@@ -29,8 +29,8 @@ use crate::num::conversion::traits::{
     RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom,
 };
 use crate::num::logic::traits::{LowMask, SignificantBits};
-use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use crate::rounding_modes::RoundingMode::*;
+use core::cmp::Ordering::*;
 
 const U8_CUBES: [u8; 7] = [0, 1, 8, 27, 64, 125, 216];
 
@@ -496,17 +496,17 @@ pub_test! {floor_root_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G
         max_pow
     };
     match pow.cmp(&x) {
-        Ordering::Equal => root,
-        Ordering::Less => loop {
+        Equal => root,
+        Less => loop {
             root += T::ONE;
             pow = root.pow(exp);
             match pow.cmp(&x) {
-                Ordering::Equal => return root,
-                Ordering::Less => {}
-                Ordering::Greater => return root - T::ONE,
+                Equal => return root,
+                Less => {}
+                Greater => return root - T::ONE,
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             root -= T::ONE;
             pow = root.pow(exp);
             if pow <= x {
@@ -1027,7 +1027,7 @@ pub_test! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1073,7 +1073,7 @@ pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.saturating_pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1118,7 +1118,7 @@ pub_test! {fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1167,7 +1167,7 @@ pub_test! {fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1216,7 +1216,7 @@ pub_test! {fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1265,7 +1265,7 @@ pub_test! {fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1315,7 +1315,7 @@ pub_test! {fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1361,7 +1361,7 @@ pub_test! {fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
-        RoundingMode::Down,
+        Down,
     ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
@@ -1395,7 +1395,7 @@ pub fn floor_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
         if bits <= exp {
             T::ONE
         } else {
-            let p = T::power_of_2(bits.div_round(exp, RoundingMode::Ceiling).0);
+            let p = T::power_of_2(bits.div_round(exp, Ceiling).0);
             floor_inverse_checked_binary(|i| i.checked_pow(exp), x, p >> 1, p)
         }
     }

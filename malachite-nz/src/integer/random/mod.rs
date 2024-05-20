@@ -86,7 +86,6 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_natural_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_natural_integers(EXAMPLE_SEED, 32, 1), 10),
@@ -144,7 +143,6 @@ pub fn random_natural_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_positive_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_positive_integers(EXAMPLE_SEED, 32, 1), 10),
@@ -202,7 +200,6 @@ pub fn random_positive_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_negative_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_negative_integers(EXAMPLE_SEED, 32, 1), 10),
@@ -261,7 +258,6 @@ pub fn random_negative_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_nonzero_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_nonzero_integers(EXAMPLE_SEED, 32, 1), 10),
@@ -320,7 +316,6 @@ pub fn random_nonzero_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_integers(EXAMPLE_SEED, 32, 1), 10),
@@ -393,10 +388,12 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_natural_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_natural_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_natural_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[18014656207519744, 2228160, 64, 17592184995840, 1179440951012584587264, \
 ///     9007749010526207, 67108864, 5, 24, 34359738879, ...]"
 /// )
@@ -451,10 +448,12 @@ pub fn striped_random_natural_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_positive_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_positive_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_positive_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[16, 4, 128, 34391195648, 75493376, 9007199120523391, 8, 8796094070783, 8, \
 ///     950737950171027935941967741439, ...]"
 /// )
@@ -510,10 +509,12 @@ pub fn striped_random_positive_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_negative_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_negative_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_negative_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[-16, -4, -128, -34391195648, -75493376, -9007199120523391, -8, -8796094070783, -8, \
 ///     -950737950171027935941967741439, ...]"
 /// )
@@ -572,10 +573,12 @@ pub fn striped_random_negative_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_nonzero_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_nonzero_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_nonzero_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[4, 268435456, 84405977732342160290572740160760316144, -133169152, -131064, \
 ///     -2251834173421823, 1577058304, -126100789566374399, -76, 270335, ...]"
 /// )
@@ -633,7 +636,6 @@ pub fn striped_random_nonzero_integers(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integers;
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(striped_random_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
@@ -1217,18 +1219,13 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_integer_range;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         striped_random_integer_range(
-///             EXAMPLE_SEED,
-///             Integer::from(-4),
-///             Integer::from(7),
-///             4,
-///             1
-///         ).map(|x| x.to_binary_string()),
+///         striped_random_integer_range(EXAMPLE_SEED, Integer::from(-4), Integer::from(7), 4, 1)
+///             .map(|x| x.to_binary_string()),
 ///         10
 ///     ),
 ///     "[-100, -100, 110, 11, -100, 0, 110, 11, 0, 110, ...]"
@@ -1279,8 +1276,8 @@ pub fn striped_random_integer_range(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_integer_inclusive_range;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1290,7 +1287,8 @@ pub fn striped_random_integer_range(
 ///             Integer::from(6),
 ///             4,
 ///             1
-///         ).map(|x| x.to_binary_string()),
+///         )
+///         .map(|x| x.to_binary_string()),
 ///         10
 ///     ),
 ///     "[-100, -100, 110, 11, -100, 0, 110, 11, 0, 110, ...]"

@@ -202,7 +202,10 @@ impl Natural {
     ///     assert!(Natural::ZERO.to_limbs_asc().is_empty());
     ///     assert_eq!(Natural::from(123u32).to_limbs_asc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from(10u32).pow(12).to_limbs_asc(), &[3567587328, 232]);
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).to_limbs_asc(),
+    ///         &[3567587328, 232]
+    ///     );
     /// }
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<Limb> {
@@ -242,7 +245,10 @@ impl Natural {
     ///     assert!(Natural::ZERO.to_limbs_desc().is_empty());
     ///     assert_eq!(Natural::from(123u32).to_limbs_desc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from(10u32).pow(12).to_limbs_desc(), &[232, 3567587328]);
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).to_limbs_desc(),
+    ///         &[232, 3567587328]
+    ///     );
     /// }
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<Limb> {
@@ -278,7 +284,10 @@ impl Natural {
     ///     assert!(Natural::ZERO.into_limbs_asc().is_empty());
     ///     assert_eq!(Natural::from(123u32).into_limbs_asc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from(10u32).pow(12).into_limbs_asc(), &[3567587328, 232]);
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).into_limbs_asc(),
+    ///         &[3567587328, 232]
+    ///     );
     /// }
     /// ```
     pub fn into_limbs_asc(self) -> Vec<Limb> {
@@ -318,7 +327,10 @@ impl Natural {
     ///     assert!(Natural::ZERO.into_limbs_desc().is_empty());
     ///     assert_eq!(Natural::from(123u32).into_limbs_desc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from(10u32).pow(12).into_limbs_desc(), &[232, 3567587328]);
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).into_limbs_desc(),
+    ///         &[232, 3567587328]
+    ///     );
     /// }
     /// ```
     pub fn into_limbs_desc(self) -> Vec<Limb> {
@@ -358,9 +370,12 @@ impl Natural {
     ///     assert!(Natural::ZERO.limbs().next().is_none());
     ///     assert_eq!(Natural::from(123u32).limbs().collect_vec(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from(10u32).pow(12).limbs().collect_vec(), &[3567587328, 232]);
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).limbs().collect_vec(),
+    ///         &[3567587328, 232]
+    ///     );
     ///
-    ///     assert!(Natural::ZERO.limbs().rev().next().is_none());
+    ///     assert!(Natural::ZERO.limbs().next_back().is_none());
     ///     assert_eq!(Natural::from(123u32).limbs().rev().collect_vec(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(

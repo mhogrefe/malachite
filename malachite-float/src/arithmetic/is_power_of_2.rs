@@ -31,8 +31,8 @@ impl IsPowerOf2 for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{NaN, One, OneHalf, Two};
     /// use malachite_base::num::arithmetic::traits::IsPowerOf2;
+    /// use malachite_base::num::basic::traits::{NaN, One, OneHalf, Two};
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::NAN.is_power_of_2(), false);

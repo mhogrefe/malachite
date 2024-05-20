@@ -8,7 +8,7 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 impl PartialOrd<Natural> for Integer {
     /// Compares an [`Integer`] to a [`Natural`].
@@ -36,7 +36,7 @@ impl PartialOrd<Natural> for Integer {
         if self.sign {
             self.abs.partial_cmp(other)
         } else {
-            Some(Ordering::Less)
+            Some(Less)
         }
     }
 }
@@ -67,7 +67,7 @@ impl PartialOrd<Integer> for Natural {
         if other.sign {
             self.partial_cmp(&other.abs)
         } else {
-            Some(Ordering::Greater)
+            Some(Greater)
         }
     }
 }

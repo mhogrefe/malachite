@@ -12,6 +12,88 @@ pub mod cmp;
 /// and [`OrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`) (traits for comparing
 /// the absolute values of numbers by order) for [`Integer`](crate::integer::Integer)s.
 pub mod cmp_abs;
+/// Equality of the absolute values of two [`Integer`](crate::integer::Integer)s.
+pub mod eq_abs;
+/// Equality of the absolute values of an [`Integer`](crate::integer::Integer) and a
+/// [`Natural`](crate::integer::Natural).
+pub mod eq_abs_natural;
+/// Equality of the absolute values of an [`Integer`](crate::integer::Integer) and a primitive
+/// float.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(Integer::from(123).eq_abs(&123.0), true);
+/// assert_eq!(Integer::from(123).eq_abs(&5.0), false);
+/// assert_eq!(Integer::from(123).eq_abs(&-123.0), true);
+/// assert_eq!(Integer::from(123).eq_abs(&-5.0), false);
+/// assert_eq!(Integer::from(-123).eq_abs(&123.0), true);
+/// assert_eq!(Integer::from(-123).eq_abs(&5.0), false);
+/// assert_eq!(Integer::from(-123).eq_abs(&-123.0), true);
+/// assert_eq!(Integer::from(-123).eq_abs(&-5.0), false);
+/// assert_eq!(Integer::ZERO.eq_abs(&0.0), true);
+/// assert_eq!(Integer::ZERO.eq_abs(&-0.0), true);
+/// assert_eq!(Integer::ZERO.eq_abs(&f64::NAN), false);
+/// assert_eq!(Integer::ZERO.eq_abs(&f64::INFINITY), false);
+/// assert_eq!(Integer::ZERO.eq_abs(&f64::NEGATIVE_INFINITY), false);
+///
+/// assert_eq!(123.0.eq_abs(&Integer::from(123)), true);
+/// assert_eq!(5.0.eq_abs(&Integer::from(123)), false);
+/// assert_eq!((-123.0).eq_abs(&Integer::from(123)), true);
+/// assert_eq!((-5.0).eq_abs(&Integer::from(123)), false);
+/// assert_eq!(123.0.eq_abs(&Integer::from(-123)), true);
+/// assert_eq!(5.0.eq_abs(&Integer::from(-123)), false);
+/// assert_eq!((-123.0).eq_abs(&Integer::from(-123)), true);
+/// assert_eq!((-5.0).eq_abs(&Integer::from(-123)), false);
+/// assert_eq!(0.0.eq_abs(&Integer::ZERO), true);
+/// assert_eq!((-0.0).eq_abs(&Integer::ZERO), true);
+/// assert_eq!(f64::NAN.eq_abs(&Integer::ZERO), false);
+/// assert_eq!(f64::INFINITY.eq_abs(&Integer::ZERO), false);
+/// assert_eq!(f64::NEGATIVE_INFINITY.eq_abs(&Integer::ZERO), false);
+/// ```
+pub mod eq_abs_primitive_float;
+/// Equality of the absolute values of an [`Integer`](crate::integer::Integer) and a primitive
+/// integer.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(Integer::from(123).eq_abs(&123u32), true);
+/// assert_eq!(Integer::from(-123).eq_abs(&123u32), true);
+/// assert_eq!(Integer::from(123).eq_abs(&5u32), false);
+/// assert_eq!(Integer::from(-123).eq_abs(&5u32), false);
+///
+/// assert_eq!(Integer::from(123).eq_abs(&123u64), true);
+/// assert_eq!(Integer::from(-123).eq_abs(&123u64), true);
+/// assert_eq!(Integer::from(123).eq_abs(&5u64), false);
+/// assert_eq!(Integer::from(-123).eq_abs(&5u64), false);
+///
+/// assert_eq!(Integer::from(123).eq_abs(&123i64), true);
+/// assert_eq!(Integer::from(-123).eq_abs(&123i64), true);
+/// assert_eq!(Integer::from(123).eq_abs(&-123i64), true);
+/// assert_eq!(Integer::from(-123).eq_abs(&-123i64), true);
+///
+/// assert_eq!(123u8.eq_abs(&Integer::from(123)), true);
+/// assert_eq!(123u8.eq_abs(&Integer::from(-123)), true);
+/// assert_eq!(5u8.eq_abs(&Integer::from(123)), false);
+/// assert_eq!(5u8.eq_abs(&Integer::from(-123)), false);
+///
+/// assert_eq!(123u64.eq_abs(&Integer::from(123)), true);
+/// assert_eq!(123u64.eq_abs(&Integer::from(-123)), true);
+/// assert_eq!(5u64.eq_abs(&Integer::from(123)), false);
+/// assert_eq!(5u64.eq_abs(&Integer::from(-123)), false);
+///
+/// assert_eq!(123i64.eq_abs(&Integer::from(123)), true);
+/// assert_eq!(123i64.eq_abs(&Integer::from(-123)), true);
+/// assert_eq!((-123i64).eq_abs(&Integer::from(123)), true);
+/// assert_eq!((-123i64).eq_abs(&Integer::from(-123)), true);
+/// ```
+pub mod eq_abs_primitive_int;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
 /// (a trait for comparing the absolute values of numbers by order) for
 /// [`Integer`](crate::integer::Integer)s and [`Natural`](crate::natural::Natural)s.
@@ -22,7 +104,6 @@ pub mod partial_cmp_abs_natural;
 ///
 /// # partial_cmp_abs
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
@@ -87,7 +168,6 @@ pub mod partial_cmp_natural;
 ///
 /// # partial_cmp
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert!(Integer::from(-123) < -122.5f32);

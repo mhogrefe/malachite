@@ -43,10 +43,8 @@ impl Rational {
     /// use malachite_q::Rational;
     ///
     /// let before_point = vec_from_str("[3]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
-    ///     Vec::new(),
-    ///     vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap(),
-    /// );
+    /// let after_point =
+    ///     RationalSequence::from_vecs(Vec::new(), vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap());
     /// assert_eq!(
     ///     Rational::from_digits(&Natural::from(10u32), before_point, after_point).to_string(),
     ///     "22/7"
@@ -115,10 +113,8 @@ impl Rational {
     /// use malachite_q::Rational;
     ///
     /// let before_point = vec_from_str("[3]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
-    ///     Vec::new(),
-    ///     vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap(),
-    /// );
+    /// let after_point =
+    ///     RationalSequence::from_vecs(Vec::new(), vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap());
     /// assert_eq!(
     ///     Rational::from_digits_ref(&Natural::from(10u32), &before_point, &after_point)
     ///         .to_string(),

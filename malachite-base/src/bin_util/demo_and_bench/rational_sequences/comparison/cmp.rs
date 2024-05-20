@@ -11,7 +11,7 @@ use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_rational_sequence_pair_gen;
 use malachite_base::test_util::runner::Runner;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_sequence_cmp);
@@ -24,9 +24,9 @@ fn demo_rational_sequence_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
         .take(limit)
     {
         match xs.cmp(&ys) {
-            Ordering::Less => println!("{xs} < {ys}"),
-            Ordering::Equal => println!("{xs} = {ys}"),
-            Ordering::Greater => println!("{xs} > {ys}"),
+            Less => println!("{xs} < {ys}"),
+            Equal => println!("{xs} = {ys}"),
+            Greater => println!("{xs} > {ys}"),
         }
     }
 }

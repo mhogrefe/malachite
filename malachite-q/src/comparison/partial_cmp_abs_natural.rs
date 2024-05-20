@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -31,15 +31,15 @@ impl PartialOrdAbs<Natural> for Rational {
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(
     ///     Rational::from_signeds(22, 7).partial_cmp_abs(&Natural::from(3u32)),
-    ///     Some(Ordering::Greater)
+    ///     Some(Greater)
     /// );
     /// assert_eq!(
     ///     Rational::from_signeds(-22, 7).partial_cmp_abs(&Natural::from(3u32)),
-    ///     Some(Ordering::Greater)
+    ///     Some(Greater)
     /// );
     /// ```
     fn partial_cmp_abs(&self, other: &Natural) -> Option<Ordering> {
@@ -47,24 +47,24 @@ impl PartialOrdAbs<Natural> for Rational {
         let self_sign = self.numerator_ref().sign();
         let other_sign = other.sign();
         let sign_cmp = self_sign.cmp(&other_sign);
-        if sign_cmp != Ordering::Equal || self_sign == Ordering::Equal {
+        if sign_cmp != Equal || self_sign == Equal {
             return Some(sign_cmp);
         }
         // Then check if one is < 1 and the other is > 1
         let self_cmp_one = self.numerator.cmp(&self.denominator);
         let other_cmp_one = other.cmp(&Natural::ONE);
         let one_cmp = self_cmp_one.cmp(&other_cmp_one);
-        if one_cmp != Ordering::Equal {
+        if one_cmp != Equal {
             return Some(one_cmp);
         }
         // Then compare numerators and denominators
         let n_cmp = self.numerator.cmp(other);
         let d_cmp = self.denominator.cmp(&Natural::ONE);
-        if n_cmp == Ordering::Equal && d_cmp == Ordering::Equal {
-            return Some(Ordering::Equal);
+        if n_cmp == Equal && d_cmp == Equal {
+            return Some(Equal);
         } else {
             let nd_cmp = n_cmp.cmp(&d_cmp);
-            if nd_cmp != Ordering::Equal {
+            if nd_cmp != Equal {
                 return Some(nd_cmp);
             }
         }
@@ -72,7 +72,7 @@ impl PartialOrdAbs<Natural> for Rational {
         let log_cmp = self
             .floor_log_base_2_abs()
             .cmp(&i64::exact_from(other.significant_bits() - 1));
-        if log_cmp != Ordering::Equal {
+        if log_cmp != Equal {
             return Some(log_cmp);
         }
         // Finally, cross-multiply.
@@ -96,15 +96,15 @@ impl PartialOrdAbs<Rational> for Natural {
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(
     ///     Natural::from(3u32).partial_cmp_abs(&Rational::from_signeds(22, 7)),
-    ///     Some(Ordering::Less)
+    ///     Some(Less)
     /// );
     /// assert_eq!(
     ///     Natural::from(3u32).partial_cmp_abs(&Rational::from_signeds(-22, 7)),
-    ///     Some(Ordering::Less)
+    ///     Some(Less)
     /// );
     /// ```
     #[inline]

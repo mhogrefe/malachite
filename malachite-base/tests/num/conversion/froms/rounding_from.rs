@@ -14,7 +14,7 @@ use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_13, primitive_float_gen_var_14, primitive_float_gen_var_15,
     primitive_float_gen_var_16, primitive_float_gen_var_17,
@@ -22,7 +22,7 @@ use malachite_base::test_util::generators::{
     signed_gen_var_9, signed_rounding_mode_pair_gen_var_4, unsigned_gen_var_18,
     unsigned_gen_var_19, unsigned_gen_var_20, unsigned_rounding_mode_pair_gen_var_2,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
 #[test]
@@ -35,110 +35,80 @@ pub fn test_rounding_from() {
     ) {
         assert_eq!(U::rounding_from(n_in, rm), (n_out, o));
     }
-    test_from_floating_point::<f32, u8>(0.0, RoundingMode::Down, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(0.0, RoundingMode::Floor, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(0.0, RoundingMode::Up, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(0.0, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(0.0, RoundingMode::Nearest, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(0.0, RoundingMode::Exact, 0, Ordering::Equal);
+    test_from_floating_point::<f32, u8>(0.0, Down, 0, Equal);
+    test_from_floating_point::<f32, u8>(0.0, Floor, 0, Equal);
+    test_from_floating_point::<f32, u8>(0.0, Up, 0, Equal);
+    test_from_floating_point::<f32, u8>(0.0, Ceiling, 0, Equal);
+    test_from_floating_point::<f32, u8>(0.0, Nearest, 0, Equal);
+    test_from_floating_point::<f32, u8>(0.0, Exact, 0, Equal);
 
-    test_from_floating_point::<f32, u8>(-0.0, RoundingMode::Down, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(-0.0, RoundingMode::Floor, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(-0.0, RoundingMode::Up, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(-0.0, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(-0.0, RoundingMode::Nearest, 0, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(-0.0, RoundingMode::Exact, 0, Ordering::Equal);
+    test_from_floating_point::<f32, u8>(-0.0, Down, 0, Equal);
+    test_from_floating_point::<f32, u8>(-0.0, Floor, 0, Equal);
+    test_from_floating_point::<f32, u8>(-0.0, Up, 0, Equal);
+    test_from_floating_point::<f32, u8>(-0.0, Ceiling, 0, Equal);
+    test_from_floating_point::<f32, u8>(-0.0, Nearest, 0, Equal);
+    test_from_floating_point::<f32, u8>(-0.0, Exact, 0, Equal);
 
-    test_from_floating_point::<f32, u8>(100.0, RoundingMode::Down, 100, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(100.0, RoundingMode::Floor, 100, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(100.0, RoundingMode::Up, 100, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(100.0, RoundingMode::Ceiling, 100, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(100.0, RoundingMode::Nearest, 100, Ordering::Equal);
-    test_from_floating_point::<f32, u8>(100.0, RoundingMode::Exact, 100, Ordering::Equal);
+    test_from_floating_point::<f32, u8>(100.0, Down, 100, Equal);
+    test_from_floating_point::<f32, u8>(100.0, Floor, 100, Equal);
+    test_from_floating_point::<f32, u8>(100.0, Up, 100, Equal);
+    test_from_floating_point::<f32, u8>(100.0, Ceiling, 100, Equal);
+    test_from_floating_point::<f32, u8>(100.0, Nearest, 100, Equal);
+    test_from_floating_point::<f32, u8>(100.0, Exact, 100, Equal);
 
-    test_from_floating_point::<f32, u8>(100.1, RoundingMode::Down, 100, Ordering::Less);
-    test_from_floating_point::<f32, u8>(100.1, RoundingMode::Floor, 100, Ordering::Less);
-    test_from_floating_point::<f32, u8>(100.1, RoundingMode::Up, 101, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(100.1, RoundingMode::Ceiling, 101, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(100.1, RoundingMode::Nearest, 100, Ordering::Less);
+    test_from_floating_point::<f32, u8>(100.1, Down, 100, Less);
+    test_from_floating_point::<f32, u8>(100.1, Floor, 100, Less);
+    test_from_floating_point::<f32, u8>(100.1, Up, 101, Greater);
+    test_from_floating_point::<f32, u8>(100.1, Ceiling, 101, Greater);
+    test_from_floating_point::<f32, u8>(100.1, Nearest, 100, Less);
 
-    test_from_floating_point::<f32, u8>(100.9, RoundingMode::Down, 100, Ordering::Less);
-    test_from_floating_point::<f32, u8>(100.9, RoundingMode::Floor, 100, Ordering::Less);
-    test_from_floating_point::<f32, u8>(100.9, RoundingMode::Up, 101, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(100.9, RoundingMode::Ceiling, 101, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(100.9, RoundingMode::Nearest, 101, Ordering::Greater);
+    test_from_floating_point::<f32, u8>(100.9, Down, 100, Less);
+    test_from_floating_point::<f32, u8>(100.9, Floor, 100, Less);
+    test_from_floating_point::<f32, u8>(100.9, Up, 101, Greater);
+    test_from_floating_point::<f32, u8>(100.9, Ceiling, 101, Greater);
+    test_from_floating_point::<f32, u8>(100.9, Nearest, 101, Greater);
 
-    test_from_floating_point::<f32, u8>(100.5, RoundingMode::Down, 100, Ordering::Less);
-    test_from_floating_point::<f32, u8>(100.5, RoundingMode::Floor, 100, Ordering::Less);
-    test_from_floating_point::<f32, u8>(100.5, RoundingMode::Up, 101, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(100.5, RoundingMode::Ceiling, 101, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(100.5, RoundingMode::Nearest, 100, Ordering::Less);
+    test_from_floating_point::<f32, u8>(100.5, Down, 100, Less);
+    test_from_floating_point::<f32, u8>(100.5, Floor, 100, Less);
+    test_from_floating_point::<f32, u8>(100.5, Up, 101, Greater);
+    test_from_floating_point::<f32, u8>(100.5, Ceiling, 101, Greater);
+    test_from_floating_point::<f32, u8>(100.5, Nearest, 100, Less);
 
-    test_from_floating_point::<f32, u8>(101.5, RoundingMode::Down, 101, Ordering::Less);
-    test_from_floating_point::<f32, u8>(101.5, RoundingMode::Floor, 101, Ordering::Less);
-    test_from_floating_point::<f32, u8>(101.5, RoundingMode::Up, 102, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(101.5, RoundingMode::Ceiling, 102, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(101.5, RoundingMode::Nearest, 102, Ordering::Greater);
+    test_from_floating_point::<f32, u8>(101.5, Down, 101, Less);
+    test_from_floating_point::<f32, u8>(101.5, Floor, 101, Less);
+    test_from_floating_point::<f32, u8>(101.5, Up, 102, Greater);
+    test_from_floating_point::<f32, u8>(101.5, Ceiling, 102, Greater);
+    test_from_floating_point::<f32, u8>(101.5, Nearest, 102, Greater);
 
-    test_from_floating_point::<f32, u8>(256.0, RoundingMode::Down, 255, Ordering::Less);
-    test_from_floating_point::<f32, u8>(256.0, RoundingMode::Floor, 255, Ordering::Less);
-    test_from_floating_point::<f32, u8>(256.0, RoundingMode::Nearest, 255, Ordering::Less);
+    test_from_floating_point::<f32, u8>(256.0, Down, 255, Less);
+    test_from_floating_point::<f32, u8>(256.0, Floor, 255, Less);
+    test_from_floating_point::<f32, u8>(256.0, Nearest, 255, Less);
 
-    test_from_floating_point::<f32, u8>(-100.0, RoundingMode::Down, 0, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(-100.0, RoundingMode::Ceiling, 0, Ordering::Greater);
-    test_from_floating_point::<f32, u8>(-100.0, RoundingMode::Nearest, 0, Ordering::Greater);
+    test_from_floating_point::<f32, u8>(-100.0, Down, 0, Greater);
+    test_from_floating_point::<f32, u8>(-100.0, Ceiling, 0, Greater);
+    test_from_floating_point::<f32, u8>(-100.0, Nearest, 0, Greater);
 
-    test_from_floating_point::<f32, i8>(128.0, RoundingMode::Down, 127, Ordering::Less);
-    test_from_floating_point::<f32, i8>(128.0, RoundingMode::Floor, 127, Ordering::Less);
-    test_from_floating_point::<f32, i8>(128.0, RoundingMode::Nearest, 127, Ordering::Less);
+    test_from_floating_point::<f32, i8>(128.0, Down, 127, Less);
+    test_from_floating_point::<f32, i8>(128.0, Floor, 127, Less);
+    test_from_floating_point::<f32, i8>(128.0, Nearest, 127, Less);
 
-    test_from_floating_point::<f32, i8>(-129.0, RoundingMode::Down, -128, Ordering::Greater);
-    test_from_floating_point::<f32, i8>(-129.0, RoundingMode::Ceiling, -128, Ordering::Greater);
-    test_from_floating_point::<f32, i8>(-129.0, RoundingMode::Nearest, -128, Ordering::Greater);
+    test_from_floating_point::<f32, i8>(-129.0, Down, -128, Greater);
+    test_from_floating_point::<f32, i8>(-129.0, Ceiling, -128, Greater);
+    test_from_floating_point::<f32, i8>(-129.0, Nearest, -128, Greater);
 
-    test_from_floating_point::<f32, u8>(f32::INFINITY, RoundingMode::Down, 255, Ordering::Less);
-    test_from_floating_point::<f32, u8>(f32::INFINITY, RoundingMode::Floor, 255, Ordering::Less);
-    test_from_floating_point::<f32, u8>(f32::INFINITY, RoundingMode::Nearest, 255, Ordering::Less);
-    test_from_floating_point::<f32, u8>(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Down,
-        0,
-        Ordering::Greater,
-    );
-    test_from_floating_point::<f32, u8>(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Ceiling,
-        0,
-        Ordering::Greater,
-    );
-    test_from_floating_point::<f32, u8>(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Nearest,
-        0,
-        Ordering::Greater,
-    );
+    test_from_floating_point::<f32, u8>(f32::INFINITY, Down, 255, Less);
+    test_from_floating_point::<f32, u8>(f32::INFINITY, Floor, 255, Less);
+    test_from_floating_point::<f32, u8>(f32::INFINITY, Nearest, 255, Less);
+    test_from_floating_point::<f32, u8>(f32::NEGATIVE_INFINITY, Down, 0, Greater);
+    test_from_floating_point::<f32, u8>(f32::NEGATIVE_INFINITY, Ceiling, 0, Greater);
+    test_from_floating_point::<f32, u8>(f32::NEGATIVE_INFINITY, Nearest, 0, Greater);
 
-    test_from_floating_point::<f32, i8>(f32::INFINITY, RoundingMode::Down, 127, Ordering::Less);
-    test_from_floating_point::<f32, i8>(f32::INFINITY, RoundingMode::Floor, 127, Ordering::Less);
-    test_from_floating_point::<f32, i8>(f32::INFINITY, RoundingMode::Nearest, 127, Ordering::Less);
-    test_from_floating_point::<f32, i8>(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Down,
-        -128,
-        Ordering::Greater,
-    );
-    test_from_floating_point::<f32, i8>(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Ceiling,
-        -128,
-        Ordering::Greater,
-    );
-    test_from_floating_point::<f32, i8>(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Nearest,
-        -128,
-        Ordering::Greater,
-    );
+    test_from_floating_point::<f32, i8>(f32::INFINITY, Down, 127, Less);
+    test_from_floating_point::<f32, i8>(f32::INFINITY, Floor, 127, Less);
+    test_from_floating_point::<f32, i8>(f32::INFINITY, Nearest, 127, Less);
+    test_from_floating_point::<f32, i8>(f32::NEGATIVE_INFINITY, Down, -128, Greater);
+    test_from_floating_point::<f32, i8>(f32::NEGATIVE_INFINITY, Ceiling, -128, Greater);
+    test_from_floating_point::<f32, i8>(f32::NEGATIVE_INFINITY, Nearest, -128, Greater);
 
     fn test_from_primitive_int<T: PrimitiveInt, U: PrimitiveFloat + RoundingFrom<T>>(
         n_in: T,
@@ -149,172 +119,90 @@ pub fn test_rounding_from() {
         let (x, actual_o) = U::rounding_from(n_in, rm);
         assert_eq!((NiceFloat(x), actual_o), (NiceFloat(n_out), o));
     }
-    test_from_primitive_int::<u8, f32>(0, RoundingMode::Down, 0.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(0, RoundingMode::Floor, 0.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(0, RoundingMode::Up, 0.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(0, RoundingMode::Ceiling, 0.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(0, RoundingMode::Nearest, 0.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(0, RoundingMode::Exact, 0.0, Ordering::Equal);
+    test_from_primitive_int::<u8, f32>(0, Down, 0.0, Equal);
+    test_from_primitive_int::<u8, f32>(0, Floor, 0.0, Equal);
+    test_from_primitive_int::<u8, f32>(0, Up, 0.0, Equal);
+    test_from_primitive_int::<u8, f32>(0, Ceiling, 0.0, Equal);
+    test_from_primitive_int::<u8, f32>(0, Nearest, 0.0, Equal);
+    test_from_primitive_int::<u8, f32>(0, Exact, 0.0, Equal);
 
-    test_from_primitive_int::<u8, f32>(100, RoundingMode::Down, 100.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(100, RoundingMode::Floor, 100.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(100, RoundingMode::Up, 100.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(100, RoundingMode::Ceiling, 100.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(100, RoundingMode::Nearest, 100.0, Ordering::Equal);
-    test_from_primitive_int::<u8, f32>(100, RoundingMode::Exact, 100.0, Ordering::Equal);
+    test_from_primitive_int::<u8, f32>(100, Down, 100.0, Equal);
+    test_from_primitive_int::<u8, f32>(100, Floor, 100.0, Equal);
+    test_from_primitive_int::<u8, f32>(100, Up, 100.0, Equal);
+    test_from_primitive_int::<u8, f32>(100, Ceiling, 100.0, Equal);
+    test_from_primitive_int::<u8, f32>(100, Nearest, 100.0, Equal);
+    test_from_primitive_int::<u8, f32>(100, Exact, 100.0, Equal);
 
-    test_from_primitive_int::<i8, f32>(-100, RoundingMode::Down, -100.0, Ordering::Equal);
-    test_from_primitive_int::<i8, f32>(-100, RoundingMode::Floor, -100.0, Ordering::Equal);
-    test_from_primitive_int::<i8, f32>(-100, RoundingMode::Up, -100.0, Ordering::Equal);
-    test_from_primitive_int::<i8, f32>(-100, RoundingMode::Ceiling, -100.0, Ordering::Equal);
-    test_from_primitive_int::<i8, f32>(-100, RoundingMode::Nearest, -100.0, Ordering::Equal);
-    test_from_primitive_int::<i8, f32>(-100, RoundingMode::Exact, -100.0, Ordering::Equal);
+    test_from_primitive_int::<i8, f32>(-100, Down, -100.0, Equal);
+    test_from_primitive_int::<i8, f32>(-100, Floor, -100.0, Equal);
+    test_from_primitive_int::<i8, f32>(-100, Up, -100.0, Equal);
+    test_from_primitive_int::<i8, f32>(-100, Ceiling, -100.0, Equal);
+    test_from_primitive_int::<i8, f32>(-100, Nearest, -100.0, Equal);
+    test_from_primitive_int::<i8, f32>(-100, Exact, -100.0, Equal);
 
-    test_from_primitive_int::<i32, f32>(
-        i32::MIN,
-        RoundingMode::Down,
-        -2147483600.0,
-        Ordering::Equal,
-    );
-    test_from_primitive_int::<i32, f32>(
-        i32::MIN,
-        RoundingMode::Floor,
-        -2147483600.0,
-        Ordering::Equal,
-    );
-    test_from_primitive_int::<i32, f32>(i32::MIN, RoundingMode::Up, -2147483600.0, Ordering::Equal);
-    test_from_primitive_int::<i32, f32>(
-        i32::MIN,
-        RoundingMode::Ceiling,
-        -2147483600.0,
-        Ordering::Equal,
-    );
-    test_from_primitive_int::<i32, f32>(
-        i32::MIN,
-        RoundingMode::Nearest,
-        -2147483600.0,
-        Ordering::Equal,
-    );
-    test_from_primitive_int::<i32, f32>(
-        i32::MIN,
-        RoundingMode::Exact,
-        -2147483600.0,
-        Ordering::Equal,
-    );
+    test_from_primitive_int::<i32, f32>(i32::MIN, Down, -2147483600.0, Equal);
+    test_from_primitive_int::<i32, f32>(i32::MIN, Floor, -2147483600.0, Equal);
+    test_from_primitive_int::<i32, f32>(i32::MIN, Up, -2147483600.0, Equal);
+    test_from_primitive_int::<i32, f32>(i32::MIN, Ceiling, -2147483600.0, Equal);
+    test_from_primitive_int::<i32, f32>(i32::MIN, Nearest, -2147483600.0, Equal);
+    test_from_primitive_int::<i32, f32>(i32::MIN, Exact, -2147483600.0, Equal);
 
-    test_from_primitive_int::<i32, f32>(i32::MAX, RoundingMode::Down, 2147483500.0, Ordering::Less);
-    test_from_primitive_int::<i32, f32>(
-        i32::MAX,
-        RoundingMode::Floor,
-        2147483500.0,
-        Ordering::Less,
-    );
-    test_from_primitive_int::<i32, f32>(
-        i32::MAX,
-        RoundingMode::Up,
-        2147483600.0,
-        Ordering::Greater,
-    );
-    test_from_primitive_int::<i32, f32>(
-        i32::MAX,
-        RoundingMode::Ceiling,
-        2147483600.0,
-        Ordering::Greater,
-    );
-    test_from_primitive_int::<i32, f32>(
-        i32::MAX,
-        RoundingMode::Nearest,
-        2147483600.0,
-        Ordering::Greater,
-    );
+    test_from_primitive_int::<i32, f32>(i32::MAX, Down, 2147483500.0, Less);
+    test_from_primitive_int::<i32, f32>(i32::MAX, Floor, 2147483500.0, Less);
+    test_from_primitive_int::<i32, f32>(i32::MAX, Up, 2147483600.0, Greater);
+    test_from_primitive_int::<i32, f32>(i32::MAX, Ceiling, 2147483600.0, Greater);
+    test_from_primitive_int::<i32, f32>(i32::MAX, Nearest, 2147483600.0, Greater);
 
-    test_from_primitive_int::<u128, f32>(
-        u128::MAX,
-        RoundingMode::Down,
-        3.4028235e38,
-        Ordering::Less,
-    );
-    test_from_primitive_int::<u128, f32>(
-        u128::MAX,
-        RoundingMode::Floor,
-        3.4028235e38,
-        Ordering::Less,
-    );
-    test_from_primitive_int::<u128, f32>(
-        u128::MAX,
-        RoundingMode::Up,
-        f32::INFINITY,
-        Ordering::Greater,
-    );
-    test_from_primitive_int::<u128, f32>(
-        u128::MAX,
-        RoundingMode::Ceiling,
-        f32::INFINITY,
-        Ordering::Greater,
-    );
-    test_from_primitive_int::<u128, f32>(
-        u128::MAX,
-        RoundingMode::Nearest,
-        3.4028235e38,
-        Ordering::Less,
-    );
+    test_from_primitive_int::<u128, f32>(u128::MAX, Down, 3.4028235e38, Less);
+    test_from_primitive_int::<u128, f32>(u128::MAX, Floor, 3.4028235e38, Less);
+    test_from_primitive_int::<u128, f32>(u128::MAX, Up, f32::INFINITY, Greater);
+    test_from_primitive_int::<u128, f32>(u128::MAX, Ceiling, f32::INFINITY, Greater);
+    test_from_primitive_int::<u128, f32>(u128::MAX, Nearest, 3.4028235e38, Less);
 }
 
 #[test]
 fn exact_from_fail() {
-    assert_panic!(u8::rounding_from(100.1f32, RoundingMode::Exact));
+    assert_panic!(u8::rounding_from(100.1f32, Exact));
 
-    assert_panic!(u8::rounding_from(256.0f32, RoundingMode::Exact));
-    assert_panic!(u8::rounding_from(256.0f32, RoundingMode::Up));
-    assert_panic!(u8::rounding_from(256.0f32, RoundingMode::Ceiling));
-    assert_panic!(u8::rounding_from(-100.0f32, RoundingMode::Exact));
-    assert_panic!(u8::rounding_from(-100.0f32, RoundingMode::Up));
-    assert_panic!(u8::rounding_from(-100.0f32, RoundingMode::Floor));
+    assert_panic!(u8::rounding_from(256.0f32, Exact));
+    assert_panic!(u8::rounding_from(256.0f32, Up));
+    assert_panic!(u8::rounding_from(256.0f32, Ceiling));
+    assert_panic!(u8::rounding_from(-100.0f32, Exact));
+    assert_panic!(u8::rounding_from(-100.0f32, Up));
+    assert_panic!(u8::rounding_from(-100.0f32, Floor));
 
-    assert_panic!(i8::rounding_from(128.0f32, RoundingMode::Exact));
-    assert_panic!(i8::rounding_from(128.0f32, RoundingMode::Up));
-    assert_panic!(i8::rounding_from(128.0f32, RoundingMode::Ceiling));
-    assert_panic!(i8::rounding_from(-129.0f32, RoundingMode::Exact));
-    assert_panic!(i8::rounding_from(-129.0f32, RoundingMode::Up));
-    assert_panic!(i8::rounding_from(-129.0f32, RoundingMode::Floor));
+    assert_panic!(i8::rounding_from(128.0f32, Exact));
+    assert_panic!(i8::rounding_from(128.0f32, Up));
+    assert_panic!(i8::rounding_from(128.0f32, Ceiling));
+    assert_panic!(i8::rounding_from(-129.0f32, Exact));
+    assert_panic!(i8::rounding_from(-129.0f32, Up));
+    assert_panic!(i8::rounding_from(-129.0f32, Floor));
 
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Down));
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Floor));
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Up));
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Ceiling));
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Nearest));
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Exact));
+    assert_panic!(u8::rounding_from(f32::NAN, Down));
+    assert_panic!(u8::rounding_from(f32::NAN, Floor));
+    assert_panic!(u8::rounding_from(f32::NAN, Up));
+    assert_panic!(u8::rounding_from(f32::NAN, Ceiling));
+    assert_panic!(u8::rounding_from(f32::NAN, Nearest));
+    assert_panic!(u8::rounding_from(f32::NAN, Exact));
 
-    assert_panic!(u8::rounding_from(f32::INFINITY, RoundingMode::Up));
-    assert_panic!(u8::rounding_from(f32::INFINITY, RoundingMode::Ceiling));
-    assert_panic!(u8::rounding_from(f32::INFINITY, RoundingMode::Exact));
-    assert_panic!(u8::rounding_from(f32::NEGATIVE_INFINITY, RoundingMode::Up));
-    assert_panic!(u8::rounding_from(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Floor
-    ));
-    assert_panic!(u8::rounding_from(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Exact
-    ));
+    assert_panic!(u8::rounding_from(f32::INFINITY, Up));
+    assert_panic!(u8::rounding_from(f32::INFINITY, Ceiling));
+    assert_panic!(u8::rounding_from(f32::INFINITY, Exact));
+    assert_panic!(u8::rounding_from(f32::NEGATIVE_INFINITY, Up));
+    assert_panic!(u8::rounding_from(f32::NEGATIVE_INFINITY, Floor));
+    assert_panic!(u8::rounding_from(f32::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(i8::rounding_from(f32::INFINITY, RoundingMode::Up));
-    assert_panic!(i8::rounding_from(f32::INFINITY, RoundingMode::Ceiling));
-    assert_panic!(i8::rounding_from(f32::INFINITY, RoundingMode::Exact));
-    assert_panic!(i8::rounding_from(f32::NEGATIVE_INFINITY, RoundingMode::Up));
-    assert_panic!(i8::rounding_from(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Floor
-    ));
-    assert_panic!(i8::rounding_from(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Exact
-    ));
+    assert_panic!(i8::rounding_from(f32::INFINITY, Up));
+    assert_panic!(i8::rounding_from(f32::INFINITY, Ceiling));
+    assert_panic!(i8::rounding_from(f32::INFINITY, Exact));
+    assert_panic!(i8::rounding_from(f32::NEGATIVE_INFINITY, Up));
+    assert_panic!(i8::rounding_from(f32::NEGATIVE_INFINITY, Floor));
+    assert_panic!(i8::rounding_from(f32::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(u8::rounding_from(f32::NAN, RoundingMode::Down));
+    assert_panic!(u8::rounding_from(f32::NAN, Down));
 
-    assert_panic!(f32::rounding_from(u32::MAX, RoundingMode::Exact));
-    assert_panic!(f32::rounding_from(u128::MAX, RoundingMode::Exact));
+    assert_panic!(f32::rounding_from(u32::MAX, Exact));
+    assert_panic!(f32::rounding_from(u128::MAX, Exact));
 }
 
 fn rounding_from_helper_unsigned_primitive_float<
@@ -327,46 +215,46 @@ where
     primitive_float_rounding_mode_pair_gen_var_3::<U, T>().test_properties(|(f, rm)| {
         let o = T::rounding_from(f, rm).1;
         match (f >= U::ZERO, rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     primitive_float_gen_var_13::<U, T>().test_properties(|f| {
-        let no = T::rounding_from(f, RoundingMode::Exact);
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Floor));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Ceiling));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Down));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Up));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Nearest));
+        let no = T::rounding_from(f, Exact);
+        assert_eq!(no, T::rounding_from(f, Floor));
+        assert_eq!(no, T::rounding_from(f, Ceiling));
+        assert_eq!(no, T::rounding_from(f, Down));
+        assert_eq!(no, T::rounding_from(f, Up));
+        assert_eq!(no, T::rounding_from(f, Nearest));
     });
 
-    let f_max = U::rounding_from(T::MAX, RoundingMode::Down).0;
+    let f_max = U::rounding_from(T::MAX, Down).0;
     primitive_float_gen_var_15::<U, T>().test_properties(|f| {
         if f >= U::ZERO && f <= f_max {
-            let n_floor = T::rounding_from(f, RoundingMode::Floor);
-            assert_eq!(n_floor.1, Ordering::Less);
+            let n_floor = T::rounding_from(f, Floor);
+            assert_eq!(n_floor.1, Less);
             if let Some(n_ceiling) = n_floor.0.checked_add(T::ONE) {
-                let n_ceiling = (n_ceiling, Ordering::Greater);
-                assert_eq!(n_ceiling, T::rounding_from(f, RoundingMode::Ceiling));
-                assert_eq!(n_floor, T::rounding_from(f, RoundingMode::Down));
-                assert_eq!(n_ceiling, T::rounding_from(f, RoundingMode::Up));
-                let n_nearest = T::rounding_from(f, RoundingMode::Nearest);
+                let n_ceiling = (n_ceiling, Greater);
+                assert_eq!(n_ceiling, T::rounding_from(f, Ceiling));
+                assert_eq!(n_floor, T::rounding_from(f, Down));
+                assert_eq!(n_ceiling, T::rounding_from(f, Up));
+                let n_nearest = T::rounding_from(f, Nearest);
                 assert!(n_nearest == n_floor || n_nearest == n_ceiling);
             }
         }
     });
 
     primitive_float_gen_var_16::<U, T>().test_properties(|f| {
-        let floor = T::rounding_from(f, RoundingMode::Floor);
-        let ceiling = (floor.0 + T::ONE, Ordering::Greater);
-        let nearest = T::rounding_from(f, RoundingMode::Nearest);
+        let floor = T::rounding_from(f, Floor);
+        let ceiling = (floor.0 + T::ONE, Greater);
+        let nearest = T::rounding_from(f, Nearest);
         assert_eq!(nearest, if floor.0.even() { floor } else { ceiling });
     });
 }
@@ -381,51 +269,51 @@ where
     primitive_float_rounding_mode_pair_gen_var_3::<U, T>().test_properties(|(f, rm)| {
         let o = T::rounding_from(f, rm).1;
         match (f >= U::ZERO, rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     primitive_float_gen_var_14::<U, T>().test_properties(|f| {
-        let no = T::rounding_from(f, RoundingMode::Exact);
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Floor));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Ceiling));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Down));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Up));
-        assert_eq!(no, T::rounding_from(f, RoundingMode::Nearest));
+        let no = T::rounding_from(f, Exact);
+        assert_eq!(no, T::rounding_from(f, Floor));
+        assert_eq!(no, T::rounding_from(f, Ceiling));
+        assert_eq!(no, T::rounding_from(f, Down));
+        assert_eq!(no, T::rounding_from(f, Up));
+        assert_eq!(no, T::rounding_from(f, Nearest));
     });
 
-    let f_min = U::rounding_from(T::MIN, RoundingMode::Down).0;
-    let f_max = U::rounding_from(T::MAX, RoundingMode::Down).0;
+    let f_min = U::rounding_from(T::MIN, Down).0;
+    let f_max = U::rounding_from(T::MAX, Down).0;
     primitive_float_gen_var_15::<U, T>().test_properties(|f| {
         if f >= f_min && f <= f_max {
-            let n_floor = T::rounding_from(f, RoundingMode::Floor);
+            let n_floor = T::rounding_from(f, Floor);
             if let Some(n_ceiling) = n_floor.0.checked_add(T::ONE) {
-                let n_ceiling = (n_ceiling, Ordering::Greater);
-                assert_eq!(n_ceiling, T::rounding_from(f, RoundingMode::Ceiling));
+                let n_ceiling = (n_ceiling, Greater);
+                assert_eq!(n_ceiling, T::rounding_from(f, Ceiling));
                 if f >= U::ZERO {
-                    assert_eq!(n_floor, T::rounding_from(f, RoundingMode::Down));
-                    assert_eq!(n_ceiling, T::rounding_from(f, RoundingMode::Up));
+                    assert_eq!(n_floor, T::rounding_from(f, Down));
+                    assert_eq!(n_ceiling, T::rounding_from(f, Up));
                 } else {
-                    assert_eq!(n_ceiling, T::rounding_from(f, RoundingMode::Down));
-                    assert_eq!(n_floor, T::rounding_from(f, RoundingMode::Up));
+                    assert_eq!(n_ceiling, T::rounding_from(f, Down));
+                    assert_eq!(n_floor, T::rounding_from(f, Up));
                 }
-                let n_nearest = T::rounding_from(f, RoundingMode::Nearest);
+                let n_nearest = T::rounding_from(f, Nearest);
                 assert!(n_nearest == n_floor || n_nearest == n_ceiling);
             }
         }
     });
 
     primitive_float_gen_var_17::<U, T>().test_properties(|f| {
-        let floor = T::rounding_from(f, RoundingMode::Floor);
-        let ceiling = (floor.0 + T::ONE, Ordering::Greater);
-        let nearest = T::rounding_from(f, RoundingMode::Nearest);
+        let floor = T::rounding_from(f, Floor);
+        let ceiling = (floor.0 + T::ONE, Greater);
+        let nearest = T::rounding_from(f, Nearest);
         assert_eq!(nearest, if floor.0.even() { floor } else { ceiling });
     });
 }
@@ -437,68 +325,65 @@ fn rounding_from_helper_primitive_float_unsigned<
     unsigned_rounding_mode_pair_gen_var_2::<U, T>().test_properties(|(u, rm)| {
         let o = T::rounding_from(u, rm).1;
         match rm {
-            RoundingMode::Floor | RoundingMode::Down => assert_ne!(o, Ordering::Greater),
-            RoundingMode::Ceiling | RoundingMode::Up => assert_ne!(o, Ordering::Less),
-            RoundingMode::Exact => assert_eq!(o, Ordering::Equal),
+            Floor | Down => assert_ne!(o, Greater),
+            Ceiling | Up => assert_ne!(o, Less),
+            Exact => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     unsigned_gen_var_18::<U, T>().test_properties(|u| {
-        let (f, o) = T::rounding_from(u, RoundingMode::Exact);
-        let (f_alt, o_alt) = T::rounding_from(u, RoundingMode::Floor);
+        let (f, o) = T::rounding_from(u, Exact);
+        let (f_alt, o_alt) = T::rounding_from(u, Floor);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(u, RoundingMode::Ceiling);
+        let (f_alt, o_alt) = T::rounding_from(u, Ceiling);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(u, RoundingMode::Down);
+        let (f_alt, o_alt) = T::rounding_from(u, Down);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(u, RoundingMode::Up);
+        let (f_alt, o_alt) = T::rounding_from(u, Up);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(u, RoundingMode::Nearest);
+        let (f_alt, o_alt) = T::rounding_from(u, Nearest);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        assert_eq!(
-            U::rounding_from(f, RoundingMode::Exact),
-            (u, Ordering::Equal)
-        );
+        assert_eq!(U::rounding_from(f, Exact), (u, Equal));
     });
 
     if U::WIDTH > T::MANTISSA_WIDTH {
         unsigned_gen_var_19::<U, T>().test_properties(|u| {
-            let (f_below, o) = T::rounding_from(u, RoundingMode::Floor);
-            assert_eq!(o, Ordering::Less);
+            let (f_below, o) = T::rounding_from(u, Floor);
+            assert_eq!(o, Less);
             let f_above = f_below.next_higher();
-            let (f_alt, o) = T::rounding_from(u, RoundingMode::Ceiling);
+            let (f_alt, o) = T::rounding_from(u, Ceiling);
             assert_eq!(NiceFloat(f_alt), NiceFloat(f_above));
-            assert_eq!(o, Ordering::Greater);
-            let (f_alt, o) = T::rounding_from(u, RoundingMode::Down);
+            assert_eq!(o, Greater);
+            let (f_alt, o) = T::rounding_from(u, Down);
             assert_eq!(NiceFloat(f_alt), NiceFloat(f_below));
-            assert_eq!(o, Ordering::Less);
-            let (f_alt, o) = T::rounding_from(u, RoundingMode::Up);
+            assert_eq!(o, Less);
+            let (f_alt, o) = T::rounding_from(u, Up);
             assert_eq!(NiceFloat(f_alt), NiceFloat(f_above));
-            assert_eq!(o, Ordering::Greater);
-            let (f_nearest, o) = T::rounding_from(u, RoundingMode::Nearest);
+            assert_eq!(o, Greater);
+            let (f_nearest, o) = T::rounding_from(u, Nearest);
             assert!(
-                (NiceFloat(f_nearest), o) == (NiceFloat(f_below), Ordering::Less)
-                    || (NiceFloat(f_nearest), o) == (NiceFloat(f_above), Ordering::Greater)
+                (NiceFloat(f_nearest), o) == (NiceFloat(f_below), Less)
+                    || (NiceFloat(f_nearest), o) == (NiceFloat(f_above), Greater)
             );
         });
 
         unsigned_gen_var_20::<U, T>().test_properties(|u| {
-            let (floor, o) = T::rounding_from(u, RoundingMode::Floor);
-            assert_eq!(o, Ordering::Less);
+            let (floor, o) = T::rounding_from(u, Floor);
+            assert_eq!(o, Less);
             let ceiling = floor.next_higher();
-            let (nearest, o) = T::rounding_from(u, RoundingMode::Nearest);
+            let (nearest, o) = T::rounding_from(u, Nearest);
             assert_eq!(
                 (NiceFloat(nearest), o),
                 if floor.to_bits().even() {
-                    (NiceFloat(floor), Ordering::Less)
+                    (NiceFloat(floor), Less)
                 } else {
-                    (NiceFloat(ceiling), Ordering::Greater)
+                    (NiceFloat(ceiling), Greater)
                 }
             );
         });
@@ -513,81 +398,78 @@ fn rounding_from_helper_primitive_float_signed<
     signed_rounding_mode_pair_gen_var_4::<S, T>().test_properties(|(i, rm)| {
         let o = T::rounding_from(i, rm).1;
         match (i >= S::ZERO, rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     signed_gen_var_7::<S, T>().test_properties(|i| {
-        let (f, o) = T::rounding_from(i, RoundingMode::Exact);
-        let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Floor);
+        let (f, o) = T::rounding_from(i, Exact);
+        let (f_alt, o_alt) = T::rounding_from(i, Floor);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Ceiling);
+        let (f_alt, o_alt) = T::rounding_from(i, Ceiling);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Down);
+        let (f_alt, o_alt) = T::rounding_from(i, Down);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Up);
+        let (f_alt, o_alt) = T::rounding_from(i, Up);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Nearest);
+        let (f_alt, o_alt) = T::rounding_from(i, Nearest);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
         assert_eq!(o_alt, o);
-        assert_eq!(
-            S::rounding_from(f, RoundingMode::Exact),
-            (i, Ordering::Equal)
-        );
+        assert_eq!(S::rounding_from(f, Exact), (i, Equal));
     });
 
     if S::WIDTH > T::MANTISSA_WIDTH {
         signed_gen_var_8::<U, S, T>().test_properties(|i| {
-            let (f_below, o) = T::rounding_from(i, RoundingMode::Floor);
-            assert_eq!(o, Ordering::Less);
+            let (f_below, o) = T::rounding_from(i, Floor);
+            assert_eq!(o, Less);
             let f_above = f_below.next_higher();
-            let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Ceiling);
+            let (f_alt, o_alt) = T::rounding_from(i, Ceiling);
             assert_eq!(NiceFloat(f_alt), NiceFloat(f_above));
-            assert_eq!(o_alt, Ordering::Greater);
+            assert_eq!(o_alt, Greater);
             if i >= S::ZERO {
-                let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Down);
+                let (f_alt, o_alt) = T::rounding_from(i, Down);
                 assert_eq!(NiceFloat(f_below), NiceFloat(f_alt));
-                assert_eq!(o_alt, Ordering::Less);
-                let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Up);
+                assert_eq!(o_alt, Less);
+                let (f_alt, o_alt) = T::rounding_from(i, Up);
                 assert_eq!(NiceFloat(f_above), NiceFloat(f_alt));
-                assert_eq!(o_alt, Ordering::Greater);
+                assert_eq!(o_alt, Greater);
             } else {
-                let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Down);
+                let (f_alt, o_alt) = T::rounding_from(i, Down);
                 assert_eq!(NiceFloat(f_above), NiceFloat(f_alt));
-                assert_eq!(o_alt, Ordering::Greater);
-                let (f_alt, o_alt) = T::rounding_from(i, RoundingMode::Up);
+                assert_eq!(o_alt, Greater);
+                let (f_alt, o_alt) = T::rounding_from(i, Up);
                 assert_eq!(NiceFloat(f_below), NiceFloat(f_alt));
-                assert_eq!(o_alt, Ordering::Less);
+                assert_eq!(o_alt, Less);
             }
-            let (f_nearest, o_alt) = T::rounding_from(i, RoundingMode::Nearest);
+            let (f_nearest, o_alt) = T::rounding_from(i, Nearest);
             assert!(
-                (NiceFloat(f_nearest), o_alt) == (NiceFloat(f_below), Ordering::Less)
-                    || (NiceFloat(f_nearest), o_alt) == (NiceFloat(f_above), Ordering::Greater)
+                (NiceFloat(f_nearest), o_alt) == (NiceFloat(f_below), Less)
+                    || (NiceFloat(f_nearest), o_alt) == (NiceFloat(f_above), Greater)
             );
         });
 
         signed_gen_var_9::<U, S, T>().test_properties(|i| {
-            let (floor, o) = T::rounding_from(i, RoundingMode::Floor);
-            assert_eq!(o, Ordering::Less);
+            let (floor, o) = T::rounding_from(i, Floor);
+            assert_eq!(o, Less);
             let ceiling = floor.next_higher();
-            let (nearest, o) = T::rounding_from(i, RoundingMode::Nearest);
+            let (nearest, o) = T::rounding_from(i, Nearest);
             assert_eq!(
                 (NiceFloat(nearest), o),
                 if floor.to_bits().even() {
-                    (NiceFloat(floor), Ordering::Less)
+                    (NiceFloat(floor), Less)
                 } else {
-                    (NiceFloat(ceiling), Ordering::Greater)
+                    (NiceFloat(ceiling), Greater)
                 }
             );
         });

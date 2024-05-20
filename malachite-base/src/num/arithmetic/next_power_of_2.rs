@@ -9,7 +9,7 @@
 use crate::num::arithmetic::traits::{NextPowerOf2, NextPowerOf2Assign, PowerOf2, Sign};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::conversion::traits::SciMantissaAndExponent;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 
 macro_rules! impl_next_power_of_2_unsigned {
     ($t:ident) => {
@@ -66,7 +66,7 @@ macro_rules! impl_next_power_of_2_primitive_float {
             /// See [here](super::next_power_of_2#next_power_of_2).
             #[inline]
             fn next_power_of_2(self) -> $t {
-                assert_eq!(self.sign(), Ordering::Greater);
+                assert_eq!(self.sign(), Greater);
                 assert!(self.is_finite());
                 if self == 0.0 {
                     return $t::MIN_POSITIVE_SUBNORMAL;

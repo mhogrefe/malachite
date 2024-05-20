@@ -156,8 +156,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     /// assert_eq!(&Integer::from(123) - &Integer::ZERO, 123);
     /// assert_eq!(&Integer::from(456) - &Integer::from(-123), 579);
     /// assert_eq!(
-    ///     &-Integer::from(10u32).pow(12) -
-    ///             &(-Integer::from(10u32).pow(12) * Integer::from(2u32)),
+    ///     &-Integer::from(10u32).pow(12) - &(-Integer::from(10u32).pow(12) * Integer::from(2u32)),
     ///     1000000000000u64
     /// );
     /// ```

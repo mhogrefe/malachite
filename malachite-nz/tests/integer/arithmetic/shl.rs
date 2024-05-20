@@ -12,7 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -339,7 +339,7 @@ where
         assert!(shifted_alt.is_valid());
         assert_eq!(shifted_alt, shifted);
 
-        assert_eq!((&n).shl_round(i, RoundingMode::Floor).0, shifted);
+        assert_eq!((&n).shl_round(i, Floor).0, shifted);
 
         if i >= T::ZERO {
             assert_eq!(&n << i.unsigned_abs(), shifted);

@@ -53,7 +53,7 @@ use crate::platform::{
 };
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::iter::once;
 use core::mem::swap;
 use core::ops::{Div, DivAssign};
@@ -345,7 +345,7 @@ pub_test! {limbs_div_schoolbook(
     let d_sum = d_len + d_len_s; // 2 * d_len or n_len + 1
     let d_diff = d_len - d_len_s; // 0 or 2 * d_len - n_len - 1
     let ns_hi = &mut ns[n_len - d_len_s..];
-    let highest_q = limbs_cmp_same_length(ns_hi, ds_s) >= Ordering::Equal;
+    let highest_q = limbs_cmp_same_length(ns_hi, ds_s) >= Equal;
     if highest_q {
         limbs_sub_same_length_in_place_left(ns_hi, ds_s);
     }
@@ -587,7 +587,7 @@ pub_test! {limbs_div_divide_and_conquer(
         let scratch_init = &mut scratch[..n_len];
         // At most is wrong by one, no cycle.
         if highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
-            || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater
+            || limbs_cmp_same_length(scratch_init, ns) == Greater
         {
             return if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
                 assert!(highest_q);
@@ -642,7 +642,7 @@ pub_test! {limbs_div_barrett(
         rs.push(0);
         rs.extend_from_slice(ns);
         let rs_hi = &mut rs[q_len_plus_1..];
-        highest_q = limbs_cmp_same_length(rs_hi, ds) >= Ordering::Equal;
+        highest_q = limbs_cmp_same_length(rs_hi, ds) >= Equal;
         if highest_q {
             limbs_sub_same_length_in_place_left(rs_hi, ds);
         }
@@ -665,7 +665,7 @@ pub_test! {limbs_div_barrett(
                 vec![0; limbs_mul_greater_to_out_scratch_len(scratch_2_tail.len(), ds.len())];
             limbs_mul_greater_to_out(rs, scratch_2_tail, ds, &mut mul_scratch);
             if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
-                || limbs_cmp_same_length(rs, ns) == Ordering::Greater
+                || limbs_cmp_same_length(rs, ns) == Greater
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
@@ -705,7 +705,7 @@ pub_test! {limbs_div_barrett(
                 vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())];
             limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail, &mut mul_scratch);
             if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
-                || limbs_cmp_same_length(&rs, ns) == Ordering::Greater
+                || limbs_cmp_same_length(&rs, ns) == Greater
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
@@ -781,7 +781,7 @@ pub_crate_test! {limbs_div_schoolbook_approx(
     let d_len = ds.len();
     let d_len_minus_1 = d_len - 1;
     let ns_hi = &mut ns[n_len - d_len..];
-    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal;
+    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Equal;
     if highest_q {
         limbs_sub_same_length_in_place_left(ns_hi, ds);
     }
@@ -1001,7 +1001,7 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
         if q_len_mod_d_len == 1 {
             // Handle highest_q up front, for simplicity.
             let ns_2 = &mut ns_hi[1..d_len + 1];
-            highest_q = limbs_cmp_same_length(ns_2, ds) >= Ordering::Equal;
+            highest_q = limbs_cmp_same_length(ns_2, ds) >= Equal;
             if highest_q {
                 assert!(!limbs_sub_same_length_in_place_left(ns_2, ds));
             }
@@ -1234,7 +1234,7 @@ fn limbs_div_barrett_approx_preinverted(
         assert_ne!(i_len, 0);
     }
     let (ns_lo, ns_hi) = ns.split_at(if ns_ghost_limb { q_len - 1 } else { q_len });
-    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal;
+    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Equal;
     if q_len == 0 {
         return highest_q;
     }
@@ -1316,7 +1316,7 @@ fn limbs_div_barrett_approx_preinverted(
                 r -= 1;
             }
         }
-        if limbs_cmp_same_length(rs, ds) >= Ordering::Equal {
+        if limbs_cmp_same_length(rs, ds) >= Equal {
             // This is executed with about 76% probability.
             assert!(!limbs_slice_add_limb_in_place(qs, 1));
             carry = limbs_sub_same_length_in_place_left(rs, ds);
@@ -1734,7 +1734,7 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
             vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())];
         limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail, &mut mul_scratch);
         let r_len = if rs[n_len] == 0 { n_len } else { n_len + 1 };
-        if r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less {
+        if r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Less {
             assert!(!limbs_sub_limb_in_place(qs, 1));
         }
     }
@@ -2033,16 +2033,16 @@ impl Div<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) / Natural::from(10u32), 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap() /
-    ///             Natural::from_str("1234567890987").unwrap(),
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///         / Natural::from_str("1234567890987").unwrap(),
     ///     810000006723u64
     /// );
     /// ```
@@ -2072,16 +2072,16 @@ impl<'a> Div<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) / &Natural::from(10u32), 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap() /
-    ///             &Natural::from_str("1234567890987").unwrap(),
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///         / &Natural::from_str("1234567890987").unwrap(),
     ///     810000006723u64
     /// );
     /// ```
@@ -2111,17 +2111,16 @@ impl<'a> Div<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::DivMod;
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) / Natural::from(10u32), 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     &Natural::from_str("1000000000000000000000000").unwrap() /
-    ///             Natural::from_str("1234567890987").unwrap(),
+    ///     &Natural::from_str("1000000000000000000000000").unwrap()
+    ///         / Natural::from_str("1234567890987").unwrap(),
     ///     810000006723u64
     /// );
     /// ```
@@ -2166,17 +2165,16 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::DivMod;
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) / &Natural::from(10u32), 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     &Natural::from_str("1000000000000000000000000").unwrap() /
-    ///     &Natural::from_str("1234567890987").unwrap(),
+    ///     &Natural::from_str("1000000000000000000000000").unwrap()
+    ///         / &Natural::from_str("1234567890987").unwrap(),
     ///     810000006723u64
     /// );
     /// ```
@@ -2215,8 +2213,8 @@ impl DivAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2270,8 +2268,8 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2343,7 +2341,9 @@ impl CheckedDiv<Natural> for Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     Natural::from(23u32).checked_div(Natural::from(10u32)).to_debug_string(),
+    ///     Natural::from(23u32)
+    ///         .checked_div(Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "Some(2)"
     /// );
     /// assert_eq!(Natural::ONE.checked_div(Natural::ZERO), None);
@@ -2409,7 +2409,9 @@ impl<'a> CheckedDiv<&'a Natural> for Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     Natural::from(23u32).checked_div(&Natural::from(10u32)).to_debug_string(),
+    ///     Natural::from(23u32)
+    ///         .checked_div(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "Some(2)"
     /// );
     /// assert_eq!(Natural::ONE.checked_div(&Natural::ZERO), None);
@@ -2475,7 +2477,9 @@ impl<'a> CheckedDiv<Natural> for &'a Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).checked_div(Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .checked_div(Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "Some(2)"
     /// );
     /// assert_eq!((&Natural::ONE).checked_div(Natural::ZERO), None);
@@ -2537,7 +2541,9 @@ impl<'a, 'b> CheckedDiv<&'b Natural> for &'a Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).checked_div(&Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .checked_div(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "Some(2)"
     /// );
     /// assert_eq!((&Natural::ONE).checked_div(&Natural::ZERO), None);

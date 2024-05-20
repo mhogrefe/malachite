@@ -24,7 +24,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
 };
@@ -359,7 +359,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
     }
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - ys|
-    if limbs_cmp(xs, ys) >= Ordering::Equal {
+    if limbs_cmp(xs, ys) >= Equal {
         assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
@@ -407,7 +407,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
     }
     let mut scratch;
     // calculate |xs - ys|
-    let scratch = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let scratch = if limbs_cmp(xs, ys) >= Equal {
         scratch = vec![0; xs.len()];
         assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
         &mut scratch
@@ -457,7 +457,7 @@ fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], m: Limb) -> b
         return equal;
     }
     // calculate |xs - ys|
-    if limbs_cmp(xs, ys) >= Ordering::Equal {
+    if limbs_cmp(xs, ys) >= Equal {
         assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
@@ -529,7 +529,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
     }
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - ys|
-    if limbs_cmp(xs, ys) >= Ordering::Equal {
+    if limbs_cmp(xs, ys) >= Equal {
         assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
@@ -573,7 +573,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
     }
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - ys|
-    if limbs_cmp(xs, ys) >= Ordering::Equal {
+    if limbs_cmp(xs, ys) >= Equal {
         assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
@@ -617,7 +617,7 @@ fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -
     }
     let mut scratch;
     // calculate |xs - ys|
-    let scratch = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let scratch = if limbs_cmp(xs, ys) >= Equal {
         scratch = vec![0; xs.len()];
         assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
         &mut scratch
@@ -635,7 +635,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
         return equal;
     }
     // calculate |xs - ys|
-    if limbs_cmp(xs, ys) >= Ordering::Equal {
+    if limbs_cmp(xs, ys) >= Equal {
         assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
@@ -679,7 +679,7 @@ fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb
     }
     let mut scratch;
     // calculate |xs - ys|
-    let scratch = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let scratch = if limbs_cmp(xs, ys) >= Equal {
         scratch = vec![0; xs.len()];
         assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
         &mut scratch
@@ -697,7 +697,7 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], ms: &mut [Limb
         return equal;
     }
     // calculate |xs - ys|
-    if limbs_cmp(xs, ys) >= Ordering::Equal {
+    if limbs_cmp(xs, ys) >= Equal {
         assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
@@ -737,9 +737,9 @@ impl EqMod<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(Natural::from(223u32), Natural::from(100u32)),
@@ -805,9 +805,9 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
@@ -873,9 +873,9 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
@@ -941,9 +941,9 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),
@@ -1009,9 +1009,9 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(Natural::from(223u32), Natural::from(100u32)),
@@ -1077,9 +1077,9 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
@@ -1145,9 +1145,9 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
@@ -1213,9 +1213,9 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),

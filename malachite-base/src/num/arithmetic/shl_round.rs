@@ -12,7 +12,7 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::ops::{Shl, ShlAssign};
 
 fn shl_round<
@@ -32,7 +32,7 @@ fn shl_round<
             } else {
                 x << bits.unsigned_abs()
             },
-            Ordering::Equal,
+            Equal,
         )
     } else {
         x.shr_round(bits.unsigned_abs(), rm)
@@ -55,7 +55,7 @@ fn shl_round_assign<
         } else {
             *x <<= bits.unsigned_abs();
         }
-        Ordering::Equal
+        Equal
     } else {
         x.shr_round_assign(bits.unsigned_abs(), rm)
     }
@@ -75,10 +75,9 @@ macro_rules! impl_shl_round {
                     /// non-negative, then the returned [`Ordering`] is always `Equal`, even if the
                     /// higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
-                    /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
-                    /// `bits` is negative.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `bits > 0 || self.divisible_by_power_of_2(bits)`.
+                    /// Rounding might only be necessary if `bits` is negative.
                     ///
                     /// Let $q = x2^k$, and let $g$ be the function that just returns the first
                     /// element of the pair, without the [`Ordering`]:
@@ -112,8 +111,8 @@ macro_rules! impl_shl_round {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by $2^b$.
+                    /// Panics if `bits` is positive and `rm` is `Exact` but `self` is not divisible
+                    /// by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shl_round#shl_round).
@@ -131,10 +130,9 @@ macro_rules! impl_shl_round {
                     /// non-negative, then the returned [`Ordering`] is always `Equal`, even if the
                     /// higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
-                    /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
-                    /// `bits` is negative.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `bits > 0 || self.divisible_by_power_of_2(bits)`.
+                    /// Rounding might only be necessary if `bits` is negative.
                     ///
                     /// See the [`ShlRound`] documentation for details.
                     ///
@@ -142,8 +140,8 @@ macro_rules! impl_shl_round {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by $2^b$.
+                    /// Panics if `bits` is positive and `rm` is `Exact` but `self` is not divisible
+                    /// by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shl_round#shl_round_assign).

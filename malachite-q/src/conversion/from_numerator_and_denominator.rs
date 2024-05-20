@@ -152,7 +152,7 @@ impl Rational {
     /// assert_eq!(TWO_THIRDS, Rational::from_unsigneds(2u32, 3));
     ///
     /// const TWO_THIRDS_ALT: Rational = Rational::const_from_unsigneds(22, 33);
-    /// assert_eq!(TWO_THIRDS, Rational::from_unsigneds(2u32, 3));
+    /// assert_eq!(TWO_THIRDS_ALT, Rational::from_unsigneds(2u32, 3));
     /// ```
     pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Rational {
         assert!(denominator != 0);
@@ -188,7 +188,7 @@ impl Rational {
     /// assert_eq!(NEGATIVE_TWO_THIRDS, Rational::from_signeds(-2, 3));
     ///
     /// const NEGATIVE_TWO_THIRDS_ALT: Rational = Rational::const_from_signeds(-22, 33);
-    /// assert_eq!(NEGATIVE_TWO_THIRDS, Rational::from_signeds(-2, 3));
+    /// assert_eq!(NEGATIVE_TWO_THIRDS_ALT, Rational::from_signeds(-2, 3));
     /// ```
     pub const fn const_from_signeds(numerator: SignedLimb, denominator: SignedLimb) -> Rational {
         assert!(denominator != 0);
@@ -233,7 +233,10 @@ impl Rational {
     ///     Rational::from_naturals(Natural::from(4u32), Natural::from(6u32)).to_string(),
     ///     "2/3"
     /// );
-    /// assert_eq!(Rational::from_naturals(Natural::ZERO, Natural::from(6u32)), 0);
+    /// assert_eq!(
+    ///     Rational::from_naturals(Natural::ZERO, Natural::from(6u32)),
+    ///     0
+    /// );
     /// ```
     pub fn from_naturals(numerator: Natural, denominator: Natural) -> Rational {
         assert_ne!(denominator, 0);
@@ -275,7 +278,10 @@ impl Rational {
     ///     Rational::from_naturals_ref(&Natural::from(4u32), &Natural::from(6u32)).to_string(),
     ///     "2/3"
     /// );
-    /// assert_eq!(Rational::from_naturals_ref(&Natural::ZERO, &Natural::from(6u32)), 0);
+    /// assert_eq!(
+    ///     Rational::from_naturals_ref(&Natural::ZERO, &Natural::from(6u32)),
+    ///     0
+    /// );
     /// ```
     pub fn from_naturals_ref(numerator: &Natural, denominator: &Natural) -> Rational {
         assert_ne!(*denominator, 0);
@@ -309,7 +315,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from_unsigneds(4u32, 6).to_string(), "2/3");
@@ -402,8 +407,14 @@ impl Rational {
     ///     Rational::from_integers_ref(&Integer::from(4), &Integer::from(-6)).to_string(),
     ///     "-2/3"
     /// );
-    /// assert_eq!(Rational::from_integers_ref(&Integer::ZERO, &Integer::from(6)), 0);
-    /// assert_eq!(Rational::from_integers_ref(&Integer::ZERO, &Integer::from(-6)), 0);
+    /// assert_eq!(
+    ///     Rational::from_integers_ref(&Integer::ZERO, &Integer::from(6)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_integers_ref(&Integer::ZERO, &Integer::from(-6)),
+    ///     0
+    /// );
     /// ```
     pub fn from_integers_ref(numerator: &Integer, denominator: &Integer) -> Rational {
         assert_ne!(*denominator, 0);
@@ -437,7 +448,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from_signeds(4i8, 6).to_string(), "2/3");
@@ -476,24 +486,17 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_sign_and_naturals(
-    ///         true,
-    ///         Natural::from(4u32),
-    ///         Natural::from(6u32)
-    ///     ).to_string(),
+    ///     Rational::from_sign_and_naturals(true, Natural::from(4u32), Natural::from(6u32))
+    ///         .to_string(),
     ///     "2/3"
     /// );
     /// assert_eq!(
-    ///     Rational::from_sign_and_naturals(
-    ///         false,
-    ///         Natural::from(4u32),
-    ///         Natural::from(6u32)
-    ///     ).to_string(),
+    ///     Rational::from_sign_and_naturals(false, Natural::from(4u32), Natural::from(6u32))
+    ///         .to_string(),
     ///     "-2/3"
     /// );
     /// ```
@@ -535,24 +538,17 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_sign_and_naturals_ref(
-    ///         true,
-    ///         &Natural::from(4u32),
-    ///         &Natural::from(6u32)
-    ///     ).to_string(),
+    ///     Rational::from_sign_and_naturals_ref(true, &Natural::from(4u32), &Natural::from(6u32))
+    ///         .to_string(),
     ///     "2/3"
     /// );
     /// assert_eq!(
-    ///     Rational::from_sign_and_naturals_ref(
-    ///         false,
-    ///         &Natural::from(4u32),
-    ///         &Natural::from(6u32)
-    ///     ).to_string(),
+    ///     Rational::from_sign_and_naturals_ref(false, &Natural::from(4u32), &Natural::from(6u32))
+    ///         .to_string(),
     ///     "-2/3"
     /// );
     /// ```
@@ -593,11 +589,16 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from_sign_and_unsigneds(true, 4u32, 6).to_string(), "2/3");
-    /// assert_eq!(Rational::from_sign_and_unsigneds(false, 4u32, 6).to_string(), "-2/3");
+    /// assert_eq!(
+    ///     Rational::from_sign_and_unsigneds(true, 4u32, 6).to_string(),
+    ///     "2/3"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sign_and_unsigneds(false, 4u32, 6).to_string(),
+    ///     "-2/3"
+    /// );
     /// ```
     pub fn from_sign_and_unsigneds<T: PrimitiveUnsigned>(
         sign: bool,

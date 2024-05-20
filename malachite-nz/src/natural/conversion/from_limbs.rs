@@ -56,7 +56,10 @@ impl Natural {
     ///     assert_eq!(Natural::from_limbs_asc(&[]), 0);
     ///     assert_eq!(Natural::from_limbs_asc(&[123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from_limbs_asc(&[3567587328, 232]), 1000000000000u64);
+    ///     assert_eq!(
+    ///         Natural::from_limbs_asc(&[3567587328, 232]),
+    ///         1000000000000u64
+    ///     );
     /// }
     /// ```
     pub fn from_limbs_asc(xs: &[Limb]) -> Natural {
@@ -95,7 +98,10 @@ impl Natural {
     ///     assert_eq!(Natural::from_limbs_desc(&[]), 0);
     ///     assert_eq!(Natural::from_limbs_desc(&[123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from_limbs_desc(&[232, 3567587328]), 1000000000000u64);
+    ///     assert_eq!(
+    ///         Natural::from_limbs_desc(&[232, 3567587328]),
+    ///         1000000000000u64
+    ///     );
     /// }
     /// ```
     pub fn from_limbs_desc(xs: &[Limb]) -> Natural {
@@ -129,7 +135,10 @@ impl Natural {
     ///     assert_eq!(Natural::from_owned_limbs_asc(vec![]), 0);
     ///     assert_eq!(Natural::from_owned_limbs_asc(vec![123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from_owned_limbs_asc(vec![3567587328, 232]), 1000000000000u64);
+    ///     assert_eq!(
+    ///         Natural::from_owned_limbs_asc(vec![3567587328, 232]),
+    ///         1000000000000u64
+    ///     );
     /// }
     /// ```
     pub fn from_owned_limbs_asc(mut xs: Vec<Limb>) -> Natural {
@@ -171,7 +180,10 @@ impl Natural {
     ///     assert_eq!(Natural::from_owned_limbs_desc(vec![]), 0);
     ///     assert_eq!(Natural::from_owned_limbs_desc(vec![123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::from_owned_limbs_desc(vec![232, 3567587328]), 1000000000000u64);
+    ///     assert_eq!(
+    ///         Natural::from_owned_limbs_desc(vec![232, 3567587328]),
+    ///         1000000000000u64
+    ///     );
     /// }
     /// ```
     pub fn from_owned_limbs_desc(mut xs: Vec<Limb>) -> Natural {

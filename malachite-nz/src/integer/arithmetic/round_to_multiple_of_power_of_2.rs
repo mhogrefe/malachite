@@ -48,7 +48,7 @@ impl RoundToMultipleOfPowerOf2<u64> for Integer {
     /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+    /// - `x.round_to_multiple_of_power_of_2(pow, Exact)`
     /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
@@ -67,37 +67,43 @@ impl RoundToMultipleOfPowerOf2<u64> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Floor)
+    ///     Integer::from(10)
+    ///         .round_to_multiple_of_power_of_2(2, Floor)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+    ///     Integer::from(-10)
+    ///         .round_to_multiple_of_power_of_2(2, Ceiling)
     ///         .to_debug_string(),
     ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Down)
+    ///     Integer::from(10)
+    ///         .round_to_multiple_of_power_of_2(2, Down)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple_of_power_of_2(2, RoundingMode::Up)
+    ///     Integer::from(-10)
+    ///         .round_to_multiple_of_power_of_2(2, Up)
     ///         .to_debug_string(),
     ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest)
+    ///     Integer::from(10)
+    ///         .round_to_multiple_of_power_of_2(2, Nearest)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-12).round_to_multiple_of_power_of_2(2, RoundingMode::Exact)
+    ///     Integer::from(-12)
+    ///         .round_to_multiple_of_power_of_2(2, Exact)
     ///         .to_debug_string(),
     ///     "(-12, Equal)"
     /// );
@@ -148,7 +154,7 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Integer {
     /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+    /// - `x.round_to_multiple_of_power_of_2(pow, Exact)`
     /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
@@ -167,37 +173,43 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Floor)
+    ///     (&Integer::from(10))
+    ///         .round_to_multiple_of_power_of_2(2, Floor)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+    ///     (&Integer::from(-10))
+    ///         .round_to_multiple_of_power_of_2(2, Ceiling)
     ///         .to_debug_string(),
     ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Down)
+    ///     (&Integer::from(10))
+    ///         .round_to_multiple_of_power_of_2(2, Down)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple_of_power_of_2(2, RoundingMode::Up)
+    ///     (&Integer::from(-10))
+    ///         .round_to_multiple_of_power_of_2(2, Up)
     ///         .to_debug_string(),
     ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest)
+    ///     (&Integer::from(10))
+    ///         .round_to_multiple_of_power_of_2(2, Nearest)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-12)).round_to_multiple_of_power_of_2(2, RoundingMode::Exact)
+    ///     (&Integer::from(-12))
+    ///         .round_to_multiple_of_power_of_2(2, Exact)
     ///         .to_debug_string(),
     ///     "(-12, Equal)"
     /// );
@@ -227,7 +239,7 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
     ///
     /// The following two expressions are equivalent:
-    /// - `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`
+    /// - `x.round_to_multiple_of_power_of_2_assign(pow, Exact);`
     /// - `assert!(x.divisible_by_power_of_2(pow));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
@@ -245,48 +257,36 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// let mut n = Integer::from(10);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Floor), Less);
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Integer::from(-10);
     /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     n.round_to_multiple_of_power_of_2_assign(2, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(n, -8);
     ///
     /// let mut n = Integer::from(10);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Down),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Down), Less);
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Up), Ordering::Less);
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Up), Less);
     /// assert_eq!(n, -12);
     ///
     /// let mut n = Integer::from(10);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Nearest),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Nearest), Less);
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Integer::from(-12);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Exact),
-    ///     Ordering::Equal
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Exact), Equal);
     /// assert_eq!(n, -12);
     /// ```
     fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) -> Ordering {

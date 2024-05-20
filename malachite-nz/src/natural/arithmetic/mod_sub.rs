@@ -33,11 +33,15 @@ impl ModSub<Natural, Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(4u32).mod_sub(Natural::from(3u32), Natural::from(5u32)).to_string(),
+    ///     Natural::from(4u32)
+    ///         .mod_sub(Natural::from(3u32), Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     Natural::from(7u32).mod_sub(Natural::from(9u32), Natural::from(10u32)).to_string(),
+    ///     Natural::from(7u32)
+    ///         .mod_sub(Natural::from(9u32), Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -76,11 +80,15 @@ impl<'a> ModSub<Natural, &'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(4u32).mod_sub(Natural::from(3u32), &Natural::from(5u32)).to_string(),
+    ///     Natural::from(4u32)
+    ///         .mod_sub(Natural::from(3u32), &Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     Natural::from(7u32).mod_sub(Natural::from(9u32), &Natural::from(10u32)).to_string(),
+    ///     Natural::from(7u32)
+    ///         .mod_sub(Natural::from(9u32), &Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -119,11 +127,15 @@ impl<'a> ModSub<&'a Natural, Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(4u32).mod_sub(&Natural::from(3u32), Natural::from(5u32)).to_string(),
+    ///     Natural::from(4u32)
+    ///         .mod_sub(&Natural::from(3u32), Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     Natural::from(7u32).mod_sub(&Natural::from(9u32), Natural::from(10u32)).to_string(),
+    ///     Natural::from(7u32)
+    ///         .mod_sub(&Natural::from(9u32), Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -162,11 +174,15 @@ impl<'a, 'b> ModSub<&'a Natural, &'b Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(4u32).mod_sub(&Natural::from(3u32), &Natural::from(5u32)).to_string(),
+    ///     Natural::from(4u32)
+    ///         .mod_sub(&Natural::from(3u32), &Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     Natural::from(7u32).mod_sub(&Natural::from(9u32), &Natural::from(10u32)).to_string(),
+    ///     Natural::from(7u32)
+    ///         .mod_sub(&Natural::from(9u32), &Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -205,11 +221,15 @@ impl<'a> ModSub<Natural, Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(4u32)).mod_sub(Natural::from(3u32), Natural::from(5u32)).to_string(),
+    ///     (&Natural::from(4u32))
+    ///         .mod_sub(Natural::from(3u32), Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_sub(Natural::from(9u32), Natural::from(10u32)).to_string(),
+    ///     (&Natural::from(7u32))
+    ///         .mod_sub(Natural::from(9u32), Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -252,11 +272,15 @@ impl<'a, 'b> ModSub<Natural, &'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(4u32)).mod_sub(Natural::from(3u32), &Natural::from(5u32)).to_string(),
+    ///     (&Natural::from(4u32))
+    ///         .mod_sub(Natural::from(3u32), &Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_sub(Natural::from(9u32), &Natural::from(10u32)).to_string(),
+    ///     (&Natural::from(7u32))
+    ///         .mod_sub(Natural::from(9u32), &Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -302,11 +326,15 @@ impl<'a, 'b> ModSub<&'b Natural, Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(4u32)).mod_sub(&Natural::from(3u32), Natural::from(5u32)).to_string(),
+    ///     (&Natural::from(4u32))
+    ///         .mod_sub(&Natural::from(3u32), Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_sub(&Natural::from(9u32), Natural::from(10u32)).to_string(),
+    ///     (&Natural::from(7u32))
+    ///         .mod_sub(&Natural::from(9u32), Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```
@@ -351,11 +379,15 @@ impl<'a, 'b, 'c> ModSub<&'b Natural, &'c Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(4u32)).mod_sub(&Natural::from(3u32), &Natural::from(5u32)).to_string(),
+    ///     (&Natural::from(4u32))
+    ///         .mod_sub(&Natural::from(3u32), &Natural::from(5u32))
+    ///         .to_string(),
     ///     "1"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_sub(&Natural::from(9u32), &Natural::from(10u32)).to_string(),
+    ///     (&Natural::from(7u32))
+    ///         .mod_sub(&Natural::from(9u32), &Natural::from(10u32))
+    ///         .to_string(),
     ///     "8"
     /// );
     /// ```

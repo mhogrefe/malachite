@@ -34,7 +34,7 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{DoubleLimb, Limb};
-use core::cmp::{max, min, Ordering};
+use core::cmp::{max, min, Ordering::*};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -748,16 +748,16 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     let mut swapped = false;
     // Arrange so that x < y, subtract y -= x, and maintain normalization.
     match xs_len.cmp(&ys_len) {
-        Ordering::Equal => {
+        Equal => {
             match limbs_cmp_same_length(xs_init, ys_init) {
-                Ordering::Equal => {
+                Equal => {
                     // For gcdext, return the smallest of the two cofactors.
                     if s == 0 {
                         context.gcd_subdiv_step_hook(Some(xs_init), None, 0, -1);
                     }
                     return 0;
                 }
-                Ordering::Greater => {
+                Greater => {
                     swap(&mut xs, &mut ys);
                     xs_init = &mut xs[..xs_len];
                     ys_init = &mut ys[..ys_len];
@@ -766,14 +766,14 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
                 _ => {}
             }
         }
-        Ordering::Greater => {
+        Greater => {
             swap(&mut xs, &mut ys);
             swap(&mut xs_len, &mut ys_len);
             xs_init = &mut xs[..xs_len];
             ys_init = &mut ys[..ys_len];
             swapped.not_assign();
         }
-        Ordering::Less => {}
+        Less => {}
     }
     if xs_len <= s {
         if s == 0 {
@@ -794,10 +794,10 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     }
     // Arrange so that x < y
     match xs_len.cmp(&ys_len) {
-        Ordering::Equal => {
+        Equal => {
             match limbs_cmp_same_length(xs_init, ys_init) {
-                Ordering::Equal => {
-                    fail_on_untested_path("limbs_gcd_subdivide_step, c == Ordering::Equal");
+                Equal => {
+                    fail_on_untested_path("limbs_gcd_subdivide_step, c == Equal");
                     if s != 0 {
                         // Just record subtraction and return
                         context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
@@ -808,19 +808,19 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
                         return 0;
                     }
                 }
-                Ordering::Greater => {
+                Greater => {
                     context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
                     swap(&mut xs, &mut ys);
                     xs_init = &mut xs[..xs_len];
                     ys_init = &mut ys[..ys_len];
                     swapped.not_assign();
                 }
-                Ordering::Less => {
+                Less => {
                     context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
                 }
             }
         }
-        Ordering::Greater => {
+        Greater => {
             context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
             swap(&mut xs, &mut ys);
             swap(&mut xs_len, &mut ys_len);
@@ -828,7 +828,7 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
             ys_init = &mut ys[..ys_len];
             swapped.not_assign();
         }
-        Ordering::Less => {
+        Less => {
             context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
         }
     }

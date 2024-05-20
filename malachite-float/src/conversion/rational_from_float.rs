@@ -37,10 +37,19 @@ impl TryFrom<Float> for Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::try_from(Float::ZERO).unwrap(), 0);
-    /// assert_eq!(Rational::try_from(Float::from(1.5)).unwrap().to_string(), "3/2");
-    /// assert_eq!(Rational::try_from(Float::from(-1.5)).unwrap().to_string(), "-3/2");
+    /// assert_eq!(
+    ///     Rational::try_from(Float::from(1.5)).unwrap().to_string(),
+    ///     "3/2"
+    /// );
+    /// assert_eq!(
+    ///     Rational::try_from(Float::from(-1.5)).unwrap().to_string(),
+    ///     "-3/2"
+    /// );
     ///
-    /// assert_eq!(Rational::try_from(Float::INFINITY), Err(RationalFromFloatError));
+    /// assert_eq!(
+    ///     Rational::try_from(Float::INFINITY),
+    ///     Err(RationalFromFloatError)
+    /// );
     /// assert_eq!(Rational::try_from(Float::NAN), Err(RationalFromFloatError));
     /// ```
     fn try_from(x: Float) -> Result<Rational, Self::Error> {
@@ -84,10 +93,19 @@ impl<'a> TryFrom<&'a Float> for Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::try_from(&Float::ZERO).unwrap(), 0);
-    /// assert_eq!(Rational::try_from(&Float::from(1.5)).unwrap().to_string(), "3/2");
-    /// assert_eq!(Rational::try_from(&Float::from(-1.5)).unwrap().to_string(), "-3/2");
+    /// assert_eq!(
+    ///     Rational::try_from(&Float::from(1.5)).unwrap().to_string(),
+    ///     "3/2"
+    /// );
+    /// assert_eq!(
+    ///     Rational::try_from(&Float::from(-1.5)).unwrap().to_string(),
+    ///     "-3/2"
+    /// );
     ///
-    /// assert_eq!(Rational::try_from(&Float::INFINITY), Err(RationalFromFloatError));
+    /// assert_eq!(
+    ///     Rational::try_from(&Float::INFINITY),
+    ///     Err(RationalFromFloatError)
+    /// );
     /// assert_eq!(Rational::try_from(&Float::NAN), Err(RationalFromFloatError));
     /// ```
     fn try_from(x: &'a Float) -> Result<Rational, Self::Error> {

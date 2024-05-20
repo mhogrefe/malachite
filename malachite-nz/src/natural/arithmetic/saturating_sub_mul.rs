@@ -44,8 +44,9 @@ impl SaturatingSubMul<Natural, Natural> for Natural {
     ///     0
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .saturating_sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .saturating_sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -87,8 +88,9 @@ impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
     ///     0
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .saturating_sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .saturating_sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -130,8 +132,9 @@ impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     ///     0
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .saturating_sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .saturating_sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -173,8 +176,9 @@ impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
     ///     0
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .saturating_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .saturating_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -217,7 +221,7 @@ impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32).pow(12))
-    ///             .saturating_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///         .saturating_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```

@@ -15,7 +15,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_nz::test_util::generators::{natural_signed_pair_gen, natural_unsigned_pair_gen};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_natural_partial_cmp_abs_unsigned);
@@ -70,9 +70,9 @@ fn demo_natural_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
 {
     for (n, u) in natural_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp_abs(&u).unwrap() {
-            Ordering::Less => println!("|{n}| < |{u}|"),
-            Ordering::Equal => println!("|{n}| = |{u}|"),
-            Ordering::Greater => println!("|{n}| > |{u}|"),
+            Less => println!("|{n}| < |{u}|"),
+            Equal => println!("|{n}| = |{u}|"),
+            Greater => println!("|{n}| > |{u}|"),
         }
     }
 }
@@ -86,9 +86,9 @@ fn demo_natural_partial_cmp_abs_signed<T: PrimitiveSigned>(
 {
     for (n, i) in natural_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp_abs(&i).unwrap() {
-            Ordering::Less => println!("|{n}| < |{i}|"),
-            Ordering::Equal => println!("|{n}| = |{i}|"),
-            Ordering::Greater => println!("|{n}| > |{i}|"),
+            Less => println!("|{n}| < |{i}|"),
+            Equal => println!("|{n}| = |{i}|"),
+            Greater => println!("|{n}| > |{i}|"),
         }
     }
 }
@@ -100,9 +100,9 @@ fn demo_unsigned_partial_cmp_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUn
 ) {
     for (n, u) in natural_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         match u.partial_cmp_abs(&n).unwrap() {
-            Ordering::Less => println!("|{u}| < |{n}|"),
-            Ordering::Equal => println!("|{u}| = |{n}|"),
-            Ordering::Greater => println!("|{u}| > |{n}|"),
+            Less => println!("|{u}| < |{n}|"),
+            Equal => println!("|{u}| = |{n}|"),
+            Greater => println!("|{u}| > |{n}|"),
         }
     }
 }
@@ -114,9 +114,9 @@ fn demo_signed_partial_cmp_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSign
 ) {
     for (n, i) in natural_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match i.partial_cmp_abs(&n).unwrap() {
-            Ordering::Less => println!("|{i}| < |{n}|"),
-            Ordering::Equal => println!("|{i}| = |{n}|"),
-            Ordering::Greater => println!("|{i}| > |{n}|"),
+            Less => println!("|{i}| < |{n}|"),
+            Equal => println!("|{i}| = |{n}|"),
+            Greater => println!("|{i}| > |{n}|"),
         }
     }
 }

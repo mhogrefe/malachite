@@ -13,7 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
@@ -21,7 +21,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 impl Natural {
     /// Calculates the approximate natural logarithm of a nonzero [`Natural`].
@@ -41,7 +41,10 @@ impl Natural {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(NiceFloat(Natural::from(10u32).approx_log()), NiceFloat(2.3025850929940455));
+    /// assert_eq!(
+    ///     NiceFloat(Natural::from(10u32).approx_log()),
+    ///     NiceFloat(2.3025850929940455)
+    /// );
     /// assert_eq!(
     ///     NiceFloat(Natural::from(10u32).pow(10000).approx_log()),
     ///     NiceFloat(23025.850929940454)
@@ -70,34 +73,34 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     } else if x < base {
         return (0, false);
     }
-    let mut log = u64::rounding_from(x.approx_log() / base.approx_log(), RoundingMode::Floor).0;
+    let mut log = u64::rounding_from(x.approx_log() / base.approx_log(), Floor).0;
     let mut power = base.pow(log);
     match power.cmp(x) {
-        Ordering::Equal => (log, true),
-        Ordering::Less => loop {
+        Equal => (log, true),
+        Less => loop {
             power *= base;
             match power.cmp(x) {
-                Ordering::Equal => {
+                Equal => {
                     return (log + 1, true);
                 }
-                Ordering::Less => {
+                Less => {
                     log += 1;
                 }
-                Ordering::Greater => {
+                Greater => {
                     return (log, false);
                 }
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             power.div_exact_assign(base);
             match power.cmp(x) {
-                Ordering::Equal => {
+                Equal => {
                     return (log - 1, true);
                 }
-                Ordering::Less => {
+                Less => {
                     return (log - 1, false);
                 }
-                Ordering::Greater => {
+                Greater => {
                     log -= 1;
                 }
             }
@@ -124,34 +127,34 @@ pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, boo
     let mut log = (x.approx_log() / base.approx_log()) as u64;
     let mut power = base.pow(log);
     match power.cmp(x) {
-        Ordering::Equal => (log, true, power, log),
-        Ordering::Less => loop {
+        Equal => (log, true, power, log),
+        Less => loop {
             power *= base;
             match power.cmp(x) {
-                Ordering::Equal => {
+                Equal => {
                     log += 1;
                     return (log, true, power, log);
                 }
-                Ordering::Less => {
+                Less => {
                     log += 1;
                 }
-                Ordering::Greater => {
+                Greater => {
                     return (log, false, power, log + 1);
                 }
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             power.div_exact_assign(base);
             match power.cmp(x) {
-                Ordering::Equal => {
+                Equal => {
                     log -= 1;
                     return (log, true, power, log);
                 }
-                Ordering::Less => {
+                Less => {
                     log -= 1;
                     return (log, false, power, log);
                 }
-                Ordering::Greater => {
+                Greater => {
                     log -= 1;
                 }
             }
@@ -184,7 +187,10 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
     /// assert_eq!(Natural::from(80u32).floor_log_base(&Natural::from(3u32)), 3);
     /// assert_eq!(Natural::from(81u32).floor_log_base(&Natural::from(3u32)), 4);
     /// assert_eq!(Natural::from(82u32).floor_log_base(&Natural::from(3u32)), 4);
-    /// assert_eq!(Natural::from(4294967296u64).floor_log_base(&Natural::from(10u32)), 9);
+    /// assert_eq!(
+    ///     Natural::from(4294967296u64).floor_log_base(&Natural::from(10u32)),
+    ///     9
+    /// );
     /// ```
     ///
     /// This is equivalent to `fmpz_flog` from `fmpz/flog.c`, FLINT 2.7.1.
@@ -218,10 +224,22 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(80u32).ceiling_log_base(&Natural::from(3u32)), 4);
-    /// assert_eq!(Natural::from(81u32).ceiling_log_base(&Natural::from(3u32)), 4);
-    /// assert_eq!(Natural::from(82u32).ceiling_log_base(&Natural::from(3u32)), 5);
-    /// assert_eq!(Natural::from(4294967296u64).ceiling_log_base(&Natural::from(10u32)), 10);
+    /// assert_eq!(
+    ///     Natural::from(80u32).ceiling_log_base(&Natural::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(81u32).ceiling_log_base(&Natural::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(82u32).ceiling_log_base(&Natural::from(3u32)),
+    ///     5
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(4294967296u64).ceiling_log_base(&Natural::from(10u32)),
+    ///     10
+    /// );
     /// ```
     ///
     /// This is equivalent to `fmpz_clog` from `fmpz/clog.c`, FLINT 2.7.1.
@@ -266,10 +284,22 @@ impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(80u32).checked_log_base(&Natural::from(3u32)), None);
-    /// assert_eq!(Natural::from(81u32).checked_log_base(&Natural::from(3u32)), Some(4));
-    /// assert_eq!(Natural::from(82u32).checked_log_base(&Natural::from(3u32)), None);
-    /// assert_eq!(Natural::from(4294967296u64).checked_log_base(&Natural::from(10u32)), None);
+    /// assert_eq!(
+    ///     Natural::from(80u32).checked_log_base(&Natural::from(3u32)),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(81u32).checked_log_base(&Natural::from(3u32)),
+    ///     Some(4)
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(82u32).checked_log_base(&Natural::from(3u32)),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(4294967296u64).checked_log_base(&Natural::from(10u32)),
+    ///     None
+    /// );
     /// ```
     fn checked_log_base(self, base: &Natural) -> Option<u64> {
         if let Some(log_base) = base.checked_log_base_2() {

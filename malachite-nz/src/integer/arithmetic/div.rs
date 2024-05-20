@@ -321,7 +321,9 @@ impl CheckedDiv<Integer> for Integer {
     ///
     /// // -2 * -10 + 3 = 23
     /// assert_eq!(
-    ///     Integer::from(23).checked_div(Integer::from(-10)).to_debug_string(),
+    ///     Integer::from(23)
+    ///         .checked_div(Integer::from(-10))
+    ///         .to_debug_string(),
     ///     "Some(-2)"
     /// );
     /// assert_eq!(Integer::ONE.checked_div(Integer::ZERO), None);
@@ -370,7 +372,9 @@ impl<'a> CheckedDiv<&'a Integer> for Integer {
     ///
     /// // -2 * -10 + 3 = 23
     /// assert_eq!(
-    ///     Integer::from(23).checked_div(&Integer::from(-10)).to_debug_string(),
+    ///     Integer::from(23)
+    ///         .checked_div(&Integer::from(-10))
+    ///         .to_debug_string(),
     ///     "Some(-2)"
     /// );
     /// assert_eq!(Integer::ONE.checked_div(&Integer::ZERO), None);
@@ -419,7 +423,9 @@ impl<'a> CheckedDiv<Integer> for &'a Integer {
     ///
     /// // -2 * -10 + 3 = 23
     /// assert_eq!(
-    ///     (&Integer::from(23)).checked_div(Integer::from(-10)).to_debug_string(),
+    ///     (&Integer::from(23))
+    ///         .checked_div(Integer::from(-10))
+    ///         .to_debug_string(),
     ///     "Some(-2)"
     /// );
     /// assert_eq!((&Integer::ONE).checked_div(Integer::ZERO), None);
@@ -467,7 +473,9 @@ impl<'a, 'b> CheckedDiv<&'b Integer> for &'a Integer {
     ///
     /// // -2 * -10 + 3 = 23
     /// assert_eq!(
-    ///     (&Integer::from(23)).checked_div(&Integer::from(-10)).to_debug_string(),
+    ///     (&Integer::from(23))
+    ///         .checked_div(&Integer::from(-10))
+    ///         .to_debug_string(),
     ///     "Some(-2)"
     /// );
     /// assert_eq!((&Integer::ONE).checked_div(&Integer::ZERO), None);

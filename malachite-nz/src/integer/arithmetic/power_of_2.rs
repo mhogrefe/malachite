@@ -29,7 +29,10 @@ impl PowerOf2<u64> for Integer {
     ///
     /// assert_eq!(Integer::power_of_2(0), 1);
     /// assert_eq!(Integer::power_of_2(3), 8);
-    /// assert_eq!(Integer::power_of_2(100).to_string(), "1267650600228229401496703205376");
+    /// assert_eq!(
+    ///     Integer::power_of_2(100).to_string(),
+    ///     "1267650600228229401496703205376"
+    /// );
     /// ```
     #[inline]
     fn power_of_2(pow: u64) -> Integer {

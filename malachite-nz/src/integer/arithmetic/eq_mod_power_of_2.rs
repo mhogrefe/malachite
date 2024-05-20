@@ -15,7 +15,7 @@ use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_powe
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -39,8 +39,8 @@ pub_test! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> b
     }
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     match i.cmp(&xs.len()) {
-        Ordering::Greater => false,
-        Ordering::Equal => {
+        Greater => false,
+        Equal => {
             if pow & Limb::WIDTH_MASK == 0 {
                 // Check whether the sum of X and y is 0 mod B ^ xs.len().
                 let mut carry = y;
@@ -56,7 +56,7 @@ pub_test! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> b
                 false
             }
         }
-        Ordering::Less => {
+        Less => {
             if i == 0 {
                 xs[0].eq_mod_power_of_2(y.wrapping_neg(), pow)
             } else {
@@ -175,9 +175,18 @@ impl<'a, 'b> EqModPowerOf2<&'b Integer> for &'a Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.eq_mod_power_of_2(&Integer::from(-256), 8), true);
-    /// assert_eq!(Integer::from(-0b1101).eq_mod_power_of_2(&Integer::from(0b11011), 3), true);
-    /// assert_eq!(Integer::from(-0b1101).eq_mod_power_of_2(&Integer::from(0b11011), 4), false);
+    /// assert_eq!(
+    ///     Integer::ZERO.eq_mod_power_of_2(&Integer::from(-256), 8),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-0b1101).eq_mod_power_of_2(&Integer::from(0b11011), 3),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-0b1101).eq_mod_power_of_2(&Integer::from(0b11011), 4),
+    ///     false
+    /// );
     /// ```
     fn eq_mod_power_of_2(self, other: &'b Integer, pow: u64) -> bool {
         if self.sign == other.sign {

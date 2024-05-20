@@ -488,17 +488,24 @@ impl DivisibleBy<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.divisible_by(Natural::ZERO), true);
-    /// assert_eq!(Natural::from(100u32).divisible_by(Natural::from(3u32)), false);
-    /// assert_eq!(Natural::from(102u32).divisible_by(Natural::from(3u32)), true);
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .divisible_by(Natural::from_str("1000000000000").unwrap()),
+    ///     Natural::from(100u32).divisible_by(Natural::from(3u32)),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(102u32).divisible_by(Natural::from(3u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .divisible_by(Natural::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```
@@ -533,17 +540,24 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.divisible_by(&Natural::ZERO), true);
-    /// assert_eq!(Natural::from(100u32).divisible_by(&Natural::from(3u32)), false);
-    /// assert_eq!(Natural::from(102u32).divisible_by(&Natural::from(3u32)), true);
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .divisible_by(&Natural::from_str("1000000000000").unwrap()),
+    ///     Natural::from(100u32).divisible_by(&Natural::from(3u32)),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(102u32).divisible_by(&Natural::from(3u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .divisible_by(&Natural::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```
@@ -578,17 +592,23 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Natural::ZERO).divisible_by(Natural::ZERO), true);
-    /// assert_eq!((&Natural::from(100u32)).divisible_by(Natural::from(3u32)), false);
-    /// assert_eq!((&Natural::from(102u32)).divisible_by(Natural::from(3u32)), true);
+    /// assert_eq!(
+    ///     (&Natural::from(100u32)).divisible_by(Natural::from(3u32)),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(102u32)).divisible_by(Natural::from(3u32)),
+    ///     true
+    /// );
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .divisible_by(Natural::from_str("1000000000000").unwrap()),
+    ///         .divisible_by(Natural::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```
@@ -622,17 +642,23 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Natural::ZERO).divisible_by(&Natural::ZERO), true);
-    /// assert_eq!((&Natural::from(100u32)).divisible_by(&Natural::from(3u32)), false);
-    /// assert_eq!((&Natural::from(102u32)).divisible_by(&Natural::from(3u32)), true);
+    /// assert_eq!(
+    ///     (&Natural::from(100u32)).divisible_by(&Natural::from(3u32)),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(102u32)).divisible_by(&Natural::from(3u32)),
+    ///     true
+    /// );
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .divisible_by(&Natural::from_str("1000000000000").unwrap()),
+    ///         .divisible_by(&Natural::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```

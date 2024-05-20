@@ -7,11 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -33,7 +33,10 @@ impl TryFrom<Rational> for Natural {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Natural::try_from(Rational::from(123)).unwrap(), 123);
-    /// assert_eq!(Natural::try_from(Rational::from(-123)), Err(NaturalFromRationalError));
+    /// assert_eq!(
+    ///     Natural::try_from(Rational::from(-123)),
+    ///     Err(NaturalFromRationalError)
+    /// );
     /// assert_eq!(
     ///     Natural::try_from(Rational::from_signeds(22, 7)),
     ///     Err(NaturalFromRationalError)
@@ -68,7 +71,10 @@ impl<'a> TryFrom<&'a Rational> for Natural {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Natural::try_from(&Rational::from(123)).unwrap(), 123);
-    /// assert_eq!(Natural::try_from(&Rational::from(-123)), Err(NaturalFromRationalError));
+    /// assert_eq!(
+    ///     Natural::try_from(&Rational::from(-123)),
+    ///     Err(NaturalFromRationalError)
+    /// );
     /// assert_eq!(
     ///     Natural::try_from(&Rational::from_signeds(22, 7)),
     ///     Err(NaturalFromRationalError)
@@ -98,7 +104,10 @@ impl<'a> ConvertibleFrom<&'a Rational> for Natural {
     ///
     /// assert_eq!(Natural::convertible_from(&Rational::from(123)), true);
     /// assert_eq!(Natural::convertible_from(&Rational::from(-123)), false);
-    /// assert_eq!(Natural::convertible_from(&Rational::from_signeds(22, 7)), false);
+    /// assert_eq!(
+    ///     Natural::convertible_from(&Rational::from_signeds(22, 7)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn convertible_from(x: &Rational) -> bool {
@@ -128,63 +137,55 @@ impl RoundingFrom<Rational> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::traits::RoundingFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from(123), RoundingMode::Exact).to_debug_string(),
+    ///     Natural::rounding_from(Rational::from(123), Exact).to_debug_string(),
     ///     "(123, Equal)"
     /// );
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Floor)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), Floor).to_debug_string(),
     ///     "(3, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Down)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), Down).to_debug_string(),
     ///     "(3, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Ceiling)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), Ceiling).to_debug_string(),
     ///     "(4, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Up)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), Up).to_debug_string(),
     ///     "(4, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Nearest)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), Nearest).to_debug_string(),
     ///     "(3, Less)"
     /// );
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from(-123), RoundingMode::Down).to_debug_string(),
+    ///     Natural::rounding_from(Rational::from(-123), Down).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from(-123), RoundingMode::Ceiling).to_debug_string(),
+    ///     Natural::rounding_from(Rational::from(-123), Ceiling).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from(-123), RoundingMode::Nearest).to_debug_string(),
+    ///     Natural::rounding_from(Rational::from(-123), Nearest).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// ```
     fn rounding_from(x: Rational, rm: RoundingMode) -> (Natural, Ordering) {
         if x.sign {
             x.numerator.div_round(x.denominator, rm)
-        } else if rm == RoundingMode::Down
-            || rm == RoundingMode::Ceiling
-            || rm == RoundingMode::Nearest
-        {
-            (Natural::ZERO, Ordering::Greater)
+        } else if rm == Down || rm == Ceiling || rm == Nearest {
+            (Natural::ZERO, Greater)
         } else {
             panic!("Cannot round negative Rational to Natural using RoundingMode {rm}");
         }
@@ -213,63 +214,55 @@ impl<'a> RoundingFrom<&'a Rational> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::traits::RoundingFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from(123), RoundingMode::Exact).to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from(123), Exact).to_debug_string(),
     ///     "(123, Equal)"
     /// );
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), Floor).to_debug_string(),
     ///     "(3, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), Down).to_debug_string(),
     ///     "(3, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), Ceiling).to_debug_string(),
     ///     "(4, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), Up).to_debug_string(),
     ///     "(4, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), Nearest).to_debug_string(),
     ///     "(3, Less)"
     /// );
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from(-123), RoundingMode::Down).to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from(-123), Down).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from(-123), RoundingMode::Ceiling).to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from(-123), Ceiling).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from(-123), RoundingMode::Nearest).to_debug_string(),
+    ///     Natural::rounding_from(&Rational::from(-123), Nearest).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// ```
     fn rounding_from(x: &Rational, rm: RoundingMode) -> (Natural, Ordering) {
         if x.sign {
             (&x.numerator).div_round(&x.denominator, rm)
-        } else if rm == RoundingMode::Down
-            || rm == RoundingMode::Ceiling
-            || rm == RoundingMode::Nearest
-        {
-            (Natural::ZERO, Ordering::Greater)
+        } else if rm == Down || rm == Ceiling || rm == Nearest {
+            (Natural::ZERO, Greater)
         } else {
             panic!("Cannot round negative Rational to Natural using RoundingMode {rm}");
         }

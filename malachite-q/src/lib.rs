@@ -164,13 +164,16 @@ impl<'a> SignificantBits for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Rational::ZERO.significant_bits(), 1);
-    /// assert_eq!(Rational::from_str("-100/101").unwrap().significant_bits(), 14);
+    /// assert_eq!(
+    ///     Rational::from_str("-100/101").unwrap().significant_bits(),
+    ///     14
+    /// );
     /// ```
     fn significant_bits(self) -> u64 {
         self.numerator.significant_bits() + self.denominator.significant_bits()

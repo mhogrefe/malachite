@@ -10,7 +10,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToStringBase};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,
     string_gen_var_14, string_gen_var_15,
@@ -231,56 +231,56 @@ pub fn test_from_sci_string_with_options() {
     test("FF", options, Some("255"));
 
     options = FromSciStringOptions::default();
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("123.4", options, Some("123"));
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("123.4", options, Some("123"));
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("123.4", options, Some("124"));
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("123.4", options, Some("124"));
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("123.4", options, Some("123"));
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("123.4", options, None);
 
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("123.5", options, Some("123"));
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("123.5", options, Some("123"));
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("123.5", options, Some("124"));
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("123.5", options, Some("124"));
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("123.5", options, Some("124"));
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("123.5", options, None);
 
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("0.4", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("0.4", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("0.4", options, Some("1"));
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("0.4", options, Some("1"));
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("0.4", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("0.4", options, None);
 
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("0.04", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("0.04", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("0.04", options, Some("1"));
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("0.04", options, Some("1"));
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("0.04", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("0.04", options, None);
 
     options = FromSciStringOptions::default();
@@ -314,7 +314,7 @@ pub fn test_from_sci_string_with_options() {
     test("0.002", options, None);
 
     options = FromSciStringOptions::default();
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("1.5", options, None);
     test("1.9999999999999999999999999999", options, None);
 
@@ -356,30 +356,30 @@ pub fn test_from_sci_string_with_options() {
     options.set_base(36);
     test_i("7ksyyizzkutudzbv8aqztecjj", options, Some(i128::MAX));
 
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("-0.4", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("-0.4", options, None);
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("-0.4", options, None);
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("-0.4", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("-0.4", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("-0.4", options, None);
 
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("-0.04", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("-0.04", options, None);
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("-0.04", options, None);
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("-0.04", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("-0.04", options, Some("0"));
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("-0.04", options, None);
 }
 

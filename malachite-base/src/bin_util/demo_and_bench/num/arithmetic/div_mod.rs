@@ -8,7 +8,7 @@
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -207,7 +207,7 @@ fn benchmark_div_mod_signed_algorithms<T: PrimitiveSigned>(
         &mut [
             ("using div_mod", &mut |(x, y)| no_out!(x.div_mod(y))),
             ("using div_round and mod_op", &mut |(x, y)| {
-                no_out!((x.div_round(y, RoundingMode::Floor), x.mod_op(y)))
+                no_out!((x.div_round(y, Floor), x.mod_op(y)))
             }),
         ],
     );
@@ -349,7 +349,7 @@ fn benchmark_ceiling_div_neg_mod_algorithms<T: PrimitiveUnsigned>(
                 no_out!(x.ceiling_div_neg_mod(y))
             }),
             ("using div_round and neg_mod", &mut |(x, y)| {
-                no_out!((x.div_round(y, RoundingMode::Ceiling), x.neg_mod(y)))
+                no_out!((x.div_round(y, Ceiling), x.neg_mod(y)))
             }),
         ],
     );
@@ -375,7 +375,7 @@ fn benchmark_ceiling_div_mod_algorithms<T: PrimitiveSigned>(
                 no_out!(x.ceiling_div_mod(y))
             }),
             ("using div_round and ceiling_mod", &mut |(x, y)| {
-                no_out!((x.div_round(y, RoundingMode::Ceiling), x.ceiling_mod(y)))
+                no_out!((x.div_round(y, Ceiling), x.ceiling_mod(y)))
             }),
         ],
     );

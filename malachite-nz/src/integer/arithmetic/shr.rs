@@ -11,7 +11,7 @@ use crate::natural::Natural;
 use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 fn shr_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
 where
@@ -29,7 +29,7 @@ where
             sign: false,
             ref abs,
         } => {
-            let abs_shifted = abs.shr_round(bits, RoundingMode::Ceiling).0;
+            let abs_shifted = abs.shr_round(bits, Ceiling).0;
             if abs_shifted == 0 {
                 Integer::ZERO
             } else {
@@ -57,7 +57,7 @@ where
             sign: false,
             ref mut abs,
         } => {
-            abs.shr_round_assign(bits, RoundingMode::Ceiling);
+            abs.shr_round_assign(bits, Ceiling);
             if *abs == 0 {
                 x.sign = true;
             }

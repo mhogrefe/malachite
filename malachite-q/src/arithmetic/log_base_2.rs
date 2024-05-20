@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase2, FloorLogBase2, IsPowerOf2,
 };
@@ -46,7 +46,7 @@ impl Rational {
     pub fn floor_log_base_2_abs(&self) -> i64 {
         let exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
-        if self.numerator.cmp_normalized(&self.denominator) == Ordering::Less {
+        if self.numerator.cmp_normalized(&self.denominator) == Less {
             exponent - 1
         } else {
             exponent
@@ -84,7 +84,7 @@ impl Rational {
     pub fn ceiling_log_base_2_abs(&self) -> i64 {
         let exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
-        if self.numerator.cmp_normalized(&self.denominator) == Ordering::Greater {
+        if self.numerator.cmp_normalized(&self.denominator) == Greater {
             exponent + 1
         } else {
             exponent

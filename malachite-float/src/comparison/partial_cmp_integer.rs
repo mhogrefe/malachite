@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 
@@ -41,8 +41,8 @@ impl PartialOrd<Integer> for Float {
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) => None,
-            (float_infinity!(), _) => Some(Ordering::Greater),
-            (float_negative_infinity!(), _) => Some(Ordering::Less),
+            (float_infinity!(), _) => Some(Greater),
+            (float_negative_infinity!(), _) => Some(Less),
             (float_either_zero!(), y) => 0u32.partial_cmp(y),
             (
                 Float(Finite {
@@ -55,13 +55,13 @@ impl PartialOrd<Integer> for Float {
             ) => {
                 let s_y = *other > 0;
                 let s_cmp = s_x.cmp(&s_y);
-                if s_cmp != Ordering::Equal {
+                if s_cmp != Equal {
                     return Some(s_cmp);
                 }
                 let abs_cmp = if *other == 0u32 {
-                    Ordering::Greater
+                    Greater
                 } else if *e_x <= 0 {
-                    Ordering::Less
+                    Less
                 } else {
                     e_x.unsigned_abs()
                         .cmp(&other.significant_bits())

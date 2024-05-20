@@ -12,7 +12,7 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::primitive_float_unsigned_pair_gen_var_4;
 use malachite_float::conversion::from_primitive_float::alt_precision;
 use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
@@ -22,7 +22,10 @@ use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
 use rug::Assign;
-use std::cmp::{max, Ordering};
+use std::cmp::{
+    max,
+    Ordering::{self, *},
+};
 use std::panic::catch_unwind;
 
 #[test]
@@ -169,74 +172,50 @@ fn test_from_primitive_float_prec() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
     }
-    test_helper(f32::NAN, 1, "NaN", "NaN", Ordering::Equal);
-    test_helper(f32::NAN, 10, "NaN", "NaN", Ordering::Equal);
-    test_helper(f32::NAN, 100, "NaN", "NaN", Ordering::Equal);
-    test_helper(f32::INFINITY, 1, "Infinity", "Infinity", Ordering::Equal);
-    test_helper(f32::INFINITY, 10, "Infinity", "Infinity", Ordering::Equal);
-    test_helper(f32::INFINITY, 100, "Infinity", "Infinity", Ordering::Equal);
-    test_helper(
-        f32::NEGATIVE_INFINITY,
-        1,
-        "-Infinity",
-        "-Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_INFINITY,
-        10,
-        "-Infinity",
-        "-Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_INFINITY,
-        100,
-        "-Infinity",
-        "-Infinity",
-        Ordering::Equal,
-    );
-    test_helper(f32::ZERO, 1, "0.0", "0x0.0", Ordering::Equal);
-    test_helper(f32::ZERO, 10, "0.0", "0x0.0", Ordering::Equal);
-    test_helper(f32::ZERO, 100, "0.0", "0x0.0", Ordering::Equal);
-    test_helper(f32::NEGATIVE_ZERO, 1, "-0.0", "-0x0.0", Ordering::Equal);
-    test_helper(f32::NEGATIVE_ZERO, 10, "-0.0", "-0x0.0", Ordering::Equal);
-    test_helper(f32::NEGATIVE_ZERO, 100, "-0.0", "-0x0.0", Ordering::Equal);
+    test_helper(f32::NAN, 1, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 10, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 100, "NaN", "NaN", Equal);
+    test_helper(f32::INFINITY, 1, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 10, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 100, "Infinity", "Infinity", Equal);
+    test_helper(f32::NEGATIVE_INFINITY, 1, "-Infinity", "-Infinity", Equal);
+    test_helper(f32::NEGATIVE_INFINITY, 10, "-Infinity", "-Infinity", Equal);
+    test_helper(f32::NEGATIVE_INFINITY, 100, "-Infinity", "-Infinity", Equal);
+    test_helper(f32::ZERO, 1, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 10, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 100, "0.0", "0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 1, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 10, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 100, "-0.0", "-0x0.0", Equal);
 
-    test_helper(f32::ONE, 1, "1.0", "0x1.0#1", Ordering::Equal);
-    test_helper(f32::ONE, 10, "1.0", "0x1.000#10", Ordering::Equal);
+    test_helper(f32::ONE, 1, "1.0", "0x1.0#1", Equal);
+    test_helper(f32::ONE, 10, "1.0", "0x1.000#10", Equal);
     test_helper(
         f32::ONE,
         100,
         "1.0",
         "0x1.0000000000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(1.0f32 / 3.0, 1, "0.2", "0x0.4#1", Ordering::Less);
-    test_helper(1.0f32 / 3.0, 10, "0.3335", "0x0.556#10", Ordering::Greater);
+    test_helper(1.0f32 / 3.0, 1, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 10, "0.3335", "0x0.556#10", Greater);
     test_helper(
         1.0f32 / 3.0,
         100,
         "0.3333333432674407958984375",
         "0x0.55555580000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(std::f32::consts::PI, 1, "4.0", "0x4.0#1", Ordering::Greater);
-    test_helper(
-        std::f32::consts::PI,
-        10,
-        "3.141",
-        "0x3.24#10",
-        Ordering::Less,
-    );
+    test_helper(std::f32::consts::PI, 1, "4.0", "0x4.0#1", Greater);
+    test_helper(std::f32::consts::PI, 10, "3.141", "0x3.24#10", Less);
     test_helper(
         std::f32::consts::PI,
         100,
         "3.1415927410125732421875",
         "0x3.243f6c0000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
     test_helper(
@@ -244,63 +223,51 @@ fn test_from_primitive_float_prec() {
         1,
         "1.0e-45",
         "0x8.0E-38#1",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::MIN_POSITIVE_SUBNORMAL,
         10,
         "1.401e-45",
         "0x8.00E-38#10",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::MIN_POSITIVE_SUBNORMAL,
         100,
         "1.40129846432481707092372958329e-45",
         "0x8.000000000000000000000000E-38#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(f32::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Ordering::Equal);
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
+    test_helper(f32::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, "-1.0", "-0x1.000#10", Equal);
     test_helper(
         f32::NEGATIVE_ONE,
         100,
         "-1.0",
         "-0x1.0000000000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(-1.0f32 / 3.0, 1, "-0.2", "-0x0.4#1", Ordering::Greater);
-    test_helper(-1.0f32 / 3.0, 10, "-0.3335", "-0x0.556#10", Ordering::Less);
+    test_helper(-1.0f32 / 3.0, 1, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 10, "-0.3335", "-0x0.556#10", Less);
     test_helper(
         -1.0f32 / 3.0,
         100,
         "-0.3333333432674407958984375",
         "-0x0.55555580000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(-std::f32::consts::PI, 1, "-4.0", "-0x4.0#1", Ordering::Less);
-    test_helper(
-        -std::f32::consts::PI,
-        10,
-        "-3.141",
-        "-0x3.24#10",
-        Ordering::Greater,
-    );
+    test_helper(-std::f32::consts::PI, 1, "-4.0", "-0x4.0#1", Less);
+    test_helper(-std::f32::consts::PI, 10, "-3.141", "-0x3.24#10", Greater);
     test_helper(
         -std::f32::consts::PI,
         100,
         "-3.1415927410125732421875",
         "-0x3.243f6c0000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
     test_helper(
@@ -308,91 +275,67 @@ fn test_from_primitive_float_prec() {
         1,
         "-1.0e-45",
         "-0x8.0E-38#1",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         -f32::MIN_POSITIVE_SUBNORMAL,
         10,
         "-1.401e-45",
         "-0x8.00E-38#10",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         -f32::MIN_POSITIVE_SUBNORMAL,
         100,
         "-1.40129846432481707092372958329e-45",
         "-0x8.000000000000000000000000E-38#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(f64::NAN, 1, "NaN", "NaN", Ordering::Equal);
-    test_helper(f64::NAN, 10, "NaN", "NaN", Ordering::Equal);
-    test_helper(f64::NAN, 100, "NaN", "NaN", Ordering::Equal);
-    test_helper(f64::INFINITY, 1, "Infinity", "Infinity", Ordering::Equal);
-    test_helper(f64::INFINITY, 10, "Infinity", "Infinity", Ordering::Equal);
-    test_helper(f64::INFINITY, 100, "Infinity", "Infinity", Ordering::Equal);
-    test_helper(
-        f64::NEGATIVE_INFINITY,
-        1,
-        "-Infinity",
-        "-Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_INFINITY,
-        10,
-        "-Infinity",
-        "-Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_INFINITY,
-        100,
-        "-Infinity",
-        "-Infinity",
-        Ordering::Equal,
-    );
-    test_helper(f64::ZERO, 1, "0.0", "0x0.0", Ordering::Equal);
-    test_helper(f64::ZERO, 10, "0.0", "0x0.0", Ordering::Equal);
-    test_helper(f64::ZERO, 100, "0.0", "0x0.0", Ordering::Equal);
-    test_helper(f64::NEGATIVE_ZERO, 1, "-0.0", "-0x0.0", Ordering::Equal);
-    test_helper(f64::NEGATIVE_ZERO, 10, "-0.0", "-0x0.0", Ordering::Equal);
-    test_helper(f64::NEGATIVE_ZERO, 100, "-0.0", "-0x0.0", Ordering::Equal);
+    test_helper(f64::NAN, 1, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 10, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 100, "NaN", "NaN", Equal);
+    test_helper(f64::INFINITY, 1, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 10, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 100, "Infinity", "Infinity", Equal);
+    test_helper(f64::NEGATIVE_INFINITY, 1, "-Infinity", "-Infinity", Equal);
+    test_helper(f64::NEGATIVE_INFINITY, 10, "-Infinity", "-Infinity", Equal);
+    test_helper(f64::NEGATIVE_INFINITY, 100, "-Infinity", "-Infinity", Equal);
+    test_helper(f64::ZERO, 1, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 10, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 100, "0.0", "0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 1, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 10, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 100, "-0.0", "-0x0.0", Equal);
 
-    test_helper(f64::ONE, 1, "1.0", "0x1.0#1", Ordering::Equal);
-    test_helper(f64::ONE, 10, "1.0", "0x1.000#10", Ordering::Equal);
+    test_helper(f64::ONE, 1, "1.0", "0x1.0#1", Equal);
+    test_helper(f64::ONE, 10, "1.0", "0x1.000#10", Equal);
     test_helper(
         f64::ONE,
         100,
         "1.0",
         "0x1.0000000000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(1.0f64 / 3.0, 1, "0.2", "0x0.4#1", Ordering::Less);
-    test_helper(1.0f64 / 3.0, 10, "0.3335", "0x0.556#10", Ordering::Greater);
+    test_helper(1.0f64 / 3.0, 1, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 10, "0.3335", "0x0.556#10", Greater);
     test_helper(
         1.0f64 / 3.0,
         100,
         "0.3333333333333333148296162562474",
         "0x0.55555555555554000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(std::f64::consts::PI, 1, "4.0", "0x4.0#1", Ordering::Greater);
-    test_helper(
-        std::f64::consts::PI,
-        10,
-        "3.141",
-        "0x3.24#10",
-        Ordering::Less,
-    );
+    test_helper(std::f64::consts::PI, 1, "4.0", "0x4.0#1", Greater);
+    test_helper(std::f64::consts::PI, 10, "3.141", "0x3.24#10", Less);
     test_helper(
         std::f64::consts::PI,
         100,
         "3.141592653589793115997963468544",
         "0x3.243f6a8885a30000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
     test_helper(
@@ -400,63 +343,51 @@ fn test_from_primitive_float_prec() {
         1,
         "5.0e-324",
         "0x4.0E-269#1",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::MIN_POSITIVE_SUBNORMAL,
         10,
         "4.94e-324",
         "0x4.00E-269#10",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::MIN_POSITIVE_SUBNORMAL,
         100,
         "4.94065645841246544176568792868e-324",
         "0x4.0000000000000000000000000E-269#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(f64::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Ordering::Equal);
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
+    test_helper(f64::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, "-1.0", "-0x1.000#10", Equal);
     test_helper(
         f64::NEGATIVE_ONE,
         100,
         "-1.0",
         "-0x1.0000000000000000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(-1.0f64 / 3.0, 1, "-0.2", "-0x0.4#1", Ordering::Greater);
-    test_helper(-1.0f64 / 3.0, 10, "-0.3335", "-0x0.556#10", Ordering::Less);
+    test_helper(-1.0f64 / 3.0, 1, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 10, "-0.3335", "-0x0.556#10", Less);
     test_helper(
         -1.0f64 / 3.0,
         100,
         "-0.3333333333333333148296162562474",
         "-0x0.55555555555554000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(-std::f64::consts::PI, 1, "-4.0", "-0x4.0#1", Ordering::Less);
-    test_helper(
-        -std::f64::consts::PI,
-        10,
-        "-3.141",
-        "-0x3.24#10",
-        Ordering::Greater,
-    );
+    test_helper(-std::f64::consts::PI, 1, "-4.0", "-0x4.0#1", Less);
+    test_helper(-std::f64::consts::PI, 10, "-3.141", "-0x3.24#10", Greater);
     test_helper(
         -std::f64::consts::PI,
         100,
         "-3.141592653589793115997963468544",
         "-0x3.243f6a8885a30000000000000#100",
-        Ordering::Equal,
+        Equal,
     );
 
     test_helper(
@@ -464,21 +395,21 @@ fn test_from_primitive_float_prec() {
         1,
         "-5.0e-324",
         "-0x4.0E-269#1",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         -f64::MIN_POSITIVE_SUBNORMAL,
         10,
         "-4.94e-324",
         "-0x4.00E-269#10",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         -f64::MIN_POSITIVE_SUBNORMAL,
         100,
         "-4.94065645841246544176568792868e-324",
         "-0x4.0000000000000000000000000E-269#100",
-        Ordering::Equal,
+        Equal,
     );
 }
 
@@ -526,2346 +457,813 @@ fn test_from_primitive_float_prec_round() {
             assert_eq!(rug_o, out_o);
         }
     }
-    test_helper(
-        f32::NAN,
-        1,
-        RoundingMode::Floor,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        1,
-        RoundingMode::Ceiling,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        1,
-        RoundingMode::Down,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(f32::NAN, 1, RoundingMode::Up, "NaN", "NaN", Ordering::Equal);
-    test_helper(
-        f32::NAN,
-        1,
-        RoundingMode::Nearest,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        1,
-        RoundingMode::Exact,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
+    test_helper(f32::NAN, 1, Floor, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 1, Ceiling, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 1, Down, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 1, Up, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 1, Nearest, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 1, Exact, "NaN", "NaN", Equal);
 
-    test_helper(
-        f32::NAN,
-        10,
-        RoundingMode::Floor,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        10,
-        RoundingMode::Ceiling,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        10,
-        RoundingMode::Down,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        10,
-        RoundingMode::Up,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        10,
-        RoundingMode::Nearest,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NAN,
-        10,
-        RoundingMode::Exact,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
+    test_helper(f32::NAN, 10, Floor, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 10, Ceiling, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 10, Down, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 10, Up, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 10, Nearest, "NaN", "NaN", Equal);
+    test_helper(f32::NAN, 10, Exact, "NaN", "NaN", Equal);
 
-    test_helper(
-        f32::INFINITY,
-        1,
-        RoundingMode::Floor,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        1,
-        RoundingMode::Ceiling,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        1,
-        RoundingMode::Down,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        1,
-        RoundingMode::Up,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        1,
-        RoundingMode::Nearest,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        1,
-        RoundingMode::Exact,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
+    test_helper(f32::INFINITY, 1, Floor, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 1, Ceiling, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 1, Down, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 1, Up, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 1, Nearest, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 1, Exact, "Infinity", "Infinity", Equal);
 
-    test_helper(
-        f32::INFINITY,
-        10,
-        RoundingMode::Floor,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        10,
-        RoundingMode::Ceiling,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        10,
-        RoundingMode::Down,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        10,
-        RoundingMode::Up,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        10,
-        RoundingMode::Nearest,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::INFINITY,
-        10,
-        RoundingMode::Exact,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
+    test_helper(f32::INFINITY, 10, Floor, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 10, Ceiling, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 10, Down, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 10, Up, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 10, Nearest, "Infinity", "Infinity", Equal);
+    test_helper(f32::INFINITY, 10, Exact, "Infinity", "Infinity", Equal);
 
     test_helper(
         f32::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Floor,
+        Floor,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Down,
+        Down,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Up,
+        Up,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Nearest,
+        Nearest,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Exact,
+        Exact,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
 
     test_helper(
         f32::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Floor,
+        Floor,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Down,
+        Down,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Up,
+        Up,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Nearest,
+        Nearest,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f32::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Exact,
+        Exact,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(
-        f32::ZERO,
-        1,
-        RoundingMode::Floor,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        1,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        1,
-        RoundingMode::Down,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        1,
-        RoundingMode::Up,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        1,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        1,
-        RoundingMode::Exact,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f32::ZERO, 1, Floor, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 1, Ceiling, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 1, Down, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 1, Up, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 1, Nearest, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 1, Exact, "0.0", "0x0.0", Equal);
 
-    test_helper(
-        f32::ZERO,
-        10,
-        RoundingMode::Floor,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        10,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        10,
-        RoundingMode::Down,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        10,
-        RoundingMode::Up,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        10,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ZERO,
-        10,
-        RoundingMode::Exact,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f32::ZERO, 10, Floor, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 10, Down, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 10, Up, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 10, Nearest, "0.0", "0x0.0", Equal);
+    test_helper(f32::ZERO, 10, Exact, "0.0", "0x0.0", Equal);
 
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Floor,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Ceiling,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Down,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Up,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Nearest,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Exact,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f32::NEGATIVE_ZERO, 1, Floor, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 1, Ceiling, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 1, Down, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 1, Up, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 1, Nearest, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 1, Exact, "-0.0", "-0x0.0", Equal);
 
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Floor,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Ceiling,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Down,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Up,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Nearest,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Exact,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f32::NEGATIVE_ZERO, 10, Floor, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 10, Ceiling, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 10, Down, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 10, Up, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 10, Nearest, "-0.0", "-0x0.0", Equal);
+    test_helper(f32::NEGATIVE_ZERO, 10, Exact, "-0.0", "-0x0.0", Equal);
 
-    test_helper(
-        f32::ONE,
-        1,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        1,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        1,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        1,
-        RoundingMode::Up,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        1,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        1,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
+    test_helper(f32::ONE, 1, Floor, "1.0", "0x1.0#1", Equal);
+    test_helper(f32::ONE, 1, Ceiling, "1.0", "0x1.0#1", Equal);
+    test_helper(f32::ONE, 1, Down, "1.0", "0x1.0#1", Equal);
+    test_helper(f32::ONE, 1, Up, "1.0", "0x1.0#1", Equal);
+    test_helper(f32::ONE, 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test_helper(f32::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test_helper(
-        f32::ONE,
-        10,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        10,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        10,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        10,
-        RoundingMode::Up,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        10,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::ONE,
-        10,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
+    test_helper(f32::ONE, 10, Floor, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Ceiling, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Down, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Up, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Exact, "1.0", "0x1.000#10", Equal);
 
-    test_helper(
-        1.0f32 / 3.0,
-        1,
-        RoundingMode::Floor,
-        "0.2",
-        "0x0.4#1",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        1,
-        RoundingMode::Ceiling,
-        "0.5",
-        "0x0.8#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        1,
-        RoundingMode::Down,
-        "0.2",
-        "0x0.4#1",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        1,
-        RoundingMode::Up,
-        "0.5",
-        "0x0.8#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        1,
-        RoundingMode::Nearest,
-        "0.2",
-        "0x0.4#1",
-        Ordering::Less,
-    );
+    test_helper(1.0f32 / 3.0, 1, Floor, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 1, Ceiling, "0.5", "0x0.8#1", Greater);
+    test_helper(1.0f32 / 3.0, 1, Down, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 1, Up, "0.5", "0x0.8#1", Greater);
+    test_helper(1.0f32 / 3.0, 1, Nearest, "0.2", "0x0.4#1", Less);
 
-    test_helper(
-        1.0f32 / 3.0,
-        10,
-        RoundingMode::Floor,
-        "0.333",
-        "0x0.554#10",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        10,
-        RoundingMode::Ceiling,
-        "0.3335",
-        "0x0.556#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        10,
-        RoundingMode::Down,
-        "0.333",
-        "0x0.554#10",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        10,
-        RoundingMode::Up,
-        "0.3335",
-        "0x0.556#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f32 / 3.0,
-        10,
-        RoundingMode::Nearest,
-        "0.3335",
-        "0x0.556#10",
-        Ordering::Greater,
-    );
+    test_helper(1.0f32 / 3.0, 10, Floor, "0.333", "0x0.554#10", Less);
+    test_helper(1.0f32 / 3.0, 10, Ceiling, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f32 / 3.0, 10, Down, "0.333", "0x0.554#10", Less);
+    test_helper(1.0f32 / 3.0, 10, Up, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f32 / 3.0, 10, Nearest, "0.3335", "0x0.556#10", Greater);
 
-    test_helper(
-        std::f32::consts::PI,
-        1,
-        RoundingMode::Floor,
-        "2.0",
-        "0x2.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        1,
-        RoundingMode::Ceiling,
-        "4.0",
-        "0x4.0#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        1,
-        RoundingMode::Down,
-        "2.0",
-        "0x2.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        1,
-        RoundingMode::Up,
-        "4.0",
-        "0x4.0#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        1,
-        RoundingMode::Nearest,
-        "4.0",
-        "0x4.0#1",
-        Ordering::Greater,
-    );
+    test_helper(std::f32::consts::PI, 1, Floor, "2.0", "0x2.0#1", Less);
+    test_helper(std::f32::consts::PI, 1, Ceiling, "4.0", "0x4.0#1", Greater);
+    test_helper(std::f32::consts::PI, 1, Down, "2.0", "0x2.0#1", Less);
+    test_helper(std::f32::consts::PI, 1, Up, "4.0", "0x4.0#1", Greater);
+    test_helper(std::f32::consts::PI, 1, Nearest, "4.0", "0x4.0#1", Greater);
 
+    test_helper(std::f32::consts::PI, 10, Floor, "3.141", "0x3.24#10", Less);
     test_helper(
         std::f32::consts::PI,
         10,
-        RoundingMode::Floor,
-        "3.141",
-        "0x3.24#10",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "3.145",
         "0x3.25#10",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(std::f32::consts::PI, 10, Down, "3.141", "0x3.24#10", Less);
+    test_helper(std::f32::consts::PI, 10, Up, "3.145", "0x3.25#10", Greater);
     test_helper(
         std::f32::consts::PI,
         10,
-        RoundingMode::Down,
+        Nearest,
         "3.141",
         "0x3.24#10",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        10,
-        RoundingMode::Up,
-        "3.145",
-        "0x3.25#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        std::f32::consts::PI,
-        10,
-        RoundingMode::Nearest,
-        "3.141",
-        "0x3.24#10",
-        Ordering::Less,
+        Less,
     );
 
+    test_helper(f32::MAX_FINITE, 1, Floor, "2.0e38", "0x8.0E+31#1", Less);
     test_helper(
         f32::MAX_FINITE,
         1,
-        RoundingMode::Floor,
-        "2.0e38",
-        "0x8.0E+31#1",
-        Ordering::Less,
-    );
-    test_helper(
-        f32::MAX_FINITE,
-        1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "3.0e38",
         "0x1.0E+32#1",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(f32::MAX_FINITE, 1, Down, "2.0e38", "0x8.0E+31#1", Less);
+    test_helper(f32::MAX_FINITE, 1, Up, "3.0e38", "0x1.0E+32#1", Greater);
     test_helper(
         f32::MAX_FINITE,
         1,
-        RoundingMode::Down,
-        "2.0e38",
-        "0x8.0E+31#1",
-        Ordering::Less,
-    );
-    test_helper(
-        f32::MAX_FINITE,
-        1,
-        RoundingMode::Up,
+        Nearest,
         "3.0e38",
         "0x1.0E+32#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        f32::MAX_FINITE,
-        1,
-        RoundingMode::Nearest,
-        "3.0e38",
-        "0x1.0E+32#1",
-        Ordering::Greater,
+        Greater,
     );
 
+    test_helper(f32::MAX_FINITE, 10, Floor, "3.4e38", "0xf.fcE+31#10", Less);
     test_helper(
         f32::MAX_FINITE,
         10,
-        RoundingMode::Floor,
-        "3.4e38",
-        "0xf.fcE+31#10",
-        Ordering::Less,
-    );
-    test_helper(
-        f32::MAX_FINITE,
-        10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "3.403e38",
         "0x1.000E+32#10",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(f32::MAX_FINITE, 10, Down, "3.4e38", "0xf.fcE+31#10", Less);
     test_helper(
         f32::MAX_FINITE,
         10,
-        RoundingMode::Down,
-        "3.4e38",
-        "0xf.fcE+31#10",
-        Ordering::Less,
-    );
-    test_helper(
-        f32::MAX_FINITE,
-        10,
-        RoundingMode::Up,
+        Up,
         "3.403e38",
         "0x1.000E+32#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         f32::MAX_FINITE,
         10,
-        RoundingMode::Nearest,
+        Nearest,
         "3.403e38",
         "0x1.000E+32#10",
-        Ordering::Greater,
+        Greater,
     );
 
-    test_helper(
-        f32::NEGATIVE_ONE,
-        1,
-        RoundingMode::Floor,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        1,
-        RoundingMode::Ceiling,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        1,
-        RoundingMode::Down,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        1,
-        RoundingMode::Up,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        1,
-        RoundingMode::Nearest,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        1,
-        RoundingMode::Exact,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
+    test_helper(f32::NEGATIVE_ONE, 1, Floor, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f32::NEGATIVE_ONE, 1, Ceiling, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f32::NEGATIVE_ONE, 1, Down, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f32::NEGATIVE_ONE, 1, Up, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f32::NEGATIVE_ONE, 1, Nearest, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f32::NEGATIVE_ONE, 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        RoundingMode::Floor,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        RoundingMode::Ceiling,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        RoundingMode::Down,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        RoundingMode::Up,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        RoundingMode::Nearest,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f32::NEGATIVE_ONE,
-        10,
-        RoundingMode::Exact,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
+    test_helper(f32::NEGATIVE_ONE, 10, Floor, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, Down, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, Up, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, Nearest, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, Exact, "-1.0", "-0x1.000#10", Equal);
 
-    test_helper(
-        -1.0f32 / 3.0,
-        1,
-        RoundingMode::Floor,
-        "-0.5",
-        "-0x0.8#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        1,
-        RoundingMode::Ceiling,
-        "-0.2",
-        "-0x0.4#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        1,
-        RoundingMode::Down,
-        "-0.2",
-        "-0x0.4#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        1,
-        RoundingMode::Up,
-        "-0.5",
-        "-0x0.8#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        1,
-        RoundingMode::Nearest,
-        "-0.2",
-        "-0x0.4#1",
-        Ordering::Greater,
-    );
+    test_helper(-1.0f32 / 3.0, 1, Floor, "-0.5", "-0x0.8#1", Less);
+    test_helper(-1.0f32 / 3.0, 1, Ceiling, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 1, Down, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 1, Up, "-0.5", "-0x0.8#1", Less);
+    test_helper(-1.0f32 / 3.0, 1, Nearest, "-0.2", "-0x0.4#1", Greater);
 
-    test_helper(
-        -1.0f32 / 3.0,
-        10,
-        RoundingMode::Floor,
-        "-0.3335",
-        "-0x0.556#10",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        10,
-        RoundingMode::Ceiling,
-        "-0.333",
-        "-0x0.554#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        10,
-        RoundingMode::Down,
-        "-0.333",
-        "-0x0.554#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        10,
-        RoundingMode::Up,
-        "-0.3335",
-        "-0x0.556#10",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f32 / 3.0,
-        10,
-        RoundingMode::Nearest,
-        "-0.3335",
-        "-0x0.556#10",
-        Ordering::Less,
-    );
+    test_helper(-1.0f32 / 3.0, 10, Floor, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f32 / 3.0, 10, Ceiling, "-0.333", "-0x0.554#10", Greater);
+    test_helper(-1.0f32 / 3.0, 10, Down, "-0.333", "-0x0.554#10", Greater);
+    test_helper(-1.0f32 / 3.0, 10, Up, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f32 / 3.0, 10, Nearest, "-0.3335", "-0x0.556#10", Less);
 
+    test_helper(-std::f32::consts::PI, 1, Floor, "-4.0", "-0x4.0#1", Less);
     test_helper(
         -std::f32::consts::PI,
         1,
-        RoundingMode::Floor,
-        "-4.0",
-        "-0x4.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -std::f32::consts::PI,
-        1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-2.0",
         "-0x2.0#1",
-        Ordering::Greater,
+        Greater,
     );
-    test_helper(
-        -std::f32::consts::PI,
-        1,
-        RoundingMode::Down,
-        "-2.0",
-        "-0x2.0#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        -std::f32::consts::PI,
-        1,
-        RoundingMode::Up,
-        "-4.0",
-        "-0x4.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -std::f32::consts::PI,
-        1,
-        RoundingMode::Nearest,
-        "-4.0",
-        "-0x4.0#1",
-        Ordering::Less,
-    );
+    test_helper(-std::f32::consts::PI, 1, Down, "-2.0", "-0x2.0#1", Greater);
+    test_helper(-std::f32::consts::PI, 1, Up, "-4.0", "-0x4.0#1", Less);
+    test_helper(-std::f32::consts::PI, 1, Nearest, "-4.0", "-0x4.0#1", Less);
 
     test_helper(
         -std::f32::consts::PI,
         10,
-        RoundingMode::Floor,
+        Floor,
         "-3.145",
         "-0x3.25#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -std::f32::consts::PI,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-3.141",
         "-0x3.24#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -std::f32::consts::PI,
         10,
-        RoundingMode::Down,
+        Down,
         "-3.141",
         "-0x3.24#10",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(-std::f32::consts::PI, 10, Up, "-3.145", "-0x3.25#10", Less);
     test_helper(
         -std::f32::consts::PI,
         10,
-        RoundingMode::Up,
-        "-3.145",
-        "-0x3.25#10",
-        Ordering::Less,
-    );
-    test_helper(
-        -std::f32::consts::PI,
-        10,
-        RoundingMode::Nearest,
+        Nearest,
         "-3.141",
         "-0x3.24#10",
-        Ordering::Greater,
+        Greater,
     );
 
+    test_helper(-f32::MAX_FINITE, 1, Floor, "-3.0e38", "-0x1.0E+32#1", Less);
     test_helper(
         -f32::MAX_FINITE,
         1,
-        RoundingMode::Floor,
-        "-3.0e38",
-        "-0x1.0E+32#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -f32::MAX_FINITE,
-        1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-2.0e38",
         "-0x8.0E+31#1",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -f32::MAX_FINITE,
         1,
-        RoundingMode::Down,
+        Down,
         "-2.0e38",
         "-0x8.0E+31#1",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(-f32::MAX_FINITE, 1, Up, "-3.0e38", "-0x1.0E+32#1", Less);
     test_helper(
         -f32::MAX_FINITE,
         1,
-        RoundingMode::Up,
+        Nearest,
         "-3.0e38",
         "-0x1.0E+32#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -f32::MAX_FINITE,
-        1,
-        RoundingMode::Nearest,
-        "-3.0e38",
-        "-0x1.0E+32#1",
-        Ordering::Less,
+        Less,
     );
 
     test_helper(
         -f32::MAX_FINITE,
         10,
-        RoundingMode::Floor,
+        Floor,
         "-3.403e38",
         "-0x1.000E+32#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -f32::MAX_FINITE,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-3.4e38",
         "-0xf.fcE+31#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -f32::MAX_FINITE,
         10,
-        RoundingMode::Down,
+        Down,
         "-3.4e38",
         "-0xf.fcE+31#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -f32::MAX_FINITE,
         10,
-        RoundingMode::Up,
+        Up,
         "-3.403e38",
         "-0x1.000E+32#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -f32::MAX_FINITE,
         10,
-        RoundingMode::Nearest,
+        Nearest,
         "-3.403e38",
         "-0x1.000E+32#10",
-        Ordering::Less,
+        Less,
     );
 
-    test_helper(
-        f64::NAN,
-        1,
-        RoundingMode::Floor,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        1,
-        RoundingMode::Ceiling,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        1,
-        RoundingMode::Down,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(f64::NAN, 1, RoundingMode::Up, "NaN", "NaN", Ordering::Equal);
-    test_helper(
-        f64::NAN,
-        1,
-        RoundingMode::Nearest,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        1,
-        RoundingMode::Exact,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
+    test_helper(f64::NAN, 1, Floor, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 1, Ceiling, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 1, Down, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 1, Up, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 1, Nearest, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 1, Exact, "NaN", "NaN", Equal);
 
-    test_helper(
-        f64::NAN,
-        10,
-        RoundingMode::Floor,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        10,
-        RoundingMode::Ceiling,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        10,
-        RoundingMode::Down,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        10,
-        RoundingMode::Up,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        10,
-        RoundingMode::Nearest,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NAN,
-        10,
-        RoundingMode::Exact,
-        "NaN",
-        "NaN",
-        Ordering::Equal,
-    );
+    test_helper(f64::NAN, 10, Floor, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 10, Ceiling, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 10, Down, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 10, Up, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 10, Nearest, "NaN", "NaN", Equal);
+    test_helper(f64::NAN, 10, Exact, "NaN", "NaN", Equal);
 
-    test_helper(
-        f64::INFINITY,
-        1,
-        RoundingMode::Floor,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        1,
-        RoundingMode::Ceiling,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        1,
-        RoundingMode::Down,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        1,
-        RoundingMode::Up,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        1,
-        RoundingMode::Nearest,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        1,
-        RoundingMode::Exact,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
+    test_helper(f64::INFINITY, 1, Floor, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 1, Ceiling, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 1, Down, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 1, Up, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 1, Nearest, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 1, Exact, "Infinity", "Infinity", Equal);
 
-    test_helper(
-        f64::INFINITY,
-        10,
-        RoundingMode::Floor,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        10,
-        RoundingMode::Ceiling,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        10,
-        RoundingMode::Down,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        10,
-        RoundingMode::Up,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        10,
-        RoundingMode::Nearest,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::INFINITY,
-        10,
-        RoundingMode::Exact,
-        "Infinity",
-        "Infinity",
-        Ordering::Equal,
-    );
+    test_helper(f64::INFINITY, 10, Floor, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 10, Ceiling, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 10, Down, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 10, Up, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 10, Nearest, "Infinity", "Infinity", Equal);
+    test_helper(f64::INFINITY, 10, Exact, "Infinity", "Infinity", Equal);
 
     test_helper(
         f64::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Floor,
+        Floor,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Down,
+        Down,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Up,
+        Up,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Nearest,
+        Nearest,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         1,
-        RoundingMode::Exact,
+        Exact,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
 
     test_helper(
         f64::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Floor,
+        Floor,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Down,
+        Down,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Up,
+        Up,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Nearest,
+        Nearest,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
     test_helper(
         f64::NEGATIVE_INFINITY,
         10,
-        RoundingMode::Exact,
+        Exact,
         "-Infinity",
         "-Infinity",
-        Ordering::Equal,
+        Equal,
     );
 
-    test_helper(
-        f64::ZERO,
-        1,
-        RoundingMode::Floor,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        1,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        1,
-        RoundingMode::Down,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        1,
-        RoundingMode::Up,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        1,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        1,
-        RoundingMode::Exact,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f64::ZERO, 1, Floor, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 1, Ceiling, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 1, Down, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 1, Up, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 1, Nearest, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 1, Exact, "0.0", "0x0.0", Equal);
 
-    test_helper(
-        f64::ZERO,
-        10,
-        RoundingMode::Floor,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        10,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        10,
-        RoundingMode::Down,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        10,
-        RoundingMode::Up,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        10,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ZERO,
-        10,
-        RoundingMode::Exact,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f64::ZERO, 10, Floor, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 10, Down, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 10, Up, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 10, Nearest, "0.0", "0x0.0", Equal);
+    test_helper(f64::ZERO, 10, Exact, "0.0", "0x0.0", Equal);
 
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Floor,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Ceiling,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Down,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Up,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Nearest,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        1,
-        RoundingMode::Exact,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f64::NEGATIVE_ZERO, 1, Floor, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 1, Ceiling, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 1, Down, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 1, Up, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 1, Nearest, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 1, Exact, "-0.0", "-0x0.0", Equal);
 
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Floor,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Ceiling,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Down,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Up,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Nearest,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ZERO,
-        10,
-        RoundingMode::Exact,
-        "-0.0",
-        "-0x0.0",
-        Ordering::Equal,
-    );
+    test_helper(f64::NEGATIVE_ZERO, 10, Floor, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 10, Ceiling, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 10, Down, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 10, Up, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 10, Nearest, "-0.0", "-0x0.0", Equal);
+    test_helper(f64::NEGATIVE_ZERO, 10, Exact, "-0.0", "-0x0.0", Equal);
 
-    test_helper(
-        f64::ONE,
-        1,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        1,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        1,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        1,
-        RoundingMode::Up,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        1,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        1,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
+    test_helper(f64::ONE, 1, Floor, "1.0", "0x1.0#1", Equal);
+    test_helper(f64::ONE, 1, Ceiling, "1.0", "0x1.0#1", Equal);
+    test_helper(f64::ONE, 1, Down, "1.0", "0x1.0#1", Equal);
+    test_helper(f64::ONE, 1, Up, "1.0", "0x1.0#1", Equal);
+    test_helper(f64::ONE, 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test_helper(f64::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test_helper(
-        f64::ONE,
-        10,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        10,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        10,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        10,
-        RoundingMode::Up,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        10,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::ONE,
-        10,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
+    test_helper(f64::ONE, 10, Floor, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Ceiling, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Down, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Up, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Exact, "1.0", "0x1.000#10", Equal);
 
-    test_helper(
-        1.0f64 / 3.0,
-        1,
-        RoundingMode::Floor,
-        "0.2",
-        "0x0.4#1",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        1,
-        RoundingMode::Ceiling,
-        "0.5",
-        "0x0.8#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        1,
-        RoundingMode::Down,
-        "0.2",
-        "0x0.4#1",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        1,
-        RoundingMode::Up,
-        "0.5",
-        "0x0.8#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        1,
-        RoundingMode::Nearest,
-        "0.2",
-        "0x0.4#1",
-        Ordering::Less,
-    );
+    test_helper(1.0f64 / 3.0, 1, Floor, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 1, Ceiling, "0.5", "0x0.8#1", Greater);
+    test_helper(1.0f64 / 3.0, 1, Down, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 1, Up, "0.5", "0x0.8#1", Greater);
+    test_helper(1.0f64 / 3.0, 1, Nearest, "0.2", "0x0.4#1", Less);
 
-    test_helper(
-        1.0f64 / 3.0,
-        10,
-        RoundingMode::Floor,
-        "0.333",
-        "0x0.554#10",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        10,
-        RoundingMode::Ceiling,
-        "0.3335",
-        "0x0.556#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        10,
-        RoundingMode::Down,
-        "0.333",
-        "0x0.554#10",
-        Ordering::Less,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        10,
-        RoundingMode::Up,
-        "0.3335",
-        "0x0.556#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        1.0f64 / 3.0,
-        10,
-        RoundingMode::Nearest,
-        "0.3335",
-        "0x0.556#10",
-        Ordering::Greater,
-    );
+    test_helper(1.0f64 / 3.0, 10, Floor, "0.333", "0x0.554#10", Less);
+    test_helper(1.0f64 / 3.0, 10, Ceiling, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f64 / 3.0, 10, Down, "0.333", "0x0.554#10", Less);
+    test_helper(1.0f64 / 3.0, 10, Up, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f64 / 3.0, 10, Nearest, "0.3335", "0x0.556#10", Greater);
 
-    test_helper(
-        std::f64::consts::PI,
-        1,
-        RoundingMode::Floor,
-        "2.0",
-        "0x2.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        1,
-        RoundingMode::Ceiling,
-        "4.0",
-        "0x4.0#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        1,
-        RoundingMode::Down,
-        "2.0",
-        "0x2.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        1,
-        RoundingMode::Up,
-        "4.0",
-        "0x4.0#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        1,
-        RoundingMode::Nearest,
-        "4.0",
-        "0x4.0#1",
-        Ordering::Greater,
-    );
+    test_helper(std::f64::consts::PI, 1, Floor, "2.0", "0x2.0#1", Less);
+    test_helper(std::f64::consts::PI, 1, Ceiling, "4.0", "0x4.0#1", Greater);
+    test_helper(std::f64::consts::PI, 1, Down, "2.0", "0x2.0#1", Less);
+    test_helper(std::f64::consts::PI, 1, Up, "4.0", "0x4.0#1", Greater);
+    test_helper(std::f64::consts::PI, 1, Nearest, "4.0", "0x4.0#1", Greater);
 
+    test_helper(std::f64::consts::PI, 10, Floor, "3.141", "0x3.24#10", Less);
     test_helper(
         std::f64::consts::PI,
         10,
-        RoundingMode::Floor,
-        "3.141",
-        "0x3.24#10",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "3.145",
         "0x3.25#10",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(std::f64::consts::PI, 10, Down, "3.141", "0x3.24#10", Less);
+    test_helper(std::f64::consts::PI, 10, Up, "3.145", "0x3.25#10", Greater);
     test_helper(
         std::f64::consts::PI,
         10,
-        RoundingMode::Down,
+        Nearest,
         "3.141",
         "0x3.24#10",
-        Ordering::Less,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        10,
-        RoundingMode::Up,
-        "3.145",
-        "0x3.25#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        std::f64::consts::PI,
-        10,
-        RoundingMode::Nearest,
-        "3.141",
-        "0x3.24#10",
-        Ordering::Less,
+        Less,
     );
 
+    test_helper(f64::MAX_FINITE, 1, Floor, "9.0e307", "0x8.0E+255#1", Less);
     test_helper(
         f64::MAX_FINITE,
         1,
-        RoundingMode::Floor,
-        "9.0e307",
-        "0x8.0E+255#1",
-        Ordering::Less,
-    );
-    test_helper(
-        f64::MAX_FINITE,
-        1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "2.0e308",
         "0x1.0E+256#1",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(f64::MAX_FINITE, 1, Down, "9.0e307", "0x8.0E+255#1", Less);
+    test_helper(f64::MAX_FINITE, 1, Up, "2.0e308", "0x1.0E+256#1", Greater);
     test_helper(
         f64::MAX_FINITE,
         1,
-        RoundingMode::Down,
-        "9.0e307",
-        "0x8.0E+255#1",
-        Ordering::Less,
-    );
-    test_helper(
-        f64::MAX_FINITE,
-        1,
-        RoundingMode::Up,
+        Nearest,
         "2.0e308",
         "0x1.0E+256#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        f64::MAX_FINITE,
-        1,
-        RoundingMode::Nearest,
-        "2.0e308",
-        "0x1.0E+256#1",
-        Ordering::Greater,
+        Greater,
     );
 
     test_helper(
         f64::MAX_FINITE,
         10,
-        RoundingMode::Floor,
+        Floor,
         "1.796e308",
         "0xf.fcE+255#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         f64::MAX_FINITE,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "1.798e308",
         "0x1.000E+256#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         f64::MAX_FINITE,
         10,
-        RoundingMode::Down,
+        Down,
         "1.796e308",
         "0xf.fcE+255#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         f64::MAX_FINITE,
         10,
-        RoundingMode::Up,
+        Up,
         "1.798e308",
         "0x1.000E+256#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         f64::MAX_FINITE,
         10,
-        RoundingMode::Nearest,
+        Nearest,
         "1.798e308",
         "0x1.000E+256#10",
-        Ordering::Greater,
+        Greater,
     );
 
-    test_helper(
-        f64::NEGATIVE_ONE,
-        1,
-        RoundingMode::Floor,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        1,
-        RoundingMode::Ceiling,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        1,
-        RoundingMode::Down,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        1,
-        RoundingMode::Up,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        1,
-        RoundingMode::Nearest,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        1,
-        RoundingMode::Exact,
-        "-1.0",
-        "-0x1.0#1",
-        Ordering::Equal,
-    );
+    test_helper(f64::NEGATIVE_ONE, 1, Floor, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f64::NEGATIVE_ONE, 1, Ceiling, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f64::NEGATIVE_ONE, 1, Down, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f64::NEGATIVE_ONE, 1, Up, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f64::NEGATIVE_ONE, 1, Nearest, "-1.0", "-0x1.0#1", Equal);
+    test_helper(f64::NEGATIVE_ONE, 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        RoundingMode::Floor,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        RoundingMode::Ceiling,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        RoundingMode::Down,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        RoundingMode::Up,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        RoundingMode::Nearest,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
-    test_helper(
-        f64::NEGATIVE_ONE,
-        10,
-        RoundingMode::Exact,
-        "-1.0",
-        "-0x1.000#10",
-        Ordering::Equal,
-    );
+    test_helper(f64::NEGATIVE_ONE, 10, Floor, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, Down, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, Up, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, Nearest, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, Exact, "-1.0", "-0x1.000#10", Equal);
 
-    test_helper(
-        -1.0f64 / 3.0,
-        1,
-        RoundingMode::Floor,
-        "-0.5",
-        "-0x0.8#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        1,
-        RoundingMode::Ceiling,
-        "-0.2",
-        "-0x0.4#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        1,
-        RoundingMode::Down,
-        "-0.2",
-        "-0x0.4#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        1,
-        RoundingMode::Up,
-        "-0.5",
-        "-0x0.8#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        1,
-        RoundingMode::Nearest,
-        "-0.2",
-        "-0x0.4#1",
-        Ordering::Greater,
-    );
+    test_helper(-1.0f64 / 3.0, 1, Floor, "-0.5", "-0x0.8#1", Less);
+    test_helper(-1.0f64 / 3.0, 1, Ceiling, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 1, Down, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 1, Up, "-0.5", "-0x0.8#1", Less);
+    test_helper(-1.0f64 / 3.0, 1, Nearest, "-0.2", "-0x0.4#1", Greater);
 
-    test_helper(
-        -1.0f64 / 3.0,
-        10,
-        RoundingMode::Floor,
-        "-0.3335",
-        "-0x0.556#10",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        10,
-        RoundingMode::Ceiling,
-        "-0.333",
-        "-0x0.554#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        10,
-        RoundingMode::Down,
-        "-0.333",
-        "-0x0.554#10",
-        Ordering::Greater,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        10,
-        RoundingMode::Up,
-        "-0.3335",
-        "-0x0.556#10",
-        Ordering::Less,
-    );
-    test_helper(
-        -1.0f64 / 3.0,
-        10,
-        RoundingMode::Nearest,
-        "-0.3335",
-        "-0x0.556#10",
-        Ordering::Less,
-    );
+    test_helper(-1.0f64 / 3.0, 10, Floor, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f64 / 3.0, 10, Ceiling, "-0.333", "-0x0.554#10", Greater);
+    test_helper(-1.0f64 / 3.0, 10, Down, "-0.333", "-0x0.554#10", Greater);
+    test_helper(-1.0f64 / 3.0, 10, Up, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f64 / 3.0, 10, Nearest, "-0.3335", "-0x0.556#10", Less);
 
+    test_helper(-std::f64::consts::PI, 1, Floor, "-4.0", "-0x4.0#1", Less);
     test_helper(
         -std::f64::consts::PI,
         1,
-        RoundingMode::Floor,
-        "-4.0",
-        "-0x4.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -std::f64::consts::PI,
-        1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-2.0",
         "-0x2.0#1",
-        Ordering::Greater,
+        Greater,
     );
-    test_helper(
-        -std::f64::consts::PI,
-        1,
-        RoundingMode::Down,
-        "-2.0",
-        "-0x2.0#1",
-        Ordering::Greater,
-    );
-    test_helper(
-        -std::f64::consts::PI,
-        1,
-        RoundingMode::Up,
-        "-4.0",
-        "-0x4.0#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -std::f64::consts::PI,
-        1,
-        RoundingMode::Nearest,
-        "-4.0",
-        "-0x4.0#1",
-        Ordering::Less,
-    );
+    test_helper(-std::f64::consts::PI, 1, Down, "-2.0", "-0x2.0#1", Greater);
+    test_helper(-std::f64::consts::PI, 1, Up, "-4.0", "-0x4.0#1", Less);
+    test_helper(-std::f64::consts::PI, 1, Nearest, "-4.0", "-0x4.0#1", Less);
 
     test_helper(
         -std::f64::consts::PI,
         10,
-        RoundingMode::Floor,
+        Floor,
         "-3.145",
         "-0x3.25#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -std::f64::consts::PI,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-3.141",
         "-0x3.24#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -std::f64::consts::PI,
         10,
-        RoundingMode::Down,
+        Down,
         "-3.141",
         "-0x3.24#10",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(-std::f64::consts::PI, 10, Up, "-3.145", "-0x3.25#10", Less);
     test_helper(
         -std::f64::consts::PI,
         10,
-        RoundingMode::Up,
-        "-3.145",
-        "-0x3.25#10",
-        Ordering::Less,
-    );
-    test_helper(
-        -std::f64::consts::PI,
-        10,
-        RoundingMode::Nearest,
+        Nearest,
         "-3.141",
         "-0x3.24#10",
-        Ordering::Greater,
+        Greater,
     );
 
     test_helper(
         -f64::MAX_FINITE,
         1,
-        RoundingMode::Floor,
+        Floor,
         "-2.0e308",
         "-0x1.0E+256#1",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -f64::MAX_FINITE,
         1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-9.0e307",
         "-0x8.0E+255#1",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -f64::MAX_FINITE,
         1,
-        RoundingMode::Down,
+        Down,
         "-9.0e307",
         "-0x8.0E+255#1",
-        Ordering::Greater,
+        Greater,
     );
+    test_helper(-f64::MAX_FINITE, 1, Up, "-2.0e308", "-0x1.0E+256#1", Less);
     test_helper(
         -f64::MAX_FINITE,
         1,
-        RoundingMode::Up,
+        Nearest,
         "-2.0e308",
         "-0x1.0E+256#1",
-        Ordering::Less,
-    );
-    test_helper(
-        -f64::MAX_FINITE,
-        1,
-        RoundingMode::Nearest,
-        "-2.0e308",
-        "-0x1.0E+256#1",
-        Ordering::Less,
+        Less,
     );
 
     test_helper(
         -f64::MAX_FINITE,
         10,
-        RoundingMode::Floor,
+        Floor,
         "-1.798e308",
         "-0x1.000E+256#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -f64::MAX_FINITE,
         10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "-1.796e308",
         "-0xf.fcE+255#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -f64::MAX_FINITE,
         10,
-        RoundingMode::Down,
+        Down,
         "-1.796e308",
         "-0xf.fcE+255#10",
-        Ordering::Greater,
+        Greater,
     );
     test_helper(
         -f64::MAX_FINITE,
         10,
-        RoundingMode::Up,
+        Up,
         "-1.798e308",
         "-0x1.000E+256#10",
-        Ordering::Less,
+        Less,
     );
     test_helper(
         -f64::MAX_FINITE,
         10,
-        RoundingMode::Nearest,
+        Nearest,
         "-1.798e308",
         "-0x1.000E+256#10",
-        Ordering::Less,
+        Less,
     );
 }
 
@@ -2873,51 +1271,39 @@ fn from_primitive_float_prec_round_fail_helper<T: PrimitiveFloat>()
 where
     Float: From<T>,
 {
-    assert_panic!(Float::from_primitive_float_prec_round(
-        T::NAN,
-        0,
-        RoundingMode::Floor
-    ));
+    assert_panic!(Float::from_primitive_float_prec_round(T::NAN, 0, Floor));
     assert_panic!(Float::from_primitive_float_prec_round(
         T::INFINITY,
         0,
-        RoundingMode::Floor
+        Floor
     ));
     assert_panic!(Float::from_primitive_float_prec_round(
         T::NEGATIVE_INFINITY,
         0,
-        RoundingMode::Floor
+        Floor
     ));
-    assert_panic!(Float::from_primitive_float_prec_round(
-        T::ZERO,
-        0,
-        RoundingMode::Floor
-    ));
+    assert_panic!(Float::from_primitive_float_prec_round(T::ZERO, 0, Floor));
     assert_panic!(Float::from_primitive_float_prec_round(
         T::NEGATIVE_ZERO,
         0,
-        RoundingMode::Floor
+        Floor
     ));
-    assert_panic!(Float::from_primitive_float_prec_round(
-        T::ONE,
-        0,
-        RoundingMode::Floor
-    ));
+    assert_panic!(Float::from_primitive_float_prec_round(T::ONE, 0, Floor));
     assert_panic!(Float::from_primitive_float_prec_round(
         T::NEGATIVE_ONE,
         0,
-        RoundingMode::Floor
+        Floor
     ));
 
     assert_panic!(Float::from_primitive_float_prec_round(
         T::from(1.0f32) / T::from(3.0f32),
         1,
-        RoundingMode::Exact
+        Exact
     ));
     assert_panic!(Float::from_primitive_float_prec_round(
         T::from(-1.0f32) / T::from(3.0f32),
         1,
-        RoundingMode::Exact
+        Exact
     ));
 }
 
@@ -2965,19 +1351,14 @@ where
             }
         );
 
-        let (float_x_alt, o_alt) = Float::from_primitive_float_times_power_of_2_prec(x, 0, prec);
+        let (float_x_alt, o_alt) = Float::from_primitive_float_prec(x, prec);
         assert_eq!(
             ComparableFloatRef(&float_x_alt),
             ComparableFloatRef(&float_x)
         );
         assert_eq!(o_alt, o);
 
-        let (float_x_alt, o_alt) = Float::from_primitive_float_times_power_of_2_prec_round(
-            x,
-            0,
-            prec,
-            RoundingMode::Nearest,
-        );
+        let (float_x_alt, o_alt) = Float::from_primitive_float_prec_round(x, prec, Nearest);
         assert_eq!(ComparableFloat(float_x_alt), ComparableFloat(float_x));
         assert_eq!(o_alt, o);
     });
@@ -3004,17 +1385,13 @@ where
                 if x.is_nan() { None } else { Some(o) }
             );
             match (x >= T::ZERO, rm) {
-                (_, RoundingMode::Floor)
-                | (true, RoundingMode::Down)
-                | (false, RoundingMode::Up) => {
-                    assert_ne!(o, Ordering::Greater)
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater)
                 }
-                (_, RoundingMode::Ceiling)
-                | (true, RoundingMode::Up)
-                | (false, RoundingMode::Down) => {
-                    assert_ne!(o, Ordering::Less)
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less)
                 }
-                (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+                (_, Exact) => assert_eq!(o, Equal),
                 _ => {}
             }
 
@@ -3049,7 +1426,7 @@ where
     );
 
     primitive_float_unsigned_pair_gen_var_4::<T, u64>().test_properties(|(x, prec)| {
-        let floor = Float::from_primitive_float_prec_round(x, prec, RoundingMode::Floor);
+        let floor = Float::from_primitive_float_prec_round(x, prec, Floor);
         if x.is_nan() {
             assert!(floor.0.is_nan());
         } else {
@@ -3063,11 +1440,7 @@ where
                 let (floor_x_alt, o_alt) = Float::from_primitive_float_prec_round(
                     x,
                     prec,
-                    if x >= T::ZERO {
-                        RoundingMode::Down
-                    } else {
-                        RoundingMode::Up
-                    },
+                    if x >= T::ZERO { Down } else { Up },
                 );
                 assert_eq!(
                     ComparableFloatRef(&floor_x_alt),
@@ -3077,7 +1450,7 @@ where
             }
         }
 
-        let ceiling = Float::from_primitive_float_prec_round(x, prec, RoundingMode::Ceiling);
+        let ceiling = Float::from_primitive_float_prec_round(x, prec, Ceiling);
         if x.is_nan() {
             assert!(ceiling.0.is_nan());
         } else {
@@ -3091,11 +1464,7 @@ where
                 let (ceiling_x_alt, o_alt) = Float::from_primitive_float_prec_round(
                     x,
                     prec,
-                    if x >= T::ZERO {
-                        RoundingMode::Up
-                    } else {
-                        RoundingMode::Down
-                    },
+                    if x >= T::ZERO { Up } else { Down },
                 );
                 assert_eq!(
                     ComparableFloatRef(&ceiling_x_alt),
@@ -3105,7 +1474,7 @@ where
             }
         }
 
-        let nearest = Float::from_primitive_float_prec_round(x, prec, RoundingMode::Nearest);
+        let nearest = Float::from_primitive_float_prec_round(x, prec, Nearest);
         assert!(
             ComparableFloatRef(&nearest.0) == ComparableFloatRef(&floor.0) && nearest.1 == floor.1
                 || ComparableFloatRef(&nearest.0) == ComparableFloatRef(&ceiling.0)

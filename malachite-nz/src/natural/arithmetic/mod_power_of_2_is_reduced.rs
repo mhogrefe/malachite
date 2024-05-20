@@ -26,8 +26,14 @@ impl ModPowerOf2IsReduced for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.mod_power_of_2_is_reduced(5), true);
-    /// assert_eq!(Natural::from(10u32).pow(12).mod_power_of_2_is_reduced(39), false);
-    /// assert_eq!(Natural::from(10u32).pow(12).mod_power_of_2_is_reduced(40), true);
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12).mod_power_of_2_is_reduced(39),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12).mod_power_of_2_is_reduced(40),
+    ///     true
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_is_reduced(&self, pow: u64) -> bool {

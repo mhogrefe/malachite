@@ -23,7 +23,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
 // `Vec` of the limbs of the product of the `Natural`s mod `2 ^ pow`. Assumes the inputs are already
@@ -47,7 +47,7 @@ pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow:
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -96,7 +96,7 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -145,7 +145,7 @@ pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) 
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -238,8 +238,14 @@ impl ModPowerOf2Mul<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_power_of_2_mul(Natural::from(2u32), 5), 6);
-    /// assert_eq!(Natural::from(10u32).mod_power_of_2_mul(Natural::from(14u32), 4), 12);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_power_of_2_mul(Natural::from(2u32), 5),
+    ///     6
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_power_of_2_mul(Natural::from(14u32), 4),
+    ///     12
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_mul(mut self, other: Natural, pow: u64) -> Natural {
@@ -271,8 +277,14 @@ impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_power_of_2_mul(&Natural::from(2u32), 5), 6);
-    /// assert_eq!(Natural::from(10u32).mod_power_of_2_mul(&Natural::from(14u32), 4), 12);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_power_of_2_mul(&Natural::from(2u32), 5),
+    ///     6
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_power_of_2_mul(&Natural::from(14u32), 4),
+    ///     12
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_mul(mut self, other: &'a Natural, pow: u64) -> Natural {
@@ -304,8 +316,14 @@ impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_mul(Natural::from(2u32), 5), 6);
-    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_mul(Natural::from(14u32), 4), 12);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_power_of_2_mul(Natural::from(2u32), 5),
+    ///     6
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).mod_power_of_2_mul(Natural::from(14u32), 4),
+    ///     12
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_mul(self, mut other: Natural, pow: u64) -> Natural {
@@ -337,8 +355,14 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_mul(&Natural::from(2u32), 5), 6);
-    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_mul(&Natural::from(14u32), 4), 12);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_power_of_2_mul(&Natural::from(2u32), 5),
+    ///     6
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).mod_power_of_2_mul(&Natural::from(14u32), 4),
+    ///     12
+    /// );
     /// ```
     fn mod_power_of_2_mul(self, other: &'b Natural, pow: u64) -> Natural {
         assert!(

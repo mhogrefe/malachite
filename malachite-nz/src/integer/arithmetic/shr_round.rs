@@ -8,7 +8,7 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::ops::{Shl, ShlAssign};
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
@@ -78,8 +78,8 @@ macro_rules! impl_shr_round_unsigned {
             /// indicating whether the returned value is less than, equal to, or greater than the
             /// exact value.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -121,8 +121,7 @@ macro_rules! impl_shr_round_unsigned {
             /// where $T$ is time, $M$ is additional memory and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if `rm` is `Exact` but `self` is not divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -141,8 +140,8 @@ macro_rules! impl_shr_round_unsigned {
             /// returned, indicating whether the returned value is less than, equal to, or greater
             /// than the exact value.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -184,8 +183,7 @@ macro_rules! impl_shr_round_unsigned {
             /// where $T$ is time, $M$ is additional memory and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if `rm` is `Exact` but `self` is not divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -197,10 +195,10 @@ macro_rules! impl_shr_round_unsigned {
 
         impl ShrRoundAssign<$t> for Integer {
             /// Shifts a [`Natural`] right (divides it by a power of 2) and rounds according to the
-            /// specified rounding mode, in place. Passing `RoundingMode::Floor` is equivalent to
-            /// using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`. An [`Ordering`] is returned, indicating
-            /// whether the assigned value is less than, equal to, or greater than the exact value.
+            /// specified rounding mode, in place. Passing `Floor` is equivalent to using `>>=`. To
+            /// test whether `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`. An
+            /// [`Ordering`] is returned, indicating whether the assigned value is less than, equal
+            /// to, or greater than the exact value.
             ///
             /// See the [`ShrRound`] documentation for details.
             ///
@@ -212,8 +210,7 @@ macro_rules! impl_shr_round_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if `rm` is `Exact` but `self` is not divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round_assign).
@@ -236,7 +233,7 @@ where
     if bits >= S::ZERO {
         x.shr_round(bits.unsigned_abs(), rm)
     } else {
-        (x << bits.unsigned_abs(), Ordering::Equal)
+        (x << bits.unsigned_abs(), Equal)
     }
 }
 
@@ -252,7 +249,7 @@ where
         x.shr_round_assign(bits.unsigned_abs(), rm)
     } else {
         *x <<= bits.unsigned_abs();
-        Ordering::Equal
+        Equal
     }
 }
 
@@ -267,8 +264,8 @@ macro_rules! impl_shr_round_signed {
             /// than the exact value. If `bits` is negative, then the returned [`Ordering`] is
             /// always `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -311,8 +308,8 @@ macro_rules! impl_shr_round_signed {
             /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -332,8 +329,8 @@ macro_rules! impl_shr_round_signed {
             /// greater than the exact value. If `bits` is negative, then the returned [`Ordering`]
             /// is always `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -376,8 +373,8 @@ macro_rules! impl_shr_round_signed {
             /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -394,8 +391,8 @@ macro_rules! impl_shr_round_signed {
             /// exact value. If `bits` is negative, then the returned [`Ordering`] is always
             /// `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `self.divisible_by_power_of_2(bits)`.
             ///
             /// See the [`ShrRound`] documentation for details.
             ///
@@ -408,8 +405,8 @@ macro_rules! impl_shr_round_signed {
             /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round_assign).

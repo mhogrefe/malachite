@@ -24,8 +24,8 @@ impl<'a> SignificantBits for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO.significant_bits(), 0);

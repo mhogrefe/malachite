@@ -16,7 +16,7 @@ use malachite_base::test_util::vecs::exhaustive::{
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs_fixed_length_from_single, lex_vecs_length_2,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::fmt::Debug;
 use std::iter::{empty, once};
 
@@ -145,96 +145,30 @@ fn test_lex_vecs_length_2() {
         ],
     );
     lex_vecs_length_2_finite_helper(
-        lex_vecs_length_2(
-            exhaustive_orderings(),
-            [Ordering::Less, Ordering::Greater].iter().cloned(),
-        ),
-        exhaustive_vecs_fixed_length_from_single(
-            3,
-            [Ordering::Less, Ordering::Greater].iter().cloned(),
-        ),
+        lex_vecs_length_2(exhaustive_orderings(), [Less, Greater].iter().cloned()),
+        exhaustive_vecs_fixed_length_from_single(3, [Less, Greater].iter().cloned()),
         48,
         &[
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Less, Ordering::Less, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Less, Ordering::Less, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Less, Ordering::Greater, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Less, Ordering::Greater, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Greater, Ordering::Less, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Greater, Ordering::Less, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Greater, Ordering::Greater, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Less],
-                vec![Ordering::Greater, Ordering::Greater, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Less, Ordering::Less, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Less, Ordering::Less, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Less, Ordering::Greater, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Less, Ordering::Greater, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Greater, Ordering::Less, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Greater, Ordering::Less, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Greater, Ordering::Greater, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Equal, Ordering::Greater],
-                vec![Ordering::Greater, Ordering::Greater, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Less, Ordering::Less],
-                vec![Ordering::Less, Ordering::Less, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Less, Ordering::Less],
-                vec![Ordering::Less, Ordering::Less, Ordering::Greater],
-            ],
-            &[
-                vec![Ordering::Less, Ordering::Less],
-                vec![Ordering::Less, Ordering::Greater, Ordering::Less],
-            ],
-            &[
-                vec![Ordering::Less, Ordering::Less],
-                vec![Ordering::Less, Ordering::Greater, Ordering::Greater],
-            ],
+            &[vec![Equal, Less], vec![Less, Less, Less]],
+            &[vec![Equal, Less], vec![Less, Less, Greater]],
+            &[vec![Equal, Less], vec![Less, Greater, Less]],
+            &[vec![Equal, Less], vec![Less, Greater, Greater]],
+            &[vec![Equal, Less], vec![Greater, Less, Less]],
+            &[vec![Equal, Less], vec![Greater, Less, Greater]],
+            &[vec![Equal, Less], vec![Greater, Greater, Less]],
+            &[vec![Equal, Less], vec![Greater, Greater, Greater]],
+            &[vec![Equal, Greater], vec![Less, Less, Less]],
+            &[vec![Equal, Greater], vec![Less, Less, Greater]],
+            &[vec![Equal, Greater], vec![Less, Greater, Less]],
+            &[vec![Equal, Greater], vec![Less, Greater, Greater]],
+            &[vec![Equal, Greater], vec![Greater, Less, Less]],
+            &[vec![Equal, Greater], vec![Greater, Less, Greater]],
+            &[vec![Equal, Greater], vec![Greater, Greater, Less]],
+            &[vec![Equal, Greater], vec![Greater, Greater, Greater]],
+            &[vec![Less, Less], vec![Less, Less, Less]],
+            &[vec![Less, Less], vec![Less, Less, Greater]],
+            &[vec![Less, Less], vec![Less, Greater, Less]],
+            &[vec![Less, Less], vec![Less, Greater, Greater]],
         ],
     );
 }

@@ -9,7 +9,7 @@
 use malachite_base::nevers::Never;
 use malachite_base::options::{option_from_str, option_from_str_custom};
 use malachite_base::orderings::ordering_from_str;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::fmt::Debug;
 use std::str::FromStr;
 
@@ -38,7 +38,7 @@ fn option_from_str_custom_helper<T: Debug + Eq>(
 
 #[test]
 fn test_option_from_str_custom() {
-    option_from_str_custom_helper(&ordering_from_str, "Some(Less)", Some(Some(Ordering::Less)));
+    option_from_str_custom_helper(&ordering_from_str, "Some(Less)", Some(Some(Less)));
     option_from_str_custom_helper(
         &option_from_str,
         "Some(Some(false))",

@@ -503,16 +503,17 @@ impl Mul<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ONE * Natural::from(123u32), 123);
     /// assert_eq!(Natural::from(123u32) * Natural::ZERO, 0);
     /// assert_eq!(Natural::from(123u32) * Natural::from(456u32), 56088);
     /// assert_eq!(
-    ///     (Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(),
+    ///     (Natural::from_str("123456789000").unwrap()
+    ///         * Natural::from_str("987654321000").unwrap())
+    ///     .to_string(),
     ///     "121932631112635269000000"
     /// );
     /// ```
@@ -542,16 +543,17 @@ impl<'a> Mul<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ONE * &Natural::from(123u32), 123);
     /// assert_eq!(Natural::from(123u32) * &Natural::ZERO, 0);
     /// assert_eq!(Natural::from(123u32) * &Natural::from(456u32), 56088);
     /// assert_eq!(
-    ///     (Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(),
+    ///     (Natural::from_str("123456789000").unwrap()
+    ///         * &Natural::from_str("987654321000").unwrap())
+    ///         .to_string(),
     ///     "121932631112635269000000"
     /// );
     /// ```
@@ -581,16 +583,17 @@ impl<'a> Mul<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Natural::ONE * Natural::from(123u32), 123);
     /// assert_eq!(&Natural::from(123u32) * Natural::ZERO, 0);
     /// assert_eq!(&Natural::from(123u32) * Natural::from(456u32), 56088);
     /// assert_eq!(
-    ///     (&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(),
+    ///     (&Natural::from_str("123456789000").unwrap()
+    ///         * Natural::from_str("987654321000").unwrap())
+    ///     .to_string(),
     ///     "121932631112635269000000"
     /// );
     /// ```
@@ -620,16 +623,17 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Natural::ONE * &Natural::from(123u32), 123);
     /// assert_eq!(&Natural::from(123u32) * &Natural::ZERO, 0);
     /// assert_eq!(&Natural::from(123u32) * &Natural::from(456u32), 56088);
     /// assert_eq!(
-    ///     (&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(),
+    ///     (&Natural::from_str("123456789000").unwrap()
+    ///         * &Natural::from_str("987654321000").unwrap())
+    ///         .to_string(),
     ///     "121932631112635269000000"
     /// );
     /// ```
@@ -662,9 +666,9 @@ impl MulAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// let mut x = Natural::ONE;
     /// x *= Natural::from_str("1000").unwrap();
@@ -706,9 +710,9 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// let mut x = Natural::ONE;
     /// x *= &Natural::from_str("1000").unwrap();
@@ -746,9 +750,9 @@ impl Product for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Product;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use core::iter::Product;
     ///
     /// assert_eq!(
     ///     Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()),
@@ -795,11 +799,14 @@ impl<'a> Product<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Product;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use core::iter::Product;
     ///
-    /// assert_eq!(Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()), 210);
+    /// assert_eq!(
+    ///     Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()),
+    ///     210
+    /// );
     /// ```
     fn product<I>(xs: I) -> Natural
     where

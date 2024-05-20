@@ -10,7 +10,7 @@ use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_3, unsigned_pair_gen_var_4,
 };
@@ -163,11 +163,7 @@ fn to_power_of_2_digits_desc_helper<
         }
         assert_eq!(
             digits.len(),
-            usize::exact_from(
-                u.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-                    .0
-            )
+            usize::exact_from(u.significant_bits().div_round(log_base, Ceiling).0)
         );
         assert!(digits
             .iter()

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{rounding_mode_gen, rounding_mode_pair_gen};
 
 #[test]
@@ -16,12 +16,12 @@ fn test_clone() {
         let cloned = rm.clone();
         assert_eq!(cloned, rm);
     };
-    test(RoundingMode::Down);
-    test(RoundingMode::Up);
-    test(RoundingMode::Floor);
-    test(RoundingMode::Ceiling);
-    test(RoundingMode::Nearest);
-    test(RoundingMode::Exact);
+    test(Down);
+    test(Up);
+    test(Floor);
+    test(Ceiling);
+    test(Nearest);
+    test(Exact);
 }
 
 #[test]
@@ -30,8 +30,8 @@ fn test_clone_from() {
         x.clone_from(&y);
         assert_eq!(x, y);
     };
-    test(RoundingMode::Exact, RoundingMode::Floor);
-    test(RoundingMode::Up, RoundingMode::Ceiling);
+    test(Exact, Floor);
+    test(Up, Ceiling);
 }
 
 #[test]

@@ -36,7 +36,10 @@ impl ModNeg<Natural> for Natural {
     ///
     /// assert_eq!(Natural::ZERO.mod_neg(Natural::from(5u32)), 0);
     /// assert_eq!(Natural::from(7u32).mod_neg(Natural::from(10u32)), 3);
-    /// assert_eq!(Natural::from(7u32).mod_neg(Natural::from(10u32).pow(12)), 999999999993u64);
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_neg(Natural::from(10u32).pow(12)),
+    ///     999999999993u64
+    /// );
     /// ```
     #[inline]
     fn mod_neg(mut self, m: Natural) -> Natural {
@@ -69,7 +72,10 @@ impl<'a> ModNeg<&'a Natural> for Natural {
     ///
     /// assert_eq!(Natural::ZERO.mod_neg(&Natural::from(5u32)), 0);
     /// assert_eq!(Natural::from(7u32).mod_neg(&Natural::from(10u32)), 3);
-    /// assert_eq!(Natural::from(7u32).mod_neg(&Natural::from(10u32).pow(12)), 999999999993u64);
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_neg(&Natural::from(10u32).pow(12)),
+    ///     999999999993u64
+    /// );
     /// ```
     #[inline]
     fn mod_neg(mut self, m: &'a Natural) -> Natural {
@@ -102,7 +108,10 @@ impl<'a> ModNeg<Natural> for &'a Natural {
     ///
     /// assert_eq!((&Natural::ZERO).mod_neg(Natural::from(5u32)), 0);
     /// assert_eq!((&Natural::from(7u32)).mod_neg(Natural::from(10u32)), 3);
-    /// assert_eq!((&Natural::from(7u32)).mod_neg(Natural::from(10u32).pow(12)), 999999999993u64);
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_neg(Natural::from(10u32).pow(12)),
+    ///     999999999993u64
+    /// );
     /// ```
     fn mod_neg(self, m: Natural) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");

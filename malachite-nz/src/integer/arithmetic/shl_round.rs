@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::ops::{Shl, ShlAssign};
 use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
@@ -24,7 +24,7 @@ where
     &'a Integer: Shl<U, Output = Integer> + ShrRound<U, Output = Integer>,
 {
     if bits >= S::ZERO {
-        (x << bits.unsigned_abs(), Ordering::Equal)
+        (x << bits.unsigned_abs(), Equal)
     } else {
         x.shr_round(bits.unsigned_abs(), rm)
     }
@@ -40,7 +40,7 @@ where
 {
     if bits >= S::ZERO {
         *x <<= bits.unsigned_abs();
-        Ordering::Equal
+        Equal
     } else {
         x.shr_round_assign(bits.unsigned_abs(), rm)
     }
@@ -57,10 +57,9 @@ macro_rules! impl_shl_round_signed {
             /// than the exact value. If `bits` is non-negative, then the returned [`Ordering`] is
             /// always `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `bits > 0 ||
-            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
-            /// negative.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
+            /// necessary if `bits` is negative.
             ///
             /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
             /// the pair, without the [`Ordering`]:
@@ -99,8 +98,8 @@ macro_rules! impl_shl_round_signed {
             /// $m$ is `max(bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is negative and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^{-k}$.
+            /// Let $k$ be `bits`. Panics if $k$ is negative and `rm` is `Exact` but `self` is not
+            /// divisible by $2^{-k}$.
             ///
             /// # Examples
             /// See [here](super::shl_round#shl_round).
@@ -120,10 +119,9 @@ macro_rules! impl_shl_round_signed {
             /// greater than the exact value. If `bits` is non-negative, then the returned
             /// [`Ordering`] is always `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `bits > 0 ||
-            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
-            /// negative.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
+            /// necessary if `bits` is negative.
             ///
             /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
             /// the pair, without the [`Ordering`]:
@@ -162,8 +160,8 @@ macro_rules! impl_shl_round_signed {
             /// $m$ is `max(bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is negative and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^{-k}$.
+            /// Let $k$ be `bits`. Panics if $k$ is negative and `rm` is `Exact` but `self` is not
+            /// divisible by $2^{-k}$.
             ///
             /// # Examples
             /// See [here](super::shl_round#shl_round).
@@ -179,10 +177,9 @@ macro_rules! impl_shl_round_signed {
             /// indicating whether the assigned value is less than, equal to, or greater than the
             /// exact value.
             ///
-            /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `bits > 0 ||
-            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
-            /// negative.
+            /// Passing `Floor` is equivalent to using `>>`. To test whether `Exact` can be passed,
+            /// use `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
+            /// necessary if `bits` is negative.
             ///
             /// See the [`ShlRound`] documentation for details.
             ///

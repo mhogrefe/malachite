@@ -16,7 +16,7 @@ use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{ruler_sequence, RulerSequence};
 use crate::num::logic::traits::{BitAccess, NotAssign, SignificantBits};
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 use crate::tuples::exhaustive::{
     exhaustive_dependent_pairs, lex_dependent_pairs, ExhaustiveDependentPairs,
     ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
@@ -481,14 +481,19 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(primitive_float_increasing_range::<f32>(1.0, 2.0).map(NiceFloat), 20),
+///     prefix_to_string(
+///         primitive_float_increasing_range::<f32>(1.0, 2.0).map(NiceFloat),
+///         20
+///     ),
 ///     "[1.0, 1.0000001, 1.0000002, 1.0000004, 1.0000005, 1.0000006, 1.0000007, 1.0000008, \
 ///     1.000001, 1.0000011, 1.0000012, 1.0000013, 1.0000014, 1.0000015, 1.0000017, 1.0000018, \
 ///     1.0000019, 1.000002, 1.0000021, 1.0000023, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
-///         primitive_float_increasing_range::<f32>(1.0, 2.0).rev().map(NiceFloat),
+///         primitive_float_increasing_range::<f32>(1.0, 2.0)
+///             .rev()
+///             .map(NiceFloat),
 ///         20,
 ///     ),
 ///     "[1.9999999, 1.9999998, 1.9999996, 1.9999995, 1.9999994, 1.9999993, 1.9999992, 1.999999, \
@@ -556,7 +561,9 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
-///         primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0).rev().map(NiceFloat),
+///         primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0)
+///             .rev()
+///             .map(NiceFloat),
 ///         20
 ///     ),
 ///     "[2.0, 1.9999999, 1.9999998, 1.9999996, 1.9999995, 1.9999994, 1.9999993, 1.9999992, \
@@ -613,14 +620,19 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(positive_finite_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         positive_finite_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[1.0e-45, 3.0e-45, 4.0e-45, 6.0e-45, 7.0e-45, 8.0e-45, 1.0e-44, 1.1e-44, 1.3e-44, \
 ///     1.4e-44, 1.5e-44, 1.7e-44, 1.8e-44, 2.0e-44, 2.1e-44, 2.2e-44, 2.4e-44, 2.5e-44, 2.7e-44, \
 ///     2.8e-44, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
-///         positive_finite_primitive_floats_increasing::<f32>().rev().map(NiceFloat),
+///         positive_finite_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
 ///         20
 ///     ),
 ///     "[3.4028235e38, 3.4028233e38, 3.402823e38, 3.4028229e38, 3.4028227e38, 3.4028225e38, \
@@ -662,7 +674,10 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(negative_finite_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         negative_finite_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[-3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, \
 ///     -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, \
 ///     -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, \
@@ -670,7 +685,9 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
-///         negative_finite_primitive_floats_increasing::<f32>().rev().map(NiceFloat),
+///         negative_finite_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
 ///         20
 ///     ),
 ///     "[-1.0e-45, -3.0e-45, -4.0e-45, -6.0e-45, -7.0e-45, -8.0e-45, -1.0e-44, -1.1e-44, \
@@ -714,7 +731,10 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(nonzero_finite_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         nonzero_finite_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[-3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, \
 ///     -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, \
 ///     -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, \
@@ -722,7 +742,9 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
-///         nonzero_finite_primitive_floats_increasing::<f32>().rev().map(NiceFloat),
+///         nonzero_finite_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
 ///         20
 ///     ),
 ///     "[3.4028235e38, 3.4028233e38, 3.402823e38, 3.4028229e38, 3.4028227e38, 3.4028225e38, \
@@ -764,14 +786,22 @@ pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(finite_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         finite_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[-3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, \
 ///     -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, \
 ///     -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, \
 ///     -3.40282e38, -3.4028198e38, -3.4028196e38, ...]",
 /// );
 /// assert_eq!(
-///     prefix_to_string(finite_primitive_floats_increasing::<f32>().rev().map(NiceFloat), 20),
+///     prefix_to_string(
+///         finite_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
+///         20
+///     ),
 ///     "[3.4028235e38, 3.4028233e38, 3.402823e38, 3.4028229e38, 3.4028227e38, 3.4028225e38, \
 ///     3.4028222e38, 3.402822e38, 3.4028218e38, 3.4028216e38, 3.4028214e38, 3.4028212e38, \
 ///     3.402821e38, 3.4028208e38, 3.4028206e38, 3.4028204e38, 3.4028202e38, 3.40282e38, \
@@ -806,18 +836,25 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::positive_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(positive_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         positive_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[1.0e-45, 3.0e-45, 4.0e-45, 6.0e-45, 7.0e-45, 8.0e-45, 1.0e-44, 1.1e-44, 1.3e-44, \
 ///     1.4e-44, 1.5e-44, 1.7e-44, 1.8e-44, 2.0e-44, 2.1e-44, 2.2e-44, 2.4e-44, 2.5e-44, 2.7e-44, \
 ///     2.8e-44, ...]"
 /// );
 /// assert_eq!(
-///     prefix_to_string(positive_primitive_floats_increasing::<f32>().rev().map(NiceFloat), 20),
+///     prefix_to_string(
+///         positive_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
+///         20
+///     ),
 ///     "[Infinity, 3.4028235e38, 3.4028233e38, 3.402823e38, 3.4028229e38, 3.4028227e38, \
 ///     3.4028225e38, 3.4028222e38, 3.402822e38, 3.4028218e38, 3.4028216e38, 3.4028214e38, \
 ///     3.4028212e38, 3.402821e38, 3.4028208e38, 3.4028206e38, 3.4028204e38, 3.4028202e38, \
@@ -853,19 +890,26 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::negative_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(negative_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         negative_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[-Infinity, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, \
 ///     -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, \
 ///     -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, \
 ///     -3.40282e38, -3.4028198e38, ...]"
 /// );
 /// assert_eq!(
-///     prefix_to_string(negative_primitive_floats_increasing::<f32>().rev().map(NiceFloat), 20),
+///     prefix_to_string(
+///         negative_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
+///         20
+///     ),
 ///     "[-1.0e-45, -3.0e-45, -4.0e-45, -6.0e-45, -7.0e-45, -8.0e-45, -1.0e-44, -1.1e-44, \
 ///     -1.3e-44, -1.4e-44, -1.5e-44, -1.7e-44, -1.8e-44, -2.0e-44, -2.1e-44, -2.2e-44, -2.4e-44, \
 ///     -2.5e-44, -2.7e-44, -2.8e-44, ...]"
@@ -902,19 +946,26 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::nonzero_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(nonzero_primitive_floats_increasing::<f32>().map(NiceFloat), 20),
+///     prefix_to_string(
+///         nonzero_primitive_floats_increasing::<f32>().map(NiceFloat),
+///         20
+///     ),
 ///     "[-Infinity, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, \
 ///     -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, \
 ///     -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, \
 ///     -3.40282e38, -3.4028198e38, ...]"
 /// );
 /// assert_eq!(
-///     prefix_to_string(nonzero_primitive_floats_increasing::<f32>().rev().map(NiceFloat), 20),
+///     prefix_to_string(
+///         nonzero_primitive_floats_increasing::<f32>()
+///             .rev()
+///             .map(NiceFloat),
+///         20
+///     ),
 ///     "[Infinity, 3.4028235e38, 3.4028233e38, 3.402823e38, 3.4028229e38, 3.4028227e38, \
 ///     3.4028225e38, 3.4028222e38, 3.402822e38, 3.4028218e38, 3.4028216e38, 3.4028214e38, \
 ///     3.4028212e38, 3.402821e38, 3.4028208e38, 3.4028206e38, 3.4028204e38, 3.4028202e38, \
@@ -949,7 +1000,6 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
 ///
@@ -961,7 +1011,10 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 ///     -3.40282e38, -3.4028198e38, ...]"
 /// );
 /// assert_eq!(
-///     prefix_to_string(primitive_floats_increasing::<f32>().rev().map(NiceFloat), 20),
+///     prefix_to_string(
+///         primitive_floats_increasing::<f32>().rev().map(NiceFloat),
+///         20
+///     ),
 ///     "[Infinity, 3.4028235e38, 3.4028233e38, 3.402823e38, 3.4028229e38, 3.4028227e38, \
 ///     3.4028225e38, 3.4028222e38, 3.402822e38, 3.4028218e38, 3.4028216e38, 3.4028214e38, \
 ///     3.4028212e38, 3.402821e38, 3.4028208e38, 3.4028206e38, 3.4028204e38, 3.4028202e38, \
@@ -1208,8 +1261,14 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///     29.0, 31.0, 16.5, 17.5, 18.5, 19.5, ...]"
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent::<f32>(-147).map(NiceFloat).collect_vec(),
-///     [6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44].iter().copied().map(NiceFloat).collect_vec()
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(-147)
+///         .map(NiceFloat)
+///         .collect_vec(),
+///     [6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44]
+///         .iter()
+///         .copied()
+///         .map(NiceFloat)
+///         .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1301,7 +1360,10 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> 
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_positive_finite_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_positive_finite_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375, 0.75, 1.625, 3.5, 1.875, \
 ///     0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0, 1.5625, 3.25, 1.6875, 0.875, \
 ///     1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625, 1.15625, 2.375, 1.21875, 5.0, \
@@ -1353,7 +1415,10 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> 
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_negative_finite_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_negative_finite_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[-1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5, -1.375, -0.75, -1.625, \
 ///     -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125, -2.75, -1.4375, -6.0, \
 ///     -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0, -1.03125, -2.125, \
@@ -1414,7 +1479,10 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_nonzero_finite_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_nonzero_finite_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, \
 ///     -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, \
 ///     1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, \
@@ -1455,7 +1523,10 @@ pub type ExhaustiveFinitePrimitiveFloats<T> =
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_finite_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_finite_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, \
 ///     -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, \
 ///     3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, \
@@ -1489,12 +1560,14 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_positive_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_positive_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[Infinity, 1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375, 0.75, 1.625, \
 ///     3.5, 1.875, 0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0, 1.5625, 3.25, \
 ///     1.6875, 0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625, 1.15625, \
@@ -1525,12 +1598,14 @@ pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_negative_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_negative_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_negative_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[-Infinity, -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5, -1.375, \
 ///     -0.75, -1.625, -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125, -2.75, \
 ///     -1.4375, -6.0, -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0, -1.03125, \
@@ -1561,12 +1636,14 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_nonzero_primitive_floats::<f32>().map(NiceFloat), 50),
+///     prefix_to_string(
+///         exhaustive_nonzero_primitive_floats::<f32>().map(NiceFloat),
+///         50
+///     ),
 ///     "[Infinity, -Infinity, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, \
 ///     -3.0, 1.75, -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, \
 ///     1.625, -1.625, 3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, \
@@ -1599,7 +1676,6 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
 ///
@@ -1660,14 +1736,14 @@ pub_test! {exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<
     }
     let trailing_zeros = max_precision - precision;
     let increment = u64::power_of_2(trailing_zeros + 1);
-    let mut start_mantissa = am.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Up).0;
+    let mut start_mantissa = am.round_to_multiple_of_power_of_2(trailing_zeros, Up).0;
     if !start_mantissa.get_bit(trailing_zeros) {
         start_mantissa.set_bit(trailing_zeros);
     }
     if start_mantissa > bm {
         return ConstantPrecisionPrimitiveFloats::default();
     }
-    let mut end_mantissa = bm.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Down).0;
+    let mut end_mantissa = bm.round_to_multiple_of_power_of_2(trailing_zeros, Down).0;
     if !end_mantissa.get_bit(trailing_zeros) {
         let adjust = u64::power_of_2(trailing_zeros);
         if adjust > end_mantissa {
@@ -1993,7 +2069,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
 /// assert_eq!(
 ///     prefix_to_string(
 ///         exhaustive_primitive_float_range::<f32>(core::f32::consts::E, core::f32::consts::PI)
-///                 .map(NiceFloat),
+///             .map(NiceFloat),
 ///         50
 ///     ),
 ///     "[3.0, 2.75, 2.875, 3.125, 2.8125, 2.9375, 3.0625, 2.71875, 2.78125, 2.84375, 2.90625, \
@@ -2053,7 +2129,8 @@ pub fn exhaustive_primitive_float_range<T: PrimitiveFloat>(
 ///         exhaustive_primitive_float_inclusive_range::<f32>(
 ///             core::f32::consts::E,
 ///             core::f32::consts::PI
-///         ).map(NiceFloat),
+///         )
+///         .map(NiceFloat),
 ///         50
 ///     ),
 ///     "[3.0, 2.75, 2.875, 3.125, 2.8125, 2.9375, 3.0625, 2.71875, 2.78125, 2.84375, 2.90625, \

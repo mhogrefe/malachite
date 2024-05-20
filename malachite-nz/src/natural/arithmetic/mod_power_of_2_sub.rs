@@ -30,7 +30,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -40,7 +40,7 @@ use malachite_base::rounding_modes::RoundingMode;
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
     xs.resize(
-        usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0),
+        usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0),
         Limb::MAX,
     );
 }
@@ -307,7 +307,10 @@ impl ModPowerOf2Sub<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).mod_power_of_2_sub(Natural::TWO, 4), 8);
-    /// assert_eq!(Natural::from(56u32).mod_power_of_2_sub(Natural::from(123u32), 9), 445);
+    /// assert_eq!(
+    ///     Natural::from(56u32).mod_power_of_2_sub(Natural::from(123u32), 9),
+    ///     445
+    /// );
     /// ```
     fn mod_power_of_2_sub(mut self, other: Natural, pow: u64) -> Natural {
         self.mod_power_of_2_sub_assign(other, pow);
@@ -340,7 +343,10 @@ impl<'a> ModPowerOf2Sub<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).mod_power_of_2_sub(&Natural::TWO, 4), 8);
-    /// assert_eq!(Natural::from(56u32).mod_power_of_2_sub(&Natural::from(123u32), 9), 445);
+    /// assert_eq!(
+    ///     Natural::from(56u32).mod_power_of_2_sub(&Natural::from(123u32), 9),
+    ///     445
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_sub(mut self, other: &'a Natural, pow: u64) -> Natural {
@@ -373,8 +379,14 @@ impl<'a> ModPowerOf2Sub<Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_sub(Natural::TWO, 4), 8);
-    /// assert_eq!((&Natural::from(56u32)).mod_power_of_2_sub(Natural::from(123u32), 9), 445);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).mod_power_of_2_sub(Natural::TWO, 4),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(56u32)).mod_power_of_2_sub(Natural::from(123u32), 9),
+    ///     445
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_sub(self, mut other: Natural, pow: u64) -> Natural {
@@ -425,8 +437,14 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_sub(&Natural::TWO, 4), 8);
-    /// assert_eq!((&Natural::from(56u32)).mod_power_of_2_sub(&Natural::from(123u32), 9), 445);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).mod_power_of_2_sub(&Natural::TWO, 4),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(56u32)).mod_power_of_2_sub(&Natural::from(123u32), 9),
+    ///     445
+    /// );
     /// ```
     fn mod_power_of_2_sub(self, other: &'a Natural, pow: u64) -> Natural {
         assert!(

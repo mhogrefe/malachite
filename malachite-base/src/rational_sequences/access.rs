@@ -47,8 +47,14 @@ impl<T: Eq> RationalSequence<T> {
     /// ```
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
-    /// assert_eq!(RationalSequence::from_slices(&[1, 2], &[3, 4]).get(1), Some(&2));
-    /// assert_eq!(RationalSequence::from_slices(&[1, 2], &[3, 4]).get(10), Some(&3));
+    /// assert_eq!(
+    ///     RationalSequence::from_slices(&[1, 2], &[3, 4]).get(1),
+    ///     Some(&2)
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::from_slices(&[1, 2], &[3, 4]).get(10),
+    ///     Some(&3)
+    /// );
     /// ```
     pub fn get(&self, i: usize) -> Option<&T> {
         let non_repeating_len = self.non_repeating.len();
@@ -83,12 +89,27 @@ impl<T: Clone + Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// let mut xs = RationalSequence::from_slices(&[1, 2], &[3, 4]);
-    /// assert_eq!(xs.mutate(1, |x| { *x = 100; 25 }), 25);
+    /// assert_eq!(
+    ///     xs.mutate(1, |x| {
+    ///         *x = 100;
+    ///         25
+    ///     }),
+    ///     25
+    /// );
     /// assert_eq!(xs, RationalSequence::from_slices(&[1, 100], &[3, 4]));
     ///
     /// let mut xs = RationalSequence::from_slices(&[1, 2], &[3, 4]);
-    /// assert_eq!(xs.mutate(6, |x| { *x = 100; 25 }), 25);
-    /// assert_eq!(xs, RationalSequence::from_slices(&[1, 2, 3, 4, 3, 4, 100], &[4, 3]));
+    /// assert_eq!(
+    ///     xs.mutate(6, |x| {
+    ///         *x = 100;
+    ///         25
+    ///     }),
+    ///     25
+    /// );
+    /// assert_eq!(
+    ///     xs,
+    ///     RationalSequence::from_slices(&[1, 2, 3, 4, 3, 4, 100], &[4, 3])
+    /// );
     /// ```
     pub fn mutate<F: FnOnce(&mut T) -> U, U>(&mut self, i: usize, f: F) -> U {
         let non_repeating_len = self.non_repeating.len();

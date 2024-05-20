@@ -12,7 +12,7 @@ use malachite_base::test_util::common::test_cmp_helper;
 use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_pair_gen, primitive_float_triple_gen,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 const TEST_STRINGS: [&str; 7] = ["-Infinity", "-5.0e5", "-0.0", "NaN", "0.0", "0.123", "Infinity"];
 
@@ -33,7 +33,7 @@ fn cmp_properties_helper<T: PrimitiveFloat>() {
 
     primitive_float_gen::<T>().test_properties(|x| {
         let x = NiceFloat(x);
-        assert_eq!(x.cmp(&x), Ordering::Equal);
+        assert_eq!(x.cmp(&x), Equal);
     });
 
     primitive_float_triple_gen::<T>().test_properties(|(x, y, z)| {

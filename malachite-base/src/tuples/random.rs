@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::random::Seed;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::iter::{repeat, Repeat};
 
 /// Generates random units; repeats `()`.
@@ -48,11 +48,8 @@ pub fn next_helper<I: Iterator>(x: &mut I, _i: usize) -> Option<I::Item> {
 /// See usage examples [here](self#random_pairs) and [here](self#random_pairs_from_single).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
-/// use malachite_base::num::random::{random_unsigned_range, RandomUnsignedRange};
 /// use malachite_base::random::Seed;
+/// use malachite_base::random_tuples;
 /// use malachite_base::tuples::random::next_helper;
 ///
 /// random_tuples!(
@@ -153,7 +150,6 @@ pub fn next_helper<I: Iterator>(x: &mut I, _i: usize) -> Option<I::Item> {
 ///     [6, T, O, ts, ts_gen],
 ///     [7, S, P, ss, ss_gen]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! random_tuples {
@@ -269,10 +265,8 @@ random_tuples!(
 /// See usage examples [here](self#random_triples_xyx).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
 /// use malachite_base::random::Seed;
+/// use malachite_base::random_custom_tuples;
 ///
 /// random_custom_tuples!(
 ///     (pub(crate)),
@@ -367,7 +361,6 @@ random_tuples!(
 ///     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2], [y_3, y_3]],
 ///     [Z, K, zs, zs_gen, [z_4, z_4]]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! random_custom_tuples {
@@ -454,12 +447,12 @@ where
                 out_0 = Some(x);
             } else {
                 match x.cmp(out_0.as_ref().unwrap()) {
-                    Ordering::Equal => {}
-                    Ordering::Greater => {
+                    Equal => {}
+                    Greater => {
                         out_1 = x;
                         break;
                     }
-                    Ordering::Less => {
+                    Less => {
                         out_1 = out_0.unwrap();
                         out_0 = Some(x);
                         break;
@@ -502,12 +495,9 @@ where
 /// See usage examples [here](self#random_ordered_unique_quadruples).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
+/// use malachite_base::random_ordered_unique_tuples;
 /// use malachite_base::sets::random::{
-///     random_b_tree_sets_fixed_length,
-///     RandomBTreeSetsFixedLength
+///     random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength,
 /// };
 ///
 /// random_ordered_unique_tuples!(
@@ -575,7 +565,6 @@ where
 ///     random_ordered_unique_octuples,
 ///     [0, 1, 2, 3, 4, 5, 6, 7]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! random_ordered_unique_tuples {
@@ -691,9 +680,7 @@ where
 /// See usage examples [here](self#random_unique_quadruples).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
+/// use malachite_base::random_unique_tuples;
 /// use std::collections::HashMap;
 /// use std::hash::Hash;
 ///
@@ -762,7 +749,6 @@ where
 ///     random_unique_octuples,
 ///     [0, 1, 2, 3, 4, 5, 6, 7]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! random_unique_tuples {

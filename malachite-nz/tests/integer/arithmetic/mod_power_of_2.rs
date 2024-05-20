@@ -13,7 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
     signed_unsigned_pair_gen_var_11, unsigned_gen,
@@ -363,10 +363,7 @@ fn rem_power_of_2_properties() {
         assert_eq!(result_alt, result);
 
         assert!(result.le_abs(&n));
-        assert_eq!(
-            (((&n).shr_round(u, RoundingMode::Down).0 << u) + &result),
-            n
-        );
+        assert_eq!((((&n).shr_round(u, Down).0 << u) + &result), n);
         assert!(result.lt_abs(&Natural::power_of_2(u)));
         assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));
         assert_eq!((&result).rem_power_of_2(u), result);
@@ -424,10 +421,7 @@ fn ceiling_mod_power_of_2_properties() {
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
-        assert_eq!(
-            (((&n).shr_round(u, RoundingMode::Ceiling).0 << u) + &result),
-            n
-        );
+        assert_eq!((((&n).shr_round(u, Ceiling).0 << u) + &result), n);
         assert!(result <= 0);
         assert!(-&result <= Natural::power_of_2(u));
         assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));

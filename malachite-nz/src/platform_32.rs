@@ -2,8 +2,8 @@
 //
 // Uses code adopted from the GNU MP Library.
 //
-//      `bin2kk`, `bin2kkinv`, and `fac2bin` contributed to the GNU project by Torbjörn Granlund and
-//      Marco Bodrato.
+//      `bin2kk`, `bin2kkinv`, and `fac2bin` contributed to the GNU project by Torbjörn Granlund
+//      and Marco Bodrato.
 //
 //      Copyright © 2002, 2010-2018 Free Software Foundation, Inc.
 //

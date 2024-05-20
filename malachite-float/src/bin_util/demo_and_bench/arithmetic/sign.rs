@@ -13,7 +13,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
 use malachite_float::test_util::generators::float_gen_var_2;
 use malachite_float::ComparableFloat;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sign);
@@ -25,9 +25,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_float_sign(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_2().get(gm, config).take(limit) {
         match n.sign() {
-            Ordering::Less => println!("{n} is negative"),
-            Ordering::Equal => println!("{n} is zero"),
-            Ordering::Greater => println!("{n} is positive"),
+            Less => println!("{n} is negative"),
+            Equal => println!("{n} is zero"),
+            Greater => println!("{n} is positive"),
         }
     }
 }
@@ -35,9 +35,9 @@ fn demo_float_sign(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_sign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_2().get(gm, config).take(limit) {
         match n.sign() {
-            Ordering::Less => println!("{:#x} is negative", ComparableFloat(n)),
-            Ordering::Equal => println!("{:#x} is zero", ComparableFloat(n)),
-            Ordering::Greater => println!("{:#x} is positive", ComparableFloat(n)),
+            Less => println!("{:#x} is negative", ComparableFloat(n)),
+            Equal => println!("{:#x} is zero", ComparableFloat(n)),
+            Greater => println!("{:#x} is positive", ComparableFloat(n)),
         }
     }
 }

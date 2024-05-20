@@ -9,7 +9,7 @@
 use crate::itertools::Itertools;
 use crate::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
 use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
@@ -71,10 +71,8 @@ pub fn random_floats_helper_helper<I: Clone + Iterator<Item = Float>>(
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     let actual_sample_median_hex = (median_lo_hex.as_str(), median_hi_hex.as_deref());
-    let actual_sample_moment_stats = moment_stats(
-        xs.take(1000000)
-            .map(|x| f64::rounding_from(&x, RoundingMode::Nearest).0),
-    );
+    let actual_sample_moment_stats =
+        moment_stats(xs.take(1000000).map(|x| f64::rounding_from(&x, Nearest).0));
     assert_eq!(
         (
             actual_values.as_slice(),
@@ -134,10 +132,8 @@ pub fn random_floats_helper_helper_no_common_values<I: Clone + Iterator<Item = F
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     let actual_sample_median_hex = (median_lo_hex.as_str(), median_hi_hex.as_deref());
-    let actual_sample_moment_stats = moment_stats(
-        xs.take(1000000)
-            .map(|x| f64::rounding_from(&x, RoundingMode::Nearest).0),
-    );
+    let actual_sample_moment_stats =
+        moment_stats(xs.take(1000000).map(|x| f64::rounding_from(&x, Nearest).0));
     assert_eq!(
         (
             actual_values.as_slice(),

@@ -14,7 +14,7 @@ use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen_var_27,
     unsigned_triple_gen_var_19,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 
 #[test]
 pub fn test_cmp_abs_partial_cmp_abs_and_comparators() {
@@ -26,33 +26,25 @@ pub fn test_cmp_abs_partial_cmp_abs_and_comparators() {
         assert_eq!(le, x.le_abs(&y));
         assert_eq!(ge, x.ge_abs(&y));
     }
-    test(123u16, 123u16, Ordering::Equal, false, false, true, true);
-    test(123u16, 456u16, Ordering::Less, true, false, true, false);
-    test(456u16, 123u16, Ordering::Greater, false, true, false, true);
+    test(123u16, 123u16, Equal, false, false, true, true);
+    test(123u16, 456u16, Less, true, false, true, false);
+    test(456u16, 123u16, Greater, false, true, false, true);
 
-    test(123i64, 123i64, Ordering::Equal, false, false, true, true);
-    test(123i64, 456i64, Ordering::Less, true, false, true, false);
-    test(456i64, 123i64, Ordering::Greater, false, true, false, true);
+    test(123i64, 123i64, Equal, false, false, true, true);
+    test(123i64, 456i64, Less, true, false, true, false);
+    test(456i64, 123i64, Greater, false, true, false, true);
 
-    test(123i64, -123i64, Ordering::Equal, false, false, true, true);
-    test(123i64, -456i64, Ordering::Less, true, false, true, false);
-    test(456i64, -123i64, Ordering::Greater, false, true, false, true);
+    test(123i64, -123i64, Equal, false, false, true, true);
+    test(123i64, -456i64, Less, true, false, true, false);
+    test(456i64, -123i64, Greater, false, true, false, true);
 
-    test(-123i64, 123i64, Ordering::Equal, false, false, true, true);
-    test(-123i64, 456i64, Ordering::Less, true, false, true, false);
-    test(-456i64, 123i64, Ordering::Greater, false, true, false, true);
+    test(-123i64, 123i64, Equal, false, false, true, true);
+    test(-123i64, 456i64, Less, true, false, true, false);
+    test(-456i64, 123i64, Greater, false, true, false, true);
 
-    test(-123i64, -123i64, Ordering::Equal, false, false, true, true);
-    test(-123i64, -456i64, Ordering::Less, true, false, true, false);
-    test(
-        -456i64,
-        -123i64,
-        Ordering::Greater,
-        false,
-        true,
-        false,
-        true,
-    );
+    test(-123i64, -123i64, Equal, false, false, true, true);
+    test(-123i64, -456i64, Less, true, false, true, false);
+    test(-456i64, -123i64, Greater, false, true, false, true);
 }
 
 fn properties_helper_unsigned<T: PrimitiveUnsigned>() {
@@ -60,15 +52,15 @@ fn properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let cmp = x.cmp_abs(&y);
         assert_eq!(x.cmp(&y), cmp);
         assert_eq!(x.partial_cmp_abs(&y), Some(cmp));
-        assert_eq!(x.lt_abs(&y), cmp == Ordering::Less);
-        assert_eq!(x.gt_abs(&y), cmp == Ordering::Greater);
-        assert_eq!(x.le_abs(&y), cmp != Ordering::Greater);
-        assert_eq!(x.ge_abs(&y), cmp != Ordering::Less);
+        assert_eq!(x.lt_abs(&y), cmp == Less);
+        assert_eq!(x.gt_abs(&y), cmp == Greater);
+        assert_eq!(x.le_abs(&y), cmp != Greater);
+        assert_eq!(x.ge_abs(&y), cmp != Less);
         assert_eq!(y.cmp_abs(&x), cmp.reverse());
     });
 
     unsigned_gen::<T>().test_properties(|x| {
-        assert_eq!(x.cmp_abs(&x), Ordering::Equal);
+        assert_eq!(x.cmp_abs(&x), Equal);
         assert!(x.le_abs(&x));
         assert!(x.ge_abs(&x));
         assert!(!x.lt_abs(&x));
@@ -102,15 +94,15 @@ where
             assert_eq!(x.cmp_abs(&-y), cmp);
         }
         assert_eq!(x.partial_cmp_abs(&y), Some(cmp));
-        assert_eq!(x.lt_abs(&y), cmp == Ordering::Less);
-        assert_eq!(x.gt_abs(&y), cmp == Ordering::Greater);
-        assert_eq!(x.le_abs(&y), cmp != Ordering::Greater);
-        assert_eq!(x.ge_abs(&y), cmp != Ordering::Less);
+        assert_eq!(x.lt_abs(&y), cmp == Less);
+        assert_eq!(x.gt_abs(&y), cmp == Greater);
+        assert_eq!(x.le_abs(&y), cmp != Greater);
+        assert_eq!(x.ge_abs(&y), cmp != Less);
         assert_eq!(y.cmp_abs(&x), cmp.reverse());
     });
 
     signed_gen::<T>().test_properties(|x| {
-        assert_eq!(x.cmp_abs(&x), Ordering::Equal);
+        assert_eq!(x.cmp_abs(&x), Equal);
         assert!(x.le_abs(&x));
         assert!(x.ge_abs(&x));
         assert!(!x.lt_abs(&x));

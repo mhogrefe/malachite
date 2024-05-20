@@ -44,7 +44,6 @@ pub mod partial_cmp_abs_primitive_float;
 /// ```
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_q::Rational;
-/// use std::cmp::Ordering;
 ///
 /// assert!(Rational::from_signeds(22, 7).gt_abs(&3u32));
 /// assert!(Rational::from_signeds(22, 7).lt_abs(&4u32));

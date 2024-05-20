@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -20,13 +20,9 @@ where
 {
     match (x, y) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) => Some(Ordering::Greater),
-        (float_negative_infinity!(), _) => Some(Ordering::Less),
-        (float_either_zero!(), _) => Some(if *y == T::ZERO {
-            Ordering::Equal
-        } else {
-            Ordering::Less
-        }),
+        (float_infinity!(), _) => Some(Greater),
+        (float_negative_infinity!(), _) => Some(Less),
+        (float_either_zero!(), _) => Some(if *y == T::ZERO { Equal } else { Less }),
         (
             Float(Finite {
                 sign: s_x,
@@ -36,11 +32,11 @@ where
             }),
             y,
         ) => Some(if !s_x {
-            Ordering::Less
+            Less
         } else if *y == T::ZERO {
-            Ordering::Greater
+            Greater
         } else if *e_x <= 0 {
-            Ordering::Less
+            Less
         } else {
             e_x.unsigned_abs()
                 .cmp(&y.significant_bits())
@@ -104,8 +100,8 @@ where
 {
     match (x, y) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) => Some(Ordering::Greater),
-        (float_negative_infinity!(), _) => Some(Ordering::Less),
+        (float_infinity!(), _) => Some(Greater),
+        (float_negative_infinity!(), _) => Some(Less),
         (float_either_zero!(), _) => Some(T::ZERO.cmp(y)),
         (
             Float(Finite {
@@ -118,13 +114,13 @@ where
         ) => {
             let s_y = *y > T::ZERO;
             let s_cmp = s_x.cmp(&s_y);
-            if s_cmp != Ordering::Equal {
+            if s_cmp != Equal {
                 return Some(s_cmp);
             }
             let abs_cmp = if *y == T::ZERO {
-                Ordering::Greater
+                Greater
             } else if *e_x <= 0 {
-                Ordering::Less
+                Less
             } else {
                 e_x.unsigned_abs()
                     .cmp(&y.significant_bits())

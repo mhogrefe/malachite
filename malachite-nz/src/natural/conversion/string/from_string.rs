@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_string::digit_from_display_byte;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, FromStringBase, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 impl FromStr for Natural {
     type Err = ();
@@ -34,8 +34,8 @@ impl FromStr for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from_str("123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_str("00123456").unwrap(), 123456);
@@ -56,7 +56,7 @@ fn from_binary_str(s: &str) -> Option<Natural> {
     if len <= usize::wrapping_from(Limb::WIDTH) {
         Limb::from_str_radix(s, 2).ok().map(Natural::from)
     } else {
-        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0];
+        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH, Ceiling).0];
         let mut remaining = u64::wrapping_from(len & usize::wrapping_from(Limb::WIDTH_MASK));
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
@@ -87,7 +87,7 @@ fn from_oct_str(s: &str) -> Option<Natural> {
         Limb::from_str_radix(s, 8).ok().map(Natural::from)
     } else {
         let bit_len = len.checked_mul(3).unwrap();
-        let mut xs = vec![0; bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0];
+        let mut xs = vec![0; bit_len.shr_round(Limb::LOG_WIDTH, Ceiling).0];
         let mut remaining = u64::exact_from(bit_len) & Limb::WIDTH_MASK;
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
@@ -139,7 +139,7 @@ fn from_hex_str(s: &str) -> Option<Natural> {
     if len <= usize::wrapping_from(Limb::WIDTH >> 2) {
         Limb::from_str_radix(s, 16).ok().map(Natural::from)
     } else {
-        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH - 2, RoundingMode::Ceiling).0];
+        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH - 2, Ceiling).0];
         let mut remaining = u64::wrapping_from(len.mod_power_of_2(Limb::LOG_WIDTH - 2)) << 2;
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
@@ -184,14 +184,20 @@ impl FromStringBase for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::conversion::traits::{Digits, FromStringBase};
+    /// use malachite_base::num::conversion::traits::FromStringBase;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from_string_base(10, "123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_string_base(10, "00123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_string_base(16, "0").unwrap(), 0);
-    /// assert_eq!(Natural::from_string_base(16, "deadbeef").unwrap(), 3735928559u32);
-    /// assert_eq!(Natural::from_string_base(16, "deAdBeEf").unwrap(), 3735928559u32);
+    /// assert_eq!(
+    ///     Natural::from_string_base(16, "deadbeef").unwrap(),
+    ///     3735928559u32
+    /// );
+    /// assert_eq!(
+    ///     Natural::from_string_base(16, "deAdBeEf").unwrap(),
+    ///     3735928559u32
+    /// );
     ///
     /// assert!(Natural::from_string_base(10, "").is_none());
     /// assert!(Natural::from_string_base(10, "a").is_none());

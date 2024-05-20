@@ -20,7 +20,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::slices::slice_trailing_zeros;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub fn limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     assert!(xs.len() > 1);
@@ -50,7 +50,7 @@ pub fn limbs_eq_mod_limb_naive_2(xs: &[Limb], ys: &[Limb], ms: Limb) -> bool {
     if xs == ys {
         return true;
     }
-    let mut diff = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let mut diff = if limbs_cmp(xs, ys) >= Equal {
         limbs_sub(xs, ys)
     } else {
         limbs_sub(ys, xs)
@@ -77,14 +77,14 @@ pub fn limbs_eq_mod_naive_1(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     };
     xs_mod.truncate(xs_mod.len() - slice_trailing_zeros(&xs_mod));
     ys_mod.truncate(ys_mod.len() - slice_trailing_zeros(&ys_mod));
-    limbs_cmp(&xs_mod, &ys_mod) == Ordering::Equal
+    limbs_cmp(&xs_mod, &ys_mod) == Equal
 }
 
 pub fn limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs == ys {
         return true;
     }
-    let mut diff = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let mut diff = if limbs_cmp(xs, ys) >= Equal {
         limbs_sub(xs, ys)
     } else {
         limbs_sub(ys, xs)

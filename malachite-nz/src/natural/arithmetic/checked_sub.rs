@@ -152,18 +152,28 @@ impl CheckedSub<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.checked_sub(Natural::from(123u32)).to_debug_string(), "None");
     /// assert_eq!(
-    ///     Natural::from(123u32).checked_sub(Natural::ZERO).to_debug_string(),
+    ///     Natural::ZERO
+    ///         .checked_sub(Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(123u32)
+    ///         .checked_sub(Natural::ZERO)
+    ///         .to_debug_string(),
     ///     "Some(123)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(456u32).checked_sub(Natural::from(123u32)).to_debug_string(),
+    ///     Natural::from(456u32)
+    ///         .checked_sub(Natural::from(123u32))
+    ///         .to_debug_string(),
     ///     "Some(333)"
     /// );
     /// assert_eq!(
     ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
-    ///             .checked_sub(Natural::from(10u32).pow(12)).to_debug_string(),
+    ///         .checked_sub(Natural::from(10u32).pow(12))
+    ///         .to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```
@@ -203,16 +213,28 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.checked_sub(&Natural::from(123u32)).to_debug_string(), "None");
     /// assert_eq!(
-    ///     Natural::from(123u32).checked_sub(&Natural::ZERO).to_debug_string(),
+    ///     Natural::ZERO
+    ///         .checked_sub(&Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(123u32)
+    ///         .checked_sub(&Natural::ZERO)
+    ///         .to_debug_string(),
     ///     "Some(123)"
     /// );
-    /// assert_eq!(Natural::from(456u32).checked_sub(&Natural::from(123u32)).to_debug_string(),
-    ///     "Some(333)");
+    /// assert_eq!(
+    ///     Natural::from(456u32)
+    ///         .checked_sub(&Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "Some(333)"
+    /// );
     /// assert_eq!(
     ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
-    ///             .checked_sub(&Natural::from(10u32).pow(12)).to_debug_string(),
+    ///         .checked_sub(&Natural::from(10u32).pow(12))
+    ///         .to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```
@@ -252,14 +274,28 @@ impl<'a> CheckedSub<Natural> for &'a Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).checked_sub(Natural::from(123u32)).to_debug_string(), "None");
-    /// assert_eq!((&Natural::from(123u32)).checked_sub(Natural::ZERO).to_debug_string(),
-    ///     "Some(123)");
-    /// assert_eq!((&Natural::from(456u32)).checked_sub(Natural::from(123u32)).to_debug_string(),
-    ///     "Some(333)");
+    /// assert_eq!(
+    ///     (&Natural::ZERO)
+    ///         .checked_sub(Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(123u32))
+    ///         .checked_sub(Natural::ZERO)
+    ///         .to_debug_string(),
+    ///     "Some(123)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(456u32))
+    ///         .checked_sub(Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "Some(333)"
+    /// );
     /// assert_eq!(
     ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
-    ///             .checked_sub(Natural::from(10u32).pow(12)).to_debug_string(),
+    ///         .checked_sub(Natural::from(10u32).pow(12))
+    ///         .to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```
@@ -299,14 +335,28 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).checked_sub(&Natural::from(123u32)).to_debug_string(), "None");
-    /// assert_eq!((&Natural::from(123u32)).checked_sub(&Natural::ZERO).to_debug_string(),
-    ///     "Some(123)");
-    /// assert_eq!((&Natural::from(456u32)).checked_sub(&Natural::from(123u32)).to_debug_string(),
-    ///     "Some(333)");
+    /// assert_eq!(
+    ///     (&Natural::ZERO)
+    ///         .checked_sub(&Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(123u32))
+    ///         .checked_sub(&Natural::ZERO)
+    ///         .to_debug_string(),
+    ///     "Some(123)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(456u32))
+    ///         .checked_sub(&Natural::from(123u32))
+    ///         .to_debug_string(),
+    ///     "Some(333)"
+    /// );
     /// assert_eq!(
     ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
-    ///             .checked_sub(&Natural::from(10u32).pow(12)).to_debug_string(),
+    ///         .checked_sub(&Natural::from(10u32).pow(12))
+    ///         .to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```

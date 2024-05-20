@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_sequences::RationalSequence;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 impl<T: Eq + Ord> PartialOrd for RationalSequence<T> {
     /// Compares a [`RationalSequence`] to another [`RationalSequence`].
@@ -36,17 +36,16 @@ impl<T: Eq + Ord> Ord for RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert!(
-    ///     RationalSequence::from_slice(&[1, 2]) <
-    ///         RationalSequence::from_slices(&[1, 2], &[1])
+    ///     RationalSequence::from_slice(&[1, 2]) < RationalSequence::from_slices(&[1, 2], &[1])
     /// );
     /// assert!(
-    ///     RationalSequence::from_slice(&[1, 2, 3]) <
-    ///         RationalSequence::from_slices(&[1, 2], &[3, 4])
+    ///     RationalSequence::from_slice(&[1, 2, 3])
+    ///         < RationalSequence::from_slices(&[1, 2], &[3, 4])
     /// );
     /// ```
     fn cmp(&self, other: &RationalSequence<T>) -> Ordering {
         if self == other {
-            Ordering::Equal
+            Equal
         } else {
             Iterator::cmp(self.iter(), other.iter())
         }

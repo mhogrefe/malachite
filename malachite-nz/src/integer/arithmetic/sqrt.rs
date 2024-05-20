@@ -288,10 +288,26 @@ impl CheckedSqrt for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(99u8).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Integer::from(100u8).checked_sqrt().to_debug_string(), "Some(10)");
-    /// assert_eq!(Integer::from(101u8).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Integer::from(1000000000u32).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Integer::from(10000000000u64).checked_sqrt().to_debug_string(), "Some(100000)");
+    /// assert_eq!(
+    ///     Integer::from(100u8).checked_sqrt().to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(101u8).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(1000000000u32)
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(10000000000u64)
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "Some(100000)"
+    /// );
     /// ```
     #[inline]
     fn checked_sqrt(self) -> Option<Integer> {
@@ -332,12 +348,28 @@ impl<'a> CheckedSqrt for &'a Integer {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(99u8)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Integer::from(100u8)).checked_sqrt().to_debug_string(), "Some(10)");
-    /// assert_eq!((&Integer::from(101u8)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Integer::from(1000000000u32)).checked_sqrt().to_debug_string(), "None");
     /// assert_eq!(
-    ///     (&Integer::from(10000000000u64)).checked_sqrt().to_debug_string(),
+    ///     (&Integer::from(99u8)).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(100u8)).checked_sqrt().to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(101u8)).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(1000000000u32))
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(10000000000u64))
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
     ///     "Some(100000)"
     /// );
     /// ```

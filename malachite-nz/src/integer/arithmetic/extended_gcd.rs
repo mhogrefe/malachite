@@ -45,15 +45,21 @@ impl ExtendedGcd for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(3).extended_gcd(Integer::from(5)).to_debug_string(),
+    ///     Integer::from(3)
+    ///         .extended_gcd(Integer::from(5))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(240).extended_gcd(Integer::from(46)).to_debug_string(),
+    ///     Integer::from(240)
+    ///         .extended_gcd(Integer::from(46))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-111).extended_gcd(Integer::from(300)).to_debug_string(),
+    ///     Integer::from(-111)
+    ///         .extended_gcd(Integer::from(300))
+    ///         .to_debug_string(),
     ///     "(3, 27, 10)"
     /// );
     /// ```
@@ -106,15 +112,21 @@ impl<'a> ExtendedGcd<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(3).extended_gcd(&Integer::from(5)).to_debug_string(),
+    ///     Integer::from(3)
+    ///         .extended_gcd(&Integer::from(5))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(240).extended_gcd(&Integer::from(46)).to_debug_string(),
+    ///     Integer::from(240)
+    ///         .extended_gcd(&Integer::from(46))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-111).extended_gcd(&Integer::from(300)).to_debug_string(),
+    ///     Integer::from(-111)
+    ///         .extended_gcd(&Integer::from(300))
+    ///         .to_debug_string(),
     ///     "(3, 27, 10)"
     /// );
     /// ```
@@ -166,15 +178,21 @@ impl<'a> ExtendedGcd<Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     (&Integer::from(3)).extended_gcd(Integer::from(5)).to_debug_string(),
+    ///     (&Integer::from(3))
+    ///         .extended_gcd(Integer::from(5))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(240)).extended_gcd(Integer::from(46)).to_debug_string(),
+    ///     (&Integer::from(240))
+    ///         .extended_gcd(Integer::from(46))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-111)).extended_gcd(Integer::from(300)).to_debug_string(),
+    ///     (&Integer::from(-111))
+    ///         .extended_gcd(Integer::from(300))
+    ///         .to_debug_string(),
     ///     "(3, 27, 10)"
     /// );
     /// ```
@@ -226,15 +244,21 @@ impl<'a, 'b> ExtendedGcd<&'a Integer> for &'b Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     (&Integer::from(3)).extended_gcd(&Integer::from(5)).to_debug_string(),
+    ///     (&Integer::from(3))
+    ///         .extended_gcd(&Integer::from(5))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(240)).extended_gcd(&Integer::from(46)).to_debug_string(),
+    ///     (&Integer::from(240))
+    ///         .extended_gcd(&Integer::from(46))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-111)).extended_gcd(&Integer::from(300)).to_debug_string(),
+    ///     (&Integer::from(-111))
+    ///         .extended_gcd(&Integer::from(300))
+    ///         .to_debug_string(),
     ///     "(3, 27, 10)"
     /// );
     /// ```

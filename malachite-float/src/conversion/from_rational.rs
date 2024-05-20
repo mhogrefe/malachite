@@ -8,7 +8,7 @@
 
 use crate::InnerFloat::Finite;
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, IsPowerOf2, NegModPowerOf2, RoundToMultipleOfPowerOf2, UnsignedAbs,
 };
@@ -16,76 +16,19 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
 use malachite_q::Rational;
 
 impl Float {
-    #[doc(hidden)]
-    pub fn from_rational_times_power_of_2_prec_round(
-        x: Rational,
-        pow: i64,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        if x == 0 {
-            (Float::ZERO, Ordering::Equal)
-        } else {
-            let mut exponent = i64::exact_from(x.floor_log_base_2_abs());
-            let (significand, o) =
-                Integer::rounding_from(x << (i64::exact_from(prec) - exponent - 1), rm);
-            let sign = significand >= 0;
-            let mut significand = significand.unsigned_abs();
-            let away_from_0 = if sign {
-                Ordering::Greater
-            } else {
-                Ordering::Less
-            };
-            if o == away_from_0 && significand.is_power_of_2() {
-                exponent += 1;
-            }
-            significand <<= significand
-                .significant_bits()
-                .neg_mod_power_of_2(Limb::LOG_WIDTH);
-            let target_bits = prec
-                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
-                .0;
-            let current_bits = significand_bits(&significand);
-            if current_bits > target_bits {
-                significand >>= current_bits - target_bits;
-            }
-            (
-                Float(Finite {
-                    sign,
-                    exponent: exponent + pow + 1,
-                    precision: prec,
-                    significand,
-                }),
-                o,
-            )
-        }
-    }
-
-    #[doc(hidden)]
-    #[inline]
-    pub fn from_rational_times_power_of_2_prec(
-        x: Rational,
-        pow: i64,
-        prec: u64,
-    ) -> (Float, Ordering) {
-        Float::from_rational_times_power_of_2_prec_round(x, pow, prec, RoundingMode::Nearest)
-    }
-
     /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by value. If the [`Float`]
     /// is nonzero, it has the specified precision. If rounding is needed, the specified rounding
     /// mode is used. An [`Ordering`] is also returned, indicating whether the returned value is
     /// less than, equal to, or greater than the original value.
     ///
-    /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_rational_prec`]
-    /// instead.
+    /// If you're only using [`Nearest`], try using [`Float::from_rational_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -96,69 +39,76 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = Float::from_rational_prec_round(
-    ///     Rational::from_signeds(1, 3),
-    ///     10,
-    ///     RoundingMode::Floor
-    /// );
+    /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Floor);
     /// assert_eq!(x.to_string(), "0.333");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (x, o) = Float::from_rational_prec_round(
-    ///     Rational::from_signeds(1, 3),
-    ///     10,
-    ///     RoundingMode::Ceiling
-    /// );
+    /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Ceiling);
     /// assert_eq!(x.to_string(), "0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (x, o) = Float::from_rational_prec_round(
-    ///     Rational::from_signeds(1, 3),
-    ///     10,
-    ///     RoundingMode::Nearest
-    /// );
+    /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Nearest);
     /// assert_eq!(x.to_string(), "0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (x, o) = Float::from_rational_prec_round(
-    ///     Rational::from_signeds(-1, 3),
-    ///     10,
-    ///     RoundingMode::Floor
-    /// );
+    /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(-1, 3), 10, Floor);
     /// assert_eq!(x.to_string(), "-0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (x, o) = Float::from_rational_prec_round(
-    ///     Rational::from_signeds(-1, 3),
-    ///     10,
-    ///     RoundingMode::Ceiling
-    /// );
+    /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(-1, 3), 10, Ceiling);
     /// assert_eq!(x.to_string(), "-0.333");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (x, o) = Float::from_rational_prec_round(
-    ///     Rational::from_signeds(-1, 3),
-    ///     10,
-    ///     RoundingMode::Nearest
-    /// );
+    /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(-1, 3), 10, Nearest);
     /// assert_eq!(x.to_string(), "-0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn from_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-        Float::from_rational_times_power_of_2_prec_round(x, 0, prec, rm)
+        assert_ne!(prec, 0);
+        if x == 0 {
+            (Float::ZERO, Equal)
+        } else {
+            let mut exponent = i64::exact_from(x.floor_log_base_2_abs());
+            let (significand, o) =
+                Integer::rounding_from(x << (i64::exact_from(prec) - exponent - 1), rm);
+            let sign = significand >= 0;
+            let mut significand = significand.unsigned_abs();
+            let away_from_0 = if sign { Greater } else { Less };
+            if o == away_from_0 && significand.is_power_of_2() {
+                exponent += 1;
+            }
+            significand <<= significand
+                .significant_bits()
+                .neg_mod_power_of_2(Limb::LOG_WIDTH);
+            let target_bits = prec
+                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+                .0;
+            let current_bits = significand_bits(&significand);
+            if current_bits > target_bits {
+                significand >>= current_bits - target_bits;
+            }
+            (
+                Float(Finite {
+                    sign,
+                    exponent: exponent + 1,
+                    precision: prec,
+                    significand,
+                }),
+                o,
+            )
+        }
     }
 
     /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by value. If the [`Float`]
@@ -169,8 +119,8 @@ impl Float {
     /// a [`Float`] using `try_from` instead. The precision of the resulting [`Float`] will be the
     /// number of significant bits of the [`Rational`]'s numerator.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
-    /// rounding mode as well as a precision, try [`Float::from_rational_prec_round`].
+    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// as well as a precision, try [`Float::from_rational_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -184,58 +134,108 @@ impl Float {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::ZERO, 10);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(1, 3), 10);
     /// assert_eq!(x.to_string(), "0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(1, 3), 100);
     /// assert_eq!(x.to_string(), "0.3333333333333333333333333333335");
     /// assert_eq!(x.get_prec(), Some(100));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(-1, 3), 10);
     /// assert_eq!(x.to_string(), "-0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(-1, 3), 100);
     /// assert_eq!(x.to_string(), "-0.3333333333333333333333333333335");
     /// assert_eq!(x.get_prec(), Some(100));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn from_rational_prec(x: Rational, prec: u64) -> (Float, Ordering) {
-        Float::from_rational_prec_round(x, prec, RoundingMode::Nearest)
+        Float::from_rational_prec_round(x, prec, Nearest)
     }
 
-    #[doc(hidden)]
-    pub fn from_rational_times_power_of_2_prec_round_ref(
+    /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by reference. If the
+    /// [`Float`] is nonzero, it has the specified precision. If rounding is needed, the specified
+    /// rounding mode is used. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the original value.
+    ///
+    /// If you're only using [`Nearest`], try using [`Float::from_rational_prec_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(), prec)`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (x, o) = Float::from_rational_prec_round_ref(&Rational::from_signeds(1, 3), 10, Floor);
+    /// assert_eq!(x.to_string(), "0.333");
+    /// assert_eq!(x.get_prec(), Some(10));
+    /// assert_eq!(o, Less);
+    ///
+    /// let (x, o) =
+    ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(1, 3), 10, Ceiling);
+    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.get_prec(), Some(10));
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (x, o) =
+    ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(1, 3), 10, Nearest);
+    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.get_prec(), Some(10));
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (x, o) = Float::from_rational_prec_round_ref(&Rational::from_signeds(-1, 3), 10, Floor);
+    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.get_prec(), Some(10));
+    /// assert_eq!(o, Less);
+    ///
+    /// let (x, o) =
+    ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(-1, 3), 10, Ceiling);
+    /// assert_eq!(x.to_string(), "-0.333");
+    /// assert_eq!(x.get_prec(), Some(10));
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (x, o) =
+    ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(-1, 3), 10, Nearest);
+    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.get_prec(), Some(10));
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn from_rational_prec_round_ref(
         x: &Rational,
-        pow: i64,
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
         assert_ne!(prec, 0);
         if *x == 0 {
-            (Float::ZERO, Ordering::Equal)
+            (Float::ZERO, Equal)
         } else {
             let mut exponent = i64::exact_from(x.floor_log_base_2_abs());
             let (significand, o) =
                 Integer::rounding_from(x << (i64::exact_from(prec) - exponent - 1), rm);
             let sign = significand >= 0;
             let mut significand = significand.unsigned_abs();
-            let away_from_0 = if sign {
-                Ordering::Greater
-            } else {
-                Ordering::Less
-            };
+            let away_from_0 = if sign { Greater } else { Less };
             if o == away_from_0 && significand.is_power_of_2() {
                 exponent += 1;
             }
@@ -243,7 +243,7 @@ impl Float {
                 .significant_bits()
                 .neg_mod_power_of_2(Limb::LOG_WIDTH);
             let target_bits = prec
-                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                 .0;
             let current_bits = significand_bits(&significand);
             if current_bits > target_bits {
@@ -252,109 +252,13 @@ impl Float {
             (
                 Float(Finite {
                     sign,
-                    exponent: exponent + pow + 1,
+                    exponent: exponent + 1,
                     precision: prec,
                     significand,
                 }),
                 o,
             )
         }
-    }
-
-    #[doc(hidden)]
-    #[inline]
-    pub fn from_rational_times_power_of_2_prec_ref(
-        x: &Rational,
-        pow: i64,
-        prec: u64,
-    ) -> (Float, Ordering) {
-        Float::from_rational_times_power_of_2_prec_round_ref(x, pow, prec, RoundingMode::Nearest)
-    }
-
-    /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by reference. If the
-    /// [`Float`] is nonzero, it has the specified precision. If rounding is needed, the specified
-    /// rounding mode is used. An [`Ordering`] is also returned, indicating whether the returned
-    /// value is less than, equal to, or greater than the original value.
-    ///
-    /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_rational_prec_ref`]
-    /// instead.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
-    ///
-    /// $M(n) = O(n \log n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(), prec)`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_modes::RoundingMode;
-    /// use malachite_float::Float;
-    /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
-    ///
-    /// let (x, o) = Float::from_rational_prec_round_ref(
-    ///     &Rational::from_signeds(1, 3),
-    ///     10,
-    ///     RoundingMode::Floor
-    /// );
-    /// assert_eq!(x.to_string(), "0.333");
-    /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
-    ///
-    /// let (x, o) = Float::from_rational_prec_round_ref(
-    ///     &Rational::from_signeds(1, 3),
-    ///     10,
-    ///     RoundingMode::Ceiling
-    /// );
-    /// assert_eq!(x.to_string(), "0.3335");
-    /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
-    ///
-    /// let (x, o) = Float::from_rational_prec_round_ref(
-    ///     &Rational::from_signeds(1, 3),
-    ///     10,
-    ///     RoundingMode::Nearest
-    /// );
-    /// assert_eq!(x.to_string(), "0.3335");
-    /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
-    ///
-    /// let (x, o) = Float::from_rational_prec_round_ref(
-    ///     &Rational::from_signeds(-1, 3),
-    ///     10,
-    ///     RoundingMode::Floor
-    /// );
-    /// assert_eq!(x.to_string(), "-0.3335");
-    /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
-    ///
-    /// let (x, o) = Float::from_rational_prec_round_ref(
-    ///     &Rational::from_signeds(-1, 3),
-    ///     10,
-    ///     RoundingMode::Ceiling
-    /// );
-    /// assert_eq!(x.to_string(), "-0.333");
-    /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
-    ///
-    /// let (x, o) = Float::from_rational_prec_round_ref(
-    ///     &Rational::from_signeds(-1, 3),
-    ///     10,
-    ///     RoundingMode::Nearest
-    /// );
-    /// assert_eq!(x.to_string(), "-0.3335");
-    /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
-    /// ```
-    #[inline]
-    pub fn from_rational_prec_round_ref(
-        x: &Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        Float::from_rational_times_power_of_2_prec_round_ref(x, 0, prec, rm)
     }
 
     /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by reference. If the
@@ -366,8 +270,8 @@ impl Float {
     /// a [`Float`] using `try_from` instead. The precision of the resulting [`Float`] will be the
     /// number of significant bits of the [`Rational`]'s numerator.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
-    /// rounding mode as well as a precision, try [`Float::from_rational_prec_round_ref`].
+    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// as well as a precision, try [`Float::from_rational_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -381,35 +285,35 @@ impl Float {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::ZERO, 10);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(1, 3), 10);
     /// assert_eq!(x.to_string(), "0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(1, 3), 100);
     /// assert_eq!(x.to_string(), "0.3333333333333333333333333333335");
     /// assert_eq!(x.get_prec(), Some(100));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(-1, 3), 10);
     /// assert_eq!(x.to_string(), "-0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(-1, 3), 100);
     /// assert_eq!(x.to_string(), "-0.3333333333333333333333333333335");
     /// assert_eq!(x.get_prec(), Some(100));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn from_rational_prec_ref(x: &Rational, prec: u64) -> (Float, Ordering) {
-        Float::from_rational_prec_round_ref(x, prec, RoundingMode::Nearest)
+        Float::from_rational_prec_round_ref(x, prec, Nearest)
     }
 }
 
@@ -437,21 +341,30 @@ impl TryFrom<Rational> for Float {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Float::try_from(Rational::ZERO).unwrap(), 0);
-    /// assert_eq!(Float::try_from(Rational::from_signeds(1, 8)).unwrap(), 0.125);
-    /// assert_eq!(Float::try_from(Rational::from_signeds(-1, 8)).unwrap(), -0.125);
+    /// assert_eq!(
+    ///     Float::try_from(Rational::from_signeds(1, 8)).unwrap(),
+    ///     0.125
+    /// );
+    /// assert_eq!(
+    ///     Float::try_from(Rational::from_signeds(-1, 8)).unwrap(),
+    ///     -0.125
+    /// );
     ///
-    /// assert_eq!(Float::try_from(Rational::from_signeds(1, 3)), Err(FloatFromRationalError));
-    /// assert_eq!(Float::try_from(Rational::from_signeds(-1, 3)), Err(FloatFromRationalError));
+    /// assert_eq!(
+    ///     Float::try_from(Rational::from_signeds(1, 3)),
+    ///     Err(FloatFromRationalError)
+    /// );
+    /// assert_eq!(
+    ///     Float::try_from(Rational::from_signeds(-1, 3)),
+    ///     Err(FloatFromRationalError)
+    /// );
     /// ```
     fn try_from(x: Rational) -> Result<Float, Self::Error> {
         if let Some(log_denominator) = x.denominator_ref().checked_log_base_2() {
-            Ok(Float::from_integer_times_power_of_2(
-                Integer::from_sign_and_abs(x >= 0u32, x.into_numerator()),
-                i64::try_from(log_denominator)
-                    .map_err(|_| FloatFromRationalError)?
-                    .checked_neg()
-                    .ok_or(FloatFromRationalError)?,
-            ))
+            Ok(
+                Float::from(Integer::from_sign_and_abs(x >= 0u32, x.into_numerator()))
+                    >> i64::try_from(log_denominator).map_err(|_| FloatFromRationalError)?,
+            )
         } else {
             Err(FloatFromRationalError)
         }
@@ -482,21 +395,30 @@ impl<'a> TryFrom<&'a Rational> for Float {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Float::try_from(&Rational::ZERO).unwrap(), 0);
-    /// assert_eq!(Float::try_from(&Rational::from_signeds(1, 8)).unwrap(), 0.125);
-    /// assert_eq!(Float::try_from(&Rational::from_signeds(-1, 8)).unwrap(), -0.125);
+    /// assert_eq!(
+    ///     Float::try_from(&Rational::from_signeds(1, 8)).unwrap(),
+    ///     0.125
+    /// );
+    /// assert_eq!(
+    ///     Float::try_from(&Rational::from_signeds(-1, 8)).unwrap(),
+    ///     -0.125
+    /// );
     ///
-    /// assert_eq!(Float::try_from(&Rational::from_signeds(1, 3)), Err(FloatFromRationalError));
-    /// assert_eq!(Float::try_from(&Rational::from_signeds(-1, 3)), Err(FloatFromRationalError));
+    /// assert_eq!(
+    ///     Float::try_from(&Rational::from_signeds(1, 3)),
+    ///     Err(FloatFromRationalError)
+    /// );
+    /// assert_eq!(
+    ///     Float::try_from(&Rational::from_signeds(-1, 3)),
+    ///     Err(FloatFromRationalError)
+    /// );
     /// ```
     fn try_from(x: &'a Rational) -> Result<Float, Self::Error> {
         if let Some(log_denominator) = x.denominator_ref().checked_log_base_2() {
-            Ok(Float::from_integer_times_power_of_2(
-                Integer::from_sign_and_abs_ref(*x >= 0u32, x.numerator_ref()),
-                i64::try_from(log_denominator)
-                    .map_err(|_| FloatFromRationalError)?
-                    .checked_neg()
-                    .ok_or(FloatFromRationalError)?,
-            ))
+            Ok(Float::from(Integer::from_sign_and_abs_ref(
+                *x >= 0u32,
+                x.numerator_ref(),
+            )) >> i64::try_from(log_denominator).map_err(|_| FloatFromRationalError)?)
         } else {
             Err(FloatFromRationalError)
         }
@@ -523,10 +445,19 @@ impl<'a> ConvertibleFrom<&'a Rational> for Float {
     ///
     /// assert_eq!(Float::convertible_from(&Rational::ZERO), true);
     /// assert_eq!(Float::convertible_from(&Rational::from_signeds(3, 8)), true);
-    /// assert_eq!(Float::convertible_from(&Rational::from_signeds(-3, 8)), true);
+    /// assert_eq!(
+    ///     Float::convertible_from(&Rational::from_signeds(-3, 8)),
+    ///     true
+    /// );
     ///
-    /// assert_eq!(Float::convertible_from(&Rational::from_signeds(1, 3)), false);
-    /// assert_eq!(Float::convertible_from(&Rational::from_signeds(-1, 3)), false);
+    /// assert_eq!(
+    ///     Float::convertible_from(&Rational::from_signeds(1, 3)),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     Float::convertible_from(&Rational::from_signeds(-1, 3)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn convertible_from(x: &'a Rational) -> bool {

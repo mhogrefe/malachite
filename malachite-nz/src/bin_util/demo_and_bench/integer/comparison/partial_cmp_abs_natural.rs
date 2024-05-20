@@ -14,7 +14,7 @@ use malachite_nz::test_util::bench::bucketers::{
     integer_natural_max_bit_bucketer, pair_2_integer_natural_max_bit_bucketer,
 };
 use malachite_nz::test_util::generators::{integer_natural_pair_gen, integer_natural_pair_gen_rm};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_partial_cmp_abs_natural);
@@ -49,9 +49,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_integer_partial_cmp_abs_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_natural_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp_abs(&y).unwrap() {
-            Ordering::Less => println!("|{x}| < |{y}|"),
-            Ordering::Equal => println!("|{x}| = |{y}|"),
-            Ordering::Greater => println!("|{x}| > |{y}|"),
+            Less => println!("|{x}| < |{y}|"),
+            Equal => println!("|{x}| = |{y}|"),
+            Greater => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -59,9 +59,9 @@ fn demo_integer_partial_cmp_abs_natural(gm: GenMode, config: &GenConfig, limit: 
 fn demo_natural_partial_cmp_abs_integer(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_natural_pair_gen().get(gm, config).take(limit) {
         match y.partial_cmp_abs(&x).unwrap() {
-            Ordering::Less => println!("|{y}| < |{x}|"),
-            Ordering::Equal => println!("|{y}| = |{x}|"),
-            Ordering::Greater => println!("|{y}| > |{x}|"),
+            Less => println!("|{y}| < |{x}|"),
+            Equal => println!("|{y}| = |{x}|"),
+            Greater => println!("|{y}| > |{x}|"),
         }
     }
 }

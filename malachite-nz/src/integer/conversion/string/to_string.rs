@@ -211,9 +211,9 @@ impl Display for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_string(), "0");
     ///
@@ -261,10 +261,10 @@ impl Debug for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_debug_string(), "0");
     ///
@@ -306,10 +306,10 @@ impl Binary for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_binary_string(), "0");
     /// assert_eq!(Integer::from(123).to_binary_string(), "1111011");
@@ -382,10 +382,10 @@ impl Octal for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_octal_string(), "0");
     /// assert_eq!(Integer::from(123).to_octal_string(), "173");
@@ -458,10 +458,10 @@ impl LowerHex for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Integer::from(123).to_lower_hex_string(), "7b");
@@ -534,10 +534,10 @@ impl UpperHex for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Integer::from(123).to_upper_hex_string(), "7B");

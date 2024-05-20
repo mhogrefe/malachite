@@ -20,14 +20,14 @@ use malachite_float::test_util::generators::{
     float_primitive_float_pair_gen, float_primitive_float_primitive_float_triple_gen,
 };
 use malachite_float::Float;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 
 const fn encode(oo: Option<Ordering>) -> u8 {
     match oo {
         None => 9,
-        Some(Ordering::Less) => 0,
-        Some(Ordering::Equal) => 1,
-        Some(Ordering::Greater) => 2,
+        Some(Less) => 0,
+        Some(Equal) => 1,
+        Some(Greater) => 2,
     }
 }
 
@@ -120,14 +120,11 @@ where
 
     float_float_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n.lt_abs(&u) && u.lt_abs(&m) {
-            assert_eq!(
-                PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m),
-                Some(Ordering::Less)
-            );
+            assert_eq!(PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m), Some(Less));
         } else if n.gt_abs(&u) && u.gt_abs(&m) {
             assert_eq!(
                 PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m),
-                Some(Ordering::Greater)
+                Some(Greater)
             );
         }
     });

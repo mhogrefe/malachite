@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 
 impl Sign for Float {
@@ -28,25 +28,25 @@ impl Sign for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Sign;
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// assert_eq!(Float::INFINITY.sign(), Ordering::Greater);
-    /// assert_eq!(Float::NEGATIVE_INFINITY.sign(), Ordering::Less);
-    /// assert_eq!(Float::ZERO.sign(), Ordering::Greater);
-    /// assert_eq!(Float::NEGATIVE_ZERO.sign(), Ordering::Less);
-    /// assert_eq!(Float::ONE.sign(), Ordering::Greater);
-    /// assert_eq!(Float::NEGATIVE_ONE.sign(), Ordering::Less);
+    /// assert_eq!(Float::INFINITY.sign(), Greater);
+    /// assert_eq!(Float::NEGATIVE_INFINITY.sign(), Less);
+    /// assert_eq!(Float::ZERO.sign(), Greater);
+    /// assert_eq!(Float::NEGATIVE_ZERO.sign(), Less);
+    /// assert_eq!(Float::ONE.sign(), Greater);
+    /// assert_eq!(Float::NEGATIVE_ONE.sign(), Less);
     /// ```
     fn sign(&self) -> Ordering {
         match self {
             Float(Infinity { sign }) | Float(Zero { sign }) | Float(Finite { sign, .. }) => {
                 if *sign {
-                    Ordering::Greater
+                    Greater
                 } else {
-                    Ordering::Less
+                    Less
                 }
             }
             _ => panic!(),

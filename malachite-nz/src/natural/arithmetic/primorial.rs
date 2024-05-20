@@ -130,7 +130,10 @@ impl Primorial for Natural {
     /// assert_eq!(Natural::primorial(3), 6);
     /// assert_eq!(Natural::primorial(4), 6);
     /// assert_eq!(Natural::primorial(5), 30);
-    /// assert_eq!(Natural::primorial(100).to_string(), "2305567963945518424753102147331756070");
+    /// assert_eq!(
+    ///     Natural::primorial(100).to_string(),
+    ///     "2305567963945518424753102147331756070"
+    /// );
     /// ```
     ///
     /// This is equivalent to `mpz_primorial_ui` from `mpz/primorial_ui.c`, GMP 6.2.1.

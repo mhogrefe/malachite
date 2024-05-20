@@ -11,7 +11,7 @@ use malachite_base::test_util::generators::{
     unsigned_rational_sequence_gen, unsigned_rational_sequence_pair_gen,
     unsigned_rational_sequence_triple_gen,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_cmp() {
@@ -34,12 +34,12 @@ fn cmp_properties() {
     unsigned_rational_sequence_pair_gen::<u8>().test_properties(|(xs, ys)| {
         let ord = xs.cmp(&ys);
         assert_eq!(ys.cmp(&xs).reverse(), ord);
-        assert_eq!(xs == ys, xs.cmp(&ys) == Ordering::Equal);
+        assert_eq!(xs == ys, xs.cmp(&ys) == Equal);
     });
 
     let empty = RationalSequence::from_vec(vec![]);
     unsigned_rational_sequence_gen::<u8>().test_properties(|xs| {
-        assert_eq!(xs.cmp(&xs), Ordering::Equal);
+        assert_eq!(xs.cmp(&xs), Equal);
         assert!(xs >= empty);
     });
 

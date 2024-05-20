@@ -13,7 +13,7 @@ use core::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};
 use malachite_base::num::arithmetic::traits::{Abs, ModPowerOf2, ShrRound};
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, ToSci};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_q::Rational;
 
 impl Display for Float {
@@ -78,10 +78,7 @@ impl LowerHex for Float {
                 let mut options = ToSciOptions::default();
                 options.set_base(16);
                 let m = exponent.mod_power_of_2(2);
-                let mut p = precision
-                    .saturating_sub(m)
-                    .shr_round(2, RoundingMode::Ceiling)
-                    .0;
+                let mut p = precision.saturating_sub(m).shr_round(2, Ceiling).0;
                 if m != 0 {
                     p += 1;
                 }

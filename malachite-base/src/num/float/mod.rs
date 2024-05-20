@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::basic::floats::PrimitiveFloat;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::fmt::{self, Debug, Display, Formatter};
 use core::hash::{Hash, Hasher};
 use core::str::FromStr;
@@ -58,7 +58,7 @@ impl<T: PrimitiveFloat> NiceFloat<T> {
         let f = self.0;
         if f.is_nan() {
             FloatType::NaN
-        } else if f.sign() == Ordering::Greater {
+        } else if f.sign() == Greater {
             if f == T::ZERO {
                 FloatType::PositiveZero
             } else if f.is_finite() {
@@ -144,7 +144,6 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::floats::PrimitiveFloat;
     /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert!(NiceFloat(0.0) > NiceFloat(-0.0));
@@ -160,7 +159,7 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
             if self_type == FloatType::PositiveFinite || self_type == FloatType::NegativeFinite {
                 self.0.partial_cmp(&other.0).unwrap()
             } else {
-                Ordering::Equal
+                Equal
             }
         })
     }
@@ -277,7 +276,7 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
         if self.0.is_nan() {
             f.write_str("NaN")
         } else if self.0.is_infinite() {
-            if self.0.sign() == Ordering::Greater {
+            if self.0.sign() == Greater {
                 f.write_str("Infinity")
             } else {
                 f.write_str("-Infinity")

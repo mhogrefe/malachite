@@ -18,7 +18,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::BitAccess;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     large_type_gen_var_2, unsigned_gen, unsigned_pair_gen_var_31, unsigned_vec_gen_var_1,
@@ -155,7 +155,7 @@ fn limbs_sqrt_rem_helper_fail() {
 #[test]
 fn test_limbs_sqrt_helper() {
     fn test(xs: &[Limb], out_out: &[Limb], has_remainder: bool) {
-        let n = xs.len().shr_round(1, RoundingMode::Ceiling).0;
+        let n = xs.len().shr_round(1, Ceiling).0;
         let odd = xs.len().odd();
         let shift = LeadingZeros::leading_zeros(*xs.last().unwrap()) >> 1;
         let mut out = vec![0; n];
@@ -187,11 +187,11 @@ fn test_limbs_sqrt_helper() {
         true,
     );
     // - (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) == 0
-    // - cmp != Ordering::Less first time
+    // - cmp != Less first time
     // - slice_test_zero(&scratch_hi[h1 + 1..h2 + 1])
-    // - cmp == Ordering::Equal
+    // - cmp == Equal
     // - shift != 0 second time
-    // - cmp != Ordering::Less second time
+    // - cmp != Less second time
     test(&[0, 0, 0, 0, 0, 0, 0, 0, 1], &[0, 0, 0, 0, 1], false);
     // - !slice_test_zero(&scratch_hi[h1 + 1..h2 + 1])
     test(
@@ -199,8 +199,8 @@ fn test_limbs_sqrt_helper() {
         &[4294959104, 4294967295, 32767, 0, 65536],
         true,
     );
-    // - cmp != Ordering::Equal
-    // - cmp == Ordering::Less second time
+    // - cmp != Equal
+    // - cmp == Less second time
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
         &[4095, 0, 4294959104, 4294967295, 32767, 0, 65536],
@@ -248,7 +248,7 @@ fn test_limbs_sqrt_helper() {
         ],
         true,
     );
-    // - cmp == Ordering::Less first time
+    // - cmp == Less first time
     test(
         &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4294967232, 4294967295, 4294967295,
@@ -291,7 +291,7 @@ fn limbs_sqrt_helper_fail() {
 fn test_limbs_sqrt_to_out() {
     fn test(xs: &[Limb], out_out: &[Limb]) {
         let xs_len = xs.len();
-        let mut out = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
+        let mut out = vec![0; xs_len.shr_round(1, Ceiling).0];
         limbs_sqrt_to_out(&mut out, xs);
         assert_eq!(out, out_out);
         let x = Natural::from_limbs_asc(xs);
@@ -362,7 +362,7 @@ fn limbs_sqrt_to_out_fail() {
 fn test_limbs_sqrt_rem_to_out() {
     fn test(xs: &[Limb], out_out_sqrt: &[Limb], out_out_rem: &[Limb]) {
         let xs_len = xs.len();
-        let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
+        let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
         let mut out_rem = vec![0; xs_len];
         let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
         assert_eq!(out_sqrt, out_out_sqrt);
@@ -727,7 +727,7 @@ fn limbs_sqrt_to_out_properties() {
     unsigned_vec_pair_gen_var_5().test_properties_with_config(&config, |(mut out, xs)| {
         limbs_sqrt_to_out(&mut out, &xs);
         let xs_len = xs.len();
-        let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+        let sqrt_len = xs_len.shr_round(1, Ceiling).0;
         let x = Natural::from_limbs_asc(&xs);
         let sqrt = Natural::from_limbs_asc(&out[..sqrt_len]);
         assert_eq!((&x).floor_sqrt(), sqrt);
@@ -746,7 +746,7 @@ fn limbs_sqrt_rem_to_out_properties() {
         |(mut out_sqrt, mut out_rem, xs)| {
             let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, &xs);
             let xs_len = xs.len();
-            let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+            let sqrt_len = xs_len.shr_round(1, Ceiling).0;
             let x = Natural::from_limbs_asc(&xs);
             let sqrt = Natural::from_limbs_asc(&out_sqrt[..sqrt_len]);
             let rem = Natural::from_limbs_asc(&out_rem[..rem_len]);

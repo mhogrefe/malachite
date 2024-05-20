@@ -17,14 +17,14 @@ impl Display for RoundingMode {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     ///
-    /// assert_eq!(RoundingMode::Down.to_string(), "Down");
-    /// assert_eq!(RoundingMode::Up.to_string(), "Up");
-    /// assert_eq!(RoundingMode::Floor.to_string(), "Floor");
-    /// assert_eq!(RoundingMode::Ceiling.to_string(), "Ceiling");
-    /// assert_eq!(RoundingMode::Nearest.to_string(), "Nearest");
-    /// assert_eq!(RoundingMode::Exact.to_string(), "Exact");
+    /// assert_eq!(Down.to_string(), "Down");
+    /// assert_eq!(Up.to_string(), "Up");
+    /// assert_eq!(Floor.to_string(), "Floor");
+    /// assert_eq!(Ceiling.to_string(), "Ceiling");
+    /// assert_eq!(Nearest.to_string(), "Nearest");
+    /// assert_eq!(Exact.to_string(), "Exact");
     /// ```
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {

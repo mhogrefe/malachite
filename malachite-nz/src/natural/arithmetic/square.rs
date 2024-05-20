@@ -63,7 +63,7 @@ use crate::platform::{
     SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
@@ -72,7 +72,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
@@ -219,7 +219,7 @@ pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &m
     let n = xs_len - s;
     let (xs_0, xs_1) = xs.split_at(n);
     if s == n {
-        if limbs_cmp_same_length(xs_0, xs_1) == Ordering::Less {
+        if limbs_cmp_same_length(xs_0, xs_1) == Less {
             limbs_sub_same_length_to_out(out, xs_1, xs_0);
         } else {
             limbs_sub_same_length_to_out(out, xs_0, xs_1);
@@ -228,7 +228,7 @@ pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &m
         // n - s == 1
         let (xs_0_last, xs_0_init) = xs_0.split_last().unwrap();
         let (out_last, out_init) = out[..n].split_last_mut().unwrap();
-        if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Ordering::Less {
+        if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Less {
             limbs_sub_same_length_to_out(out_init, xs_1, xs_0_init);
             *out_last = 0;
         } else {
@@ -363,7 +363,7 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // This is equivalent to `mpn_toom3_sqr` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
-    let n = xs_len.div_round(3, RoundingMode::Ceiling).0;
+    let n = xs_len.div_round(3, Ceiling).0;
     let m = n + 1;
     let k = m + n;
     let s = xs_len - (n << 1);
@@ -379,7 +379,7 @@ pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &m
     if limbs_add_same_length_to_out(as1_init, scratch_lo, xs_1) {
         *as1_last += 1;
     }
-    if carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Ordering::Less {
+    if carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Less {
         limbs_sub_same_length_to_out(asm1_init, xs_1, scratch_lo);
     } else if limbs_sub_same_length_to_out(asm1_init, scratch_lo, xs_1) {
         carry.wrapping_sub_assign(1);
@@ -902,7 +902,7 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
-    let n: usize = xs_len.shr_round(3, RoundingMode::Ceiling).0;
+    let n: usize = xs_len.shr_round(3, Ceiling).0;
     let m = n + 1;
     let k = m + n;
     let p = k + n;

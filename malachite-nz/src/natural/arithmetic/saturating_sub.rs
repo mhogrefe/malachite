@@ -35,10 +35,13 @@ impl SaturatingSub<Natural> for Natural {
     ///
     /// assert_eq!(Natural::ZERO.saturating_sub(Natural::from(123u32)), 0);
     /// assert_eq!(Natural::from(123u32).saturating_sub(Natural::ZERO), 123);
-    /// assert_eq!(Natural::from(456u32).saturating_sub(Natural::from(123u32)), 333);
+    /// assert_eq!(
+    ///     Natural::from(456u32).saturating_sub(Natural::from(123u32)),
+    ///     333
+    /// );
     /// assert_eq!(
     ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
-    ///             .saturating_sub(Natural::from(10u32).pow(12)),
+    ///         .saturating_sub(Natural::from(10u32).pow(12)),
     ///     2000000000000u64
     /// );
     /// ```
@@ -73,10 +76,13 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
     ///
     /// assert_eq!(Natural::ZERO.saturating_sub(&Natural::from(123u32)), 0);
     /// assert_eq!(Natural::from(123u32).saturating_sub(&Natural::ZERO), 123);
-    /// assert_eq!(Natural::from(456u32).saturating_sub(&Natural::from(123u32)), 333);
+    /// assert_eq!(
+    ///     Natural::from(456u32).saturating_sub(&Natural::from(123u32)),
+    ///     333
+    /// );
     /// assert_eq!(
     ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
-    ///             .saturating_sub(&Natural::from(10u32).pow(12)),
+    ///         .saturating_sub(&Natural::from(10u32).pow(12)),
     ///     2000000000000u64
     /// );
     /// ```
@@ -111,7 +117,10 @@ impl<'a> SaturatingSub<Natural> for &'a Natural {
     ///
     /// assert_eq!((&Natural::ZERO).saturating_sub(Natural::from(123u32)), 0);
     /// assert_eq!((&Natural::from(123u32)).saturating_sub(Natural::ZERO), 123);
-    /// assert_eq!((&Natural::from(456u32)).saturating_sub(Natural::from(123u32)), 333);
+    /// assert_eq!(
+    ///     (&Natural::from(456u32)).saturating_sub(Natural::from(123u32)),
+    ///     333
+    /// );
     /// assert_eq!(
     ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
     ///         .saturating_sub(Natural::from(10u32).pow(12)),
@@ -149,10 +158,13 @@ impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
     ///
     /// assert_eq!((&Natural::ZERO).saturating_sub(&Natural::from(123u32)), 0);
     /// assert_eq!((&Natural::from(123u32)).saturating_sub(&Natural::ZERO), 123);
-    /// assert_eq!((&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)), 333);
+    /// assert_eq!(
+    ///     (&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)),
+    ///     333
+    /// );
     /// assert_eq!(
     ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
-    ///             .saturating_sub(&Natural::from(10u32).pow(12)),
+    ///         .saturating_sub(&Natural::from(10u32).pow(12)),
     ///     2000000000000u64
     /// );
     /// ```

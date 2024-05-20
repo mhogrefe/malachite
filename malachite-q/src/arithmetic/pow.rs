@@ -29,12 +29,20 @@ impl Pow<u64> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from_signeds(22, 7).pow(3u64).to_string(), "10648/343");
-    /// assert_eq!(Rational::from_signeds(-22, 7).pow(3u64).to_string(), "-10648/343");
-    /// assert_eq!(Rational::from_signeds(-22, 7).pow(4u64).to_string(), "234256/2401");
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7).pow(3u64).to_string(),
+    ///     "10648/343"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).pow(3u64).to_string(),
+    ///     "-10648/343"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).pow(4u64).to_string(),
+    ///     "234256/2401"
+    /// );
     /// ```
     #[inline]
     fn pow(mut self, exp: u64) -> Rational {
@@ -61,12 +69,20 @@ impl<'a> Pow<u64> for &'a Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::from_signeds(22, 7)).pow(3u64).to_string(), "10648/343");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(3u64).to_string(), "-10648/343");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(4u64).to_string(), "234256/2401");
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7)).pow(3u64).to_string(),
+    ///     "10648/343"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).pow(3u64).to_string(),
+    ///     "-10648/343"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).pow(4u64).to_string(),
+    ///     "234256/2401"
+    /// );
     /// ```
     #[inline]
     fn pow(self, exp: u64) -> Rational {
@@ -94,7 +110,6 @@ impl PowAssign<u64> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
     /// let mut x = Rational::from_signeds(22, 7);
@@ -137,15 +152,32 @@ impl Pow<i64> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from_signeds(22, 7).pow(3i64).to_string(), "10648/343");
-    /// assert_eq!(Rational::from_signeds(-22, 7).pow(3i64).to_string(), "-10648/343");
-    /// assert_eq!(Rational::from_signeds(-22, 7).pow(4i64).to_string(), "234256/2401");
-    /// assert_eq!(Rational::from_signeds(22, 7).pow(-3i64).to_string(), "343/10648");
-    /// assert_eq!(Rational::from_signeds(-22, 7).pow(-3i64).to_string(), "-343/10648");
-    /// assert_eq!(Rational::from_signeds(-22, 7).pow(-4i64).to_string(), "2401/234256");
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7).pow(3i64).to_string(),
+    ///     "10648/343"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).pow(3i64).to_string(),
+    ///     "-10648/343"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).pow(4i64).to_string(),
+    ///     "234256/2401"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7).pow(-3i64).to_string(),
+    ///     "343/10648"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).pow(-3i64).to_string(),
+    ///     "-343/10648"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).pow(-4i64).to_string(),
+    ///     "2401/234256"
+    /// );
     /// ```
     #[inline]
     fn pow(mut self, exp: i64) -> Rational {
@@ -175,15 +207,32 @@ impl<'a> Pow<i64> for &'a Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::from_signeds(22, 7)).pow(3i64).to_string(), "10648/343");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(3i64).to_string(), "-10648/343");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(4i64).to_string(), "234256/2401");
-    /// assert_eq!((&Rational::from_signeds(22, 7)).pow(-3i64).to_string(), "343/10648");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(-3i64).to_string(), "-343/10648");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(-4i64).to_string(), "2401/234256");
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7)).pow(3i64).to_string(),
+    ///     "10648/343"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).pow(3i64).to_string(),
+    ///     "-10648/343"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).pow(4i64).to_string(),
+    ///     "234256/2401"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7)).pow(-3i64).to_string(),
+    ///     "343/10648"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).pow(-3i64).to_string(),
+    ///     "-343/10648"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).pow(-4i64).to_string(),
+    ///     "2401/234256"
+    /// );
     /// ```
     #[inline]
     fn pow(self, exp: i64) -> Rational {
@@ -215,7 +264,6 @@ impl PowAssign<i64> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
     /// let mut x = Rational::from_signeds(22, 7);

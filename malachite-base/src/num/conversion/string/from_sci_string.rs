@@ -11,9 +11,9 @@ use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::string::from_string::digit_from_display_byte;
 use crate::num::conversion::string::options::FromSciStringOptions;
 use crate::num::conversion::traits::FromSciString;
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 
 #[doc(hidden)]
@@ -49,14 +49,14 @@ pub fn is_zero_helper(s: &[u8], base: u8) -> Option<bool> {
 #[doc(hidden)]
 pub fn cmp_half_helper(s: &[u8], base: u8) -> Option<Ordering> {
     if s.is_empty() {
-        return Some(Ordering::Less);
+        return Some(Less);
     }
     let h = base >> 1;
     let mut done = false;
     let mut result;
     if base.even() {
         // 1/2 is 0.h
-        result = Ordering::Equal;
+        result = Equal;
         let mut first = true;
         for &c in s {
             let d = digit_from_display_byte(c)?;
@@ -68,26 +68,26 @@ pub fn cmp_half_helper(s: &[u8], base: u8) -> Option<Ordering> {
             }
             if first {
                 let half_c = d.cmp(&h);
-                if half_c != Ordering::Equal {
+                if half_c != Equal {
                     result = half_c;
                     done = true;
                 }
                 first = false;
             } else if d != 0 {
-                result = Ordering::Greater;
+                result = Greater;
                 done = true;
             }
         }
     } else {
         // 1/2 is 0.hhh...
-        result = Ordering::Less;
+        result = Less;
         for &c in s {
             let d = digit_from_display_byte(c)?;
             if done {
                 continue;
             }
             let half_c = d.cmp(&h);
-            if half_c != Ordering::Equal {
+            if half_c != Equal {
                 result = half_c;
                 done = true;
             }
@@ -212,18 +212,18 @@ fn from_sci_string_with_options_primitive_int<T: PrimitiveInt>(
         if neg_exponent > sig_len {
             let s = if sign { &s[1..] } else { &s[..] };
             return match rm {
-                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                Down | Floor | Nearest => {
                     validate_helper(s, options.base)?;
                     Some(T::ZERO)
                 }
-                RoundingMode::Up | RoundingMode::Ceiling => {
+                Up | Ceiling => {
                     if is_zero_helper(s, options.base)? {
                         Some(T::ZERO)
                     } else {
                         up_1(T::ZERO, neg)
                     }
                 }
-                RoundingMode::Exact => None,
+                Exact => None,
             };
         }
         let (before_e, after_e) = s.split_at(len - neg_exponent);
@@ -235,28 +235,28 @@ fn from_sci_string_with_options_primitive_int<T: PrimitiveInt>(
             return Some(x);
         }
         match rm {
-            RoundingMode::Down | RoundingMode::Floor => {
+            Down | Floor => {
                 validate_helper(after_e, options.base)?;
                 Some(x)
             }
-            RoundingMode::Up | RoundingMode::Ceiling => {
+            Up | Ceiling => {
                 if is_zero_helper(after_e, options.base)? {
                     Some(x)
                 } else {
                     up_1(x, neg)
                 }
             }
-            RoundingMode::Exact => {
+            Exact => {
                 if is_zero_helper(after_e, options.base)? {
                     Some(x)
                 } else {
                     None
                 }
             }
-            RoundingMode::Nearest => match cmp_half_helper(after_e, options.base)? {
-                Ordering::Less => Some(x),
-                Ordering::Greater => up_1(x, neg),
-                Ordering::Equal => {
+            Nearest => match cmp_half_helper(after_e, options.base)? {
+                Less => Some(x),
+                Greater => up_1(x, neg),
+                Equal => {
                     if x.even() {
                         Some(x)
                     } else {

@@ -11,7 +11,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_q::Rational;
 
 fn from_hex_string(s: &str) -> Float {
@@ -35,7 +35,7 @@ fn from_hex_string(s: &str) -> Float {
             let x = Float::from_rational_prec_round(
                 Rational::from_sci_string_with_options(&s[..hash_index], options).unwrap(),
                 precision,
-                RoundingMode::Exact,
+                Exact,
             )
             .0;
             if sign {

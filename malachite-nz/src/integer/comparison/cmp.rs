@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 impl PartialOrd for Integer {
     /// Compares two [`Integer`]s.
@@ -41,11 +41,11 @@ impl Ord for Integer {
     /// ```
     fn cmp(&self, other: &Integer) -> Ordering {
         if core::ptr::eq(self, other) {
-            Ordering::Equal
+            Equal
         } else {
             match (self.sign, other.sign) {
-                (true, false) => Ordering::Greater,
-                (false, true) => Ordering::Less,
+                (true, false) => Greater,
+                (false, true) => Less,
                 (true, true) => self.abs.cmp(&other.abs),
                 (false, false) => other.abs.cmp(&self.abs),
             }

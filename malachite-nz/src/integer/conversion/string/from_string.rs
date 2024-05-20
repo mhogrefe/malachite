@@ -30,8 +30,8 @@ impl FromStr for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::integer::Integer;
     /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from_str("123456").unwrap(), 123456);
     /// assert_eq!(Integer::from_str("00123456").unwrap(), 123456);
@@ -70,7 +70,7 @@ impl FromStringBase for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::conversion::traits::{Digits, FromStringBase};
+    /// use malachite_base::num::conversion::traits::FromStringBase;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from_string_base(10, "123456").unwrap(), 123456);

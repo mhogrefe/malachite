@@ -70,7 +70,10 @@ impl Integer {
     /// assert_eq!(Integer::from(-105).checked_count_zeros(), Some(3));
     /// assert_eq!(Integer::from(105).checked_count_zeros(), None);
     /// // -10^12 = 10001011100101011010110101111000000000000 in two's complement
-    /// assert_eq!((-Integer::from(10u32).pow(12)).checked_count_zeros(), Some(24));
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12)).checked_count_zeros(),
+    ///     Some(24)
+    /// );
     /// ```
     pub fn checked_count_zeros(&self) -> Option<u64> {
         if self.sign {

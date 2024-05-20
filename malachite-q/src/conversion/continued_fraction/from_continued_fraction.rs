@@ -46,10 +46,16 @@ impl Rational {
     /// use malachite_q::Rational;
     ///
     /// let xs = vec_from_str("[1, 2]").unwrap().into_iter();
-    /// assert_eq!(Rational::from_continued_fraction(Integer::ZERO, xs).to_string(), "2/3");
+    /// assert_eq!(
+    ///     Rational::from_continued_fraction(Integer::ZERO, xs).to_string(),
+    ///     "2/3"
+    /// );
     ///
     /// let xs = vec_from_str("[7, 16]").unwrap().into_iter();
-    /// assert_eq!(Rational::from_continued_fraction(Integer::from(3), xs).to_string(), "355/113");
+    /// assert_eq!(
+    ///     Rational::from_continued_fraction(Integer::from(3), xs).to_string(),
+    ///     "355/113"
+    /// );
     /// ```
     pub fn from_continued_fraction<I: Iterator<Item = Natural>>(floor: Integer, xs: I) -> Rational {
         let mut previous_numerator = Integer::ONE;

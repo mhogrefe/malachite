@@ -10,27 +10,27 @@ use crate::num::arithmetic::traits::{DivRound, DivRoundAssign, UnsignedAbs};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
-use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use crate::rounding_modes::RoundingMode::{self, *};
+use core::cmp::Ordering::{self, *};
 
 fn div_round_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> (T, Ordering) {
     let quotient = x / other;
     let remainder = x - quotient * other;
     match rm {
-        _ if remainder == T::ZERO => (quotient, Ordering::Equal),
-        RoundingMode::Down | RoundingMode::Floor => (quotient, Ordering::Less),
-        RoundingMode::Up | RoundingMode::Ceiling => (quotient + T::ONE, Ordering::Greater),
-        RoundingMode::Nearest => {
+        _ if remainder == T::ZERO => (quotient, Equal),
+        Down | Floor => (quotient, Less),
+        Up | Ceiling => (quotient + T::ONE, Greater),
+        Nearest => {
             let shifted_other = other >> 1;
             if remainder > shifted_other
                 || remainder == shifted_other && other.even() && quotient.odd()
             {
-                (quotient + T::ONE, Ordering::Greater)
+                (quotient + T::ONE, Greater)
             } else {
-                (quotient, Ordering::Less)
+                (quotient, Less)
             }
         }
-        RoundingMode::Exact => {
+        Exact => {
             panic!("Division is not exact: {x} / {other}");
         }
     }

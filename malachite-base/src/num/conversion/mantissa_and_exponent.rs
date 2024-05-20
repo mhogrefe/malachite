@@ -17,8 +17,8 @@ use crate::num::conversion::traits::{
     WrappingFrom,
 };
 use crate::num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
-use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use crate::rounding_modes::RoundingMode::{self, *};
+use core::cmp::Ordering::{self, *};
 
 fn raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
     let bits = x.to_bits();
@@ -235,10 +235,9 @@ fn from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use std::cmp::Ordering;
+/// use malachite_base::rounding_modes::RoundingMode::{self, *};
+/// use std::cmp::Ordering::{self, *};
 ///
 /// fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
 ///     n: T,
@@ -250,21 +249,21 @@ fn from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 ///         out.map(|(m, e, o)| (NiceFloat(m), e, o))
 ///     );
 /// }
-/// test::<u32, f32>(3, RoundingMode::Down, Some((1.5, 1, Ordering::Equal)));
-/// test::<u32, f32>(3, RoundingMode::Ceiling, Some((1.5, 1, Ordering::Equal)));
-/// test::<u32, f32>(3, RoundingMode::Up, Some((1.5, 1, Ordering::Equal)));
-/// test::<u32, f32>(3, RoundingMode::Nearest, Some((1.5, 1, Ordering::Equal)));
-/// test::<u32, f32>(3, RoundingMode::Exact, Some((1.5, 1, Ordering::Equal)));
+/// test::<u32, f32>(3, Down, Some((1.5, 1, Equal)));
+/// test::<u32, f32>(3, Ceiling, Some((1.5, 1, Equal)));
+/// test::<u32, f32>(3, Up, Some((1.5, 1, Equal)));
+/// test::<u32, f32>(3, Nearest, Some((1.5, 1, Equal)));
+/// test::<u32, f32>(3, Exact, Some((1.5, 1, Equal)));
 ///
-/// test::<u32, f32>(123, RoundingMode::Floor, Some((1.921875, 6, Ordering::Equal)));
-/// test::<u32, f32>(123, RoundingMode::Down, Some((1.921875, 6, Ordering::Equal)));
-/// test::<u32, f32>(123, RoundingMode::Ceiling, Some((1.921875, 6, Ordering::Equal)));
-/// test::<u32, f32>(123, RoundingMode::Up, Some((1.921875, 6, Ordering::Equal)));
-/// test::<u32, f32>(123, RoundingMode::Nearest, Some((1.921875, 6, Ordering::Equal)));
-/// test::<u32, f32>(123, RoundingMode::Exact, Some((1.921875, 6, Ordering::Equal)));
+/// test::<u32, f32>(123, Floor, Some((1.921875, 6, Equal)));
+/// test::<u32, f32>(123, Down, Some((1.921875, 6, Equal)));
+/// test::<u32, f32>(123, Ceiling, Some((1.921875, 6, Equal)));
+/// test::<u32, f32>(123, Up, Some((1.921875, 6, Equal)));
+/// test::<u32, f32>(123, Nearest, Some((1.921875, 6, Equal)));
+/// test::<u32, f32>(123, Exact, Some((1.921875, 6, Equal)));
 ///
-/// test::<u32, f32>(1000000000, RoundingMode::Nearest, Some((1.8626451, 29, Ordering::Equal)));
-/// test::<u32, f32>(999999999, RoundingMode::Nearest, Some((1.8626451, 29, Ordering::Greater)));
+/// test::<u32, f32>(1000000000, Nearest, Some((1.8626451, 29, Equal)));
+/// test::<u32, f32>(999999999, Nearest, Some((1.8626451, 29, Greater)));
 /// ```
 pub fn sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     x: T,
@@ -275,17 +274,14 @@ pub fn sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     let mut exponent = significant_bits - 1;
     let (mut raw_mantissa, o) = if significant_bits > U::MANTISSA_WIDTH {
         let shift = significant_bits - U::MANTISSA_WIDTH - 1;
-        if rm == RoundingMode::Exact && TrailingZeros::trailing_zeros(x) < shift {
+        if rm == Exact && TrailingZeros::trailing_zeros(x) < shift {
             return None;
         }
         let (s, o) = x.shr_round(shift, rm);
         (s.wrapping_into(), o)
     } else {
         let x: u64 = x.wrapping_into();
-        (
-            x << (U::MANTISSA_WIDTH - significant_bits + 1),
-            Ordering::Equal,
-        )
+        (x << (U::MANTISSA_WIDTH - significant_bits + 1), Equal)
     };
     if raw_mantissa.significant_bits() == U::MANTISSA_WIDTH + 2 {
         // Rounding up to a power of 2
@@ -328,10 +324,8 @@ pub fn sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use std::cmp::Ordering;
-/// use std::str::FromStr;
+/// use malachite_base::rounding_modes::RoundingMode::{self, *};
+/// use std::cmp::Ordering::{self, *};
 ///
 /// fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
 ///     mantissa: U,
@@ -343,24 +337,24 @@ pub fn sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
 ///         from_sci_mantissa_and_exponent_round::<T, U>(mantissa, exponent, rm),
 ///         out
 ///     );
-/// };
-/// test::<u32, f32>(1.5, 1, RoundingMode::Floor, Some((3, Ordering::Equal)));
-/// test::<u32, f32>(1.5, 1, RoundingMode::Down, Some((3, Ordering::Equal)));
-/// test::<u32, f32>(1.5, 1, RoundingMode::Ceiling, Some((3, Ordering::Equal)));
-/// test::<u32, f32>(1.5, 1, RoundingMode::Up, Some((3, Ordering::Equal)));
-/// test::<u32, f32>(1.5, 1, RoundingMode::Nearest, Some((3, Ordering::Equal)));
-/// test::<u32, f32>(1.5, 1, RoundingMode::Exact, Some((3, Ordering::Equal)));
+/// }
+/// test::<u32, f32>(1.5, 1, Floor, Some((3, Equal)));
+/// test::<u32, f32>(1.5, 1, Down, Some((3, Equal)));
+/// test::<u32, f32>(1.5, 1, Ceiling, Some((3, Equal)));
+/// test::<u32, f32>(1.5, 1, Up, Some((3, Equal)));
+/// test::<u32, f32>(1.5, 1, Nearest, Some((3, Equal)));
+/// test::<u32, f32>(1.5, 1, Exact, Some((3, Equal)));
 ///
-/// test::<u32, f32>(1.51, 1, RoundingMode::Floor, Some((3, Ordering::Less)));
-/// test::<u32, f32>(1.51, 1, RoundingMode::Down, Some((3, Ordering::Less)));
-/// test::<u32, f32>(1.51, 1, RoundingMode::Ceiling, Some((4, Ordering::Greater)));
-/// test::<u32, f32>(1.51, 1, RoundingMode::Up, Some((4, Ordering::Greater)));
-/// test::<u32, f32>(1.51, 1, RoundingMode::Nearest, Some((3, Ordering::Less)));
-/// test::<u32, f32>(1.51, 1, RoundingMode::Exact, None);
+/// test::<u32, f32>(1.51, 1, Floor, Some((3, Less)));
+/// test::<u32, f32>(1.51, 1, Down, Some((3, Less)));
+/// test::<u32, f32>(1.51, 1, Ceiling, Some((4, Greater)));
+/// test::<u32, f32>(1.51, 1, Up, Some((4, Greater)));
+/// test::<u32, f32>(1.51, 1, Nearest, Some((3, Less)));
+/// test::<u32, f32>(1.51, 1, Exact, None);
 ///
-/// test::<u32, f32>(2.0, 1, RoundingMode::Floor, None);
-/// test::<u32, f32>(10.0, 1, RoundingMode::Floor, None);
-/// test::<u32, f32>(0.5, 1, RoundingMode::Floor, None);
+/// test::<u32, f32>(2.0, 1, Floor, None);
+/// test::<u32, f32>(10.0, 1, Floor, None);
+/// test::<u32, f32>(0.5, 1, Floor, None);
 /// ```
 pub fn from_sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     sci_mantissa: U,
@@ -377,10 +371,10 @@ pub fn from_sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFl
         T::try_from(raw_mantissa)
             .ok()?
             .arithmetic_checked_shl(sci_exponent - U::MANTISSA_WIDTH)
-            .map(|n| (n, Ordering::Equal))
+            .map(|n| (n, Equal))
     } else {
         let shift = U::MANTISSA_WIDTH - sci_exponent;
-        if rm == RoundingMode::Exact && TrailingZeros::trailing_zeros(raw_mantissa) < shift {
+        if rm == Exact && TrailingZeros::trailing_zeros(raw_mantissa) < shift {
             return None;
         }
         let (s, o) = raw_mantissa.shr_round(shift, rm);
@@ -525,8 +519,7 @@ macro_rules! impl_sci_mantissa_and_exponent_unsigned {
                     /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
                     #[inline]
                     fn sci_mantissa_and_exponent(self) -> ($f, u64) {
-                        let (m, e, _) =
-                            sci_mantissa_and_exponent_round(self, RoundingMode::Nearest).unwrap();
+                        let (m, e, _) = sci_mantissa_and_exponent_round(self, Nearest).unwrap();
                         (m, e)
                     }
 
@@ -559,12 +552,8 @@ macro_rules! impl_sci_mantissa_and_exponent_unsigned {
                         sci_mantissa: $f,
                         sci_exponent: u64,
                     ) -> Option<$u> {
-                        from_sci_mantissa_and_exponent_round(
-                            sci_mantissa,
-                            sci_exponent,
-                            RoundingMode::Nearest,
-                        )
-                        .map(|p| p.0)
+                        from_sci_mantissa_and_exponent_round(sci_mantissa, sci_exponent, Nearest)
+                            .map(|p| p.0)
                     }
                 }
             };

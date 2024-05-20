@@ -17,7 +17,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use core::ops::{BitAnd, BitAndAssign};
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::basic::traits::Zero;
@@ -393,11 +393,11 @@ pub_test! {limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>)
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
-        Ordering::Greater => {
+        Greater => {
             let ys_len = ys.len();
             ys.extend(xs[ys_len..].iter());
         }
-        Ordering::Less => {
+        Less => {
             ys.truncate(xs_len);
         }
         _ => {}
@@ -949,7 +949,6 @@ impl<'a> BitAnd<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::from(-123) & Integer::from(-456), -512);
     /// assert_eq!(
@@ -986,7 +985,6 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::from(-123) & &Integer::from(-456), -512);
     /// assert_eq!(

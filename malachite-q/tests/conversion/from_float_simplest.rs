@@ -9,7 +9,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::primitive_float_gen_var_8;
 use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
@@ -248,7 +248,7 @@ where
         // This only works for simple `Rational`s, i.e. those `Rational`s q that round to a float x
         // such that no simpler `Rational` rounds to x.
         assert_eq!(
-            Rational::try_from_float_simplest(T::rounding_from(&q, RoundingMode::Nearest).0),
+            Rational::try_from_float_simplest(T::rounding_from(&q, Nearest).0),
             Ok(q)
         );
     });

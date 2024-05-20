@@ -17,7 +17,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::fmt::Display;
 use malachite_base::num::arithmetic::traits::{
     CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
@@ -263,7 +263,7 @@ pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &
     if *scratch.last().unwrap() == 0 {
         scratch.pop();
     }
-    let borrow = limbs_cmp(xs, &scratch) == Ordering::Less;
+    let borrow = limbs_cmp(xs, &scratch) == Less;
     if !borrow {
         assert!(!limbs_sub_greater_in_place_left(xs, &scratch));
     }
@@ -299,10 +299,14 @@ impl SubMul<Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32).sub_mul(Natural::from(3u32), Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     Natural::from(20u32).sub_mul(Natural::from(3u32), Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -338,10 +342,14 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32).sub_mul(Natural::from(3u32), &Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     Natural::from(20u32).sub_mul(Natural::from(3u32), &Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -377,10 +385,14 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32).sub_mul(&Natural::from(3u32), Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     Natural::from(20u32).sub_mul(&Natural::from(3u32), Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -416,10 +428,14 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     Natural::from(20u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```
@@ -455,10 +471,13 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(20u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)), 8);
+    /// assert_eq!(
+    ///     (&Natural::from(20u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     8
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32).pow(12))
-    ///             .sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///         .sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
     ///     995705032704u64
     /// );
     /// ```

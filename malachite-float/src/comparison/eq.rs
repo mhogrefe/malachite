@@ -8,7 +8,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 
 impl PartialEq for Float {
     /// Compares two [`Float`]s for equality.
@@ -59,7 +59,7 @@ impl PartialEq for Float {
                     significand: y,
                     ..
                 }),
-            ) => e_x == e_y && s_x == s_y && x.cmp_normalized_no_shift(y) == Ordering::Equal,
+            ) => e_x == e_y && s_x == s_y && x.cmp_normalized_no_shift(y) == Equal,
             _ => false,
         }
     }
@@ -89,12 +89,21 @@ impl PartialEq for ComparableFloat {
     ///
     /// assert_eq!(ComparableFloat(Float::NAN), ComparableFloat(Float::NAN));
     /// assert_eq!(ComparableFloat(Float::ZERO), ComparableFloat(Float::ZERO));
-    /// assert_eq!(ComparableFloat(Float::NEGATIVE_ZERO), ComparableFloat(Float::NEGATIVE_ZERO));
-    /// assert_ne!(ComparableFloat(Float::ZERO), ComparableFloat(Float::NEGATIVE_ZERO));
+    /// assert_eq!(
+    ///     ComparableFloat(Float::NEGATIVE_ZERO),
+    ///     ComparableFloat(Float::NEGATIVE_ZERO)
+    /// );
+    /// assert_ne!(
+    ///     ComparableFloat(Float::ZERO),
+    ///     ComparableFloat(Float::NEGATIVE_ZERO)
+    /// );
     ///
     /// assert_eq!(ComparableFloat(Float::ONE), ComparableFloat(Float::ONE));
     /// assert_ne!(ComparableFloat(Float::ONE), ComparableFloat(Float::TWO));
-    /// assert_ne!(ComparableFloat(Float::ONE), ComparableFloat(Float::one_prec(100)));
+    /// assert_ne!(
+    ///     ComparableFloat(Float::ONE),
+    ///     ComparableFloat(Float::one_prec(100))
+    /// );
     /// ```
     #[inline]
     fn eq(&self, other: &ComparableFloat) -> bool {
@@ -126,17 +135,35 @@ impl<'a, 'b> PartialEq<ComparableFloatRef<'b>> for ComparableFloatRef<'a> {
     /// use malachite_base::num::basic::traits::{NaN, NegativeZero, One, Two, Zero};
     /// use malachite_float::{ComparableFloatRef, Float};
     ///
-    /// assert_eq!(ComparableFloatRef(&Float::NAN), ComparableFloatRef(&Float::NAN));
-    /// assert_eq!(ComparableFloatRef(&Float::ZERO), ComparableFloatRef(&Float::ZERO));
+    /// assert_eq!(
+    ///     ComparableFloatRef(&Float::NAN),
+    ///     ComparableFloatRef(&Float::NAN)
+    /// );
+    /// assert_eq!(
+    ///     ComparableFloatRef(&Float::ZERO),
+    ///     ComparableFloatRef(&Float::ZERO)
+    /// );
     /// assert_eq!(
     ///     ComparableFloatRef(&Float::NEGATIVE_ZERO),
     ///     ComparableFloatRef(&Float::NEGATIVE_ZERO)
     /// );
-    /// assert_ne!(ComparableFloatRef(&Float::ZERO), ComparableFloatRef(&Float::NEGATIVE_ZERO));
+    /// assert_ne!(
+    ///     ComparableFloatRef(&Float::ZERO),
+    ///     ComparableFloatRef(&Float::NEGATIVE_ZERO)
+    /// );
     ///
-    /// assert_eq!(ComparableFloatRef(&Float::ONE), ComparableFloatRef(&Float::ONE));
-    /// assert_ne!(ComparableFloatRef(&Float::ONE), ComparableFloatRef(&Float::TWO));
-    /// assert_ne!(ComparableFloatRef(&Float::ONE), ComparableFloatRef(&Float::one_prec(100)));
+    /// assert_eq!(
+    ///     ComparableFloatRef(&Float::ONE),
+    ///     ComparableFloatRef(&Float::ONE)
+    /// );
+    /// assert_ne!(
+    ///     ComparableFloatRef(&Float::ONE),
+    ///     ComparableFloatRef(&Float::TWO)
+    /// );
+    /// assert_ne!(
+    ///     ComparableFloatRef(&Float::ONE),
+    ///     ComparableFloatRef(&Float::one_prec(100))
+    /// );
     /// ```
     fn eq(&self, other: &ComparableFloatRef<'b>) -> bool {
         match (&self.0, &other.0) {

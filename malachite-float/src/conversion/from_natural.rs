@@ -8,70 +8,23 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::NegModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 impl Float {
-    #[doc(hidden)]
-    pub fn from_natural_times_power_of_2(x: Natural, pow: i64) -> Float {
-        if x == 0u32 {
-            return Float::ZERO;
-        }
-        let bits = x.significant_bits();
-        Float(Finite {
-            sign: true,
-            exponent: i64::exact_from(bits) + pow,
-            precision: bits,
-            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
-        })
-    }
-
-    #[doc(hidden)]
-    pub fn from_natural_times_power_of_2_prec_round(
-        x: Natural,
-        pow: i64,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        if x == 0u32 {
-            return (Float::ZERO, Ordering::Equal);
-        }
-        let bits = x.significant_bits();
-        let mut f = Float(Finite {
-            sign: true,
-            exponent: i64::exact_from(bits) + pow,
-            precision: bits,
-            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
-        });
-        let o = f.set_prec_round(prec, rm);
-        (f, o)
-    }
-
-    #[doc(hidden)]
-    #[inline]
-    pub fn from_natural_times_power_of_2_prec(
-        x: Natural,
-        pow: i64,
-        prec: u64,
-    ) -> (Float, Ordering) {
-        Float::from_natural_times_power_of_2_prec_round(x, pow, prec, RoundingMode::Nearest)
-    }
-
     /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by value. If the [`Float`] is
     /// nonzero, it has the specified precision. If rounding is needed, the specified rounding mode
     /// is used. An [`Ordering`] is also returned, indicating whether the returned value is less
     /// than, equal to, or greater than the original value.
     ///
-    /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_natural_prec`]
-    /// instead.
+    /// If you're only using [`Nearest`], try using [`Float::from_natural_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -82,42 +35,46 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = Float::from_natural_prec_round(Natural::ZERO, 10, RoundingMode::Exact);
+    /// let (x, o) = Float::from_natural_prec_round(Natural::ZERO, 10, Exact);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_natural_prec_round(
-    ///     Natural::from(123u32),
-    ///     20,
-    ///     RoundingMode::Exact
-    /// );
+    /// let (x, o) = Float::from_natural_prec_round(Natural::from(123u32), 20, Exact);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_natural_prec_round(Natural::from(123u32), 4, RoundingMode::Floor);
+    /// let (x, o) = Float::from_natural_prec_round(Natural::from(123u32), 4, Floor);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (x, o) = Float::from_natural_prec_round(
-    ///     Natural::from(123u32),
-    ///     4,
-    ///     RoundingMode::Ceiling
-    /// );
+    /// let (x, o) = Float::from_natural_prec_round(Natural::from(123u32), 4, Ceiling);
     /// assert_eq!(x.to_string(), "1.3e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn from_natural_prec_round(x: Natural, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-        Float::from_natural_times_power_of_2_prec_round(x, 0, prec, rm)
+        assert_ne!(prec, 0);
+        if x == 0u32 {
+            return (Float::ZERO, Equal);
+        }
+        let bits = x.significant_bits();
+        let mut f = Float(Finite {
+            sign: true,
+            exponent: i64::exact_from(bits),
+            precision: bits,
+            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        });
+        let o = f.set_prec_round(prec, rm);
+        (f, o)
     }
 
     /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by value. If the [`Float`] is
@@ -127,8 +84,8 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the [`Natural`]'s number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
-    /// rounding mode as well as a precision, try [`Float::from_natural_prec_round`].
+    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// as well as a precision, try [`Float::from_natural_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -142,72 +99,25 @@ impl Float {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_natural_prec(Natural::ZERO, 10);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_natural_prec(Natural::from(123u32), 20);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_natural_prec(Natural::from(123u32), 4);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn from_natural_prec(x: Natural, prec: u64) -> (Float, Ordering) {
-        Float::from_natural_times_power_of_2_prec_round(x, 0, prec, RoundingMode::Nearest)
-    }
-
-    #[doc(hidden)]
-    pub fn from_natural_times_power_of_2_ref(x: &Natural, pow: i64) -> Float {
-        if *x == 0u32 {
-            return Float::ZERO;
-        }
-        let bits = x.significant_bits();
-        Float(Finite {
-            sign: true,
-            exponent: i64::exact_from(bits) + pow,
-            precision: bits,
-            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
-        })
-    }
-
-    #[doc(hidden)]
-    pub fn from_natural_times_power_of_2_prec_round_ref(
-        x: &Natural,
-        pow: i64,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        // TODO be more efficient when x is large and prec is small
-        assert_ne!(prec, 0);
-        if *x == 0u32 {
-            return (Float::ZERO, Ordering::Equal);
-        }
-        let bits = x.significant_bits();
-        let mut f = Float(Finite {
-            sign: true,
-            exponent: i64::exact_from(bits) + pow,
-            precision: bits,
-            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
-        });
-        let o = f.set_prec_round(prec, rm);
-        (f, o)
-    }
-
-    #[doc(hidden)]
-    #[inline]
-    pub fn from_natural_times_power_of_2_prec_ref(
-        x: &Natural,
-        pow: i64,
-        prec: u64,
-    ) -> (Float, Ordering) {
-        Float::from_natural_times_power_of_2_prec_round_ref(x, pow, prec, RoundingMode::Nearest)
+        Float::from_natural_prec_round(x, prec, Nearest)
     }
 
     /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the [`Float`]
@@ -215,8 +125,7 @@ impl Float {
     /// mode is used. An [`Ordering`] is also returned, indicating whether the returned value is
     /// less than, equal to, or greater than the original value.
     ///
-    /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_natural_prec_ref`]
-    /// instead.
+    /// If you're only using [`Nearest`], try using [`Float::from_natural_prec_ref`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -227,42 +136,30 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = Float::from_natural_prec_round_ref(&Natural::ZERO, 10, RoundingMode::Exact);
+    /// let (x, o) = Float::from_natural_prec_round_ref(&Natural::ZERO, 10, Exact);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_natural_prec_round_ref(
-    ///     &Natural::from(123u32),
-    ///     20,
-    ///     RoundingMode::Exact
-    /// );
+    /// let (x, o) = Float::from_natural_prec_round_ref(&Natural::from(123u32), 20, Exact);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_natural_prec_round_ref(
-    ///     &Natural::from(123u32),
-    ///     4,
-    ///     RoundingMode::Floor
-    /// );
+    /// let (x, o) = Float::from_natural_prec_round_ref(&Natural::from(123u32), 4, Floor);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (x, o) = Float::from_natural_prec_round_ref(
-    ///     &Natural::from(123u32),
-    ///     4,
-    ///     RoundingMode::Ceiling
-    /// );
+    /// let (x, o) = Float::from_natural_prec_round_ref(&Natural::from(123u32), 4, Ceiling);
     /// assert_eq!(x.to_string(), "1.3e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn from_natural_prec_round_ref(
@@ -270,7 +167,20 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
-        Float::from_natural_times_power_of_2_prec_round_ref(x, 0, prec, rm)
+        // TODO be more efficient when x is large and prec is small
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            return (Float::ZERO, Equal);
+        }
+        let bits = x.significant_bits();
+        let mut f = Float(Finite {
+            sign: true,
+            exponent: i64::exact_from(bits),
+            precision: bits,
+            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        });
+        let o = f.set_prec_round(prec, rm);
+        (f, o)
     }
 
     /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the [`Float`]
@@ -280,8 +190,8 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the [`Natural`]'s number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
-    /// rounding mode as well as a precision, try [`Float::from_natural_prec_round_ref`].
+    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// as well as a precision, try [`Float::from_natural_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -295,25 +205,38 @@ impl Float {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_natural_prec_ref(&Natural::ZERO, 10);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_natural_prec_ref(&Natural::from(123u32), 20);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_natural_prec_ref(&Natural::from(123u32), 4);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn from_natural_prec_ref(x: &Natural, prec: u64) -> (Float, Ordering) {
-        Float::from_natural_times_power_of_2_prec_round_ref(x, 0, prec, RoundingMode::Nearest)
+        // TODO be more efficient when x is large and prec is small
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            return (Float::ZERO, Equal);
+        }
+        let bits = x.significant_bits();
+        let mut f = Float(Finite {
+            sign: true,
+            exponent: i64::exact_from(bits),
+            precision: bits,
+            significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        });
+        let o = f.set_prec(prec);
+        (f, o)
     }
 }
 
@@ -322,9 +245,8 @@ impl From<Natural> for Float {
     ///
     /// If the [`Natural`] is nonzero, the precision of the [`Float`] is equal to the [`Natural`]'s
     /// number of significant bits. If you want to specify a different precision, try
-    /// [`Float::from_natural_prec`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
-    /// [`Float::from_natural_prec_round`].
+    /// [`Float::from_natural_prec`]. This may require rounding, which uses [`Nearest`] by default.
+    /// To specify a rounding mode as well as a precision, try [`Float::from_natural_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -343,9 +265,17 @@ impl From<Natural> for Float {
     /// assert_eq!(Float::from(Natural::from(123u32)).to_string(), "123.0");
     /// assert_eq!(Float::from(Natural::from(123u32)).get_prec(), Some(7));
     /// ```
-    #[inline]
     fn from(n: Natural) -> Float {
-        Float::from_natural_times_power_of_2(n, 0)
+        if n == 0u32 {
+            return Float::ZERO;
+        }
+        let bits = n.significant_bits();
+        Float(Finite {
+            sign: true,
+            exponent: i64::exact_from(bits),
+            precision: bits,
+            significand: n << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        })
     }
 }
 
@@ -354,8 +284,8 @@ impl<'a> From<&'a Natural> for Float {
     ///
     /// If the [`Natural`] is nonzero, the precision of the [`Float`] is equal to the [`Natural`]'s
     /// number of significant bits. If you want to specify a different precision, try
-    /// [`Float::from_natural_prec_ref`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_natural_prec_ref`]. This may require rounding, which uses [`Nearest`] by
+    /// default. To specify a rounding mode as well as a precision, try
     /// [`Float::from_natural_prec_round_ref`].
     ///
     /// # Worst-case complexity
@@ -377,6 +307,15 @@ impl<'a> From<&'a Natural> for Float {
     /// ```
     #[inline]
     fn from(n: &'a Natural) -> Float {
-        Float::from_natural_times_power_of_2_ref(n, 0)
+        if *n == 0u32 {
+            return Float::ZERO;
+        }
+        let bits = n.significant_bits();
+        Float(Finite {
+            sign: true,
+            exponent: i64::exact_from(bits),
+            precision: bits,
+            significand: n << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        })
     }
 }

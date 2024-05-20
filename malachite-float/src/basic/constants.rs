@@ -16,7 +16,7 @@ use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeOne, NegativeZero, One,
     OneHalf, Two, Zero as ZeroTrait,
 };
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -239,7 +239,7 @@ impl Float {
             exponent: 1,
             precision: prec,
             significand: Natural::power_of_2(
-                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                     .0
                     - 1,
             ),
@@ -283,7 +283,7 @@ impl Float {
             exponent: 2,
             precision: prec,
             significand: Natural::power_of_2(
-                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                     .0
                     - 1,
             ),
@@ -327,7 +327,7 @@ impl Float {
             exponent: 1,
             precision: prec,
             significand: Natural::power_of_2(
-                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                     .0
                     - 1,
             ),
@@ -371,7 +371,7 @@ impl Float {
             exponent: 0,
             precision: prec,
             significand: Natural::power_of_2(
-                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                     .0
                     - 1,
             ),

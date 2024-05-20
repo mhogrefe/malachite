@@ -299,7 +299,6 @@ where
 ///
 /// # Examples
 /// ```
-/// use itertools::Itertools;
 /// use malachite_base::iterators::{prefix_to_string, with_special_value};
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -387,7 +386,13 @@ where
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         with_special_values(EXAMPLE_SEED, vec![1, 2, 3], 1, 2, &random_primitive_ints::<i16>),
+///         with_special_values(
+///             EXAMPLE_SEED,
+///             vec![1, 2, 3],
+///             1,
+///             2,
+///             &random_primitive_ints::<i16>
+///         ),
 ///         20,
 ///     ),
 ///     "[3, 1, 3, 2901, 1, -14200, 2, 3, 1, -30997, -8245, -5338, 1, 1, -20007, 3, 1, 1, 1, 1, \
@@ -461,7 +466,9 @@ where
 /// use malachite_base::iterators::iter_windows;
 ///
 /// let xs = 0..=5;
-/// let windows = iter_windows(3, xs).map(|ws| ws.iter().cloned().collect_vec()).collect_vec();
+/// let windows = iter_windows(3, xs)
+///     .map(|ws| ws.iter().cloned().collect_vec())
+///     .collect_vec();
 /// assert_eq!(
 ///     windows.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[&[0, 1, 2], &[1, 2, 3], &[2, 3, 4], &[3, 4, 5]]
@@ -492,7 +499,6 @@ where
 ///
 /// # Examples
 /// ```
-/// use itertools::Itertools;
 /// use malachite_base::iterators::prefix_to_string;
 ///
 /// assert_eq!(prefix_to_string(0..10, 3), "[0, 1, 2, ...]");

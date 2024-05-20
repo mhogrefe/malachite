@@ -18,7 +18,10 @@
 ///
 /// assert!(Natural::ZERO.to_digits_asc(&6u64).is_empty());
 /// assert_eq!(Natural::TWO.to_digits_asc(&6u32), &[2]);
-/// assert_eq!(Natural::from(123456u32).to_digits_asc(&3u16), &[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]);
+/// assert_eq!(
+///     Natural::from(123456u32).to_digits_asc(&3u16),
+///     &[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]
+/// );
 /// ```
 ///
 /// # to_digits_desc
@@ -29,7 +32,10 @@
 ///
 /// assert!(Natural::ZERO.to_digits_desc(&6u64).is_empty());
 /// assert_eq!(Natural::TWO.to_digits_desc(&6u32), &[2]);
-/// assert_eq!(Natural::from(123456u32).to_digits_desc(&3u16), &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]);
+/// assert_eq!(
+///     Natural::from(123456u32).to_digits_desc(&3u16),
+///     &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]
+/// );
 /// ```
 ///
 /// # from_digits_asc
@@ -44,7 +50,7 @@
 /// );
 /// assert_eq!(
 ///     Natural::from_digits_asc(&3u64, [0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2].iter().cloned())
-///             .to_debug_string(),
+///         .to_debug_string(),
 ///     "Some(123456)"
 /// );
 /// assert_eq!(
@@ -69,7 +75,7 @@
 /// );
 /// assert_eq!(
 ///     Natural::from_digits_desc(&3u64, [2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0].iter().cloned())
-///             .to_debug_string(),
+///         .to_debug_string(),
 ///     "Some(123456)"
 /// );
 /// assert_eq!(
@@ -94,7 +100,9 @@ pub mod general_digits;
 /// use malachite_nz::natural::Natural;
 ///
 /// let n = Natural::ZERO;
-/// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next().is_none());
+/// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
+///     .next()
+///     .is_none());
 ///
 /// // 107 = 1223_4
 /// let n = Natural::from(107u32);
@@ -104,12 +112,16 @@ pub mod general_digits;
 /// );
 ///
 /// let n = Natural::ZERO;
-/// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next_back().is_none());
+/// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
+///     .next_back()
+///     .is_none());
 ///
 /// // 107 = 1223_4
 /// let n = Natural::from(107u32);
 /// assert_eq!(
-///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2).rev().collect_vec(),
+///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2)
+///         .rev()
+///         .collect_vec(),
 ///     vec![1, 2, 2, 3]
 /// );
 /// ```
@@ -128,7 +140,10 @@ pub mod power_of_2_digit_iterable;
 ///     PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&Natural::ZERO, 6),
 ///     Vec::<u64>::new()
 /// );
-/// assert_eq!(PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&Natural::TWO, 6), vec![2]);
+/// assert_eq!(
+///     PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&Natural::TWO, 6),
+///     vec![2]
+/// );
 ///
 /// // 123_10 = 173_8
 /// assert_eq!(
@@ -147,7 +162,10 @@ pub mod power_of_2_digit_iterable;
 ///     PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&Natural::ZERO, 6),
 ///     Vec::<u64>::new()
 /// );
-/// assert_eq!(PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&Natural::TWO, 6), vec![2]);
+/// assert_eq!(
+///     PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&Natural::TWO, 6),
+///     vec![2]
+/// );
 ///
 /// // 123_10 = 173_8
 /// assert_eq!(

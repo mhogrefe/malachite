@@ -31,7 +31,7 @@ impl<I: Iterator> IteratorCache<I> {
     /// ```
     /// use malachite_base::iterators::iterator_cache::IteratorCache;
     ///
-    /// let xs = IteratorCache::new([1, 2, 3].iter());
+    /// IteratorCache::new([1, 2, 3].iter());
     /// ```
     pub const fn new(xs: I) -> IteratorCache<I> {
         IteratorCache {

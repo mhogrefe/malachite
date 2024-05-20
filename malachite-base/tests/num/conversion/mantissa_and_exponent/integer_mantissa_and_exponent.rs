@@ -15,7 +15,7 @@ use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, unsigned_gen_var_1, unsigned_pair_gen_var_2,
     unsigned_pair_gen_var_30, unsigned_signed_pair_gen_var_1, unsigned_signed_pair_gen_var_2,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 
 #[test]
@@ -188,7 +188,7 @@ fn from_integer_mantissa_and_exponent_properties_helper_primitive_float<T: Primi
     unsigned_signed_pair_gen_var_2::<T>().test_properties(|(mantissa, exponent)| {
         let f = T::from_integer_mantissa_and_exponent(mantissa, exponent).unwrap();
         assert!(!f.is_nan());
-        assert_eq!(f.sign(), Ordering::Greater);
+        assert_eq!(f.sign(), Greater);
         if !f.is_nan() && mantissa.odd() {
             assert_eq!(f.integer_mantissa_and_exponent(), (mantissa, exponent));
         }

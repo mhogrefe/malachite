@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use crate::itertools::Itertools;
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
 use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
@@ -41,10 +41,8 @@ pub fn random_integers_helper_helper<I: Clone + Iterator<Item = Integer>>(
         median_hi.map(|x| Integer::to_string(&x)),
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
-    let actual_sample_moment_stats = moment_stats(
-        xs.take(1000000)
-            .map(|x| f64::rounding_from(&x, RoundingMode::Nearest).0),
-    );
+    let actual_sample_moment_stats =
+        moment_stats(xs.take(1000000).map(|x| f64::rounding_from(&x, Nearest).0));
     assert_eq!(
         (
             actual_values.as_slice(),

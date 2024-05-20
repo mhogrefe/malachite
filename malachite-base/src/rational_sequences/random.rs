@@ -51,8 +51,8 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::rational_sequences::RationalSequence;
 /// use malachite_base::rational_sequences::random::random_rational_sequences;
+/// use malachite_base::rational_sequences::RationalSequence;
 ///
 /// assert_eq!(
 ///     random_rational_sequences(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1)
@@ -61,10 +61,14 @@ where
 ///         .collect_vec(),
 ///     &[
 ///         "[[85, 11, 136, 200, 235, 134, 203, 223, 38, 235, 217, 177, 162, 32]]",
-///         "[166, 234, 30, 218, [90, 106, 9, 216]]", "[204]", "[151, 213, 97, 253, 78, [91, 39]]",
-///         "[191, 175, 170, 232]", "[233, 2, 35, 22, 217, 198]",
+///         "[166, 234, 30, 218, [90, 106, 9, 216]]",
+///         "[204]",
+///         "[151, 213, 97, 253, 78, [91, 39]]",
+///         "[191, 175, 170, 232]",
+///         "[233, 2, 35, 22, 217, 198]",
 ///         "[[114, 17, 32, 173, 114, 65, 121, 222, 173, 25, 144]]",
-///         "[148, 79, 115, 52, 73, 69, 137, 91]", "[153, 178, 112]",
+///         "[148, 79, 115, 52, 73, 69, 137, 91]",
+///         "[153, 178, 112]",
 ///         "[34, 95, 106, 167, 197, [130, 168, 122, 207, 172, 177, 86, 150, 221]]"
 ///     ]
 /// )

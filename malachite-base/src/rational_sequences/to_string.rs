@@ -23,9 +23,18 @@ impl<T: Display + Eq> Display for RationalSequence<T> {
     /// ```
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![], vec![]).to_string(), "[]");
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![], vec![1, 2]).to_string(), "[[1, 2]]");
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![1, 2], vec![]).to_string(), "[1, 2]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![], vec![]).to_string(),
+    ///     "[]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![], vec![1, 2]).to_string(),
+    ///     "[[1, 2]]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![]).to_string(),
+    ///     "[1, 2]"
+    /// );
     /// assert_eq!(
     ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![3, 4]).to_string(),
     ///     "[1, 2, [3, 4]]"
@@ -79,7 +88,10 @@ impl<T: Display + Eq> Debug for RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     /// use malachite_base::strings::ToDebugString;
     ///
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![], vec![]).to_debug_string(), "[]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![], vec![]).to_debug_string(),
+    ///     "[]"
+    /// );
     /// assert_eq!(
     ///     RationalSequence::<u8>::from_vecs(vec![], vec![1, 2]).to_debug_string(),
     ///     "[[1, 2]]"

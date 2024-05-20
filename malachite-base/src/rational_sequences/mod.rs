@@ -72,9 +72,18 @@ impl<T: Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert_eq!(RationalSequence::<u8>::from_slice(&[]).is_empty(), true);
-    /// assert_eq!(RationalSequence::<u8>::from_slice(&[1, 2, 3]).is_empty(), false);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[], &[3, 4]).is_empty(), false);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).is_empty(), false);
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slice(&[1, 2, 3]).is_empty(),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[], &[3, 4]).is_empty(),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).is_empty(),
+    ///     false
+    /// );
     /// ```
     pub fn is_empty(&self) -> bool {
         self.non_repeating.is_empty() && self.repeating.is_empty()
@@ -90,9 +99,18 @@ impl<T: Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert_eq!(RationalSequence::<u8>::from_slice(&[]).is_finite(), true);
-    /// assert_eq!(RationalSequence::<u8>::from_slice(&[1, 2, 3]).is_finite(), true);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[], &[3, 4]).is_finite(), false);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).is_finite(), false);
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slice(&[1, 2, 3]).is_finite(),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[], &[3, 4]).is_finite(),
+    ///     false
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).is_finite(),
+    ///     false
+    /// );
     /// ```
     pub fn is_finite(&self) -> bool {
         self.repeating.is_empty()
@@ -111,9 +129,18 @@ impl<T: Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert_eq!(RationalSequence::<u8>::from_slice(&[]).len(), Some(0));
-    /// assert_eq!(RationalSequence::<u8>::from_slice(&[1, 2, 3]).len(), Some(3));
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[], &[3, 4]).len(), None);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).len(), None);
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slice(&[1, 2, 3]).len(),
+    ///     Some(3)
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[], &[3, 4]).len(),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).len(),
+    ///     None
+    /// );
     /// ```
     pub fn len(&self) -> Option<usize> {
         if self.repeating.is_empty() {
@@ -137,9 +164,18 @@ impl<T: Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert_eq!(RationalSequence::<u8>::from_slice(&[]).component_len(), 0);
-    /// assert_eq!(RationalSequence::<u8>::from_slice(&[1, 2, 3]).component_len(), 3);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[], &[3, 4]).component_len(), 2);
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).component_len(), 4);
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slice(&[1, 2, 3]).component_len(),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[], &[3, 4]).component_len(),
+    ///     2
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).component_len(),
+    ///     4
+    /// );
     /// ```
     pub fn component_len(&self) -> usize {
         self.non_repeating.len() + self.repeating.len()
@@ -156,18 +192,33 @@ impl<T: Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// let empty: &[u8] = &[];
-    /// assert_eq!(RationalSequence::<u8>::from_slice(empty).iter().cloned().collect_vec(), empty);
     /// assert_eq!(
-    ///     RationalSequence::<u8>::from_slice(&[1, 2, 3]).iter().cloned().collect_vec(),
+    ///     RationalSequence::<u8>::from_slice(empty)
+    ///         .iter()
+    ///         .cloned()
+    ///         .collect_vec(),
+    ///     empty
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slice(&[1, 2, 3])
+    ///         .iter()
+    ///         .cloned()
+    ///         .collect_vec(),
     ///     &[1, 2, 3]
     /// );
     /// assert_eq!(
-    ///     RationalSequence::<u8>::from_slices(&[], &[3, 4]).iter().cloned().take(10)
+    ///     RationalSequence::<u8>::from_slices(&[], &[3, 4])
+    ///         .iter()
+    ///         .cloned()
+    ///         .take(10)
     ///         .collect_vec(),
     ///     &[3, 4, 3, 4, 3, 4, 3, 4, 3, 4]
     /// );
     /// assert_eq!(
-    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).iter().cloned().take(10)
+    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4])
+    ///         .iter()
+    ///         .cloned()
+    ///         .take(10)
     ///         .collect_vec(),
     ///     &[1, 2, 3, 4, 3, 4, 3, 4, 3, 4]
     /// );

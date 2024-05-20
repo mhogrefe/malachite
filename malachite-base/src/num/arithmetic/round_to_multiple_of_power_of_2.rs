@@ -59,7 +59,7 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
             ///
             /// The following two expressions are equivalent:
-            /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+            /// - `x.round_to_multiple_of_power_of_2(pow, Exact)`
             /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
             ///
             /// but the latter should be used as it is clearer and more efficient.
@@ -95,7 +95,7 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
             ///
             /// The following two expressions are equivalent:
-            /// - `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`
+            /// - `x.round_to_multiple_of_power_of_2_assign(pow, Exact);`
             /// - `assert!(x.divisible_by_power_of_2(pow));`
             ///
             /// but the latter should be used as it is clearer and more efficient.

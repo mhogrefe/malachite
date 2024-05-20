@@ -144,7 +144,10 @@ impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(100u32).ceiling_log_base_power_of_2(2), 4);
-    /// assert_eq!(Natural::from(4294967296u64).ceiling_log_base_power_of_2(8), 4);
+    /// assert_eq!(
+    ///     Natural::from(4294967296u64).ceiling_log_base_power_of_2(8),
+    ///     4
+    /// );
     /// ```
     fn ceiling_log_base_power_of_2(self, pow: u64) -> u64 {
         match *self {
@@ -181,10 +184,12 @@ impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::from(100u32).checked_log_base_power_of_2(2), None);
-    /// assert_eq!(Natural::from(4294967296u64).checked_log_base_power_of_2(8), Some(4));
+    /// assert_eq!(
+    ///     Natural::from(4294967296u64).checked_log_base_power_of_2(8),
+    ///     Some(4)
+    /// );
     /// ```
     fn checked_log_base_power_of_2(self, pow: u64) -> Option<u64> {
         match *self {

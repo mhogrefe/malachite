@@ -53,22 +53,41 @@ impl FromSciString for Rational {
     /// ```
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
     /// use malachite_base::num::conversion::traits::FromSciString;
-    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from_sci_string("123").unwrap(), 123);
-    /// assert_eq!(Rational::from_sci_string("0.1").unwrap().to_string(), "1/10");
-    /// assert_eq!(Rational::from_sci_string("0.10").unwrap().to_string(), "1/10");
-    /// assert_eq!(Rational::from_sci_string("0.333").unwrap().to_string(), "333/1000");
+    /// assert_eq!(
+    ///     Rational::from_sci_string("0.1").unwrap().to_string(),
+    ///     "1/10"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sci_string("0.10").unwrap().to_string(),
+    ///     "1/10"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sci_string("0.333").unwrap().to_string(),
+    ///     "333/1000"
+    /// );
     /// assert_eq!(Rational::from_sci_string("1.2e5").unwrap(), 120000);
-    /// assert_eq!(Rational::from_sci_string("1.2e-5").unwrap().to_string(), "3/250000");
+    /// assert_eq!(
+    ///     Rational::from_sci_string("1.2e-5").unwrap().to_string(),
+    ///     "3/250000"
+    /// );
     ///
     /// let mut options = FromSciStringOptions::default();
     /// options.set_base(16);
-    /// assert_eq!(Rational::from_sci_string_with_options("ff", options).unwrap(), 255);
-    /// assert_eq!(Rational::from_sci_string_with_options("ffE+5", options).unwrap(), 267386880);
     /// assert_eq!(
-    ///     Rational::from_sci_string_with_options("ffE-5", options).unwrap().to_string(),
+    ///     Rational::from_sci_string_with_options("ff", options).unwrap(),
+    ///     255
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sci_string_with_options("ffE+5", options).unwrap(),
+    ///     267386880
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sci_string_with_options("ffE-5", options)
+    ///         .unwrap()
+    ///         .to_string(),
     ///     "255/1048576"
     /// );
     /// ```
@@ -137,19 +156,23 @@ impl Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
-    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
     /// let mut options = FromSciStringOptions::default();
     /// options.set_base(16);
-    /// assert_eq!(Rational::from_sci_string_simplest_with_options("ff", options).unwrap(), 255);
+    /// assert_eq!(
+    ///     Rational::from_sci_string_simplest_with_options("ff", options).unwrap(),
+    ///     255
+    /// );
     /// assert_eq!(
     ///     Rational::from_sci_string_simplest_with_options("ffE+5", options).unwrap(),
     ///     267386880
     /// );
     /// // 1/4105 is 0.000ff705..._16
     /// assert_eq!(
-    ///     Rational::from_sci_string_simplest_with_options("ffE-5", options).unwrap().to_string(),
+    ///     Rational::from_sci_string_simplest_with_options("ffE-5", options)
+    ///         .unwrap()
+    ///         .to_string(),
     ///     "1/4105"
     /// );
     /// ```
@@ -222,11 +245,31 @@ impl Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from_sci_string_simplest("123").unwrap(), 123);
-    /// assert_eq!(Rational::from_sci_string_simplest("0.1").unwrap().to_string(), "1/7");
-    /// assert_eq!(Rational::from_sci_string_simplest("0.10").unwrap().to_string(), "1/10");
-    /// assert_eq!(Rational::from_sci_string_simplest("0.333").unwrap().to_string(), "1/3");
+    /// assert_eq!(
+    ///     Rational::from_sci_string_simplest("0.1")
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "1/7"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sci_string_simplest("0.10")
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "1/10"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_sci_string_simplest("0.333")
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "1/3"
+    /// );
     /// assert_eq!(Rational::from_sci_string_simplest("1.2e5").unwrap(), 120000);
-    /// assert_eq!(Rational::from_sci_string_simplest("1.2e-5").unwrap().to_string(), "1/80000");
+    /// assert_eq!(
+    ///     Rational::from_sci_string_simplest("1.2e-5")
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "1/80000"
+    /// );
     /// ```
     #[inline]
     pub fn from_sci_string_simplest(s: &str) -> Option<Rational> {

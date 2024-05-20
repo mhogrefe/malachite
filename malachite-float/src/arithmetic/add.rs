@@ -17,14 +17,17 @@ use crate::{
     float_either_zero, float_infinity, float_nan, float_negative_infinity, float_negative_zero,
     float_zero, Float,
 };
-use core::cmp::{max, Ordering};
+use core::cmp::{
+    max,
+    Ordering::{self, *},
+};
 use core::mem::swap;
 use core::ops::{Add, AddAssign};
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::SaturatingFrom;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_add::{
     add_float_significands_in_place, add_float_significands_in_place_ref,
     add_float_significands_ref_ref,
@@ -54,30 +57,30 @@ impl Float {
             | (float_infinity!(), float_infinity!(), true)
             | (float_negative_infinity!(), float_negative_infinity!(), true) => {
                 *self = float_nan!();
-                Ordering::Equal
+                Equal
             }
             (float_infinity!(), _, _)
             | (_, float_infinity!(), false)
             | (_, float_negative_infinity!(), true) => {
                 *self = float_infinity!();
-                Ordering::Equal
+                Equal
             }
             (float_negative_infinity!(), _, _)
             | (_, float_negative_infinity!(), false)
             | (_, float_infinity!(), true) => {
                 *self = float_negative_infinity!();
-                Ordering::Equal
+                Equal
             }
             (float_zero!(), float_negative_zero!(), false)
             | (float_negative_zero!(), float_zero!(), false)
             | (float_zero!(), float_zero!(), true)
             | (float_negative_zero!(), float_negative_zero!(), true) => {
-                *self = if rm == RoundingMode::Floor {
+                *self = if rm == Floor {
                     float_negative_zero!()
                 } else {
                     float_zero!()
                 };
-                Ordering::Equal
+                Equal
             }
             (float_either_zero!(), mut z, subtract) => {
                 if subtract {
@@ -129,7 +132,7 @@ impl Float {
                         if *x_sign { rm } else { -rm },
                     );
                     if *x == 0u32 {
-                        *self = if rm == RoundingMode::Floor {
+                        *self = if rm == Floor {
                             float_negative_zero!()
                         } else {
                             float_zero!()
@@ -170,30 +173,30 @@ impl Float {
             | (x @ float_infinity!(), float_infinity!(), true)
             | (x @ float_negative_infinity!(), float_negative_infinity!(), true) => {
                 *x = float_nan!();
-                Ordering::Equal
+                Equal
             }
             (x @ float_infinity!(), _, _)
             | (x, float_infinity!(), false)
             | (x, float_negative_infinity!(), true) => {
                 *x = float_infinity!();
-                Ordering::Equal
+                Equal
             }
             (x @ float_negative_infinity!(), _, _)
             | (x, float_negative_infinity!(), false)
             | (x, float_infinity!(), true) => {
                 *x = float_negative_infinity!();
-                Ordering::Equal
+                Equal
             }
             (x @ float_zero!(), float_negative_zero!(), false)
             | (x @ float_negative_zero!(), float_zero!(), false)
             | (x @ float_zero!(), float_zero!(), true)
             | (x @ float_negative_zero!(), float_negative_zero!(), true) => {
-                *x = if rm == RoundingMode::Floor {
+                *x = if rm == Floor {
                     float_negative_zero!()
                 } else {
                     float_zero!()
                 };
-                Ordering::Equal
+                Equal
             }
             (x @ float_either_zero!(), z, subtract) => {
                 x.clone_from(z);
@@ -244,7 +247,7 @@ impl Float {
                         if *x_sign { rm } else { -rm },
                     );
                     if *x == 0u32 {
-                        *self = if rm == RoundingMode::Floor {
+                        *self = if rm == Floor {
                             float_negative_zero!()
                         } else {
                             float_zero!()
@@ -281,24 +284,24 @@ impl Float {
             | (float_negative_infinity!(), float_infinity!(), false)
             | (float_infinity!(), float_infinity!(), true)
             | (float_negative_infinity!(), float_negative_infinity!(), true) => {
-                (float_nan!(), Ordering::Equal)
+                (float_nan!(), Equal)
             }
             (float_infinity!(), _, _)
             | (_, float_infinity!(), false)
-            | (_, float_negative_infinity!(), true) => (float_infinity!(), Ordering::Equal),
+            | (_, float_negative_infinity!(), true) => (float_infinity!(), Equal),
             (float_negative_infinity!(), _, _)
             | (_, float_negative_infinity!(), false)
-            | (_, float_infinity!(), true) => (float_negative_infinity!(), Ordering::Equal),
+            | (_, float_infinity!(), true) => (float_negative_infinity!(), Equal),
             (float_zero!(), float_negative_zero!(), false)
             | (float_negative_zero!(), float_zero!(), false)
             | (float_zero!(), float_zero!(), true)
             | (float_negative_zero!(), float_negative_zero!(), true) => (
-                if rm == RoundingMode::Floor {
+                if rm == Floor {
                     float_negative_zero!()
                 } else {
                     float_zero!()
                 },
-                Ordering::Equal,
+                Equal,
             ),
             (float_either_zero!(), z, subtract) => {
                 let mut out = if subtract { -z } else { z.clone() };
@@ -359,7 +362,7 @@ impl Float {
                     );
                     if diff == 0u32 {
                         (
-                            if rm == RoundingMode::Floor {
+                            if rm == Floor {
                                 float_negative_zero!()
                             } else {
                                 float_zero!()
@@ -389,10 +392,10 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Ordering::Equal,
+            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
             (float_negative_zero!(), y) => {
                 if y == 0u32 {
-                    Ordering::Equal
+                    Equal
                 } else {
                     let o;
                     (*self, o) = Float::from_rational_prec_round(y, prec, rm);
@@ -410,19 +413,13 @@ impl Float {
                 let mut increment = Limb::WIDTH;
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_round_ref(
-                        &y,
-                        working_prec,
-                        RoundingMode::Nearest,
-                    );
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         return self.add_prec_round_assign(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let t = x
-                        .add_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let t = x.add_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -462,10 +459,10 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Ordering::Equal,
+            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
             (float_negative_zero!(), y) => {
                 if *y == 0u32 {
-                    Ordering::Equal
+                    Equal
                 } else {
                     let o;
                     (*self, o) = Float::from_rational_prec_round_ref(y, prec, rm);
@@ -481,18 +478,16 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) =
-                        Float::from_rational_prec_round_ref(y, working_prec, RoundingMode::Nearest);
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         return self.add_prec_round_assign(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let t = x
-                        .add_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let t = x.add_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -532,12 +527,12 @@ impl Float {
     ) -> (Float, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Ordering::Equal),
-            (float_infinity!(), _) => (float_infinity!(), Ordering::Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Ordering::Equal),
+            (float_nan!(), _) => (float_nan!(), Equal),
+            (float_infinity!(), _) => (float_infinity!(), Equal),
+            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
             (float_negative_zero!(), y) => {
                 if y == 0u32 {
-                    (float_negative_zero!(), Ordering::Equal)
+                    (float_negative_zero!(), Equal)
                 } else {
                     Float::from_rational_prec_round(y, prec, rm)
                 }
@@ -551,23 +546,18 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_round_ref(
-                        &y,
-                        working_prec,
-                        RoundingMode::Nearest,
-                    );
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         let mut x = self.clone();
                         let o = x.add_prec_round_assign(q, prec, rm);
                         return (x, o);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let mut t = x
-                        .add_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let mut t = x.add_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -607,12 +597,12 @@ impl Float {
     ) -> (Float, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Ordering::Equal),
-            (float_infinity!(), _) => (float_infinity!(), Ordering::Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Ordering::Equal),
+            (float_nan!(), _) => (float_nan!(), Equal),
+            (float_infinity!(), _) => (float_infinity!(), Equal),
+            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
             (float_negative_zero!(), y) => {
                 if *y == 0u32 {
-                    (float_negative_zero!(), Ordering::Equal)
+                    (float_negative_zero!(), Equal)
                 } else {
                     Float::from_rational_prec_round_ref(y, prec, rm)
                 }
@@ -626,20 +616,18 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) =
-                        Float::from_rational_prec_round_ref(y, working_prec, RoundingMode::Nearest);
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         let mut x = self.clone();
                         let o = x.add_prec_round_assign(q, prec, rm);
                         return (x, o);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let mut t = x
-                        .add_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let mut t = x.add_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -680,7 +668,7 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Ordering::Equal,
+            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
             (float_negative_zero!(), y) => {
                 let o;
                 (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
@@ -689,7 +677,7 @@ impl Float {
             }
             (float_zero!(), y) => {
                 if y == 0u32 {
-                    Ordering::Equal
+                    Equal
                 } else {
                     let o;
                     (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
@@ -701,21 +689,16 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_round_ref(
-                        &y,
-                        working_prec,
-                        RoundingMode::Nearest,
-                    );
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         return self.sub_prec_round_assign(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let t = x
-                        .sub_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let t = x.sub_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -755,7 +738,7 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Ordering::Equal,
+            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
             (float_negative_zero!(), y) => {
                 let o;
                 (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
@@ -764,7 +747,7 @@ impl Float {
             }
             (float_zero!(), y) => {
                 if *y == 0u32 {
-                    Ordering::Equal
+                    Equal
                 } else {
                     let o;
                     (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
@@ -776,18 +759,16 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) =
-                        Float::from_rational_prec_round_ref(y, working_prec, RoundingMode::Nearest);
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         return self.sub_prec_round_assign(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let t = x
-                        .sub_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let t = x.sub_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -827,16 +808,16 @@ impl Float {
     ) -> (Float, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Ordering::Equal),
-            (float_infinity!(), _) => (float_infinity!(), Ordering::Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Ordering::Equal),
+            (float_nan!(), _) => (float_nan!(), Equal),
+            (float_infinity!(), _) => (float_infinity!(), Equal),
+            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
             (float_negative_zero!(), y) => {
                 let (diff, o) = Float::from_rational_prec_round(y, prec, -rm);
                 (-diff, o.reverse())
             }
             (float_zero!(), y) => {
                 if y == 0u32 {
-                    (float_zero!(), Ordering::Equal)
+                    (float_zero!(), Equal)
                 } else {
                     let (diff, o) = Float::from_rational_prec_round(y, prec, -rm);
                     (-diff, o.reverse())
@@ -850,23 +831,18 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_round_ref(
-                        &y,
-                        working_prec,
-                        RoundingMode::Nearest,
-                    );
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         let mut x = self.clone();
                         let o = x.sub_prec_round_assign(q, prec, rm);
                         return (x, o);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let mut t = x
-                        .sub_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let mut t = x.sub_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -906,16 +882,16 @@ impl Float {
     ) -> (Float, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Ordering::Equal),
-            (float_infinity!(), _) => (float_infinity!(), Ordering::Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Ordering::Equal),
+            (float_nan!(), _) => (float_nan!(), Equal),
+            (float_infinity!(), _) => (float_infinity!(), Equal),
+            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
             (float_negative_zero!(), y) => {
                 let (diff, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
                 (-diff, o.reverse())
             }
             (float_zero!(), y) => {
                 if *y == 0u32 {
-                    (float_zero!(), Ordering::Equal)
+                    (float_zero!(), Equal)
                 } else {
                     let (diff, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
                     (-diff, o.reverse())
@@ -929,20 +905,18 @@ impl Float {
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) =
-                        Float::from_rational_prec_round_ref(y, working_prec, RoundingMode::Nearest);
-                    if o == Ordering::Equal {
+                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    if o == Equal {
                         // Result is exact so we can add it directly!
                         let mut x = self.clone();
                         let o = x.sub_prec_round_assign(q, prec, rm);
                         return (x, o);
                     }
                     let q_exp = q.get_exponent().unwrap();
-                    let mut t = x
-                        .sub_prec_round_ref_val(q, working_prec, RoundingMode::Nearest)
-                        .0;
+                    let mut t = x.sub_prec_ref_val(q, working_prec).0;
                     // Error on t is <= 1/2 ulp(t).
                     // ```
                     // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
@@ -978,7 +952,7 @@ impl Float {
     /// rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Ordering::Equal`.
+    /// `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1018,38 +992,38 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, Floor);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, Ceiling);
     /// assert_eq!(sum.to_string(), "6.0");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, Nearest);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, Floor);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, Ceiling);
     /// assert_eq!(sum.to_string(), "5.85988");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, Nearest);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_round(
@@ -1066,7 +1040,7 @@ impl Float {
     /// rounding mode. The first [`Float`]s is taken by value and the second by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1106,44 +1080,38 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 5, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Floor);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 5, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Ceiling);
     /// assert_eq!(sum.to_string(), "6.0");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 5, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Nearest);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 20, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 20, Floor);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 20, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 20, Ceiling);
     /// assert_eq!(sum.to_string(), "5.85988");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 20, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 20, Nearest);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_round_val_ref(
@@ -1160,7 +1128,7 @@ impl Float {
     /// rounding mode. The first [`Float`]s is taken by reference and the second by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1200,44 +1168,38 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_val_ref(&Float::from(E), 5, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Floor);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_val(Float::from(E), 5, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 5, Ceiling);
     /// assert_eq!(sum.to_string(), "6.0");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_val(Float::from(E), 5, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 5, Nearest);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_val(Float::from(E), 20, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 20, Floor);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_val(Float::from(E), 20, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 20, Ceiling);
     /// assert_eq!(sum.to_string(), "5.85988");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_val(Float::from(E), 20, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 20, Nearest);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_round_ref_val(
@@ -1254,7 +1216,7 @@ impl Float {
     /// rounding mode. Both [`Float`]s are taken by reference. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Ordering::Equal`.
+    /// `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1294,44 +1256,38 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_ref(&Float::from(E), 5, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 5, Floor);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_ref(&Float::from(E), 5, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 5, Ceiling);
     /// assert_eq!(sum.to_string(), "6.0");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_ref(&Float::from(E), 5, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 5, Nearest);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_ref(&Float::from(E), 20, RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 20, Floor);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_ref(&Float::from(E), 20, RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 20, Ceiling);
     /// assert_eq!(sum.to_string(), "5.85988");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_prec_round_ref_ref(&Float::from(E), 20, RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 20, Nearest);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_round_ref_ref(
@@ -1347,7 +1303,7 @@ impl Float {
     /// Both [`Float`]s are taken by value. An [`Ordering`] is also returned, indicating whether the
     /// rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
     /// comparable to any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Ordering::Equal`.
+    /// `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -1385,26 +1341,26 @@ impl Float {
     /// ```
     /// use core::f64::consts::{E, PI};
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec(Float::from(E), 5);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec(Float::from(E), 20);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec(self, other: Float, prec: u64) -> (Float, Ordering) {
-        self.add_prec_round(other, prec, RoundingMode::Nearest)
+        self.add_prec_round(other, prec, Nearest)
     }
 
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// The first [`Float`] is taken by value and the second by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Ordering::Equal`.
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -1442,26 +1398,26 @@ impl Float {
     /// ```
     /// use core::f64::consts::{E, PI};
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec_val_ref(&Float::from(E), 5);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_val_ref(&Float::from(E), 20);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_val_ref(self, other: &Float, prec: u64) -> (Float, Ordering) {
-        self.add_prec_round_val_ref(other, prec, RoundingMode::Nearest)
+        self.add_prec_round_val_ref(other, prec, Nearest)
     }
 
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// The first [`Float`] is taken by reference and the second by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Ordering::Equal`.
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -1499,26 +1455,26 @@ impl Float {
     /// ```
     /// use core::f64::consts::{E, PI};
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_val(Float::from(E), 5);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_val(Float::from(E), 20);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_ref_val(&self, other: Float, prec: u64) -> (Float, Ordering) {
-        self.add_prec_round_ref_val(other, prec, RoundingMode::Nearest)
+        self.add_prec_round_ref_val(other, prec, Nearest)
     }
 
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// Both [`Float`]s are taken by reference. An [`Ordering`] is also returned, indicating whether
     /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
     /// not comparable to any other [`Float`], whenever this function returns a `NaN` it also
-    /// returns `Ordering::Equal`.
+    /// returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -1556,26 +1512,25 @@ impl Float {
     /// ```
     /// use core::f64::consts::{E, PI};
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_ref(&Float::from(E), 5);
     /// assert_eq!(sum.to_string(), "5.8");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_ref(&Float::from(E), 20);
     /// assert_eq!(sum.to_string(), "5.85987");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_prec_ref_ref(&self, other: &Float, prec: u64) -> (Float, Ordering) {
-        self.add_prec_round_ref_ref(other, prec, RoundingMode::Nearest)
+        self.add_prec_round_ref_ref(other, prec, Nearest)
     }
 
     /// Adds two [`Float`]s, rounding the result with the specified rounding mode. Both [`Float`]s
     /// are taken by value. An [`Ordering`] is also returned, indicating whether the rounded sum is
     /// less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Ordering::Equal`.
+    /// any other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1617,27 +1572,27 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the maximum precision of the inputs is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the maximum precision of the inputs is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI).add_round(Float::from(E), RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_round(Float::from(E), Floor);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI).add_round(Float::from(E), RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_round(Float::from(E), Ceiling);
     /// assert_eq!(sum.to_string(), "5.859874482048839");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI).add_round(Float::from(E), RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_round(Float::from(E), Nearest);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_round(self, other: Float, rm: RoundingMode) -> (Float, Ordering) {
@@ -1649,7 +1604,7 @@ impl Float {
     /// [`Float`] is taken by value and the second by reference. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Ordering::Equal`.
+    /// `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1691,27 +1646,27 @@ impl Float {
     /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the maximum precision of the inputs is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the maximum precision of the inputs is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), Floor);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), Ceiling);
     /// assert_eq!(sum.to_string(), "5.859874482048839");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), Nearest);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_round_val_ref(self, other: &Float, rm: RoundingMode) -> (Float, Ordering) {
@@ -1723,7 +1678,7 @@ impl Float {
     /// [`Float`] is taken by reference and the second by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Ordering::Equal`.
+    /// `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1765,27 +1720,27 @@ impl Float {
     /// other.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the maximum precision of the inputs is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the maximum precision of the inputs is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), RoundingMode::Floor);
+    /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), Floor);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), RoundingMode::Ceiling);
+    /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), Ceiling);
     /// assert_eq!(sum.to_string(), "5.859874482048839");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), RoundingMode::Nearest);
+    /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), Nearest);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_round_ref_val(&self, other: Float, rm: RoundingMode) -> (Float, Ordering) {
@@ -1796,8 +1751,7 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result with the specified rounding mode. Both [`Float`]s
     /// are taken by reference. An [`Ordering`] is also returned, indicating whether the rounded sum
     /// is less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Ordering::Equal`.
+    /// any other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1839,27 +1793,27 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the maximum precision of the inputs is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the maximum precision of the inputs is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), Floor);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), RoundingMode::Ceiling);
+    /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), Ceiling);
     /// assert_eq!(sum.to_string(), "5.859874482048839");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), RoundingMode::Nearest);
+    /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), Nearest);
     /// assert_eq!(sum.to_string(), "5.859874482048838");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn add_round_ref_ref(&self, other: &Float, rm: RoundingMode) -> (Float, Ordering) {
@@ -1871,7 +1825,7 @@ impl Float {
     /// with the specified rounding mode. The [`Float`] on the right-hand side is taken by value. An
     /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1901,55 +1855,40 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_prec_round_assign(Float::from(E), 5, RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.add_prec_round_assign(Float::from(E), 5, Floor), Less);
     /// assert_eq!(x.to_string(), "5.8");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_prec_round_assign(Float::from(E), 5, RoundingMode::Ceiling),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(x.add_prec_round_assign(Float::from(E), 5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "6.0");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_prec_round_assign(Float::from(E), 5, RoundingMode::Nearest),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.add_prec_round_assign(Float::from(E), 5, Nearest), Less);
     /// assert_eq!(x.to_string(), "5.8");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_prec_round_assign(Float::from(E), 20, RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.add_prec_round_assign(Float::from(E), 20, Floor), Less);
     /// assert_eq!(x.to_string(), "5.85987");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_prec_round_assign(Float::from(E), 20, RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     x.add_prec_round_assign(Float::from(E), 20, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "5.85988");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_prec_round_assign(Float::from(E), 20, RoundingMode::Nearest),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.add_prec_round_assign(Float::from(E), 20, Nearest), Less);
     /// assert_eq!(x.to_string(), "5.85987");
     /// ```
     #[inline]
@@ -1961,8 +1900,7 @@ impl Float {
     /// with the specified rounding mode. The [`Float`] on the right-hand side is taken by
     /// reference. An [`Ordering`] is returned, indicating whether the rounded sum is less than,
     /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any other
-    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns
-    /// `Ordering::Equal`.
+    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1992,54 +1930,51 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_prec_round_assign_ref(&Float::from(E), 5, RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.add_prec_round_assign_ref(&Float::from(E), 5, Floor), Less);
     /// assert_eq!(x.to_string(), "5.8");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_prec_round_assign_ref(&Float::from(E), 5, RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     x.add_prec_round_assign_ref(&Float::from(E), 5, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "6.0");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_prec_round_assign_ref(&Float::from(E), 5, RoundingMode::Nearest),
-    ///     Ordering::Less
+    ///     x.add_prec_round_assign_ref(&Float::from(E), 5, Nearest),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "5.8");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_prec_round_assign_ref(&Float::from(E), 20, RoundingMode::Floor),
-    ///     Ordering::Less
+    ///     x.add_prec_round_assign_ref(&Float::from(E), 20, Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "5.85987");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_prec_round_assign_ref(&Float::from(E), 20, RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     x.add_prec_round_assign_ref(&Float::from(E), 20, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "5.85988");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_prec_round_assign_ref(&Float::from(E), 20, RoundingMode::Nearest),
-    ///     Ordering::Less
+    ///     x.add_prec_round_assign_ref(&Float::from(E), 20, Nearest),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "5.85987");
     /// ```
@@ -2057,7 +1992,7 @@ impl Float {
     /// specified precision. The [`Float`] on the right-hand side is taken by value. An [`Ordering`]
     /// is returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// sets the [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2088,26 +2023,26 @@ impl Float {
     /// ```
     /// use core::f64::consts::{E, PI};
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_prec_assign(Float::from(E), 5), Ordering::Less);
+    /// assert_eq!(x.add_prec_assign(Float::from(E), 5), Less);
     /// assert_eq!(x.to_string(), "5.8");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_prec_assign(Float::from(E), 20), Ordering::Less);
+    /// assert_eq!(x.add_prec_assign(Float::from(E), 20), Less);
     /// assert_eq!(x.to_string(), "5.85987");
     /// ```
     #[inline]
     pub fn add_prec_assign(&mut self, other: Float, prec: u64) -> Ordering {
-        self.add_prec_round_assign(other, prec, RoundingMode::Nearest)
+        self.add_prec_round_assign(other, prec, Nearest)
     }
 
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result to the nearest value of the
     /// specified precision. The [`Float`] on the right-hand side is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2138,26 +2073,26 @@ impl Float {
     /// ```
     /// use core::f64::consts::{E, PI};
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_prec_assign_ref(&Float::from(E), 5), Ordering::Less);
+    /// assert_eq!(x.add_prec_assign_ref(&Float::from(E), 5), Less);
     /// assert_eq!(x.to_string(), "5.8");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_prec_assign_ref(&Float::from(E), 20), Ordering::Less);
+    /// assert_eq!(x.add_prec_assign_ref(&Float::from(E), 20), Less);
     /// assert_eq!(x.to_string(), "5.85987");
     /// ```
     #[inline]
     pub fn add_prec_assign_ref(&mut self, other: &Float, prec: u64) -> Ordering {
-        self.add_prec_round_assign_ref(other, prec, RoundingMode::Nearest)
+        self.add_prec_round_assign_ref(other, prec, Nearest)
     }
 
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result with the specified rounding
     /// mode. The [`Float`] on the right-hand side is taken by value. An [`Ordering`] is returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
-    /// [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -2188,26 +2123,26 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the maximum precision of the inputs is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the maximum precision of the inputs is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_round_assign(Float::from(E), RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(x.add_round_assign(Float::from(E), Floor), Less);
     /// assert_eq!(x.to_string(), "5.859874482048838");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_round_assign(Float::from(E), RoundingMode::Ceiling), Ordering::Greater);
+    /// assert_eq!(x.add_round_assign(Float::from(E), Ceiling), Greater);
     /// assert_eq!(x.to_string(), "5.859874482048839");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_round_assign(Float::from(E), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(x.add_round_assign(Float::from(E), Nearest), Less);
     /// assert_eq!(x.to_string(), "5.859874482048838");
     /// ```
     #[inline]
@@ -2220,7 +2155,7 @@ impl Float {
     /// mode. The [`Float`] on the right-hand side is taken by reference. An [`Ordering`] is
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// sets the [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -2251,29 +2186,26 @@ impl Float {
     /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the maximum precision of the inputs is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the maximum precision of the inputs is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_round_assign_ref(&Float::from(E), RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(x.add_round_assign_ref(&Float::from(E), Floor), Less);
     /// assert_eq!(x.to_string(), "5.859874482048838");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(
-    ///     x.add_round_assign_ref(&Float::from(E), RoundingMode::Ceiling),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(x.add_round_assign_ref(&Float::from(E), Ceiling), Greater);
     /// assert_eq!(x.to_string(), "5.859874482048839");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_round_assign_ref(&Float::from(E), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(x.add_round_assign_ref(&Float::from(E), Nearest), Less);
     /// assert_eq!(x.to_string(), "5.859874482048838");
     /// ```
     #[inline]
@@ -2286,7 +2218,7 @@ impl Float {
     /// the specified rounding mode. The [`Float`] and the [`Rational`] are both taken by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2324,45 +2256,45 @@ impl Float {
     /// prec)`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, RoundingMode::Floor);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Floor);
     /// assert_eq!(sum.to_string(), "3.4");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, RoundingMode::Ceiling);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Ceiling);
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, RoundingMode::Nearest);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Nearest);
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, RoundingMode::Floor);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Floor);
     /// assert_eq!(sum.to_string(), "3.474922");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, RoundingMode::Ceiling);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Ceiling);
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, RoundingMode::Nearest);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Nearest);
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_round(
@@ -2379,7 +2311,7 @@ impl Float {
     /// the specified rounding mode. The [`Float`] is taken by value and the [`Rational`] by
     /// reference. An  [`Ordering`] is also returned, indicating whether the rounded sum is less
     /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// other [`Float`], whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2417,69 +2349,63 @@ impl Float {
     /// prec)`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_val_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Floor
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Floor,
+    /// );
     /// assert_eq!(sum.to_string(), "3.4");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_val_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Ceiling
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Ceiling,
+    /// );
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_val_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Nearest
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Nearest,
+    /// );
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_val_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Floor
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Floor,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474922");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_val_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Ceiling
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Ceiling,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_val_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Nearest
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Nearest,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_round_val_ref(
@@ -2496,7 +2422,7 @@ impl Float {
     /// the specified rounding mode. The [`Float`] is taken by reference and the [`Rational`] by
     /// value. An [`Ordering`] is also returned, indicating whether the rounded sum is less than,
     /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any other
-    /// [`Float`], whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2534,69 +2460,63 @@ impl Float {
     /// prec)`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_val(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Floor
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Floor,
+    /// );
     /// assert_eq!(sum.to_string(), "3.4");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_val(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Ceiling
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Ceiling,
+    /// );
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_val(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Nearest
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Nearest,
+    /// );
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_val(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Floor
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Floor,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474922");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_val(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Ceiling
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Ceiling,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_val(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Nearest
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Nearest,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_round_ref_val(
@@ -2612,7 +2532,7 @@ impl Float {
     /// the specified rounding mode. The [`Float`] and the [`Rational`] are both taken by reference.
     /// An [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to,
     /// or greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2650,69 +2570,63 @@ impl Float {
     /// prec)`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Floor
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Floor,
+    /// );
     /// assert_eq!(sum.to_string(), "3.4");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Ceiling
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Ceiling,
+    /// );
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Nearest
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     5,
+    ///     Nearest,
+    /// );
     /// assert_eq!(sum.to_string(), "3.5");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Floor
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Floor,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474922");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Ceiling
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Ceiling,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_prec_round_ref_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Nearest
-    ///     );
+    /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     20,
+    ///     Nearest,
+    /// );
     /// assert_eq!(sum.to_string(), "3.474926");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_round_ref_ref(
@@ -2728,7 +2642,7 @@ impl Float {
     /// specified precision. The [`Float`] and the [`Rational`] are both are taken by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2768,26 +2682,26 @@ impl Float {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec(Rational::exact_from(1.5), 5);
     /// assert_eq!(sum.to_string(), "4.8");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec(Rational::exact_from(1.5), 20);
     /// assert_eq!(sum.to_string(), "4.641594");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec(self, other: Rational, prec: u64) -> (Float, Ordering) {
-        self.add_rational_prec_round(other, prec, RoundingMode::Nearest)
+        self.add_rational_prec_round(other, prec, Nearest)
     }
 
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by value and the [`Rational`] by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2827,26 +2741,26 @@ impl Float {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_val_ref(&Rational::exact_from(1.5), 5);
     /// assert_eq!(sum.to_string(), "4.8");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_val_ref(&Rational::exact_from(1.5), 20);
     /// assert_eq!(sum.to_string(), "4.641594");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Float, Ordering) {
-        self.add_rational_prec_round_val_ref(other, prec, RoundingMode::Nearest)
+        self.add_rational_prec_round_val_ref(other, prec, Nearest)
     }
 
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by reference and the [`Rational`] by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2886,26 +2800,26 @@ impl Float {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_val(Rational::exact_from(1.5), 5);
     /// assert_eq!(sum.to_string(), "4.8");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_val(Rational::exact_from(1.5), 20);
     /// assert_eq!(sum.to_string(), "4.641594");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Float, Ordering) {
-        self.add_rational_prec_round_ref_val(other, prec, RoundingMode::Nearest)
+        self.add_rational_prec_round_ref_val(other, prec, Nearest)
     }
 
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] and the [`Rational`] are both are taken by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2945,26 +2859,26 @@ impl Float {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_ref(&Rational::exact_from(1.5), 5);
     /// assert_eq!(sum.to_string(), "4.8");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_ref(&Rational::exact_from(1.5), 20);
     /// assert_eq!(sum.to_string(), "4.641594");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Float, Ordering) {
-        self.add_rational_prec_round_ref_ref(other, prec, RoundingMode::Nearest)
+        self.add_rational_prec_round_ref_ref(other, prec, Nearest)
     }
 
     /// Adds a [`Float`] and a [`Rational`], rounding the result with the specified rounding mode.
     /// The [`Float`] and the [`Rational`] are both are taken by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Ordering::Equal`.
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3003,31 +2917,30 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the precision of the [`Float`] input is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the precision of the [`Float`] input is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round(Rational::from_unsigneds(1u8, 3), RoundingMode::Floor);
+    /// let (sum, o) = Float::from(PI).add_rational_round(Rational::from_unsigneds(1u8, 3), Floor);
     /// assert_eq!(sum.to_string(), "3.4749259869231262");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round(Rational::from_unsigneds(1u8, 3), RoundingMode::Ceiling);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round(Rational::from_unsigneds(1u8, 3), Ceiling);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round(Rational::from_unsigneds(1u8, 3), RoundingMode::Nearest);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round(Rational::from_unsigneds(1u8, 3), Nearest);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_round(self, other: Rational, rm: RoundingMode) -> (Float, Ordering) {
@@ -3039,7 +2952,7 @@ impl Float {
     /// The [`Float`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Ordering::Equal`.
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3078,31 +2991,31 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the precision of the [`Float`] input is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the precision of the [`Float`] input is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), RoundingMode::Floor);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Floor);
     /// assert_eq!(sum.to_string(), "3.4749259869231262");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), RoundingMode::Ceiling);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), RoundingMode::Nearest);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_round_val_ref(
@@ -3118,7 +3031,7 @@ impl Float {
     /// The [`Float`] is taken by reference and the [`Float`] by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Ordering::Equal`.
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3157,31 +3070,31 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the precision of the [`Float`] input is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the precision of the [`Float`] input is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), RoundingMode::Floor);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Floor);
     /// assert_eq!(sum.to_string(), "3.4749259869231262");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), RoundingMode::Ceiling);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Ceiling);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), RoundingMode::Nearest);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Nearest);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_round_ref_val(
@@ -3197,7 +3110,7 @@ impl Float {
     /// The [`Float`] and the [`Rational`] are both are taken by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Ordering::Equal`.
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3236,31 +3149,31 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the precision of the [`Float`] input is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the precision of the [`Float`] input is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), RoundingMode::Floor);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Floor);
     /// assert_eq!(sum.to_string(), "3.4749259869231262");
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), RoundingMode::Ceiling);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (sum, o) = Float::from(PI)
-    ///     .add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), RoundingMode::Nearest);
+    /// let (sum, o) =
+    ///     Float::from(PI).add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
     /// assert_eq!(sum.to_string(), "3.4749259869231266");
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn add_rational_round_ref_ref(
@@ -3276,7 +3189,7 @@ impl Float {
     /// and with the specified rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
     /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// sets the [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -3307,79 +3220,55 @@ impl Float {
     /// prec)`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Floor
-    ///     ),
-    ///     Ordering::Less
+    ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "3.4");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Ceiling
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.5");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Nearest
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Nearest),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.5");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Floor
-    ///     ),
-    ///     Ordering::Less
+    ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "3.474922");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Ceiling
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.474926");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign(
-    ///         Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Nearest
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Nearest),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.474926");
     /// ```
@@ -3397,7 +3286,7 @@ impl Float {
     /// and with the specified rounding mode. The [`Rational`] is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
     /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -3429,79 +3318,55 @@ impl Float {
     /// prec)`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but `prec` is too small for an exact addition.
+    /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Floor
-    ///     ),
-    ///     Ordering::Less
+    ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "3.4");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Ceiling
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.5");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         5,
-    ///         RoundingMode::Nearest
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Nearest),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.5");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Floor
-    ///     ),
-    ///     Ordering::Less
+    ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "3.474922");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Ceiling
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.474926");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_prec_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         20,
-    ///         RoundingMode::Nearest
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Nearest),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.474926");
     /// ```
@@ -3519,7 +3384,7 @@ impl Float {
     /// specified precision. The [`Rational`] is taken by value. An [`Ordering`] is returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
-    /// [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -3553,26 +3418,32 @@ impl Float {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_rational_prec_assign(Rational::exact_from(1.5), 5), Ordering::Greater);
+    /// assert_eq!(
+    ///     x.add_rational_prec_assign(Rational::exact_from(1.5), 5),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "4.8");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.add_rational_prec_assign(Rational::exact_from(1.5), 20), Ordering::Greater);
+    /// assert_eq!(
+    ///     x.add_rational_prec_assign(Rational::exact_from(1.5), 20),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "4.641594");
     /// ```
     #[inline]
     pub fn add_rational_prec_assign(&mut self, other: Rational, prec: u64) -> Ordering {
-        self.add_rational_prec_round_assign(other, prec, RoundingMode::Nearest)
+        self.add_rational_prec_round_assign(other, prec, Nearest)
     }
 
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the nearest value of the
     /// specified precision. The [`Rational`] is taken by reference. An [`Ordering`] is returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
     /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
-    /// [`Float`] to `NaN` it also returns `Ordering::Equal`.
+    /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -3606,32 +3477,32 @@ impl Float {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_assign_ref(&Rational::exact_from(1.5), 5),
-    ///     Ordering::Greater
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "4.8");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_assign_ref(&Rational::exact_from(1.5), 20),
-    ///     Ordering::Greater
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "4.641594");
     /// ```
     #[inline]
     pub fn add_rational_prec_assign_ref(&mut self, other: &Rational, prec: u64) -> Ordering {
-        self.add_rational_prec_round_assign_ref(other, prec, RoundingMode::Nearest)
+        self.add_rational_prec_round_assign_ref(other, prec, Nearest)
     }
 
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result with the specified rounding
     /// mode. The [`Rational`] is taken by value. An [`Ordering`] is returned, indicating whether
     /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
     /// not comparable to any other [`Float`], whenever this function sets the [`Float`] to `NaN` it
-    /// also returns `Ordering::Equal`.
+    /// also returns `Equal`.
     ///
     /// The precision of the output is the precision of the input [`Float`]. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3662,35 +3533,35 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the precision of the input [`Float`] is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the precision of the input [`Float`] is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), RoundingMode::Floor),
-    ///     Ordering::Less
+    ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "3.4749259869231262");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.4749259869231266");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), RoundingMode::Nearest),
-    ///     Ordering::Greater
+    ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), Nearest),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.4749259869231266");
     /// ```
@@ -3704,7 +3575,7 @@ impl Float {
     /// mode. The [`Rational`] is taken by reference. An [`Ordering`] is returned, indicating
     /// whether the rounded sum is less than, equal to, or greater than the exact sum. Although
     /// `NaN`s are not comparable to any other [`Float`], whenever this function sets the [`Float`]
-    /// to `NaN` it also returns `Ordering::Equal`.
+    /// to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the input [`Float`]. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3735,44 +3606,35 @@ impl Float {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `rm` is `RoundingMode::Exact` but the precision of the input [`Float`] is not high
-    /// enough to represent the output.
+    /// Panics if `rm` is `Exact` but the precision of the input [`Float`] is not high enough to
+    /// represent the output.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         RoundingMode::Floor
-    ///     ),
-    ///     Ordering::Less
+    ///     x.add_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Floor),
+    ///     Less
     /// );
     /// assert_eq!(x.to_string(), "3.4749259869231262");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         RoundingMode::Ceiling
-    /// ),
-    ///     Ordering::Greater
+    ///     x.add_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.4749259869231266");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
-    ///     x.add_rational_round_assign_ref(
-    ///         &Rational::from_unsigneds(1u8, 3),
-    ///         RoundingMode::Nearest
-    ///     ),
-    ///     Ordering::Greater
+    ///     x.add_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Nearest),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "3.4749259869231266");
     /// ```
@@ -3833,7 +3695,10 @@ impl Add<Float> for Float {
     ///
     /// assert!((Float::from(1.5) + Float::NAN).is_nan());
     /// assert_eq!(Float::from(1.5) + Float::INFINITY, Float::INFINITY);
-    /// assert_eq!(Float::from(1.5) + Float::NEGATIVE_INFINITY, Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     Float::from(1.5) + Float::NEGATIVE_INFINITY,
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     /// assert!((Float::INFINITY + Float::NEGATIVE_INFINITY).is_nan());
     ///
     /// assert_eq!(Float::from(1.5) + Float::from(2.5), 4.0);
@@ -3844,7 +3709,7 @@ impl Add<Float> for Float {
     #[inline]
     fn add(self, other: Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
-        self.add_prec_round(other, prec, RoundingMode::Nearest).0
+        self.add_prec_round(other, prec, Nearest).0
     }
 }
 
@@ -3895,7 +3760,10 @@ impl<'a> Add<&'a Float> for Float {
     ///
     /// assert!((Float::from(1.5) + &Float::NAN).is_nan());
     /// assert_eq!(Float::from(1.5) + &Float::INFINITY, Float::INFINITY);
-    /// assert_eq!(Float::from(1.5) + &Float::NEGATIVE_INFINITY, Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     Float::from(1.5) + &Float::NEGATIVE_INFINITY,
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     /// assert!((Float::INFINITY + &Float::NEGATIVE_INFINITY).is_nan());
     ///
     /// assert_eq!(Float::from(1.5) + &Float::from(2.5), 4.0);
@@ -3906,8 +3774,7 @@ impl<'a> Add<&'a Float> for Float {
     #[inline]
     fn add(self, other: &'a Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
-        self.add_prec_round_val_ref(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_prec_round_val_ref(other, prec, Nearest).0
     }
 }
 
@@ -3958,7 +3825,10 @@ impl<'a> Add<Float> for &'a Float {
     ///
     /// assert!((&Float::from(1.5) + Float::NAN).is_nan());
     /// assert_eq!(&Float::from(1.5) + Float::INFINITY, Float::INFINITY);
-    /// assert_eq!(&Float::from(1.5) + Float::NEGATIVE_INFINITY, Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     &Float::from(1.5) + Float::NEGATIVE_INFINITY,
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     /// assert!((&Float::INFINITY + Float::NEGATIVE_INFINITY).is_nan());
     ///
     /// assert_eq!(&Float::from(1.5) + Float::from(2.5), 4.0);
@@ -3969,8 +3839,7 @@ impl<'a> Add<Float> for &'a Float {
     #[inline]
     fn add(self, other: Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
-        self.add_prec_round_ref_val(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_prec_round_ref_val(other, prec, Nearest).0
     }
 }
 
@@ -4021,7 +3890,10 @@ impl<'a, 'b> Add<&'a Float> for &'b Float {
     ///
     /// assert!((&Float::from(1.5) + &Float::NAN).is_nan());
     /// assert_eq!(&Float::from(1.5) + &Float::INFINITY, Float::INFINITY);
-    /// assert_eq!(&Float::from(1.5) + &Float::NEGATIVE_INFINITY, Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     &Float::from(1.5) + &Float::NEGATIVE_INFINITY,
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     /// assert!((&Float::INFINITY + &Float::NEGATIVE_INFINITY).is_nan());
     ///
     /// assert_eq!(&Float::from(1.5) + &Float::from(2.5), 4.0);
@@ -4032,8 +3904,7 @@ impl<'a, 'b> Add<&'a Float> for &'b Float {
     #[inline]
     fn add(self, other: &'a Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
-        self.add_prec_round_ref_ref(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_prec_round_ref_ref(other, prec, Nearest).0
     }
 }
 
@@ -4108,7 +3979,7 @@ impl AddAssign<Float> for Float {
     #[inline]
     fn add_assign(&mut self, other: Float) {
         let prec = max(self.significant_bits(), other.significant_bits());
-        self.add_prec_round_assign(other, prec, RoundingMode::Nearest);
+        self.add_prec_round_assign(other, prec, Nearest);
     }
 }
 
@@ -4183,7 +4054,7 @@ impl<'a> AddAssign<&'a Float> for Float {
     #[inline]
     fn add_assign(&mut self, other: &Float) {
         let prec = max(self.significant_bits(), other.significant_bits());
-        self.add_prec_round_assign_ref(other, prec, RoundingMode::Nearest);
+        self.add_prec_round_assign_ref(other, prec, Nearest);
     }
 }
 
@@ -4235,7 +4106,10 @@ impl Add<Rational> for Float {
     ///
     /// assert!((Float::NAN + Rational::exact_from(1.5)).is_nan());
     /// assert_eq!(Float::INFINITY + Rational::exact_from(1.5), Float::INFINITY);
-    /// assert_eq!(Float::NEGATIVE_INFINITY + Rational::exact_from(1.5), Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     Float::NEGATIVE_INFINITY + Rational::exact_from(1.5),
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     ///
     /// assert_eq!(Float::from(2.5) + Rational::exact_from(1.5), 4.0);
     /// assert_eq!(Float::from(2.5) + Rational::exact_from(-1.5), 1.0);
@@ -4245,8 +4119,7 @@ impl Add<Rational> for Float {
     #[inline]
     fn add(self, other: Rational) -> Float {
         let prec = self.significant_bits();
-        self.add_rational_prec_round(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_rational_prec_round(other, prec, Nearest).0
     }
 }
 
@@ -4298,7 +4171,10 @@ impl<'a> Add<&'a Rational> for Float {
     /// use malachite_q::Rational;
     ///
     /// assert!((Float::NAN + &Rational::exact_from(1.5)).is_nan());
-    /// assert_eq!(Float::INFINITY + &Rational::exact_from(1.5), Float::INFINITY);
+    /// assert_eq!(
+    ///     Float::INFINITY + &Rational::exact_from(1.5),
+    ///     Float::INFINITY
+    /// );
     /// assert_eq!(
     ///     Float::NEGATIVE_INFINITY + &Rational::exact_from(1.5),
     ///     Float::NEGATIVE_INFINITY
@@ -4312,8 +4188,7 @@ impl<'a> Add<&'a Rational> for Float {
     #[inline]
     fn add(self, other: &Rational) -> Float {
         let prec = self.significant_bits();
-        self.add_rational_prec_round_val_ref(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_rational_prec_round_val_ref(other, prec, Nearest).0
     }
 }
 
@@ -4365,7 +4240,10 @@ impl<'a> Add<Rational> for &'a Float {
     /// use malachite_q::Rational;
     ///
     /// assert!((&Float::NAN + Rational::exact_from(1.5)).is_nan());
-    /// assert_eq!(&Float::INFINITY + Rational::exact_from(1.5), Float::INFINITY);
+    /// assert_eq!(
+    ///     &Float::INFINITY + Rational::exact_from(1.5),
+    ///     Float::INFINITY
+    /// );
     /// assert_eq!(
     ///     &Float::NEGATIVE_INFINITY + Rational::exact_from(1.5),
     ///     Float::NEGATIVE_INFINITY
@@ -4379,8 +4257,7 @@ impl<'a> Add<Rational> for &'a Float {
     #[inline]
     fn add(self, other: Rational) -> Float {
         let prec = self.significant_bits();
-        self.add_rational_prec_round_ref_val(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_rational_prec_round_ref_val(other, prec, Nearest).0
     }
 }
 
@@ -4431,7 +4308,10 @@ impl<'a, 'b> Add<&'a Rational> for &'b Float {
     /// use malachite_q::Rational;
     ///
     /// assert!((&Float::NAN + &Rational::exact_from(1.5)).is_nan());
-    /// assert_eq!(&Float::INFINITY + &Rational::exact_from(1.5), Float::INFINITY);
+    /// assert_eq!(
+    ///     &Float::INFINITY + &Rational::exact_from(1.5),
+    ///     Float::INFINITY
+    /// );
     /// assert_eq!(
     ///     &Float::NEGATIVE_INFINITY + &Rational::exact_from(1.5),
     ///     Float::NEGATIVE_INFINITY
@@ -4445,8 +4325,7 @@ impl<'a, 'b> Add<&'a Rational> for &'b Float {
     #[inline]
     fn add(self, other: &Rational) -> Float {
         let prec = self.significant_bits();
-        self.add_rational_prec_round_ref_ref(other, prec, RoundingMode::Nearest)
-            .0
+        self.add_rational_prec_round_ref_ref(other, prec, Nearest).0
     }
 }
 
@@ -4518,7 +4397,7 @@ impl AddAssign<Rational> for Float {
     #[inline]
     fn add_assign(&mut self, other: Rational) {
         let prec = self.significant_bits();
-        self.add_rational_prec_round_assign(other, prec, RoundingMode::Nearest);
+        self.add_rational_prec_round_assign(other, prec, Nearest);
     }
 }
 
@@ -4590,7 +4469,7 @@ impl<'a> AddAssign<&'a Rational> for Float {
     #[inline]
     fn add_assign(&mut self, other: &Rational) {
         let prec = self.significant_bits();
-        self.add_rational_prec_round_assign_ref(other, prec, RoundingMode::Nearest);
+        self.add_rational_prec_round_assign_ref(other, prec, Nearest);
     }
 }
 
@@ -4637,7 +4516,10 @@ impl Add<Float> for Rational {
     ///
     /// assert!((Rational::exact_from(1.5) + Float::NAN).is_nan());
     /// assert_eq!(Rational::exact_from(1.5) + Float::INFINITY, Float::INFINITY);
-    /// assert_eq!(Rational::exact_from(1.5) + Float::NEGATIVE_INFINITY, Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     Rational::exact_from(1.5) + Float::NEGATIVE_INFINITY,
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     ///
     /// assert_eq!(Rational::exact_from(1.5) + Float::from(2.5), 4.0);
     /// assert_eq!(Rational::exact_from(1.5) + Float::from(-2.5), -1.0);
@@ -4647,9 +4529,7 @@ impl Add<Float> for Rational {
     #[inline]
     fn add(self, other: Float) -> Float {
         let prec = other.significant_bits();
-        other
-            .add_rational_prec_round(self, prec, RoundingMode::Nearest)
-            .0
+        other.add_rational_prec_round(self, prec, Nearest).0
     }
 }
 
@@ -4696,7 +4576,10 @@ impl<'a> Add<&'a Float> for Rational {
     /// use malachite_q::Rational;
     ///
     /// assert!((Rational::exact_from(1.5) + &Float::NAN).is_nan());
-    /// assert_eq!(Rational::exact_from(1.5) + &Float::INFINITY, Float::INFINITY);
+    /// assert_eq!(
+    ///     Rational::exact_from(1.5) + &Float::INFINITY,
+    ///     Float::INFINITY
+    /// );
     /// assert_eq!(
     ///     Rational::exact_from(1.5) + &Float::NEGATIVE_INFINITY,
     ///     Float::NEGATIVE_INFINITY
@@ -4710,9 +4593,7 @@ impl<'a> Add<&'a Float> for Rational {
     #[inline]
     fn add(self, other: &Float) -> Float {
         let prec = other.significant_bits();
-        other
-            .add_rational_prec_round_ref_val(self, prec, RoundingMode::Nearest)
-            .0
+        other.add_rational_prec_round_ref_val(self, prec, Nearest).0
     }
 }
 
@@ -4759,7 +4640,10 @@ impl<'a> Add<Float> for &'a Rational {
     /// use malachite_q::Rational;
     ///
     /// assert!((&Rational::exact_from(1.5) + Float::NAN).is_nan());
-    /// assert_eq!(&Rational::exact_from(1.5) + Float::INFINITY, Float::INFINITY);
+    /// assert_eq!(
+    ///     &Rational::exact_from(1.5) + Float::INFINITY,
+    ///     Float::INFINITY
+    /// );
     /// assert_eq!(
     ///     &Rational::exact_from(1.5) + Float::NEGATIVE_INFINITY,
     ///     Float::NEGATIVE_INFINITY
@@ -4773,9 +4657,7 @@ impl<'a> Add<Float> for &'a Rational {
     #[inline]
     fn add(self, other: Float) -> Float {
         let prec = other.significant_bits();
-        other
-            .add_rational_prec_round_val_ref(self, prec, RoundingMode::Nearest)
-            .0
+        other.add_rational_prec_round_val_ref(self, prec, Nearest).0
     }
 }
 
@@ -4821,7 +4703,10 @@ impl<'a, 'b> Add<&'a Float> for &'b Rational {
     /// use malachite_q::Rational;
     ///
     /// assert!((&Rational::exact_from(1.5) + &Float::NAN).is_nan());
-    /// assert_eq!(&Rational::exact_from(1.5) + &Float::INFINITY, Float::INFINITY);
+    /// assert_eq!(
+    ///     &Rational::exact_from(1.5) + &Float::INFINITY,
+    ///     Float::INFINITY
+    /// );
     /// assert_eq!(
     ///     &Rational::exact_from(1.5) + &Float::NEGATIVE_INFINITY,
     ///     Float::NEGATIVE_INFINITY
@@ -4835,8 +4720,6 @@ impl<'a, 'b> Add<&'a Float> for &'b Rational {
     #[inline]
     fn add(self, other: &Float) -> Float {
         let prec = other.significant_bits();
-        other
-            .add_rational_prec_round_ref_ref(self, prec, RoundingMode::Nearest)
-            .0
+        other.add_rational_prec_round_ref_ref(self, prec, Nearest).0
     }
 }

@@ -18,14 +18,14 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 
 const fn encode(oo: Option<Ordering>) -> u8 {
     match oo {
         None => 9,
-        Some(Ordering::Less) => 0,
-        Some(Ordering::Equal) => 1,
-        Some(Ordering::Greater) => 2,
+        Some(Less) => 0,
+        Some(Equal) => 1,
+        Some(Greater) => 2,
     }
 }
 
@@ -76,7 +76,7 @@ fn partial_cmp_abs_properties() {
         assert_eq!(y.partial_cmp_abs(&x).map(Ordering::reverse), ord);
         assert_eq!(
             (&x).abs() == (&y).abs(),
-            x.partial_cmp_abs(&y) == Some(Ordering::Equal)
+            x.partial_cmp_abs(&y) == Some(Equal)
         );
         assert_eq!((-&x).partial_cmp_abs(&y), ord);
         assert_eq!(x.partial_cmp_abs(&-&y), ord);
@@ -87,7 +87,7 @@ fn partial_cmp_abs_properties() {
         );
         if !x.is_zero() || !y.is_zero() {
             if let Some(ord) = ord {
-                if ord != Ordering::Equal {
+                if ord != Equal {
                     assert_eq!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)), ord);
                 }
             }
@@ -96,10 +96,10 @@ fn partial_cmp_abs_properties() {
 
     float_gen().test_properties(|x| {
         if !x.is_nan() {
-            assert_eq!(x.partial_cmp_abs(&x), Some(Ordering::Equal));
-            assert_eq!(x.partial_cmp_abs(&-&x), Some(Ordering::Equal));
-            assert_eq!((-&x).partial_cmp_abs(&x), Some(Ordering::Equal));
-            assert_eq!((-&x).partial_cmp_abs(&-&x), Some(Ordering::Equal));
+            assert_eq!(x.partial_cmp_abs(&x), Some(Equal));
+            assert_eq!(x.partial_cmp_abs(&-&x), Some(Equal));
+            assert_eq!((-&x).partial_cmp_abs(&x), Some(Equal));
+            assert_eq!((-&x).partial_cmp_abs(&-&x), Some(Equal));
             assert!(x.le_abs(&Float::INFINITY));
             assert!(x.le_abs(&Float::NEGATIVE_INFINITY));
         }
@@ -185,7 +185,7 @@ fn comparable_float_cmp_abs_properties() {
         assert_eq!(cy.cmp_abs(&cx).reverse(), ord);
         assert_eq!(
             ComparableFloat((&x).abs()) == ComparableFloat((&y).abs()),
-            cx.cmp_abs(&cy) == Ordering::Equal
+            cx.cmp_abs(&cy) == Equal
         );
         assert_eq!(
             ComparableFloat(x.clone()).cmp_abs(&ComparableFloat(y.clone())),
@@ -204,12 +204,12 @@ fn comparable_float_cmp_abs_properties() {
 
     float_gen().test_properties(|x| {
         let cx = ComparableFloatRef(&x);
-        assert_eq!(cx.cmp_abs(&cx), Ordering::Equal);
-        assert_eq!(cx.cmp_abs(&ComparableFloatRef(&-&x)), Ordering::Equal);
-        assert_eq!(ComparableFloatRef(&-&x).cmp_abs(&cx), Ordering::Equal);
+        assert_eq!(cx.cmp_abs(&cx), Equal);
+        assert_eq!(cx.cmp_abs(&ComparableFloatRef(&-&x)), Equal);
+        assert_eq!(ComparableFloatRef(&-&x).cmp_abs(&cx), Equal);
         assert_eq!(
             ComparableFloatRef(&-&x).cmp_abs(&ComparableFloatRef(&-&x)),
-            Ordering::Equal
+            Equal
         );
         assert!(cx.le_abs(&ComparableFloatRef(&Float::INFINITY)));
         assert!(cx.le_abs(&ComparableFloatRef(&Float::NEGATIVE_INFINITY)));

@@ -14,6 +14,8 @@ pub(crate) fn register(runner: &mut Runner) {
     is_power_of_2::register(runner);
     neg::register(runner);
     power_of_2::register(runner);
+    shl::register(runner);
+    shr::register(runner);
     sign::register(runner);
     sub::register(runner);
 }
@@ -23,5 +25,7 @@ mod add;
 mod is_power_of_2;
 mod neg;
 mod power_of_2;
+mod shl;
+mod shr;
 mod sign;
 mod sub;

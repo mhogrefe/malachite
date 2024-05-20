@@ -113,7 +113,7 @@ impl<I: Iterator> Iterator for RandomOptions<I> {
 /// assert_eq!(
 ///     prefix_to_string(
 ///         random_options(EXAMPLE_SEED, 1, 2, &random_primitive_ints::<u8>)
-///                 .map(|x| x.to_debug_string()),
+///             .map(|x| x.to_debug_string()),
 ///         10
 ///     ),
 ///     "[Some(85), Some(11), Some(136), None, Some(200), None, Some(235), Some(134), Some(203), \

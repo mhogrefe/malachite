@@ -68,37 +68,33 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_hash_sets_fixed_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = random_hash_sets_fixed_length(
-///         2,
-///         random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100),
-///     )
-///     .take(10)
-///     .collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{24, 95},
-///             hashset!{71, 99},
-///             hashset!{53, 93},
-///             hashset!{34, 85},
-///             hashset!{2, 48},
-///             hashset!{11, 55},
-///             hashset!{18, 48},
-///             hashset!{90, 93},
-///             hashset!{67, 93},
-///             hashset!{93, 95}
-///         ]
-///     );
-/// }
+/// let xss = random_hash_sets_fixed_length(
+///     2,
+///     random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100),
+/// )
+/// .take(10)
+/// .collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {24, 95},
+///         hashset! {71, 99},
+///         hashset! {53, 93},
+///         hashset! {34, 85},
+///         hashset! {2, 48},
+///         hashset! {11, 55},
+///         hashset! {18, 48},
+///         hashset! {90, 93},
+///         hashset! {67, 93},
+///         hashset! {93, 95}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_hash_sets_fixed_length<I: Iterator>(len: u64, xs: I) -> RandomHashSetsFixedLength<I>
@@ -147,48 +143,44 @@ impl<T: Eq + Hash, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_hash_sets_from_length_iterator;
 /// use malachite_base::vecs::random_values_from_vec;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xs = random_hash_sets_from_length_iterator(
-///         EXAMPLE_SEED,
-///         &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
-///         &random_primitive_ints::<u8>,
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             hashset!{11, 85},
-///             hashset!{134, 136, 200, 235},
-///             hashset!{203, 223},
-///             hashset!{38, 177, 217, 235},
-///             hashset!{32, 162, 166, 234},
-///             hashset!{30, 218},
-///             hashset!{},
-///             hashset!{90, 106},
-///             hashset!{},
-///             hashset!{9, 151, 204, 216},
-///             hashset!{78, 97, 213, 253},
-///             hashset!{39, 91},
-///             hashset!{170, 175, 191, 232},
-///             hashset!{2, 233},
-///             hashset!{22, 35, 198, 217},
-///             hashset!{17, 32, 114, 173},
-///             hashset!{65, 114, 121, 222},
-///             hashset!{},
-///             hashset!{25, 144, 148, 173},
-///             hashset!{}
-///         ]
-///     );
-/// }
+/// let xs = random_hash_sets_from_length_iterator(
+///     EXAMPLE_SEED,
+///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
+///     &random_primitive_ints::<u8>,
+/// );
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         hashset! {11, 85},
+///         hashset! {134, 136, 200, 235},
+///         hashset! {203, 223},
+///         hashset! {38, 177, 217, 235},
+///         hashset! {32, 162, 166, 234},
+///         hashset! {30, 218},
+///         hashset! {},
+///         hashset! {90, 106},
+///         hashset! {},
+///         hashset! {9, 151, 204, 216},
+///         hashset! {78, 97, 213, 253},
+///         hashset! {39, 91},
+///         hashset! {170, 175, 191, 232},
+///         hashset! {2, 233},
+///         hashset! {22, 35, 198, 217},
+///         hashset! {17, 32, 114, 173},
+///         hashset! {65, 114, 121, 222},
+///         hashset! {},
+///         hashset! {25, 144, 148, 173},
+///         hashset! {}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_hash_sets_from_length_iterator<
@@ -230,43 +222,39 @@ pub fn random_hash_sets_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_hash_sets;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xs = random_hash_sets(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             hashset!{},
-///             hashset!{11, 32, 38, 85, 134, 136, 162, 166, 177, 200, 203, 217, 223, 235},
-///             hashset!{30, 90, 218, 234},
-///             hashset!{9, 106, 204, 216},
-///             hashset!{151},
-///             hashset!{},
-///             hashset!{78, 91, 97, 213, 253},
-///             hashset!{39, 191},
-///             hashset!{170, 175, 232, 233},
-///             hashset!{},
-///             hashset!{2, 22, 35, 114, 198, 217},
-///             hashset!{},
-///             hashset!{},
-///             hashset!{17, 25, 32, 65, 79, 114, 121, 144, 148, 173, 222},
-///             hashset!{52, 69, 73, 91, 115, 137, 153, 178},
-///             hashset!{},
-///             hashset!{34, 95, 112},
-///             hashset!{},
-///             hashset!{106, 130, 167, 168, 197},
-///             hashset!{86, 101, 122, 150, 172, 177, 207, 218, 221}
-///         ]
-///     );
-/// }
+/// let xs = random_hash_sets(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         hashset! {},
+///         hashset! {11, 32, 38, 85, 134, 136, 162, 166, 177, 200, 203, 217, 223, 235},
+///         hashset! {30, 90, 218, 234},
+///         hashset! {9, 106, 204, 216},
+///         hashset! {151},
+///         hashset! {},
+///         hashset! {78, 91, 97, 213, 253},
+///         hashset! {39, 191},
+///         hashset! {170, 175, 232, 233},
+///         hashset! {},
+///         hashset! {2, 22, 35, 114, 198, 217},
+///         hashset! {},
+///         hashset! {},
+///         hashset! {17, 25, 32, 65, 79, 114, 121, 144, 148, 173, 222},
+///         hashset! {52, 69, 73, 91, 115, 137, 153, 178},
+///         hashset! {},
+///         hashset! {34, 95, 112},
+///         hashset! {},
+///         hashset! {106, 130, 167, 168, 197},
+///         hashset! {86, 101, 122, 150, 172, 177, 207, 218, 221}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_hash_sets<I: Iterator>(
@@ -311,51 +299,41 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_hash_sets_min_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xs = random_hash_sets_min_length(
-///         EXAMPLE_SEED,
-///         2,
-///         &random_primitive_ints::<u8>,
-///         6,
-///         1
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             hashset!{11, 85},
-///             hashset!{
-///                 30, 32, 38, 90, 134, 136, 162, 166, 177, 200, 203, 217, 218, 223, 234, 235
-///             },
-///             hashset!{9, 106, 151, 204, 213, 216},
-///             hashset!{39, 78, 91, 97, 191, 253},
-///             hashset!{170, 175, 232},
-///             hashset!{2, 233},
-///             hashset!{17, 22, 32, 35, 114, 198, 217},
-///             hashset!{65, 114, 121, 173},
-///             hashset!{25, 79, 144, 148, 173, 222},
-///             hashset!{52, 115},
-///             hashset!{34, 69, 73, 91, 112, 137, 153, 178},
-///             hashset!{95, 106},
-///             hashset!{167, 197},
-///             hashset!{74, 86, 101, 115, 122, 130, 150, 168, 172, 177, 207, 218, 221},
-///             hashset!{9, 48, 52, 109, 123, 133, 159, 201, 247, 250},
-///             hashset!{196, 235},
-///             hashset!{40, 68, 97, 104, 190},
-///             hashset!{7, 216},
-///             hashset!{11, 24, 43, 112, 157, 216, 217},
-///             hashset!{29, 51, 55, 65, 84, 89, 103, 135, 191, 206, 211}
-///         ]
-///     );
-/// }
+/// let xs = random_hash_sets_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         hashset! {11, 85},
+///         hashset! {
+///             30, 32, 38, 90, 134, 136, 162, 166, 177, 200, 203, 217, 218, 223, 234, 235
+///         },
+///         hashset! {9, 106, 151, 204, 213, 216},
+///         hashset! {39, 78, 91, 97, 191, 253},
+///         hashset! {170, 175, 232},
+///         hashset! {2, 233},
+///         hashset! {17, 22, 32, 35, 114, 198, 217},
+///         hashset! {65, 114, 121, 173},
+///         hashset! {25, 79, 144, 148, 173, 222},
+///         hashset! {52, 115},
+///         hashset! {34, 69, 73, 91, 112, 137, 153, 178},
+///         hashset! {95, 106},
+///         hashset! {167, 197},
+///         hashset! {74, 86, 101, 115, 122, 130, 150, 168, 172, 177, 207, 218, 221},
+///         hashset! {9, 48, 52, 109, 123, 133, 159, 201, 247, 250},
+///         hashset! {196, 235},
+///         hashset! {40, 68, 97, 104, 190},
+///         hashset! {7, 216},
+///         hashset! {11, 24, 43, 112, 157, 216, 217},
+///         hashset! {29, 51, 55, 65, 84, 89, 103, 135, 191, 206, 211}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_hash_sets_min_length<I: Iterator>(
@@ -401,48 +379,39 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_hash_sets_length_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xs = random_hash_sets_length_range(
-///         EXAMPLE_SEED,
-///         2,
-///         5,
-///         &random_primitive_ints::<u8>
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             hashset!{11, 85, 136},
-///             hashset!{134, 200, 203, 235},
-///             hashset!{38, 223, 235},
-///             hashset!{32, 162, 177, 217},
-///             hashset!{30, 166, 218, 234},
-///             hashset!{9, 90, 106},
-///             hashset!{204, 216},
-///             hashset!{97, 151, 213},
-///             hashset!{78, 253},
-///             hashset!{39, 91, 175, 191},
-///             hashset!{2, 170, 232, 233},
-///             hashset!{22, 35, 217},
-///             hashset!{17, 32, 114, 198},
-///             hashset!{65, 114, 173},
-///             hashset!{25, 121, 173, 222},
-///             hashset!{79, 115, 144, 148},
-///             hashset!{52, 69, 73, 137},
-///             hashset!{91, 153},
-///             hashset!{34, 95, 112, 178},
-///             hashset!{106, 167}
-///         ]
-///     );
-/// }
+/// let xs = random_hash_sets_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         hashset! {11, 85, 136},
+///         hashset! {134, 200, 203, 235},
+///         hashset! {38, 223, 235},
+///         hashset! {32, 162, 177, 217},
+///         hashset! {30, 166, 218, 234},
+///         hashset! {9, 90, 106},
+///         hashset! {204, 216},
+///         hashset! {97, 151, 213},
+///         hashset! {78, 253},
+///         hashset! {39, 91, 175, 191},
+///         hashset! {2, 170, 232, 233},
+///         hashset! {22, 35, 217},
+///         hashset! {17, 32, 114, 198},
+///         hashset! {65, 114, 173},
+///         hashset! {25, 121, 173, 222},
+///         hashset! {79, 115, 144, 148},
+///         hashset! {52, 69, 73, 137},
+///         hashset! {91, 153},
+///         hashset! {34, 95, 112, 178},
+///         hashset! {106, 167}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_hash_sets_length_range<I: Iterator>(
@@ -479,48 +448,40 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_hash_sets_length_inclusive_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xs = random_hash_sets_length_inclusive_range(
-///         EXAMPLE_SEED,
-///         2,
-///         4,
-///         &random_primitive_ints::<u8>
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             hashset!{11, 85, 136},
-///             hashset!{134, 200, 203, 235},
-///             hashset!{38, 223, 235},
-///             hashset!{32, 162, 177, 217},
-///             hashset!{30, 166, 218, 234},
-///             hashset!{9, 90, 106},
-///             hashset!{204, 216},
-///             hashset!{97, 151, 213},
-///             hashset!{78, 253},
-///             hashset!{39, 91, 175, 191},
-///             hashset!{2, 170, 232, 233},
-///             hashset!{22, 35, 217},
-///             hashset!{17, 32, 114, 198},
-///             hashset!{65, 114, 173},
-///             hashset!{25, 121, 173, 222},
-///             hashset!{79, 115, 144, 148},
-///             hashset!{52, 69, 73, 137},
-///             hashset!{91, 153},
-///             hashset!{34, 95, 112, 178},
-///             hashset!{106, 167}
-///         ]
-///     );
-/// }
+/// let xs =
+///     random_hash_sets_length_inclusive_range(EXAMPLE_SEED, 2, 4, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         hashset! {11, 85, 136},
+///         hashset! {134, 200, 203, 235},
+///         hashset! {38, 223, 235},
+///         hashset! {32, 162, 177, 217},
+///         hashset! {30, 166, 218, 234},
+///         hashset! {9, 90, 106},
+///         hashset! {204, 216},
+///         hashset! {97, 151, 213},
+///         hashset! {78, 253},
+///         hashset! {39, 91, 175, 191},
+///         hashset! {2, 170, 232, 233},
+///         hashset! {22, 35, 217},
+///         hashset! {17, 32, 114, 198},
+///         hashset! {65, 114, 173},
+///         hashset! {25, 121, 173, 222},
+///         hashset! {79, 115, 144, 148},
+///         hashset! {52, 69, 73, 137},
+///         hashset! {91, 153},
+///         hashset! {34, 95, 112, 178},
+///         hashset! {106, 167}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_hash_sets_length_inclusive_range<I: Iterator>(
@@ -583,37 +544,33 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_b_tree_sets_fixed_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = random_b_tree_sets_fixed_length(
-///         2,
-///         random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100),
-///     )
-///     .take(10)
-///     .collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{24, 95},
-///             btreeset!{71, 99},
-///             btreeset!{53, 93},
-///             btreeset!{34, 85},
-///             btreeset!{2, 48},
-///             btreeset!{11, 55},
-///             btreeset!{18, 48},
-///             btreeset!{90, 93},
-///             btreeset!{67, 93},
-///             btreeset!{93, 95}
-///         ]
-///     );
-/// }
+/// let xss = random_b_tree_sets_fixed_length(
+///     2,
+///     random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100),
+/// )
+/// .take(10)
+/// .collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {24, 95},
+///         btreeset! {71, 99},
+///         btreeset! {53, 93},
+///         btreeset! {34, 85},
+///         btreeset! {2, 48},
+///         btreeset! {11, 55},
+///         btreeset! {18, 48},
+///         btreeset! {90, 93},
+///         btreeset! {67, 93},
+///         btreeset! {93, 95}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_b_tree_sets_fixed_length<I: Iterator>(
@@ -663,48 +620,44 @@ impl<T: Ord, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for Random
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_b_tree_sets_from_length_iterator;
 /// use malachite_base::vecs::random_values_from_vec;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xs = random_b_tree_sets_from_length_iterator(
-///         EXAMPLE_SEED,
-///         &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
-///         &random_primitive_ints::<u8>,
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             btreeset!{11, 85},
-///             btreeset!{134, 136, 200, 235},
-///             btreeset!{203, 223},
-///             btreeset!{38, 177, 217, 235},
-///             btreeset!{32, 162, 166, 234},
-///             btreeset!{30, 218},
-///             btreeset!{},
-///             btreeset!{90, 106},
-///             btreeset!{},
-///             btreeset!{9, 151, 204, 216},
-///             btreeset!{78, 97, 213, 253},
-///             btreeset!{39, 91},
-///             btreeset!{170, 175, 191, 232},
-///             btreeset!{2, 233},
-///             btreeset!{22, 35, 198, 217},
-///             btreeset!{17, 32, 114, 173},
-///             btreeset!{65, 114, 121, 222},
-///             btreeset!{},
-///             btreeset!{25, 144, 148, 173},
-///             btreeset!{}
-///         ]
-///     );
-/// }
+/// let xs = random_b_tree_sets_from_length_iterator(
+///     EXAMPLE_SEED,
+///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
+///     &random_primitive_ints::<u8>,
+/// );
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         btreeset! {11, 85},
+///         btreeset! {134, 136, 200, 235},
+///         btreeset! {203, 223},
+///         btreeset! {38, 177, 217, 235},
+///         btreeset! {32, 162, 166, 234},
+///         btreeset! {30, 218},
+///         btreeset! {},
+///         btreeset! {90, 106},
+///         btreeset! {},
+///         btreeset! {9, 151, 204, 216},
+///         btreeset! {78, 97, 213, 253},
+///         btreeset! {39, 91},
+///         btreeset! {170, 175, 191, 232},
+///         btreeset! {2, 233},
+///         btreeset! {22, 35, 198, 217},
+///         btreeset! {17, 32, 114, 173},
+///         btreeset! {65, 114, 121, 222},
+///         btreeset! {},
+///         btreeset! {25, 144, 148, 173},
+///         btreeset! {}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_b_tree_sets_from_length_iterator<
@@ -746,43 +699,39 @@ pub fn random_b_tree_sets_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_b_tree_sets;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xs = random_b_tree_sets(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             btreeset!{},
-///             btreeset!{11, 32, 38, 85, 134, 136, 162, 166, 177, 200, 203, 217, 223, 235},
-///             btreeset!{30, 90, 218, 234},
-///             btreeset!{9, 106, 204, 216},
-///             btreeset!{151},
-///             btreeset!{},
-///             btreeset!{78, 91, 97, 213, 253},
-///             btreeset!{39, 191},
-///             btreeset!{170, 175, 232, 233},
-///             btreeset!{},
-///             btreeset!{2, 22, 35, 114, 198, 217},
-///             btreeset!{},
-///             btreeset!{},
-///             btreeset!{17, 25, 32, 65, 79, 114, 121, 144, 148, 173, 222},
-///             btreeset!{52, 69, 73, 91, 115, 137, 153, 178},
-///             btreeset!{},
-///             btreeset!{34, 95, 112},
-///             btreeset!{},
-///             btreeset!{106, 130, 167, 168, 197},
-///             btreeset!{86, 101, 122, 150, 172, 177, 207, 218, 221}
-///         ]
-///     );
-/// }
+/// let xs = random_b_tree_sets(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         btreeset! {},
+///         btreeset! {11, 32, 38, 85, 134, 136, 162, 166, 177, 200, 203, 217, 223, 235},
+///         btreeset! {30, 90, 218, 234},
+///         btreeset! {9, 106, 204, 216},
+///         btreeset! {151},
+///         btreeset! {},
+///         btreeset! {78, 91, 97, 213, 253},
+///         btreeset! {39, 191},
+///         btreeset! {170, 175, 232, 233},
+///         btreeset! {},
+///         btreeset! {2, 22, 35, 114, 198, 217},
+///         btreeset! {},
+///         btreeset! {},
+///         btreeset! {17, 25, 32, 65, 79, 114, 121, 144, 148, 173, 222},
+///         btreeset! {52, 69, 73, 91, 115, 137, 153, 178},
+///         btreeset! {},
+///         btreeset! {34, 95, 112},
+///         btreeset! {},
+///         btreeset! {106, 130, 167, 168, 197},
+///         btreeset! {86, 101, 122, 150, 172, 177, 207, 218, 221}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_b_tree_sets<I: Iterator>(
@@ -827,51 +776,41 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_b_tree_sets_min_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xs = random_b_tree_sets_min_length(
-///         EXAMPLE_SEED,
-///         2,
-///         &random_primitive_ints::<u8>,
-///         6,
-///         1
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             btreeset!{11, 85},
-///             btreeset!{
-///                 30, 32, 38, 90, 134, 136, 162, 166, 177, 200, 203, 217, 218, 223, 234, 235
-///             },
-///             btreeset!{9, 106, 151, 204, 213, 216},
-///             btreeset!{39, 78, 91, 97, 191, 253},
-///             btreeset!{170, 175, 232},
-///             btreeset!{2, 233},
-///             btreeset!{17, 22, 32, 35, 114, 198, 217},
-///             btreeset!{65, 114, 121, 173},
-///             btreeset!{25, 79, 144, 148, 173, 222},
-///             btreeset!{52, 115},
-///             btreeset!{34, 69, 73, 91, 112, 137, 153, 178},
-///             btreeset!{95, 106},
-///             btreeset!{167, 197},
-///             btreeset!{74, 86, 101, 115, 122, 130, 150, 168, 172, 177, 207, 218, 221},
-///             btreeset!{9, 48, 52, 109, 123, 133, 159, 201, 247, 250},
-///             btreeset!{196, 235},
-///             btreeset!{40, 68, 97, 104, 190},
-///             btreeset!{7, 216},
-///             btreeset!{11, 24, 43, 112, 157, 216, 217},
-///             btreeset!{29, 51, 55, 65, 84, 89, 103, 135, 191, 206, 211}
-///         ]
-///     );
-/// }
+/// let xs = random_b_tree_sets_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         btreeset! {11, 85},
+///         btreeset! {
+///             30, 32, 38, 90, 134, 136, 162, 166, 177, 200, 203, 217, 218, 223, 234, 235
+///         },
+///         btreeset! {9, 106, 151, 204, 213, 216},
+///         btreeset! {39, 78, 91, 97, 191, 253},
+///         btreeset! {170, 175, 232},
+///         btreeset! {2, 233},
+///         btreeset! {17, 22, 32, 35, 114, 198, 217},
+///         btreeset! {65, 114, 121, 173},
+///         btreeset! {25, 79, 144, 148, 173, 222},
+///         btreeset! {52, 115},
+///         btreeset! {34, 69, 73, 91, 112, 137, 153, 178},
+///         btreeset! {95, 106},
+///         btreeset! {167, 197},
+///         btreeset! {74, 86, 101, 115, 122, 130, 150, 168, 172, 177, 207, 218, 221},
+///         btreeset! {9, 48, 52, 109, 123, 133, 159, 201, 247, 250},
+///         btreeset! {196, 235},
+///         btreeset! {40, 68, 97, 104, 190},
+///         btreeset! {7, 216},
+///         btreeset! {11, 24, 43, 112, 157, 216, 217},
+///         btreeset! {29, 51, 55, 65, 84, 89, 103, 135, 191, 206, 211}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_b_tree_sets_min_length<I: Iterator>(
@@ -917,48 +856,39 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_b_tree_sets_length_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xs = random_b_tree_sets_length_range(
-///         EXAMPLE_SEED,
-///         2,
-///         5,
-///         &random_primitive_ints::<u8>
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             btreeset!{11, 85, 136},
-///             btreeset!{134, 200, 203, 235},
-///             btreeset!{38, 223, 235},
-///             btreeset!{32, 162, 177, 217},
-///             btreeset!{30, 166, 218, 234},
-///             btreeset!{9, 90, 106},
-///             btreeset!{204, 216},
-///             btreeset!{97, 151, 213},
-///             btreeset!{78, 253},
-///             btreeset!{39, 91, 175, 191},
-///             btreeset!{2, 170, 232, 233},
-///             btreeset!{22, 35, 217},
-///             btreeset!{17, 32, 114, 198},
-///             btreeset!{65, 114, 173},
-///             btreeset!{25, 121, 173, 222},
-///             btreeset!{79, 115, 144, 148},
-///             btreeset!{52, 69, 73, 137},
-///             btreeset!{91, 153},
-///             btreeset!{34, 95, 112, 178},
-///             btreeset!{106, 167}
-///         ]
-///     );
-/// }
+/// let xs = random_b_tree_sets_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         btreeset! {11, 85, 136},
+///         btreeset! {134, 200, 203, 235},
+///         btreeset! {38, 223, 235},
+///         btreeset! {32, 162, 177, 217},
+///         btreeset! {30, 166, 218, 234},
+///         btreeset! {9, 90, 106},
+///         btreeset! {204, 216},
+///         btreeset! {97, 151, 213},
+///         btreeset! {78, 253},
+///         btreeset! {39, 91, 175, 191},
+///         btreeset! {2, 170, 232, 233},
+///         btreeset! {22, 35, 217},
+///         btreeset! {17, 32, 114, 198},
+///         btreeset! {65, 114, 173},
+///         btreeset! {25, 121, 173, 222},
+///         btreeset! {79, 115, 144, 148},
+///         btreeset! {52, 69, 73, 137},
+///         btreeset! {91, 153},
+///         btreeset! {34, 95, 112, 178},
+///         btreeset! {106, 167}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_b_tree_sets_length_range<I: Iterator>(
@@ -995,48 +925,40 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::sets::random::random_b_tree_sets_length_inclusive_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xs = random_b_tree_sets_length_inclusive_range(
-///         EXAMPLE_SEED,
-///         2,
-///         4,
-///         &random_primitive_ints::<u8>
-///     );
-///     let values = xs.take(20).collect_vec();
-///     assert_eq!(
-///         values,
-///         &[
-///             btreeset!{11, 85, 136},
-///             btreeset!{134, 200, 203, 235},
-///             btreeset!{38, 223, 235},
-///             btreeset!{32, 162, 177, 217},
-///             btreeset!{30, 166, 218, 234},
-///             btreeset!{9, 90, 106},
-///             btreeset!{204, 216},
-///             btreeset!{97, 151, 213},
-///             btreeset!{78, 253},
-///             btreeset!{39, 91, 175, 191},
-///             btreeset!{2, 170, 232, 233},
-///             btreeset!{22, 35, 217},
-///             btreeset!{17, 32, 114, 198},
-///             btreeset!{65, 114, 173},
-///             btreeset!{25, 121, 173, 222},
-///             btreeset!{79, 115, 144, 148},
-///             btreeset!{52, 69, 73, 137},
-///             btreeset!{91, 153},
-///             btreeset!{34, 95, 112, 178},
-///             btreeset!{106, 167}
-///         ]
-///     );
-/// }
+/// let xs =
+///     random_b_tree_sets_length_inclusive_range(EXAMPLE_SEED, 2, 4, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values,
+///     &[
+///         btreeset! {11, 85, 136},
+///         btreeset! {134, 200, 203, 235},
+///         btreeset! {38, 223, 235},
+///         btreeset! {32, 162, 177, 217},
+///         btreeset! {30, 166, 218, 234},
+///         btreeset! {9, 90, 106},
+///         btreeset! {204, 216},
+///         btreeset! {97, 151, 213},
+///         btreeset! {78, 253},
+///         btreeset! {39, 91, 175, 191},
+///         btreeset! {2, 170, 232, 233},
+///         btreeset! {22, 35, 217},
+///         btreeset! {17, 32, 114, 198},
+///         btreeset! {65, 114, 173},
+///         btreeset! {25, 121, 173, 222},
+///         btreeset! {79, 115, 144, 148},
+///         btreeset! {52, 69, 73, 137},
+///         btreeset! {91, 153},
+///         btreeset! {34, 95, 112, 178},
+///         btreeset! {106, 167}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn random_b_tree_sets_length_inclusive_range<I: Iterator>(

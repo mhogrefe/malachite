@@ -26,14 +26,14 @@ impl ToSci for Integer {
     /// ```
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut options = ToSciOptions::default();
     /// assert!(Integer::from(123).fmt_sci_valid(options));
     /// assert!(Integer::from(u128::MAX).fmt_sci_valid(options));
     /// // u128::MAX has more than 16 significant digits
-    /// options.set_rounding_mode(RoundingMode::Exact);
+    /// options.set_rounding_mode(Exact);
     /// assert!(!Integer::from(u128::MAX).fmt_sci_valid(options));
     /// options.set_precision(50);
     /// assert!(Integer::from(u128::MAX).fmt_sci_valid(options));
@@ -65,11 +65,17 @@ impl ToSci for Integer {
     /// ```
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(u128::MAX).to_sci().to_string(), "3.402823669209385e38");
-    /// assert_eq!(Integer::from(i128::MIN).to_sci().to_string(), "-1.701411834604692e38");
+    /// assert_eq!(
+    ///     Integer::from(u128::MAX).to_sci().to_string(),
+    ///     "3.402823669209385e38"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(i128::MIN).to_sci().to_string(),
+    ///     "-1.701411834604692e38"
+    /// );
     ///
     /// let n = Integer::from(123456u32);
     /// let mut options = ToSciOptions::default();
@@ -78,7 +84,7 @@ impl ToSci for Integer {
     /// options.set_precision(3);
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "1.23e5");
     ///
-    /// options.set_rounding_mode(RoundingMode::Ceiling);
+    /// options.set_rounding_mode(Ceiling);
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "1.24e5");
     ///
     /// options.set_e_uppercase();

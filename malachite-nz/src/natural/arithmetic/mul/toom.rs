@@ -67,14 +67,14 @@ use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::NotAssign;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 // TODO tune
@@ -337,7 +337,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22(
     split_into_chunks_mut!(out, n, [asm1, bsm1], _unused);
     // Compute bsm1.
     if s == n {
-        if limbs_cmp_same_length(xs_0, xs_1) == Ordering::Less {
+        if limbs_cmp_same_length(xs_0, xs_1) == Less {
             limbs_sub_same_length_to_out(asm1, xs_1, xs_0);
             v_neg_1_neg = true;
         } else {
@@ -347,7 +347,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22(
         // n - s == 1
         let (xs_0_last, xs_0_init) = xs_0.split_last().unwrap();
         let (asm1_last, asm1_init) = asm1.split_last_mut().unwrap();
-        if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Ordering::Less {
+        if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Less {
             limbs_sub_same_length_to_out(asm1_init, xs_1, xs_0_init);
             *asm1_last = 0;
             v_neg_1_neg = true;
@@ -360,7 +360,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22(
     }
     // Compute bsm1.
     if t == n {
-        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(ys_0, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
             v_neg_1_neg.not_assign();
         } else {
@@ -368,7 +368,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22(
         }
     } else {
         let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
-        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0_lo);
             slice_set_zero(&mut bsm1[t..]);
             v_neg_1_neg.not_assign();
@@ -539,7 +539,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32(
     // Compute ap1 = xs0 + xs1 + a3, am1 = xs0 - xs1 + a3
     let mut hi = limbs_add_to_out(ap1, xs_0, xs_2);
     let mut ap1_hi = Limb::from(hi);
-    let mut v_neg_1_neg = ap1_hi == 0 && limbs_cmp_same_length(ap1, xs_1) == Ordering::Less;
+    let mut v_neg_1_neg = ap1_hi == 0 && limbs_cmp_same_length(ap1, xs_1) == Less;
     if v_neg_1_neg {
         assert!(!limbs_sub_same_length_to_out(am1, xs_1, ap1));
     } else if limbs_sub_same_length_to_out(am1, ap1, xs_1) {
@@ -552,7 +552,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32(
     // Compute bp1 = ys0 + ys1 and bm1 = ys0 - ys1.
     if t == n {
         bp1_hi = limbs_add_same_length_to_out(bp1, ys_0, ys_1);
-        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(ys_0, ys_1) == Less {
             assert!(!limbs_sub_same_length_to_out(bm1, ys_1, ys_0));
             v_neg_1_neg.not_assign();
         } else {
@@ -561,7 +561,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32(
     } else {
         bp1_hi = limbs_add_to_out(bp1, ys_0, ys_1);
         let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
-        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Less {
             let (bm1_lo, bm1_hi) = bm1.split_at_mut(t);
             assert!(!limbs_sub_same_length_to_out(bm1_lo, ys_1, ys_0_lo));
             slice_set_zero(bm1_hi);
@@ -784,7 +784,7 @@ pub_test! {limbs_mul_greater_to_out_toom_33_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
-    xs_len >= ys_len && xs_len.div_round(3, RoundingMode::Ceiling).0 << 1 < ys_len
+    xs_len >= ys_len && xs_len.div_round(3, Ceiling).0 << 1 < ys_len
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -801,7 +801,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
-    let n = xs_len.div_round(3, RoundingMode::Ceiling).0;
+    let n = xs_len.div_round(3, Ceiling).0;
     let m = n + 1;
     assert!(m < xs_len);
     let s = xs_len - (n << 1);
@@ -872,7 +872,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let n = xs_len.div_round(3, RoundingMode::Ceiling).0;
+    let n = xs_len.div_round(3, Ceiling).0;
     let m = n + 1;
     split_into_chunks!(xs, n, [xs_0, xs_1], xs_2);
     let s = xs_2.len();
@@ -891,7 +891,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
     if limbs_add_same_length_to_out(as1_init, gp, xs_1) {
         as1_last.wrapping_add_assign(1);
     }
-    let mut v_neg_1_neg = carry == 0 && limbs_cmp_same_length(gp, xs_1) == Ordering::Less;
+    let mut v_neg_1_neg = carry == 0 && limbs_cmp_same_length(gp, xs_1) == Less;
     let (asm1_last, asm1_init) = asm1.split_last_mut().unwrap();
     if v_neg_1_neg {
         limbs_sub_same_length_to_out(asm1_init, xs_1, gp);
@@ -929,7 +929,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
         *bs1_last += 1;
     }
     let (bsm1_last, bsm1_init) = bsm1.split_last_mut().unwrap();
-    if carry == 0 && limbs_cmp_same_length(gp, ys_1) == Ordering::Less {
+    if carry == 0 && limbs_cmp_same_length(gp, ys_1) == Less {
         limbs_sub_same_length_to_out(bsm1_init, ys_1, gp);
         *bsm1_last = 0;
         v_neg_1_neg.not_assign();
@@ -1047,8 +1047,8 @@ pub_test! {
     limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 9 && ys_len == 4)
         && xs_len + 3 < ys_len << 2
-        && xs_len.div_round(3, RoundingMode::Ceiling).0
-            > ys_len.shr_round(1, RoundingMode::Ceiling).0
+        && xs_len.div_round(3, Ceiling).0
+            > ys_len.shr_round(1, Ceiling).0
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -1063,9 +1063,9 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42_scratch_len(
     ys_len: usize
 ) -> usize {
     let n = if xs_len >= ys_len << 1 {
-        xs_len.shr_round(2, RoundingMode::Ceiling).0
+        xs_len.shr_round(2, Ceiling).0
     } else {
-        ys_len.shr_round(1, RoundingMode::Ceiling).0
+        ys_len.shr_round(1, Ceiling).0
     };
     let s = xs_len - 3 * n;
     let t = ys_len - n;
@@ -1133,9 +1133,9 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     let xs_len = xs.len();
     let ys_len = ys.len();
     let n = if xs_len >= ys_len << 1 {
-        xs_len.shr_round(2, RoundingMode::Ceiling).0
+        xs_len.shr_round(2, Ceiling).0
     } else {
-        ys_len.shr_round(1, RoundingMode::Ceiling).0
+        ys_len.shr_round(1, Ceiling).0
     };
     split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
     let s = xs_3.len();
@@ -1176,7 +1176,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     if t == n {
         *bs1_last = Limb::from(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));
-        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(ys_0, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
             v_neg_1_neg.not_assign();
         } else {
@@ -1184,7 +1184,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
         }
     } else {
         *bs1_last = Limb::from(limbs_add_to_out(bs1_init, ys_0, ys_1));
-        if slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+        if slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less
         {
             limbs_sub_same_length_to_out(bsm1, ys_1, &ys_0[..t]);
             slice_set_zero(&mut bsm1[t..]);
@@ -1252,11 +1252,11 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
 pub_test! {
     limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 16 && ys_len == 13)
-        && xs_len.div_round(3, RoundingMode::Ceiling).0
-            > ys_len.div_round(3, RoundingMode::Ceiling).0
+        && xs_len.div_round(3, Ceiling).0
+            > ys_len.div_round(3, Ceiling).0
         && {
-            let xs_len_div_4: usize = xs_len.shr_round(2, RoundingMode::Ceiling).0;
-            xs_len_div_4 < ys_len.shr_round(1, RoundingMode::Ceiling).0
+            let xs_len_div_4: usize = xs_len.shr_round(2, Ceiling).0;
+            xs_len_div_4 < ys_len.shr_round(1, Ceiling).0
                 && xs_len + ys_len >= 5 * (xs_len_div_4 + 1)
         }
 }}
@@ -1384,7 +1384,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_43(
     }
     small_scratch[n] = carry;
     limbs_add_same_length_to_out(bs2, small_scratch, bsm1);
-    if limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less {
+    if limbs_cmp_same_length(small_scratch, bsm1) == Less {
         limbs_sub_same_length_to_out(bsm2, bsm1, small_scratch);
         v_neg_2_neg.not_assign();
     } else {
@@ -1402,7 +1402,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_43(
     if limbs_add_same_length_to_out(bs1_init, bsm1_init, ys_1) {
         *bs1_last += 1;
     }
-    if *bsm1_last == 0 && limbs_cmp_same_length(bsm1_init, ys_1) == Ordering::Less {
+    if *bsm1_last == 0 && limbs_cmp_same_length(bsm1_init, ys_1) == Less {
         limbs_sub_same_length_in_place_right(ys_1, bsm1_init);
         v_neg_1_neg.not_assign();
     } else if limbs_sub_same_length_in_place_left(bsm1_init, ys_1) {
@@ -1457,7 +1457,7 @@ pub_test! {limbs_mul_greater_to_out_toom_44_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
-    xs_len >= ys_len && 3usize * xs_len.shr_round(2, RoundingMode::Ceiling).0 < ys_len
+    xs_len >= ys_len && 3usize * xs_len.shr_round(2, Ceiling).0 < ys_len
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -1471,7 +1471,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
-    let n = xs_len.shr_round(2, RoundingMode::Ceiling).0;
+    let n = xs_len.shr_round(2, Ceiling).0;
     let s = xs_len - 3 * n;
     let t = ys_len - 3 * n;
     assert!(n + 1 < xs_len);
@@ -1568,7 +1568,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let n = xs_len.shr_round(2, RoundingMode::Ceiling).0;
+    let n = xs_len.shr_round(2, Ceiling).0;
     let m = 2 * n + 1;
     split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
     let s = xs_3.len();
@@ -1691,9 +1691,9 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44(
 pub_test! {
     limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     xs_len + 4 < 5 * ys_len
-        && xs_len.shr_round(2, RoundingMode::Ceiling).0
-            > ys_len.shr_round(1, RoundingMode::Ceiling).0
-        && xs_len + ys_len >= 5 * (xs_len.div_round(5, RoundingMode::Ceiling).0 + 1)
+        && xs_len.shr_round(2, Ceiling).0
+            > ys_len.shr_round(1, Ceiling).0
+        && xs_len + ys_len >= 5 * (xs_len.div_round(5, Ceiling).0 + 1)
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -1817,7 +1817,7 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
         if limbs_add_same_length_to_out(bs1_init, ys_0, ys_1) {
             *bs1_last = 1;
         }
-        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(ys_0, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
             v_neg_1_neg = true;
         } else {
@@ -1828,7 +1828,7 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
             *bs1_last = 1;
         }
         let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
-        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Less {
             let (bsm1_lo, bsm1_hi) = bsm1.split_at_mut(t);
             limbs_sub_same_length_to_out(bsm1_lo, ys_1, ys_0_lo);
             slice_set_zero(bsm1_hi);
@@ -1847,7 +1847,7 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
         }
         v_neg_2_neg.not_assign();
     } else if t == n {
-        if limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(bsm1, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm2_init, ys_1, bsm1);
             v_neg_2_neg.not_assign();
         } else {
@@ -1855,7 +1855,7 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
         }
     } else {
         let (bsm1_lo, bsm1_hi) = bsm1.split_at(t);
-        if slice_test_zero(bsm1_hi) && limbs_cmp_same_length(bsm1_lo, ys_1) == Ordering::Less {
+        if slice_test_zero(bsm1_hi) && limbs_cmp_same_length(bsm1_lo, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm2_init, ys_1, bsm1_lo);
             slice_set_zero(&mut bsm2_init[t..]);
             v_neg_2_neg.not_assign();
@@ -1912,10 +1912,10 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
 pub_test! {
     limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 16 && ys_len == 9)
-        && xs_len.shr_round(2, RoundingMode::Ceiling).0
-            > ys_len.div_round(3, RoundingMode::Ceiling).0
-        && xs_len.div_round(5, RoundingMode::Ceiling).0
-            < ys_len.shr_round(1, RoundingMode::Ceiling).0
+        && xs_len.shr_round(2, Ceiling).0
+            > ys_len.div_round(3, Ceiling).0
+        && xs_len.div_round(5, Ceiling).0
+            < ys_len.shr_round(1, Ceiling).0
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -2057,7 +2057,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
     // ys_0 + ys_2
     *bs1_last = Limb::from(limbs_add_to_out(bs1_init, ys_0, ys_2));
     let (bsm1_last, bsm1_init) = bsm1.split_last_mut().unwrap();
-    if *bs1_last == 0 && limbs_cmp_same_length(bs1_init, ys_1) == Ordering::Less {
+    if *bs1_last == 0 && limbs_cmp_same_length(bs1_init, ys_1) == Less {
         limbs_sub_same_length_to_out(bsm1_init, ys_1, bs1_init);
         *bsm1_last = 0;
         v_neg_1_neg.not_assign();
@@ -2078,7 +2078,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
     *bs2_last = Limb::from(limbs_add_to_out(bs2_init, ys_0, &out_lo_init[..t]));
     assert!(!limbs_slice_add_limb_in_place(&mut bs2[t..], carry));
     *out_lo_last = limbs_shl_to_out(out_lo_init, ys_1, 1);
-    if limbs_cmp_same_length(bs2, out_lo) == Ordering::Less {
+    if limbs_cmp_same_length(bs2, out_lo) == Less {
         assert!(!limbs_sub_same_length_to_out(bsm2, out_lo, bs2));
         v_neg_2_neg.not_assign();
     } else {
@@ -2534,7 +2534,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     let v_neg_1_neg_b = if t == n {
         *bs1_last = Limb::from(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));
-        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(ys_0, ys_1) == Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
             true
         } else {
@@ -2544,7 +2544,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
     } else {
         *bs1_last = Limb::from(limbs_add_to_out(bs1_init, ys_0, ys_1));
         let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
-        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Less {
             let (bsm1_lo, bsm1_hi) = bsm1.split_at_mut(t);
             limbs_sub_same_length_to_out(bsm1_lo, ys_1, ys_0_lo);
             slice_set_zero(bsm1_hi);
@@ -2561,7 +2561,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
         true
     } else if t < n {
         let (bsm1_lo, bsm1_hi) = bsm1.split_at(t);
-        if slice_test_zero(bsm1_hi) && limbs_cmp_same_length(bsm1_lo, ys_1) == Ordering::Less {
+        if slice_test_zero(bsm1_hi) && limbs_cmp_same_length(bsm1_lo, ys_1) == Less {
             let (bsm2_lo, bsm2_hi) = bsm2.split_at_mut(t);
             assert!(!limbs_sub_same_length_to_out(bsm2_lo, ys_1, bsm1_lo));
             slice_set_zero(bsm2_hi);
@@ -2573,7 +2573,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
         }
     } else {
         bsm2[n] = 0;
-        if limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less {
+        if limbs_cmp_same_length(bsm1, ys_1) == Less {
             assert!(!limbs_sub_same_length_to_out(bsm2, ys_1, bsm1));
             true
         } else {
@@ -2873,7 +2873,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
         *v3_last += 1;
     }
     let (v1_last, v1_init) = v1.split_last_mut().unwrap();
-    if !carry && limbs_cmp_same_length(scratch2_lo, ys_1) == Ordering::Less {
+    if !carry && limbs_cmp_same_length(scratch2_lo, ys_1) == Less {
         limbs_sub_same_length_to_out(v1_init, ys_1, scratch2_lo);
         *v1_last = 0;
         v_neg_2_neg.not_assign();

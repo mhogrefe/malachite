@@ -28,17 +28,18 @@ impl DivisibleBy<Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.divisible_by(Integer::ZERO), true);
     /// assert_eq!(Integer::from(-100).divisible_by(Integer::from(-3)), false);
     /// assert_eq!(Integer::from(102).divisible_by(Integer::from(-3)), true);
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000000000000000").unwrap()
-    ///             .divisible_by(Integer::from_str("1000000000000").unwrap()),
+    ///     Integer::from_str("-1000000000000000000000000")
+    ///         .unwrap()
+    ///         .divisible_by(Integer::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```
@@ -67,17 +68,18 @@ impl<'a> DivisibleBy<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.divisible_by(&Integer::ZERO), true);
     /// assert_eq!(Integer::from(-100).divisible_by(&Integer::from(-3)), false);
     /// assert_eq!(Integer::from(102).divisible_by(&Integer::from(-3)), true);
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000000000000000").unwrap()
-    ///             .divisible_by(&Integer::from_str("1000000000000").unwrap()),
+    ///     Integer::from_str("-1000000000000000000000000")
+    ///         .unwrap()
+    ///         .divisible_by(&Integer::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```
@@ -106,17 +108,20 @@ impl<'a> DivisibleBy<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Integer::ZERO).divisible_by(Integer::ZERO), true);
-    /// assert_eq!((&Integer::from(-100)).divisible_by(Integer::from(-3)), false);
+    /// assert_eq!(
+    ///     (&Integer::from(-100)).divisible_by(Integer::from(-3)),
+    ///     false
+    /// );
     /// assert_eq!((&Integer::from(102)).divisible_by(Integer::from(-3)), true);
     /// assert_eq!(
     ///     (&Integer::from_str("-1000000000000000000000000").unwrap())
-    ///             .divisible_by(Integer::from_str("1000000000000").unwrap()),
+    ///         .divisible_by(Integer::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```
@@ -144,17 +149,20 @@ impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Integer::ZERO).divisible_by(&Integer::ZERO), true);
-    /// assert_eq!((&Integer::from(-100)).divisible_by(&Integer::from(-3)), false);
+    /// assert_eq!(
+    ///     (&Integer::from(-100)).divisible_by(&Integer::from(-3)),
+    ///     false
+    /// );
     /// assert_eq!((&Integer::from(102)).divisible_by(&Integer::from(-3)), true);
     /// assert_eq!(
     ///     (&Integer::from_str("-1000000000000000000000000").unwrap())
-    ///             .divisible_by(&Integer::from_str("1000000000000").unwrap()),
+    ///         .divisible_by(&Integer::from_str("1000000000000").unwrap()),
     ///     true
     /// );
     /// ```

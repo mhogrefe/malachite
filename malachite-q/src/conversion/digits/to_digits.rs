@@ -81,7 +81,7 @@ impl Rational {
     /// assert_eq!(after_point.to_string(), "[]");
     ///
     /// let (before_point, after_point) =
-    ///         Rational::from_signeds(22, 7).into_digits(&Natural::from(10u32));
+    ///     Rational::from_signeds(22, 7).into_digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```
@@ -127,7 +127,7 @@ impl Rational {
     /// assert_eq!(after_point.to_string(), "[]");
     ///
     /// let (before_point, after_point) =
-    ///         Rational::from_signeds(22, 7).to_digits(&Natural::from(10u32));
+    ///     Rational::from_signeds(22, 7).to_digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```

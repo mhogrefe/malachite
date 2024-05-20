@@ -29,7 +29,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
@@ -333,7 +333,7 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
         product.pop();
     }
     assert_ne!(*product.last().unwrap(), 0);
-    if limbs_cmp(xs, &product) == Ordering::Less {
+    if limbs_cmp(xs, &product) == Less {
         if xs_len < product_len {
             xs.resize(product.len(), 0);
         }
@@ -370,10 +370,13 @@ impl SubMul<Integer, Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), Integer::from(-4)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).sub_mul(Integer::from(3u32), Integer::from(-4)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .sub_mul(Integer::from(-0x10000), -Integer::from(10u32).pow(12)),
+    ///         .sub_mul(Integer::from(-0x10000), -Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -405,10 +408,13 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), &Integer::from(-4)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).sub_mul(Integer::from(3u32), &Integer::from(-4)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .sub_mul(Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
+    ///         .sub_mul(Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -440,10 +446,13 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), Integer::from(-4)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).sub_mul(&Integer::from(3u32), Integer::from(-4)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .sub_mul(&Integer::from(-0x10000), -Integer::from(10u32).pow(12)),
+    ///         .sub_mul(&Integer::from(-0x10000), -Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -475,10 +484,13 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), &Integer::from(-4)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).sub_mul(&Integer::from(3u32), &Integer::from(-4)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .sub_mul(&Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
+    ///         .sub_mul(&Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -510,10 +522,13 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(10u32)).sub_mul(&Integer::from(3u32), &Integer::from(-4)), 22);
+    /// assert_eq!(
+    ///     (&Integer::from(10u32)).sub_mul(&Integer::from(3u32), &Integer::from(-4)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (&-Integer::from(10u32).pow(12))
-    ///             .sub_mul(&Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
+    ///         .sub_mul(&Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```

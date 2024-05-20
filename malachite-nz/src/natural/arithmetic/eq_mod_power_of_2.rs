@@ -14,7 +14,7 @@ use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_powe
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -93,9 +93,9 @@ fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
 #[doc(hidden)]
 pub fn limbs_eq_mod_power_of_2(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     match xs.len().cmp(&ys.len()) {
-        Ordering::Equal => limbs_eq_mod_power_of_2_same_length(xs, ys, pow),
-        Ordering::Less => limbs_eq_mod_power_of_2_greater(ys, xs, pow),
-        Ordering::Greater => limbs_eq_mod_power_of_2_greater(xs, ys, pow),
+        Equal => limbs_eq_mod_power_of_2_same_length(xs, ys, pow),
+        Less => limbs_eq_mod_power_of_2_greater(ys, xs, pow),
+        Greater => limbs_eq_mod_power_of_2_greater(xs, ys, pow),
     }
 }
 
@@ -130,7 +130,10 @@ impl<'a, 'b> EqModPowerOf2<&'b Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).eq_mod_power_of_2(&Natural::from(256u32), 8), true);
+    /// assert_eq!(
+    ///     (&Natural::ZERO).eq_mod_power_of_2(&Natural::from(256u32), 8),
+    ///     true
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(0b1101u32)).eq_mod_power_of_2(&Natural::from(0b10101u32), 3),
     ///     true

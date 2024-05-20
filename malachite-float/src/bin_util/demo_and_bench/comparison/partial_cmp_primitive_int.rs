@@ -21,7 +21,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_partial_cmp_unsigned);
@@ -61,9 +61,9 @@ fn demo_float_partial_cmp_unsigned<T: PrimitiveUnsigned>(
     for (x, y) in float_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         match x.partial_cmp(&y) {
             None => println!("{x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {y}"),
-            Some(Ordering::Equal) => println!("{x} = {y}"),
-            Some(Ordering::Greater) => println!("{x} > {y}"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
         }
     }
 }
@@ -79,9 +79,9 @@ fn demo_float_partial_cmp_unsigned_debug<T: PrimitiveUnsigned>(
         let cx = ComparableFloatRef(&x);
         match x.partial_cmp(&y) {
             None => println!("{cx:#x} and {y:#x} are incomparable"),
-            Some(Ordering::Less) => println!("{cx:#x} < {y:#x}"),
-            Some(Ordering::Equal) => println!("{cx:#x} = {y:#x}"),
-            Some(Ordering::Greater) => println!("{cx:#x} > {y:#x}"),
+            Some(Less) => println!("{cx:#x} < {y:#x}"),
+            Some(Equal) => println!("{cx:#x} = {y:#x}"),
+            Some(Greater) => println!("{cx:#x} > {y:#x}"),
         }
     }
 }
@@ -94,9 +94,9 @@ fn demo_unsigned_partial_cmp_float<T: PartialOrd<Float> + PrimitiveUnsigned>(
     for (y, x) in float_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         match x.partial_cmp(&y) {
             None => println!("{x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {y}"),
-            Some(Ordering::Equal) => println!("{x} = {y}"),
-            Some(Ordering::Greater) => println!("{x} > {y}"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
         }
     }
 }
@@ -110,9 +110,9 @@ fn demo_unsigned_partial_cmp_float_debug<T: PartialOrd<Float> + PrimitiveUnsigne
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp(&y) {
             None => println!("{x:x} and {cy:#x} are incomparable"),
-            Some(Ordering::Less) => println!("{x:#x} < {cy:#x}"),
-            Some(Ordering::Equal) => println!("{x:#x} = {cy:#x}"),
-            Some(Ordering::Greater) => println!("{x:#x} > {cy:#x}"),
+            Some(Less) => println!("{x:#x} < {cy:#x}"),
+            Some(Equal) => println!("{x:#x} = {cy:#x}"),
+            Some(Greater) => println!("{x:#x} > {cy:#x}"),
         }
     }
 }
@@ -124,9 +124,9 @@ where
     for (x, y) in float_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match x.partial_cmp(&y) {
             None => println!("{x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {y}"),
-            Some(Ordering::Equal) => println!("{x} = {y}"),
-            Some(Ordering::Greater) => println!("{x} > {y}"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
         }
     }
 }
@@ -142,9 +142,9 @@ fn demo_float_partial_cmp_signed_debug<T: PrimitiveSigned>(
         let cx = ComparableFloatRef(&x);
         match x.partial_cmp(&y) {
             None => println!("{cx:#x} and {y:#x} are incomparable"),
-            Some(Ordering::Less) => println!("{cx:#x} < {y:#x}"),
-            Some(Ordering::Equal) => println!("{cx:#x} = {y:#x}"),
-            Some(Ordering::Greater) => println!("{cx:#x} > {y:#x}"),
+            Some(Less) => println!("{cx:#x} < {y:#x}"),
+            Some(Equal) => println!("{cx:#x} = {y:#x}"),
+            Some(Greater) => println!("{cx:#x} > {y:#x}"),
         }
     }
 }
@@ -157,9 +157,9 @@ fn demo_signed_partial_cmp_float<T: PartialOrd<Float> + PrimitiveSigned>(
     for (y, x) in float_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match x.partial_cmp(&y) {
             None => println!("{x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {y}"),
-            Some(Ordering::Equal) => println!("{x} = {y}"),
-            Some(Ordering::Greater) => println!("{x} > {y}"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
         }
     }
 }
@@ -173,9 +173,9 @@ fn demo_signed_partial_cmp_float_debug<T: PartialOrd<Float> + PrimitiveSigned>(
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp(&y) {
             None => println!("{x:x} and {cy:#x} are incomparable"),
-            Some(Ordering::Less) => println!("{x:#x} < {cy:#x}"),
-            Some(Ordering::Equal) => println!("{x:#x} = {cy:#x}"),
-            Some(Ordering::Greater) => println!("{x:#x} > {cy:#x}"),
+            Some(Less) => println!("{x:#x} < {cy:#x}"),
+            Some(Equal) => println!("{x:#x} = {cy:#x}"),
+            Some(Greater) => println!("{x:#x} > {cy:#x}"),
         }
     }
 }

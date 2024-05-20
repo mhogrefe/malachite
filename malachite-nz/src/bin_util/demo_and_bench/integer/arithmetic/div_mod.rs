@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     DivRound, Mod,
 };
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -258,7 +258,7 @@ fn benchmark_integer_div_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.div_mod(y))),
             ("using div_round and mod_op", &mut |(x, y)| {
-                no_out!(((&x).div_round(&y, RoundingMode::Floor), x.mod_op(y)))
+                no_out!(((&x).div_round(&y, Floor), x.mod_op(y)))
             }),
         ],
     );
@@ -461,7 +461,7 @@ fn benchmark_integer_ceiling_div_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.ceiling_div_mod(y))),
             ("using div_round and ceiling_mod", &mut |(x, y)| {
-                ((&x).div_round(&y, RoundingMode::Ceiling), x.ceiling_mod(y));
+                ((&x).div_round(&y, Ceiling), x.ceiling_mod(y));
             }),
         ],
     );

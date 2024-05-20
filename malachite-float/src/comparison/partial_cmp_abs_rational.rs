@@ -8,7 +8,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -45,12 +45,8 @@ impl PartialOrdAbs<Rational> for Float {
     fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) => None,
-            (float_either_infinity!(), _) => Some(Ordering::Greater),
-            (float_either_zero!(), y) => Some(if *y == 0 {
-                Ordering::Equal
-            } else {
-                Ordering::Less
-            }),
+            (float_either_infinity!(), _) => Some(Greater),
+            (float_either_zero!(), y) => Some(if *y == 0 { Equal } else { Less }),
             (
                 Float(Finite {
                     exponent: e_x,
@@ -59,22 +55,21 @@ impl PartialOrdAbs<Rational> for Float {
                 }),
                 y,
             ) => Some(if *y == 0u32 {
-                Ordering::Greater
+                Greater
             } else {
                 let ord_cmp = (e_x - 1).cmp(&y.floor_log_base_2_abs());
-                if ord_cmp != Ordering::Equal {
+                if ord_cmp != Equal {
                     ord_cmp
                 } else {
                     let shift = e_x - i64::exact_from(significand_bits(significand_x));
                     let abs_shift = shift.unsigned_abs();
                     match shift.sign() {
-                        Ordering::Equal => {
+                        Equal => {
                             (significand_x * other.denominator_ref()).cmp(other.numerator_ref())
                         }
-                        Ordering::Greater => ((significand_x * other.denominator_ref())
-                            << abs_shift)
+                        Greater => ((significand_x * other.denominator_ref()) << abs_shift)
                             .cmp(other.numerator_ref()),
-                        Ordering::Less => {
+                        Less => {
                             let n_trailing_zeros = significand_x.trailing_zeros().unwrap();
                             if abs_shift <= n_trailing_zeros {
                                 ((significand_x >> abs_shift) * other.denominator_ref())

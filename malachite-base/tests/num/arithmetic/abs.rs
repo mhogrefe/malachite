@@ -12,7 +12,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::{primitive_float_gen, signed_gen_var_1};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 fn abs_signed_helper<T: PrimitiveSigned>() {
     let test = |n: T, out| {
@@ -74,7 +74,7 @@ fn abs_assign_properties_primitive_float_helper<T: PrimitiveFloat>() {
         abs.abs_assign();
         assert_eq!(NiceFloat(abs), NiceFloat(f.abs()));
         assert_eq!(NiceFloat(abs.abs()), NiceFloat(abs));
-        assert_eq!(NiceFloat(abs) == NiceFloat(f), f.sign() != Ordering::Less);
+        assert_eq!(NiceFloat(abs) == NiceFloat(f), f.sign() != Less);
     });
 }
 

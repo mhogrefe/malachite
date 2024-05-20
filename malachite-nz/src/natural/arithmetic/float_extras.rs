@@ -20,7 +20,7 @@ use malachite_base::num::arithmetic::traits::WrappingSubAssign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // This is MPFR_CAN_ROUND from mpfr-impl.h, MPFR 4.2.0.
 pub fn float_can_round(x: &Natural, err0: u64, mut prec: u64, rm: RoundingMode) -> bool {
@@ -32,7 +32,7 @@ pub fn float_can_round(x: &Natural, err0: u64, mut prec: u64, rm: RoundingMode) 
         }
         Natural(Large(xs)) => xs,
     };
-    if rm == RoundingMode::Nearest {
+    if rm == Nearest {
         prec += 1;
     }
     let len = xs.len();

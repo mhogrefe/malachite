@@ -40,11 +40,30 @@ impl CheckedSqrt for Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(99u8).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Rational::from(100u8).checked_sqrt().to_debug_string(), "Some(10)");
-    /// assert_eq!(Rational::from(101u8).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Rational::from_signeds(22, 7).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Rational::from_signeds(25, 9).checked_sqrt().to_debug_string(), "Some(5/3)");
+    /// assert_eq!(
+    ///     Rational::from(99u8).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(100u8).checked_sqrt().to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(101u8).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7)
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(25, 9)
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "Some(5/3)"
+    /// );
     /// ```
     fn checked_sqrt(self) -> Option<Rational> {
         let sign = self >= 0;
@@ -95,11 +114,30 @@ impl<'a> CheckedSqrt for &'a Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::from(99u8)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Rational::from(100u8)).checked_sqrt().to_debug_string(), "Some(10)");
-    /// assert_eq!((&Rational::from(101u8)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Rational::from_signeds(22, 7)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Rational::from_signeds(25, 9)).checked_sqrt().to_debug_string(), "Some(5/3)");
+    /// assert_eq!(
+    ///     (&Rational::from(99u8)).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from(100u8)).checked_sqrt().to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from(101u8)).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7))
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(25, 9))
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "Some(5/3)"
+    /// );
     /// ```
     fn checked_sqrt(self) -> Option<Rational> {
         let (n, d) = self.numerator_and_denominator_ref();

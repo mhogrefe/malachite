@@ -25,7 +25,7 @@ use crate::num::conversion::traits::{
 };
 use crate::num::float::FmtRyuString;
 use crate::num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::fmt::{Debug, Display, LowerExp, UpperExp};
 use core::iter::{Product, Sum};
 use core::num::FpCategory;
@@ -295,7 +295,7 @@ pub trait PrimitiveFloat:
     /// ```
     #[inline]
     fn is_negative_zero(self) -> bool {
-        self.sign() == Ordering::Less && self == Self::ZERO
+        self.sign() == Less && self == Self::ZERO
     }
 
     /// If `self` is negative zero, returns positive zero; otherwise, returns `self`.
@@ -383,7 +383,7 @@ pub trait PrimitiveFloat:
     /// ```
     fn next_higher(self) -> Self {
         assert!(!self.is_nan());
-        if self.sign() == Ordering::Greater {
+        if self.sign() == Greater {
             assert_ne!(self, Self::INFINITY);
             Self::from_bits(self.to_bits() + 1)
         } else if self == Self::ZERO {
@@ -416,7 +416,7 @@ pub trait PrimitiveFloat:
     /// ```
     fn next_lower(self) -> Self {
         assert!(!self.is_nan());
-        if self.sign() == Ordering::Less {
+        if self.sign() == Less {
             assert_ne!(self, Self::NEGATIVE_INFINITY);
             Self::from_bits(self.to_bits() + 1)
         } else if self == Self::ZERO {
@@ -452,15 +452,12 @@ pub trait PrimitiveFloat:
     /// assert_eq!((-0.0f32).to_ordered_representation(), 2139095040);
     /// assert_eq!(0.0f32.to_ordered_representation(), 2139095041);
     /// assert_eq!(1.0f32.to_ordered_representation(), 3204448257);
-    /// assert_eq!(
-    ///     f32::INFINITY.to_ordered_representation(),
-    ///     4278190081
-    /// );
+    /// assert_eq!(f32::INFINITY.to_ordered_representation(), 4278190081);
     /// ```
     fn to_ordered_representation(self) -> u64 {
         assert!(!self.is_nan());
         let bits = self.to_bits();
-        if self.sign() == Ordering::Greater {
+        if self.sign() == Greater {
             (u64::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH) + bits + 1
         } else {
             (u64::low_mask(Self::EXPONENT_WIDTH + 1) << Self::MANTISSA_WIDTH) - bits
@@ -495,10 +492,7 @@ pub trait PrimitiveFloat:
     /// assert_eq!(f32::from_ordered_representation(2139095040), -0.0f32);
     /// assert_eq!(f32::from_ordered_representation(2139095041), 0.0f32);
     /// assert_eq!(f32::from_ordered_representation(3204448257), 1.0f32);
-    /// assert_eq!(
-    ///     f32::from_ordered_representation(4278190081),
-    ///     f32::INFINITY
-    /// );
+    /// assert_eq!(f32::from_ordered_representation(4278190081), f32::INFINITY);
     /// ```
     fn from_ordered_representation(n: u64) -> Self {
         let zero_exp = u64::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH;
@@ -506,7 +500,7 @@ pub trait PrimitiveFloat:
             Self::from_bits((u64::low_mask(Self::EXPONENT_WIDTH + 1) << Self::MANTISSA_WIDTH) - n)
         } else {
             let f = Self::from_bits(n - zero_exp - 1);
-            assert_eq!(f.sign(), Ordering::Greater);
+            assert_eq!(f.sign(), Greater);
             f
         };
         assert!(!f.is_nan());

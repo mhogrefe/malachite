@@ -16,7 +16,7 @@ use malachite_base::options::exhaustive::exhaustive_somes;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::unions::exhaustive::exhaustive_union2s;
 use malachite_base::unions::Union2;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::fmt::Debug;
 use std::iter::once;
 
@@ -114,11 +114,11 @@ fn test_exhaustive_union2s() {
         6,
         &[
             Union2::A('a'),
-            Union2::B(Ordering::Equal),
+            Union2::B(Equal),
             Union2::A('b'),
-            Union2::B(Ordering::Less),
+            Union2::B(Less),
             Union2::A('c'),
-            Union2::B(Ordering::Greater),
+            Union2::B(Greater),
         ],
     );
 }

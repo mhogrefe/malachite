@@ -37,7 +37,7 @@ use malachite_base::num::random::{
 };
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::random::random_rounding_modes;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::{GenConfig, It};
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
@@ -52,7 +52,7 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::natural::Natural;
 use num::BigRational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::ops::Shr;
 
 // -- Rational --
@@ -709,8 +709,7 @@ pub fn random_rational_signed_rounding_mode_triple_gen_var_1(
             &random_rounding_modes,
         )
         .filter(|(x, i, rm)| {
-            *rm != RoundingMode::Exact
-                || x.denominator_ref().is_power_of_2() && (x >> *i).is_integer()
+            *rm != Exact || x.denominator_ref().is_power_of_2() && (x >> *i).is_integer()
         }),
     )
 }
@@ -995,9 +994,9 @@ pub fn random_rational_pair_gen_var_5(config: &GenConfig) -> It<(Rational, Ratio
             .map(Natural::from),
         })
         .filter_map(|(x, y)| match x.cmp(&y) {
-            Ordering::Equal => None,
-            Ordering::Less => Some((x, y)),
-            Ordering::Greater => Some((y, x)),
+            Equal => None,
+            Less => Some((x, y)),
+            Greater => Some((y, x)),
         }),
     )
 }
@@ -1352,8 +1351,8 @@ pub fn random_rational_rounding_mode_pair_gen_var_1(
             &random_rounding_modes,
         )
         .filter(|(x, rm)| match rm {
-            RoundingMode::Floor | RoundingMode::Up => *x >= 0u32,
-            RoundingMode::Exact => Natural::convertible_from(x),
+            Floor | Up => *x >= 0u32,
+            Exact => Natural::convertible_from(x),
             _ => true,
         }),
     )
@@ -1374,7 +1373,7 @@ pub fn random_rational_rounding_mode_pair_gen_var_2(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, rm)| *rm != RoundingMode::Exact || x.is_integer()),
+        .filter(|(x, rm)| *rm != Exact || x.is_integer()),
     )
 }
 
@@ -1399,10 +1398,10 @@ where
             &random_rounding_modes,
         )
         .filter(|(x, rm)| match rm {
-            RoundingMode::Floor => *x >= T::MIN,
-            RoundingMode::Ceiling => *x <= T::MAX,
-            RoundingMode::Up => *x >= T::MIN && *x <= T::MAX,
-            RoundingMode::Exact => T::convertible_from(x),
+            Floor => *x >= T::MIN,
+            Ceiling => *x <= T::MAX,
+            Up => *x >= T::MIN && *x <= T::MAX,
+            Exact => T::convertible_from(x),
             _ => true,
         }),
     )
@@ -1447,10 +1446,10 @@ where
             &random_rounding_modes,
         )
         .filter(move |(x, rm)| match rm {
-            RoundingMode::Floor => *x >= min,
-            RoundingMode::Ceiling => *x <= max,
-            RoundingMode::Up => *x >= min && *x <= max,
-            RoundingMode::Exact => T::convertible_from(x),
+            Floor => *x >= min,
+            Ceiling => *x <= max,
+            Up => *x >= min && *x <= max,
+            Exact => T::convertible_from(x),
             _ => true,
         }),
     )

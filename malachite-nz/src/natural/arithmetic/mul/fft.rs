@@ -29,7 +29,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::platform::{Limb, SignedLimb, FFT_TAB, MULMOD_TAB};
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering};
+use core::cmp::{max, min, Ordering::*};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -386,7 +386,7 @@ fn limbs_butterfly_lsh_b(
             limbs_fft_addmod_2expp1_1(us, ys_last.wrapping_sub(*xs_last));
         }
         (x, y) => match x.cmp(&y) {
-            Ordering::Greater => {
+            Greater => {
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let (ys_last, ys_init) = ys.split_last().unwrap();
                 let (us_last, us_init) = us.split_last_mut().unwrap();
@@ -433,7 +433,7 @@ fn limbs_butterfly_lsh_b(
                         .wrapping_sub(*xs_last),
                 );
             }
-            Ordering::Less => {
+            Less => {
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let (ys_last, ys_init) = ys.split_last().unwrap();
                 let (us_last, us_init) = us.split_last_mut().unwrap();
@@ -471,7 +471,7 @@ fn limbs_butterfly_lsh_b(
                 }
                 limbs_fft_addmod_2expp1_1(ts_hi, carry_1);
             }
-            Ordering::Equal => {
+            Equal => {
                 fail_on_untested_path("limbs_butterfly_lsh_b, x != 0 && x == y");
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let (ys_last, ys_init) = ys.split_last().unwrap();
@@ -563,7 +563,7 @@ fn limbs_butterfly_rsh_b(
             limbs_fft_addmod_2expp1_1(us_hi, carry_2.wrapping_add(*xs_last));
         }
         (x, y) => match x.cmp(&y) {
-            Ordering::Greater => {
+            Greater => {
                 let (xs_last, xs_init) = xs.split_last_mut().unwrap();
                 let (ys_last, ys_init) = ys.split_last_mut().unwrap();
                 let s = n - x;
@@ -601,7 +601,7 @@ fn limbs_butterfly_rsh_b(
                     (if carry.even() { 0 } else { Limb::MAX }).wrapping_add(*xs_last),
                 );
             }
-            Ordering::Less => {
+            Less => {
                 let (xs_last, xs_init) = xs.split_last_mut().unwrap();
                 let (ys_last, ys_init) = ys.split_last_mut().unwrap();
                 let (ts_last, ts_init) = ts.split_last_mut().unwrap();
@@ -640,7 +640,7 @@ fn limbs_butterfly_rsh_b(
                     (if carry.even() { 0 } else { Limb::MAX }).wrapping_sub(*ys_last),
                 );
             }
-            Ordering::Equal => {
+            Equal => {
                 fail_on_untested_path("limbs_butterfly_lsh_b, x != 0 && x == y");
                 let (xs_last, xs_init) = xs.split_last_mut().unwrap();
                 let (ys_last, ys_init) = ys.split_last_mut().unwrap();

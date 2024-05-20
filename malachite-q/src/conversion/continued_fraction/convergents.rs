@@ -86,11 +86,17 @@ impl Convergents for Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(2, 3).convergents().collect_vec().to_debug_string(),
+    ///     Rational::from_signeds(2, 3)
+    ///         .convergents()
+    ///         .collect_vec()
+    ///         .to_debug_string(),
     ///     "[0, 1, 2/3]"
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(355, 113).convergents().collect_vec().to_debug_string(),
+    ///     Rational::from_signeds(355, 113)
+    ///         .convergents()
+    ///         .collect_vec()
+    ///         .to_debug_string(),
     ///     "[3, 22/7, 355/113]",
     /// );
     /// ```
@@ -139,11 +145,17 @@ impl<'a> Convergents for &'a Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from_signeds(2, 3)).convergents().collect_vec().to_debug_string(),
+    ///     (&Rational::from_signeds(2, 3))
+    ///         .convergents()
+    ///         .collect_vec()
+    ///         .to_debug_string(),
     ///     "[0, 1, 2/3]"
     /// );
     /// assert_eq!(
-    ///     (&Rational::from_signeds(355, 113)).convergents().collect_vec().to_debug_string(),
+    ///     (&Rational::from_signeds(355, 113))
+    ///         .convergents()
+    ///         .collect_vec()
+    ///         .to_debug_string(),
     ///     "[3, 22/7, 355/113]",
     /// );
     /// ```

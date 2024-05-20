@@ -8,12 +8,12 @@
 
 use num::bigint::Sign;
 use num::BigInt;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 
 pub fn num_sign(x: &BigInt) -> Ordering {
     match x.sign() {
-        Sign::NoSign => Ordering::Equal,
-        Sign::Plus => Ordering::Greater,
-        Sign::Minus => Ordering::Less,
+        Sign::NoSign => Equal,
+        Sign::Plus => Greater,
+        Sign::Minus => Less,
     }
 }

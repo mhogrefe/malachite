@@ -18,10 +18,8 @@ use crate::unions::Union2;
 /// See usage examples [here](self#lex_union2s) and [here](self#exhaustive_union2s).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
 /// use malachite_base::unions::UnionFromStrError;
+/// use malachite_base::{exhaustive_unions, union_struct};
 /// use std::fmt::{self, Display, Formatter};
 /// use std::str::FromStr;
 ///
@@ -176,7 +174,6 @@ use crate::unions::Union2;
 ///     [6, T, O, G, ts, ts_done],
 ///     [7, S, P, H, ss, ss_done]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! exhaustive_unions {

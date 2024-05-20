@@ -33,7 +33,7 @@ use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2}
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
 
 // TODO tune
@@ -48,14 +48,11 @@ pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     if n < low_threshold {
         n
     } else if n <= (low_threshold - 1) << 2 {
-        n.round_to_multiple_of_power_of_2(1, RoundingMode::Ceiling)
-            .0
+        n.round_to_multiple_of_power_of_2(1, Ceiling).0
     } else if n <= (low_threshold - 1) << 3 {
-        n.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
-            .0
+        n.round_to_multiple_of_power_of_2(2, Ceiling).0
     } else {
-        n.round_to_multiple_of_power_of_2(3, RoundingMode::Ceiling)
-            .0
+        n.round_to_multiple_of_power_of_2(3, Ceiling).0
     }
 }
 

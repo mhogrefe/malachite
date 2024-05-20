@@ -21,7 +21,10 @@ impl<T: Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert_eq!(RationalSequence::<u8>::from_vec(vec![]).to_string(), "[]");
-    /// assert_eq!(RationalSequence::<u8>::from_vec(vec![1, 2]).to_string(), "[1, 2]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vec(vec![1, 2]).to_string(),
+    ///     "[1, 2]"
+    /// );
     /// ```
     pub fn from_vec(non_repeating: Vec<T>) -> RationalSequence<T> {
         RationalSequence {
@@ -45,9 +48,18 @@ impl<T: Eq> RationalSequence<T> {
     /// ```
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![], vec![]).to_string(), "[]");
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![], vec![1, 2]).to_string(), "[[1, 2]]");
-    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![1, 2], vec![]).to_string(), "[1, 2]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![], vec![]).to_string(),
+    ///     "[]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![], vec![1, 2]).to_string(),
+    ///     "[[1, 2]]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![]).to_string(),
+    ///     "[1, 2]"
+    /// );
     /// assert_eq!(
     ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![3, 4]).to_string(),
     ///     "[1, 2, [3, 4]]"
@@ -119,7 +131,10 @@ impl<T: Clone + Eq> RationalSequence<T> {
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
     /// assert_eq!(RationalSequence::<u8>::from_slice(&[]).to_string(), "[]");
-    /// assert_eq!(RationalSequence::<u8>::from_slice(&[1, 2]).to_string(), "[1, 2]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slice(&[1, 2]).to_string(),
+    ///     "[1, 2]"
+    /// );
     /// ```
     pub fn from_slice(non_repeating: &[T]) -> RationalSequence<T> {
         RationalSequence {
@@ -143,9 +158,18 @@ impl<T: Clone + Eq> RationalSequence<T> {
     /// ```
     /// use malachite_base::rational_sequences::RationalSequence;
     ///
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[], &[]).to_string(), "[]");
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[], &[1, 2]).to_string(), "[[1, 2]]");
-    /// assert_eq!(RationalSequence::<u8>::from_slices(&[1, 2], &[]).to_string(), "[1, 2]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[], &[]).to_string(),
+    ///     "[]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[], &[1, 2]).to_string(),
+    ///     "[[1, 2]]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[1, 2], &[]).to_string(),
+    ///     "[1, 2]"
+    /// );
     /// assert_eq!(
     ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).to_string(),
     ///     "[1, 2, [3, 4]]"

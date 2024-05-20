@@ -15,7 +15,7 @@ use malachite_nz::test_util::generators::{
 };
 use num::BigInt;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_ord() {
@@ -46,12 +46,12 @@ fn cmp_properties() {
         assert_eq!(BigInt::from(&x).cmp(&BigInt::from(&y)), ord);
         assert_eq!(rug::Integer::from(&x).cmp(&rug::Integer::from(&y)), ord);
         assert_eq!(y.cmp(&x).reverse(), ord);
-        assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
+        assert_eq!(x == y, x.cmp(&y) == Equal);
         assert_eq!((-y).cmp(&-x), ord);
     });
 
     integer_gen().test_properties(|x| {
-        assert_eq!(x.cmp(&x), Ordering::Equal);
+        assert_eq!(x.cmp(&x), Equal);
     });
 
     integer_triple_gen().test_properties(|(x, y, z)| {

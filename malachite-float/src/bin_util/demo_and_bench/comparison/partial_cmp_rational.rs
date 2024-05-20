@@ -15,7 +15,7 @@ use malachite_float::test_util::bench::bucketers::{
 };
 use malachite_float::test_util::generators::{float_rational_pair_gen, float_rational_pair_gen_rm};
 use malachite_float::ComparableFloatRef;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_partial_cmp_rational);
@@ -38,9 +38,9 @@ fn demo_float_partial_cmp_rational(gm: GenMode, config: &GenConfig, limit: usize
     for (x, y) in float_rational_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp(&y) {
             None => println!("{x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {y}"),
-            Some(Ordering::Equal) => println!("{x} = {y}"),
-            Some(Ordering::Greater) => println!("{x} > {y}"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
         }
     }
 }
@@ -50,9 +50,9 @@ fn demo_float_partial_cmp_rational_debug(gm: GenMode, config: &GenConfig, limit:
         let cx = ComparableFloatRef(&x);
         match x.partial_cmp(&y) {
             None => println!("{cx:#x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{cx:#x} < {y}"),
-            Some(Ordering::Equal) => println!("{cx:#x} = {y}"),
-            Some(Ordering::Greater) => println!("{cx:#x} > {y}"),
+            Some(Less) => println!("{cx:#x} < {y}"),
+            Some(Equal) => println!("{cx:#x} = {y}"),
+            Some(Greater) => println!("{cx:#x} > {y}"),
         }
     }
 }
@@ -61,9 +61,9 @@ fn demo_rational_partial_cmp_float(gm: GenMode, config: &GenConfig, limit: usize
     for (y, x) in float_rational_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp(&y) {
             None => println!("{x} and {y} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {y}"),
-            Some(Ordering::Equal) => println!("{x} = {y}"),
-            Some(Ordering::Greater) => println!("{x} > {y}"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
         }
     }
 }
@@ -73,9 +73,9 @@ fn demo_rational_partial_cmp_float_debug(gm: GenMode, config: &GenConfig, limit:
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp(&y) {
             None => println!("{x} and {cy:#x} are incomparable"),
-            Some(Ordering::Less) => println!("{x} < {cy:#x}"),
-            Some(Ordering::Equal) => println!("{x} = {cy:#x}"),
-            Some(Ordering::Greater) => println!("{x} > {cy:#x}"),
+            Some(Less) => println!("{x} < {cy:#x}"),
+            Some(Equal) => println!("{x} = {cy:#x}"),
+            Some(Greater) => println!("{x} > {cy:#x}"),
         }
     }
 }

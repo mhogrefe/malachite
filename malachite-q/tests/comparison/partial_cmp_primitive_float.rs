@@ -16,7 +16,7 @@ use malachite_q::test_util::generators::{
 };
 use malachite_q::Rational;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 
 #[test]
@@ -37,31 +37,31 @@ fn test_partial_cmp_primitive_float() {
         assert_eq!(v.partial_cmp(&rug::Rational::from_str(u).unwrap()), out_rev);
     };
     test("2/3", f32::NAN, None);
-    test("2/3", f32::INFINITY, Some(Ordering::Less));
-    test("2/3", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
+    test("2/3", f32::INFINITY, Some(Less));
+    test("2/3", f32::NEGATIVE_INFINITY, Some(Greater));
     test("-2/3", f32::NAN, None);
-    test("-2/3", f32::INFINITY, Some(Ordering::Less));
-    test("-2/3", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
+    test("-2/3", f32::INFINITY, Some(Less));
+    test("-2/3", f32::NEGATIVE_INFINITY, Some(Greater));
 
-    test("0", 0.0, Some(Ordering::Equal));
-    test("0", -0.0, Some(Ordering::Equal));
-    test("0", 5.0, Some(Ordering::Less));
-    test("0", -5.0, Some(Ordering::Greater));
-    test("3/2", 1.5, Some(Ordering::Equal));
-    test("3/2", 5.0, Some(Ordering::Less));
-    test("3/2", -5.0, Some(Ordering::Greater));
-    test("-3/2", 5.0, Some(Ordering::Less));
-    test("-3/2", -5.0, Some(Ordering::Greater));
-    test("-3/2", -1.5, Some(Ordering::Equal));
+    test("0", 0.0, Some(Equal));
+    test("0", -0.0, Some(Equal));
+    test("0", 5.0, Some(Less));
+    test("0", -5.0, Some(Greater));
+    test("3/2", 1.5, Some(Equal));
+    test("3/2", 5.0, Some(Less));
+    test("3/2", -5.0, Some(Greater));
+    test("-3/2", 5.0, Some(Less));
+    test("-3/2", -5.0, Some(Greater));
+    test("-3/2", -1.5, Some(Equal));
 
-    test("1/3", 0.333, Some(Ordering::Greater));
-    test("1/3", 0.334, Some(Ordering::Less));
-    test("1/3", -0.333, Some(Ordering::Greater));
-    test("1/3", -0.334, Some(Ordering::Greater));
-    test("-1/3", -0.334, Some(Ordering::Greater));
-    test("-1/3", -0.333, Some(Ordering::Less));
-    test("-1/3", 0.334, Some(Ordering::Less));
-    test("-1/3", 0.333, Some(Ordering::Less));
+    test("1/3", 0.333, Some(Greater));
+    test("1/3", 0.334, Some(Less));
+    test("1/3", -0.333, Some(Greater));
+    test("1/3", -0.334, Some(Greater));
+    test("-1/3", -0.334, Some(Greater));
+    test("-1/3", -0.333, Some(Less));
+    test("-1/3", 0.334, Some(Less));
+    test("-1/3", 0.333, Some(Less));
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
@@ -87,9 +87,9 @@ where
 
     rational_rational_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n < u && u < m {
-            assert_eq!(n.cmp(&m), Ordering::Less);
+            assert_eq!(n.cmp(&m), Less);
         } else if n > u && u > m {
-            assert_eq!(n.cmp(&m), Ordering::Greater);
+            assert_eq!(n.cmp(&m), Greater);
         }
     });
 

@@ -33,7 +33,7 @@ use crate::platform::{
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use itertools::Itertools;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -47,7 +47,7 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOf2Digits, WrappingFrom, WrappingInto,
 };
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 
 // TODO tune
@@ -218,7 +218,7 @@ pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
             base_10_normalization_step!(1, buffer, i, frac);
             base_10_normalization_step!(2, buffer, i, frac);
             base_10_normalization_step!(3, buffer, i, frac);
-            frac.shr_round_assign(4, RoundingMode::Ceiling);
+            frac.shr_round_assign(4, Ceiling);
             for _ in 0..LIMIT {
                 frac *= 10;
                 let digit = frac >> DIGIT_SHIFT;
@@ -335,7 +335,7 @@ pub_test! {limbs_choose_power_table_algorithm(
 ) -> (usize, PowerTableAlgorithm) {
     let digits_per_limb = get_chars_per_limb(base);
     let mut number_of_powers = 0;
-    let mut power: usize = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+    let mut power: usize = xs_len.shr_round(1, Ceiling).0;
     while power != 1 {
         exptab[number_of_powers] = power * digits_per_limb;
         number_of_powers += 1;
@@ -344,7 +344,7 @@ pub_test! {limbs_choose_power_table_algorithm(
     exptab[number_of_powers] = digits_per_limb;
     if HAVE_MPN_COMPUTE_POWTAB_MUL && HAVE_MPN_COMPUTE_POWTAB_DIV {
         let power = xs_len - 1;
-        let n = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+        let n = xs_len.shr_round(1, Ceiling).0;
         let mut mul_cost = 1;
         let mut div_cost = 1;
         for i in (1..number_of_powers).rev() {
@@ -716,14 +716,13 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
         let shift = power.shift;
         let total_len = power_len + shift;
         if xs_len < total_len
-            || xs_len == total_len
-                && limbs_cmp_same_length(&xs[shift..], power.power) == Ordering::Less
+            || xs_len == total_len && limbs_cmp_same_length(&xs[shift..], power.power) == Less
         {
             fail_on_untested_path(
                 "limbs_to_digits_small_base_divide_and_conquer, \
                 xs_len < total_len || \
                 xs_len == total_len && \
-                limbs_cmp_same_length(&xs[shift..], power.power) == Ordering::Less",
+                limbs_cmp_same_length(&xs[shift..], power.power) == Less",
             );
             limbs_to_digits_small_base_divide_and_conquer(
                 out,
@@ -744,8 +743,7 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
             assert!(
                 q_len < total_len
                     || q_len == total_len
-                        && limbs_cmp_same_length(&scratch[shift..total_len], power.power)
-                            == Ordering::Less
+                        && limbs_cmp_same_length(&scratch[shift..total_len], power.power) == Less
             );
             if len != 0 {
                 len -= powers[i].digits_in_base;
@@ -914,7 +912,7 @@ fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<Natural> {
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
         return Vec::new();
     }
-    let limit = (bits + 3).shr_round(1, RoundingMode::Ceiling).0;
+    let limit = (bits + 3).shr_round(1, Ceiling).0;
     let mut powers = Vec::new();
     let mut power = base.clone();
     loop {
@@ -1554,7 +1552,7 @@ fn compute_powers_for_from_digits(base: &Natural, digits: usize) -> Vec<Natural>
     {
         return Vec::new();
     }
-    let limit = digits.shr_round(1u64, RoundingMode::Ceiling).0;
+    let limit = digits.shr_round(1u64, Ceiling).0;
     let mut powers = Vec::new();
     let mut power = base.clone();
     let mut p = 1;
@@ -2266,10 +2264,22 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.to_digits_asc(&Natural::from(6u32)).to_debug_string(), "[]");
-    /// assert_eq!(Natural::TWO.to_digits_asc(&Natural::from(6u32)).to_debug_string(), "[2]");
     /// assert_eq!(
-    ///     Natural::from(123456u32).to_digits_asc(&Natural::from(3u32)).to_debug_string(),
+    ///     Natural::ZERO
+    ///         .to_digits_asc(&Natural::from(6u32))
+    ///         .to_debug_string(),
+    ///     "[]"
+    /// );
+    /// assert_eq!(
+    ///     Natural::TWO
+    ///         .to_digits_asc(&Natural::from(6u32))
+    ///         .to_debug_string(),
+    ///     "[2]"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(123456u32)
+    ///         .to_digits_asc(&Natural::from(3u32))
+    ///         .to_debug_string(),
     ///     "[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]"
     /// );
     /// ```
@@ -2313,10 +2323,22 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.to_digits_desc(&Natural::from(6u32)).to_debug_string(), "[]");
-    /// assert_eq!(Natural::TWO.to_digits_desc(&Natural::from(6u32)).to_debug_string(), "[2]");
     /// assert_eq!(
-    ///     Natural::from(123456u32).to_digits_desc(&Natural::from(3u32)).to_debug_string(),
+    ///     Natural::ZERO
+    ///         .to_digits_desc(&Natural::from(6u32))
+    ///         .to_debug_string(),
+    ///     "[]"
+    /// );
+    /// assert_eq!(
+    ///     Natural::TWO
+    ///         .to_digits_desc(&Natural::from(6u32))
+    ///         .to_debug_string(),
+    ///     "[2]"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(123456u32)
+    ///         .to_digits_desc(&Natural::from(3u32))
+    ///         .to_debug_string(),
     ///     "[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]"
     /// );
     /// ```
@@ -2357,34 +2379,39 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(64u32),
     ///         vec_from_str::<Natural>("[0, 0, 0]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///     )
+    ///     .to_debug_string(),
     ///     "Some(0)"
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(3u32),
-    ///         vec_from_str::<Natural>("[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///         vec_from_str::<Natural>("[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     )
+    ///     .to_debug_string(),
     ///     "Some(123456)"
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(8u32),
     ///         vec_from_str::<Natural>("[3, 7, 1]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///     )
+    ///     .to_debug_string(),
     ///     "Some(123)"
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(8u32),
     ///         vec_from_str::<Natural>("[1, 10, 3]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///     )
+    ///     .to_debug_string(),
     ///     "None"
     /// );
     /// ```
@@ -2422,34 +2449,39 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(64u32),
     ///         vec_from_str::<Natural>("[0, 0, 0]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///     )
+    ///     .to_debug_string(),
     ///     "Some(0)"
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(3u32),
-    ///         vec_from_str::<Natural>("[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///         vec_from_str::<Natural>("[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     )
+    ///     .to_debug_string(),
     ///     "Some(123456)"
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(8u32),
     ///         vec_from_str::<Natural>("[1, 7, 3]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///     )
+    ///     .to_debug_string(),
     ///     "Some(123)"
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(8u32),
     ///         vec_from_str::<Natural>("[3, 10, 1]").unwrap().into_iter()
-    ///     ).to_debug_string(),
+    ///     )
+    ///     .to_debug_string(),
     ///     "None"
     /// );
     /// ```

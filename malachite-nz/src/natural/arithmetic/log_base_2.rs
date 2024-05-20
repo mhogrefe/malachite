@@ -177,14 +177,16 @@ impl<'a> CheckedLogBase2 for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase2;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::from(3u32).checked_log_base_2(), None);
     /// assert_eq!(Natural::from(4u32).checked_log_base_2(), Some(2));
     /// assert_eq!(
-    ///     Natural::from_str("1267650600228229401496703205376").unwrap().checked_log_base_2(),
+    ///     Natural::from_str("1267650600228229401496703205376")
+    ///         .unwrap()
+    ///         .checked_log_base_2(),
     ///     Some(100)
     /// );
     /// ```

@@ -27,9 +27,7 @@ pub enum UnionFromStrError<E> {
 /// as well.
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
+/// use malachite_base::union_struct;
 /// use malachite_base::unions::UnionFromStrError;
 /// use std::fmt::{self, Display, Formatter};
 /// use std::str::FromStr;
@@ -97,7 +95,6 @@ pub enum UnionFromStrError<E> {
 ///     [G, G, 'G', g],
 ///     [H, H, 'H', h]
 /// );
-/// }
 /// ```
 #[macro_export]
 macro_rules! union_struct {
@@ -240,13 +237,13 @@ pub mod exhaustive;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::unions::Union2;
 /// use malachite_base::unions::random::random_union2s;
+/// use malachite_base::unions::Union2;
 ///
 /// let us = random_union2s(
 ///     EXAMPLE_SEED,
 ///     &|seed| random_char_inclusive_range(seed, 'a', 'z'),
-///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 1, 10)
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 1, 10),
 /// );
 /// assert_eq!(
 ///     us.take(20).collect_vec().as_slice(),

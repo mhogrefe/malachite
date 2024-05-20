@@ -41,7 +41,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
@@ -50,7 +50,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
 
 // Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
@@ -312,8 +312,8 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
                 assert!(!limbs_sub_limb_in_place(&mut scratch_hi_1_hi[..h1], 1));
             }
             let cmp = limbs_cmp_same_length(&scratch_hi_1_hi[..h1], &scratch_lo_hi[..h1]);
-            assert_ne!(cmp, Ordering::Greater);
-            if cmp == Ordering::Less {
+            assert_ne!(cmp, Greater);
+            if cmp == Less {
                 // May happen only if div result was not exact.
                 let carry =
                     limbs_slice_add_mul_limb_same_length_in_place_left(scratch_hi_1_lo, out_hi, 2);
@@ -331,7 +331,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
                 // scratch_lo_hi len is h2 + 1
                 let (scratch_lo_lo, scratch_lo_hi) = scratch_lo.split_at(h1);
                 let mut cmp = limbs_cmp_same_length(scratch_hi_1_lo, &scratch_lo_hi[..h1]);
-                if cmp == Ordering::Equal {
+                if cmp == Equal {
                     let scratch = &scratch_lo_lo[odd..];
                     cmp = if shift != 0 {
                         limbs_shl_to_out(scratch_hi, &xs[..h1], shift << 1);
@@ -340,10 +340,10 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
                         limbs_cmp_same_length(&xs[..h1 - odd], scratch)
                     };
                 }
-                if cmp == Ordering::Less {
+                if cmp == Less {
                     assert!(!limbs_sub_limb_in_place(out_lo, 1));
                 }
-                nonzero_remainder = cmp != Ordering::Equal;
+                nonzero_remainder = cmp != Equal;
             }
         }
     }
@@ -397,11 +397,11 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
             };
         }
         _ if xs_len > 8 => {
-            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+            let out_len = xs_len.shr_round(1, Ceiling).0;
             limbs_sqrt_helper(&mut out[..out_len], xs, shift, xs_len.odd());
         }
         _ => {
-            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+            let out_len = xs_len.shr_round(1, Ceiling).0;
             let out = &mut out[..out_len];
             if xs_len.odd() || shift != 0 {
                 let scratch_1_len = out_len << 1;
@@ -495,7 +495,7 @@ pub_test! {limbs_sqrt_rem_to_out(
             }
         }
         _ => {
-            let mut out_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
+            let mut out_len = xs_len.shr_round(1, Ceiling).0;
             let out_sqrt = &mut out_sqrt[..out_len];
             if xs_len.odd() || shift != 0 {
                 let scratch_1_len = out_len << 1;
@@ -574,7 +574,7 @@ pub_test! {limbs_sqrt_rem_to_out(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
-    let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling).0];
+    let mut out = vec![0; xs.len().shr_round(1, Ceiling).0];
     limbs_sqrt_to_out(&mut out, xs);
     out
 }}
@@ -590,7 +590,7 @@ pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // TODO
 pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     if !slice_test_zero(&out_rem[..rem_len]) {
@@ -621,7 +621,7 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     if slice_test_zero(&out_rem[..rem_len]) {
@@ -648,7 +648,7 @@ pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     out_rem.truncate(rem_len);
@@ -896,10 +896,26 @@ impl CheckedSqrt for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(99u8).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Natural::from(100u8).checked_sqrt().to_debug_string(), "Some(10)");
-    /// assert_eq!(Natural::from(101u8).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Natural::from(1000000000u32).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!(Natural::from(10000000000u64).checked_sqrt().to_debug_string(), "Some(100000)");
+    /// assert_eq!(
+    ///     Natural::from(100u8).checked_sqrt().to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(101u8).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(1000000000u32)
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10000000000u64)
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "Some(100000)"
+    /// );
     /// ```
     #[inline]
     fn checked_sqrt(self) -> Option<Natural> {
@@ -933,12 +949,28 @@ impl<'a> CheckedSqrt for &'a Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(99u8)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Natural::from(100u8)).checked_sqrt().to_debug_string(), "Some(10)");
-    /// assert_eq!((&Natural::from(101u8)).checked_sqrt().to_debug_string(), "None");
-    /// assert_eq!((&Natural::from(1000000000u32)).checked_sqrt().to_debug_string(), "None");
     /// assert_eq!(
-    ///     (&Natural::from(10000000000u64)).checked_sqrt().to_debug_string(),
+    ///     (&Natural::from(99u8)).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(100u8)).checked_sqrt().to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(101u8)).checked_sqrt().to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(1000000000u32))
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10000000000u64))
+    ///         .checked_sqrt()
+    ///         .to_debug_string(),
     ///     "Some(100000)"
     /// );
     /// ```
@@ -977,8 +1009,14 @@ impl SqrtRem for Natural {
     /// assert_eq!(Natural::from(99u8).sqrt_rem().to_debug_string(), "(9, 18)");
     /// assert_eq!(Natural::from(100u8).sqrt_rem().to_debug_string(), "(10, 0)");
     /// assert_eq!(Natural::from(101u8).sqrt_rem().to_debug_string(), "(10, 1)");
-    /// assert_eq!(Natural::from(1000000000u32).sqrt_rem().to_debug_string(), "(31622, 49116)");
-    /// assert_eq!(Natural::from(10000000000u64).sqrt_rem().to_debug_string(), "(100000, 0)");
+    /// assert_eq!(
+    ///     Natural::from(1000000000u32).sqrt_rem().to_debug_string(),
+    ///     "(31622, 49116)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10000000000u64).sqrt_rem().to_debug_string(),
+    ///     "(100000, 0)"
+    /// );
     /// ```
     #[inline]
     fn sqrt_rem(self) -> (Natural, Natural) {
@@ -1008,11 +1046,28 @@ impl<'a> SqrtRem for &'a Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(99u8)).sqrt_rem().to_debug_string(), "(9, 18)");
-    /// assert_eq!((&Natural::from(100u8)).sqrt_rem().to_debug_string(), "(10, 0)");
-    /// assert_eq!((&Natural::from(101u8)).sqrt_rem().to_debug_string(), "(10, 1)");
-    /// assert_eq!((&Natural::from(1000000000u32)).sqrt_rem().to_debug_string(), "(31622, 49116)");
-    /// assert_eq!((&Natural::from(10000000000u64)).sqrt_rem().to_debug_string(), "(100000, 0)");
+    /// assert_eq!(
+    ///     (&Natural::from(99u8)).sqrt_rem().to_debug_string(),
+    ///     "(9, 18)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(100u8)).sqrt_rem().to_debug_string(),
+    ///     "(10, 0)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(101u8)).sqrt_rem().to_debug_string(),
+    ///     "(10, 1)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(1000000000u32)).sqrt_rem().to_debug_string(),
+    ///     "(31622, 49116)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10000000000u64))
+    ///         .sqrt_rem()
+    ///         .to_debug_string(),
+    ///     "(100000, 0)"
+    /// );
     /// ```
     fn sqrt_rem(self) -> (Natural, Natural) {
         match self {

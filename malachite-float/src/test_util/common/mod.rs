@@ -13,9 +13,11 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
-use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase, SciMantissaAndExponent};
+use malachite_base::num::conversion::traits::{
+    ExactFrom, FromStringBase, RoundingFrom, SciMantissaAndExponent,
+};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug::float::{Round, Special};
@@ -24,11 +26,11 @@ use rug::float::{Round, Special};
 // RoundingMode is defined, but pulling in rug::float just for that purpose seems overkill.
 pub const fn rounding_mode_from_rug_round(rm: Round) -> RoundingMode {
     match rm {
-        Round::Nearest => RoundingMode::Nearest,
-        Round::Zero => RoundingMode::Down,
-        Round::Up => RoundingMode::Ceiling,
-        Round::Down => RoundingMode::Floor,
-        Round::AwayZero => RoundingMode::Up,
+        Round::Nearest => Nearest,
+        Round::Zero => Down,
+        Round::Up => Ceiling,
+        Round::Down => Floor,
+        Round::AwayZero => Up,
         _ => panic!(),
     }
 }
@@ -36,12 +38,12 @@ pub const fn rounding_mode_from_rug_round(rm: Round) -> RoundingMode {
 #[allow(clippy::result_unit_err)]
 pub const fn rug_round_try_from_rounding_mode(rm: RoundingMode) -> Result<Round, ()> {
     match rm {
-        RoundingMode::Floor => Ok(Round::Down),
-        RoundingMode::Ceiling => Ok(Round::Up),
-        RoundingMode::Down => Ok(Round::Zero),
-        RoundingMode::Up => Ok(Round::AwayZero),
-        RoundingMode::Nearest => Ok(Round::Nearest),
-        RoundingMode::Exact => Err(()),
+        Floor => Ok(Round::Down),
+        Ceiling => Ok(Round::Up),
+        Down => Ok(Round::Zero),
+        Up => Ok(Round::AwayZero),
+        Nearest => Ok(Round::Nearest),
+        Exact => Err(()),
     }
 }
 
@@ -144,6 +146,33 @@ pub fn to_hex_string(x: &Float) -> String {
     format!("{:#x}", ComparableFloatRef(x))
 }
 
+pub fn emulate_primitive_float_fn<T: PrimitiveFloat, F: Fn(Float, u64) -> Float>(f: F, x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let mut result = f(x.clone(), T::MANTISSA_WIDTH + 1);
+    if !result.is_normal() {
+        return T::exact_from(&result);
+    }
+    let e = <&Float as SciMantissaAndExponent<Float, i64, _>>::sci_exponent(&result);
+    if e < T::MIN_NORMAL_EXPONENT {
+        if e < T::MIN_EXPONENT {
+            return T::rounding_from(&result, Nearest).0;
+        } else {
+            result = f(x, T::max_precision_for_sci_exponent(e));
+        }
+    }
+    if result > T::MAX_FINITE {
+        T::INFINITY
+    } else if result < -T::MAX_FINITE {
+        T::NEGATIVE_INFINITY
+    } else {
+        T::exact_from(&result)
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds)]
 pub fn emulate_primitive_float_fn_2<T: PrimitiveFloat, F: Fn(Float, Float, u64) -> Float>(
     f: F,
@@ -152,7 +181,7 @@ pub fn emulate_primitive_float_fn_2<T: PrimitiveFloat, F: Fn(Float, Float, u64) 
 ) -> T
 where
     Float: From<T> + PartialOrd<T>,
-    for<'a> T: ExactFrom<&'a Float>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     let x = Float::from(x);
     let y = Float::from(y);
@@ -162,7 +191,11 @@ where
     }
     let e = <&Float as SciMantissaAndExponent<Float, i64, _>>::sci_exponent(&result);
     if e < T::MIN_NORMAL_EXPONENT {
-        result = f(x, y, T::max_precision_for_sci_exponent(e));
+        if e < T::MIN_EXPONENT {
+            return T::rounding_from(&result, Nearest).0;
+        } else {
+            result = f(x, y, T::max_precision_for_sci_exponent(e));
+        }
     }
     if result > T::MAX_FINITE {
         T::INFINITY

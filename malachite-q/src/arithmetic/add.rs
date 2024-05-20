@@ -407,7 +407,11 @@ impl Sum for Rational {
     /// use std::iter::Sum;
     ///
     /// assert_eq!(
-    ///     Rational::sum(vec_from_str::<Rational>("[2, -3, 5, 7]").unwrap().into_iter()),
+    ///     Rational::sum(
+    ///         vec_from_str::<Rational>("[2, -3, 5, 7]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     ),
     ///     11
     /// );
     /// ```
@@ -455,8 +459,10 @@ impl<'a> Sum<&'a Rational> for Rational {
     /// assert_eq!(
     ///     Rational::sum(
     ///         vec_from_str::<Rational>("[0, 1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
-    ///                 .unwrap().iter()
-    ///     ).to_string(),
+    ///             .unwrap()
+    ///             .iter()
+    ///     )
+    ///     .to_string(),
     ///     "19079/2520"
     /// );
     /// ```

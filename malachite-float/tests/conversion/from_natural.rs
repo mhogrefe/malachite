@@ -10,7 +10,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -18,7 +18,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
 use malachite_q::Rational;
-use std::cmp::{max, Ordering};
+use std::cmp::{max, Ordering::*};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -73,39 +73,21 @@ fn test_from_natural_prec() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
     };
-    test("0", 1, "0.0", "0x0.0", Ordering::Equal);
-    test("0", 10, "0.0", "0x0.0", Ordering::Equal);
-    test("0", 20, "0.0", "0x0.0", Ordering::Equal);
+    test("0", 1, "0.0", "0x0.0", Equal);
+    test("0", 10, "0.0", "0x0.0", Equal);
+    test("0", 20, "0.0", "0x0.0", Equal);
 
-    test("1", 1, "1.0", "0x1.0#1", Ordering::Equal);
-    test("1", 10, "1.0", "0x1.000#10", Ordering::Equal);
-    test("1", 20, "1.0", "0x1.00000#20", Ordering::Equal);
+    test("1", 1, "1.0", "0x1.0#1", Equal);
+    test("1", 10, "1.0", "0x1.000#10", Equal);
+    test("1", 20, "1.0", "0x1.00000#20", Equal);
 
-    test("123", 1, "1.0e2", "0x8.0E+1#1", Ordering::Greater);
-    test("123", 10, "123.0", "0x7b.0#10", Ordering::Equal);
-    test("123", 20, "123.0", "0x7b.0000#20", Ordering::Equal);
+    test("123", 1, "1.0e2", "0x8.0E+1#1", Greater);
+    test("123", 10, "123.0", "0x7b.0#10", Equal);
+    test("123", 20, "123.0", "0x7b.0000#20", Equal);
 
-    test(
-        "1000000000000",
-        1,
-        "1.0e12",
-        "0x1.0E+10#1",
-        Ordering::Greater,
-    );
-    test(
-        "1000000000000",
-        10,
-        "9.997e11",
-        "0xe.8cE+9#10",
-        Ordering::Less,
-    );
-    test(
-        "1000000000000",
-        20,
-        "9.999997e11",
-        "0xe.8d4aE+9#20",
-        Ordering::Less,
-    );
+    test("1000000000000", 1, "1.0e12", "0x1.0E+10#1", Greater);
+    test("1000000000000", 10, "9.997e11", "0xe.8cE+9#10", Less);
+    test("1000000000000", 20, "9.999997e11", "0xe.8d4aE+9#20", Less);
 }
 
 #[test]
@@ -146,535 +128,169 @@ fn test_from_natural_prec_round() {
             assert_eq!(rug_o, out_o);
         }
     };
-    test("0", 1, RoundingMode::Floor, "0.0", "0x0.0", Ordering::Equal);
-    test(
-        "0",
-        1,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test("0", 1, RoundingMode::Down, "0.0", "0x0.0", Ordering::Equal);
-    test("0", 1, RoundingMode::Up, "0.0", "0x0.0", Ordering::Equal);
-    test(
-        "0",
-        1,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test("0", 1, RoundingMode::Exact, "0.0", "0x0.0", Ordering::Equal);
+    test("0", 1, Floor, "0.0", "0x0.0", Equal);
+    test("0", 1, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 1, Down, "0.0", "0x0.0", Equal);
+    test("0", 1, Up, "0.0", "0x0.0", Equal);
+    test("0", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 1, Exact, "0.0", "0x0.0", Equal);
 
-    test(
-        "0",
-        10,
-        RoundingMode::Floor,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test(
-        "0",
-        10,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test("0", 10, RoundingMode::Down, "0.0", "0x0.0", Ordering::Equal);
-    test("0", 10, RoundingMode::Up, "0.0", "0x0.0", Ordering::Equal);
-    test(
-        "0",
-        10,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test(
-        "0",
-        10,
-        RoundingMode::Exact,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
+    test("0", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 10, Exact, "0.0", "0x0.0", Equal);
 
-    test(
-        "0",
-        20,
-        RoundingMode::Floor,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test(
-        "0",
-        20,
-        RoundingMode::Ceiling,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test("0", 20, RoundingMode::Down, "0.0", "0x0.0", Ordering::Equal);
-    test("0", 20, RoundingMode::Up, "0.0", "0x0.0", Ordering::Equal);
-    test(
-        "0",
-        20,
-        RoundingMode::Nearest,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
-    test(
-        "0",
-        20,
-        RoundingMode::Exact,
-        "0.0",
-        "0x0.0",
-        Ordering::Equal,
-    );
+    test("0", 20, Floor, "0.0", "0x0.0", Equal);
+    test("0", 20, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 20, Down, "0.0", "0x0.0", Equal);
+    test("0", 20, Up, "0.0", "0x0.0", Equal);
+    test("0", 20, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 20, Exact, "0.0", "0x0.0", Equal);
 
-    test(
-        "1",
-        1,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        1,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        1,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test("1", 1, RoundingMode::Up, "1.0", "0x1.0#1", Ordering::Equal);
-    test(
-        "1",
-        1,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        1,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.0#1",
-        Ordering::Equal,
-    );
+    test("1", 1, Floor, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Ceiling, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Down, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Up, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test(
-        "1",
-        10,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        10,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        10,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        10,
-        RoundingMode::Up,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        10,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        10,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.000#10",
-        Ordering::Equal,
-    );
+    test("1", 10, Floor, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Down, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Up, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Exact, "1.0", "0x1.000#10", Equal);
 
-    test(
-        "1",
-        20,
-        RoundingMode::Floor,
-        "1.0",
-        "0x1.00000#20",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        20,
-        RoundingMode::Ceiling,
-        "1.0",
-        "0x1.00000#20",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        20,
-        RoundingMode::Down,
-        "1.0",
-        "0x1.00000#20",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        20,
-        RoundingMode::Up,
-        "1.0",
-        "0x1.00000#20",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        20,
-        RoundingMode::Nearest,
-        "1.0",
-        "0x1.00000#20",
-        Ordering::Equal,
-    );
-    test(
-        "1",
-        20,
-        RoundingMode::Exact,
-        "1.0",
-        "0x1.00000#20",
-        Ordering::Equal,
-    );
+    test("1", 20, Floor, "1.0", "0x1.00000#20", Equal);
+    test("1", 20, Ceiling, "1.0", "0x1.00000#20", Equal);
+    test("1", 20, Down, "1.0", "0x1.00000#20", Equal);
+    test("1", 20, Up, "1.0", "0x1.00000#20", Equal);
+    test("1", 20, Nearest, "1.0", "0x1.00000#20", Equal);
+    test("1", 20, Exact, "1.0", "0x1.00000#20", Equal);
 
-    test(
-        "123",
-        1,
-        RoundingMode::Floor,
-        "6.0e1",
-        "0x4.0E+1#1",
-        Ordering::Less,
-    );
-    test(
-        "123",
-        1,
-        RoundingMode::Ceiling,
-        "1.0e2",
-        "0x8.0E+1#1",
-        Ordering::Greater,
-    );
-    test(
-        "123",
-        1,
-        RoundingMode::Down,
-        "6.0e1",
-        "0x4.0E+1#1",
-        Ordering::Less,
-    );
-    test(
-        "123",
-        1,
-        RoundingMode::Up,
-        "1.0e2",
-        "0x8.0E+1#1",
-        Ordering::Greater,
-    );
-    test(
-        "123",
-        1,
-        RoundingMode::Nearest,
-        "1.0e2",
-        "0x8.0E+1#1",
-        Ordering::Greater,
-    );
+    test("123", 1, Floor, "6.0e1", "0x4.0E+1#1", Less);
+    test("123", 1, Ceiling, "1.0e2", "0x8.0E+1#1", Greater);
+    test("123", 1, Down, "6.0e1", "0x4.0E+1#1", Less);
+    test("123", 1, Up, "1.0e2", "0x8.0E+1#1", Greater);
+    test("123", 1, Nearest, "1.0e2", "0x8.0E+1#1", Greater);
 
-    test(
-        "123",
-        10,
-        RoundingMode::Floor,
-        "123.0",
-        "0x7b.0#10",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        10,
-        RoundingMode::Ceiling,
-        "123.0",
-        "0x7b.0#10",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        10,
-        RoundingMode::Down,
-        "123.0",
-        "0x7b.0#10",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        10,
-        RoundingMode::Up,
-        "123.0",
-        "0x7b.0#10",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        10,
-        RoundingMode::Nearest,
-        "123.0",
-        "0x7b.0#10",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        10,
-        RoundingMode::Exact,
-        "123.0",
-        "0x7b.0#10",
-        Ordering::Equal,
-    );
+    test("123", 10, Floor, "123.0", "0x7b.0#10", Equal);
+    test("123", 10, Ceiling, "123.0", "0x7b.0#10", Equal);
+    test("123", 10, Down, "123.0", "0x7b.0#10", Equal);
+    test("123", 10, Up, "123.0", "0x7b.0#10", Equal);
+    test("123", 10, Nearest, "123.0", "0x7b.0#10", Equal);
+    test("123", 10, Exact, "123.0", "0x7b.0#10", Equal);
 
-    test(
-        "123",
-        20,
-        RoundingMode::Floor,
-        "123.0",
-        "0x7b.0000#20",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        20,
-        RoundingMode::Ceiling,
-        "123.0",
-        "0x7b.0000#20",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        20,
-        RoundingMode::Down,
-        "123.0",
-        "0x7b.0000#20",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        20,
-        RoundingMode::Up,
-        "123.0",
-        "0x7b.0000#20",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        20,
-        RoundingMode::Nearest,
-        "123.0",
-        "0x7b.0000#20",
-        Ordering::Equal,
-    );
-    test(
-        "123",
-        20,
-        RoundingMode::Exact,
-        "123.0",
-        "0x7b.0000#20",
-        Ordering::Equal,
-    );
+    test("123", 20, Floor, "123.0", "0x7b.0000#20", Equal);
+    test("123", 20, Ceiling, "123.0", "0x7b.0000#20", Equal);
+    test("123", 20, Down, "123.0", "0x7b.0000#20", Equal);
+    test("123", 20, Up, "123.0", "0x7b.0000#20", Equal);
+    test("123", 20, Nearest, "123.0", "0x7b.0000#20", Equal);
+    test("123", 20, Exact, "123.0", "0x7b.0000#20", Equal);
 
+    test("1000000000000", 1, Floor, "5.0e11", "0x8.0E+9#1", Less);
     test(
         "1000000000000",
         1,
-        RoundingMode::Floor,
-        "5.0e11",
-        "0x8.0E+9#1",
-        Ordering::Less,
-    );
-    test(
-        "1000000000000",
-        1,
-        RoundingMode::Ceiling,
+        Ceiling,
         "1.0e12",
         "0x1.0E+10#1",
-        Ordering::Greater,
+        Greater,
     );
+    test("1000000000000", 1, Down, "5.0e11", "0x8.0E+9#1", Less);
+    test("1000000000000", 1, Up, "1.0e12", "0x1.0E+10#1", Greater);
     test(
         "1000000000000",
         1,
-        RoundingMode::Down,
-        "5.0e11",
-        "0x8.0E+9#1",
-        Ordering::Less,
-    );
-    test(
-        "1000000000000",
-        1,
-        RoundingMode::Up,
+        Nearest,
         "1.0e12",
         "0x1.0E+10#1",
-        Ordering::Greater,
-    );
-    test(
-        "1000000000000",
-        1,
-        RoundingMode::Nearest,
-        "1.0e12",
-        "0x1.0E+10#1",
-        Ordering::Greater,
+        Greater,
     );
 
+    test("1000000000000", 10, Floor, "9.997e11", "0xe.8cE+9#10", Less);
     test(
         "1000000000000",
         10,
-        RoundingMode::Floor,
-        "9.997e11",
-        "0xe.8cE+9#10",
-        Ordering::Less,
-    );
-    test(
-        "1000000000000",
-        10,
-        RoundingMode::Ceiling,
+        Ceiling,
         "1.001e12",
         "0xe.90E+9#10",
-        Ordering::Greater,
+        Greater,
     );
+    test("1000000000000", 10, Down, "9.997e11", "0xe.8cE+9#10", Less);
+    test("1000000000000", 10, Up, "1.001e12", "0xe.90E+9#10", Greater);
     test(
         "1000000000000",
         10,
-        RoundingMode::Down,
+        Nearest,
         "9.997e11",
         "0xe.8cE+9#10",
-        Ordering::Less,
-    );
-    test(
-        "1000000000000",
-        10,
-        RoundingMode::Up,
-        "1.001e12",
-        "0xe.90E+9#10",
-        Ordering::Greater,
-    );
-    test(
-        "1000000000000",
-        10,
-        RoundingMode::Nearest,
-        "9.997e11",
-        "0xe.8cE+9#10",
-        Ordering::Less,
+        Less,
     );
 
     test(
         "1000000000000",
         20,
-        RoundingMode::Floor,
+        Floor,
         "9.999997e11",
         "0xe.8d4aE+9#20",
-        Ordering::Less,
+        Less,
     );
     test(
         "1000000000000",
         20,
-        RoundingMode::Ceiling,
+        Ceiling,
         "1.000001e12",
         "0xe.8d4bE+9#20",
-        Ordering::Greater,
+        Greater,
     );
     test(
         "1000000000000",
         20,
-        RoundingMode::Down,
+        Down,
         "9.999997e11",
         "0xe.8d4aE+9#20",
-        Ordering::Less,
+        Less,
     );
     test(
         "1000000000000",
         20,
-        RoundingMode::Up,
+        Up,
         "1.000001e12",
         "0xe.8d4bE+9#20",
-        Ordering::Greater,
+        Greater,
     );
     test(
         "1000000000000",
         20,
-        RoundingMode::Nearest,
+        Nearest,
         "9.999997e11",
         "0xe.8d4aE+9#20",
-        Ordering::Less,
+        Less,
     );
 }
 
 #[test]
 fn from_natural_prec_round_fail() {
-    assert_panic!(Float::from_natural_prec_round(
-        Natural::ZERO,
-        0,
-        RoundingMode::Floor
-    ));
-    assert_panic!(Float::from_natural_prec_round(
-        Natural::ONE,
-        0,
-        RoundingMode::Floor
-    ));
+    assert_panic!(Float::from_natural_prec_round(Natural::ZERO, 0, Floor));
+    assert_panic!(Float::from_natural_prec_round(Natural::ONE, 0, Floor));
     assert_panic!(Float::from_natural_prec_round(
         Natural::from(123u32),
         1,
-        RoundingMode::Exact
+        Exact
     ));
 }
 
 #[test]
 fn from_natural_prec_round_ref_fail() {
-    assert_panic!(Float::from_natural_prec_round_ref(
-        &Natural::ZERO,
-        0,
-        RoundingMode::Floor
-    ));
-    assert_panic!(Float::from_natural_prec_round_ref(
-        &Natural::ONE,
-        0,
-        RoundingMode::Floor
-    ));
+    assert_panic!(Float::from_natural_prec_round_ref(&Natural::ZERO, 0, Floor));
+    assert_panic!(Float::from_natural_prec_round_ref(&Natural::ONE, 0, Floor));
     assert_panic!(Float::from_natural_prec_round_ref(
         &Natural::from(123u32),
         1,
-        RoundingMode::Exact
+        Exact
     ));
 }
 
@@ -718,7 +334,7 @@ fn from_natural_properties() {
         let bits = max(1, n.significant_bits());
         let (f, o) = Float::from_natural_prec(n, bits);
         assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
-        assert_eq!(o, Ordering::Equal);
+        assert_eq!(o, Equal);
     });
 }
 
@@ -772,13 +388,13 @@ fn from_natural_prec_round_properties() {
         assert_eq!(o, o_alt);
         assert_eq!(float_n.partial_cmp(&n), Some(o));
         match rm {
-            RoundingMode::Floor | RoundingMode::Down => {
-                assert_ne!(o, Ordering::Greater)
+            Floor | Down => {
+                assert_ne!(o, Greater)
             }
-            RoundingMode::Ceiling | RoundingMode::Up => {
-                assert_ne!(o, Ordering::Less)
+            Ceiling | Up => {
+                assert_ne!(o, Less)
             }
-            RoundingMode::Exact => assert_eq!(o, Ordering::Equal),
+            Exact => assert_eq!(o, Equal),
             _ => {}
         }
 
@@ -806,32 +422,30 @@ fn from_natural_prec_round_properties() {
     });
 
     natural_unsigned_pair_gen_var_7().test_properties(|(n, prec)| {
-        let floor = Float::from_natural_prec_round_ref(&n, prec, RoundingMode::Floor);
+        let floor = Float::from_natural_prec_round_ref(&n, prec, Floor);
         let r_floor = Rational::exact_from(&floor.0);
         assert!(r_floor <= n);
         if r_floor != 0u32 {
             assert!(r_floor + Rational::exact_from(floor.0.ulp().unwrap()) > n);
         }
-        let (floor_alt, floor_o_alt) =
-            Float::from_natural_prec_round_ref(&n, prec, RoundingMode::Down);
+        let (floor_alt, floor_o_alt) = Float::from_natural_prec_round_ref(&n, prec, Down);
         assert_eq!(ComparableFloatRef(&floor_alt), ComparableFloatRef(&floor.0));
         assert_eq!(floor_o_alt, floor.1);
 
-        let ceiling = Float::from_natural_prec_round_ref(&n, prec, RoundingMode::Ceiling);
+        let ceiling = Float::from_natural_prec_round_ref(&n, prec, Ceiling);
         let r_ceiling = Rational::exact_from(&ceiling.0);
         assert!(r_ceiling >= n);
         if r_ceiling != 0u32 {
             assert!(r_ceiling - Rational::exact_from(ceiling.0.ulp().unwrap()) < n);
         }
-        let (ceiling_alt, ceiling_o_alt) =
-            Float::from_natural_prec_round_ref(&n, prec, RoundingMode::Up);
+        let (ceiling_alt, ceiling_o_alt) = Float::from_natural_prec_round_ref(&n, prec, Up);
         assert_eq!(
             ComparableFloatRef(&ceiling_alt),
             ComparableFloatRef(&ceiling.0)
         );
         assert_eq!(ceiling_o_alt, ceiling.1);
 
-        let nearest = Float::from_natural_prec_round_ref(&n, prec, RoundingMode::Nearest);
+        let nearest = Float::from_natural_prec_round_ref(&n, prec, Nearest);
         assert!(
             ComparableFloatRef(&nearest.0) == ComparableFloatRef(&floor.0) && nearest.1 == floor.1
                 || ComparableFloatRef(&nearest.0) == ComparableFloatRef(&ceiling.0)

@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
 
@@ -28,8 +28,7 @@ fn float_partial_eq_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> bool
                 && *y != T::ZERO
                 && *sign == (*y > T::ZERO)
                 && *exponent - 1 == y.sci_exponent()
-                && significand.cmp_normalized(&Natural::from(y.integer_mantissa()))
-                    == Ordering::Equal
+                && significand.cmp_normalized(&Natural::from(y.integer_mantissa())) == Equal
         }
     }
 }

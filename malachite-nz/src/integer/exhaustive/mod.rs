@@ -327,8 +327,9 @@ pub fn exhaustive_nonzero_integers() -> IntegerUpDown {
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     integer_increasing_range(Integer::from(-4), Integer::from(4)).collect_vec()
-///             .to_debug_string(),
+///     integer_increasing_range(Integer::from(-4), Integer::from(4))
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[-4, -3, -2, -1, 0, 1, 2, 3]"
 /// )
 /// ```
@@ -373,8 +374,9 @@ pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRang
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     integer_increasing_inclusive_range(Integer::from(-4), Integer::from(4)).collect_vec()
-///             .to_debug_string(),
+///     integer_increasing_inclusive_range(Integer::from(-4), Integer::from(4))
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[-4, -3, -2, -1, 0, 1, 2, 3, 4]"
 /// )
 /// ```
@@ -447,7 +449,10 @@ pub const fn integer_increasing_range_to_infinity(a: Integer) -> IntegerIncreasi
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     prefix_to_string(integer_decreasing_range_to_negative_infinity(Integer::from(4)), 10),
+///     prefix_to_string(
+///         integer_decreasing_range_to_negative_infinity(Integer::from(4)),
+///         10
+///     ),
 ///     "[4, 3, 2, 1, 0, -1, -2, -3, -4, -5, ...]"
 /// )
 /// ```
@@ -492,8 +497,9 @@ pub const fn integer_decreasing_range_to_negative_infinity(
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     exhaustive_integer_range(Integer::from(-4), Integer::from(4)).collect_vec()
-///             .to_debug_string(),
+///     exhaustive_integer_range(Integer::from(-4), Integer::from(4))
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[0, 1, -1, 2, -2, 3, -3, -4]"
 /// )
 /// ```
@@ -549,8 +555,9 @@ pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRang
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     exhaustive_integer_inclusive_range(Integer::from(-4), Integer::from(4)).collect_vec()
-///             .to_debug_string(),
+///     exhaustive_integer_inclusive_range(Integer::from(-4), Integer::from(4))
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[0, 1, -1, 2, -2, 3, -3, 4, -4]"
 /// )
 /// ```
@@ -646,7 +653,10 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     prefix_to_string(exhaustive_integer_range_to_negative_infinity(Integer::from(2)), 10),
+///     prefix_to_string(
+///         exhaustive_integer_range_to_negative_infinity(Integer::from(2)),
+///         10
+///     ),
 ///     "[0, 1, -1, 2, -2, -3, -4, -5, -6, -7, ...]"
 /// )
 /// ```

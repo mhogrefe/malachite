@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 
@@ -49,7 +49,7 @@ impl PartialEq<Integer> for Float {
                     && *sign == (*other >= 0u32)
                     && *exponent >= 0
                     && other.significant_bits() == exponent.unsigned_abs()
-                    && significand.cmp_normalized(other.unsigned_abs_ref()) == Ordering::Equal
+                    && significand.cmp_normalized(other.unsigned_abs_ref()) == Equal
             }
             _ => false,
         }

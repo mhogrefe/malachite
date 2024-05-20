@@ -55,7 +55,7 @@ fn test_limbs_floor_root() {
     test(&[1000], 3, &[10], false);
     // - root_bits > log_exp in limbs_root_to_out_internal
     // - need_adjust || qs_len != rs_len in limbs_root_to_out_internal
-    // - pow_cmp != Ordering::Equal in limbs_root_to_out_internal
+    // - pow_cmp != Equal in limbs_root_to_out_internal
     // - carry == 0 first time in limbs_root_to_out_internal
     // - n_len - 1 <= next_len in limbs_root_to_out_internal
     // - carry == 0 second time in limbs_root_to_out_internal
@@ -67,7 +67,7 @@ fn test_limbs_floor_root() {
     test(&[123, 456, 789], 3, &[24415497], true);
     // - leading_zeros == Limb::WIDTH in limbs_root_to_out_internal
     test(&[0, 1], 3, &[1625], true);
-    // - pow_cmp == Ordering::Equal in limbs_root_to_out_internal
+    // - pow_cmp == Equal in limbs_root_to_out_internal
     // - rs_len < ws_len in limbs_root_to_out_internal
     test(&[0, 0, 1], 4, &[65536], false);
     // - !need_adjust && qs_len == rs_len in limbs_root_to_out_internal
@@ -164,7 +164,7 @@ fn test_limbs_root_rem() {
     test(&[1000], 3, &[10], &[]);
     // - root_bits > log_exp in limbs_root_to_out_internal
     // - need_adjust || qs_len != rs_len in limbs_root_to_out_internal
-    // - pow_cmp != Ordering::Equal in limbs_root_to_out_internal
+    // - pow_cmp != Equal in limbs_root_to_out_internal
     // - carry == 0 first time in limbs_root_to_out_internal
     // - n_len - 1 <= next_len in limbs_root_to_out_internal
     // - carry == 0 second time in limbs_root_to_out_internal
@@ -177,7 +177,7 @@ fn test_limbs_root_rem() {
     test(&[123, 456, 789], 3, &[24415497], &[1082861218, 142292]);
     // - leading_zeros == Limb::WIDTH in limbs_root_to_out_internal
     test(&[0, 1], 3, &[1625], &[3951671]);
-    // - pow_cmp == Ordering::Equal in limbs_root_to_out_internal
+    // - pow_cmp == Equal in limbs_root_to_out_internal
     // - rs_len < ws_len in limbs_root_to_out_internal
     test(&[0, 0, 1], 4, &[65536], &[]);
     // - !need_adjust && qs_len == rs_len in limbs_root_to_out_internal

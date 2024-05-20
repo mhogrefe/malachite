@@ -14,7 +14,7 @@ use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::options::exhaustive::exhaustive_somes;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::tuples::exhaustive::{lex_pairs, lex_pairs_from_single};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::fmt::Debug;
 use std::iter::once;
 
@@ -115,102 +115,42 @@ fn test_lex_pairs() {
         exhaustive_orderings(),
         9,
         &[
-            ('a', Ordering::Equal),
-            ('a', Ordering::Less),
-            ('a', Ordering::Greater),
-            ('b', Ordering::Equal),
-            ('b', Ordering::Less),
-            ('b', Ordering::Greater),
-            ('c', Ordering::Equal),
-            ('c', Ordering::Less),
-            ('c', Ordering::Greater),
+            ('a', Equal),
+            ('a', Less),
+            ('a', Greater),
+            ('b', Equal),
+            ('b', Less),
+            ('b', Greater),
+            ('c', Equal),
+            ('c', Less),
+            ('c', Greater),
         ],
     );
     lex_pairs_helper(
         lex_pairs(exhaustive_orderings(), exhaustive_bools()),
-        lex_triples_from_single([Ordering::Less, Ordering::Greater].iter().cloned()),
+        lex_triples_from_single([Less, Greater].iter().cloned()),
         48,
         &[
-            (
-                (Ordering::Equal, false),
-                (Ordering::Less, Ordering::Less, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Less, Ordering::Less, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Less, Ordering::Greater, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Less, Ordering::Greater, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Greater, Ordering::Less, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Greater, Ordering::Less, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Greater, Ordering::Greater, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, false),
-                (Ordering::Greater, Ordering::Greater, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Less, Ordering::Less, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Less, Ordering::Less, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Less, Ordering::Greater, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Less, Ordering::Greater, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Greater, Ordering::Less, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Greater, Ordering::Less, Ordering::Greater),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Greater, Ordering::Greater, Ordering::Less),
-            ),
-            (
-                (Ordering::Equal, true),
-                (Ordering::Greater, Ordering::Greater, Ordering::Greater),
-            ),
-            (
-                (Ordering::Less, false),
-                (Ordering::Less, Ordering::Less, Ordering::Less),
-            ),
-            (
-                (Ordering::Less, false),
-                (Ordering::Less, Ordering::Less, Ordering::Greater),
-            ),
-            (
-                (Ordering::Less, false),
-                (Ordering::Less, Ordering::Greater, Ordering::Less),
-            ),
-            (
-                (Ordering::Less, false),
-                (Ordering::Less, Ordering::Greater, Ordering::Greater),
-            ),
+            ((Equal, false), (Less, Less, Less)),
+            ((Equal, false), (Less, Less, Greater)),
+            ((Equal, false), (Less, Greater, Less)),
+            ((Equal, false), (Less, Greater, Greater)),
+            ((Equal, false), (Greater, Less, Less)),
+            ((Equal, false), (Greater, Less, Greater)),
+            ((Equal, false), (Greater, Greater, Less)),
+            ((Equal, false), (Greater, Greater, Greater)),
+            ((Equal, true), (Less, Less, Less)),
+            ((Equal, true), (Less, Less, Greater)),
+            ((Equal, true), (Less, Greater, Less)),
+            ((Equal, true), (Less, Greater, Greater)),
+            ((Equal, true), (Greater, Less, Less)),
+            ((Equal, true), (Greater, Less, Greater)),
+            ((Equal, true), (Greater, Greater, Less)),
+            ((Equal, true), (Greater, Greater, Greater)),
+            ((Less, false), (Less, Less, Less)),
+            ((Less, false), (Less, Less, Greater)),
+            ((Less, false), (Less, Greater, Less)),
+            ((Less, false), (Less, Greater, Greater)),
         ],
     );
 }

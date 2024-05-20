@@ -11,7 +11,7 @@ use crate::InnerFloat::Finite;
 use malachite_base::num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -62,7 +62,7 @@ impl Float {
             exponent: pow + 1,
             precision: prec,
             significand: Natural::power_of_2(
-                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                     .0
                     - 1,
             ),

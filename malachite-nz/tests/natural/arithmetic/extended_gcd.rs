@@ -100,7 +100,7 @@ fn test_limbs_extended_gcd() {
         // - qs[qs_len - 1] == 0 in gcd_subdiv_step_hook
         test(&[0, 1], &[3, 1], &[1], &[6148914691236517206, 0, 0], true);
         // - ys[0] == ys[0] in mpn_gcdext_lehmer_n
-        // - c == Ordering::Less in mpn_gcdext_lehmer_n
+        // - c == Less in mpn_gcdext_lehmer_n
         test(&[0, 3], &[2, 1], &[6], &[1, 0, 0], false);
         // - qs_len != 1 in gcd_subdiv_step_hook
         // - us1_len >= un in gcd_subdiv_step_hook
@@ -111,7 +111,7 @@ fn test_limbs_extended_gcd() {
             &[9223372036854775808, 9223372036854775807, 0, 0],
             true,
         );
-        // - c != Ordering::Less in mpn_gcdext_lehmer_n
+        // - c != Less in mpn_gcdext_lehmer_n
         test(&[2, 1], &[0, 3], &[6], &[3, 0, 0], true);
         // - mask.get_highest_bit() in mpn_gcdext_lehmer_n
         test(&[0, 0, 0, 1], &[0, 1, 2], &[0, 1], &[4, 0, 0, 0], true);
@@ -26729,7 +26729,7 @@ fn test_limbs_extended_gcd() {
         // - nn != 0 first time
         // - nn != 0 second time
         // - a_high == 0 && b_high == 0 in hgcd_mul_matrix_vector
-        // - limbs_cmp_same_length(..) != Ordering::Equal && (us0[0] != 0 || us_len != 1)
+        // - limbs_cmp_same_length(..) != Equal && (us0[0] != 0 || us_len != 1)
         // - lehmer_us_len != 0
         // - ss_len != 0 && ss_sign in limbs_extended_gcd_cofactor
         // - size != 0 in limbs_extended_gcd_cofactor
@@ -29177,8 +29177,8 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // - limbs_cmp_same_length(..) == Ordering::Equal
-        // - c != Ordering::Less
+        // - limbs_cmp_same_length(..) == Equal
+        // - c != Less
         test(
             &[
                 1582207393, 3257769320, 312002593, 3788671422, 2562360222, 2018485950, 1642000633,
@@ -29491,7 +29491,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // - c == Ordering::Less
+        // - c == Less
         test(
             &[
                 187934912, 3963930250, 231958896, 4245982773, 1934140206, 440616703, 3262112836,

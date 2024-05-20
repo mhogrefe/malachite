@@ -35,6 +35,7 @@ impl PartialOrdAbs<Natural> for Integer {
     /// assert!(Integer::from(-124).gt_abs(&Natural::from(123u32)));
     /// assert!(Integer::from(-124).ge_abs(&Natural::from(123u32)));
     /// ```
+    #[inline]
     fn partial_cmp_abs(&self, other: &Natural) -> Option<Ordering> {
         self.abs.partial_cmp(other)
     }
@@ -64,6 +65,7 @@ impl PartialOrdAbs<Integer> for Natural {
     /// assert!(Natural::from(123u32).lt_abs(&Integer::from(-124)));
     /// assert!(Natural::from(123u32).le_abs(&Integer::from(-124)));
     /// ```
+    #[inline]
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         self.partial_cmp(&other.abs)
     }

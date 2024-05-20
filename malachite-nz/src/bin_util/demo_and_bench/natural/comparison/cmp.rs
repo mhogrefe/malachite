@@ -25,7 +25,7 @@ use malachite_nz::test_util::generators::{
     natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_var_9,
 };
 use malachite_nz::test_util::natural::comparison::cmp::natural_cmp_normalized_naive;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_cmp_same_length);
@@ -72,9 +72,9 @@ fn demo_limbs_cmp_normalized(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_natural_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         match x.cmp(&y) {
-            Ordering::Less => println!("{x} < {y}"),
-            Ordering::Equal => println!("{x} = {y}"),
-            Ordering::Greater => println!("{x} > {y}"),
+            Less => println!("{x} < {y}"),
+            Equal => println!("{x} = {y}"),
+            Greater => println!("{x} > {y}"),
         }
     }
 }

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::ops::{Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShl, ModShlAssign, UnsignedAbs,
@@ -255,9 +255,9 @@ where
     assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
-        Ordering::Equal => x.clone(),
-        Ordering::Less => x >> bits_abs,
-        Ordering::Greater => match m {
+        Equal => x.clone(),
+        Less => x >> bits_abs,
+        Greater => match m {
             Natural::ONE | Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits_abs), &m), m),
         },
@@ -276,9 +276,9 @@ where
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
-        Ordering::Equal => x.clone(),
-        Ordering::Less => x >> bits_abs,
-        Ordering::Greater => match m {
+        Equal => x.clone(),
+        Less => x >> bits_abs,
+        Greater => match m {
             &Natural::ONE | &Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits_abs), m), m),
         },
@@ -295,9 +295,9 @@ fn mod_shl_assign_signed_nz<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
-        Ordering::Equal => {}
-        Ordering::Less => *x >>= bits_abs,
-        Ordering::Greater => match m {
+        Equal => {}
+        Less => *x >>= bits_abs,
+        Greater => match m {
             Natural::ONE | Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits_abs), &m), m),
         },
@@ -314,9 +314,9 @@ fn mod_shl_assign_ref_signed<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     assert!(*x < *m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
-        Ordering::Equal => {}
-        Ordering::Less => *x >>= bits_abs,
-        Ordering::Greater => match m {
+        Equal => {}
+        Less => *x >>= bits_abs,
+        Greater => match m {
             &Natural::ONE | &Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits_abs), m), m),
         },

@@ -238,7 +238,7 @@ fn test_limbs_to_digits_small_base() {
     //   1].divisible_by_power_of_2(big_base_trailing_zeros) in limbs_compute_power_table_using_div
     // - xs_len >= GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
     // - xs_len > total_len || xs_len == total_len && limbs_cmp_same_length(&xs[shift..],
-    //   power.power) == Ordering::Less in limbs_to_digits_small_base_divide_and_conquer
+    //   power.power) == Less in limbs_to_digits_small_base_divide_and_conquer
     // - len == 0 in limbs_to_digits_small_base_divide_and_conquer
     // - xs_len < GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
     // - xs_len != 0 in limbs_to_digits_small_base_divide_and_conquer

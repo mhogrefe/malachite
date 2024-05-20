@@ -10,7 +10,7 @@ use crate::Rational;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign, Floor, FloorAssign};
 use malachite_base::num::basic::traits::One;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -45,12 +45,7 @@ impl Floor for Rational {
         if self.sign {
             Integer::from(self.numerator / self.denominator)
         } else {
-            Integer::from_sign_and_abs(
-                false,
-                self.numerator
-                    .div_round(self.denominator, RoundingMode::Ceiling)
-                    .0,
-            )
+            Integer::from_sign_and_abs(false, self.numerator.div_round(self.denominator, Ceiling).0)
         }
     }
 }
@@ -77,7 +72,6 @@ impl<'a> Floor for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::Floor;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!((&Rational::ZERO).floor(), 0);
     /// assert_eq!((&Rational::from_signeds(22, 7)).floor(), 3);
@@ -89,9 +83,7 @@ impl<'a> Floor for &'a Rational {
         } else {
             Integer::from_sign_and_abs(
                 false,
-                (&self.numerator)
-                    .div_round(&self.denominator, RoundingMode::Ceiling)
-                    .0,
+                (&self.numerator).div_round(&self.denominator, Ceiling).0,
             )
         }
     }
@@ -117,7 +109,6 @@ impl FloorAssign for Rational {
     /// use malachite_base::num::arithmetic::traits::FloorAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// let mut x = Rational::ZERO;
     /// x.floor_assign();
@@ -137,7 +128,7 @@ impl FloorAssign for Rational {
         if self.sign {
             self.numerator /= d;
         } else {
-            self.numerator.div_round_assign(d, RoundingMode::Ceiling);
+            self.numerator.div_round_assign(d, Ceiling);
             if !self.sign && self.numerator == 0 {
                 self.sign = true;
             }

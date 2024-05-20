@@ -23,7 +23,7 @@ use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToSci};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 fn write_helper<T>(x: &T, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result
 where
@@ -55,20 +55,20 @@ impl ToSci for Natural {
     /// ```
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut options = ToSciOptions::default();
     /// assert!(Natural::from(123u8).fmt_sci_valid(options));
     /// assert!(Natural::from(u128::MAX).fmt_sci_valid(options));
     /// // u128::MAX has more than 16 significant digits
-    /// options.set_rounding_mode(RoundingMode::Exact);
+    /// options.set_rounding_mode(Exact);
     /// assert!(!Natural::from(u128::MAX).fmt_sci_valid(options));
     /// options.set_precision(50);
     /// assert!(Natural::from(u128::MAX).fmt_sci_valid(options));
     /// ```
     fn fmt_sci_valid(&self, options: ToSciOptions) -> bool {
-        if *self == 0u32 || options.get_rounding_mode() != RoundingMode::Exact {
+        if *self == 0u32 || options.get_rounding_mode() != Exact {
             return true;
         }
         match options.get_size_options() {
@@ -111,11 +111,17 @@ impl ToSci for Natural {
     /// ```
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(format!("{}", Natural::from(u128::MAX).to_sci()), "3.402823669209385e38");
-    /// assert_eq!(Natural::from(u128::MAX).to_sci().to_string(), "3.402823669209385e38");
+    /// assert_eq!(
+    ///     format!("{}", Natural::from(u128::MAX).to_sci()),
+    ///     "3.402823669209385e38"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(u128::MAX).to_sci().to_string(),
+    ///     "3.402823669209385e38"
+    /// );
     ///
     /// let n = Natural::from(123456u32);
     /// let mut options = ToSciOptions::default();
@@ -125,7 +131,7 @@ impl ToSci for Natural {
     /// options.set_precision(3);
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "1.23e5");
     ///
-    /// options.set_rounding_mode(RoundingMode::Ceiling);
+    /// options.set_rounding_mode(Ceiling);
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "1.24e5");
     ///
     /// options.set_e_uppercase();

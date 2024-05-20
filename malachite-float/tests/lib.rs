@@ -55,6 +55,8 @@ pub mod arithmetic {
     pub mod is_power_of_2;
     pub mod neg;
     pub mod power_of_2;
+    pub mod shl;
+    pub mod shr;
     pub mod sign;
     pub mod sub;
 }

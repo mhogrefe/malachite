@@ -663,8 +663,14 @@ impl<'a, 'b> KroneckerSymbol<&'a Integer> for &'b Integer {
     /// assert_eq!((&Integer::from(-7)).kronecker_symbol(&Integer::from(5)), -1);
     /// assert_eq!((&Integer::from(-11)).kronecker_symbol(&Integer::from(5)), 1);
     /// assert_eq!((&Integer::from(-11)).kronecker_symbol(&Integer::from(9)), 1);
-    /// assert_eq!((&Integer::from(-11)).kronecker_symbol(&Integer::from(8)), -1);
-    /// assert_eq!((&Integer::from(-11)).kronecker_symbol(&Integer::from(-8)), 1);
+    /// assert_eq!(
+    ///     (&Integer::from(-11)).kronecker_symbol(&Integer::from(8)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-11)).kronecker_symbol(&Integer::from(-8)),
+    ///     1
+    /// );
     /// ```
     fn kronecker_symbol(self, other: &'a Integer) -> i8 {
         match (self, other) {

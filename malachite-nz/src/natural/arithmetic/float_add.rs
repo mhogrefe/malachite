@@ -22,7 +22,7 @@ use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -30,7 +30,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 
 const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
@@ -66,12 +66,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -102,12 +98,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -138,12 +130,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         xs,
@@ -168,12 +156,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, xs, *x_exp, ys, y_exp, out_prec, rm,
                     );
@@ -201,12 +185,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -237,12 +217,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         ys,
@@ -273,12 +249,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -303,12 +275,8 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, ys, y_exp, xs, *x_exp, out_prec, rm,
                     );
@@ -351,12 +319,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -387,12 +351,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -423,12 +383,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         xs,
@@ -453,12 +409,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, xs, *x_exp, ys, y_exp, out_prec, rm,
                     );
@@ -486,12 +438,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -522,12 +470,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         ys,
@@ -558,12 +502,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -588,12 +528,8 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, ys, y_exp, xs, *x_exp, out_prec, rm,
                     );
@@ -639,12 +575,8 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*x],
@@ -671,12 +603,8 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*x],
@@ -703,12 +631,8 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         xs,
@@ -729,12 +653,8 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, xs, x_exp, ys, y_exp, out_prec, rm,
                     );
@@ -986,25 +906,25 @@ fn add_float_significands_same_prec_lt_w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (sum, x_exp, Ordering::Equal)
+        (sum, x_exp, Equal)
     } else {
         match rm {
-            RoundingMode::Exact => panic!("Inexact float addition"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float addition"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (sum & shift_bit) == 0) {
-                    (sum, x_exp, Ordering::Less)
+                    (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(shift_bit) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Ordering::Greater)
+                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum, x_exp, Ordering::Greater)
+                    (sum, x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => (sum, x_exp, Ordering::Less),
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (sum, x_exp, Less),
+            Ceiling | Up => {
                 if sum.overflowing_add_assign(shift_bit) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Ordering::Greater)
+                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum, x_exp, Ordering::Greater)
+                    (sum, x_exp, Greater)
                 }
             }
         }
@@ -1050,25 +970,25 @@ fn add_float_significands_same_prec_w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (sum, x_exp, Ordering::Equal)
+        (sum, x_exp, Equal)
     } else {
         match rm {
-            RoundingMode::Exact => panic!("Inexact float addition"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float addition"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (sum & 1) == 0) {
-                    (sum, x_exp, Ordering::Less)
+                    (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Ordering::Greater)
+                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum, x_exp, Ordering::Greater)
+                    (sum, x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => (sum, x_exp, Ordering::Less),
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (sum, x_exp, Less),
+            Ceiling | Up => {
                 if sum.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Ordering::Greater)
+                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum, x_exp, Ordering::Greater)
+                    (sum, x_exp, Greater)
                 }
             }
         }
@@ -1177,36 +1097,26 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (sum_0, sum_1, x_exp, Ordering::Equal)
+        (sum_0, sum_1, x_exp, Equal)
     } else {
         match rm {
-            RoundingMode::Exact => panic!("Inexact float addition"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float addition"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (sum_0 & shift_bit) == 0) {
-                    (sum_0, sum_1, x_exp, Ordering::Less)
+                    (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(shift_bit) && sum_1.overflowing_add_assign(1)
                 {
-                    (
-                        sum_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
-                    )
+                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum_0, sum_1, x_exp, Ordering::Greater)
+                    (sum_0, sum_1, x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => (sum_0, sum_1, x_exp, Ordering::Less),
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (sum_0, sum_1, x_exp, Less),
+            Ceiling | Up => {
                 if sum_0.overflowing_add_assign(shift_bit) && sum_1.overflowing_add_assign(1) {
-                    (
-                        sum_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
-                    )
+                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum_0, sum_1, x_exp, Ordering::Greater)
+                    (sum_0, sum_1, x_exp, Greater)
                 }
             }
         }
@@ -1299,35 +1209,25 @@ fn add_float_significands_same_prec_2w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (sum_0, sum_1, x_exp, Ordering::Equal)
+        (sum_0, sum_1, x_exp, Equal)
     } else {
         match rm {
-            RoundingMode::Exact => panic!("Inexact float addition"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float addition"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (sum_0 & 1) == 0) {
-                    (sum_0, sum_1, x_exp, Ordering::Less)
+                    (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
-                    (
-                        sum_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
-                    )
+                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum_0, sum_1, x_exp, Ordering::Greater)
+                    (sum_0, sum_1, x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => (sum_0, sum_1, x_exp, Ordering::Less),
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (sum_0, sum_1, x_exp, Less),
+            Ceiling | Up => {
                 if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
-                    (
-                        sum_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
-                    )
+                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
                 } else {
-                    (sum_0, sum_1, x_exp, Ordering::Greater)
+                    (sum_0, sum_1, x_exp, Greater)
                 }
             }
         }
@@ -1495,13 +1395,13 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (sum_0, sum_1, sum_2, x_exp, Ordering::Equal)
+        (sum_0, sum_1, sum_2, x_exp, Equal)
     } else {
         match rm {
-            RoundingMode::Exact => panic!("Inexact float addition"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float addition"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (sum_0 & shift_bit) == 0) {
-                    (sum_0, sum_1, sum_2, x_exp, Ordering::Less)
+                    (sum_0, sum_1, sum_2, x_exp, Less)
                 } else {
                     if sum_0.overflowing_add_assign(shift_bit) {
                         sum_1.wrapping_add_assign(1);
@@ -1515,17 +1415,15 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                             sum_1,
                             HIGH_BIT,
                             x_exp.checked_add(1).unwrap(),
-                            Ordering::Greater,
+                            Greater,
                         )
                     } else {
-                        (sum_0, sum_1, sum_2, x_exp, Ordering::Greater)
+                        (sum_0, sum_1, sum_2, x_exp, Greater)
                     }
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => {
-                (sum_0, sum_1, sum_2, x_exp, Ordering::Less)
-            }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (sum_0, sum_1, sum_2, x_exp, Less),
+            Ceiling | Up => {
                 if sum_0.overflowing_add_assign(shift_bit) {
                     sum_1.wrapping_add_assign(1);
                 }
@@ -1538,10 +1436,10 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                         sum_1,
                         HIGH_BIT,
                         x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
+                        Greater,
                     )
                 } else {
-                    (sum_0, sum_1, sum_2, x_exp, Ordering::Greater)
+                    (sum_0, sum_1, sum_2, x_exp, Greater)
                 }
             }
         }
@@ -1868,13 +1766,13 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
         out[last_index] |= HIGH_BIT;
         out[0] &= !(shift_bit - 1);
         if round_bit == 0 {
-            (x_exp, Ordering::Equal)
+            (x_exp, Equal)
         } else {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float addition"),
+                Nearest => {
                     if out[0] & shift_bit == 0 {
-                        (x_exp, Ordering::Less)
+                        (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
                             fail_on_untested_path(
@@ -1884,11 +1782,11 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                             x_exp = x_exp.checked_add(1).unwrap();
                             out[last_index] = HIGH_BIT;
                         }
-                        (x_exp, Ordering::Greater)
+                        (x_exp, Greater)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => (x_exp, Ordering::Less),
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Floor | Down => (x_exp, Less),
+                Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         fail_on_untested_path(
                             "exp_diff == 0 && (rm == Ceiling || rm == Up) && carry",
@@ -1896,55 +1794,55 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                         x_exp = x_exp.checked_add(1).unwrap();
                         out[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         }
     } else if exp_diff >= prec {
         if exp_diff > prec {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest | RoundingMode::Floor | RoundingMode::Down => {
+                Exact => panic!("Inexact float addition"),
+                Nearest | Floor | Down => {
                     out.copy_from_slice(xs);
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 }
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Ceiling | Up => {
                     out.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         out[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         } else {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float addition"),
+                Nearest => {
                     // Check if y was a power of 2
                     if limbs_is_power_of_2(ys) && xs[0] & shift_bit == 0 {
                         out.copy_from_slice(xs);
-                        (x_exp, Ordering::Less)
+                        (x_exp, Less)
                     } else {
                         out.copy_from_slice(xs);
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
                             x_exp = x_exp.checked_add(1).unwrap();
                             out[last_index] = HIGH_BIT;
                         }
-                        (x_exp, Ordering::Greater)
+                        (x_exp, Greater)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => {
+                Floor | Down => {
                     out.copy_from_slice(xs);
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 }
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Ceiling | Up => {
                     out.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         out[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         }
@@ -1977,50 +1875,36 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
             out[0] &= mask;
         }
         match rm {
-            RoundingMode::Nearest => {
+            Nearest => {
                 if round_bit == 0 {
-                    (
-                        x_exp,
-                        if sticky_bit != 0 {
-                            Ordering::Less
-                        } else {
-                            Ordering::Equal
-                        },
-                    )
+                    (x_exp, if sticky_bit != 0 { Less } else { Equal })
                 } else if sticky_bit == 0 && out[0] & shift_bit == 0 {
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 } else {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         out[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Exact => {
+            Floor | Down | Exact => {
                 let inexact = round_bit != 0 || sticky_bit != 0;
-                if rm == RoundingMode::Exact && inexact {
+                if rm == Exact && inexact {
                     panic!("Inexact float addition");
                 } else {
-                    (
-                        x_exp,
-                        if inexact {
-                            Ordering::Less
-                        } else {
-                            Ordering::Equal
-                        },
-                    )
+                    (x_exp, if inexact { Less } else { Equal })
                 }
             }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         out[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 } else {
-                    (x_exp, Ordering::Equal)
+                    (x_exp, Equal)
                 }
             }
         }
@@ -2071,13 +1955,13 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
         xs[last_index] |= HIGH_BIT;
         xs[0] &= !(shift_bit - 1);
         if round_bit == 0 {
-            (x_exp, Ordering::Equal)
+            (x_exp, Equal)
         } else {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float addition"),
+                Nearest => {
                     if xs[0] & shift_bit == 0 {
-                        (x_exp, Ordering::Less)
+                        (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
                             fail_on_untested_path(
@@ -2087,11 +1971,11 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                             x_exp = x_exp.checked_add(1).unwrap();
                             xs[last_index] = HIGH_BIT;
                         }
-                        (x_exp, Ordering::Greater)
+                        (x_exp, Greater)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => (x_exp, Ordering::Less),
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Floor | Down => (x_exp, Less),
+                Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         fail_on_untested_path(
                             "exp_diff == 0 && (rm == Ceiling || rm == Up) && carry",
@@ -2099,47 +1983,45 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                         x_exp = x_exp.checked_add(1).unwrap();
                         xs[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         }
     } else if exp_diff >= prec {
         if exp_diff > prec {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest | RoundingMode::Floor | RoundingMode::Down => {
-                    (x_exp, Ordering::Less)
-                }
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Exact => panic!("Inexact float addition"),
+                Nearest | Floor | Down => (x_exp, Less),
+                Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         xs[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         } else {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float addition"),
+                Nearest => {
                     // Check if y was a power of 2
                     if limbs_is_power_of_2(ys) && xs[0] & shift_bit == 0 {
-                        (x_exp, Ordering::Less)
+                        (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
                             x_exp = x_exp.checked_add(1).unwrap();
                             xs[last_index] = HIGH_BIT;
                         }
-                        (x_exp, Ordering::Greater)
+                        (x_exp, Greater)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => (x_exp, Ordering::Less),
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Floor | Down => (x_exp, Less),
+                Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         xs[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         }
@@ -2172,50 +2054,36 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
             xs[0] &= mask;
         }
         match rm {
-            RoundingMode::Nearest => {
+            Nearest => {
                 if round_bit == 0 {
-                    (
-                        x_exp,
-                        if sticky_bit != 0 {
-                            Ordering::Less
-                        } else {
-                            Ordering::Equal
-                        },
-                    )
+                    (x_exp, if sticky_bit != 0 { Less } else { Equal })
                 } else if sticky_bit == 0 && xs[0] & shift_bit == 0 {
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 } else {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         xs[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Exact => {
+            Floor | Down | Exact => {
                 let inexact = round_bit != 0 || sticky_bit != 0;
-                if rm == RoundingMode::Exact && inexact {
+                if rm == Exact && inexact {
                     panic!("Inexact float addition");
                 } else {
-                    (
-                        x_exp,
-                        if inexact {
-                            Ordering::Less
-                        } else {
-                            Ordering::Equal
-                        },
-                    )
+                    (x_exp, if inexact { Less } else { Equal })
                 }
             }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         xs[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 } else {
-                    (x_exp, Ordering::Equal)
+                    (x_exp, Equal)
                 }
             }
         }
@@ -2247,13 +2115,13 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
         ys[last_index] |= HIGH_BIT;
         ys[0] &= !(shift_bit - 1);
         if round_bit == 0 {
-            (x_exp, Ordering::Equal)
+            (x_exp, Equal)
         } else {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float addition"),
+                Nearest => {
                     if ys[0] & shift_bit == 0 {
-                        (x_exp, Ordering::Less)
+                        (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
                             fail_on_untested_path(
@@ -2263,11 +2131,11 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                             x_exp = x_exp.checked_add(1).unwrap();
                             ys[last_index] = HIGH_BIT;
                         }
-                        (x_exp, Ordering::Greater)
+                        (x_exp, Greater)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => (x_exp, Ordering::Less),
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Floor | Down => (x_exp, Less),
+                Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         fail_on_untested_path(
                             "exp_diff == 0 && (rm == Ceiling || rm == Up) && carry",
@@ -2275,55 +2143,55 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                         x_exp = x_exp.checked_add(1).unwrap();
                         ys[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         }
     } else if exp_diff >= prec {
         if exp_diff > prec {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest | RoundingMode::Floor | RoundingMode::Down => {
+                Exact => panic!("Inexact float addition"),
+                Nearest | Floor | Down => {
                     ys.copy_from_slice(xs);
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 }
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Ceiling | Up => {
                     ys.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         ys[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         } else {
             match rm {
-                RoundingMode::Exact => panic!("Inexact float addition"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float addition"),
+                Nearest => {
                     // Check if y was a power of 2
                     if limbs_is_power_of_2(ys) && xs[0] & shift_bit == 0 {
                         ys.copy_from_slice(xs);
-                        (x_exp, Ordering::Less)
+                        (x_exp, Less)
                     } else {
                         ys.copy_from_slice(xs);
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
                             x_exp = x_exp.checked_add(1).unwrap();
                             ys[last_index] = HIGH_BIT;
                         }
-                        (x_exp, Ordering::Greater)
+                        (x_exp, Greater)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => {
+                Floor | Down => {
                     ys.copy_from_slice(xs);
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 }
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Ceiling | Up => {
                     ys.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         ys[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
         }
@@ -2356,50 +2224,36 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
             ys[0] &= mask;
         }
         match rm {
-            RoundingMode::Nearest => {
+            Nearest => {
                 if round_bit == 0 {
-                    (
-                        x_exp,
-                        if sticky_bit != 0 {
-                            Ordering::Less
-                        } else {
-                            Ordering::Equal
-                        },
-                    )
+                    (x_exp, if sticky_bit != 0 { Less } else { Equal })
                 } else if sticky_bit == 0 && ys[0] & shift_bit == 0 {
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 } else {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         ys[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Exact => {
+            Floor | Down | Exact => {
                 let inexact = round_bit != 0 || sticky_bit != 0;
-                if rm == RoundingMode::Exact && inexact {
+                if rm == Exact && inexact {
                     panic!("Inexact float addition");
                 } else {
-                    (
-                        x_exp,
-                        if inexact {
-                            Ordering::Less
-                        } else {
-                            Ordering::Equal
-                        },
-                    )
+                    (x_exp, if inexact { Less } else { Equal })
                 }
             }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         ys[last_index] = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 } else {
-                    (x_exp, Ordering::Equal)
+                    (x_exp, Equal)
                 }
             }
         }
@@ -2444,38 +2298,38 @@ fn add_float_significands_general_round(
     rm: RoundingMode,
 ) -> (i64, Ordering) {
     if following_bits == False && round_bit == False {
-        return (x_exp, Ordering::Equal);
+        return (x_exp, Equal);
     }
     match rm {
-        RoundingMode::Exact => panic!("Inexact float addition"),
-        RoundingMode::Nearest => {
+        Exact => panic!("Inexact float addition"),
+        Nearest => {
             if following_bits == False {
                 if out[0] & shift_bit != 0 {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp = x_exp.checked_add(1).unwrap();
                         *out.last_mut().unwrap() = HIGH_BIT;
                     }
-                    (x_exp, Ordering::Greater)
+                    (x_exp, Greater)
                 } else {
-                    (x_exp, Ordering::Less)
+                    (x_exp, Less)
                 }
             } else if round_bit == False {
-                (x_exp, Ordering::Less)
+                (x_exp, Less)
             } else {
                 if limbs_slice_add_limb_in_place(out, shift_bit) {
                     x_exp = x_exp.checked_add(1).unwrap();
                     *out.last_mut().unwrap() = HIGH_BIT;
                 }
-                (x_exp, Ordering::Greater)
+                (x_exp, Greater)
             }
         }
-        RoundingMode::Floor | RoundingMode::Down => (x_exp, Ordering::Less),
-        RoundingMode::Ceiling | RoundingMode::Up => {
+        Floor | Down => (x_exp, Less),
+        Ceiling | Up => {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
                 x_exp = x_exp.checked_add(1).unwrap();
                 *out.last_mut().unwrap() = HIGH_BIT;
             }
-            (x_exp, Ordering::Greater)
+            (x_exp, Greater)
         }
     }
 }
@@ -2526,11 +2380,8 @@ fn add_float_significands_general(
         // - y overlaps with out'
         // - copy y (shifted) into out
         // overlap is the number of limbs of y which overlap with out'
-        let mut overlap = usize::exact_from(
-            (out_bits - exp_diff)
-                .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
-                .0,
-        );
+        let mut overlap =
+            usize::exact_from((out_bits - exp_diff).shr_round(Limb::LOG_WIDTH, Ceiling).0);
         // only the highest overlap limbs from y have to be considered
         if overlap > ys_len {
             // y doesn't have enough limbs

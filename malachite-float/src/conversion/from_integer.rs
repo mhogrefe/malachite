@@ -9,59 +9,16 @@
 use crate::Float;
 use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 
 impl Float {
-    #[doc(hidden)]
-    pub fn from_integer_times_power_of_2(x: Integer, pow: i64) -> Float {
-        let sign = x >= 0;
-        let f = Float::from_natural_times_power_of_2(x.unsigned_abs(), pow);
-        if sign {
-            f
-        } else {
-            -f
-        }
-    }
-
-    #[doc(hidden)]
-    pub fn from_integer_times_power_of_2_prec_round(
-        x: Integer,
-        pow: i64,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        let sign = x >= 0;
-        let (f, o) = Float::from_natural_times_power_of_2_prec_round(
-            x.unsigned_abs(),
-            pow,
-            prec,
-            if sign { rm } else { -rm },
-        );
-        if sign {
-            (f, o)
-        } else {
-            (-f, o.reverse())
-        }
-    }
-
-    #[doc(hidden)]
-    #[inline]
-    pub fn from_integer_times_power_of_2_prec(
-        x: Integer,
-        pow: i64,
-        prec: u64,
-    ) -> (Float, Ordering) {
-        Float::from_integer_times_power_of_2_prec_round(x, pow, prec, RoundingMode::Nearest)
-    }
-
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`] is
     /// nonzero, it has the specified precision. If rounding is needed, the specified rounding mode
     /// is used. An [`Ordering`] is also returned, indicating whether the returned value is less
     /// than, equal to, or greater than the original value.
     ///
-    /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_integer_prec`]
-    /// instead.
+    /// If you're only using [`Nearest`], try using [`Float::from_integer_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -72,65 +29,56 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = Float::from_integer_prec_round(Integer::ZERO, 10, RoundingMode::Exact);
+    /// let (x, o) = Float::from_integer_prec_round(Integer::ZERO, 10, Exact);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_integer_prec_round(
-    ///     Integer::from(123),
-    ///     20,
-    ///     RoundingMode::Exact
-    /// );
+    /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 20, Exact);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 4, RoundingMode::Floor);
+    /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 4, Floor);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (x, o) = Float::from_integer_prec_round(
-    ///     Integer::from(123),
-    ///     4,
-    ///     RoundingMode::Ceiling
-    /// );
+    /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 4, Ceiling);
     /// assert_eq!(x.to_string(), "1.3e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     ///
-    /// let (x, o) = Float::from_integer_prec_round(
-    ///     Integer::from(-123),
-    ///     20,
-    ///     RoundingMode::Exact
-    /// );
+    /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 20, Exact);
     /// assert_eq!(x.to_string(), "-123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
-    /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 4, RoundingMode::Floor);
+    /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 4, Floor);
     /// assert_eq!(x.to_string(), "-1.3e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
-    /// let (x, o) = Float::from_integer_prec_round(
-    ///     Integer::from(-123),
-    ///     4,
-    ///     RoundingMode::Ceiling
-    /// );
+    /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 4, Ceiling);
     /// assert_eq!(x.to_string(), "-1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn from_integer_prec_round(x: Integer, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-        Float::from_integer_times_power_of_2_prec_round(x, 0, prec, rm)
+        let sign = x >= 0;
+        let (f, o) =
+            Float::from_natural_prec_round(x.unsigned_abs(), prec, if sign { rm } else { -rm });
+        if sign {
+            (f, o)
+        } else {
+            (-f, o.reverse())
+        }
     }
 
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`] is
@@ -140,8 +88,8 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
-    /// rounding mode as well as a precision, try [`Float::from_integer_prec_round`].
+    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// as well as a precision, try [`Float::from_integer_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -155,58 +103,102 @@ impl Float {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::ZERO, 10);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(123), 20);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(123), 4);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(-123), 20);
     /// assert_eq!(x.to_string(), "-123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(-123), 4);
     /// assert_eq!(x.to_string(), "-1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn from_integer_prec(x: Integer, prec: u64) -> (Float, Ordering) {
-        Float::from_integer_times_power_of_2_prec_round(x, 0, prec, RoundingMode::Nearest)
+        Float::from_integer_prec_round(x, prec, Nearest)
     }
 
-    #[doc(hidden)]
-    pub fn from_integer_times_power_of_2_ref(x: &Integer, pow: i64) -> Float {
-        let f = Float::from_natural_times_power_of_2_ref(x.unsigned_abs_ref(), pow);
-        if *x >= 0 {
-            f
-        } else {
-            -f
-        }
-    }
-
-    #[doc(hidden)]
-    pub fn from_integer_times_power_of_2_prec_round_ref(
+    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference. If the
+    /// [`Float`] is nonzero, it has the specified precision. If rounding is needed, the specified
+    /// rounding mode is used. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the original value.
+    ///
+    /// If you're only using [`Nearest`], try using [`Float::from_integer_prec_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_nz::integer::Integer;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::ZERO, 10, Exact);
+    /// assert_eq!(x.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(123), 20, Exact);
+    /// assert_eq!(x.to_string(), "123.0");
+    /// assert_eq!(x.get_prec(), Some(20));
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(123), 4, Floor);
+    /// assert_eq!(x.to_string(), "1.2e2");
+    /// assert_eq!(x.get_prec(), Some(4));
+    /// assert_eq!(o, Less);
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(123), 4, Ceiling);
+    /// assert_eq!(x.to_string(), "1.3e2");
+    /// assert_eq!(x.get_prec(), Some(4));
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(-123), 20, Exact);
+    /// assert_eq!(x.to_string(), "-123.0");
+    /// assert_eq!(x.get_prec(), Some(20));
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(-123), 4, Floor);
+    /// assert_eq!(x.to_string(), "-1.3e2");
+    /// assert_eq!(x.get_prec(), Some(4));
+    /// assert_eq!(o, Less);
+    ///
+    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(-123), 4, Ceiling);
+    /// assert_eq!(x.to_string(), "-1.2e2");
+    /// assert_eq!(x.get_prec(), Some(4));
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn from_integer_prec_round_ref(
         x: &Integer,
-        pow: i64,
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
         let sign = *x >= 0;
-        let (f, o) = Float::from_natural_times_power_of_2_prec_round_ref(
+        let (f, o) = Float::from_natural_prec_round_ref(
             x.unsigned_abs_ref(),
-            pow,
             prec,
             if sign { rm } else { -rm },
         );
@@ -215,106 +207,6 @@ impl Float {
         } else {
             (-f, o.reverse())
         }
-    }
-
-    #[doc(hidden)]
-    #[inline]
-    pub fn from_integer_times_power_of_2_prec_ref(
-        x: &Integer,
-        pow: i64,
-        prec: u64,
-    ) -> (Float, Ordering) {
-        Float::from_integer_times_power_of_2_prec_round_ref(x, pow, prec, RoundingMode::Nearest)
-    }
-
-    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference. If the
-    /// [`Float`] is nonzero, it has the specified precision. If rounding is needed, the specified
-    /// rounding mode is used. An [`Ordering`] is also returned, indicating whether the returned
-    /// value is less than, equal to, or greater than the original value.
-    ///
-    /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_integer_prec_ref`]
-    /// instead.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_float::Float;
-    /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::ZERO, 10, RoundingMode::Exact);
-    /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(
-    ///     &Integer::from(123),
-    ///     20,
-    ///     RoundingMode::Exact
-    /// );
-    /// assert_eq!(x.to_string(), "123.0");
-    /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(
-    ///     &Integer::from(123),
-    ///     4,
-    ///     RoundingMode::Floor
-    /// );
-    /// assert_eq!(x.to_string(), "1.2e2");
-    /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(
-    ///     &Integer::from(123),
-    ///     4,
-    ///     RoundingMode::Ceiling
-    /// );
-    /// assert_eq!(x.to_string(), "1.3e2");
-    /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(
-    ///     &Integer::from(-123),
-    ///     20,
-    ///     RoundingMode::Exact
-    /// );
-    /// assert_eq!(x.to_string(), "-123.0");
-    /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(
-    ///     &Integer::from(-123),
-    ///     4,
-    ///     RoundingMode::Floor
-    /// );
-    /// assert_eq!(x.to_string(), "-1.3e2");
-    /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
-    ///
-    /// let (x, o) = Float::from_integer_prec_round_ref(
-    ///     &Integer::from(-123),
-    ///     4,
-    ///     RoundingMode::Ceiling
-    /// );
-    /// assert_eq!(x.to_string(), "-1.2e2");
-    /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
-    /// ```
-    #[inline]
-    pub fn from_integer_prec_round_ref(
-        x: &Integer,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        Float::from_integer_times_power_of_2_prec_round_ref(x, 0, prec, rm)
     }
 
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference. If the
@@ -325,8 +217,8 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
-    /// rounding mode as well as a precision, try [`Float::from_integer_prec_round_ref`].
+    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// as well as a precision, try [`Float::from_integer_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -340,35 +232,41 @@ impl Float {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::ZERO, 10);
     /// assert_eq!(x.to_string(), "0.0");
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(123), 20);
     /// assert_eq!(x.to_string(), "123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(123), 4);
     /// assert_eq!(x.to_string(), "1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Less);
+    /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(-123), 20);
     /// assert_eq!(x.to_string(), "-123.0");
     /// assert_eq!(x.get_prec(), Some(20));
-    /// assert_eq!(o, Ordering::Equal);
+    /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(-123), 4);
     /// assert_eq!(x.to_string(), "-1.2e2");
     /// assert_eq!(x.get_prec(), Some(4));
-    /// assert_eq!(o, Ordering::Greater);
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn from_integer_prec_ref(x: &Integer, prec: u64) -> (Float, Ordering) {
-        Float::from_integer_times_power_of_2_prec_round_ref(x, 0, prec, RoundingMode::Nearest)
+        let sign = *x >= 0;
+        let (f, o) = Float::from_natural_prec_ref(x.unsigned_abs_ref(), prec);
+        if sign {
+            (f, o)
+        } else {
+            (-f, o.reverse())
+        }
     }
 }
 
@@ -377,9 +275,8 @@ impl From<Integer> for Float {
     ///
     /// If the [`Integer`] is nonzero, the precision of the [`Float`] is equal to the [`Integer`]'s
     /// number of significant bits. If you want to specify a different precision, try
-    /// [`Float::from_integer_prec`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
-    /// [`Float::from_integer_prec_round`].
+    /// [`Float::from_integer_prec`]. This may require rounding, which uses [`Nearest`] by default.
+    /// To specify a rounding mode as well as a precision, try [`Float::from_integer_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -401,7 +298,13 @@ impl From<Integer> for Float {
     /// ```
     #[inline]
     fn from(n: Integer) -> Float {
-        Float::from_integer_times_power_of_2(n, 0)
+        let sign = n >= 0;
+        let f = Float::from(n.unsigned_abs());
+        if sign {
+            f
+        } else {
+            -f
+        }
     }
 }
 
@@ -410,8 +313,8 @@ impl<'a> From<&'a Integer> for Float {
     ///
     /// If the [`Integer`] is nonzero, the precision of the [`Float`] is equal to the [`Integer`]'s
     /// number of significant bits. If you want to specify a different precision, try
-    /// [`Float::from_integer_prec_ref`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_integer_prec_ref`]. This may require rounding, which uses [`Nearest`] by
+    /// default. To specify a rounding mode as well as a precision, try
     /// [`Float::from_integer_prec_round_ref`].
     ///
     /// # Worst-case complexity
@@ -434,6 +337,11 @@ impl<'a> From<&'a Integer> for Float {
     /// ```
     #[inline]
     fn from(n: &'a Integer) -> Float {
-        Float::from_integer_times_power_of_2_ref(n, 0)
+        let f = Float::from(n.unsigned_abs_ref());
+        if *n >= 0 {
+            f
+        } else {
+            -f
+        }
     }
 }

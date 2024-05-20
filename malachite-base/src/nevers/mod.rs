@@ -18,7 +18,7 @@ use core::str::FromStr;
 /// ```
 /// use malachite_base::nevers::Never;
 ///
-/// let x: Option<Never> = None;
+/// let _x: Option<Never> = None;
 /// ```
 #[derive(Clone, Copy, Debug, Hash, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Never {}

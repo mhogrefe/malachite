@@ -13,7 +13,7 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
@@ -81,28 +81,28 @@ pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
     let mut ys_len = ys.len();
     let mut swapped = false;
     match xs_leading.cmp(&ys_leading) {
-        Ordering::Equal => {
+        Equal => {
             return match xs_len.cmp(&ys_len) {
-                Ordering::Equal => limbs_cmp_same_length(xs, ys),
-                Ordering::Less => {
+                Equal => limbs_cmp_same_length(xs, ys),
+                Less => {
                     let leading_cmp = limbs_cmp_same_length(xs, &ys[ys_len - xs_len..]);
-                    if leading_cmp == Ordering::Greater {
-                        Ordering::Greater
+                    if leading_cmp == Greater {
+                        Greater
                     } else {
-                        Ordering::Less
+                        Less
                     }
                 }
-                Ordering::Greater => {
+                Greater => {
                     let leading_cmp = limbs_cmp_same_length(&xs[xs_len - ys_len..], ys);
-                    if leading_cmp == Ordering::Less {
-                        Ordering::Less
+                    if leading_cmp == Less {
+                        Less
                     } else {
-                        Ordering::Greater
+                        Greater
                     }
                 }
             };
         }
-        Ordering::Less => {
+        Less => {
             swap(&mut xs, &mut ys);
             swap(&mut xs_leading, &mut ys_leading);
             swap(&mut xs_len, &mut ys_len);
@@ -120,24 +120,24 @@ pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
         let xs_lo = if xs_i == 0 { 0 } else { xs[xs_i - 1] };
         let x = (xs_hi << xs_shift) | (xs_lo >> comp_xs_shift);
         let cmp = x.cmp(&y);
-        if cmp != Ordering::Equal {
+        if cmp != Equal {
             return if swapped { cmp.reverse() } else { cmp };
         }
         if xs_i == 0 {
             return if ys_i == 0 {
-                Ordering::Equal
+                Equal
             } else if swapped {
-                Ordering::Greater
+                Greater
             } else {
-                Ordering::Less
+                Less
             };
         } else if ys_i == 0 {
             return if xs_lo << xs_shift == 0 && slice_test_zero(&xs[..xs_i - 1]) {
-                Ordering::Equal
+                Equal
             } else if swapped {
-                Ordering::Less
+                Less
             } else {
-                Ordering::Greater
+                Greater
             };
         }
         xs_i -= 1;
@@ -177,12 +177,12 @@ impl Ord for Natural {
     /// ```
     fn cmp(&self, other: &Natural) -> Ordering {
         if core::ptr::eq(self, other) {
-            return Ordering::Equal;
+            return Equal;
         }
         match (self, other) {
             (&Natural(Small(ref x)), &Natural(Small(ref y))) => x.cmp(y),
-            (&Natural(Small(_)), &Natural(Large(_))) => Ordering::Less,
-            (&Natural(Large(_)), &Natural(Small(_))) => Ordering::Greater,
+            (&Natural(Small(_)), &Natural(Large(_))) => Less,
+            (&Natural(Large(_)), &Natural(Small(_))) => Greater,
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_cmp(xs, ys),
         }
     }
@@ -212,39 +212,51 @@ impl Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_nz::natural::Natural;
-    /// use core::cmp::Ordering;
     ///
     /// // 1 == 1.0 * 2^0, 4 == 1.0 * 2^2
     /// // 1.0 == 1.0
-    /// assert_eq!(Natural::from(1u32).cmp_normalized(&Natural::from(4u32)), Ordering::Equal);
+    /// assert_eq!(
+    ///     Natural::from(1u32).cmp_normalized(&Natural::from(4u32)),
+    ///     Equal
+    /// );
     ///
     /// // 5 == 1.25 * 2^2, 6 == 1.5 * 2^2
     /// // 1.25 < 1.5
-    /// assert_eq!(Natural::from(5u32).cmp_normalized(&Natural::from(6u32)), Ordering::Less);
+    /// assert_eq!(
+    ///     Natural::from(5u32).cmp_normalized(&Natural::from(6u32)),
+    ///     Less
+    /// );
     ///
     /// // 3 == 1.5 * 2^1, 17 == 1.0625 * 2^4
     /// // 1.5 > 1.0625
-    /// assert_eq!(Natural::from(3u32).cmp_normalized(&Natural::from(17u32)), Ordering::Greater);
+    /// assert_eq!(
+    ///     Natural::from(3u32).cmp_normalized(&Natural::from(17u32)),
+    ///     Greater
+    /// );
     ///
     /// // 9 == 1.125 * 2^3, 36 == 1.125 * 2^5
     /// // 1.125 == 1.125
-    /// assert_eq!(Natural::from(9u32).cmp_normalized(&Natural::from(36u32)), Ordering::Equal);
+    /// assert_eq!(
+    ///     Natural::from(9u32).cmp_normalized(&Natural::from(36u32)),
+    ///     Equal
+    /// );
     /// ```
     pub fn cmp_normalized(&self, other: &Natural) -> Ordering {
         assert_ne!(*self, 0);
         assert_ne!(*other, 0);
         if core::ptr::eq(self, other) {
-            return Ordering::Equal;
+            return Equal;
         }
         match (self, other) {
             (&Natural(Small(x)), &Natural(Small(y))) => {
                 let leading_x = x.leading_zeros();
                 let leading_y = y.leading_zeros();
                 match leading_x.cmp(&leading_y) {
-                    Ordering::Equal => x.cmp(&y),
-                    Ordering::Less => x.cmp(&(y << (leading_y - leading_x))),
-                    Ordering::Greater => (x << (leading_x - leading_y)).cmp(&y),
+                    Equal => x.cmp(&y),
+                    Less => x.cmp(&(y << (leading_y - leading_x))),
+                    Greater => (x << (leading_x - leading_y)).cmp(&y),
                 }
             }
             (&Natural(Small(x)), &Natural(Large(ref ys))) => limbs_cmp_normalized(&[x], ys),
@@ -258,57 +270,57 @@ impl Natural {
         assert_ne!(*self, 0);
         assert_ne!(*other, 0);
         if core::ptr::eq(self, other) {
-            return Ordering::Equal;
+            return Equal;
         }
         match (self, other) {
             (&Natural(Small(x)), &Natural(Small(y))) => x.cmp(&y),
             (Natural(Small(x)), &Natural(Large(ref ys))) => {
                 let (ys_last, ys_init) = ys.split_last().unwrap();
                 let c = x.cmp(ys_last);
-                if c != Ordering::Equal {
+                if c != Equal {
                     c
                 } else if slice_test_zero(ys_init) {
-                    Ordering::Equal
+                    Equal
                 } else {
-                    Ordering::Less
+                    Less
                 }
             }
             (&Natural(Large(ref xs)), Natural(Small(y))) => {
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let c = xs_last.cmp(y);
-                if c != Ordering::Equal {
+                if c != Equal {
                     c
                 } else if slice_test_zero(xs_init) {
-                    Ordering::Equal
+                    Equal
                 } else {
-                    Ordering::Greater
+                    Greater
                 }
             }
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                 let xs_len = xs.len();
                 let ys_len = ys.len();
                 match xs_len.cmp(&ys_len) {
-                    Ordering::Equal => xs.iter().rev().cmp(ys.iter().rev()),
-                    Ordering::Less => {
+                    Equal => xs.iter().rev().cmp(ys.iter().rev()),
+                    Less => {
                         let (ys_lo, ys_hi) = ys.split_at(ys_len - xs_len);
                         let c = xs.iter().rev().cmp(ys_hi.iter().rev());
-                        if c != Ordering::Equal {
+                        if c != Equal {
                             c
                         } else if slice_test_zero(ys_lo) {
-                            Ordering::Equal
+                            Equal
                         } else {
-                            Ordering::Less
+                            Less
                         }
                     }
-                    Ordering::Greater => {
+                    Greater => {
                         let (xs_lo, xs_hi) = xs.split_at(xs_len - ys_len);
                         let c = xs_hi.iter().rev().cmp(ys.iter().rev());
-                        if c != Ordering::Equal {
+                        if c != Equal {
                             c
                         } else if slice_test_zero(xs_lo) {
-                            Ordering::Equal
+                            Equal
                         } else {
-                            Ordering::Greater
+                            Greater
                         }
                     }
                 }

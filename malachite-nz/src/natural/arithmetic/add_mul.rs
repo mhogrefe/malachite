@@ -368,9 +368,13 @@ impl AddMul<Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
+    ///     Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)),
+    ///     22
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
     ///         .add_mul(Natural::from(0x10000u32), Natural::from(10u32).pow(12)),
     ///     65537000000000000u64
     /// );
@@ -403,9 +407,13 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
+    ///     Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)),
+    ///     22
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
     ///         .add_mul(Natural::from(0x10000u32), &Natural::from(10u32).pow(12)),
     ///     65537000000000000u64
     /// );
@@ -438,9 +446,13 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
+    ///     Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)),
+    ///     22
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
     ///         .add_mul(&Natural::from(0x10000u32), Natural::from(10u32).pow(12)),
     ///     65537000000000000u64
     /// );
@@ -473,9 +485,13 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
+    ///     Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     22
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32)
+    ///         .pow(12)
     ///         .add_mul(&Natural::from(0x10000u32), &Natural::from(10u32).pow(12)),
     ///     65537000000000000u64
     /// );
@@ -507,7 +523,10 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32).pow(12))
     ///         .add_mul(&Natural::from(0x10000u32), &Natural::from(10u32).pow(12)),

@@ -79,7 +79,10 @@ impl CoprimeWith<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(3u32).coprime_with(Natural::from(5u32)), true);
-    /// assert_eq!(Natural::from(12u32).coprime_with(Natural::from(90u32)), false);
+    /// assert_eq!(
+    ///     Natural::from(12u32).coprime_with(Natural::from(90u32)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn coprime_with(self, other: Natural) -> bool {
@@ -111,7 +114,10 @@ impl<'a> CoprimeWith<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(3u32).coprime_with(&Natural::from(5u32)), true);
-    /// assert_eq!(Natural::from(12u32).coprime_with(&Natural::from(90u32)), false);
+    /// assert_eq!(
+    ///     Natural::from(12u32).coprime_with(&Natural::from(90u32)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn coprime_with(self, other: &'a Natural) -> bool {
@@ -142,8 +148,14 @@ impl<'a> CoprimeWith<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).coprime_with(Natural::from(5u32)), true);
-    /// assert_eq!((&Natural::from(12u32)).coprime_with(Natural::from(90u32)), false);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).coprime_with(Natural::from(5u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(12u32)).coprime_with(Natural::from(90u32)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn coprime_with(self, other: Natural) -> bool {
@@ -174,8 +186,14 @@ impl<'a, 'b> CoprimeWith<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).coprime_with(Natural::from(5u32)), true);
-    /// assert_eq!((&Natural::from(12u32)).coprime_with(Natural::from(90u32)), false);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).coprime_with(Natural::from(5u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(12u32)).coprime_with(Natural::from(90u32)),
+    ///     false
+    /// );
     /// ```
     fn coprime_with(self, other: &'b Natural) -> bool {
         coprime_with_check_2_ref_ref(self, other)

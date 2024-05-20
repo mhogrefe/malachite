@@ -12,7 +12,7 @@ use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::generators::{primitive_float_gen, unsigned_pair_gen_var_26};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 
 #[test]
@@ -157,7 +157,7 @@ fn raw_mantissa_and_exponent_properties() {
 fn from_raw_mantissa_and_exponent_properties_helper<T: PrimitiveFloat>() {
     unsigned_pair_gen_var_26::<T>().test_properties(|(mantissa, exponent)| {
         let f = T::from_raw_mantissa_and_exponent(mantissa, exponent);
-        assert!(f.is_nan() || f.sign() == Ordering::Greater);
+        assert!(f.is_nan() || f.sign() == Greater);
         if !f.is_nan() {
             assert_eq!(f.raw_mantissa_and_exponent(), (mantissa, exponent));
         }

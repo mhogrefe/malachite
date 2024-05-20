@@ -13,7 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_2, unsigned_pair_gen_var_20,
@@ -379,10 +379,7 @@ fn neg_mod_power_of_2_properties() {
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
-        assert_eq!(
-            ((&n).shr_round(u, RoundingMode::Ceiling).0 << u) - &result,
-            n
-        );
+        assert_eq!(((&n).shr_round(u, Ceiling).0 << u) - &result, n);
         assert!(result < Natural::power_of_2(u));
         assert_eq!(result == 0, n.divisible_by_power_of_2(u));
         assert_eq!((&result).neg_mod_power_of_2(u), (&n).mod_power_of_2(u));

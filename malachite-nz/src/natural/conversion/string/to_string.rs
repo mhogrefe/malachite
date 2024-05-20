@@ -29,7 +29,7 @@ use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, WrappingFrom};
 #[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 /// A `struct` that allows for formatting a [`Natural`] or [`Integer`](crate::integer::Integer) and
 /// rendering its digits in a specified base.
@@ -262,9 +262,9 @@ impl Display for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_string(), "123");
@@ -305,15 +305,17 @@ impl Debug for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_debug_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_debug_string(), "123");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000").unwrap().to_debug_string(),
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_debug_string(),
     ///     "1000000000000"
     /// );
     /// assert_eq!(format!("{:05?}", Natural::from(123u32)), "00123");
@@ -403,15 +405,17 @@ impl Binary for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_binary_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_binary_string(), "1111011");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000").unwrap().to_binary_string(),
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_binary_string(),
     ///     "1110100011010100101001010001000000000000"
     /// );
     /// assert_eq!(format!("{:011b}", Natural::from(123u32)), "00001111011");
@@ -457,12 +461,7 @@ impl Octal for NaturalAlt {
                 f.write_str("0o")?;
             }
             if let Some(width) = f.width() {
-                let mut len = usize::exact_from(
-                    self.0
-                        .significant_bits()
-                        .div_round(3, RoundingMode::Ceiling)
-                        .0,
-                );
+                let mut len = usize::exact_from(self.0.significant_bits().div_round(3, Ceiling).0);
                 if f.alternate() {
                     len += 2;
                 }
@@ -499,11 +498,8 @@ impl Octal for NaturalAlt2 {
                     f.write_str("0o")?;
                 }
                 if let Some(width) = f.width() {
-                    let mut len = usize::exact_from(
-                        limbs_significant_bits(xs)
-                            .div_round(3, RoundingMode::Ceiling)
-                            .0,
-                    );
+                    let mut len =
+                        usize::exact_from(limbs_significant_bits(xs).div_round(3, Ceiling).0);
                     if f.alternate() {
                         len += 2;
                     }
@@ -588,15 +584,17 @@ impl Octal for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_octal_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_octal_string(), "173");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000").unwrap().to_octal_string(),
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_octal_string(),
     ///     "16432451210000"
     /// );
     /// assert_eq!(format!("{:07o}", Natural::from(123u32)), "0000173");
@@ -613,14 +611,8 @@ impl Octal for Natural {
         match self {
             Natural(Small(x)) => Octal::fmt(x, f),
             Natural(Large(xs)) => {
-                let mut digits = vec![
-                    0;
-                    usize::exact_from(
-                        limbs_significant_bits(xs)
-                            .div_round(3, RoundingMode::Ceiling)
-                            .0
-                    )
-                ];
+                let mut digits =
+                    vec![0; usize::exact_from(limbs_significant_bits(xs).div_round(3, Ceiling).0)];
                 let mut limbs = xs.iter();
                 let mut remaining_bits = Limb::WIDTH;
                 let mut limb = *limbs.next().unwrap();
@@ -677,12 +669,7 @@ impl LowerHex for NaturalAlt {
                 f.write_str("0x")?;
             }
             if let Some(width) = f.width() {
-                let mut len = usize::exact_from(
-                    self.0
-                        .significant_bits()
-                        .shr_round(2, RoundingMode::Ceiling)
-                        .0,
-                );
+                let mut len = usize::exact_from(self.0.significant_bits().shr_round(2, Ceiling).0);
                 if f.alternate() {
                     len += 2;
                 }
@@ -745,15 +732,17 @@ impl LowerHex for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_lower_hex_string(), "7b");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000").unwrap().to_lower_hex_string(),
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_lower_hex_string(),
     ///     "e8d4a51000"
     /// );
     /// assert_eq!(format!("{:07x}", Natural::from(123u32)), "000007b");
@@ -771,14 +760,8 @@ impl LowerHex for Natural {
             Natural(Small(x)) => LowerHex::fmt(x, f),
             Natural(Large(xs)) => {
                 const DIGITS_PER_LIMB: u64 = Limb::WIDTH >> 2;
-                let mut digits = vec![
-                    0;
-                    usize::exact_from(
-                        limbs_significant_bits(xs)
-                            .shr_round(2, RoundingMode::Ceiling)
-                            .0
-                    )
-                ];
+                let mut digits =
+                    vec![0; usize::exact_from(limbs_significant_bits(xs).shr_round(2, Ceiling).0)];
                 let mut limbs = xs.iter();
                 let mut limb = *limbs.next().unwrap();
                 let mut remaining_digits = DIGITS_PER_LIMB;
@@ -811,15 +794,17 @@ impl UpperHex for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_upper_hex_string(), "7B");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000").unwrap().to_upper_hex_string(),
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_upper_hex_string(),
     ///     "E8D4A51000"
     /// );
     /// assert_eq!(format!("{:07X}", Natural::from(123u32)), "000007B");
@@ -837,14 +822,8 @@ impl UpperHex for Natural {
             Natural(Small(x)) => UpperHex::fmt(x, f),
             Natural(Large(xs)) => {
                 const DIGITS_PER_LIMB: u64 = Limb::WIDTH >> 2;
-                let mut digits = vec![
-                    0;
-                    usize::exact_from(
-                        limbs_significant_bits(xs)
-                            .shr_round(2, RoundingMode::Ceiling)
-                            .0
-                    )
-                ];
+                let mut digits =
+                    vec![0; usize::exact_from(limbs_significant_bits(xs).shr_round(2, Ceiling).0)];
                 let mut limbs = xs.iter();
                 let mut limb = *limbs.next().unwrap();
                 let mut remaining_digits = DIGITS_PER_LIMB;

@@ -105,8 +105,8 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert!(Integer::ZERO.to_bits_asc().is_empty());
@@ -152,8 +152,8 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert!(Integer::ZERO.to_bits_desc().is_empty());
@@ -197,22 +197,26 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::empty;
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
-    /// use core::iter::empty;
     ///
     /// assert_eq!(Integer::from_bits_asc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
     ///     Integer::from_bits_asc(
-    ///         [true, false, false, true, false, true, true, false].iter().cloned()
+    ///         [true, false, false, true, false, true, true, false]
+    ///             .iter()
+    ///             .cloned()
     ///     ),
     ///     105
     /// );
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
     /// assert_eq!(
     ///     Integer::from_bits_asc(
-    ///         [true, true, true, false, true, false, false, true].iter().cloned()
+    ///         [true, true, true, false, true, false, false, true]
+    ///             .iter()
+    ///             .cloned()
     ///     ),
     ///     -105
     /// );
@@ -262,22 +266,26 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::empty;
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
-    /// use core::iter::empty;
     ///
     /// assert_eq!(Integer::from_bits_desc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
     ///     Integer::from_bits_desc(
-    ///         [false, true, true, false, true, false, false, true].iter().cloned()
+    ///         [false, true, true, false, true, false, false, true]
+    ///             .iter()
+    ///             .cloned()
     ///     ),
     ///     105
     /// );
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
     /// assert_eq!(
     ///     Integer::from_bits_desc(
-    ///         [true, false, false, true, false, true, true, true].iter().cloned()
+    ///         [true, false, false, true, false, true, true, true]
+    ///             .iter()
+    ///             .cloned()
     ///     ),
     ///     -105
     /// );

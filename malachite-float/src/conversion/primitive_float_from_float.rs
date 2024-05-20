@@ -8,25 +8,25 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, IsPowerOf2, ShrRound};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
     f: Float,
     rm: RoundingMode,
 ) -> (T, Ordering) {
     match f {
-        float_nan!() => (T::NAN, Ordering::Equal),
-        float_infinity!() => (T::INFINITY, Ordering::Equal),
-        float_negative_infinity!() => (T::NEGATIVE_INFINITY, Ordering::Equal),
-        float_zero!() => (T::ZERO, Ordering::Equal),
-        float_negative_zero!() => (T::NEGATIVE_ZERO, Ordering::Equal),
+        float_nan!() => (T::NAN, Equal),
+        float_infinity!() => (T::INFINITY, Equal),
+        float_negative_infinity!() => (T::NEGATIVE_INFINITY, Equal),
+        float_zero!() => (T::ZERO, Equal),
+        float_negative_zero!() => (T::NEGATIVE_ZERO, Equal),
         Float(Finite {
             sign,
             exponent,
@@ -38,28 +38,22 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                 let exponent = exponent - 1;
                 if exponent < T::MIN_EXPONENT {
                     match abs_rm {
-                        RoundingMode::Floor | RoundingMode::Down => (T::ZERO, Ordering::Less),
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (T::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
-                        }
-                        RoundingMode::Nearest => {
+                        Floor | Down => (T::ZERO, Less),
+                        Ceiling | Up => (T::MIN_POSITIVE_SUBNORMAL, Greater),
+                        Nearest => {
                             if exponent == T::MIN_EXPONENT - 1 && !significand.is_power_of_2() {
-                                (T::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
+                                (T::MIN_POSITIVE_SUBNORMAL, Greater)
                             } else {
-                                (T::ZERO, Ordering::Less)
+                                (T::ZERO, Less)
                             }
                         }
-                        RoundingMode::Exact => panic!("Float too small for exact conversion"),
+                        Exact => panic!("Float too small for exact conversion"),
                     }
                 } else if exponent > T::MAX_EXPONENT {
                     match abs_rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MAX_FINITE, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (T::INFINITY, Ordering::Greater)
-                        }
-                        RoundingMode::Exact => panic!("Float too large for exact conversion"),
+                        Floor | Down | Nearest => (T::MAX_FINITE, Less),
+                        Ceiling | Up => (T::INFINITY, Greater),
+                        Exact => panic!("Float too large for exact conversion"),
                     }
                 } else {
                     let target_prec = T::max_precision_for_sci_exponent(exponent);
@@ -70,14 +64,10 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                     if mantissa.significant_bits() > target_prec {
                         if exponent == T::MAX_EXPONENT {
                             match abs_rm {
-                                RoundingMode::Floor
-                                | RoundingMode::Down
-                                | RoundingMode::Nearest => (T::MAX_FINITE, Ordering::Less),
-                                RoundingMode::Ceiling | RoundingMode::Up => {
-                                    (T::INFINITY, Ordering::Greater)
-                                }
+                                Floor | Down | Nearest => (T::MAX_FINITE, Less),
+                                Ceiling | Up => (T::INFINITY, Greater),
 
-                                RoundingMode::Exact => {
+                                Exact => {
                                     panic!("Float too large for exact conversion")
                                 }
                             }
@@ -117,11 +107,11 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
     rm: RoundingMode,
 ) -> (T, Ordering) {
     match f {
-        float_nan!() => (T::NAN, Ordering::Equal),
-        float_infinity!() => (T::INFINITY, Ordering::Equal),
-        float_negative_infinity!() => (T::NEGATIVE_INFINITY, Ordering::Equal),
-        float_zero!() => (T::ZERO, Ordering::Equal),
-        float_negative_zero!() => (T::NEGATIVE_ZERO, Ordering::Equal),
+        float_nan!() => (T::NAN, Equal),
+        float_infinity!() => (T::INFINITY, Equal),
+        float_negative_infinity!() => (T::NEGATIVE_INFINITY, Equal),
+        float_zero!() => (T::ZERO, Equal),
+        float_negative_zero!() => (T::NEGATIVE_ZERO, Equal),
         Float(Finite {
             sign,
             exponent,
@@ -133,28 +123,22 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                 let exponent = exponent - 1;
                 if exponent < T::MIN_EXPONENT {
                     match abs_rm {
-                        RoundingMode::Floor | RoundingMode::Down => (T::ZERO, Ordering::Less),
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (T::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
-                        }
-                        RoundingMode::Nearest => {
+                        Floor | Down => (T::ZERO, Less),
+                        Ceiling | Up => (T::MIN_POSITIVE_SUBNORMAL, Greater),
+                        Nearest => {
                             if exponent == T::MIN_EXPONENT - 1 && !significand.is_power_of_2() {
-                                (T::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
+                                (T::MIN_POSITIVE_SUBNORMAL, Greater)
                             } else {
-                                (T::ZERO, Ordering::Less)
+                                (T::ZERO, Less)
                             }
                         }
-                        RoundingMode::Exact => panic!("Float too small for exact conversion"),
+                        Exact => panic!("Float too small for exact conversion"),
                     }
                 } else if exponent > T::MAX_EXPONENT {
                     match abs_rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MAX_FINITE, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (T::INFINITY, Ordering::Greater)
-                        }
-                        RoundingMode::Exact => panic!("Float too large for exact conversion"),
+                        Floor | Down | Nearest => (T::MAX_FINITE, Less),
+                        Ceiling | Up => (T::INFINITY, Greater),
+                        Exact => panic!("Float too large for exact conversion"),
                     }
                 } else {
                     let target_prec = T::max_precision_for_sci_exponent(exponent);
@@ -165,14 +149,10 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                     if mantissa.significant_bits() > target_prec {
                         if exponent == T::MAX_EXPONENT {
                             match abs_rm {
-                                RoundingMode::Floor
-                                | RoundingMode::Down
-                                | RoundingMode::Nearest => (T::MAX_FINITE, Ordering::Less),
-                                RoundingMode::Ceiling | RoundingMode::Up => {
-                                    (T::INFINITY, Ordering::Greater)
-                                }
+                                Floor | Down | Nearest => (T::MAX_FINITE, Less),
+                                Ceiling | Up => (T::INFINITY, Greater),
 
-                                RoundingMode::Exact => {
+                                Exact => {
                                     panic!("Float too large for exact conversion")
                                 }
                             }
@@ -327,7 +307,7 @@ macro_rules! impl_primitive_float_from {
             /// taking the [`Float`] by value. An [`Ordering`] is also returned, indicating whether
             /// the returned value is less than, equal to, or greater than the original value.
             /// (Although a NaN is not comparable to anything, converting a NaN to a NaN will also
-            /// return `Ordering::Equals`, indicating an exact conversion.)
+            /// return `Equal`, indicating an exact conversion.)
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -349,7 +329,7 @@ macro_rules! impl_primitive_float_from {
             /// taking the [`Float`] by reference. An [`Ordering`] is also returned, indicating
             /// whether the returned value is less than, equal to, or greater than the original
             /// value. (Although a NaN is not comparable to anything, converting a NaN to a NaN will
-            /// also return `Ordering::Equals`, indicating an exact conversion.)
+            /// also return `Equal`, indicating an exact conversion.)
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

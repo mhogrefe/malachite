@@ -39,11 +39,26 @@ impl Rational {
     /// use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::try_from_float_simplest(0.0).to_debug_string(), "Ok(0)");
-    /// assert_eq!(Rational::try_from_float_simplest(1.5).to_debug_string(), "Ok(3/2)");
-    /// assert_eq!(Rational::try_from_float_simplest(-1.5).to_debug_string(), "Ok(-3/2)");
-    /// assert_eq!(Rational::try_from_float_simplest(0.1f32).to_debug_string(), "Ok(1/10)");
-    /// assert_eq!(Rational::try_from_float_simplest(0.33333334f32).to_debug_string(), "Ok(1/3)");
+    /// assert_eq!(
+    ///     Rational::try_from_float_simplest(0.0).to_debug_string(),
+    ///     "Ok(0)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::try_from_float_simplest(1.5).to_debug_string(),
+    ///     "Ok(3/2)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::try_from_float_simplest(-1.5).to_debug_string(),
+    ///     "Ok(-3/2)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::try_from_float_simplest(0.1f32).to_debug_string(),
+    ///     "Ok(1/10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::try_from_float_simplest(0.33333334f32).to_debug_string(),
+    ///     "Ok(1/3)"
+    /// );
     /// assert_eq!(
     ///     Rational::try_from_float_simplest(f32::NAN),
     ///     Err(RationalFromPrimitiveFloatError)

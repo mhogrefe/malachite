@@ -23,7 +23,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
     ///
@@ -32,7 +32,10 @@ impl Float {
     ///     ComparableFloat(Float::NAN)
     /// );
     /// assert_eq!(Float::INFINITY.abs_negative_zero(), Float::INFINITY);
-    /// assert_eq!(Float::NEGATIVE_INFINITY.abs_negative_zero(), Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     Float::NEGATIVE_INFINITY.abs_negative_zero(),
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     /// assert_eq!(
     ///     ComparableFloat(Float::ZERO.abs_negative_zero()),
     ///     ComparableFloat(Float::ZERO)
@@ -63,7 +66,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
     ///
@@ -72,7 +75,10 @@ impl Float {
     ///     ComparableFloat(Float::NAN)
     /// );
     /// assert_eq!(Float::INFINITY.abs_negative_zero_ref(), Float::INFINITY);
-    /// assert_eq!(Float::NEGATIVE_INFINITY.abs_negative_zero_ref(), Float::NEGATIVE_INFINITY);
+    /// assert_eq!(
+    ///     Float::NEGATIVE_INFINITY.abs_negative_zero_ref(),
+    ///     Float::NEGATIVE_INFINITY
+    /// );
     /// assert_eq!(
     ///     ComparableFloat(Float::ZERO.abs_negative_zero_ref()),
     ///     ComparableFloat(Float::ZERO)
@@ -82,7 +88,10 @@ impl Float {
     ///     ComparableFloat(Float::ZERO)
     /// );
     /// assert_eq!(Float::ONE.abs_negative_zero_ref(), Float::ONE);
-    /// assert_eq!(Float::NEGATIVE_ONE.abs_negative_zero_ref(), Float::NEGATIVE_ONE);
+    /// assert_eq!(
+    ///     Float::NEGATIVE_ONE.abs_negative_zero_ref(),
+    ///     Float::NEGATIVE_ONE
+    /// );
     /// ```
     pub fn abs_negative_zero_ref(&self) -> Float {
         match self {
@@ -99,7 +108,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
     ///
@@ -159,15 +168,24 @@ impl Abs for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
     ///
-    /// assert_eq!(ComparableFloat(Float::NAN.abs()), ComparableFloat(Float::NAN));
+    /// assert_eq!(
+    ///     ComparableFloat(Float::NAN.abs()),
+    ///     ComparableFloat(Float::NAN)
+    /// );
     /// assert_eq!(Float::INFINITY.abs(), Float::INFINITY);
     /// assert_eq!(Float::NEGATIVE_INFINITY.abs(), Float::INFINITY);
-    /// assert_eq!(ComparableFloat(Float::ZERO.abs()), ComparableFloat(Float::ZERO));
-    /// assert_eq!(ComparableFloat(Float::NEGATIVE_ZERO.abs()), ComparableFloat(Float::ZERO));
+    /// assert_eq!(
+    ///     ComparableFloat(Float::ZERO.abs()),
+    ///     ComparableFloat(Float::ZERO)
+    /// );
+    /// assert_eq!(
+    ///     ComparableFloat(Float::NEGATIVE_ZERO.abs()),
+    ///     ComparableFloat(Float::ZERO)
+    /// );
     /// assert_eq!(Float::ONE.abs(), Float::ONE);
     /// assert_eq!(Float::NEGATIVE_ONE.abs(), Float::ONE);
     /// ```
@@ -203,15 +221,24 @@ impl<'a> Abs for &'a Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
     ///
-    /// assert_eq!(ComparableFloat((&Float::NAN).abs()), ComparableFloat(Float::NAN));
+    /// assert_eq!(
+    ///     ComparableFloat((&Float::NAN).abs()),
+    ///     ComparableFloat(Float::NAN)
+    /// );
     /// assert_eq!((&Float::INFINITY).abs(), Float::INFINITY);
     /// assert_eq!((&Float::NEGATIVE_INFINITY).abs(), Float::INFINITY);
-    /// assert_eq!(ComparableFloat((&Float::ZERO).abs()), ComparableFloat(Float::ZERO));
-    /// assert_eq!(ComparableFloat((&Float::NEGATIVE_ZERO).abs()), ComparableFloat(Float::ZERO));
+    /// assert_eq!(
+    ///     ComparableFloat((&Float::ZERO).abs()),
+    ///     ComparableFloat(Float::ZERO)
+    /// );
+    /// assert_eq!(
+    ///     ComparableFloat((&Float::NEGATIVE_ZERO).abs()),
+    ///     ComparableFloat(Float::ZERO)
+    /// );
     /// assert_eq!((&Float::ONE).abs(), Float::ONE);
     /// assert_eq!((&Float::NEGATIVE_ONE).abs(), Float::ONE);
     /// ```
@@ -256,7 +283,7 @@ impl AbsAssign for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::AbsAssign;
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
     ///

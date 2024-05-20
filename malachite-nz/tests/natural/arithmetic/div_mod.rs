@@ -16,7 +16,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_12, unsigned_pair_gen_var_12, unsigned_pair_gen_var_35,
@@ -2707,7 +2707,7 @@ fn test_limbs_invert_newton_approx() {
         );
         // - scratch[d_len] < 2
         // - carry != 2 || limbs_sub_same_length_in_place_left(scratch_lo, ds_hi)
-        // - limbs_cmp_same_length(scratch_lo, ds_hi_lo) == Ordering::Greater
+        // - limbs_cmp_same_length(scratch_lo, ds_hi_lo) == Greater
         test(
             &[10; 14],
             &[
@@ -2720,7 +2720,7 @@ fn test_limbs_invert_newton_approx() {
                 1099516923, 4253768807, 1256057898, 821933298, 3636132439, 2794702458, 2955917631,
             ],
         );
-        // - limbs_cmp_same_length(scratch_lo, ds_hi_lo) != Ordering::Greater
+        // - limbs_cmp_same_length(scratch_lo, ds_hi_lo) != Greater
         test(
             &[10; 17],
             &[
@@ -4965,8 +4965,7 @@ fn test_limbs_div_mod_barrett() {
         // - i_len == chunk_len in limbs_div_mod_barrett_preinverted
         // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_mod_barrett_preinverted
         // - n > 0 in limbs_div_mod_barrett_preinverted
-        // - limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal in
-        //   limbs_div_mod_barrett_preinverted
+        // - limbs_cmp_same_length(ns_hi, ds) >= Equal in limbs_div_mod_barrett_preinverted
         test(
             &[10, 10],
             &[10, 10, 10],
@@ -4980,7 +4979,7 @@ fn test_limbs_div_mod_barrett() {
         // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_mod_barrett_preinverted
         // - d_len_plus_i_len > scratch_len in limbs_div_barrett_large_product
         // - i_len != chunk_len in limbs_div_mod_barrett_preinverted
-        // - limbs_cmp_same_length(ns_hi, ds) == Ordering::Less in limbs_div_mod_barrett_preinverted
+        // - limbs_cmp_same_length(ns_hi, ds) == Less in limbs_div_mod_barrett_preinverted
         test(
             &[
                 3347432287, 667250836, 2974407817, 429996943, 2750501459, 981155607, 2784121354,
@@ -23511,10 +23510,7 @@ fn test_ceiling_div_neg_mod() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        let (q, r) = (
-            u.clone().div_round(v.clone(), RoundingMode::Ceiling).0,
-            u.neg_mod(v),
-        );
+        let (q, r) = (u.clone().div_round(v.clone(), Ceiling).0, u.neg_mod(v));
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
     };
@@ -24097,10 +24093,7 @@ fn ceiling_div_neg_mod_properties_helper(x: Natural, y: Natural) {
     assert!(r_alt.is_valid());
     assert_eq!(r_alt, r);
 
-    let (q_alt, r_alt) = (
-        (&x).div_round(&y, RoundingMode::Ceiling).0,
-        (&x).neg_mod(&y),
-    );
+    let (q_alt, r_alt) = ((&x).div_round(&y, Ceiling).0, (&x).neg_mod(&y));
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 

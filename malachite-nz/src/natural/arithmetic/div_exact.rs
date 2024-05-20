@@ -55,7 +55,7 @@ use crate::platform::{
     MU_BDIV_Q_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering};
+use core::cmp::{max, min, Ordering::*};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -66,7 +66,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 
 const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
@@ -423,7 +423,7 @@ pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
         itch_local,
         n,
-        n.shr_round(1, RoundingMode::Ceiling).0,
+        n.shr_round(1, Ceiling).0,
     );
     itch_local + itch_out
 }}
@@ -472,7 +472,7 @@ pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mu
     let mut sizes = Vec::new();
     while size >= BINV_NEWTON_THRESHOLD {
         sizes.push(size);
-        size.shr_round_assign(1, RoundingMode::Ceiling);
+        size.shr_round_assign(1, Ceiling);
     }
     // Compute a base value of `size` limbs.
     let scratch_lo = &mut scratch[..size];
@@ -1473,9 +1473,7 @@ fn limbs_modular_div_barrett_same_length(
         limbs_mul_mod_base_pow_n_minus_1(scratch_lo, mul_size, ds, qs_lo, scratch_hi);
         if let Some(wrapped_len) = (n_len + i_len).checked_sub(mul_size) {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(wrapped_len);
-            if wrapped_len != 0
-                && limbs_cmp_same_length(scratch_lo, &ns[..wrapped_len]) == Ordering::Less
-            {
+            if wrapped_len != 0 && limbs_cmp_same_length(scratch_lo, &ns[..wrapped_len]) == Less {
                 assert!(!limbs_sub_limb_in_place(scratch_hi, 1));
             }
         } else {
@@ -1891,7 +1889,7 @@ impl DivExact<Natural> for Natural {
     /// If you are unsure whether the division will be exact, use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(other, RoundingMode::Exact)`.
+    /// `self.div_round(other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -1905,17 +1903,21 @@ impl DivExact<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)), 123);
+    /// assert_eq!(
+    ///     Natural::from(56088u32).div_exact(Natural::from(456u32)),
+    ///     123
+    /// );
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
-    ///     Natural::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(Natural::from_str("987654321000").unwrap()),
+    ///     Natural::from_str("121932631112635269000000")
+    ///         .unwrap()
+    ///         .div_exact(Natural::from_str("987654321000").unwrap()),
     ///     123456789000u64
     /// );
     /// ```
@@ -1940,7 +1942,7 @@ impl<'a> DivExact<&'a Natural> for Natural {
     /// If you are unsure whether the division will be exact, use `self / &other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(&other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(&other, RoundingMode::Exact)`.
+    /// `self.div_round(&other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -1954,17 +1956,21 @@ impl<'a> DivExact<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!(Natural::from(56088u32).div_exact(&Natural::from(456u32)), 123);
+    /// assert_eq!(
+    ///     Natural::from(56088u32).div_exact(&Natural::from(456u32)),
+    ///     123
+    /// );
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
-    ///     Natural::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(&Natural::from_str("987654321000").unwrap()),
+    ///     Natural::from_str("121932631112635269000000")
+    ///         .unwrap()
+    ///         .div_exact(&Natural::from_str("987654321000").unwrap()),
     ///     123456789000u64
     /// );
     /// ```
@@ -1989,7 +1995,7 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// If you are unsure whether the division will be exact, use `&self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
-    /// `(&self).div_round(other, RoundingMode::Exact)`.
+    /// `(&self).div_round(other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -2003,17 +2009,20 @@ impl<'a> DivExact<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!((&Natural::from(56088u32)).div_exact(Natural::from(456u32)), 123);
+    /// assert_eq!(
+    ///     (&Natural::from(56088u32)).div_exact(Natural::from(456u32)),
+    ///     123
+    /// );
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     (&Natural::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(Natural::from_str("987654321000").unwrap()),
+    ///         .div_exact(Natural::from_str("987654321000").unwrap()),
     ///     123456789000u64
     /// );
     /// ```
@@ -2056,7 +2065,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// If you are unsure whether the division will be exact, use `&self / &other` instead. If
     /// you're unsure and you want to know, use `(&self).div_mod(&other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `(&self).div_round(&other, RoundingMode::Exact)`.
+    /// `(&self).div_round(&other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -2070,17 +2079,20 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!((&Natural::from(56088u32)).div_exact(&Natural::from(456u32)), 123);
+    /// assert_eq!(
+    ///     (&Natural::from(56088u32)).div_exact(&Natural::from(456u32)),
+    ///     123
+    /// );
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     (&Natural::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(&Natural::from_str("987654321000").unwrap()),
+    ///         .div_exact(&Natural::from_str("987654321000").unwrap()),
     ///     123456789000u64
     /// );
     /// ```
@@ -2121,7 +2133,7 @@ impl DivExactAssign<Natural> for Natural {
     /// If you are unsure whether the division will be exact, use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round_assign(other, RoundingMode::Exact)`.
+    /// `self.div_round_assign(other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -2135,9 +2147,9 @@ impl DivExactAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// let mut x = Natural::from(56088u32);
@@ -2187,7 +2199,7 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// If you are unsure whether the division will be exact, use `self /= &other` instead. If
     /// you're unsure and you want to know, use `self.div_assign_mod(&other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round_assign(&other, RoundingMode::Exact)`.
+    /// `self.div_round_assign(&other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -2201,9 +2213,9 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// let mut x = Natural::from(56088u32);

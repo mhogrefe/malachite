@@ -7,14 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::ShlRound;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
 };
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -43,13 +43,10 @@ macro_rules! float_impls {
                 if value.is_nan() || value == $f::INFINITY {
                     panic!("Cannot convert {} to Natural", value);
                 } else if value == 0.0 {
-                    (Natural::ZERO, Ordering::Equal)
+                    (Natural::ZERO, Equal)
                 } else if value < 0.0 {
-                    if rm == RoundingMode::Down
-                        || rm == RoundingMode::Ceiling
-                        || rm == RoundingMode::Nearest
-                    {
-                        (Natural::ZERO, Ordering::Greater)
+                    if rm == Down || rm == Ceiling || rm == Nearest {
+                        (Natural::ZERO, Greater)
                     } else {
                         panic!("Result is negative and cannot be converted to a Natural");
                     }

@@ -135,7 +135,10 @@ impl NextPowerOf2 for Natural {
     ///
     /// assert_eq!(Natural::ZERO.next_power_of_2(), 1);
     /// assert_eq!(Natural::from(123u32).next_power_of_2(), 128);
-    /// assert_eq!(Natural::from(10u32).pow(12).next_power_of_2(), 1099511627776u64);
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12).next_power_of_2(),
+    ///     1099511627776u64
+    /// );
     /// ```
     #[inline]
     fn next_power_of_2(mut self) -> Natural {
@@ -167,7 +170,10 @@ impl<'a> NextPowerOf2 for &'a Natural {
     ///
     /// assert_eq!((&Natural::ZERO).next_power_of_2(), 1);
     /// assert_eq!((&Natural::from(123u32)).next_power_of_2(), 128);
-    /// assert_eq!((&Natural::from(10u32).pow(12)).next_power_of_2(), 1099511627776u64);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32).pow(12)).next_power_of_2(),
+    ///     1099511627776u64
+    /// );
     /// ```
     fn next_power_of_2(self) -> Natural {
         Natural(match *self {

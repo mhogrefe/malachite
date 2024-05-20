@@ -11,7 +11,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::triple_3_pair_integer_max_bit_bucketer;
 use malachite_nz::test_util::generators::{integer_pair_gen, integer_pair_gen_nrm};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_cmp);
@@ -21,9 +21,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_integer_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         match x.cmp(&y) {
-            Ordering::Less => println!("{x} < {y}"),
-            Ordering::Equal => println!("{x} = {y}"),
-            Ordering::Greater => println!("{x} > {y}"),
+            Less => println!("{x} < {y}"),
+            Equal => println!("{x} = {y}"),
+            Greater => println!("{x} > {y}"),
         }
     }
 }

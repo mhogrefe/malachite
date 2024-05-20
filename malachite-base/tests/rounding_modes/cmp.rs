@@ -11,7 +11,7 @@ use malachite_base::test_util::common::test_cmp_helper;
 use malachite_base::test_util::generators::{
     rounding_mode_gen, rounding_mode_pair_gen, rounding_mode_triple_gen,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_cmp() {
@@ -26,7 +26,7 @@ fn cmp_properties() {
     });
 
     rounding_mode_gen().test_properties(|x| {
-        assert_eq!(x.cmp(&x), Ordering::Equal);
+        assert_eq!(x.cmp(&x), Equal);
     });
 
     rounding_mode_triple_gen().test_properties(|(x, y, z)| {

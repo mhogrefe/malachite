@@ -14,7 +14,7 @@ use malachite_float::test_util::common::{
 use malachite_float::test_util::generators::float_primitive_float_pair_gen;
 use malachite_float::Float;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[rustfmt::skip]
 const MATRIX_F32: [[u8; 17]; 21] = [
@@ -101,7 +101,7 @@ where
         let rn = rug::Float::exact_from(&n);
         assert_eq!(rn == f, eq);
         assert_eq!(f == rn, eq);
-        assert_eq!(n.partial_cmp(&f) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp(&f) == Some(Equal), eq);
         if f.is_finite() {
             assert_eq!(PartialEq::<Float>::eq(&n, &Float::exact_from(f)), eq);
         }

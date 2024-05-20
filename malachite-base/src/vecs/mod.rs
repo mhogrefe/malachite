@@ -96,7 +96,10 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 ///
 /// assert_eq!(vec_from_str::<Never>("[]"), Some(vec![]));
 /// assert_eq!(vec_from_str("[5, 6, 7]"), Some(vec![5, 6, 7]));
-/// assert_eq!(vec_from_str("[false, false, true]"), Some(vec![false, false, true]));
+/// assert_eq!(
+///     vec_from_str("[false, false, true]"),
+///     Some(vec![false, false, true])
+/// );
 /// assert_eq!(vec_from_str::<bool>("[false, false, true"), None);
 /// ```
 #[inline]
@@ -120,11 +123,11 @@ pub fn vec_from_str<T: FromStr>(src: &str) -> Option<Vec<T>> {
 /// use malachite_base::options::option_from_str;
 /// use malachite_base::orderings::ordering_from_str;
 /// use malachite_base::vecs::{vec_from_str, vec_from_str_custom};
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::*;
 ///
 /// assert_eq!(
 ///     vec_from_str_custom(&ordering_from_str, "[Less, Greater]"),
-///     Some(vec![Ordering::Less, Ordering::Greater]),
+///     Some(vec![Less, Greater]),
 /// );
 /// assert_eq!(
 ///     vec_from_str_custom(&option_from_str, "[Some(false), None]"),
@@ -204,7 +207,9 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 ///
 /// let xs = vec![2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect_vec(),
+///     random_values_from_vec(EXAMPLE_SEED, xs)
+///         .take(10)
+///         .collect_vec(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```
@@ -369,7 +374,6 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
-/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::lex_vecs_fixed_length_2_inputs;
 ///
 /// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
@@ -544,7 +548,6 @@ pub mod exhaustive;
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::strings::ToDebugString;
 /// use malachite_base::vecs::random::random_vecs_fixed_length_2_inputs;
 ///
 /// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator

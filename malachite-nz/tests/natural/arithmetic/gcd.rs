@@ -818,7 +818,7 @@ fn test_limbs_gcd_reduced() {
         // - xs_len > s in limbs_gcd_subdivide_step
         // - ys_len > s first time in limbs_gcd_subdivide_step
         // - xs_len == ys_len second time in limbs_gcd_subdivide_step
-        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Greater second time in
+        // - limbs_cmp_same_length(xs_init, ys_init) == Greater second time in
         //   limbs_gcd_subdivide_step
         // - xs_len != 1 first time in limbs_gcd_subdivide_step
         // - ys_len > s second time in limbs_gcd_subdivide_step
@@ -877,7 +877,7 @@ fn test_limbs_gcd_reduced() {
         // - x_high < 2 first time in limbs_half_gcd_2
         // - !limbs_half_gcd_2 in limbs_half_gcd_step
         // - xs_len == ys_len first time in limbs_gcd_subdivide_step
-        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Greater first time in
+        // - limbs_cmp_same_length(xs_init, ys_init) == Greater first time in
         //   limbs_gcd_subdivide_step
         // - ys_len <= s first time in limbs_gcd_subdivide_step
         // - n == 0 fourth time in limbs_half_gcd
@@ -887,8 +887,7 @@ fn test_limbs_gcd_reduced() {
         // - n != 0 second time in limbs_half_gcd
         // - n > s + 2 in limbs_half_gcd
         // - n != s + 1 && mask.get_highest_bit() in limbs_half_gcd_step
-        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Less first time in
-        //   limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Less first time in limbs_gcd_subdivide_step
         // - n != 0 third time in limbs_half_gcd
         // - first zero in limbs_half_gcd_matrix_mul_matrix
         // - second zero in limbs_half_gcd_matrix_mul_matrix
@@ -1074,11 +1073,9 @@ fn test_limbs_gcd_reduced() {
         test(&[0, 0, 0, 0, 1], &[1, 0, 1], &[1, 0, 0]);
         // - n == 1
         test(&[0, 1, 1], &[1, 0, 1], &[1]);
-        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Less second time in
-        //   limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Less second time in limbs_gcd_subdivide_step
         test(&[0, 0, 0, 0, 0, 1], &[1, 0, 1], &[1]);
-        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Equal first time in
-        //   limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Equal first time in limbs_gcd_subdivide_step
         // - s == 0 first time in limbs_gcd_subdivide_step
         test(&[1, 0, 1], &[1, 0, 1], &[1, 0, 1]);
         // - x_high == y_high first time in limbs_half_gcd_2

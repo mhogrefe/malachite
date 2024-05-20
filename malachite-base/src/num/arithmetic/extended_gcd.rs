@@ -15,7 +15,7 @@ use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 use core::mem::swap;
 
 fn extended_gcd_signed<
@@ -170,7 +170,7 @@ pub_test! {extended_gcd_unsigned_binary<
     let two_limit_b = b / gcd;
     let limit_b = two_limit_b >> 1;
     if x > limit_b {
-        let k = (x - limit_b).div_round(two_limit_b, RoundingMode::Ceiling).0;
+        let k = (x - limit_b).div_round(two_limit_b, Ceiling).0;
         x.wrapping_sub_assign(two_limit_b.wrapping_mul(k));
         y.wrapping_add_assign(two_limit_a.wrapping_mul(k));
     }

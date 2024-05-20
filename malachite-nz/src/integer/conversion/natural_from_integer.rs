@@ -30,7 +30,10 @@ impl TryFrom<Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::try_from(Integer::from(123)).to_debug_string(), "Ok(123)");
+    /// assert_eq!(
+    ///     Natural::try_from(Integer::from(123)).to_debug_string(),
+    ///     "Ok(123)"
+    /// );
     /// assert_eq!(
     ///     Natural::try_from(Integer::from(-123)).to_debug_string(),
     ///     "Err(NaturalFromIntegerError)"
@@ -72,7 +75,10 @@ impl<'a> TryFrom<&'a Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::try_from(&Integer::from(123)).to_debug_string(), "Ok(123)");
+    /// assert_eq!(
+    ///     Natural::try_from(&Integer::from(123)).to_debug_string(),
+    ///     "Ok(123)"
+    /// );
     /// assert_eq!(
     ///     Natural::try_from(&Integer::from(-123)).to_debug_string(),
     ///     "Err(NaturalFromIntegerError)"
@@ -113,7 +119,10 @@ impl SaturatingFrom<Integer> for Natural {
     ///
     /// assert_eq!(Natural::saturating_from(Integer::from(123)), 123);
     /// assert_eq!(Natural::saturating_from(Integer::from(-123)), 0);
-    /// assert_eq!(Natural::saturating_from(Integer::from(10u32).pow(12)), 1000000000000u64);
+    /// assert_eq!(
+    ///     Natural::saturating_from(Integer::from(10u32).pow(12)),
+    ///     1000000000000u64
+    /// );
     /// assert_eq!(Natural::saturating_from(-Integer::from(10u32).pow(12)), 0);
     /// ```
     fn saturating_from(value: Integer) -> Natural {
@@ -140,7 +149,10 @@ impl<'a> SaturatingFrom<&'a Integer> for Natural {
     ///
     /// assert_eq!(Natural::saturating_from(&Integer::from(123)), 123);
     /// assert_eq!(Natural::saturating_from(&Integer::from(-123)), 0);
-    /// assert_eq!(Natural::saturating_from(&Integer::from(10u32).pow(12)), 1000000000000u64);
+    /// assert_eq!(
+    ///     Natural::saturating_from(&Integer::from(10u32).pow(12)),
+    ///     1000000000000u64
+    /// );
     /// assert_eq!(Natural::saturating_from(&-Integer::from(10u32).pow(12)), 0);
     /// ```
     fn saturating_from(value: &'a Integer) -> Natural {
@@ -170,8 +182,14 @@ impl ConvertibleFrom<Integer> for Natural {
     ///
     /// assert_eq!(Natural::convertible_from(Integer::from(123)), true);
     /// assert_eq!(Natural::convertible_from(Integer::from(-123)), false);
-    /// assert_eq!(Natural::convertible_from(Integer::from(10u32).pow(12)), true);
-    /// assert_eq!(Natural::convertible_from(-Integer::from(10u32).pow(12)), false);
+    /// assert_eq!(
+    ///     Natural::convertible_from(Integer::from(10u32).pow(12)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     Natural::convertible_from(-Integer::from(10u32).pow(12)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn convertible_from(value: Integer) -> bool {
@@ -195,8 +213,14 @@ impl<'a> ConvertibleFrom<&'a Integer> for Natural {
     ///
     /// assert_eq!(Natural::convertible_from(&Integer::from(123)), true);
     /// assert_eq!(Natural::convertible_from(&Integer::from(-123)), false);
-    /// assert_eq!(Natural::convertible_from(&Integer::from(10u32).pow(12)), true);
-    /// assert_eq!(Natural::convertible_from(&-Integer::from(10u32).pow(12)), false);
+    /// assert_eq!(
+    ///     Natural::convertible_from(&Integer::from(10u32).pow(12)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     Natural::convertible_from(&-Integer::from(10u32).pow(12)),
+    ///     false
+    /// );
     /// ```
     #[inline]
     fn convertible_from(value: &'a Integer) -> bool {

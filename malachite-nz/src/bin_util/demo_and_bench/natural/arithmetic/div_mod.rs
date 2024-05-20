@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_2_3_diff_vec_len_bucketer, quadruple_2_vec_len_bucketer,
     quadruple_3_vec_len_bucketer, quadruple_4_vec_len_bucketer, quintuple_1_vec_len_bucketer,
@@ -1253,7 +1253,7 @@ fn benchmark_natural_ceiling_div_neg_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.ceiling_div_neg_mod(y))),
             ("using div_round and %", &mut |(x, y)| {
-                ((&x).div_round(&y, RoundingMode::Ceiling), x.neg_mod(y));
+                ((&x).div_round(&y, Ceiling), x.neg_mod(y));
             }),
         ],
     );

@@ -11,11 +11,11 @@ use crate::Rational;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Reciprocal, RoundToMultiple};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 use malachite_nz::natural::Natural;
-use std::cmp::{min, Ordering};
+use std::cmp::{min, Ordering::*};
 
 // Slow! Only run for rationals with small denominators
 pub fn simplest_rational_in_open_interval_naive(x: &Rational, y: &Rational) -> Rational {
@@ -34,7 +34,7 @@ pub fn simplest_rational_in_open_interval_naive(x: &Rational, y: &Rational) -> R
     };
     for d in exhaustive_positive_naturals() {
         let dr = Rational::from(d).reciprocal();
-        let mut q = x.round_to_multiple(&dr, RoundingMode::Ceiling).0;
+        let mut q = x.round_to_multiple(&dr, Ceiling).0;
         if q == *x {
             q += dr;
         }
@@ -67,13 +67,13 @@ fn simplest_rational_helper(
     Rational::from_continued_fraction(
         floor.clone(),
         match x_len.cmp(&y_len) {
-            Ordering::Equal => panic!(),
-            Ordering::Greater => {
+            Equal => panic!(),
+            Greater => {
                 let mut cf = cf_y.to_vec();
                 cf.push(cf_x[y_len].clone() + Natural::ONE);
                 cf.into_iter()
             }
-            Ordering::Less => {
+            Less => {
                 let mut cf = cf_x.to_vec();
                 cf.push(cf_y[x_len].clone() + Natural::ONE);
                 cf.into_iter()
@@ -150,7 +150,7 @@ pub fn simplest_rational_in_closed_interval_naive(x: &Rational, y: &Rational) ->
     };
     for d in exhaustive_positive_naturals() {
         let dr = Rational::from(d).reciprocal();
-        let q = x.round_to_multiple(&dr, RoundingMode::Ceiling).0;
+        let q = x.round_to_multiple(&dr, Ceiling).0;
         if q <= *y {
             return if neg { -q } else { q };
         }

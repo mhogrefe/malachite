@@ -8,12 +8,12 @@
 
 use crate::InnerFloat::{Finite, Zero};
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
 use malachite_base::num::conversion::from::SignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -38,42 +38,41 @@ impl RoundingFrom<Float> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::NegativeInfinity;
     /// use malachite_base::num::conversion::traits::RoundingFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::rounding_from(Float::from(1.5), RoundingMode::Floor).to_debug_string(),
+    ///     Integer::rounding_from(Float::from(1.5), Floor).to_debug_string(),
     ///     "(1, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(Float::from(1.5), RoundingMode::Ceiling).to_debug_string(),
+    ///     Integer::rounding_from(Float::from(1.5), Ceiling).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(Float::from(1.5), RoundingMode::Nearest).to_debug_string(),
+    ///     Integer::rounding_from(Float::from(1.5), Nearest).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::rounding_from(Float::from(-1.5), RoundingMode::Floor).to_debug_string(),
+    ///     Integer::rounding_from(Float::from(-1.5), Floor).to_debug_string(),
     ///     "(-2, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(Float::from(-1.5), RoundingMode::Ceiling).to_debug_string(),
+    ///     Integer::rounding_from(Float::from(-1.5), Ceiling).to_debug_string(),
     ///     "(-1, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(Float::from(-1.5), RoundingMode::Nearest).to_debug_string(),
+    ///     Integer::rounding_from(Float::from(-1.5), Nearest).to_debug_string(),
     ///     "(-2, Less)"
     /// );
     /// ```
     fn rounding_from(f: Float, rm: RoundingMode) -> (Integer, Ordering) {
         match f {
-            float_either_zero!() => (Integer::ZERO, Ordering::Equal),
+            float_either_zero!() => (Integer::ZERO, Equal),
             Float(Finite {
                 sign,
                 exponent,
@@ -83,13 +82,9 @@ impl RoundingFrom<Float> for Integer {
                 let abs_rm = if sign { rm } else { -rm };
                 let (abs_i, abs_o) = if exponent < 0 {
                     match abs_rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (Natural::ZERO, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (Natural::ONE, Ordering::Greater)
-                        }
-                        RoundingMode::Exact => {
+                        Floor | Down | Nearest => (Natural::ZERO, Less),
+                        Ceiling | Up => (Natural::ONE, Greater),
+                        Exact => {
                             panic!("Cannot convert Float to Integer using {rm}")
                         }
                     }
@@ -99,7 +94,7 @@ impl RoundingFrom<Float> for Integer {
                     if sb >= eb {
                         significand.shr_round(sb - eb, abs_rm)
                     } else {
-                        (significand << (eb - sb), Ordering::Equal)
+                        (significand << (eb - sb), Equal)
                     }
                 };
                 if sign {
@@ -134,42 +129,41 @@ impl<'a> RoundingFrom<&'a Float> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::NegativeInfinity;
     /// use malachite_base::num::conversion::traits::RoundingFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::rounding_from(&Float::from(1.5), RoundingMode::Floor).to_debug_string(),
+    ///     Integer::rounding_from(&Float::from(1.5), Floor).to_debug_string(),
     ///     "(1, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(&Float::from(1.5), RoundingMode::Ceiling).to_debug_string(),
+    ///     Integer::rounding_from(&Float::from(1.5), Ceiling).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(&Float::from(1.5), RoundingMode::Nearest).to_debug_string(),
+    ///     Integer::rounding_from(&Float::from(1.5), Nearest).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::rounding_from(&Float::from(-1.5), RoundingMode::Floor).to_debug_string(),
+    ///     Integer::rounding_from(&Float::from(-1.5), Floor).to_debug_string(),
     ///     "(-2, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(&Float::from(-1.5), RoundingMode::Ceiling).to_debug_string(),
+    ///     Integer::rounding_from(&Float::from(-1.5), Ceiling).to_debug_string(),
     ///     "(-1, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(&Float::from(-1.5), RoundingMode::Nearest).to_debug_string(),
+    ///     Integer::rounding_from(&Float::from(-1.5), Nearest).to_debug_string(),
     ///     "(-2, Less)"
     /// );
     /// ```
     fn rounding_from(f: &'a Float, rm: RoundingMode) -> (Integer, Ordering) {
         match f {
-            float_either_zero!() => (Integer::ZERO, Ordering::Equal),
+            float_either_zero!() => (Integer::ZERO, Equal),
             Float(Finite {
                 sign,
                 exponent,
@@ -177,18 +171,14 @@ impl<'a> RoundingFrom<&'a Float> for Integer {
                 ..
             }) => {
                 if *significand == 0u32 {
-                    (Integer::ZERO, Ordering::Equal)
+                    (Integer::ZERO, Equal)
                 } else {
                     let abs_rm = if *sign { rm } else { -rm };
                     let (abs_i, abs_o) = if *exponent < 0 {
                         match abs_rm {
-                            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                (Natural::ZERO, Ordering::Less)
-                            }
-                            RoundingMode::Ceiling | RoundingMode::Up => {
-                                (Natural::ONE, Ordering::Greater)
-                            }
-                            RoundingMode::Exact => {
+                            Floor | Down | Nearest => (Natural::ZERO, Less),
+                            Ceiling | Up => (Natural::ONE, Greater),
+                            Exact => {
                                 panic!("Cannot convert Float to Integer using {rm}")
                             }
                         }
@@ -198,7 +188,7 @@ impl<'a> RoundingFrom<&'a Float> for Integer {
                         if sb >= eb {
                             significand.shr_round(sb - eb, abs_rm)
                         } else {
-                            (significand << (eb - sb), Ordering::Equal)
+                            (significand << (eb - sb), Equal)
                         }
                     };
                     if *sign {
@@ -237,7 +227,10 @@ impl TryFrom<Float> for Integer {
     /// assert_eq!(Integer::try_from(Float::from(123.0)).unwrap(), 123);
     /// assert_eq!(Integer::try_from(Float::from(-123.0)).unwrap(), -123);
     ///
-    /// assert_eq!(Integer::try_from(Float::from(1.5)), Err(FloatNonIntegerOrOutOfRange));
+    /// assert_eq!(
+    ///     Integer::try_from(Float::from(1.5)),
+    ///     Err(FloatNonIntegerOrOutOfRange)
+    /// );
     /// assert_eq!(Integer::try_from(Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Integer::try_from(Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
@@ -296,7 +289,10 @@ impl<'a> TryFrom<&'a Float> for Integer {
     /// assert_eq!(Integer::try_from(&Float::from(123.0)).unwrap(), 123);
     /// assert_eq!(Integer::try_from(&Float::from(-123.0)).unwrap(), -123);
     ///
-    /// assert_eq!(Integer::try_from(&Float::from(1.5)), Err(FloatNonIntegerOrOutOfRange));
+    /// assert_eq!(
+    ///     Integer::try_from(&Float::from(1.5)),
+    ///     Err(FloatNonIntegerOrOutOfRange)
+    /// );
     /// assert_eq!(Integer::try_from(&Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Integer::try_from(&Float::NAN), Err(FloatInfiniteOrNan));
     /// ```

@@ -13,7 +13,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
 use malachite_base::random::Seed;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::random::{
     random_integer_range, random_integer_range_to_infinity,
     random_integer_range_to_negative_infinity, RandomIntegerRange, RandomIntegerRangeToInfinity,
@@ -69,7 +69,6 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingle<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_positive_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_positive_rationals(EXAMPLE_SEED, 32, 1), 10),
@@ -132,7 +131,6 @@ impl<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> Iterator
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_non_negative_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_non_negative_rationals(EXAMPLE_SEED, 32, 1), 10),
@@ -207,7 +205,6 @@ impl<I: Iterator<Item = Rational>> Iterator for NegativeRationals<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_negative_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_negative_rationals(EXAMPLE_SEED, 32, 1), 10),
@@ -270,7 +267,6 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingleAndSign<
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_nonzero_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_nonzero_rationals(EXAMPLE_SEED, 32, 1), 10),
@@ -337,7 +333,6 @@ impl<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> Iterator
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_rationals(EXAMPLE_SEED, 32, 1), 10),
@@ -402,10 +397,12 @@ pub fn random_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_positive_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_positive_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_positive_rationals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[4, 1/268681216, 75493376/9007199120523391, 8/8796094070783, \
 ///     8/950737950171027935941967741439, 1040391/33554432, \
 ///     2813000899879757964630563421437095845888, 1/79164837199872, 2199023255551/16, \
@@ -456,10 +453,12 @@ pub fn striped_random_positive_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_non_negative_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_non_negative_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_non_negative_rationals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[8192/127, 16776704/4396972769407, 8796093005951/648518346332962816, 87381/2863267840, \
 ///     1024/2043, 51/58408828928, 85/13521606402434254795714066382848, 270335/7, \
 ///     59421159664630116152453890047/9444741445172838006656, 6291455/1154891846623166464, ...]"
@@ -519,10 +518,12 @@ pub fn striped_random_non_negative_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_negative_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_negative_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_negative_rationals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[-4, -1/268681216, -75493376/9007199120523391, -8/8796094070783, \
 ///     -8/950737950171027935941967741439, -1040391/33554432, \
 ///     -2813000899879757964630563421437095845888, -1/79164837199872, -2199023255551/16, \
@@ -575,10 +576,12 @@ pub fn striped_random_negative_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_nonzero_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_nonzero_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_nonzero_rationals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[-68720000000/18006083452797439, -2545165805/29, 549754781664/1236950581247, \
 ///     1065353727/2047, -2147745791/513, 16128/575, 8192/17000482516899619632318463, \
 ///     18431/16778240, 1/31, 4096/526335, ...]"
@@ -629,7 +632,6 @@ pub fn striped_random_nonzero_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_rationals;
-/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(striped_random_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
@@ -693,8 +695,8 @@ pub fn striped_random_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::Rational;
 /// use malachite_q::random::random_rationals_with_denominator_range_to_infinity;
+/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -721,7 +723,7 @@ pub fn random_rationals_with_denominator_range_to_infinity(
     RationalsWithDenominator {
         numerators: random_integer_range_to_infinity(
             seed,
-            Integer::rounding_from(a * Rational::from(&d), RoundingMode::Ceiling).0,
+            Integer::rounding_from(a * Rational::from(&d), Ceiling).0,
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
         ),
@@ -755,8 +757,8 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::Rational;
 /// use malachite_q::random::random_rationals_with_denominator_range_to_negative_infinity;
+/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -783,7 +785,7 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
     RationalsWithDenominator {
         numerators: random_integer_range_to_negative_infinity(
             seed,
-            Integer::rounding_from(a * Rational::from(&d), RoundingMode::Floor).0,
+            Integer::rounding_from(a * Rational::from(&d), Floor).0,
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
         ),
@@ -827,8 +829,8 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::Rational;
 /// use malachite_q::random::random_rationals_with_denominator_range;
+/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -856,9 +858,9 @@ pub fn random_rationals_with_denominator_range(
     assert_ne!(d, 0u32);
     assert!(a < b);
     let q_d = Rational::from(&d);
-    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
+    let a_i = Integer::rounding_from(a * &q_d, Ceiling).0;
     let upper_included = b.denominator_ref() == &d;
-    let mut b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0;
+    let mut b_i = Integer::rounding_from(b * q_d, Floor).0;
     if !upper_included {
         b_i += Integer::ONE;
     }
@@ -908,8 +910,8 @@ pub fn random_rationals_with_denominator_range(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::Rational;
 /// use malachite_q::random::random_rationals_with_denominator_inclusive_range;
+/// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -937,8 +939,8 @@ pub fn random_rationals_with_denominator_inclusive_range(
     assert_ne!(d, 0u32);
     assert!(a <= b);
     let q_d = Rational::from(&d);
-    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
-    let b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0 + Integer::ONE;
+    let a_i = Integer::rounding_from(a * &q_d, Ceiling).0;
+    let b_i = Integer::rounding_from(b * q_d, Floor).0 + Integer::ONE;
     RationalsWithDenominator {
         numerators: random_integer_range(
             seed,

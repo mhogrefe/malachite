@@ -9,7 +9,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_pair_gen_var_3, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
     signed_rounding_mode_pair_gen_var_1, signed_rounding_mode_pair_gen_var_2,
@@ -18,7 +18,7 @@ use malachite_base::test_util::generators::{
     unsigned_rounding_mode_pair_gen, unsigned_rounding_mode_pair_gen_var_1,
     unsigned_unsigned_rounding_mode_triple_gen_var_1,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
 #[test]
@@ -30,345 +30,219 @@ fn test_div_round_unsigned() {
         assert_eq!(mut_n.div_round_assign(d, rm), o);
         assert_eq!(mut_n, q);
     }
-    test::<u8>(0, 1, RoundingMode::Down, 0, Ordering::Equal);
-    test::<u8>(0, 1, RoundingMode::Floor, 0, Ordering::Equal);
-    test::<u8>(0, 1, RoundingMode::Up, 0, Ordering::Equal);
-    test::<u8>(0, 1, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test::<u8>(0, 1, RoundingMode::Nearest, 0, Ordering::Equal);
-    test::<u8>(0, 1, RoundingMode::Exact, 0, Ordering::Equal);
+    test::<u8>(0, 1, Down, 0, Equal);
+    test::<u8>(0, 1, Floor, 0, Equal);
+    test::<u8>(0, 1, Up, 0, Equal);
+    test::<u8>(0, 1, Ceiling, 0, Equal);
+    test::<u8>(0, 1, Nearest, 0, Equal);
+    test::<u8>(0, 1, Exact, 0, Equal);
 
-    test::<u16>(0, 123, RoundingMode::Down, 0, Ordering::Equal);
-    test::<u16>(0, 123, RoundingMode::Floor, 0, Ordering::Equal);
-    test::<u16>(0, 123, RoundingMode::Up, 0, Ordering::Equal);
-    test::<u16>(0, 123, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test::<u16>(0, 123, RoundingMode::Nearest, 0, Ordering::Equal);
-    test::<u16>(0, 123, RoundingMode::Exact, 0, Ordering::Equal);
+    test::<u16>(0, 123, Down, 0, Equal);
+    test::<u16>(0, 123, Floor, 0, Equal);
+    test::<u16>(0, 123, Up, 0, Equal);
+    test::<u16>(0, 123, Ceiling, 0, Equal);
+    test::<u16>(0, 123, Nearest, 0, Equal);
+    test::<u16>(0, 123, Exact, 0, Equal);
 
-    test::<u32>(1, 1, RoundingMode::Down, 1, Ordering::Equal);
-    test::<u32>(1, 1, RoundingMode::Floor, 1, Ordering::Equal);
-    test::<u32>(1, 1, RoundingMode::Up, 1, Ordering::Equal);
-    test::<u32>(1, 1, RoundingMode::Ceiling, 1, Ordering::Equal);
-    test::<u32>(1, 1, RoundingMode::Nearest, 1, Ordering::Equal);
-    test::<u32>(1, 1, RoundingMode::Exact, 1, Ordering::Equal);
+    test::<u32>(1, 1, Down, 1, Equal);
+    test::<u32>(1, 1, Floor, 1, Equal);
+    test::<u32>(1, 1, Up, 1, Equal);
+    test::<u32>(1, 1, Ceiling, 1, Equal);
+    test::<u32>(1, 1, Nearest, 1, Equal);
+    test::<u32>(1, 1, Exact, 1, Equal);
 
-    test::<u64>(123, 1, RoundingMode::Down, 123, Ordering::Equal);
-    test::<u64>(123, 1, RoundingMode::Floor, 123, Ordering::Equal);
-    test::<u64>(123, 1, RoundingMode::Up, 123, Ordering::Equal);
-    test::<u64>(123, 1, RoundingMode::Ceiling, 123, Ordering::Equal);
-    test::<u64>(123, 1, RoundingMode::Nearest, 123, Ordering::Equal);
-    test::<u64>(123, 1, RoundingMode::Exact, 123, Ordering::Equal);
+    test::<u64>(123, 1, Down, 123, Equal);
+    test::<u64>(123, 1, Floor, 123, Equal);
+    test::<u64>(123, 1, Up, 123, Equal);
+    test::<u64>(123, 1, Ceiling, 123, Equal);
+    test::<u64>(123, 1, Nearest, 123, Equal);
+    test::<u64>(123, 1, Exact, 123, Equal);
 
-    test::<u128>(123, 2, RoundingMode::Down, 61, Ordering::Less);
-    test::<u128>(123, 2, RoundingMode::Floor, 61, Ordering::Less);
-    test::<u128>(123, 2, RoundingMode::Up, 62, Ordering::Greater);
-    test::<u128>(123, 2, RoundingMode::Ceiling, 62, Ordering::Greater);
-    test::<u128>(123, 2, RoundingMode::Nearest, 62, Ordering::Greater);
+    test::<u128>(123, 2, Down, 61, Less);
+    test::<u128>(123, 2, Floor, 61, Less);
+    test::<u128>(123, 2, Up, 62, Greater);
+    test::<u128>(123, 2, Ceiling, 62, Greater);
+    test::<u128>(123, 2, Nearest, 62, Greater);
 
-    test::<usize>(125, 2, RoundingMode::Down, 62, Ordering::Less);
-    test::<usize>(125, 2, RoundingMode::Floor, 62, Ordering::Less);
-    test::<usize>(125, 2, RoundingMode::Up, 63, Ordering::Greater);
-    test::<usize>(125, 2, RoundingMode::Ceiling, 63, Ordering::Greater);
-    test::<usize>(125, 2, RoundingMode::Nearest, 62, Ordering::Less);
+    test::<usize>(125, 2, Down, 62, Less);
+    test::<usize>(125, 2, Floor, 62, Less);
+    test::<usize>(125, 2, Up, 63, Greater);
+    test::<usize>(125, 2, Ceiling, 63, Greater);
+    test::<usize>(125, 2, Nearest, 62, Less);
 
-    test::<u8>(123, 123, RoundingMode::Down, 1, Ordering::Equal);
-    test::<u8>(123, 123, RoundingMode::Floor, 1, Ordering::Equal);
-    test::<u8>(123, 123, RoundingMode::Up, 1, Ordering::Equal);
-    test::<u8>(123, 123, RoundingMode::Ceiling, 1, Ordering::Equal);
-    test::<u8>(123, 123, RoundingMode::Nearest, 1, Ordering::Equal);
-    test::<u8>(123, 123, RoundingMode::Exact, 1, Ordering::Equal);
+    test::<u8>(123, 123, Down, 1, Equal);
+    test::<u8>(123, 123, Floor, 1, Equal);
+    test::<u8>(123, 123, Up, 1, Equal);
+    test::<u8>(123, 123, Ceiling, 1, Equal);
+    test::<u8>(123, 123, Nearest, 1, Equal);
+    test::<u8>(123, 123, Exact, 1, Equal);
 
-    test::<u16>(123, 456, RoundingMode::Down, 0, Ordering::Less);
-    test::<u16>(123, 456, RoundingMode::Floor, 0, Ordering::Less);
-    test::<u16>(123, 456, RoundingMode::Up, 1, Ordering::Greater);
-    test::<u16>(123, 456, RoundingMode::Ceiling, 1, Ordering::Greater);
-    test::<u16>(123, 456, RoundingMode::Nearest, 0, Ordering::Less);
+    test::<u16>(123, 456, Down, 0, Less);
+    test::<u16>(123, 456, Floor, 0, Less);
+    test::<u16>(123, 456, Up, 1, Greater);
+    test::<u16>(123, 456, Ceiling, 1, Greater);
+    test::<u16>(123, 456, Nearest, 0, Less);
 
-    test::<u64>(
-        1000000000000,
-        1,
-        RoundingMode::Down,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<u64>(
-        1000000000000,
-        1,
-        RoundingMode::Floor,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<u64>(
-        1000000000000,
-        1,
-        RoundingMode::Up,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<u64>(
-        1000000000000,
-        1,
-        RoundingMode::Ceiling,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<u64>(
-        1000000000000,
-        1,
-        RoundingMode::Nearest,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<u64>(
-        1000000000000,
-        1,
-        RoundingMode::Exact,
-        1000000000000,
-        Ordering::Equal,
-    );
+    test::<u64>(1000000000000, 1, Down, 1000000000000, Equal);
+    test::<u64>(1000000000000, 1, Floor, 1000000000000, Equal);
+    test::<u64>(1000000000000, 1, Up, 1000000000000, Equal);
+    test::<u64>(1000000000000, 1, Ceiling, 1000000000000, Equal);
+    test::<u64>(1000000000000, 1, Nearest, 1000000000000, Equal);
+    test::<u64>(1000000000000, 1, Exact, 1000000000000, Equal);
 
-    test::<u64>(
-        1000000000000,
-        3,
-        RoundingMode::Down,
-        333333333333,
-        Ordering::Less,
-    );
-    test::<u64>(
-        1000000000000,
-        3,
-        RoundingMode::Floor,
-        333333333333,
-        Ordering::Less,
-    );
-    test::<u64>(
-        1000000000000,
-        3,
-        RoundingMode::Up,
-        333333333334,
-        Ordering::Greater,
-    );
-    test::<u64>(
-        1000000000000,
-        3,
-        RoundingMode::Ceiling,
-        333333333334,
-        Ordering::Greater,
-    );
-    test::<u64>(
-        1000000000000,
-        3,
-        RoundingMode::Nearest,
-        333333333333,
-        Ordering::Less,
-    );
+    test::<u64>(1000000000000, 3, Down, 333333333333, Less);
+    test::<u64>(1000000000000, 3, Floor, 333333333333, Less);
+    test::<u64>(1000000000000, 3, Up, 333333333334, Greater);
+    test::<u64>(1000000000000, 3, Ceiling, 333333333334, Greater);
+    test::<u64>(1000000000000, 3, Nearest, 333333333333, Less);
 
-    test::<u64>(
-        999999999999,
-        2,
-        RoundingMode::Down,
-        499999999999,
-        Ordering::Less,
-    );
-    test::<u64>(
-        999999999999,
-        2,
-        RoundingMode::Floor,
-        499999999999,
-        Ordering::Less,
-    );
-    test::<u64>(
-        999999999999,
-        2,
-        RoundingMode::Up,
-        500000000000,
-        Ordering::Greater,
-    );
-    test::<u64>(
-        999999999999,
-        2,
-        RoundingMode::Ceiling,
-        500000000000,
-        Ordering::Greater,
-    );
-    test::<u64>(
-        999999999999,
-        2,
-        RoundingMode::Nearest,
-        500000000000,
-        Ordering::Greater,
-    );
+    test::<u64>(999999999999, 2, Down, 499999999999, Less);
+    test::<u64>(999999999999, 2, Floor, 499999999999, Less);
+    test::<u64>(999999999999, 2, Up, 500000000000, Greater);
+    test::<u64>(999999999999, 2, Ceiling, 500000000000, Greater);
+    test::<u64>(999999999999, 2, Nearest, 500000000000, Greater);
 
-    test::<u64>(
-        1000000000001,
-        2,
-        RoundingMode::Down,
-        500000000000,
-        Ordering::Less,
-    );
-    test::<u64>(
-        1000000000001,
-        2,
-        RoundingMode::Floor,
-        500000000000,
-        Ordering::Less,
-    );
-    test::<u64>(
-        1000000000001,
-        2,
-        RoundingMode::Up,
-        500000000001,
-        Ordering::Greater,
-    );
-    test::<u64>(
-        1000000000001,
-        2,
-        RoundingMode::Ceiling,
-        500000000001,
-        Ordering::Greater,
-    );
-    test::<u64>(
-        1000000000001,
-        2,
-        RoundingMode::Nearest,
-        500000000000,
-        Ordering::Less,
-    );
+    test::<u64>(1000000000001, 2, Down, 500000000000, Less);
+    test::<u64>(1000000000001, 2, Floor, 500000000000, Less);
+    test::<u64>(1000000000001, 2, Up, 500000000001, Greater);
+    test::<u64>(1000000000001, 2, Ceiling, 500000000001, Greater);
+    test::<u64>(1000000000001, 2, Nearest, 500000000000, Less);
 
     test::<u128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Down,
+        Down,
         232830643708079,
-        Ordering::Less,
+        Less,
     );
     test::<u128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Floor,
+        Floor,
         232830643708079,
-        Ordering::Less,
+        Less,
     );
     test::<u128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Up,
+        Up,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
     test::<u128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Ceiling,
+        Ceiling,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
     test::<u128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Nearest,
+        Nearest,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
 
     test::<u128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Down,
+        Down,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Floor,
+        Floor,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Up,
+        Up,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Ceiling,
+        Ceiling,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Exact,
+        Exact,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
 
     test::<u128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Down,
+        Down,
         999999999999,
-        Ordering::Less,
+        Less,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Floor,
+        Floor,
         999999999999,
-        Ordering::Less,
+        Less,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Up,
+        Up,
         1000000000000,
-        Ordering::Greater,
+        Greater,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Ceiling,
+        Ceiling,
         1000000000000,
-        Ordering::Greater,
+        Greater,
     );
     test::<u128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Nearest,
+        Nearest,
         999999999999,
-        Ordering::Less,
+        Less,
     );
 
     test::<u128>(
         2999999999999999999999999,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         1,
-        Ordering::Less,
+        Less,
     );
     test::<u128>(
         3000000000000000000000000,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         2,
-        Ordering::Greater,
+        Greater,
     );
     test::<u128>(
         3000000000000000000000001,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         2,
-        Ordering::Greater,
+        Greater,
     );
 }
 
@@ -381,1362 +255,858 @@ fn test_div_round_signed() {
         assert_eq!(mut_n.div_round_assign(d, rm), o);
         assert_eq!(mut_n, q);
     }
-    test::<i8>(0, 1, RoundingMode::Down, 0, Ordering::Equal);
-    test::<i8>(0, 1, RoundingMode::Floor, 0, Ordering::Equal);
-    test::<i8>(0, 1, RoundingMode::Up, 0, Ordering::Equal);
-    test::<i8>(0, 1, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test::<i8>(0, 1, RoundingMode::Nearest, 0, Ordering::Equal);
-    test::<i8>(0, 1, RoundingMode::Exact, 0, Ordering::Equal);
+    test::<i8>(0, 1, Down, 0, Equal);
+    test::<i8>(0, 1, Floor, 0, Equal);
+    test::<i8>(0, 1, Up, 0, Equal);
+    test::<i8>(0, 1, Ceiling, 0, Equal);
+    test::<i8>(0, 1, Nearest, 0, Equal);
+    test::<i8>(0, 1, Exact, 0, Equal);
 
-    test::<i16>(0, 123, RoundingMode::Down, 0, Ordering::Equal);
-    test::<i16>(0, 123, RoundingMode::Floor, 0, Ordering::Equal);
-    test::<i16>(0, 123, RoundingMode::Up, 0, Ordering::Equal);
-    test::<i16>(0, 123, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test::<i16>(0, 123, RoundingMode::Nearest, 0, Ordering::Equal);
-    test::<i16>(0, 123, RoundingMode::Exact, 0, Ordering::Equal);
+    test::<i16>(0, 123, Down, 0, Equal);
+    test::<i16>(0, 123, Floor, 0, Equal);
+    test::<i16>(0, 123, Up, 0, Equal);
+    test::<i16>(0, 123, Ceiling, 0, Equal);
+    test::<i16>(0, 123, Nearest, 0, Equal);
+    test::<i16>(0, 123, Exact, 0, Equal);
 
-    test::<i32>(1, 1, RoundingMode::Down, 1, Ordering::Equal);
-    test::<i32>(1, 1, RoundingMode::Floor, 1, Ordering::Equal);
-    test::<i32>(1, 1, RoundingMode::Up, 1, Ordering::Equal);
-    test::<i32>(1, 1, RoundingMode::Ceiling, 1, Ordering::Equal);
-    test::<i32>(1, 1, RoundingMode::Nearest, 1, Ordering::Equal);
-    test::<i32>(1, 1, RoundingMode::Exact, 1, Ordering::Equal);
+    test::<i32>(1, 1, Down, 1, Equal);
+    test::<i32>(1, 1, Floor, 1, Equal);
+    test::<i32>(1, 1, Up, 1, Equal);
+    test::<i32>(1, 1, Ceiling, 1, Equal);
+    test::<i32>(1, 1, Nearest, 1, Equal);
+    test::<i32>(1, 1, Exact, 1, Equal);
 
-    test::<i64>(123, 1, RoundingMode::Down, 123, Ordering::Equal);
-    test::<i64>(123, 1, RoundingMode::Floor, 123, Ordering::Equal);
-    test::<i64>(123, 1, RoundingMode::Up, 123, Ordering::Equal);
-    test::<i64>(123, 1, RoundingMode::Ceiling, 123, Ordering::Equal);
-    test::<i64>(123, 1, RoundingMode::Nearest, 123, Ordering::Equal);
-    test::<i64>(123, 1, RoundingMode::Exact, 123, Ordering::Equal);
+    test::<i64>(123, 1, Down, 123, Equal);
+    test::<i64>(123, 1, Floor, 123, Equal);
+    test::<i64>(123, 1, Up, 123, Equal);
+    test::<i64>(123, 1, Ceiling, 123, Equal);
+    test::<i64>(123, 1, Nearest, 123, Equal);
+    test::<i64>(123, 1, Exact, 123, Equal);
 
-    test::<i128>(123, 2, RoundingMode::Down, 61, Ordering::Less);
-    test::<i128>(123, 2, RoundingMode::Floor, 61, Ordering::Less);
-    test::<i128>(123, 2, RoundingMode::Up, 62, Ordering::Greater);
-    test::<i128>(123, 2, RoundingMode::Ceiling, 62, Ordering::Greater);
-    test::<i128>(123, 2, RoundingMode::Nearest, 62, Ordering::Greater);
+    test::<i128>(123, 2, Down, 61, Less);
+    test::<i128>(123, 2, Floor, 61, Less);
+    test::<i128>(123, 2, Up, 62, Greater);
+    test::<i128>(123, 2, Ceiling, 62, Greater);
+    test::<i128>(123, 2, Nearest, 62, Greater);
 
-    test::<isize>(125, 2, RoundingMode::Down, 62, Ordering::Less);
-    test::<isize>(125, 2, RoundingMode::Floor, 62, Ordering::Less);
-    test::<isize>(125, 2, RoundingMode::Up, 63, Ordering::Greater);
-    test::<isize>(125, 2, RoundingMode::Ceiling, 63, Ordering::Greater);
-    test::<isize>(125, 2, RoundingMode::Nearest, 62, Ordering::Less);
+    test::<isize>(125, 2, Down, 62, Less);
+    test::<isize>(125, 2, Floor, 62, Less);
+    test::<isize>(125, 2, Up, 63, Greater);
+    test::<isize>(125, 2, Ceiling, 63, Greater);
+    test::<isize>(125, 2, Nearest, 62, Less);
 
-    test::<i8>(123, 123, RoundingMode::Down, 1, Ordering::Equal);
-    test::<i8>(123, 123, RoundingMode::Floor, 1, Ordering::Equal);
-    test::<i8>(123, 123, RoundingMode::Up, 1, Ordering::Equal);
-    test::<i8>(123, 123, RoundingMode::Ceiling, 1, Ordering::Equal);
-    test::<i8>(123, 123, RoundingMode::Nearest, 1, Ordering::Equal);
-    test::<i8>(123, 123, RoundingMode::Exact, 1, Ordering::Equal);
+    test::<i8>(123, 123, Down, 1, Equal);
+    test::<i8>(123, 123, Floor, 1, Equal);
+    test::<i8>(123, 123, Up, 1, Equal);
+    test::<i8>(123, 123, Ceiling, 1, Equal);
+    test::<i8>(123, 123, Nearest, 1, Equal);
+    test::<i8>(123, 123, Exact, 1, Equal);
 
-    test::<i16>(123, 456, RoundingMode::Down, 0, Ordering::Less);
-    test::<i16>(123, 456, RoundingMode::Floor, 0, Ordering::Less);
-    test::<i16>(123, 456, RoundingMode::Up, 1, Ordering::Greater);
-    test::<i16>(123, 456, RoundingMode::Ceiling, 1, Ordering::Greater);
-    test::<i16>(123, 456, RoundingMode::Nearest, 0, Ordering::Less);
+    test::<i16>(123, 456, Down, 0, Less);
+    test::<i16>(123, 456, Floor, 0, Less);
+    test::<i16>(123, 456, Up, 1, Greater);
+    test::<i16>(123, 456, Ceiling, 1, Greater);
+    test::<i16>(123, 456, Nearest, 0, Less);
 
-    test::<i64>(
-        1000000000000,
-        1,
-        RoundingMode::Down,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        1,
-        RoundingMode::Floor,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        1,
-        RoundingMode::Up,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        1,
-        RoundingMode::Ceiling,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        1,
-        RoundingMode::Nearest,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        1,
-        RoundingMode::Exact,
-        1000000000000,
-        Ordering::Equal,
-    );
+    test::<i64>(1000000000000, 1, Down, 1000000000000, Equal);
+    test::<i64>(1000000000000, 1, Floor, 1000000000000, Equal);
+    test::<i64>(1000000000000, 1, Up, 1000000000000, Equal);
+    test::<i64>(1000000000000, 1, Ceiling, 1000000000000, Equal);
+    test::<i64>(1000000000000, 1, Nearest, 1000000000000, Equal);
+    test::<i64>(1000000000000, 1, Exact, 1000000000000, Equal);
 
-    test::<i64>(
-        1000000000000,
-        3,
-        RoundingMode::Down,
-        333333333333,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000000,
-        3,
-        RoundingMode::Floor,
-        333333333333,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000000,
-        3,
-        RoundingMode::Up,
-        333333333334,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000000,
-        3,
-        RoundingMode::Ceiling,
-        333333333334,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000000,
-        3,
-        RoundingMode::Nearest,
-        333333333333,
-        Ordering::Less,
-    );
+    test::<i64>(1000000000000, 3, Down, 333333333333, Less);
+    test::<i64>(1000000000000, 3, Floor, 333333333333, Less);
+    test::<i64>(1000000000000, 3, Up, 333333333334, Greater);
+    test::<i64>(1000000000000, 3, Ceiling, 333333333334, Greater);
+    test::<i64>(1000000000000, 3, Nearest, 333333333333, Less);
 
-    test::<i64>(
-        999999999999,
-        2,
-        RoundingMode::Down,
-        499999999999,
-        Ordering::Less,
-    );
-    test::<i64>(
-        999999999999,
-        2,
-        RoundingMode::Floor,
-        499999999999,
-        Ordering::Less,
-    );
-    test::<i64>(
-        999999999999,
-        2,
-        RoundingMode::Up,
-        500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        999999999999,
-        2,
-        RoundingMode::Ceiling,
-        500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        999999999999,
-        2,
-        RoundingMode::Nearest,
-        500000000000,
-        Ordering::Greater,
-    );
+    test::<i64>(999999999999, 2, Down, 499999999999, Less);
+    test::<i64>(999999999999, 2, Floor, 499999999999, Less);
+    test::<i64>(999999999999, 2, Up, 500000000000, Greater);
+    test::<i64>(999999999999, 2, Ceiling, 500000000000, Greater);
+    test::<i64>(999999999999, 2, Nearest, 500000000000, Greater);
 
-    test::<i64>(
-        1000000000001,
-        2,
-        RoundingMode::Down,
-        500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000001,
-        2,
-        RoundingMode::Floor,
-        500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000001,
-        2,
-        RoundingMode::Up,
-        500000000001,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000001,
-        2,
-        RoundingMode::Ceiling,
-        500000000001,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000001,
-        2,
-        RoundingMode::Nearest,
-        500000000000,
-        Ordering::Less,
-    );
+    test::<i64>(1000000000001, 2, Down, 500000000000, Less);
+    test::<i64>(1000000000001, 2, Floor, 500000000000, Less);
+    test::<i64>(1000000000001, 2, Up, 500000000001, Greater);
+    test::<i64>(1000000000001, 2, Ceiling, 500000000001, Greater);
+    test::<i64>(1000000000001, 2, Nearest, 500000000000, Less);
 
     test::<i128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Down,
+        Down,
         232830643708079,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Floor,
+        Floor,
         232830643708079,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Up,
+        Up,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Ceiling,
+        Ceiling,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Nearest,
+        Nearest,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
 
     test::<i128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Down,
+        Down,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Floor,
+        Floor,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Up,
+        Up,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Ceiling,
+        Ceiling,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000000,
-        RoundingMode::Exact,
+        Exact,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
 
     test::<i128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Down,
+        Down,
         999999999999,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Floor,
+        Floor,
         999999999999,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Up,
+        Up,
         1000000000000,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Ceiling,
+        Ceiling,
         1000000000000,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         1000000000001,
-        RoundingMode::Nearest,
+        Nearest,
         999999999999,
-        Ordering::Less,
+        Less,
     );
 
     test::<i128>(
         2999999999999999999999999,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         1,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         3000000000000000000000000,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         2,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         3000000000000000000000001,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         2,
-        Ordering::Greater,
+        Greater,
     );
 
-    test::<i8>(0, -1, RoundingMode::Down, 0, Ordering::Equal);
-    test::<i8>(0, -1, RoundingMode::Floor, 0, Ordering::Equal);
-    test::<i8>(0, -1, RoundingMode::Up, 0, Ordering::Equal);
-    test::<i8>(0, -1, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test::<i8>(0, -1, RoundingMode::Nearest, 0, Ordering::Equal);
-    test::<i8>(0, -1, RoundingMode::Exact, 0, Ordering::Equal);
+    test::<i8>(0, -1, Down, 0, Equal);
+    test::<i8>(0, -1, Floor, 0, Equal);
+    test::<i8>(0, -1, Up, 0, Equal);
+    test::<i8>(0, -1, Ceiling, 0, Equal);
+    test::<i8>(0, -1, Nearest, 0, Equal);
+    test::<i8>(0, -1, Exact, 0, Equal);
 
-    test::<i16>(0, -123, RoundingMode::Down, 0, Ordering::Equal);
-    test::<i16>(0, -123, RoundingMode::Floor, 0, Ordering::Equal);
-    test::<i16>(0, -123, RoundingMode::Up, 0, Ordering::Equal);
-    test::<i16>(0, -123, RoundingMode::Ceiling, 0, Ordering::Equal);
-    test::<i16>(0, -123, RoundingMode::Nearest, 0, Ordering::Equal);
-    test::<i16>(0, -123, RoundingMode::Exact, 0, Ordering::Equal);
+    test::<i16>(0, -123, Down, 0, Equal);
+    test::<i16>(0, -123, Floor, 0, Equal);
+    test::<i16>(0, -123, Up, 0, Equal);
+    test::<i16>(0, -123, Ceiling, 0, Equal);
+    test::<i16>(0, -123, Nearest, 0, Equal);
+    test::<i16>(0, -123, Exact, 0, Equal);
 
-    test::<i32>(1, -1, RoundingMode::Down, -1, Ordering::Equal);
-    test::<i32>(1, -1, RoundingMode::Floor, -1, Ordering::Equal);
-    test::<i32>(1, -1, RoundingMode::Up, -1, Ordering::Equal);
-    test::<i32>(1, -1, RoundingMode::Ceiling, -1, Ordering::Equal);
-    test::<i32>(1, -1, RoundingMode::Nearest, -1, Ordering::Equal);
-    test::<i32>(1, -1, RoundingMode::Exact, -1, Ordering::Equal);
+    test::<i32>(1, -1, Down, -1, Equal);
+    test::<i32>(1, -1, Floor, -1, Equal);
+    test::<i32>(1, -1, Up, -1, Equal);
+    test::<i32>(1, -1, Ceiling, -1, Equal);
+    test::<i32>(1, -1, Nearest, -1, Equal);
+    test::<i32>(1, -1, Exact, -1, Equal);
 
-    test::<i64>(123, -1, RoundingMode::Down, -123, Ordering::Equal);
-    test::<i64>(123, -1, RoundingMode::Floor, -123, Ordering::Equal);
-    test::<i64>(123, -1, RoundingMode::Up, -123, Ordering::Equal);
-    test::<i64>(123, -1, RoundingMode::Ceiling, -123, Ordering::Equal);
-    test::<i64>(123, -1, RoundingMode::Nearest, -123, Ordering::Equal);
-    test::<i64>(123, -1, RoundingMode::Exact, -123, Ordering::Equal);
+    test::<i64>(123, -1, Down, -123, Equal);
+    test::<i64>(123, -1, Floor, -123, Equal);
+    test::<i64>(123, -1, Up, -123, Equal);
+    test::<i64>(123, -1, Ceiling, -123, Equal);
+    test::<i64>(123, -1, Nearest, -123, Equal);
+    test::<i64>(123, -1, Exact, -123, Equal);
 
-    test::<i128>(123, -2, RoundingMode::Down, -61, Ordering::Greater);
-    test::<i128>(123, -2, RoundingMode::Floor, -62, Ordering::Less);
-    test::<i128>(123, -2, RoundingMode::Up, -62, Ordering::Less);
-    test::<i128>(123, -2, RoundingMode::Ceiling, -61, Ordering::Greater);
-    test::<i128>(123, -2, RoundingMode::Nearest, -62, Ordering::Less);
+    test::<i128>(123, -2, Down, -61, Greater);
+    test::<i128>(123, -2, Floor, -62, Less);
+    test::<i128>(123, -2, Up, -62, Less);
+    test::<i128>(123, -2, Ceiling, -61, Greater);
+    test::<i128>(123, -2, Nearest, -62, Less);
 
-    test::<isize>(125, -2, RoundingMode::Down, -62, Ordering::Greater);
-    test::<isize>(125, -2, RoundingMode::Floor, -63, Ordering::Less);
-    test::<isize>(125, -2, RoundingMode::Up, -63, Ordering::Less);
-    test::<isize>(125, -2, RoundingMode::Ceiling, -62, Ordering::Greater);
-    test::<isize>(125, -2, RoundingMode::Nearest, -62, Ordering::Greater);
+    test::<isize>(125, -2, Down, -62, Greater);
+    test::<isize>(125, -2, Floor, -63, Less);
+    test::<isize>(125, -2, Up, -63, Less);
+    test::<isize>(125, -2, Ceiling, -62, Greater);
+    test::<isize>(125, -2, Nearest, -62, Greater);
 
-    test::<i8>(123, -123, RoundingMode::Down, -1, Ordering::Equal);
-    test::<i8>(123, -123, RoundingMode::Floor, -1, Ordering::Equal);
-    test::<i8>(123, -123, RoundingMode::Up, -1, Ordering::Equal);
-    test::<i8>(123, -123, RoundingMode::Ceiling, -1, Ordering::Equal);
-    test::<i8>(123, -123, RoundingMode::Nearest, -1, Ordering::Equal);
-    test::<i8>(123, -123, RoundingMode::Exact, -1, Ordering::Equal);
+    test::<i8>(123, -123, Down, -1, Equal);
+    test::<i8>(123, -123, Floor, -1, Equal);
+    test::<i8>(123, -123, Up, -1, Equal);
+    test::<i8>(123, -123, Ceiling, -1, Equal);
+    test::<i8>(123, -123, Nearest, -1, Equal);
+    test::<i8>(123, -123, Exact, -1, Equal);
 
-    test::<i16>(123, -456, RoundingMode::Down, 0, Ordering::Greater);
-    test::<i16>(123, -456, RoundingMode::Floor, -1, Ordering::Less);
-    test::<i16>(123, -456, RoundingMode::Up, -1, Ordering::Less);
-    test::<i16>(123, -456, RoundingMode::Ceiling, 0, Ordering::Greater);
-    test::<i16>(123, -456, RoundingMode::Nearest, 0, Ordering::Greater);
+    test::<i16>(123, -456, Down, 0, Greater);
+    test::<i16>(123, -456, Floor, -1, Less);
+    test::<i16>(123, -456, Up, -1, Less);
+    test::<i16>(123, -456, Ceiling, 0, Greater);
+    test::<i16>(123, -456, Nearest, 0, Greater);
 
-    test::<i64>(
-        1000000000000,
-        -1,
-        RoundingMode::Down,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        -1,
-        RoundingMode::Floor,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        -1,
-        RoundingMode::Up,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        -1,
-        RoundingMode::Ceiling,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        -1,
-        RoundingMode::Nearest,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        1000000000000,
-        -1,
-        RoundingMode::Exact,
-        -1000000000000,
-        Ordering::Equal,
-    );
+    test::<i64>(1000000000000, -1, Down, -1000000000000, Equal);
+    test::<i64>(1000000000000, -1, Floor, -1000000000000, Equal);
+    test::<i64>(1000000000000, -1, Up, -1000000000000, Equal);
+    test::<i64>(1000000000000, -1, Ceiling, -1000000000000, Equal);
+    test::<i64>(1000000000000, -1, Nearest, -1000000000000, Equal);
+    test::<i64>(1000000000000, -1, Exact, -1000000000000, Equal);
 
-    test::<i64>(
-        1000000000000,
-        -3,
-        RoundingMode::Down,
-        -333333333333,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000000,
-        -3,
-        RoundingMode::Floor,
-        -333333333334,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000000,
-        -3,
-        RoundingMode::Up,
-        -333333333334,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000000,
-        -3,
-        RoundingMode::Ceiling,
-        -333333333333,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000000,
-        -3,
-        RoundingMode::Nearest,
-        -333333333333,
-        Ordering::Greater,
-    );
+    test::<i64>(1000000000000, -3, Down, -333333333333, Greater);
+    test::<i64>(1000000000000, -3, Floor, -333333333334, Less);
+    test::<i64>(1000000000000, -3, Up, -333333333334, Less);
+    test::<i64>(1000000000000, -3, Ceiling, -333333333333, Greater);
+    test::<i64>(1000000000000, -3, Nearest, -333333333333, Greater);
 
-    test::<i64>(
-        999999999999,
-        -2,
-        RoundingMode::Down,
-        -499999999999,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        999999999999,
-        -2,
-        RoundingMode::Floor,
-        -500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        999999999999,
-        -2,
-        RoundingMode::Up,
-        -500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        999999999999,
-        -2,
-        RoundingMode::Ceiling,
-        -499999999999,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        999999999999,
-        -2,
-        RoundingMode::Nearest,
-        -500000000000,
-        Ordering::Less,
-    );
+    test::<i64>(999999999999, -2, Down, -499999999999, Greater);
+    test::<i64>(999999999999, -2, Floor, -500000000000, Less);
+    test::<i64>(999999999999, -2, Up, -500000000000, Less);
+    test::<i64>(999999999999, -2, Ceiling, -499999999999, Greater);
+    test::<i64>(999999999999, -2, Nearest, -500000000000, Less);
 
-    test::<i64>(
-        1000000000001,
-        -2,
-        RoundingMode::Down,
-        -500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000001,
-        -2,
-        RoundingMode::Floor,
-        -500000000001,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000001,
-        -2,
-        RoundingMode::Up,
-        -500000000001,
-        Ordering::Less,
-    );
-    test::<i64>(
-        1000000000001,
-        -2,
-        RoundingMode::Ceiling,
-        -500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        1000000000001,
-        -2,
-        RoundingMode::Nearest,
-        -500000000000,
-        Ordering::Greater,
-    );
+    test::<i64>(1000000000001, -2, Down, -500000000000, Greater);
+    test::<i64>(1000000000001, -2, Floor, -500000000001, Less);
+    test::<i64>(1000000000001, -2, Up, -500000000001, Less);
+    test::<i64>(1000000000001, -2, Ceiling, -500000000000, Greater);
+    test::<i64>(1000000000001, -2, Nearest, -500000000000, Greater);
 
     test::<i128>(
         1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Down,
+        Down,
         -232830643708079,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Floor,
+        Floor,
         -232830643708080,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Up,
+        Up,
         -232830643708080,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Ceiling,
+        Ceiling,
         -232830643708079,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Nearest,
+        Nearest,
         -232830643708080,
-        Ordering::Less,
+        Less,
     );
 
     test::<i128>(
         1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Down,
+        Down,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Floor,
+        Floor,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Up,
+        Up,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Ceiling,
+        Ceiling,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Exact,
+        Exact,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
 
     test::<i128>(
         1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Down,
+        Down,
         -999999999999,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Floor,
+        Floor,
         -1000000000000,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Up,
+        Up,
         -1000000000000,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Ceiling,
+        Ceiling,
         -999999999999,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Nearest,
+        Nearest,
         -999999999999,
-        Ordering::Greater,
+        Greater,
     );
 
     test::<i128>(
         2999999999999999999999999,
         -2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -1,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         3000000000000000000000000,
         -2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -2,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         3000000000000000000000001,
         -2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -2,
-        Ordering::Less,
+        Less,
     );
 
-    test::<i8>(-1, 1, RoundingMode::Down, -1, Ordering::Equal);
-    test::<i8>(-1, 1, RoundingMode::Floor, -1, Ordering::Equal);
-    test::<i8>(-1, 1, RoundingMode::Up, -1, Ordering::Equal);
-    test::<i8>(-1, 1, RoundingMode::Ceiling, -1, Ordering::Equal);
-    test::<i8>(-1, 1, RoundingMode::Nearest, -1, Ordering::Equal);
-    test::<i8>(-1, 1, RoundingMode::Exact, -1, Ordering::Equal);
+    test::<i8>(-1, 1, Down, -1, Equal);
+    test::<i8>(-1, 1, Floor, -1, Equal);
+    test::<i8>(-1, 1, Up, -1, Equal);
+    test::<i8>(-1, 1, Ceiling, -1, Equal);
+    test::<i8>(-1, 1, Nearest, -1, Equal);
+    test::<i8>(-1, 1, Exact, -1, Equal);
 
-    test::<i16>(-123, 1, RoundingMode::Down, -123, Ordering::Equal);
-    test::<i16>(-123, 1, RoundingMode::Floor, -123, Ordering::Equal);
-    test::<i16>(-123, 1, RoundingMode::Up, -123, Ordering::Equal);
-    test::<i16>(-123, 1, RoundingMode::Ceiling, -123, Ordering::Equal);
-    test::<i16>(-123, 1, RoundingMode::Nearest, -123, Ordering::Equal);
-    test::<i16>(-123, 1, RoundingMode::Exact, -123, Ordering::Equal);
+    test::<i16>(-123, 1, Down, -123, Equal);
+    test::<i16>(-123, 1, Floor, -123, Equal);
+    test::<i16>(-123, 1, Up, -123, Equal);
+    test::<i16>(-123, 1, Ceiling, -123, Equal);
+    test::<i16>(-123, 1, Nearest, -123, Equal);
+    test::<i16>(-123, 1, Exact, -123, Equal);
 
-    test::<i32>(-123, 2, RoundingMode::Down, -61, Ordering::Greater);
-    test::<i32>(-123, 2, RoundingMode::Floor, -62, Ordering::Less);
-    test::<i32>(-123, 2, RoundingMode::Up, -62, Ordering::Less);
-    test::<i32>(-123, 2, RoundingMode::Ceiling, -61, Ordering::Greater);
-    test::<i32>(-123, 2, RoundingMode::Nearest, -62, Ordering::Less);
+    test::<i32>(-123, 2, Down, -61, Greater);
+    test::<i32>(-123, 2, Floor, -62, Less);
+    test::<i32>(-123, 2, Up, -62, Less);
+    test::<i32>(-123, 2, Ceiling, -61, Greater);
+    test::<i32>(-123, 2, Nearest, -62, Less);
 
-    test::<i64>(-125, 2, RoundingMode::Down, -62, Ordering::Greater);
-    test::<i64>(-125, 2, RoundingMode::Floor, -63, Ordering::Less);
-    test::<i64>(-125, 2, RoundingMode::Up, -63, Ordering::Less);
-    test::<i64>(-125, 2, RoundingMode::Ceiling, -62, Ordering::Greater);
-    test::<i64>(-125, 2, RoundingMode::Nearest, -62, Ordering::Greater);
+    test::<i64>(-125, 2, Down, -62, Greater);
+    test::<i64>(-125, 2, Floor, -63, Less);
+    test::<i64>(-125, 2, Up, -63, Less);
+    test::<i64>(-125, 2, Ceiling, -62, Greater);
+    test::<i64>(-125, 2, Nearest, -62, Greater);
 
-    test::<i128>(-123, 123, RoundingMode::Down, -1, Ordering::Equal);
-    test::<i128>(-123, 123, RoundingMode::Floor, -1, Ordering::Equal);
-    test::<i128>(-123, 123, RoundingMode::Up, -1, Ordering::Equal);
-    test::<i128>(-123, 123, RoundingMode::Ceiling, -1, Ordering::Equal);
-    test::<i128>(-123, 123, RoundingMode::Nearest, -1, Ordering::Equal);
-    test::<i128>(-123, 123, RoundingMode::Exact, -1, Ordering::Equal);
+    test::<i128>(-123, 123, Down, -1, Equal);
+    test::<i128>(-123, 123, Floor, -1, Equal);
+    test::<i128>(-123, 123, Up, -1, Equal);
+    test::<i128>(-123, 123, Ceiling, -1, Equal);
+    test::<i128>(-123, 123, Nearest, -1, Equal);
+    test::<i128>(-123, 123, Exact, -1, Equal);
 
-    test::<isize>(-123, 456, RoundingMode::Down, 0, Ordering::Greater);
-    test::<isize>(-123, 456, RoundingMode::Floor, -1, Ordering::Less);
-    test::<isize>(-123, 456, RoundingMode::Up, -1, Ordering::Less);
-    test::<isize>(-123, 456, RoundingMode::Ceiling, 0, Ordering::Greater);
-    test::<isize>(-123, 456, RoundingMode::Nearest, 0, Ordering::Greater);
+    test::<isize>(-123, 456, Down, 0, Greater);
+    test::<isize>(-123, 456, Floor, -1, Less);
+    test::<isize>(-123, 456, Up, -1, Less);
+    test::<isize>(-123, 456, Ceiling, 0, Greater);
+    test::<isize>(-123, 456, Nearest, 0, Greater);
 
-    test::<i64>(
-        -1000000000000,
-        1,
-        RoundingMode::Down,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        1,
-        RoundingMode::Floor,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        1,
-        RoundingMode::Up,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        1,
-        RoundingMode::Ceiling,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        1,
-        RoundingMode::Nearest,
-        -1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        1,
-        RoundingMode::Exact,
-        -1000000000000,
-        Ordering::Equal,
-    );
+    test::<i64>(-1000000000000, 1, Down, -1000000000000, Equal);
+    test::<i64>(-1000000000000, 1, Floor, -1000000000000, Equal);
+    test::<i64>(-1000000000000, 1, Up, -1000000000000, Equal);
+    test::<i64>(-1000000000000, 1, Ceiling, -1000000000000, Equal);
+    test::<i64>(-1000000000000, 1, Nearest, -1000000000000, Equal);
+    test::<i64>(-1000000000000, 1, Exact, -1000000000000, Equal);
 
-    test::<i64>(
-        -1000000000000,
-        3,
-        RoundingMode::Down,
-        -333333333333,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000000,
-        3,
-        RoundingMode::Floor,
-        -333333333334,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000000,
-        3,
-        RoundingMode::Up,
-        -333333333334,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000000,
-        3,
-        RoundingMode::Ceiling,
-        -333333333333,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000000,
-        3,
-        RoundingMode::Nearest,
-        -333333333333,
-        Ordering::Greater,
-    );
+    test::<i64>(-1000000000000, 3, Down, -333333333333, Greater);
+    test::<i64>(-1000000000000, 3, Floor, -333333333334, Less);
+    test::<i64>(-1000000000000, 3, Up, -333333333334, Less);
+    test::<i64>(-1000000000000, 3, Ceiling, -333333333333, Greater);
+    test::<i64>(-1000000000000, 3, Nearest, -333333333333, Greater);
 
-    test::<i64>(
-        -999999999999,
-        2,
-        RoundingMode::Down,
-        -499999999999,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -999999999999,
-        2,
-        RoundingMode::Floor,
-        -500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -999999999999,
-        2,
-        RoundingMode::Up,
-        -500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -999999999999,
-        2,
-        RoundingMode::Ceiling,
-        -499999999999,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -999999999999,
-        2,
-        RoundingMode::Nearest,
-        -500000000000,
-        Ordering::Less,
-    );
+    test::<i64>(-999999999999, 2, Down, -499999999999, Greater);
+    test::<i64>(-999999999999, 2, Floor, -500000000000, Less);
+    test::<i64>(-999999999999, 2, Up, -500000000000, Less);
+    test::<i64>(-999999999999, 2, Ceiling, -499999999999, Greater);
+    test::<i64>(-999999999999, 2, Nearest, -500000000000, Less);
 
-    test::<i64>(
-        -1000000000001,
-        2,
-        RoundingMode::Down,
-        -500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000001,
-        2,
-        RoundingMode::Floor,
-        -500000000001,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000001,
-        2,
-        RoundingMode::Up,
-        -500000000001,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000001,
-        2,
-        RoundingMode::Ceiling,
-        -500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000001,
-        2,
-        RoundingMode::Nearest,
-        -500000000000,
-        Ordering::Greater,
-    );
+    test::<i64>(-1000000000001, 2, Down, -500000000000, Greater);
+    test::<i64>(-1000000000001, 2, Floor, -500000000001, Less);
+    test::<i64>(-1000000000001, 2, Up, -500000000001, Less);
+    test::<i64>(-1000000000001, 2, Ceiling, -500000000000, Greater);
+    test::<i64>(-1000000000001, 2, Nearest, -500000000000, Greater);
 
     test::<i128>(
         -1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Down,
+        Down,
         -232830643708079,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Floor,
+        Floor,
         -232830643708080,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Up,
+        Up,
         -232830643708080,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Ceiling,
+        Ceiling,
         -232830643708079,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         0xffffffff,
-        RoundingMode::Nearest,
+        Nearest,
         -232830643708080,
-        Ordering::Less,
+        Less,
     );
 
     test::<i128>(
         -1000000000000000000000000,
         1000000000000,
-        RoundingMode::Down,
+        Down,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000000,
-        RoundingMode::Floor,
+        Floor,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000000,
-        RoundingMode::Up,
+        Up,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000000,
-        RoundingMode::Ceiling,
+        Ceiling,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000000,
-        RoundingMode::Exact,
+        Exact,
         -1000000000000,
-        Ordering::Equal,
+        Equal,
     );
 
     test::<i128>(
         -1000000000000000000000000,
         1000000000001,
-        RoundingMode::Down,
+        Down,
         -999999999999,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000001,
-        RoundingMode::Floor,
+        Floor,
         -1000000000000,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000001,
-        RoundingMode::Up,
+        Up,
         -1000000000000,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000001,
-        RoundingMode::Ceiling,
+        Ceiling,
         -999999999999,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         1000000000001,
-        RoundingMode::Nearest,
+        Nearest,
         -999999999999,
-        Ordering::Greater,
+        Greater,
     );
 
     test::<i128>(
         -2999999999999999999999999,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -1,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -3000000000000000000000000,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -2,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -3000000000000000000000001,
         2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         -2,
-        Ordering::Less,
+        Less,
     );
 
-    test::<i8>(-1, -1, RoundingMode::Down, 1, Ordering::Equal);
-    test::<i8>(-1, -1, RoundingMode::Floor, 1, Ordering::Equal);
-    test::<i8>(-1, -1, RoundingMode::Up, 1, Ordering::Equal);
-    test::<i8>(-1, -1, RoundingMode::Ceiling, 1, Ordering::Equal);
-    test::<i8>(-1, -1, RoundingMode::Nearest, 1, Ordering::Equal);
-    test::<i8>(-1, -1, RoundingMode::Exact, 1, Ordering::Equal);
+    test::<i8>(-1, -1, Down, 1, Equal);
+    test::<i8>(-1, -1, Floor, 1, Equal);
+    test::<i8>(-1, -1, Up, 1, Equal);
+    test::<i8>(-1, -1, Ceiling, 1, Equal);
+    test::<i8>(-1, -1, Nearest, 1, Equal);
+    test::<i8>(-1, -1, Exact, 1, Equal);
 
-    test::<i16>(-123, -1, RoundingMode::Down, 123, Ordering::Equal);
-    test::<i16>(-123, -1, RoundingMode::Floor, 123, Ordering::Equal);
-    test::<i16>(-123, -1, RoundingMode::Up, 123, Ordering::Equal);
-    test::<i16>(-123, -1, RoundingMode::Ceiling, 123, Ordering::Equal);
-    test::<i16>(-123, -1, RoundingMode::Nearest, 123, Ordering::Equal);
-    test::<i16>(-123, -1, RoundingMode::Exact, 123, Ordering::Equal);
+    test::<i16>(-123, -1, Down, 123, Equal);
+    test::<i16>(-123, -1, Floor, 123, Equal);
+    test::<i16>(-123, -1, Up, 123, Equal);
+    test::<i16>(-123, -1, Ceiling, 123, Equal);
+    test::<i16>(-123, -1, Nearest, 123, Equal);
+    test::<i16>(-123, -1, Exact, 123, Equal);
 
-    test::<i32>(-123, -2, RoundingMode::Down, 61, Ordering::Less);
-    test::<i32>(-123, -2, RoundingMode::Floor, 61, Ordering::Less);
-    test::<i32>(-123, -2, RoundingMode::Up, 62, Ordering::Greater);
-    test::<i32>(-123, -2, RoundingMode::Ceiling, 62, Ordering::Greater);
-    test::<i32>(-123, -2, RoundingMode::Nearest, 62, Ordering::Greater);
+    test::<i32>(-123, -2, Down, 61, Less);
+    test::<i32>(-123, -2, Floor, 61, Less);
+    test::<i32>(-123, -2, Up, 62, Greater);
+    test::<i32>(-123, -2, Ceiling, 62, Greater);
+    test::<i32>(-123, -2, Nearest, 62, Greater);
 
-    test::<i64>(-125, -2, RoundingMode::Down, 62, Ordering::Less);
-    test::<i64>(-125, -2, RoundingMode::Floor, 62, Ordering::Less);
-    test::<i64>(-125, -2, RoundingMode::Up, 63, Ordering::Greater);
-    test::<i64>(-125, -2, RoundingMode::Ceiling, 63, Ordering::Greater);
-    test::<i64>(-125, -2, RoundingMode::Nearest, 62, Ordering::Less);
+    test::<i64>(-125, -2, Down, 62, Less);
+    test::<i64>(-125, -2, Floor, 62, Less);
+    test::<i64>(-125, -2, Up, 63, Greater);
+    test::<i64>(-125, -2, Ceiling, 63, Greater);
+    test::<i64>(-125, -2, Nearest, 62, Less);
 
-    test::<i128>(-123, -123, RoundingMode::Down, 1, Ordering::Equal);
-    test::<i128>(-123, -123, RoundingMode::Floor, 1, Ordering::Equal);
-    test::<i128>(-123, -123, RoundingMode::Up, 1, Ordering::Equal);
-    test::<i128>(-123, -123, RoundingMode::Ceiling, 1, Ordering::Equal);
-    test::<i128>(-123, -123, RoundingMode::Nearest, 1, Ordering::Equal);
-    test::<i128>(-123, -123, RoundingMode::Exact, 1, Ordering::Equal);
+    test::<i128>(-123, -123, Down, 1, Equal);
+    test::<i128>(-123, -123, Floor, 1, Equal);
+    test::<i128>(-123, -123, Up, 1, Equal);
+    test::<i128>(-123, -123, Ceiling, 1, Equal);
+    test::<i128>(-123, -123, Nearest, 1, Equal);
+    test::<i128>(-123, -123, Exact, 1, Equal);
 
-    test::<isize>(-123, -456, RoundingMode::Down, 0, Ordering::Less);
-    test::<isize>(-123, -456, RoundingMode::Floor, 0, Ordering::Less);
-    test::<isize>(-123, -456, RoundingMode::Up, 1, Ordering::Greater);
-    test::<isize>(-123, -456, RoundingMode::Ceiling, 1, Ordering::Greater);
-    test::<isize>(-123, -456, RoundingMode::Nearest, 0, Ordering::Less);
+    test::<isize>(-123, -456, Down, 0, Less);
+    test::<isize>(-123, -456, Floor, 0, Less);
+    test::<isize>(-123, -456, Up, 1, Greater);
+    test::<isize>(-123, -456, Ceiling, 1, Greater);
+    test::<isize>(-123, -456, Nearest, 0, Less);
 
-    test::<i64>(
-        -1000000000000,
-        -1,
-        RoundingMode::Down,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        -1,
-        RoundingMode::Floor,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        -1,
-        RoundingMode::Up,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        -1,
-        RoundingMode::Ceiling,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        -1,
-        RoundingMode::Nearest,
-        1000000000000,
-        Ordering::Equal,
-    );
-    test::<i64>(
-        -1000000000000,
-        -1,
-        RoundingMode::Exact,
-        1000000000000,
-        Ordering::Equal,
-    );
+    test::<i64>(-1000000000000, -1, Down, 1000000000000, Equal);
+    test::<i64>(-1000000000000, -1, Floor, 1000000000000, Equal);
+    test::<i64>(-1000000000000, -1, Up, 1000000000000, Equal);
+    test::<i64>(-1000000000000, -1, Ceiling, 1000000000000, Equal);
+    test::<i64>(-1000000000000, -1, Nearest, 1000000000000, Equal);
+    test::<i64>(-1000000000000, -1, Exact, 1000000000000, Equal);
 
-    test::<i64>(
-        -1000000000000,
-        -3,
-        RoundingMode::Down,
-        333333333333,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000000,
-        -3,
-        RoundingMode::Floor,
-        333333333333,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000000,
-        -3,
-        RoundingMode::Up,
-        333333333334,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000000,
-        -3,
-        RoundingMode::Ceiling,
-        333333333334,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000000,
-        -3,
-        RoundingMode::Nearest,
-        333333333333,
-        Ordering::Less,
-    );
+    test::<i64>(-1000000000000, -3, Down, 333333333333, Less);
+    test::<i64>(-1000000000000, -3, Floor, 333333333333, Less);
+    test::<i64>(-1000000000000, -3, Up, 333333333334, Greater);
+    test::<i64>(-1000000000000, -3, Ceiling, 333333333334, Greater);
+    test::<i64>(-1000000000000, -3, Nearest, 333333333333, Less);
 
-    test::<i64>(
-        -999999999999,
-        -2,
-        RoundingMode::Down,
-        499999999999,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -999999999999,
-        -2,
-        RoundingMode::Floor,
-        499999999999,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -999999999999,
-        -2,
-        RoundingMode::Up,
-        500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -999999999999,
-        -2,
-        RoundingMode::Ceiling,
-        500000000000,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -999999999999,
-        -2,
-        RoundingMode::Nearest,
-        500000000000,
-        Ordering::Greater,
-    );
+    test::<i64>(-999999999999, -2, Down, 499999999999, Less);
+    test::<i64>(-999999999999, -2, Floor, 499999999999, Less);
+    test::<i64>(-999999999999, -2, Up, 500000000000, Greater);
+    test::<i64>(-999999999999, -2, Ceiling, 500000000000, Greater);
+    test::<i64>(-999999999999, -2, Nearest, 500000000000, Greater);
 
-    test::<i64>(
-        -1000000000001,
-        -2,
-        RoundingMode::Down,
-        500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000001,
-        -2,
-        RoundingMode::Floor,
-        500000000000,
-        Ordering::Less,
-    );
-    test::<i64>(
-        -1000000000001,
-        -2,
-        RoundingMode::Up,
-        500000000001,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000001,
-        -2,
-        RoundingMode::Ceiling,
-        500000000001,
-        Ordering::Greater,
-    );
-    test::<i64>(
-        -1000000000001,
-        -2,
-        RoundingMode::Nearest,
-        500000000000,
-        Ordering::Less,
-    );
+    test::<i64>(-1000000000001, -2, Down, 500000000000, Less);
+    test::<i64>(-1000000000001, -2, Floor, 500000000000, Less);
+    test::<i64>(-1000000000001, -2, Up, 500000000001, Greater);
+    test::<i64>(-1000000000001, -2, Ceiling, 500000000001, Greater);
+    test::<i64>(-1000000000001, -2, Nearest, 500000000000, Less);
 
     test::<i128>(
         -1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Down,
+        Down,
         232830643708079,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Floor,
+        Floor,
         232830643708079,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Up,
+        Up,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Ceiling,
+        Ceiling,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         -0xffffffff,
-        RoundingMode::Nearest,
+        Nearest,
         232830643708080,
-        Ordering::Greater,
+        Greater,
     );
 
     test::<i128>(
         -1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Down,
+        Down,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Floor,
+        Floor,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Up,
+        Up,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Ceiling,
+        Ceiling,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000000,
-        RoundingMode::Exact,
+        Exact,
         1000000000000,
-        Ordering::Equal,
+        Equal,
     );
 
     test::<i128>(
         -1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Down,
+        Down,
         999999999999,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Floor,
+        Floor,
         999999999999,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Up,
+        Up,
         1000000000000,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Ceiling,
+        Ceiling,
         1000000000000,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -1000000000000000000000000,
         -1000000000001,
-        RoundingMode::Nearest,
+        Nearest,
         999999999999,
-        Ordering::Less,
+        Less,
     );
 
     test::<i128>(
         -2999999999999999999999999,
         -2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         1,
-        Ordering::Less,
+        Less,
     );
     test::<i128>(
         -3000000000000000000000000,
         -2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         2,
-        Ordering::Greater,
+        Greater,
     );
     test::<i128>(
         -3000000000000000000000001,
         -2000000000000000000000000,
-        RoundingMode::Nearest,
+        Nearest,
         2,
-        Ordering::Greater,
+        Greater,
     );
 
-    test::<i8>(-128, 1, RoundingMode::Down, -128, Ordering::Equal);
-    test::<i8>(-128, 1, RoundingMode::Up, -128, Ordering::Equal);
-    test::<i8>(-128, 1, RoundingMode::Floor, -128, Ordering::Equal);
-    test::<i8>(-128, 1, RoundingMode::Ceiling, -128, Ordering::Equal);
-    test::<i8>(-128, 1, RoundingMode::Nearest, -128, Ordering::Equal);
-    test::<i8>(-128, 1, RoundingMode::Exact, -128, Ordering::Equal);
+    test::<i8>(-128, 1, Down, -128, Equal);
+    test::<i8>(-128, 1, Up, -128, Equal);
+    test::<i8>(-128, 1, Floor, -128, Equal);
+    test::<i8>(-128, 1, Ceiling, -128, Equal);
+    test::<i8>(-128, 1, Nearest, -128, Equal);
+    test::<i8>(-128, 1, Exact, -128, Equal);
 }
 
 fn div_round_fail_helper<T: PrimitiveInt>() {
-    assert_panic!(T::exact_from(10).div_round(T::ZERO, RoundingMode::Floor));
-    assert_panic!(T::exact_from(10).div_round(T::exact_from(3), RoundingMode::Exact));
-    assert_panic!(T::exact_from(10).div_round_assign(T::ZERO, RoundingMode::Floor));
-    assert_panic!(T::exact_from(10).div_round_assign(T::exact_from(3), RoundingMode::Exact));
+    assert_panic!(T::exact_from(10).div_round(T::ZERO, Floor));
+    assert_panic!(T::exact_from(10).div_round(T::exact_from(3), Exact));
+    assert_panic!(T::exact_from(10).div_round_assign(T::ZERO, Floor));
+    assert_panic!(T::exact_from(10).div_round_assign(T::exact_from(3), Exact));
 }
 
 fn div_round_signed_fail_helper<T: PrimitiveSigned>() {
-    assert_panic!(T::MIN.div_round(T::NEGATIVE_ONE, RoundingMode::Floor));
+    assert_panic!(T::MIN.div_round(T::NEGATIVE_ONE, Floor));
     assert_panic!({
         let mut n = T::MIN;
-        n.div_round_assign(T::NEGATIVE_ONE, RoundingMode::Floor);
+        n.div_round_assign(T::NEGATIVE_ONE, Floor);
     });
 }
 
@@ -1754,12 +1124,12 @@ fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
         assert_eq!(x.div_round(y, rm), (q, o));
         assert!(q <= x);
-        assert_eq!(x.divisible_by(y), o == Ordering::Equal);
+        assert_eq!(x.divisible_by(y), o == Equal);
 
         match rm {
-            RoundingMode::Floor | RoundingMode::Down => assert_ne!(o, Ordering::Greater),
-            RoundingMode::Ceiling | RoundingMode::Up => assert_ne!(o, Ordering::Less),
-            RoundingMode::Exact => assert_eq!(o, Ordering::Equal),
+            Floor | Down => assert_ne!(o, Greater),
+            Ceiling | Up => assert_ne!(o, Less),
+            Exact => assert_eq!(o, Equal),
             _ => {}
         }
         if let Some(product) = q.checked_mul(y) {
@@ -1768,41 +1138,38 @@ fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 
     unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
-        assert_eq!(
-            x.ceiling_div_neg_mod(y).0,
-            x.div_round(y, RoundingMode::Ceiling).0
-        );
+        assert_eq!(x.ceiling_div_neg_mod(y).0, x.div_round(y, Ceiling).0);
     });
 
     unsigned_pair_gen_var_11::<T>().test_properties(|(x, y)| {
         let q = x.div_exact(y);
-        let o = Ordering::Equal;
-        assert_eq!(x.div_round(y, RoundingMode::Down), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Up), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Floor), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Ceiling), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Nearest), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Exact), (q, o));
+        let o = Equal;
+        assert_eq!(x.div_round(y, Down), (q, o));
+        assert_eq!(x.div_round(y, Up), (q, o));
+        assert_eq!(x.div_round(y, Floor), (q, o));
+        assert_eq!(x.div_round(y, Ceiling), (q, o));
+        assert_eq!(x.div_round(y, Nearest), (q, o));
+        assert_eq!(x.div_round(y, Exact), (q, o));
     });
 
     unsigned_pair_gen_var_13::<T>().test_properties(|(x, y)| {
-        let down = x.div_round(y, RoundingMode::Down);
-        assert_eq!(down.1, Ordering::Less);
-        let up = (down.0 + T::ONE, Ordering::Greater);
-        assert_eq!(x.div_round(y, RoundingMode::Up), up);
-        assert_eq!(x.div_round(y, RoundingMode::Floor), down);
-        assert_eq!(x.div_round(y, RoundingMode::Ceiling), up);
-        let nearest = x.div_round(y, RoundingMode::Nearest);
+        let down = x.div_round(y, Down);
+        assert_eq!(down.1, Less);
+        let up = (down.0 + T::ONE, Greater);
+        assert_eq!(x.div_round(y, Up), up);
+        assert_eq!(x.div_round(y, Floor), down);
+        assert_eq!(x.div_round(y, Ceiling), up);
+        let nearest = x.div_round(y, Nearest);
         assert!(nearest == down || nearest == up);
     });
 
     unsigned_rounding_mode_pair_gen::<T>().test_properties(|(x, rm)| {
-        assert_eq!(x.div_round(T::ONE, rm), (x, Ordering::Equal));
+        assert_eq!(x.div_round(T::ONE, rm), (x, Equal));
     });
 
     unsigned_rounding_mode_pair_gen_var_1::<T>().test_properties(|(x, rm)| {
-        assert_eq!(T::ZERO.div_round(x, rm), (T::ZERO, Ordering::Equal));
-        assert_eq!(x.div_round(x, rm), (T::ONE, Ordering::Equal));
+        assert_eq!(T::ZERO.div_round(x, rm), (T::ZERO, Equal));
+        assert_eq!(x.div_round(x, rm), (T::ONE, Equal));
     });
 }
 
@@ -1815,7 +1182,7 @@ fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
         assert_eq!(x.div_round(y, rm), (q, o));
 
         assert!(q.le_abs(&x));
-        assert_eq!(x.divisible_by(y), o == Ordering::Equal);
+        assert_eq!(x.divisible_by(y), o == Equal);
         if x != T::MIN {
             let (q_alt, o_alt) = (-x).div_round(y, -rm);
             assert_eq!(-q_alt, q);
@@ -1828,13 +1195,13 @@ fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
         }
 
         match ((x >= T::ZERO) == (y >= T::ZERO), rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
         if let Some(product) = q.checked_mul(y) {
@@ -1844,46 +1211,46 @@ fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
 
     signed_pair_gen_var_3::<T>().test_properties(|(x, y)| {
         let q = x.div_exact(y);
-        let o = Ordering::Equal;
-        assert_eq!(x.div_round(y, RoundingMode::Down), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Up), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Floor), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Ceiling), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Nearest), (q, o));
-        assert_eq!(x.div_round(y, RoundingMode::Exact), (q, o));
+        let o = Equal;
+        assert_eq!(x.div_round(y, Down), (q, o));
+        assert_eq!(x.div_round(y, Up), (q, o));
+        assert_eq!(x.div_round(y, Floor), (q, o));
+        assert_eq!(x.div_round(y, Ceiling), (q, o));
+        assert_eq!(x.div_round(y, Nearest), (q, o));
+        assert_eq!(x.div_round(y, Exact), (q, o));
     });
 
     signed_pair_gen_var_5::<T>().test_properties(|(x, y)| {
-        let down = x.div_round(y, RoundingMode::Down);
+        let down = x.div_round(y, Down);
         let up = if (x >= T::ZERO) == (y >= T::ZERO) {
-            (down.0 + T::ONE, Ordering::Greater)
+            (down.0 + T::ONE, Greater)
         } else {
-            (down.0 - T::ONE, Ordering::Less)
+            (down.0 - T::ONE, Less)
         };
-        let floor = x.div_round(y, RoundingMode::Floor);
-        let ceiling = (floor.0 + T::ONE, Ordering::Greater);
-        assert_eq!(x.div_round(y, RoundingMode::Up), up);
-        assert_eq!(x.div_round(y, RoundingMode::Ceiling), ceiling);
-        let nearest = x.div_round(y, RoundingMode::Nearest);
+        let floor = x.div_round(y, Floor);
+        let ceiling = (floor.0 + T::ONE, Greater);
+        assert_eq!(x.div_round(y, Up), up);
+        assert_eq!(x.div_round(y, Ceiling), ceiling);
+        let nearest = x.div_round(y, Nearest);
         assert!(nearest == down || nearest == up);
     });
 
     signed_rounding_mode_pair_gen::<T>().test_properties(|(x, rm)| {
-        assert_eq!(x.div_round(T::ONE, rm), (x, Ordering::Equal));
+        assert_eq!(x.div_round(T::ONE, rm), (x, Equal));
     });
 
     signed_rounding_mode_pair_gen_var_2::<T>().test_properties(|(x, rm)| {
-        assert_eq!(x.div_round(T::NEGATIVE_ONE, rm), (-x, Ordering::Equal));
+        assert_eq!(x.div_round(T::NEGATIVE_ONE, rm), (-x, Equal));
     });
 
     signed_rounding_mode_pair_gen_var_1::<T>().test_properties(|(x, rm)| {
-        assert_eq!(T::ZERO.div_round(x, rm), (T::ZERO, Ordering::Equal));
-        assert_eq!(x.div_round(x, rm), (T::ONE, Ordering::Equal));
+        assert_eq!(T::ZERO.div_round(x, rm), (T::ZERO, Equal));
+        assert_eq!(x.div_round(x, rm), (T::ONE, Equal));
     });
 
     signed_rounding_mode_pair_gen_var_3::<T>().test_properties(|(x, rm)| {
-        assert_eq!(x.div_round(-x, rm), (T::NEGATIVE_ONE, Ordering::Equal));
-        assert_eq!((-x).div_round(x, rm), (T::NEGATIVE_ONE, Ordering::Equal));
+        assert_eq!(x.div_round(-x, rm), (T::NEGATIVE_ONE, Equal));
+        assert_eq!((-x).div_round(x, rm), (T::NEGATIVE_ONE, Equal));
     });
 }
 

@@ -2806,7 +2806,7 @@ fn test_limbs_div_divide_and_conquer() {
         );
         // - *scratch_2_head == 0
         // - !(highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..],
-        //   ds) || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater)
+        //   ds) || limbs_cmp_same_length(scratch_init, ns) == Greater)
         test(
             &[10; 3],
             &[0; 9],
@@ -2822,7 +2822,7 @@ fn test_limbs_div_divide_and_conquer() {
             &[0, 0, 2],
         );
         // - highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
-        //   || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater
+        //   || limbs_cmp_same_length(scratch_init, ns) == Greater
         test(
             &[10; 3],
             &[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
@@ -2907,7 +2907,7 @@ fn test_limbs_div_barrett() {
         // - *scratch_2_head <= 6
         // - !highest_q third time
         // - !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds) ||
-        //   limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater)
+        //   limbs_cmp_same_length(&mut rs, ns) == Greater)
         test(&[10; 3], &[1, 2, 3], &[0, 0x80000000], false, &[6, 10, 10]);
         test(&[10; 3], &[1, 2, 3], &[3, 0x80000000], false, &[6, 10, 10]);
         // - q_len >= d_len
@@ -2939,13 +2939,13 @@ fn test_limbs_div_barrett() {
             &[0, 10, 10],
         );
         // - highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds) ||
-        //   limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
+        //   limbs_cmp_same_length(&mut rs, ns) == Greater
         // - !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) second time
         test(&[10; 3], &[0, 0, 1], &[1, 0x80000000], false, &[1, 10, 10]);
         // - *scratch_2_head <= 4
         // - !highest_q second time
         // - !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds) ||
-        //   limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater)
+        //   limbs_cmp_same_length(&rs[..n_len], ns) == Greater)
         test(
             &[10; 3],
             &[0, 0, 0, 0],
@@ -2954,7 +2954,7 @@ fn test_limbs_div_barrett() {
             &[0, 0, 10],
         );
         // - highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds) ||
-        //   limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater
+        //   limbs_cmp_same_length(&rs[..n_len], ns) == Greater
         // - !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) first time
         test(
             &[10; 3],
@@ -15513,7 +15513,7 @@ fn test_limbs_div_barrett_approx() {
         // - q_len != 0 second time in limbs_div_barrett_approx_preinverted
         // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_barrett_approx_preinverted
         // - n != 0 in limbs_div_barrett_approx_preinverted
-        // - limbs_cmp_same_length(rs, ds) == Ordering::Less
+        // - limbs_cmp_same_length(rs, ds) == Less
         // - i_len != chunk_len in limbs_div_barrett_approx_preinverted
         test(
             &[10; 100],
@@ -16078,7 +16078,7 @@ fn test_limbs_div_barrett_approx() {
     {
         // - highest_q first time in limbs_div_barrett_approx_preinverted
         // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_barrett_approx_preinverted
-        // - limbs_cmp_same_length(rs, ds) >= Ordering::Equal
+        // - limbs_cmp_same_length(rs, ds) >= Equal
         test(
             &[10; 100],
             &[
@@ -17320,7 +17320,7 @@ fn test_limbs_div() {
             &[985368501, 2737353193, 3370693165, 1798455938, 0],
         );
         // - *scratch_2_head <= 4 in limbs_div_to_out_balanced
-        // - !(r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less)
+        // - !(r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Less)
         test(
             &[10; 3],
             &[
@@ -31240,7 +31240,7 @@ fn test_limbs_div() {
                 1,
             ],
         );
-        // - r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less in
+        // - r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Less in
         //   limbs_div_to_out_balanced
         test(
             &[10; 5],

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 /// An iterator that generates the [`Ordering`]s of adjacent elements of a given iterator.
 ///
@@ -57,11 +57,11 @@ where
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::iterators::comparison::delta_directions;
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::*;
 ///
 /// assert_eq!(
 ///     delta_directions([3, 1, 4, 1, 5, 9].into_iter()).collect_vec(),
-///     &[Ordering::Less, Ordering::Greater, Ordering::Less, Ordering::Greater, Ordering::Greater]
+///     &[Less, Greater, Less, Greater, Greater]
 /// )
 /// ```
 #[inline]
@@ -93,7 +93,7 @@ pub fn is_strictly_ascending<I: Iterator>(xs: I) -> bool
 where
     I::Item: Ord,
 {
-    delta_directions(xs).all(|x| x == Ordering::Greater)
+    delta_directions(xs).all(|x| x == Greater)
 }
 
 /// Determines whether each element of an iterator is less than the preceding one.
@@ -117,7 +117,7 @@ pub fn is_strictly_descending<I: Iterator>(xs: I) -> bool
 where
     I::Item: Ord,
 {
-    delta_directions(xs).all(|x| x == Ordering::Less)
+    delta_directions(xs).all(|x| x == Less)
 }
 
 /// Determines whether each element of an iterator is greater than or equal to the preceding one.
@@ -142,7 +142,7 @@ pub fn is_weakly_ascending<I: Iterator>(xs: I) -> bool
 where
     I::Item: Ord,
 {
-    delta_directions(xs).all(|x| x != Ordering::Less)
+    delta_directions(xs).all(|x| x != Less)
 }
 
 /// Determines whether each element of an iterator is less than or equal to the preceding one.
@@ -167,7 +167,7 @@ pub fn is_weakly_descending<I: Iterator>(xs: I) -> bool
 where
     I::Item: Ord,
 {
-    delta_directions(xs).all(|x| x != Ordering::Greater)
+    delta_directions(xs).all(|x| x != Greater)
 }
 
 /// Determines whether the sequence strictly zigzags.
@@ -193,7 +193,7 @@ where
 {
     let mut previous = None;
     for direction in delta_directions(xs) {
-        if direction == Ordering::Equal {
+        if direction == Equal {
             return false;
         }
         if let Some(previous) = previous {
@@ -234,7 +234,7 @@ where
                 return false;
             }
             *previous = previous.reverse();
-        } else if direction != Ordering::Equal {
+        } else if direction != Equal {
             previous = Some(direction);
         }
     }

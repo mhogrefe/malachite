@@ -10,7 +10,7 @@ use crate::Rational;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Ceiling, CeilingAssign, DivRound, DivRoundAssign};
 use malachite_base::num::basic::traits::One;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -43,11 +43,7 @@ impl Ceiling for Rational {
     /// ```
     fn ceiling(self) -> Integer {
         if self.sign {
-            Integer::from(
-                self.numerator
-                    .div_round(self.denominator, RoundingMode::Ceiling)
-                    .0,
-            )
+            Integer::from(self.numerator.div_round(self.denominator, Ceiling).0)
         } else {
             Integer::from_sign_and_abs(false, self.numerator / self.denominator)
         }
@@ -83,11 +79,7 @@ impl<'a> Ceiling for &'a Rational {
     /// ```
     fn ceiling(self) -> Integer {
         if self.sign {
-            Integer::from(
-                (&self.numerator)
-                    .div_round(&self.denominator, RoundingMode::Ceiling)
-                    .0,
-            )
+            Integer::from((&self.numerator).div_round(&self.denominator, Ceiling).0)
         } else {
             Integer::from_sign_and_abs(false, &self.numerator / &self.denominator)
         }
@@ -131,7 +123,7 @@ impl CeilingAssign for Rational {
         let mut d = Natural::ONE;
         swap(&mut self.denominator, &mut d);
         if self.sign {
-            self.numerator.div_round_assign(d, RoundingMode::Ceiling);
+            self.numerator.div_round_assign(d, Ceiling);
         } else {
             self.numerator /= d;
             if !self.sign && self.numerator == 0 {

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
 use malachite_base::num::logic::traits::SignificantBits;
@@ -30,16 +30,16 @@ macro_rules! impl_float {
                 if other.is_nan() {
                     None
                 } else if !other.is_finite() {
-                    Some(Ordering::Less)
+                    Some(Less)
                 } else if *other == 0.0 {
                     self.partial_cmp_abs(&0u32)
                 } else if *self == 0u32 {
-                    Some(Ordering::Less)
+                    Some(Less)
                 } else {
                     let (m, e) = other.integer_mantissa_and_exponent();
                     let log_cmp = i64::exact_from(self.significant_bits())
                         .cmp(&(i64::exact_from(m.significant_bits()) + e));
-                    Some(if log_cmp != Ordering::Equal {
+                    Some(if log_cmp != Equal {
                         log_cmp
                     } else {
                         self.cmp_normalized(&Natural::from(m))

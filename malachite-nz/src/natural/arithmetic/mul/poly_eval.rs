@@ -28,7 +28,7 @@ use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place
 use crate::natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -60,7 +60,7 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
     assert!(poly_3.len() <= n);
     v_1[n] = Limb::from(limbs_add_same_length_to_out(v_1, poly_0, poly_2));
     scratch[n] = Limb::from(limbs_add_to_out(scratch, poly_1, poly_3));
-    let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
+    let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Less;
     if v_neg_1_neg {
         limbs_sub_same_length_to_out(v_neg_1, scratch, v_1);
     } else {
@@ -114,7 +114,7 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
         }
     }
     limbs_slice_shl_in_place(scratch, 1);
-    let v_neg_2_neg = limbs_cmp_same_length(v_2, scratch) == Ordering::Less;
+    let v_neg_2_neg = limbs_cmp_same_length(v_2, scratch) == Less;
     if v_neg_2_neg {
         limbs_sub_same_length_to_out(v_neg_2, scratch, v_2);
     } else {
@@ -184,7 +184,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
         if degree.even() { v_1 } else { scratch },
         coefficients[degree],
     ));
-    let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
+    let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Less;
     if v_neg_1_neg {
         limbs_sub_same_length_to_out(v_neg_1, scratch, v_1);
     } else {
@@ -318,7 +318,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
         limbs_slice_shl_in_place(if degree.even() { scratch } else { v_2 }, 1),
         0
     );
-    let mut v_neg_2_neg = limbs_cmp_same_length(v_2, scratch) == Ordering::Less;
+    let mut v_neg_2_neg = limbs_cmp_same_length(v_2, scratch) == Less;
     if v_neg_2_neg {
         limbs_sub_same_length_to_out(v_neg_2, scratch, v_2);
     } else {
@@ -408,7 +408,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
         if degree.even() { v_2_pow } else { scratch },
         &v_neg_2_pow[..n_high + 1],
     );
-    let v_neg_2_pow_neg = limbs_cmp_same_length(v_2_pow, scratch) == Ordering::Less;
+    let v_neg_2_pow_neg = limbs_cmp_same_length(v_2_pow, scratch) == Less;
     if v_neg_2_pow_neg {
         limbs_sub_same_length_to_out(v_neg_2_pow, scratch, v_2_pow);
     } else {
@@ -515,7 +515,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
         i += 1;
         local_shift -= shift;
     }
-    let v_2_pow_neg_neg = limbs_cmp_same_length(v_2_pow_neg, scratch) == Ordering::Less;
+    let v_2_pow_neg_neg = limbs_cmp_same_length(v_2_pow_neg, scratch) == Less;
     if v_2_pow_neg_neg {
         limbs_sub_same_length_to_out(v_neg_2_pow_neg, scratch, v_2_pow_neg);
     } else {

@@ -84,21 +84,20 @@ pub mod general_digits;
 /// # power_of_2_digits
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
 /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
 ///
 /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
 /// assert!(digits.next().is_none());
 ///
 /// // 107 = 1101011b
-/// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
+/// let digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
 /// assert_eq!(digits.collect_vec(), &[3, 2, 2, 1]);
 ///
 /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
 /// assert!(digits.next_back().is_none());
 ///
 /// // 107 = 1101011b
-/// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
+/// let digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
 /// assert_eq!(digits.rev().collect_vec(), &[1, 2, 2, 3]);
 /// ```
 pub mod power_of_2_digit_iterable;

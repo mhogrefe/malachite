@@ -11,7 +11,7 @@ use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::{min, Ordering};
+use core::cmp::{min, Ordering::*};
 use core::marker::PhantomData;
 use core::slice::Chunks;
 use malachite_base::num::arithmetic::traits::{
@@ -25,7 +25,7 @@ use malachite_base::num::conversion::traits::{
     ExactFrom, PowerOf2DigitIterable, PowerOf2DigitIterator,
 };
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 #[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -379,7 +379,9 @@ impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T>
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
+    /// use malachite_base::num::conversion::traits::{
+    ///     PowerOf2DigitIterable, PowerOf2DigitIterator,
+    /// };
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
@@ -415,9 +417,7 @@ fn fits_in_limb_iterator<T: PrimitiveUnsigned>(
 ) -> FitsInLimbIterator<'_, T> {
     let significant_bits = limbs_significant_bits(xs);
     let log_log_base = log_base.floor_log_base_2();
-    let significant_digits = significant_bits
-        .shr_round(log_log_base, RoundingMode::Ceiling)
-        .0;
+    let significant_digits = significant_bits.shr_round(log_log_base, Ceiling).0;
     FitsInLimbIterator(FILIterator {
         limbs: xs,
         log_base,
@@ -459,9 +459,7 @@ fn irregular_iterator<T: PrimitiveUnsigned>(
     xs: &[Limb],
     log_base: u64,
 ) -> IrregularIterator<'_, T> {
-    let significant_digits = limbs_significant_bits(xs)
-        .div_round(log_base, RoundingMode::Ceiling)
-        .0;
+    let significant_digits = limbs_significant_bits(xs).div_round(log_base, Ceiling).0;
     IrregularIterator(IIterator {
         limbs: xs,
         log_base,
@@ -494,13 +492,13 @@ where
         Natural(Large(ref limbs)) => {
             if let Some(log_log_base) = log_base.checked_log_base_2() {
                 match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                    Ordering::Equal => NaturalPowerOf2DigitPrimitiveIterator::SizeOfLimb(
+                    Equal => NaturalPowerOf2DigitPrimitiveIterator::SizeOfLimb(
                         size_of_limb_iterator(limbs),
                     ),
-                    Ordering::Less => NaturalPowerOf2DigitPrimitiveIterator::FitsInLimb(
+                    Less => NaturalPowerOf2DigitPrimitiveIterator::FitsInLimb(
                         fits_in_limb_iterator(limbs, log_base),
                     ),
-                    Ordering::Greater => NaturalPowerOf2DigitPrimitiveIterator::MultipleOfLimb(
+                    Greater => NaturalPowerOf2DigitPrimitiveIterator::MultipleOfLimb(
                         multiple_of_limb_iterator(limbs, log_base),
                     ),
                 }
@@ -772,11 +770,16 @@ impl<'a> PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'a> {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
+    /// use malachite_base::num::conversion::traits::{
+    ///     PowerOf2DigitIterable, PowerOf2DigitIterator,
+    /// };
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).get(0), 0);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).get(0),
+    ///     0
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -808,9 +811,7 @@ fn multiple_of_limb_fn(xs: &[Limb], log_base: u64) -> NaturalMultipleOfLimbItera
 }
 
 fn irregular_fn(xs: &[Limb], log_base: u64) -> NaturalIrregularIterator<'_> {
-    let significant_digits = limbs_significant_bits(xs)
-        .div_round(log_base, RoundingMode::Ceiling)
-        .0;
+    let significant_digits = limbs_significant_bits(xs).div_round(log_base, Ceiling).0;
     NaturalIrregularIterator(NIIterator {
         limbs: xs,
         log_base,
@@ -846,7 +847,9 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next().is_none());
+    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
+    ///     .next()
+    ///     .is_none());
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);

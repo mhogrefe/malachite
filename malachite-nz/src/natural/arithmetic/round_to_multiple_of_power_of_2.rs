@@ -13,7 +13,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, PowerOf2, RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, ShrRound,
     ShrRoundAssign,
@@ -22,7 +22,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -39,7 +39,7 @@ pub_test! {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     if clear_count >= xs_len {
-        (Vec::new(), if slice_test_zero(xs) {Ordering::Equal} else {Ordering::Less})
+        (Vec::new(), if slice_test_zero(xs) {Equal} else {Less})
     } else {
         let mut out = vec![0; xs_len];
         let (xs_lo, xs_hi) = xs.split_at(clear_count);
@@ -52,7 +52,7 @@ pub_test! {
             *out_cc &= !Limb::low_mask(small_pow);
             exact &= *out_cc == old;
         }
-        (out, if exact {Ordering::Equal} else {Ordering::Less})
+        (out, if exact {Equal} else {Less})
     }
 }}
 
@@ -93,7 +93,7 @@ pub_test! {
             out.push(1);
         }
     }
-    (out, if exact {Ordering::Equal} else {Ordering::Greater})
+    (out, if exact {Equal} else {Greater})
 }}
 
 // # Worst-case complexity
@@ -109,14 +109,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     if clear_count >= xs_len {
-        (
-            Vec::new(),
-            if slice_test_zero(xs) {
-                Ordering::Equal
-            } else {
-                Ordering::Less
-            },
-        )
+        (Vec::new(), if slice_test_zero(xs) { Equal } else { Less })
     } else {
         let (xs_lo, xs_hi) = xs.split_at(clear_count);
         let mut exact = slice_test_zero(xs_lo);
@@ -132,16 +125,9 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
             if limbs_slice_add_limb_in_place(out_hi, Limb::power_of_2(small_pow)) {
                 out.push(1);
             }
-            (out, Ordering::Greater)
+            (out, Greater)
         } else {
-            (
-                out,
-                if exact {
-                    Ordering::Equal
-                } else {
-                    Ordering::Less
-                },
-            )
+            (out, if exact { Equal } else { Less })
         }
     }
 }
@@ -159,7 +145,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
 pub_test! {
     limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> (Vec<Limb>, Ordering) {
     if pow == 0 {
-        (xs.to_vec(), Ordering::Equal)
+        (xs.to_vec(), Equal)
     } else if !limbs_get_bit(xs, pow - 1) {
         limbs_round_to_multiple_of_power_of_2_down(xs, pow)
     } else if !limbs_divisible_by_power_of_2(xs, pow - 1) {
@@ -186,16 +172,16 @@ pub_test! {limbs_round_to_multiple_of_power_of_2(
     rm: RoundingMode,
 ) -> Option<(Vec<Limb>, Ordering)> {
     match rm {
-        RoundingMode::Down | RoundingMode::Floor => {
+        Down | Floor => {
             Some(limbs_round_to_multiple_of_power_of_2_down(xs, pow))
         }
-        RoundingMode::Up | RoundingMode::Ceiling => {
+        Up | Ceiling => {
             Some(limbs_round_to_multiple_of_power_of_2_up(xs, pow))
         }
-        RoundingMode::Nearest => Some(limbs_round_to_multiple_of_power_of_2_nearest(xs, pow)),
-        RoundingMode::Exact => {
+        Nearest => Some(limbs_round_to_multiple_of_power_of_2_nearest(xs, pow)),
+        Exact => {
             if limbs_divisible_by_power_of_2(xs, pow) {
-                Some((xs.to_vec(), Ordering::Equal))
+                Some((xs.to_vec(), Equal))
             } else {
                 None
             }
@@ -232,7 +218,7 @@ pub_test! {
             exact &= *x0 == old;
         }
     }
-    if exact {Ordering::Equal} else {Ordering::Less}
+    if exact {Equal} else {Less}
 }}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -253,7 +239,7 @@ pub_test! {
     if clear_count >= xs_len {
         *xs = vec![0; clear_count + 1];
         xs[clear_count] = Limb::power_of_2(small_pow);
-        Ordering::Greater
+        Greater
     } else {
         let (xs_lo, xs_hi) = xs.split_at_mut(clear_count);
         let mut exact = slice_test_zero(xs_lo);
@@ -268,7 +254,7 @@ pub_test! {
         if !exact && limbs_slice_add_limb_in_place(xs_hi, Limb::power_of_2(small_pow)) {
             xs.push(1);
         }
-        if exact {Ordering::Equal} else {Ordering::Greater}
+        if exact {Equal} else {Greater}
     }
 }}
 
@@ -288,9 +274,9 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
         let exact = slice_test_zero(xs);
         xs.clear();
         if exact {
-            Ordering::Equal
+            Equal
         } else {
-            Ordering::Less
+            Less
         }
     } else {
         let (xs_lo, xs_hi) = xs.split_at_mut(clear_count);
@@ -310,11 +296,11 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
             if limbs_slice_add_limb_in_place(xs_hi, Limb::power_of_2(small_pow)) {
                 xs.push(1);
             }
-            Ordering::Greater
+            Greater
         } else if exact {
-            Ordering::Equal
+            Equal
         } else {
-            Ordering::Less
+            Less
         }
     }
 }
@@ -335,7 +321,7 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(
     pow: u64
 ) -> Ordering {
     if pow == 0 {
-        Ordering::Equal
+        Equal
     } else if !limbs_get_bit(xs, pow - 1) {
         limbs_round_to_multiple_of_power_of_2_down_in_place(xs, pow)
     } else if !limbs_divisible_by_power_of_2(xs, pow - 1) {
@@ -363,18 +349,18 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_in_place(
     rm: RoundingMode,
 ) -> Option<Ordering> {
     match rm {
-        RoundingMode::Down | RoundingMode::Floor => {
+        Down | Floor => {
             Some(limbs_round_to_multiple_of_power_of_2_down_in_place(xs, pow))
         }
-        RoundingMode::Up | RoundingMode::Ceiling => {
+        Up | Ceiling => {
             Some(limbs_round_to_multiple_of_power_of_2_up_in_place(xs, pow))
         }
-        RoundingMode::Nearest => Some(limbs_round_to_multiple_of_power_of_2_nearest_in_place(
+        Nearest => Some(limbs_round_to_multiple_of_power_of_2_nearest_in_place(
             xs, pow,
         )),
-        RoundingMode::Exact => {
+        Exact => {
             if limbs_divisible_by_power_of_2(xs, pow) {
-                Some(Ordering::Equal)
+                Some(Equal)
             } else {
                 None
             }
@@ -413,7 +399,7 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
     /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+    /// - `x.round_to_multiple_of_power_of_2(pow, Exact)`
     /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
@@ -432,37 +418,43 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple_of_power_of_2(2, RoundingMode::Floor)
+    ///     Natural::from(10u32)
+    ///         .round_to_multiple_of_power_of_2(2, Floor)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+    ///     Natural::from(10u32)
+    ///         .round_to_multiple_of_power_of_2(2, Ceiling)
     ///         .to_debug_string(),
     ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple_of_power_of_2(2, RoundingMode::Down)
+    ///     Natural::from(10u32)
+    ///         .round_to_multiple_of_power_of_2(2, Down)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple_of_power_of_2(2, RoundingMode::Up)
+    ///     Natural::from(10u32)
+    ///         .round_to_multiple_of_power_of_2(2, Up)
     ///         .to_debug_string(),
     ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest)
+    ///     Natural::from(10u32)
+    ///         .round_to_multiple_of_power_of_2(2, Nearest)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(12u32).round_to_multiple_of_power_of_2(2, RoundingMode::Exact)
+    ///     Natural::from(12u32)
+    ///         .round_to_multiple_of_power_of_2(2, Exact)
     ///         .to_debug_string(),
     ///     "(12, Equal)"
     /// );
@@ -509,7 +501,7 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
     /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+    /// - `x.round_to_multiple_of_power_of_2(pow, Exact)`
     /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
@@ -528,44 +520,50 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple_of_power_of_2(2, RoundingMode::Floor)
+    ///     (&Natural::from(10u32))
+    ///         .round_to_multiple_of_power_of_2(2, Floor)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+    ///     (&Natural::from(10u32))
+    ///         .round_to_multiple_of_power_of_2(2, Ceiling)
     ///         .to_debug_string(),
     ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple_of_power_of_2(2, RoundingMode::Down)
+    ///     (&Natural::from(10u32))
+    ///         .round_to_multiple_of_power_of_2(2, Down)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple_of_power_of_2(2, RoundingMode::Up)
+    ///     (&Natural::from(10u32))
+    ///         .round_to_multiple_of_power_of_2(2, Up)
     ///         .to_debug_string(),
     ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest)
+    ///     (&Natural::from(10u32))
+    ///         .round_to_multiple_of_power_of_2(2, Nearest)
     ///         .to_debug_string(),
     ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(12u32)).round_to_multiple_of_power_of_2(2, RoundingMode::Exact)
+    ///     (&Natural::from(12u32))
+    ///         .round_to_multiple_of_power_of_2(2, Exact)
     ///         .to_debug_string(),
     ///     "(12, Equal)"
     /// );
     /// ```
     fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> (Natural, Ordering) {
         match (self, pow) {
-            (_, 0) | (&Natural::ZERO, _) => (self.clone(), Ordering::Equal),
+            (_, 0) | (&Natural::ZERO, _) => (self.clone(), Equal),
             (Natural(Small(small)), pow) => {
                 let (s, o) = small.shr_round(pow, rm);
                 (Natural::from(s) << pow, o)
@@ -591,7 +589,7 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
     ///
     /// The following two expressions are equivalent:
-    /// - `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`
+    /// - `x.round_to_multiple_of_power_of_2_assign(pow, Exact);`
     /// - `assert!(x.divisible_by_power_of_2(pow));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
@@ -609,56 +607,41 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
-    /// use core::cmp::Ordering;
     ///
     /// let mut n = Natural::from(10u32);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Floor), Less);
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Natural::from(10u32);
     /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     n.round_to_multiple_of_power_of_2_assign(2, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(n, 12);
     ///
     /// let mut n = Natural::from(10u32);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Down),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Down), Less);
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Natural::from(10u32);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Up),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Up), Greater);
     /// assert_eq!(n, 12);
     ///
     /// let mut n = Natural::from(10u32);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Nearest),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Nearest), Less);
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Natural::from(12u32);
-    /// assert_eq!(
-    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Exact),
-    ///     Ordering::Equal
-    /// );
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, Exact), Equal);
     /// assert_eq!(n, 12);
     /// ```
     fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) -> Ordering {
         match (&mut *self, pow) {
-            (_, 0) | (&mut Natural::ZERO, _) => Ordering::Equal,
+            (_, 0) | (&mut Natural::ZERO, _) => Equal,
             (Natural(Small(ref mut small)), pow) => {
                 let o = small.shr_round_assign(pow, rm);
                 *self <<= pow;

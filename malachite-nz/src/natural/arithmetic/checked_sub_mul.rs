@@ -162,19 +162,22 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(20u32).checked_sub_mul(Natural::from(3u32), Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(20u32)
+    ///         .checked_sub_mul(Natural::from(3u32), Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "Some(8)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).checked_sub_mul(Natural::from(3u32), Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .checked_sub_mul(Natural::from(3u32), Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "None"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .checked_sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .checked_sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32))
+    ///         .to_debug_string(),
     ///     "Some(995705032704)"
     /// );
     /// ```
@@ -218,19 +221,22 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(20u32).checked_sub_mul(Natural::from(3u32), &Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(20u32)
+    ///         .checked_sub_mul(Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "Some(8)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).checked_sub_mul(Natural::from(3u32), &Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .checked_sub_mul(Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "None"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .checked_sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .checked_sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32))
+    ///         .to_debug_string(),
     ///     "Some(995705032704)"
     /// );
     /// ```
@@ -274,19 +280,22 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(20u32).checked_sub_mul(&Natural::from(3u32), Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(20u32)
+    ///         .checked_sub_mul(&Natural::from(3u32), Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "Some(8)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).checked_sub_mul(&Natural::from(3u32), Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .checked_sub_mul(&Natural::from(3u32), Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "None"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .checked_sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .checked_sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32))
+    ///         .to_debug_string(),
     ///     "Some(995705032704)"
     /// );
     /// ```
@@ -330,19 +339,22 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(20u32).checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(20u32)
+    ///         .checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "Some(8)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "None"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
-    ///             .checked_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
-    ///             .to_debug_string(),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .checked_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
+    ///         .to_debug_string(),
     ///     "Some(995705032704)"
     /// );
     /// ```
@@ -383,19 +395,21 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(20u32)).checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     (&Natural::from(20u32))
+    ///         .checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "Some(8)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
-    ///             .to_debug_string(),
+    ///     (&Natural::from(10u32))
+    ///         .checked_sub_mul(&Natural::from(3u32), &Natural::from(4u32))
+    ///         .to_debug_string(),
     ///     "None"
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32).pow(12))
-    ///             .checked_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
-    ///             .to_debug_string(),
+    ///         .checked_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
+    ///         .to_debug_string(),
     ///     "Some(995705032704)"
     /// );
     /// ```

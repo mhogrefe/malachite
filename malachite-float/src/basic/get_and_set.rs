@@ -8,12 +8,12 @@
 
 use crate::InnerFloat::Finite;
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -31,8 +31,8 @@ impl Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
+    /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Float::NAN.to_significand(), None);
     /// assert_eq!(Float::INFINITY.to_significand(), None);
@@ -68,8 +68,8 @@ impl Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
+    /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Float::NAN.into_significand(), None);
     /// assert_eq!(Float::INFINITY.into_significand(), None);
@@ -79,7 +79,9 @@ impl Float {
     /// {
     ///     assert_eq!(Float::ONE.into_significand(), Some(Natural::power_of_2(63)));
     ///     assert_eq!(
-    ///         Float::from(std::f64::consts::PI).into_significand().unwrap(),
+    ///         Float::from(std::f64::consts::PI)
+    ///             .into_significand()
+    ///             .unwrap(),
     ///         14488038916154245120u64
     ///     );
     /// }
@@ -106,8 +108,8 @@ impl Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
+    /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Float::NAN.significand_ref(), None);
     /// assert_eq!(Float::INFINITY.significand_ref(), None);
@@ -115,7 +117,10 @@ impl Float {
     ///
     /// #[cfg(not(feature = "32_bit_limbs"))]
     /// {
-    ///     assert_eq!(*Float::ONE.significand_ref().unwrap(), Natural::power_of_2(63));
+    ///     assert_eq!(
+    ///         *Float::ONE.significand_ref().unwrap(),
+    ///         Natural::power_of_2(63)
+    ///     );
     ///     assert_eq!(
     ///         *Float::from(std::f64::consts::PI).significand_ref().unwrap(),
     ///         14488038916154245120u64
@@ -149,7 +154,6 @@ impl Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::NAN.get_exponent(), None);
@@ -181,7 +185,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::NAN.get_prec(), None);
@@ -216,7 +219,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::NAN.get_min_prec(), None);
@@ -250,31 +252,31 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero or if `rm` is [`RoundingMode::Exact`] but setting the desired
-    /// precision requires rounding.
+    /// Panics if `prec` is zero or if `rm` is [`Exact`] but setting the desired precision requires
+    /// rounding.
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let original_x = Float::from(1.0f64 / 3.0);
     /// assert_eq!(original_x.to_string(), "0.33333333333333331");
     /// assert_eq!(original_x.get_prec(), Some(53));
     ///
     /// let mut x = original_x.clone();
-    /// assert_eq!(x.set_prec_round(100, RoundingMode::Exact), Ordering::Equal);
+    /// assert_eq!(x.set_prec_round(100, Exact), Equal);
     /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
     /// assert_eq!(x.get_prec(), Some(100));
     ///
     /// let mut x = original_x.clone();
-    /// assert_eq!(x.set_prec_round(10, RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(x.set_prec_round(10, Floor), Less);
     /// assert_eq!(x.to_string(), "0.333");
     /// assert_eq!(x.get_prec(), Some(10));
     ///
     /// let mut x = original_x.clone();
-    /// assert_eq!(x.set_prec_round(10, RoundingMode::Ceiling), Ordering::Greater);
+    /// assert_eq!(x.set_prec_round(10, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
     /// ```
@@ -288,13 +290,13 @@ impl Float {
                 significand,
             }) => {
                 let target_bits = prec
-                    .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                    .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
                     .0;
                 let significant_bits = significand_bits(significand);
                 let o;
                 if target_bits > significant_bits {
                     *significand <<= target_bits - significant_bits;
-                    o = Ordering::Equal;
+                    o = Equal;
                 } else {
                     let limb_count = significand.limb_count();
                     let abs_rm = if *sign { rm } else { -rm };
@@ -313,12 +315,12 @@ impl Float {
                     o.reverse()
                 }
             }
-            _ => Ordering::Equal,
+            _ => Equal,
         }
     }
 
     /// Changes a [`Float`]'s precision. If the precision decreases, rounding may be necessary, and
-    /// [`RoundingMode::Nearest`] will be used.
+    /// [`Nearest`] will be used.
     ///
     /// Returns an [`Ordering`], indicating whether the final value is less than, greater than, or
     /// equal to the original value.
@@ -334,26 +336,25 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let original_x = Float::from(1.0f64 / 3.0);
     /// assert_eq!(original_x.to_string(), "0.33333333333333331");
     /// assert_eq!(original_x.get_prec(), Some(53));
     ///
     /// let mut x = original_x.clone();
-    /// assert_eq!(x.set_prec(100), Ordering::Equal);
+    /// assert_eq!(x.set_prec(100), Equal);
     /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
     /// assert_eq!(x.get_prec(), Some(100));
     ///
     /// let mut x = original_x.clone();
-    /// assert_eq!(x.set_prec(10), Ordering::Greater);
+    /// assert_eq!(x.set_prec(10), Greater);
     /// assert_eq!(x.to_string(), "0.3335");
     /// assert_eq!(x.get_prec(), Some(10));
     /// ```
     #[inline]
     pub fn set_prec(&mut self, p: u64) -> Ordering {
-        self.set_prec_round(p, RoundingMode::Nearest)
+        self.set_prec_round(p, Nearest)
     }
 }

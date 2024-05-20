@@ -1170,8 +1170,14 @@ impl ModMul<Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_mul(Natural::from(4u32), Natural::from(15u32)), 12);
-    /// assert_eq!(Natural::from(7u32).mod_mul(Natural::from(6u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(Natural::from(4u32), Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(Natural::from(6u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b`, `c`,
@@ -1207,8 +1213,14 @@ impl<'a> ModMul<Natural, &'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_mul(Natural::from(4u32), &Natural::from(15u32)), 12);
-    /// assert_eq!(Natural::from(7u32).mod_mul(Natural::from(6u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(Natural::from(4u32), &Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(Natural::from(6u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
@@ -1243,8 +1255,14 @@ impl<'a> ModMul<&'a Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_mul(&Natural::from(4u32), Natural::from(15u32)), 12);
-    /// assert_eq!(Natural::from(7u32).mod_mul(&Natural::from(6u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(&Natural::from(4u32), Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(&Natural::from(6u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
@@ -1280,8 +1298,14 @@ impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_mul(&Natural::from(4u32), &Natural::from(15u32)), 12);
-    /// assert_eq!(Natural::from(7u32).mod_mul(&Natural::from(6u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(&Natural::from(4u32), &Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(&Natural::from(6u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` is
@@ -1316,8 +1340,14 @@ impl<'a> ModMul<Natural, Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_mul(Natural::from(4u32), Natural::from(15u32)), 12);
-    /// assert_eq!((&Natural::from(7u32)).mod_mul(Natural::from(6u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(Natural::from(4u32), Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(Natural::from(6u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` is
@@ -1353,8 +1383,14 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_mul(Natural::from(4u32), &Natural::from(15u32)), 12);
-    /// assert_eq!((&Natural::from(7u32)).mod_mul(Natural::from(6u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(Natural::from(4u32), &Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(Natural::from(6u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
@@ -1389,8 +1425,14 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_mul(&Natural::from(4u32), Natural::from(15u32)), 12);
-    /// assert_eq!((&Natural::from(7u32)).mod_mul(&Natural::from(6u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(&Natural::from(4u32), Natural::from(15u32)),
+    ///     12
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(&Natural::from(6u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
@@ -1429,7 +1471,10 @@ impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
     ///     (&Natural::from(3u32)).mod_mul(&Natural::from(4u32), &Natural::from(15u32)),
     ///     12
     /// );
-    /// assert_eq!((&Natural::from(7u32)).mod_mul(&Natural::from(6u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(&Natural::from(6u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b`, `c`,

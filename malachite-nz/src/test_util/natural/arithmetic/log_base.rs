@@ -13,7 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub fn floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     assert_ne!(*x, 0);
@@ -80,11 +80,11 @@ fn log_by_squaring_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     for (i, power) in powers.into_iter().enumerate().rev() {
         let new_test_power = &test_power * power;
         match new_test_power.cmp(x) {
-            Ordering::Equal => {
+            Equal => {
                 log.set_bit(u64::exact_from(i));
                 return (log, true);
             }
-            Ordering::Less => {
+            Less => {
                 test_power = new_test_power;
                 log.set_bit(u64::exact_from(i))
             }

@@ -17,7 +17,7 @@ use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
 };
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_ord_abs() {
@@ -37,8 +37,8 @@ fn cmp_abs_properties() {
     });
 
     integer_gen().test_properties(|x| {
-        assert_eq!(x.cmp_abs(&x), Ordering::Equal);
-        assert_eq!(x.cmp_abs(&-&x), Ordering::Equal);
+        assert_eq!(x.cmp_abs(&x), Equal);
+        assert_eq!(x.cmp_abs(&-&x), Equal);
         assert!(x.ge_abs(&Integer::ZERO));
     });
 

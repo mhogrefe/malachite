@@ -8,7 +8,10 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
-use core::cmp::{min, Ordering};
+use core::cmp::{
+    min,
+    Ordering::{self, *},
+};
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -16,7 +19,7 @@ use malachite_base::num::conversion::traits::{
     ExactFrom, IntegerMantissaAndExponent, RawMantissaAndExponent, SciMantissaAndExponent,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -44,12 +47,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::num::float::NiceFloat;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::{self, *};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::{self, *};
     ///
     /// let test = |x: Float, rm: RoundingMode, out: Option<(f32, i64, Ordering)>| {
     ///     assert_eq!(
@@ -58,33 +60,33 @@ impl Float {
     ///         out.map(|(m, e, o)| (NiceFloat(m), e, o))
     ///     );
     /// };
-    /// test(Float::from(3u32), RoundingMode::Floor, Some((1.5, 1, Ordering::Equal)));
-    /// test(Float::from(3u32), RoundingMode::Down, Some((1.5, 1, Ordering::Equal)));
-    /// test(Float::from(3u32), RoundingMode::Ceiling, Some((1.5, 1, Ordering::Equal)));
-    /// test(Float::from(3u32), RoundingMode::Up, Some((1.5, 1, Ordering::Equal)));
-    /// test(Float::from(3u32), RoundingMode::Nearest, Some((1.5, 1, Ordering::Equal)));
-    /// test(Float::from(3u32), RoundingMode::Exact, Some((1.5, 1, Ordering::Equal)));
+    /// test(Float::from(3u32), Floor, Some((1.5, 1, Equal)));
+    /// test(Float::from(3u32), Down, Some((1.5, 1, Equal)));
+    /// test(Float::from(3u32), Ceiling, Some((1.5, 1, Equal)));
+    /// test(Float::from(3u32), Up, Some((1.5, 1, Equal)));
+    /// test(Float::from(3u32), Nearest, Some((1.5, 1, Equal)));
+    /// test(Float::from(3u32), Exact, Some((1.5, 1, Equal)));
     ///
     /// let x = Float::from(std::f64::consts::PI);
-    /// test(x.clone(), RoundingMode::Floor, Some((1.5707963, 1, Ordering::Less)));
-    /// test(x.clone(), RoundingMode::Down, Some((1.5707963, 1, Ordering::Less)));
-    /// test(x.clone(), RoundingMode::Ceiling, Some((1.5707964, 1, Ordering::Greater)));
-    /// test(x.clone(), RoundingMode::Up, Some((1.5707964, 1, Ordering::Greater)));
-    /// test(x.clone(), RoundingMode::Nearest, Some((1.5707964, 1, Ordering::Greater)));
-    /// test(x.clone(), RoundingMode::Exact, None);
+    /// test(x.clone(), Floor, Some((1.5707963, 1, Less)));
+    /// test(x.clone(), Down, Some((1.5707963, 1, Less)));
+    /// test(x.clone(), Ceiling, Some((1.5707964, 1, Greater)));
+    /// test(x.clone(), Up, Some((1.5707964, 1, Greater)));
+    /// test(x.clone(), Nearest, Some((1.5707964, 1, Greater)));
+    /// test(x.clone(), Exact, None);
     ///
     /// test(
     ///     Float::from(1000000000u32),
-    ///     RoundingMode::Nearest,
-    ///     Some((1.8626451, 29, Ordering::Equal)),
+    ///     Nearest,
+    ///     Some((1.8626451, 29, Equal)),
     /// );
     /// test(
     ///     Float::from(Natural::from(10u32).pow(52)),
-    ///     RoundingMode::Nearest,
-    ///     Some((1.670478, 172, Ordering::Greater)),
+    ///     Nearest,
+    ///     Some((1.670478, 172, Greater)),
     /// );
     ///
-    /// test(Float::from(Natural::from(10u32).pow(52)), RoundingMode::Exact, None);
+    /// test(Float::from(Natural::from(10u32).pow(52)), Exact, None);
     /// ```
     pub fn sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         &self,
@@ -100,7 +102,7 @@ impl Float {
                 .map(|(m, _, o)| {
                     (
                         m,
-                        if o == Ordering::Greater && m == T::ONE {
+                        if o == Greater && m == T::ONE {
                             *exponent
                         } else {
                             exponent - 1
@@ -154,7 +156,8 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     ///     assert_eq!(m.to_string(), "202070319366191015160784900114134073344");
     ///     assert_eq!(e, 80);
     ///
-    ///     let (m, e) = Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
+    ///     let (m, e) = Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
+    ///         .0
     ///         .raw_mantissa_and_exponent();
     ///     assert_eq!(m.to_string(), "286514342137199872022965541161805021184");
     ///     assert_eq!(e, -79);
@@ -195,9 +198,14 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     ///
     /// assert_eq!(Float::ONE.raw_exponent(), 1);
     /// assert_eq!(Float::from(std::f64::consts::PI).raw_exponent(), 2);
-    /// assert_eq!(Float::from(Natural::from(3u32).pow(50u64)).raw_exponent(), 80);
     /// assert_eq!(
-    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0.raw_exponent(),
+    ///     Float::from(Natural::from(3u32).pow(50u64)).raw_exponent(),
+    ///     80
+    /// );
+    /// assert_eq!(
+    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
+    ///         .0
+    ///         .raw_exponent(),
     ///     -79
     /// );
     /// ```
@@ -310,8 +318,7 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///     assert_eq!(m.to_string(), "14488038916154245120");
     ///     assert_eq!(e, 2);
     ///
-    ///     let (m, e) = (&Float::from(Natural::from(3u32).pow(50u64)))
-    ///         .raw_mantissa_and_exponent();
+    ///     let (m, e) = (&Float::from(Natural::from(3u32).pow(50u64))).raw_mantissa_and_exponent();
     ///     assert_eq!(m.to_string(), "202070319366191015160784900114134073344");
     ///     assert_eq!(e, 80);
     ///
@@ -356,7 +363,10 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///
     /// assert_eq!((&Float::ONE).raw_exponent(), 1);
     /// assert_eq!((&Float::from(std::f64::consts::PI)).raw_exponent(), 2);
-    /// assert_eq!((&Float::from(Natural::from(3u32).pow(50u64))).raw_exponent(), 80);
+    /// assert_eq!(
+    ///     (&Float::from(Natural::from(3u32).pow(50u64))).raw_exponent(),
+    ///     80
+    /// );
     /// assert_eq!(
     ///     (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0).raw_exponent(),
     ///     -79
@@ -410,7 +420,7 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///         <&Float as RawMantissaAndExponent<_, _, _>>::from_raw_mantissa_and_exponent(
     ///             Natural::from_str("202070319366191015160784900114134073344").unwrap(),
     ///             80
-    ///     ),
+    ///         ),
     ///         Natural::from(3u32).pow(50u64)
     ///     );
     ///     assert_eq!(
@@ -461,7 +471,10 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Float::ONE.integer_mantissa_and_exponent(), (Natural::ONE, 0));
+    /// assert_eq!(
+    ///     Float::ONE.integer_mantissa_and_exponent(),
+    ///     (Natural::ONE, 0)
+    /// );
     /// assert_eq!(
     ///     Float::from(std::f64::consts::PI).integer_mantissa_and_exponent(),
     ///     (Natural::from(884279719003555u64), -48)
@@ -471,9 +484,13 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ///     (Natural::from_str("717897987691852588770249").unwrap(), 0)
     /// );
     /// assert_eq!(
-    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
+    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
+    ///         .0
     ///         .integer_mantissa_and_exponent(),
-    ///     (Natural::from_str("1067349099133908271875104088939").unwrap(), -179)
+    ///     (
+    ///         Natural::from_str("1067349099133908271875104088939").unwrap(),
+    ///         -179
+    ///     )
     /// );
     /// ```
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
@@ -515,13 +532,17 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Float::ONE.integer_exponent(), 0);
     /// assert_eq!(Float::from(std::f64::consts::PI).integer_exponent(), -48);
-    /// assert_eq!(Float::from(Natural::from(3u32).pow(50u64)).integer_exponent(), 0);
     /// assert_eq!(
-    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0.integer_exponent(),
+    ///     Float::from(Natural::from(3u32).pow(50u64)).integer_exponent(),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
+    ///         .0
+    ///         .integer_exponent(),
     ///     -179
     /// );
     /// ```
@@ -572,7 +593,10 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Float::from_integer_mantissa_and_exponent(Natural::ONE, 0).unwrap(), 1);
+    /// assert_eq!(
+    ///     Float::from_integer_mantissa_and_exponent(Natural::ONE, 0).unwrap(),
+    ///     1
+    /// );
     /// assert_eq!(
     ///     Float::from_integer_mantissa_and_exponent(Natural::from(884279719003555u64), -48)
     ///         .unwrap(),
@@ -582,14 +606,16 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ///     Float::from_integer_mantissa_and_exponent(
     ///         Natural::from_str("717897987691852588770249").unwrap(),
     ///         0
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Natural::from(3u32).pow(50u64)
     /// );
     /// assert_eq!(
     ///     Float::from_integer_mantissa_and_exponent(
     ///         Natural::from_str("1067349099133908271875104088939").unwrap(),
     ///         -179
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
@@ -597,10 +623,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
         integer_mantissa: Natural,
         integer_exponent: i64,
     ) -> Option<Float> {
-        Some(Float::from_natural_times_power_of_2(
-            integer_mantissa,
-            integer_exponent,
-        ))
+        Some(Float::from(integer_mantissa) << integer_exponent)
     }
 }
 
@@ -637,7 +660,10 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Float::ONE).integer_mantissa_and_exponent(), (Natural::ONE, 0));
+    /// assert_eq!(
+    ///     (&Float::ONE).integer_mantissa_and_exponent(),
+    ///     (Natural::ONE, 0)
+    /// );
     /// assert_eq!(
     ///     (&Float::from(std::f64::consts::PI)).integer_mantissa_and_exponent(),
     ///     (Natural::from(884279719003555u64), -48)
@@ -649,7 +675,10 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// assert_eq!(
     ///     (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0)
     ///         .integer_mantissa_and_exponent(),
-    ///     (Natural::from_str("1067349099133908271875104088939").unwrap(), -179)
+    ///     (
+    ///         Natural::from_str("1067349099133908271875104088939").unwrap(),
+    ///         -179
+    ///     )
     /// );
     /// ```
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
@@ -691,11 +720,13 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!((&Float::ONE).integer_exponent(), 0);
     /// assert_eq!((&Float::from(std::f64::consts::PI)).integer_exponent(), -48);
-    /// assert_eq!((&Float::from(Natural::from(3u32).pow(50u64))).integer_exponent(), 0);
+    /// assert_eq!(
+    ///     (&Float::from(Natural::from(3u32).pow(50u64))).integer_exponent(),
+    ///     0
+    /// );
     /// assert_eq!(
     ///     (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0)
     ///         .integer_exponent(),
@@ -753,28 +784,32 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///     <&Float as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
     ///         Natural::ONE,
     ///         0
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     1
     /// );
     /// assert_eq!(
     ///     <&Float as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
     ///         Natural::from(884279719003555u64),
     ///         -48
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     std::f64::consts::PI
     /// );
     /// assert_eq!(
     ///     <&Float as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
     ///         Natural::from_str("717897987691852588770249").unwrap(),
     ///         0
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Natural::from(3u32).pow(50u64)
     /// );
     /// assert_eq!(
     ///     <&Float as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
     ///         Natural::from_str("1067349099133908271875104088939").unwrap(),
     ///         -179
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
@@ -782,10 +817,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
         integer_mantissa: Natural,
         integer_exponent: i64,
     ) -> Option<Float> {
-        Some(Float::from_natural_times_power_of_2(
-            integer_mantissa,
-            integer_exponent,
-        ))
+        Some(Float::from(integer_mantissa) << integer_exponent)
     }
 }
 
@@ -813,7 +845,6 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Float::ONE.sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
@@ -825,7 +856,8 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// assert_eq!(m.to_string(), "1.187662594419065093441695");
     /// assert_eq!(e, 79);
     ///
-    /// let (m, e) = Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
+    /// let (m, e) = Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
+    ///     .0
     ///     .sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.683979953059212693885095551367");
     /// assert_eq!(e, -80);
@@ -864,13 +896,17 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Float::ONE.sci_exponent(), 0);
     /// assert_eq!(Float::from(std::f64::consts::PI).sci_exponent(), 1);
-    /// assert_eq!(Float::from(Natural::from(3u32).pow(50u64)).sci_exponent(), 79);
     /// assert_eq!(
-    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0.sci_exponent(),
+    ///     Float::from(Natural::from(3u32).pow(50u64)).sci_exponent(),
+    ///     79
+    /// );
+    /// assert_eq!(
+    ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
+    ///         .0
+    ///         .sci_exponent(),
     ///     -80
     /// );
     /// ```
@@ -902,28 +938,33 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert_eq!(Float::from_sci_mantissa_and_exponent(Float::ONE, 0).unwrap(), 1);
+    /// assert_eq!(
+    ///     Float::from_sci_mantissa_and_exponent(Float::ONE, 0).unwrap(),
+    ///     1
+    /// );
     /// assert_eq!(
     ///     Float::from_sci_mantissa_and_exponent(
     ///         Float::from_string_base(16, "0x1.921fb54442d18#53").unwrap(),
     ///         1
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     std::f64::consts::PI
     /// );
     /// assert_eq!(
     ///     Float::from_sci_mantissa_and_exponent(
     ///         Float::from_string_base(16, "0x1.300aa7e1b65fa13bc792#80").unwrap(),
     ///         79
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Natural::from(3u32).pow(50u64)
     /// );
     /// assert_eq!(
     ///     Float::from_sci_mantissa_and_exponent(
     ///         Float::from_string_base(16, "0x1.af194f6982497a23f9dc546d6#100").unwrap(),
     ///         -80
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
@@ -970,17 +1011,15 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!((&Float::ONE).sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
-    /// let (m, e): (Float, i64) = (&Float::from(std::f64::consts::PI))
-    ///     .sci_mantissa_and_exponent();
+    /// let (m, e): (Float, i64) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.5707963267948966");
     /// assert_eq!(e, 1);
     ///
-    /// let (m, e): (Float, i64) = (&Float::from(Natural::from(3u32).pow(50u64)))
-    ///     .sci_mantissa_and_exponent();
+    /// let (m, e): (Float, i64) =
+    ///     (&Float::from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.187662594419065093441695");
     /// assert_eq!(e, 79);
     ///
@@ -1035,19 +1074,27 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert_eq!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&Float::ONE), 0);
-    /// assert_eq!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(
-    ///     &Float::from(std::f64::consts::PI)),
+    /// assert_eq!(
+    ///     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&Float::ONE),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&Float::from(
+    ///         std::f64::consts::PI
+    ///     )),
     ///     1
     /// );
-    /// assert_eq!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(
-    ///     &Float::from(Natural::from(3u32).pow(50u64))),
+    /// assert_eq!(
+    ///     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&Float::from(
+    ///         Natural::from(3u32).pow(50u64)
+    ///     )),
     ///     79
     /// );
-    /// assert_eq!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(
-    ///     &Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0),
+    /// assert_eq!(
+    ///     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(
+    ///         &Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
+    ///     ),
     ///     -80
     /// );
     /// ```
@@ -1079,28 +1126,33 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert_eq!(Float::from_sci_mantissa_and_exponent(Float::ONE, 0).unwrap(), 1);
+    /// assert_eq!(
+    ///     Float::from_sci_mantissa_and_exponent(Float::ONE, 0).unwrap(),
+    ///     1
+    /// );
     /// assert_eq!(
     ///     <&Float as SciMantissaAndExponent<Float, _, _>>::from_sci_mantissa_and_exponent(
     ///         Float::from_string_base(16, "0x1.921fb54442d18#53").unwrap(),
     ///         1
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     std::f64::consts::PI
     /// );
     /// assert_eq!(
     ///     <&Float as SciMantissaAndExponent<Float, _, _>>::from_sci_mantissa_and_exponent(
     ///         Float::from_string_base(16, "0x1.300aa7e1b65fa13bc792#80").unwrap(),
     ///         79
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Natural::from(3u32).pow(50u64)
     /// );
     /// assert_eq!(
     ///     <&Float as SciMantissaAndExponent<Float, _, _>>::from_sci_mantissa_and_exponent(
     ///         Float::from_string_base(16, "0x1.af194f6982497a23f9dc546d6#100").unwrap(),
     ///         -80
-    ///     ).unwrap(),
+    ///     )
+    ///     .unwrap(),
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
@@ -1141,9 +1193,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
-                let (m, e, _) = self
-                    .sci_mantissa_and_exponent_round(RoundingMode::Nearest)
-                    .unwrap();
+                let (m, e, _) = self.sci_mantissa_and_exponent_round(Nearest).unwrap();
                 (m, e)
             }
 
@@ -1176,10 +1226,10 @@ macro_rules! impl_mantissa_and_exponent {
                     None
                 } else {
                     let m = sci_mantissa.integer_mantissa();
-                    Some(Float::from_unsigned_times_power_of_2(
-                        m,
-                        sci_exponent - i64::exact_from(m.significant_bits()) + 1,
-                    ))
+                    Some(
+                        Float::from(m)
+                            << (sci_exponent - i64::exact_from(m.significant_bits()) + 1),
+                    )
                 }
             }
         }

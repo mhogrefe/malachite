@@ -16,7 +16,7 @@ use malachite_q::test_util::generators::{
 };
 use malachite_q::Rational;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 
 #[test]
@@ -28,25 +28,25 @@ fn test_partial_cmp_u32() {
         assert_eq!(rug::Rational::from_str(s).unwrap().partial_cmp(&v), out);
         assert_eq!(v.partial_cmp(&u), out.map(Ordering::reverse));
     };
-    test("0", 0, Some(Ordering::Equal));
-    test("0", 5, Some(Ordering::Less));
-    test("123", 123, Some(Ordering::Equal));
-    test("-123", 123, Some(Ordering::Less));
-    test("123", 124, Some(Ordering::Less));
-    test("-123", 124, Some(Ordering::Less));
-    test("123", 122, Some(Ordering::Greater));
-    test("-123", 122, Some(Ordering::Less));
-    test("1000000000000", 123, Some(Ordering::Greater));
-    test("-1000000000000", 123, Some(Ordering::Less));
+    test("0", 0, Some(Equal));
+    test("0", 5, Some(Less));
+    test("123", 123, Some(Equal));
+    test("-123", 123, Some(Less));
+    test("123", 124, Some(Less));
+    test("-123", 124, Some(Less));
+    test("123", 122, Some(Greater));
+    test("-123", 122, Some(Less));
+    test("1000000000000", 123, Some(Greater));
+    test("-1000000000000", 123, Some(Less));
 
-    test("99/100", 1, Some(Ordering::Less));
-    test("101/100", 1, Some(Ordering::Greater));
-    test("22/7", 3, Some(Ordering::Greater));
-    test("22/7", 4, Some(Ordering::Less));
-    test("-99/100", 1, Some(Ordering::Less));
-    test("-101/100", 1, Some(Ordering::Less));
-    test("-22/7", 3, Some(Ordering::Less));
-    test("-22/7", 4, Some(Ordering::Less));
+    test("99/100", 1, Some(Less));
+    test("101/100", 1, Some(Greater));
+    test("22/7", 3, Some(Greater));
+    test("22/7", 4, Some(Less));
+    test("-99/100", 1, Some(Less));
+    test("-101/100", 1, Some(Less));
+    test("-22/7", 3, Some(Less));
+    test("-22/7", 4, Some(Less));
 }
 
 #[test]
@@ -58,29 +58,29 @@ fn test_partial_cmp_u64() {
         assert_eq!(rug::Rational::from_str(s).unwrap().partial_cmp(&v), out);
         assert_eq!(v.partial_cmp(&u), out.map(Ordering::reverse));
     };
-    test("0", 0, Some(Ordering::Equal));
-    test("0", 5, Some(Ordering::Less));
-    test("123", 123, Some(Ordering::Equal));
-    test("-123", 123, Some(Ordering::Less));
-    test("123", 124, Some(Ordering::Less));
-    test("-123", 124, Some(Ordering::Less));
-    test("123", 122, Some(Ordering::Greater));
-    test("-123", 122, Some(Ordering::Less));
-    test("1000000000000", 123, Some(Ordering::Greater));
-    test("-1000000000000", 123, Some(Ordering::Less));
-    test("1000000000000", 1000000000000, Some(Ordering::Equal));
-    test("-1000000000000", 1000000000000, Some(Ordering::Less));
-    test("1000000000000", 1000000000001, Some(Ordering::Less));
-    test("-1000000000000", 1000000000001, Some(Ordering::Less));
+    test("0", 0, Some(Equal));
+    test("0", 5, Some(Less));
+    test("123", 123, Some(Equal));
+    test("-123", 123, Some(Less));
+    test("123", 124, Some(Less));
+    test("-123", 124, Some(Less));
+    test("123", 122, Some(Greater));
+    test("-123", 122, Some(Less));
+    test("1000000000000", 123, Some(Greater));
+    test("-1000000000000", 123, Some(Less));
+    test("1000000000000", 1000000000000, Some(Equal));
+    test("-1000000000000", 1000000000000, Some(Less));
+    test("1000000000000", 1000000000001, Some(Less));
+    test("-1000000000000", 1000000000001, Some(Less));
 
-    test("99/100", 1, Some(Ordering::Less));
-    test("101/100", 1, Some(Ordering::Greater));
-    test("22/7", 3, Some(Ordering::Greater));
-    test("22/7", 4, Some(Ordering::Less));
-    test("-99/100", 1, Some(Ordering::Less));
-    test("-101/100", 1, Some(Ordering::Less));
-    test("-22/7", 3, Some(Ordering::Less));
-    test("-22/7", 4, Some(Ordering::Less));
+    test("99/100", 1, Some(Less));
+    test("101/100", 1, Some(Greater));
+    test("22/7", 3, Some(Greater));
+    test("22/7", 4, Some(Less));
+    test("-99/100", 1, Some(Less));
+    test("-101/100", 1, Some(Less));
+    test("-22/7", 3, Some(Less));
+    test("-22/7", 4, Some(Less));
 }
 
 #[test]
@@ -94,34 +94,34 @@ fn test_partial_cmp_i32() {
             out.map(Ordering::reverse)
         );
     };
-    test("0", 0, Some(Ordering::Equal));
-    test("0", 5, Some(Ordering::Less));
-    test("0", -5, Some(Ordering::Greater));
-    test("123", 123, Some(Ordering::Equal));
-    test("123", -123, Some(Ordering::Greater));
-    test("-123", 123, Some(Ordering::Less));
-    test("-123", -123, Some(Ordering::Equal));
-    test("123", 124, Some(Ordering::Less));
-    test("123", -124, Some(Ordering::Greater));
-    test("-123", 124, Some(Ordering::Less));
-    test("-123", -124, Some(Ordering::Greater));
-    test("123", 122, Some(Ordering::Greater));
-    test("123", -122, Some(Ordering::Greater));
-    test("-123", 122, Some(Ordering::Less));
-    test("-123", -122, Some(Ordering::Less));
-    test("1000000000000", 123, Some(Ordering::Greater));
-    test("1000000000000", -123, Some(Ordering::Greater));
-    test("-1000000000000", 123, Some(Ordering::Less));
-    test("-1000000000000", -123, Some(Ordering::Less));
+    test("0", 0, Some(Equal));
+    test("0", 5, Some(Less));
+    test("0", -5, Some(Greater));
+    test("123", 123, Some(Equal));
+    test("123", -123, Some(Greater));
+    test("-123", 123, Some(Less));
+    test("-123", -123, Some(Equal));
+    test("123", 124, Some(Less));
+    test("123", -124, Some(Greater));
+    test("-123", 124, Some(Less));
+    test("-123", -124, Some(Greater));
+    test("123", 122, Some(Greater));
+    test("123", -122, Some(Greater));
+    test("-123", 122, Some(Less));
+    test("-123", -122, Some(Less));
+    test("1000000000000", 123, Some(Greater));
+    test("1000000000000", -123, Some(Greater));
+    test("-1000000000000", 123, Some(Less));
+    test("-1000000000000", -123, Some(Less));
 
-    test("99/100", 1, Some(Ordering::Less));
-    test("101/100", 1, Some(Ordering::Greater));
-    test("22/7", 3, Some(Ordering::Greater));
-    test("22/7", 4, Some(Ordering::Less));
-    test("-99/100", -1, Some(Ordering::Greater));
-    test("-101/100", -1, Some(Ordering::Less));
-    test("-22/7", -3, Some(Ordering::Less));
-    test("-22/7", -4, Some(Ordering::Greater));
+    test("99/100", 1, Some(Less));
+    test("101/100", 1, Some(Greater));
+    test("22/7", 3, Some(Greater));
+    test("22/7", 4, Some(Less));
+    test("-99/100", -1, Some(Greater));
+    test("-101/100", -1, Some(Less));
+    test("-22/7", -3, Some(Less));
+    test("-22/7", -4, Some(Greater));
 }
 
 #[test]
@@ -135,42 +135,42 @@ fn test_partial_cmp_i64() {
             out.map(Ordering::reverse)
         );
     };
-    test("0", 0, Some(Ordering::Equal));
-    test("0", 5, Some(Ordering::Less));
-    test("0", -5, Some(Ordering::Greater));
-    test("123", 123, Some(Ordering::Equal));
-    test("123", -123, Some(Ordering::Greater));
-    test("-123", 123, Some(Ordering::Less));
-    test("-123", -123, Some(Ordering::Equal));
-    test("123", 124, Some(Ordering::Less));
-    test("123", -124, Some(Ordering::Greater));
-    test("-123", 124, Some(Ordering::Less));
-    test("-123", -124, Some(Ordering::Greater));
-    test("123", 122, Some(Ordering::Greater));
-    test("123", -122, Some(Ordering::Greater));
-    test("-123", 122, Some(Ordering::Less));
-    test("-123", -122, Some(Ordering::Less));
-    test("1000000000000", 123, Some(Ordering::Greater));
-    test("1000000000000", -123, Some(Ordering::Greater));
-    test("-1000000000000", 123, Some(Ordering::Less));
-    test("-1000000000000", -123, Some(Ordering::Less));
-    test("1000000000000", 1000000000000, Some(Ordering::Equal));
-    test("1000000000000", -1000000000000, Some(Ordering::Greater));
-    test("-1000000000000", 1000000000000, Some(Ordering::Less));
-    test("-1000000000000", -1000000000000, Some(Ordering::Equal));
-    test("1000000000000", 1000000000001, Some(Ordering::Less));
-    test("1000000000000", -1000000000001, Some(Ordering::Greater));
-    test("-1000000000000", 1000000000001, Some(Ordering::Less));
-    test("-1000000000000", -1000000000001, Some(Ordering::Greater));
+    test("0", 0, Some(Equal));
+    test("0", 5, Some(Less));
+    test("0", -5, Some(Greater));
+    test("123", 123, Some(Equal));
+    test("123", -123, Some(Greater));
+    test("-123", 123, Some(Less));
+    test("-123", -123, Some(Equal));
+    test("123", 124, Some(Less));
+    test("123", -124, Some(Greater));
+    test("-123", 124, Some(Less));
+    test("-123", -124, Some(Greater));
+    test("123", 122, Some(Greater));
+    test("123", -122, Some(Greater));
+    test("-123", 122, Some(Less));
+    test("-123", -122, Some(Less));
+    test("1000000000000", 123, Some(Greater));
+    test("1000000000000", -123, Some(Greater));
+    test("-1000000000000", 123, Some(Less));
+    test("-1000000000000", -123, Some(Less));
+    test("1000000000000", 1000000000000, Some(Equal));
+    test("1000000000000", -1000000000000, Some(Greater));
+    test("-1000000000000", 1000000000000, Some(Less));
+    test("-1000000000000", -1000000000000, Some(Equal));
+    test("1000000000000", 1000000000001, Some(Less));
+    test("1000000000000", -1000000000001, Some(Greater));
+    test("-1000000000000", 1000000000001, Some(Less));
+    test("-1000000000000", -1000000000001, Some(Greater));
 
-    test("99/100", 1, Some(Ordering::Less));
-    test("101/100", 1, Some(Ordering::Greater));
-    test("22/7", 3, Some(Ordering::Greater));
-    test("22/7", 4, Some(Ordering::Less));
-    test("-99/100", -1, Some(Ordering::Greater));
-    test("-101/100", -1, Some(Ordering::Less));
-    test("-22/7", -3, Some(Ordering::Less));
-    test("-22/7", -4, Some(Ordering::Greater));
+    test("99/100", 1, Some(Less));
+    test("101/100", 1, Some(Greater));
+    test("22/7", 3, Some(Greater));
+    test("22/7", 4, Some(Less));
+    test("-99/100", -1, Some(Greater));
+    test("-101/100", -1, Some(Less));
+    test("-22/7", -3, Some(Less));
+    test("-22/7", -4, Some(Greater));
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
@@ -194,9 +194,9 @@ where
 
     rational_rational_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n < u && u < m {
-            assert_eq!(n.cmp(&m), Ordering::Less);
+            assert_eq!(n.cmp(&m), Less);
         } else if n > u && u > m {
-            assert_eq!(n.cmp(&m), Ordering::Greater);
+            assert_eq!(n.cmp(&m), Greater);
         }
     });
 
@@ -235,9 +235,9 @@ where
 
     rational_rational_signed_triple_gen::<T>().test_properties(|(n, m, i)| {
         if n < i && i < m {
-            assert_eq!(n.cmp(&m), Ordering::Less);
+            assert_eq!(n.cmp(&m), Less);
         } else if n > i && i > m {
-            assert_eq!(n.cmp(&m), Ordering::Greater);
+            assert_eq!(n.cmp(&m), Greater);
         }
     });
 

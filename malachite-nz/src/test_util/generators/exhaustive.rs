@@ -114,7 +114,7 @@ use malachite_base::num::logic::traits::{
 use malachite_base::rational_sequences::exhaustive::exhaustive_rational_sequences;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_trailing_zeros;
 use malachite_base::test_util::generators::common::{
     permute_1_3_2, permute_2_1, reshape_1_2_to_3, reshape_1_3_to_4, reshape_2_1_to_3,
@@ -141,7 +141,7 @@ use malachite_base::vecs::exhaustive::{
     LexFixedLengthVecsFromSingle,
 };
 use num::{BigInt, BigUint};
-use std::cmp::{max, Ordering};
+use std::cmp::{max, Ordering::*};
 use std::iter::once;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
@@ -416,7 +416,7 @@ pub fn exhaustive_integer_integer_rounding_mode_triple_gen_var_1(
             exhaustive_rounding_modes(),
         )
         .map(|(x, y, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (x * &y, y, rm)
             } else {
                 (x, y, rm)
@@ -433,20 +433,12 @@ pub(crate) fn round_to_multiple_integer_filter_map(
     if x == y {
         Some((x, y, rm))
     } else if y == 0 {
-        if rm == RoundingMode::Down
-            || rm
-                == if x >= 0 {
-                    RoundingMode::Floor
-                } else {
-                    RoundingMode::Ceiling
-                }
-            || rm == RoundingMode::Nearest
-        {
+        if rm == Down || rm == if x >= 0 { Floor } else { Ceiling } || rm == Nearest {
             Some((x, y, rm))
         } else {
             None
         }
-    } else if rm == RoundingMode::Exact {
+    } else if rm == Exact {
         Some((x * &y, y, rm))
     } else {
         Some((x, y, rm))
@@ -557,7 +549,7 @@ where
         )
         .map(|((n, i), rm)| {
             (
-                if i < T::ZERO && rm == RoundingMode::Exact {
+                if i < T::ZERO && rm == Exact {
                     n >> i
                 } else {
                     n
@@ -581,7 +573,7 @@ where
         )
         .map(|((n, i), rm)| {
             (
-                if i > T::ZERO && rm == RoundingMode::Exact {
+                if i > T::ZERO && rm == Exact {
                     n << i
                 } else {
                     n
@@ -769,7 +761,7 @@ pub fn exhaustive_integer_unsigned_rounding_mode_triple_gen_var_1(
             BitDistributorOutputType::tiny(),
         )
         .map(|(n, u, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (n << u, u, rm)
             } else {
                 (n, u, rm)
@@ -788,7 +780,7 @@ where
             exhaustive_pairs_big_small(exhaustive_integers(), exhaustive_unsigneds::<T>()),
             exhaustive_rounding_modes(),
         )
-        .map(|((n, u), rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
+        .map(|((n, u), rm)| (if rm == Exact { n << u } else { n }, u, rm)),
     )
 }
 
@@ -808,7 +800,7 @@ pub fn exhaustive_integer_rounding_mode_pair_gen_var_1<
 >() -> It<(Integer, RoundingMode)> {
     Box::new(
         lex_pairs(exhaustive_integers(), exhaustive_rounding_modes())
-            .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+            .filter(|&(ref n, rm)| rm != Exact || T::convertible_from(n)),
     )
 }
 
@@ -1419,7 +1411,7 @@ pub fn exhaustive_natural_natural_rounding_mode_triple_gen_var_1(
             exhaustive_rounding_modes(),
         )
         .map(|(x, y, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (x * &y, y, rm)
             } else {
                 (x, y, rm)
@@ -1436,12 +1428,12 @@ pub(crate) fn round_to_multiple_natural_filter_map(
     if x == y {
         Some((x, y, rm))
     } else if y == 0 {
-        if rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest {
+        if rm == Down || rm == Floor || rm == Nearest {
             Some((x, y, rm))
         } else {
             None
         }
-    } else if rm == RoundingMode::Exact {
+    } else if rm == Exact {
         Some((x * &y, y, rm))
     } else {
         Some((x, y, rm))
@@ -1639,7 +1631,7 @@ where
         )
         .map(|((n, i), rm)| {
             (
-                if i < T::ZERO && rm == RoundingMode::Exact {
+                if i < T::ZERO && rm == Exact {
                     n >> i
                 } else {
                     n
@@ -1663,7 +1655,7 @@ where
         )
         .map(|((n, i), rm)| {
             (
-                if i > T::ZERO && rm == RoundingMode::Exact {
+                if i > T::ZERO && rm == Exact {
                     n << i
                 } else {
                     n
@@ -1892,7 +1884,7 @@ where
             exhaustive_rounding_modes(),
         )
         .map(|((n, u), rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (n << u, u, rm)
             } else {
                 (n, u, rm)
@@ -1917,7 +1909,7 @@ impl
     #[inline]
     fn get_ys(&self, p: &(Natural, u64)) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
         lex_vecs_fixed_length_from_single(
-            p.0.significant_bits().div_round(p.1, RoundingMode::Up).0,
+            p.0.significant_bits().div_round(p.1, Up).0,
             exhaustive_bools(),
         )
     }
@@ -1963,7 +1955,7 @@ pub fn exhaustive_natural_rounding_mode_pair_gen_var_1<
 >() -> It<(Natural, RoundingMode)> {
     Box::new(
         lex_pairs(exhaustive_naturals(), exhaustive_rounding_modes())
-            .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+            .filter(|&(ref n, rm)| rm != Exact || T::convertible_from(n)),
     )
 }
 
@@ -2718,7 +2710,7 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_
 pub(crate) fn gcd_input_filter(xs: &[Limb], ys: &[Limb]) -> bool {
     *xs.last().unwrap() != 0
         && *ys.last().unwrap() != 0
-        && limbs_cmp(xs, ys) != Ordering::Less
+        && limbs_cmp(xs, ys) != Less
         && (xs[0].odd() || ys[0].odd())
 }
 

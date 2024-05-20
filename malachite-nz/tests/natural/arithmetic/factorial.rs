@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_23, unsigned_gen_var_24, unsigned_gen_var_25, unsigned_gen_var_5,
@@ -2166,11 +2166,7 @@ fn factorial_properties() {
         assert_eq!(Natural::multifactorial(n, 1), f);
         assert_ne!(f, 0u32);
         if n != 0 {
-            assert_eq!(
-                f.div_round(Natural::factorial(n - 1), RoundingMode::Exact)
-                    .0,
-                n
-            );
+            assert_eq!(f.div_round(Natural::factorial(n - 1), Exact).0, n);
         }
     });
 
@@ -2192,11 +2188,7 @@ fn double_factorial_properties() {
         assert_eq!(Natural::multifactorial(n, 2), f);
         assert_ne!(f, 0);
         if n > 1 {
-            assert_eq!(
-                f.div_round(Natural::double_factorial(n - 2), RoundingMode::Exact)
-                    .0,
-                n
-            );
+            assert_eq!(f.div_round(Natural::double_factorial(n - 2), Exact).0, n);
         }
     });
 
@@ -2219,11 +2211,7 @@ fn multifactorial_properties() {
         assert_eq!(multifactorial_naive(n, m), f);
         assert_ne!(f, 0u32);
         if n >= m {
-            assert_eq!(
-                f.div_round(Natural::multifactorial(n - m, m), RoundingMode::Exact)
-                    .0,
-                n
-            );
+            assert_eq!(f.div_round(Natural::multifactorial(n - m, m), Exact).0, n);
         }
     });
 
@@ -2247,11 +2235,7 @@ fn subfactorial_properties() {
             } else {
                 f + Natural::ONE
             };
-            assert_eq!(
-                g.div_round(Natural::subfactorial(n - 1), RoundingMode::Exact)
-                    .0,
-                n
-            );
+            assert_eq!(g.div_round(Natural::subfactorial(n - 1), Exact).0, n);
         }
     });
 

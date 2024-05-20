@@ -527,7 +527,7 @@ pub fn integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
 // -- (Integer, Integer, RoundingMode) --
 
 // All `(Integer, Integer, RoundingMode)` triples where the second `Integer` is positive and if the
-// `RoundingMode` is `RoundingMode::Exact`, the first `Integer` is divisible by the second.
+// `RoundingMode` is `Exact`, the first `Integer` is divisible by the second.
 pub fn integer_integer_rounding_mode_triple_gen_var_1(
 ) -> Generator<(Integer, Integer, RoundingMode)> {
     Generator::new(
@@ -1757,7 +1757,7 @@ pub fn natural_natural_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
 // -- (Natural, Natural, RoundingMode) --
 
 // All `(Natural, Natural, RoundingMode)` triples where the second `Natural` is positive and if the
-// `RoundingMode` is `RoundingMode::Exact`, the first `Natural` is divisible by the second.
+// `RoundingMode` is `Exact`, the first `Natural` is divisible by the second.
 pub fn natural_natural_rounding_mode_triple_gen_var_1(
 ) -> Generator<(Natural, Natural, RoundingMode)> {
     Generator::new(

@@ -14,7 +14,7 @@ use malachite_base::test_util::generators::unsigned_vec_gen;
 use malachite_base::vecs::vec_delete_left;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -126,12 +126,12 @@ fn from_twos_complement_limbs_asc_properties() {
             x
         );
         if match x.sign() {
-            Ordering::Equal => xs.is_empty(),
-            Ordering::Greater => {
+            Equal => xs.is_empty(),
+            Greater => {
                 let last = *xs.last().unwrap();
                 !last.get_highest_bit() && (last != 0 || xs[xs.len() - 2].get_highest_bit())
             }
-            Ordering::Less => {
+            Less => {
                 let last = *xs.last().unwrap();
                 last.get_highest_bit()
                     && (last != Limb::MAX || xs.len() <= 1 || !xs[xs.len() - 2].get_highest_bit())
@@ -161,12 +161,12 @@ fn from_twos_complement_limbs_desc_properties() {
             x
         );
         if match x.sign() {
-            Ordering::Equal => xs.is_empty(),
-            Ordering::Greater => {
+            Equal => xs.is_empty(),
+            Greater => {
                 let first = xs[0];
                 !first.get_highest_bit() && (first != 0 || xs[1].get_highest_bit())
             }
-            Ordering::Less => {
+            Less => {
                 let first = xs[0];
                 first.get_highest_bit()
                     && (first != Limb::MAX || xs.len() <= 1 || !xs[1].get_highest_bit())

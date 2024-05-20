@@ -45,16 +45,19 @@ impl IsPowerOf2 for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.is_power_of_2(), false);
     /// assert_eq!(Natural::from(123u32).is_power_of_2(), false);
     /// assert_eq!(Natural::from(0x80u32).is_power_of_2(), true);
     /// assert_eq!(Natural::from(10u32).pow(12).is_power_of_2(), false);
-    /// assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_2(), true);
+    /// assert_eq!(
+    ///     Natural::from_str("1099511627776").unwrap().is_power_of_2(),
+    ///     true
+    /// );
     /// ```
     fn is_power_of_2(&self) -> bool {
         match *self {

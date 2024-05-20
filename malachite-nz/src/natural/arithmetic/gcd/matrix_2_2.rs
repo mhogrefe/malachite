@@ -24,7 +24,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -37,7 +37,7 @@ use core::cmp::Ordering;
 fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
-    if limbs_cmp_same_length(xs, ys) != Ordering::Less {
+    if limbs_cmp_same_length(xs, ys) != Less {
         limbs_sub_same_length_to_out(out, xs, ys);
         false
     } else {
@@ -56,7 +56,7 @@ fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
-    if limbs_cmp_same_length(xs, ys) != Ordering::Less {
+    if limbs_cmp_same_length(xs, ys) != Less {
         limbs_sub_same_length_in_place_left(xs, ys);
         false
     } else {
@@ -76,7 +76,7 @@ fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 fn limbs_sub_abs_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
-    if limbs_cmp_same_length(xs, ys) != Ordering::Less {
+    if limbs_cmp_same_length(xs, ys) != Less {
         limbs_sub_same_length_in_place_right(xs, ys);
         false
     } else {

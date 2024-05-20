@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_3;
 use malachite_nz::integer::Integer;
@@ -51,7 +51,7 @@ fn test_div_exact() {
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = u.div_round(v, RoundingMode::Exact).0;
+        let q = u.div_round(v, Exact).0;
         assert_eq!(q.to_string(), quotient);
 
         let q = rug::Integer::from_str(s)
@@ -306,7 +306,7 @@ fn div_exact_properties() {
         assert!(q_alt.is_valid());
         assert_eq!(q_alt, q);
 
-        let q_alt = (&x).div_round(&y, RoundingMode::Exact).0;
+        let q_alt = (&x).div_round(&y, Exact).0;
         assert_eq!(q_alt, q);
 
         assert_eq!(

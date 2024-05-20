@@ -42,7 +42,7 @@ use malachite_base::num::logic::traits::{
     BitIterable, CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
 };
 #[cfg(feature = "test_build")]
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_leading_zeros;
 
 /// This is equivalent to `GMP_NUMB_HALFMAX` from `mpz/n_pow_ui.c`, GMP 6.2.1.
@@ -290,7 +290,7 @@ fn exp_predecessor(exp: u64) -> u64 {
 fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
     usize::exact_from(
         (x.significant_bits() * exp)
-            .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+            .shr_round(Limb::LOG_WIDTH, Ceiling)
             .0,
     )
 }
@@ -390,7 +390,7 @@ fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
 fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
     usize::exact_from(
         (limbs_significant_bits(xs) * exp)
-            .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+            .shr_round(Limb::LOG_WIDTH, Ceiling)
             .0,
     )
 }
@@ -551,16 +551,19 @@ impl Pow<u64> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(3u32).pow(100).to_string(),
     ///     "515377520732011331036461129765621272702107522001"
     /// );
     /// assert_eq!(
-    ///     Natural::from_str("12345678987654321").unwrap().pow(3).to_string(),
+    ///     Natural::from_str("12345678987654321")
+    ///         .unwrap()
+    ///         .pow(3)
+    ///         .to_string(),
     ///     "1881676411868862234942354805142998028003108518161"
     /// );
     /// ```
@@ -588,16 +591,18 @@ impl<'a> Pow<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(3u32)).pow(100).to_string(),
     ///     "515377520732011331036461129765621272702107522001"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from_str("12345678987654321").unwrap()).pow(3).to_string(),
+    ///     (&Natural::from_str("12345678987654321").unwrap())
+    ///         .pow(3)
+    ///         .to_string(),
     ///     "1881676411868862234942354805142998028003108518161"
     /// );
     /// ```
@@ -641,17 +646,23 @@ impl PowAssign<u64> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// let mut x = Natural::from(3u32);
     /// x.pow_assign(100);
-    /// assert_eq!(x.to_string(), "515377520732011331036461129765621272702107522001");
+    /// assert_eq!(
+    ///     x.to_string(),
+    ///     "515377520732011331036461129765621272702107522001"
+    /// );
     ///
     /// let mut x = Natural::from_str("12345678987654321").unwrap();
     /// x.pow_assign(3);
-    /// assert_eq!(x.to_string(), "1881676411868862234942354805142998028003108518161");
+    /// assert_eq!(
+    ///     x.to_string(),
+    ///     "1881676411868862234942354805142998028003108518161"
+    /// );
     /// ```
     fn pow_assign(&mut self, exp: u64) {
         match (&mut *self, exp) {

@@ -96,7 +96,10 @@ impl<'a> ModSquare<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::from(2u32)).mod_square(Natural::from(10u32)), 4);
-    /// assert_eq!((&Natural::from(100u32)).mod_square(Natural::from(497u32)), 60);
+    /// assert_eq!(
+    ///     (&Natural::from(100u32)).mod_square(Natural::from(497u32)),
+    ///     60
+    /// );
     /// ```
     fn mod_square(self, m: Natural) -> Natural {
         self.mod_pow(&Natural::TWO, &m)
@@ -127,7 +130,10 @@ impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::from(2u32)).mod_square(&Natural::from(10u32)), 4);
-    /// assert_eq!((&Natural::from(100u32)).mod_square(&Natural::from(497u32)), 60);
+    /// assert_eq!(
+    ///     (&Natural::from(100u32)).mod_square(&Natural::from(497u32)),
+    ///     60
+    /// );
     /// ```
     fn mod_square(self, m: &'b Natural) -> Natural {
         self.mod_pow(&Natural::TWO, m)

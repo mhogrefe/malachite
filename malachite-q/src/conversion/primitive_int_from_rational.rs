@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::ops::Neg;
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::named::Named;
@@ -16,7 +16,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -46,11 +46,8 @@ fn rounding_from_unsigned<'a, T: for<'b> TryFrom<&'b Natural> + Max + Named + Ze
         let (n, o) = (&x.numerator).div_round(&x.denominator, rm);
         let out = if let Ok(q) = T::try_from(&n) {
             (q, o)
-        } else if rm == RoundingMode::Down
-            || rm == RoundingMode::Floor
-            || rm == RoundingMode::Nearest
-        {
-            (T::MAX, Ordering::Less)
+        } else if rm == Down || rm == Floor || rm == Nearest {
+            (T::MAX, Less)
         } else {
             panic!(
                 "Rational is too large to round to {} using RoundingMode {}",
@@ -59,9 +56,8 @@ fn rounding_from_unsigned<'a, T: for<'b> TryFrom<&'b Natural> + Max + Named + Ze
             );
         };
         out
-    } else if rm == RoundingMode::Down || rm == RoundingMode::Ceiling || rm == RoundingMode::Nearest
-    {
-        (T::ZERO, Ordering::Greater)
+    } else if rm == Down || rm == Ceiling || rm == Nearest {
+        (T::ZERO, Greater)
     } else {
         panic!(
             "Cannot round negative Rational to {} using RoundingMode {}",
@@ -145,8 +141,8 @@ where
 {
     let (i, o) = Integer::rounding_from(x, rm);
     if i > T::MAX {
-        if rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest {
-            (T::MAX, Ordering::Less)
+        if rm == Down || rm == Floor || rm == Nearest {
+            (T::MAX, Less)
         } else {
             panic!(
                 "Rational is too large to round to {} using RoundingMode {}",
@@ -155,8 +151,8 @@ where
             );
         }
     } else if i < T::MIN {
-        if rm == RoundingMode::Down || rm == RoundingMode::Ceiling || rm == RoundingMode::Nearest {
-            (T::MIN, Ordering::Greater)
+        if rm == Down || rm == Ceiling || rm == Nearest {
+            (T::MIN, Greater)
         } else {
             panic!(
                 "Rational is too small to round to {} using RoundingMode {}",

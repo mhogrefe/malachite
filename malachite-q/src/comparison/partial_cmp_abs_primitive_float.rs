@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 #[cfg(not(any(feature = "test_build", feature = "random")))]
 use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::arithmetic::traits::FloorLogBase2;
@@ -35,12 +35,12 @@ macro_rules! impl_float {
                 } else if *other == 0.0 {
                     self.partial_cmp_abs(&0u32)
                 } else if !other.is_finite() || *self == 0u32 {
-                    Some(Ordering::Less)
+                    Some(Less)
                 } else {
                     let ord_cmp = self
                         .floor_log_base_2_abs()
                         .cmp(&other.abs().floor_log_base_2());
-                    Some(if ord_cmp != Ordering::Equal {
+                    Some(if ord_cmp != Equal {
                         ord_cmp
                     } else {
                         self.cmp_abs(&Rational::exact_from(*other))

@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -30,7 +30,7 @@ where
                 && *sign
                 && *exponent >= 0
                 && y.significant_bits() == exponent.unsigned_abs()
-                && significand.cmp_normalized(&Natural::from(*y)) == Ordering::Equal
+                && significand.cmp_normalized(&Natural::from(*y)) == Equal
         }
         _ => false,
     }
@@ -99,7 +99,7 @@ where
                 && *sign == (*y >= T::ZERO)
                 && *exponent >= 0
                 && y.significant_bits() == exponent.unsigned_abs()
-                && significand.cmp_normalized(&Natural::from(y.unsigned_abs())) == Ordering::Equal
+                && significand.cmp_normalized(&Natural::from(y.unsigned_abs())) == Equal
         }
         _ => false,
     }

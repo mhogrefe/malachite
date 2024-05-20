@@ -20,7 +20,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::Float;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 
 #[test]
 fn test_partial_cmp_abs_u32() {
@@ -33,160 +33,160 @@ fn test_partial_cmp_abs_u32() {
         assert_eq!(rug::Float::exact_from(&u).abs().partial_cmp(&v), out);
     };
     test("NaN", "NaN", 0, None);
-    test("Infinity", "Infinity", 0, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 0, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 0, Some(Ordering::Equal));
-    test("-0.0", "-0x0.0", 0, Some(Ordering::Equal));
-    test("1.0", "0x1.0#1", 0, Some(Ordering::Greater));
-    test("2.0", "0x2.0#1", 0, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 0, Some(Ordering::Greater));
+    test("Infinity", "Infinity", 0, Some(Greater));
+    test("-Infinity", "-Infinity", 0, Some(Greater));
+    test("0.0", "0x0.0", 0, Some(Equal));
+    test("-0.0", "-0x0.0", 0, Some(Equal));
+    test("1.0", "0x1.0#1", 0, Some(Greater));
+    test("2.0", "0x2.0#1", 0, Some(Greater));
+    test("0.5", "0x0.8#1", 0, Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 0, Some(Ordering::Greater));
-    test("-1.0", "-0x1.0#1", 0, Some(Ordering::Greater));
-    test("-2.0", "-0x2.0#1", 0, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 0, Some(Ordering::Greater));
+    test("3.0e120", "0x1.0E+100#1", 0, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 0, Some(Greater));
+    test("-1.0", "-0x1.0#1", 0, Some(Greater));
+    test("-2.0", "-0x2.0#1", 0, Some(Greater));
+    test("-0.5", "-0x0.8#1", 0, Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Ordering::Greater));
+    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Greater));
 
     test("NaN", "NaN", 1, None);
-    test("Infinity", "Infinity", 1, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 1, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 1, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 1, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 1, Some(Ordering::Equal));
-    test("2.0", "0x2.0#1", 1, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 1, Some(Ordering::Less));
+    test("Infinity", "Infinity", 1, Some(Greater));
+    test("-Infinity", "-Infinity", 1, Some(Greater));
+    test("0.0", "0x0.0", 1, Some(Less));
+    test("-0.0", "-0x0.0", 1, Some(Less));
+    test("1.0", "0x1.0#1", 1, Some(Equal));
+    test("2.0", "0x2.0#1", 1, Some(Greater));
+    test("0.5", "0x0.8#1", 1, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 1, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 1, Some(Ordering::Equal));
-    test("-2.0", "-0x2.0#1", 1, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 1, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 1, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 1, Some(Less));
+    test("-1.0", "-0x1.0#1", 1, Some(Equal));
+    test("-2.0", "-0x2.0#1", 1, Some(Greater));
+    test("-0.5", "-0x0.8#1", 1, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Less));
 
     test("NaN", "NaN", 100, None);
-    test("Infinity", "Infinity", 100, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 100, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 100, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 100, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 100, Some(Ordering::Less));
-    test("2.0", "0x2.0#1", 100, Some(Ordering::Less));
-    test("0.5", "0x0.8#1", 100, Some(Ordering::Less));
+    test("Infinity", "Infinity", 100, Some(Greater));
+    test("-Infinity", "-Infinity", 100, Some(Greater));
+    test("0.0", "0x0.0", 100, Some(Less));
+    test("-0.0", "-0x0.0", 100, Some(Less));
+    test("1.0", "0x1.0#1", 100, Some(Less));
+    test("2.0", "0x2.0#1", 100, Some(Less));
+    test("0.5", "0x0.8#1", 100, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 100, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 100, Some(Ordering::Less));
-    test("-2.0", "-0x2.0#1", 100, Some(Ordering::Less));
-    test("-0.5", "-0x0.8#1", 100, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 100, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 100, Some(Less));
+    test("-1.0", "-0x1.0#1", 100, Some(Less));
+    test("-2.0", "-0x2.0#1", 100, Some(Less));
+    test("-0.5", "-0x0.8#1", 100, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Less));
 }
 
 #[test]
@@ -200,160 +200,160 @@ fn test_partial_cmp_abs_u64() {
         assert_eq!(rug::Float::exact_from(&u).abs().partial_cmp(&v), out);
     };
     test("NaN", "NaN", 0, None);
-    test("Infinity", "Infinity", 0, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 0, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 0, Some(Ordering::Equal));
-    test("-0.0", "-0x0.0", 0, Some(Ordering::Equal));
-    test("1.0", "0x1.0#1", 0, Some(Ordering::Greater));
-    test("2.0", "0x2.0#1", 0, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 0, Some(Ordering::Greater));
+    test("Infinity", "Infinity", 0, Some(Greater));
+    test("-Infinity", "-Infinity", 0, Some(Greater));
+    test("0.0", "0x0.0", 0, Some(Equal));
+    test("-0.0", "-0x0.0", 0, Some(Equal));
+    test("1.0", "0x1.0#1", 0, Some(Greater));
+    test("2.0", "0x2.0#1", 0, Some(Greater));
+    test("0.5", "0x0.8#1", 0, Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 0, Some(Ordering::Greater));
-    test("-1.0", "-0x1.0#1", 0, Some(Ordering::Greater));
-    test("-2.0", "-0x2.0#1", 0, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 0, Some(Ordering::Greater));
+    test("3.0e120", "0x1.0E+100#1", 0, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 0, Some(Greater));
+    test("-1.0", "-0x1.0#1", 0, Some(Greater));
+    test("-2.0", "-0x2.0#1", 0, Some(Greater));
+    test("-0.5", "-0x0.8#1", 0, Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Ordering::Greater));
+    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Greater));
 
     test("NaN", "NaN", 1, None);
-    test("Infinity", "Infinity", 1, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 1, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 1, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 1, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 1, Some(Ordering::Equal));
-    test("2.0", "0x2.0#1", 1, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 1, Some(Ordering::Less));
+    test("Infinity", "Infinity", 1, Some(Greater));
+    test("-Infinity", "-Infinity", 1, Some(Greater));
+    test("0.0", "0x0.0", 1, Some(Less));
+    test("-0.0", "-0x0.0", 1, Some(Less));
+    test("1.0", "0x1.0#1", 1, Some(Equal));
+    test("2.0", "0x2.0#1", 1, Some(Greater));
+    test("0.5", "0x0.8#1", 1, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 1, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 1, Some(Ordering::Equal));
-    test("-2.0", "-0x2.0#1", 1, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 1, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 1, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 1, Some(Less));
+    test("-1.0", "-0x1.0#1", 1, Some(Equal));
+    test("-2.0", "-0x2.0#1", 1, Some(Greater));
+    test("-0.5", "-0x0.8#1", 1, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Less));
 
     test("NaN", "NaN", 100, None);
-    test("Infinity", "Infinity", 100, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 100, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 100, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 100, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 100, Some(Ordering::Less));
-    test("2.0", "0x2.0#1", 100, Some(Ordering::Less));
-    test("0.5", "0x0.8#1", 100, Some(Ordering::Less));
+    test("Infinity", "Infinity", 100, Some(Greater));
+    test("-Infinity", "-Infinity", 100, Some(Greater));
+    test("0.0", "0x0.0", 100, Some(Less));
+    test("-0.0", "-0x0.0", 100, Some(Less));
+    test("1.0", "0x1.0#1", 100, Some(Less));
+    test("2.0", "0x2.0#1", 100, Some(Less));
+    test("0.5", "0x0.8#1", 100, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 100, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 100, Some(Ordering::Less));
-    test("-2.0", "-0x2.0#1", 100, Some(Ordering::Less));
-    test("-0.5", "-0x0.8#1", 100, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 100, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 100, Some(Less));
+    test("-1.0", "-0x1.0#1", 100, Some(Less));
+    test("-2.0", "-0x2.0#1", 100, Some(Less));
+    test("-0.5", "-0x0.8#1", 100, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Less));
 }
 
 #[test]
@@ -372,264 +372,264 @@ fn test_partial_cmp_abs_i32() {
         );
     };
     test("NaN", "NaN", 0, None);
-    test("Infinity", "Infinity", 0, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 0, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 0, Some(Ordering::Equal));
-    test("-0.0", "-0x0.0", 0, Some(Ordering::Equal));
-    test("1.0", "0x1.0#1", 0, Some(Ordering::Greater));
-    test("2.0", "0x2.0#1", 0, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 0, Some(Ordering::Greater));
+    test("Infinity", "Infinity", 0, Some(Greater));
+    test("-Infinity", "-Infinity", 0, Some(Greater));
+    test("0.0", "0x0.0", 0, Some(Equal));
+    test("-0.0", "-0x0.0", 0, Some(Equal));
+    test("1.0", "0x1.0#1", 0, Some(Greater));
+    test("2.0", "0x2.0#1", 0, Some(Greater));
+    test("0.5", "0x0.8#1", 0, Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 0, Some(Ordering::Greater));
-    test("-1.0", "-0x1.0#1", 0, Some(Ordering::Greater));
-    test("-2.0", "-0x2.0#1", 0, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 0, Some(Ordering::Greater));
+    test("3.0e120", "0x1.0E+100#1", 0, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 0, Some(Greater));
+    test("-1.0", "-0x1.0#1", 0, Some(Greater));
+    test("-2.0", "-0x2.0#1", 0, Some(Greater));
+    test("-0.5", "-0x0.8#1", 0, Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Ordering::Greater));
+    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Greater));
 
     test("NaN", "NaN", 1, None);
-    test("Infinity", "Infinity", 1, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 1, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 1, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 1, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 1, Some(Ordering::Equal));
-    test("2.0", "0x2.0#1", 1, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 1, Some(Ordering::Less));
+    test("Infinity", "Infinity", 1, Some(Greater));
+    test("-Infinity", "-Infinity", 1, Some(Greater));
+    test("0.0", "0x0.0", 1, Some(Less));
+    test("-0.0", "-0x0.0", 1, Some(Less));
+    test("1.0", "0x1.0#1", 1, Some(Equal));
+    test("2.0", "0x2.0#1", 1, Some(Greater));
+    test("0.5", "0x0.8#1", 1, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 1, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 1, Some(Ordering::Equal));
-    test("-2.0", "-0x2.0#1", 1, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 1, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 1, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 1, Some(Less));
+    test("-1.0", "-0x1.0#1", 1, Some(Equal));
+    test("-2.0", "-0x2.0#1", 1, Some(Greater));
+    test("-0.5", "-0x0.8#1", 1, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Less));
 
     test("NaN", "NaN", 100, None);
-    test("Infinity", "Infinity", 100, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 100, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 100, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 100, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 100, Some(Ordering::Less));
-    test("2.0", "0x2.0#1", 100, Some(Ordering::Less));
-    test("0.5", "0x0.8#1", 100, Some(Ordering::Less));
+    test("Infinity", "Infinity", 100, Some(Greater));
+    test("-Infinity", "-Infinity", 100, Some(Greater));
+    test("0.0", "0x0.0", 100, Some(Less));
+    test("-0.0", "-0x0.0", 100, Some(Less));
+    test("1.0", "0x1.0#1", 100, Some(Less));
+    test("2.0", "0x2.0#1", 100, Some(Less));
+    test("0.5", "0x0.8#1", 100, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 100, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 100, Some(Ordering::Less));
-    test("-2.0", "-0x2.0#1", 100, Some(Ordering::Less));
-    test("-0.5", "-0x0.8#1", 100, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 100, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 100, Some(Less));
+    test("-1.0", "-0x1.0#1", 100, Some(Less));
+    test("-2.0", "-0x2.0#1", 100, Some(Less));
+    test("-0.5", "-0x0.8#1", 100, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Less));
 
     test("NaN", "NaN", -1, None);
-    test("Infinity", "Infinity", -1, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", -1, Some(Ordering::Greater));
-    test("0.0", "0x0.0", -1, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", -1, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", -1, Some(Ordering::Equal));
-    test("2.0", "0x2.0#1", -1, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", -1, Some(Ordering::Less));
+    test("Infinity", "Infinity", -1, Some(Greater));
+    test("-Infinity", "-Infinity", -1, Some(Greater));
+    test("0.0", "0x0.0", -1, Some(Less));
+    test("-0.0", "-0x0.0", -1, Some(Less));
+    test("1.0", "0x1.0#1", -1, Some(Equal));
+    test("2.0", "0x2.0#1", -1, Some(Greater));
+    test("0.5", "0x0.8#1", -1, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         -1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", -1, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", -1, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", -1, Some(Ordering::Equal));
-    test("-2.0", "-0x2.0#1", -1, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", -1, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", -1, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", -1, Some(Less));
+    test("-1.0", "-0x1.0#1", -1, Some(Equal));
+    test("-2.0", "-0x2.0#1", -1, Some(Greater));
+    test("-0.5", "-0x0.8#1", -1, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         -1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", -1, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", -1, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", -1, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", -1, Some(Less));
 
     test("NaN", "NaN", -100, None);
-    test("Infinity", "Infinity", -100, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", -100, Some(Ordering::Greater));
-    test("0.0", "0x0.0", -100, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", -100, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", -100, Some(Ordering::Less));
-    test("2.0", "0x2.0#1", -100, Some(Ordering::Less));
-    test("0.5", "0x0.8#1", -100, Some(Ordering::Less));
+    test("Infinity", "Infinity", -100, Some(Greater));
+    test("-Infinity", "-Infinity", -100, Some(Greater));
+    test("0.0", "0x0.0", -100, Some(Less));
+    test("-0.0", "-0x0.0", -100, Some(Less));
+    test("1.0", "0x1.0#1", -100, Some(Less));
+    test("2.0", "0x2.0#1", -100, Some(Less));
+    test("0.5", "0x0.8#1", -100, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", -100, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", -100, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", -100, Some(Ordering::Less));
-    test("-2.0", "-0x2.0#1", -100, Some(Ordering::Less));
-    test("-0.5", "-0x0.8#1", -100, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", -100, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", -100, Some(Less));
+    test("-1.0", "-0x1.0#1", -100, Some(Less));
+    test("-2.0", "-0x2.0#1", -100, Some(Less));
+    test("-0.5", "-0x0.8#1", -100, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", -100, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", -100, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", -100, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", -100, Some(Less));
 }
 
 #[test]
@@ -648,264 +648,264 @@ fn test_partial_cmp_abs_i64() {
         );
     };
     test("NaN", "NaN", 0, None);
-    test("Infinity", "Infinity", 0, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 0, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 0, Some(Ordering::Equal));
-    test("-0.0", "-0x0.0", 0, Some(Ordering::Equal));
-    test("1.0", "0x1.0#1", 0, Some(Ordering::Greater));
-    test("2.0", "0x2.0#1", 0, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 0, Some(Ordering::Greater));
+    test("Infinity", "Infinity", 0, Some(Greater));
+    test("-Infinity", "-Infinity", 0, Some(Greater));
+    test("0.0", "0x0.0", 0, Some(Equal));
+    test("-0.0", "-0x0.0", 0, Some(Equal));
+    test("1.0", "0x1.0#1", 0, Some(Greater));
+    test("2.0", "0x2.0#1", 0, Some(Greater));
+    test("0.5", "0x0.8#1", 0, Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 0, Some(Ordering::Greater));
-    test("-1.0", "-0x1.0#1", 0, Some(Ordering::Greater));
-    test("-2.0", "-0x2.0#1", 0, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 0, Some(Ordering::Greater));
+    test("3.0e120", "0x1.0E+100#1", 0, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 0, Some(Greater));
+    test("-1.0", "-0x1.0#1", 0, Some(Greater));
+    test("-2.0", "-0x2.0#1", 0, Some(Greater));
+    test("-0.5", "-0x0.8#1", 0, Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         0,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Ordering::Greater));
+    test("-3.0e120", "-0x1.0E+100#1", 0, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 0, Some(Greater));
 
     test("NaN", "NaN", 1, None);
-    test("Infinity", "Infinity", 1, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 1, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 1, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 1, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 1, Some(Ordering::Equal));
-    test("2.0", "0x2.0#1", 1, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", 1, Some(Ordering::Less));
+    test("Infinity", "Infinity", 1, Some(Greater));
+    test("-Infinity", "-Infinity", 1, Some(Greater));
+    test("0.0", "0x0.0", 1, Some(Less));
+    test("-0.0", "-0x0.0", 1, Some(Less));
+    test("1.0", "0x1.0#1", 1, Some(Equal));
+    test("2.0", "0x2.0#1", 1, Some(Greater));
+    test("0.5", "0x0.8#1", 1, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 1, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 1, Some(Ordering::Equal));
-    test("-2.0", "-0x2.0#1", 1, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", 1, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 1, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 1, Some(Less));
+    test("-1.0", "-0x1.0#1", 1, Some(Equal));
+    test("-2.0", "-0x2.0#1", 1, Some(Greater));
+    test("-0.5", "-0x0.8#1", 1, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 1, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 1, Some(Less));
 
     test("NaN", "NaN", 100, None);
-    test("Infinity", "Infinity", 100, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", 100, Some(Ordering::Greater));
-    test("0.0", "0x0.0", 100, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", 100, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", 100, Some(Ordering::Less));
-    test("2.0", "0x2.0#1", 100, Some(Ordering::Less));
-    test("0.5", "0x0.8#1", 100, Some(Ordering::Less));
+    test("Infinity", "Infinity", 100, Some(Greater));
+    test("-Infinity", "-Infinity", 100, Some(Greater));
+    test("0.0", "0x0.0", 100, Some(Less));
+    test("-0.0", "-0x0.0", 100, Some(Less));
+    test("1.0", "0x1.0#1", 100, Some(Less));
+    test("2.0", "0x2.0#1", 100, Some(Less));
+    test("0.5", "0x0.8#1", 100, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", 100, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", 100, Some(Ordering::Less));
-    test("-2.0", "-0x2.0#1", 100, Some(Ordering::Less));
-    test("-0.5", "-0x0.8#1", 100, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", 100, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", 100, Some(Less));
+    test("-1.0", "-0x1.0#1", 100, Some(Less));
+    test("-2.0", "-0x2.0#1", 100, Some(Less));
+    test("-0.5", "-0x0.8#1", 100, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", 100, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", 100, Some(Less));
 
     test("NaN", "NaN", -1, None);
-    test("Infinity", "Infinity", -1, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", -1, Some(Ordering::Greater));
-    test("0.0", "0x0.0", -1, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", -1, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", -1, Some(Ordering::Equal));
-    test("2.0", "0x2.0#1", -1, Some(Ordering::Greater));
-    test("0.5", "0x0.8#1", -1, Some(Ordering::Less));
+    test("Infinity", "Infinity", -1, Some(Greater));
+    test("-Infinity", "-Infinity", -1, Some(Greater));
+    test("0.0", "0x0.0", -1, Some(Less));
+    test("-0.0", "-0x0.0", -1, Some(Less));
+    test("1.0", "0x1.0#1", -1, Some(Equal));
+    test("2.0", "0x2.0#1", -1, Some(Greater));
+    test("0.5", "0x0.8#1", -1, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         -1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", -1, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", -1, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", -1, Some(Ordering::Equal));
-    test("-2.0", "-0x2.0#1", -1, Some(Ordering::Greater));
-    test("-0.5", "-0x0.8#1", -1, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", -1, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", -1, Some(Less));
+    test("-1.0", "-0x1.0#1", -1, Some(Equal));
+    test("-2.0", "-0x2.0#1", -1, Some(Greater));
+    test("-0.5", "-0x0.8#1", -1, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         -1,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         -1,
-        Some(Ordering::Greater),
+        Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", -1, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", -1, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", -1, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", -1, Some(Less));
 
     test("NaN", "NaN", -100, None);
-    test("Infinity", "Infinity", -100, Some(Ordering::Greater));
-    test("-Infinity", "-Infinity", -100, Some(Ordering::Greater));
-    test("0.0", "0x0.0", -100, Some(Ordering::Less));
-    test("-0.0", "-0x0.0", -100, Some(Ordering::Less));
-    test("1.0", "0x1.0#1", -100, Some(Ordering::Less));
-    test("2.0", "0x2.0#1", -100, Some(Ordering::Less));
-    test("0.5", "0x0.8#1", -100, Some(Ordering::Less));
+    test("Infinity", "Infinity", -100, Some(Greater));
+    test("-Infinity", "-Infinity", -100, Some(Greater));
+    test("0.0", "0x0.0", -100, Some(Less));
+    test("-0.0", "-0x0.0", -100, Some(Less));
+    test("1.0", "0x1.0#1", -100, Some(Less));
+    test("2.0", "0x2.0#1", -100, Some(Less));
+    test("0.5", "0x0.8#1", -100, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "1.4142135623730951",
         "0x1.6a09e667f3bcd#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", -100, Some(Ordering::Greater));
-    test("4.0e-121", "0x1.0E-100#1", -100, Some(Ordering::Less));
-    test("-1.0", "-0x1.0#1", -100, Some(Ordering::Less));
-    test("-2.0", "-0x2.0#1", -100, Some(Ordering::Less));
-    test("-0.5", "-0x0.8#1", -100, Some(Ordering::Less));
+    test("3.0e120", "0x1.0E+100#1", -100, Some(Greater));
+    test("4.0e-121", "0x1.0E-100#1", -100, Some(Less));
+    test("-1.0", "-0x1.0#1", -100, Some(Less));
+    test("-2.0", "-0x2.0#1", -100, Some(Less));
+    test("-0.5", "-0x0.8#1", -100, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-1.4142135623730951",
         "-0x1.6a09e667f3bcd#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
     test(
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         -100,
-        Some(Ordering::Less),
+        Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", -100, Some(Ordering::Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", -100, Some(Ordering::Less));
+    test("-3.0e120", "-0x1.0E+100#1", -100, Some(Greater));
+    test("-4.0e-121", "-0x1.0E-100#1", -100, Some(Less));
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
@@ -935,14 +935,11 @@ where
 
     float_float_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n.lt_abs(&u) && u.lt_abs(&m) {
-            assert_eq!(
-                PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m),
-                Some(Ordering::Less)
-            );
+            assert_eq!(PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m), Some(Less));
         } else if n.gt_abs(&u) && u.gt_abs(&m) {
             assert_eq!(
                 PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m),
-                Some(Ordering::Greater)
+                Some(Greater)
             );
         }
     });
@@ -993,14 +990,11 @@ where
 
     float_float_signed_triple_gen::<T>().test_properties(|(n, m, i)| {
         if n.lt_abs(&i) && i.lt_abs(&m) {
-            assert_eq!(
-                PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m),
-                Some(Ordering::Less)
-            );
+            assert_eq!(PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m), Some(Less));
         } else if n.gt_abs(&i) && i.gt_abs(&m) {
             assert_eq!(
                 PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m),
-                Some(Ordering::Greater)
+                Some(Greater)
             );
         }
     });

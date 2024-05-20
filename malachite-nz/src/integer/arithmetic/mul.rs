@@ -33,7 +33,6 @@ impl Mul<Integer> for Integer {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ONE * Integer::from(123), 123);
     /// assert_eq!(Integer::from(123) * Integer::ZERO, 0);
@@ -70,7 +69,6 @@ impl<'a> Mul<&'a Integer> for Integer {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ONE * &Integer::from(123), 123);
     /// assert_eq!(Integer::from(123) * &Integer::ZERO, 0);
@@ -107,7 +105,6 @@ impl<'a> Mul<Integer> for &'a Integer {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::ONE * Integer::from(123), 123);
     /// assert_eq!(&Integer::from(123) * Integer::ZERO, 0);
@@ -144,7 +141,6 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::ONE * &Integer::from(123), 123);
     /// assert_eq!(&Integer::from(123) * &Integer::ZERO, 0);
@@ -183,7 +179,6 @@ impl MulAssign<Integer> for Integer {
     /// ```
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// let mut x = Integer::NEGATIVE_ONE;
     /// x *= Integer::from(1000);
@@ -218,7 +213,6 @@ impl<'a> MulAssign<&'a Integer> for Integer {
     /// ```
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// let mut x = Integer::NEGATIVE_ONE;
     /// x *= &Integer::from(1000);
@@ -250,12 +244,16 @@ impl Product for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Product;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
-    /// use core::iter::Product;
     ///
     /// assert_eq!(
-    ///     Integer::product(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().into_iter()),
+    ///     Integer::product(
+    ///         vec_from_str::<Integer>("[2, -3, 5, 7]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     ),
     ///     -210
     /// );
     /// ```
@@ -299,9 +297,9 @@ impl<'a> Product<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Product;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
-    /// use core::iter::Product;
     ///
     /// assert_eq!(
     ///     Integer::product(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().iter()),

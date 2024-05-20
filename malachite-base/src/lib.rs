@@ -177,8 +177,8 @@ pub mod tuples;
 ///
 /// # unwrap
 /// ```
-/// use malachite_base::unions::UnionFromStrError;
 /// use malachite_base::union_struct;
+/// use malachite_base::unions::UnionFromStrError;
 /// use std::fmt::{self, Display, Formatter};
 /// use std::str::FromStr;
 ///
@@ -205,8 +205,8 @@ pub mod tuples;
 ///
 /// # fmt
 /// ```
-/// use malachite_base::unions::UnionFromStrError;
 /// use malachite_base::union_struct;
+/// use malachite_base::unions::UnionFromStrError;
 /// use std::fmt::{self, Display, Formatter};
 /// use std::str::FromStr;
 ///
@@ -233,8 +233,8 @@ pub mod tuples;
 ///
 /// # from_str
 /// ```
-/// use malachite_base::unions::UnionFromStrError;
 /// use malachite_base::union_struct;
+/// use malachite_base::unions::UnionFromStrError;
 /// use std::fmt::{self, Display, Formatter};
 /// use std::str::FromStr;
 ///

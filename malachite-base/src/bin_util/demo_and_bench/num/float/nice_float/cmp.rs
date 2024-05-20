@@ -13,7 +13,7 @@ use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_nice_float_cmp);
@@ -25,9 +25,9 @@ fn demo_nice_float_cmp<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit
         let x = NiceFloat(x);
         let y = NiceFloat(y);
         match x.cmp(&y) {
-            Ordering::Less => println!("{x} < {y}"),
-            Ordering::Equal => println!("{x} = {y}"),
-            Ordering::Greater => println!("{x} > {y}"),
+            Less => println!("{x} < {y}"),
+            Equal => println!("{x} = {y}"),
+            Greater => println!("{x} > {y}"),
         }
     }
 }

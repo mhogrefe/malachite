@@ -167,7 +167,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::Float;
     ///
@@ -198,7 +198,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::Float;
     ///
@@ -227,7 +227,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
     /// };
     /// use malachite_float::Float;
     /// use std::num::FpCategory;
@@ -263,7 +263,10 @@ impl Float {
     /// assert_eq!(Float::NAN.into_non_nan(), None);
     /// assert_eq!(Float::INFINITY.into_non_nan(), Some(Float::INFINITY));
     /// assert_eq!(Float::ZERO.into_non_nan(), Some(Float::ZERO));
-    /// assert_eq!(Float::NEGATIVE_ZERO.into_non_nan(), Some(Float::NEGATIVE_ZERO));
+    /// assert_eq!(
+    ///     Float::NEGATIVE_ZERO.into_non_nan(),
+    ///     Some(Float::NEGATIVE_ZERO)
+    /// );
     /// assert_eq!(Float::ONE.into_non_nan(), Some(Float::ONE));
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
@@ -292,7 +295,10 @@ impl Float {
     /// assert_eq!(Float::NAN.to_non_nan(), None);
     /// assert_eq!(Float::INFINITY.to_non_nan(), Some(Float::INFINITY));
     /// assert_eq!(Float::ZERO.to_non_nan(), Some(Float::ZERO));
-    /// assert_eq!(Float::NEGATIVE_ZERO.to_non_nan(), Some(Float::NEGATIVE_ZERO));
+    /// assert_eq!(
+    ///     Float::NEGATIVE_ZERO.to_non_nan(),
+    ///     Some(Float::NEGATIVE_ZERO)
+    /// );
     /// assert_eq!(Float::ONE.to_non_nan(), Some(Float::ONE));
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
@@ -317,7 +323,10 @@ impl Float {
     /// assert_eq!(Float::NAN.into_finite(), None);
     /// assert_eq!(Float::INFINITY.into_finite(), None);
     /// assert_eq!(Float::ZERO.into_finite(), Some(Float::ZERO));
-    /// assert_eq!(Float::NEGATIVE_ZERO.into_finite(), Some(Float::NEGATIVE_ZERO));
+    /// assert_eq!(
+    ///     Float::NEGATIVE_ZERO.into_finite(),
+    ///     Some(Float::NEGATIVE_ZERO)
+    /// );
     /// assert_eq!(Float::ONE.into_finite(), Some(Float::ONE));
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const

@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{Reciprocal, RoundToMultiple};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::arithmetic::traits::{Approximate, ApproximateAssign};
@@ -125,11 +125,8 @@ fn approximate_properties() {
         assert_eq!(a_alt, a);
 
         assert_eq!(
-            (&x).round_to_multiple(
-                Rational::from(a.denominator_ref()).reciprocal(),
-                RoundingMode::Nearest
-            )
-            .0,
+            (&x).round_to_multiple(Rational::from(a.denominator_ref()).reciprocal(), Nearest)
+                .0,
             a
         );
         assert_eq!((-x).approximate(&max_denominator), -a);
@@ -145,7 +142,7 @@ fn approximate_properties() {
     rational_natural_natural_triple_gen_var_1().test_properties(|(x, d, max_d)| {
         let a = (&x).approximate(&max_d);
         let a_alt = (&x)
-            .round_to_multiple(Rational::from(&d).reciprocal(), RoundingMode::Nearest)
+            .round_to_multiple(Rational::from(&d).reciprocal(), Nearest)
             .0;
         assert!((&x - a_alt).ge_abs(&(&x - &a)));
 
@@ -157,7 +154,7 @@ fn approximate_properties() {
         assert_eq!((&x).approximate(x.denominator_ref()), x);
         assert_eq!(
             (&x).approximate(&Natural::ONE),
-            Integer::rounding_from(x, RoundingMode::Nearest).0
+            Integer::rounding_from(x, Nearest).0
         );
     });
 }

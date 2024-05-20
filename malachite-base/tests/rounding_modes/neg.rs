@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::NegAssign;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::rounding_mode_gen;
 
 #[test]
@@ -17,12 +17,12 @@ fn test_neg() {
         rm.neg_assign();
         assert_eq!(rm, out);
     };
-    test(RoundingMode::Down, RoundingMode::Down);
-    test(RoundingMode::Up, RoundingMode::Up);
-    test(RoundingMode::Floor, RoundingMode::Ceiling);
-    test(RoundingMode::Ceiling, RoundingMode::Floor);
-    test(RoundingMode::Nearest, RoundingMode::Nearest);
-    test(RoundingMode::Exact, RoundingMode::Exact);
+    test(Down, Down);
+    test(Up, Up);
+    test(Floor, Ceiling);
+    test(Ceiling, Floor);
+    test(Nearest, Nearest);
+    test(Exact, Exact);
 }
 
 #[test]

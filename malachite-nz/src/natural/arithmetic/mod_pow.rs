@@ -48,7 +48,7 @@ use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering};
+use core::cmp::{max, min, Ordering::*};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, WrappingNegAssign,
@@ -424,7 +424,7 @@ pub_test! {limbs_mod_pow_odd(
     scratch_lo.copy_from_slice(out);
     slice_set_zero(&mut scratch_hi[..ms_len]);
     redc_fn(out, scratch, ms, is);
-    if limbs_cmp_same_length(out, ms) != Ordering::Less {
+    if limbs_cmp_same_length(out, ms) != Less {
         limbs_sub_same_length_in_place_left(out, ms);
     }
 }}
@@ -564,8 +564,14 @@ impl ModPow<Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(4u32).mod_pow(Natural::from(13u32), Natural::from(497u32)), 445);
-    /// assert_eq!(Natural::from(10u32).mod_pow(Natural::from(1000u32), Natural::from(30u32)), 10);
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow(Natural::from(13u32), Natural::from(497u32)),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_pow(Natural::from(1000u32), Natural::from(30u32)),
+    ///     10
+    /// );
     /// ```
     #[inline]
     fn mod_pow(mut self, exp: Natural, m: Natural) -> Natural {
@@ -599,8 +605,14 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(4u32).mod_pow(Natural::from(13u32), &Natural::from(497u32)), 445);
-    /// assert_eq!(Natural::from(10u32).mod_pow(Natural::from(1000u32), &Natural::from(30u32)), 10);
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow(Natural::from(13u32), &Natural::from(497u32)),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_pow(Natural::from(1000u32), &Natural::from(30u32)),
+    ///     10
+    /// );
     /// ```
     #[inline]
     fn mod_pow(mut self, exp: Natural, m: &'a Natural) -> Natural {
@@ -634,8 +646,14 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(4u32).mod_pow(&Natural::from(13u32), Natural::from(497u32)), 445);
-    /// assert_eq!(Natural::from(10u32).mod_pow(&Natural::from(1000u32), Natural::from(30u32)), 10);
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow(&Natural::from(13u32), Natural::from(497u32)),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_pow(&Natural::from(1000u32), Natural::from(30u32)),
+    ///     10
+    /// );
     /// ```
     #[inline]
     fn mod_pow(mut self, exp: &'a Natural, m: Natural) -> Natural {
@@ -669,7 +687,10 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(4u32).mod_pow(&Natural::from(13u32), &Natural::from(497u32)), 445);
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow(&Natural::from(13u32), &Natural::from(497u32)),
+    ///     445
+    /// );
     /// assert_eq!(
     ///     Natural::from(10u32).mod_pow(&Natural::from(1000u32), &Natural::from(30u32)),
     ///     10

@@ -311,8 +311,10 @@ impl Product for Rational {
     /// assert_eq!(
     ///     Rational::product(
     ///         vec_from_str::<Rational>("[1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
-    ///             .unwrap().into_iter()
-    ///     ).to_string(),
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     )
+    ///     .to_string(),
     ///     "1/5"
     /// );
     /// ```
@@ -363,8 +365,10 @@ impl<'a> Product<&'a Rational> for Rational {
     /// assert_eq!(
     ///     Rational::product(
     ///         vec_from_str::<Rational>("[1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
-    ///             .unwrap().iter()
-    ///     ).to_string(),
+    ///             .unwrap()
+    ///             .iter()
+    ///     )
+    ///     .to_string(),
     ///     "1/5"
     /// );
     /// ```

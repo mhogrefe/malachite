@@ -8,7 +8,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 impl PartialOrd for Float {
     /// Compares two [`Float`]s.
@@ -31,15 +31,14 @@ impl PartialOrd for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Zero,
     /// };
     /// use malachite_float::Float;
-    /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
+    /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(Float::NAN.partial_cmp(&Float::NAN), None);
-    /// assert_eq!(Float::ZERO.partial_cmp(&Float::NEGATIVE_ZERO), Some(Ordering::Equal));
-    /// assert_eq!(Float::ONE.partial_cmp(&Float::one_prec(100)), Some(Ordering::Equal));
+    /// assert_eq!(Float::ZERO.partial_cmp(&Float::NEGATIVE_ZERO), Some(Equal));
+    /// assert_eq!(Float::ONE.partial_cmp(&Float::one_prec(100)), Some(Equal));
     /// assert!(Float::INFINITY > Float::ONE);
     /// assert!(Float::NEGATIVE_INFINITY < Float::ONE);
     /// assert!(Float::ONE_HALF < Float::ONE);
@@ -50,19 +49,15 @@ impl PartialOrd for Float {
             (float_nan!(), _) | (_, float_nan!()) => None,
             (float_infinity!(), float_infinity!())
             | (float_negative_infinity!(), float_negative_infinity!())
-            | (float_either_zero!(), float_either_zero!()) => Some(Ordering::Equal),
-            (float_infinity!(), _) | (_, float_negative_infinity!()) => Some(Ordering::Greater),
-            (float_negative_infinity!(), _) | (_, float_infinity!()) => Some(Ordering::Less),
-            (Float(Finite { sign, .. }), float_either_zero!()) => Some(if *sign {
-                Ordering::Greater
-            } else {
-                Ordering::Less
-            }),
-            (float_either_zero!(), Float(Finite { sign, .. })) => Some(if *sign {
-                Ordering::Less
-            } else {
-                Ordering::Greater
-            }),
+            | (float_either_zero!(), float_either_zero!()) => Some(Equal),
+            (float_infinity!(), _) | (_, float_negative_infinity!()) => Some(Greater),
+            (float_negative_infinity!(), _) | (_, float_infinity!()) => Some(Less),
+            (Float(Finite { sign, .. }), float_either_zero!()) => {
+                Some(if *sign { Greater } else { Less })
+            }
+            (float_either_zero!(), Float(Finite { sign, .. })) => {
+                Some(if *sign { Less } else { Greater })
+            }
             (
                 Float(Finite {
                     sign: s_x,
@@ -115,15 +110,14 @@ impl<'a> Ord for ComparableFloatRef<'a> {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Zero,
     /// };
     /// use malachite_float::{ComparableFloatRef, Float};
-    /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
+    /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(
     ///     ComparableFloatRef(&Float::NAN).partial_cmp(&ComparableFloatRef(&Float::NAN)),
-    ///     Some(Ordering::Equal)
+    ///     Some(Equal)
     /// );
     /// assert!(ComparableFloatRef(&Float::ZERO) > ComparableFloatRef(&Float::NEGATIVE_ZERO));
     /// assert!(ComparableFloatRef(&Float::ONE) < ComparableFloatRef(&Float::one_prec(100)));
@@ -136,26 +130,26 @@ impl<'a> Ord for ComparableFloatRef<'a> {
         match (&self.0, &other.0) {
             (float_nan!(), float_nan!())
             | (float_infinity!(), float_infinity!())
-            | (float_negative_infinity!(), float_negative_infinity!()) => Ordering::Equal,
+            | (float_negative_infinity!(), float_negative_infinity!()) => Equal,
             (Float(Zero { sign: s_x }), Float(Zero { sign: s_y })) => s_x.cmp(s_y),
-            (float_infinity!(), _) | (_, float_negative_infinity!()) => Ordering::Greater,
-            (float_negative_infinity!(), _) | (_, float_infinity!()) => Ordering::Less,
+            (float_infinity!(), _) | (_, float_negative_infinity!()) => Greater,
+            (float_negative_infinity!(), _) | (_, float_infinity!()) => Less,
             (float_nan!(), Float(Finite { sign, .. }))
             | (float_nan!(), Float(Zero { sign }))
             | (float_either_zero!(), Float(Finite { sign, .. })) => {
                 if *sign {
-                    Ordering::Less
+                    Less
                 } else {
-                    Ordering::Greater
+                    Greater
                 }
             }
             (Float(Finite { sign, .. }), float_nan!())
             | (Float(Zero { sign }), float_nan!())
             | (Float(Finite { sign, .. }), float_either_zero!()) => {
                 if *sign {
-                    Ordering::Greater
+                    Greater
                 } else {
-                    Ordering::Less
+                    Less
                 }
             }
             (
@@ -223,15 +217,14 @@ impl Ord for ComparableFloat {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{
-    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Zero
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Zero,
     /// };
     /// use malachite_float::{ComparableFloat, Float};
-    /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
+    /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(
-    ///         ComparableFloat(Float::NAN).partial_cmp(&ComparableFloat(Float::NAN)),
-    ///         Some(Ordering::Equal)
+    ///     ComparableFloat(Float::NAN).partial_cmp(&ComparableFloat(Float::NAN)),
+    ///     Some(Equal)
     /// );
     /// assert!(ComparableFloat(Float::ZERO) > ComparableFloat(Float::NEGATIVE_ZERO));
     /// assert!(ComparableFloat(Float::ONE) < ComparableFloat(Float::one_prec(100)));

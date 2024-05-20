@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 /// Determines equality between the absolute values of two numbers.
 pub trait EqAbs<Rhs: ?Sized = Self> {
@@ -39,7 +39,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// [`partial_cmp_abs`](Self::partial_cmp_abs).
     #[inline]
     fn lt_abs(&self, other: &Rhs) -> bool {
-        matches!(self.partial_cmp_abs(other), Some(Ordering::Less))
+        matches!(self.partial_cmp_abs(other), Some(Less))
     }
 
     /// Determines whether the absolute value of one number is less than or equal to the absolute
@@ -50,10 +50,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// [`partial_cmp_abs`](Self::partial_cmp_abs).
     #[inline]
     fn le_abs(&self, other: &Rhs) -> bool {
-        matches!(
-            self.partial_cmp_abs(other),
-            Some(Ordering::Less) | Some(Ordering::Equal)
-        )
+        matches!(self.partial_cmp_abs(other), Some(Less) | Some(Equal))
     }
 
     /// Determines whether the absolute value of one number is greater than the absolute value of
@@ -64,7 +61,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// [`partial_cmp_abs`](Self::partial_cmp_abs).
     #[inline]
     fn gt_abs(&self, other: &Rhs) -> bool {
-        matches!(self.partial_cmp_abs(other), Some(Ordering::Greater))
+        matches!(self.partial_cmp_abs(other), Some(Greater))
     }
 
     /// Determines whether the absolute value of one number is greater than or equal to the absolute
@@ -75,10 +72,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// [`partial_cmp_abs`](Self::partial_cmp_abs).
     #[inline]
     fn ge_abs(&self, other: &Rhs) -> bool {
-        matches!(
-            self.partial_cmp_abs(other),
-            Some(Ordering::Greater) | Some(Ordering::Equal)
-        )
+        matches!(self.partial_cmp_abs(other), Some(Greater) | Some(Equal))
     }
 }
 

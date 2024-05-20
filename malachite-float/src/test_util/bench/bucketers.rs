@@ -26,6 +26,13 @@ pub fn pair_1_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<(Float, T
     }
 }
 
+pub fn pair_2_pair_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer<(T, (Float, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, _))| usize::exact_from(x.complexity()),
+        bucketing_label: format!("{var_name}.complexity()"),
+    }
+}
+
 pub fn pair_2_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<(T, Float)> {
     Bucketer {
         bucketing_function: &|(_, x)| usize::exact_from(x.complexity()),
@@ -96,6 +103,16 @@ pub fn pair_2_triple_1_2_float_rational_max_complexity_bucketer<'a, T, U>(
     }
 }
 
+pub fn pair_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, T)> {
+    Bucketer {
+        bucketing_function: &|(x, z)| usize::exact_from(max!(x.complexity(), z.significant_bits())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits)"),
+    }
+}
+
 pub fn triple_float_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt>(
     x_name: &'a str,
     y_name: &'a str,
@@ -108,6 +125,18 @@ pub fn triple_float_float_primitive_int_max_complexity_bucketer<'a, T: Primitive
         bucketing_label: format!(
             "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.significant_bits)"
         ),
+    }
+}
+
+pub fn triple_1_2_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| {
+            usize::exact_from(max!(x.complexity(), y.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
     }
 }
 

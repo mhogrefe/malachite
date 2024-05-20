@@ -21,7 +21,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::integer::comparison::partial_cmp_primitive_int::*;
 use num::BigInt;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_integer_partial_cmp_unsigned);
@@ -56,9 +56,9 @@ fn demo_integer_partial_cmp_unsigned<T: PrimitiveUnsigned>(
 {
     for (n, u) in integer_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp(&u).unwrap() {
-            Ordering::Less => println!("{n} < {u}"),
-            Ordering::Equal => println!("{n} = {u}"),
-            Ordering::Greater => println!("{n} > {u}"),
+            Less => println!("{n} < {u}"),
+            Equal => println!("{n} = {u}"),
+            Greater => println!("{n} > {u}"),
         }
     }
 }
@@ -72,9 +72,9 @@ fn demo_integer_partial_cmp_signed<T: PrimitiveSigned>(
 {
     for (n, i) in integer_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp(&i).unwrap() {
-            Ordering::Less => println!("{n} < {i}"),
-            Ordering::Equal => println!("{n} = {i}"),
-            Ordering::Greater => println!("{n} > {i}"),
+            Less => println!("{n} < {i}"),
+            Equal => println!("{n} = {i}"),
+            Greater => println!("{n} > {i}"),
         }
     }
 }
@@ -86,9 +86,9 @@ fn demo_unsigned_partial_cmp_integer<T: PartialOrd<Integer> + PrimitiveUnsigned>
 ) {
     for (n, u) in integer_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         match u.partial_cmp(&n).unwrap() {
-            Ordering::Less => println!("{u} < {n}"),
-            Ordering::Equal => println!("{u} = {n}"),
-            Ordering::Greater => println!("{u} > {n}"),
+            Less => println!("{u} < {n}"),
+            Equal => println!("{u} = {n}"),
+            Greater => println!("{u} > {n}"),
         }
     }
 }
@@ -100,9 +100,9 @@ fn demo_signed_partial_cmp_integer<T: PartialOrd<Integer> + PrimitiveSigned>(
 ) {
     for (n, i) in integer_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match i.partial_cmp(&n).unwrap() {
-            Ordering::Less => println!("{i} < {n}"),
-            Ordering::Equal => println!("{i} = {n}"),
-            Ordering::Greater => println!("{i} > {n}"),
+            Less => println!("{i} < {n}"),
+            Equal => println!("{i} = {n}"),
+            Greater => println!("{i} > {n}"),
         }
     }
 }

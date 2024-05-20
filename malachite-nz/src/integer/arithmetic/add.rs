@@ -359,12 +359,16 @@ impl Sum for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Sum;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
-    /// use core::iter::Sum;
     ///
     /// assert_eq!(
-    ///     Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().into_iter()),
+    ///     Integer::sum(
+    ///         vec_from_str::<Integer>("[2, -3, 5, 7]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     ),
     ///     11
     /// );
     /// ```
@@ -397,11 +401,14 @@ impl<'a> Sum<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Sum;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
-    /// use core::iter::Sum;
     ///
-    /// assert_eq!(Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().iter()), 11);
+    /// assert_eq!(
+    ///     Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().iter()),
+    ///     11
+    /// );
     /// ```
     fn sum<I>(xs: I) -> Integer
     where

@@ -318,13 +318,13 @@ fn test_binomial_coefficient() {
     test("1", "1", "1");
     test("2", "0", "1");
     // - k != 0 && n != k
-    // - double_cmp(&k, &n) != Ordering::Greater
+    // - double_cmp(&k, &n) != Greater
     // - k < 2 in binomial_coefficient_helper
     test("2", "1", "2");
     test("2", "2", "1");
     test("3", "0", "1");
     test("3", "1", "3");
-    // - double_cmp(&k, &n) == Ordering::Greater
+    // - double_cmp(&k, &n) == Greater
     test("3", "2", "3");
     test("3", "3", "1");
     test("4", "0", "1");

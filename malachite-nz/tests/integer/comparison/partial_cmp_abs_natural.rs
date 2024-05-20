@@ -14,7 +14,7 @@ use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_natural_triple_gen, integer_natural_natural_triple_gen,
     integer_natural_pair_gen, natural_pair_gen,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 
 #[test]
@@ -34,49 +34,25 @@ fn test_partial_cmp_abs_integer_natural() {
         assert_eq!(le, v.ge_abs(&u));
         assert_eq!(ge, v.le_abs(&u));
     };
-    test("0", "0", Some(Ordering::Equal), false, false, true, true);
-    test("0", "5", Some(Ordering::Less), true, false, true, false);
+    test("0", "0", Some(Equal), false, false, true, true);
+    test("0", "5", Some(Less), true, false, true, false);
+    test("123", "123", Some(Equal), false, false, true, true);
+    test("123", "124", Some(Less), true, false, true, false);
+    test("123", "122", Some(Greater), false, true, false, true);
     test(
+        "1000000000000",
         "123",
-        "123",
-        Some(Ordering::Equal),
-        false,
-        false,
-        true,
-        true,
-    );
-    test("123", "124", Some(Ordering::Less), true, false, true, false);
-    test(
-        "123",
-        "122",
-        Some(Ordering::Greater),
+        Some(Greater),
         false,
         true,
         false,
         true,
     );
-    test(
-        "1000000000000",
-        "123",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
-    test(
-        "123",
-        "1000000000000",
-        Some(Ordering::Less),
-        true,
-        false,
-        true,
-        false,
-    );
+    test("123", "1000000000000", Some(Less), true, false, true, false);
     test(
         "1000000000000",
         "1000000000000",
-        Some(Ordering::Equal),
+        Some(Equal),
         false,
         false,
         true,
@@ -85,7 +61,7 @@ fn test_partial_cmp_abs_integer_natural() {
     test(
         "-1000000000000",
         "1000000000000",
-        Some(Ordering::Equal),
+        Some(Equal),
         false,
         false,
         true,
@@ -94,7 +70,7 @@ fn test_partial_cmp_abs_integer_natural() {
     test(
         "-1000000000000",
         "0",
-        Some(Ordering::Greater),
+        Some(Greater),
         false,
         true,
         false,
@@ -112,6 +88,7 @@ fn partial_cmp_abs_natural_properties() {
             cmp
         );
         assert_eq!(y.partial_cmp_abs(&x), cmp.map(Ordering::reverse));
+        assert_eq!((-x).partial_cmp_abs(&y), cmp);
     });
 
     integer_integer_natural_triple_gen().test_properties(|(x, z, y)| {

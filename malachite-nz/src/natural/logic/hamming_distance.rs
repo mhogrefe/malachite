@@ -14,7 +14,7 @@ use crate::natural::logic::count_ones::limbs_count_ones;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::logic::traits::HammingDistance;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
@@ -73,11 +73,11 @@ pub_test! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
-        Ordering::Equal => limbs_hamming_distance_same_length(xs, ys),
-        Ordering::Less => {
+        Equal => limbs_hamming_distance_same_length(xs, ys),
+        Less => {
             limbs_hamming_distance_same_length(xs, &ys[..xs_len]) + limbs_count_ones(&ys[xs_len..])
         }
-        Ordering::Greater => {
+        Greater => {
             limbs_hamming_distance_same_length(&xs[..ys_len], ys) + limbs_count_ones(&xs[ys_len..])
         }
     }
@@ -111,9 +111,15 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     /// use malachite_base::num::logic::traits::HammingDistance;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(123u32).hamming_distance(&Natural::from(123u32)), 0);
+    /// assert_eq!(
+    ///     Natural::from(123u32).hamming_distance(&Natural::from(123u32)),
+    ///     0
+    /// );
     /// // 105 = 1101001b, 123 = 1111011
-    /// assert_eq!(Natural::from(105u32).hamming_distance(&Natural::from(123u32)), 2);
+    /// assert_eq!(
+    ///     Natural::from(105u32).hamming_distance(&Natural::from(123u32)),
+    ///     2
+    /// );
     /// let n = Natural::ONE << 100u32;
     /// assert_eq!(n.hamming_distance(&(&n - Natural::ONE)), 101);
     /// ```

@@ -7,11 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{NegAssign, RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 
 impl RoundToMultiple<Rational> for Rational {
@@ -59,12 +59,13 @@ impl RoundToMultiple<Rational> for Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from(-5).round_to_multiple(Rational::ZERO, RoundingMode::Down)
+    ///     Rational::from(-5)
+    ///         .round_to_multiple(Rational::ZERO, Down)
     ///         .to_debug_string(),
     ///     "(0, Greater)"
     /// );
@@ -72,24 +73,32 @@ impl RoundToMultiple<Rational> for Rational {
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(hundredth.clone(), RoundingMode::Down).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(hundredth.clone(), Down)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(hundredth.clone(), RoundingMode::Floor).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(hundredth.clone(), Floor)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(hundredth.clone(), RoundingMode::Up).to_debug_string(),
-    ///     "(63/20, Greater)"
-    /// );
-    /// assert_eq!(
-    ///     q.clone().round_to_multiple(hundredth.clone(), RoundingMode::Ceiling)
+    ///     q.clone()
+    ///         .round_to_multiple(hundredth.clone(), Up)
     ///         .to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(hundredth.clone(), RoundingMode::Nearest)
+    ///     q.clone()
+    ///         .round_to_multiple(hundredth.clone(), Ceiling)
+    ///         .to_debug_string(),
+    ///     "(63/20, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     q.clone()
+    ///         .round_to_multiple(hundredth.clone(), Nearest)
     ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
@@ -146,12 +155,13 @@ impl<'a> RoundToMultiple<&'a Rational> for Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from(-5).round_to_multiple(&Rational::ZERO, RoundingMode::Down)
+    ///     Rational::from(-5)
+    ///         .round_to_multiple(&Rational::ZERO, Down)
     ///         .to_debug_string(),
     ///     "(0, Greater)"
     /// );
@@ -159,23 +169,33 @@ impl<'a> RoundToMultiple<&'a Rational> for Rational {
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(&hundredth, RoundingMode::Down).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(&hundredth, Down)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(&hundredth, RoundingMode::Floor).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(&hundredth, Floor)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(&hundredth, RoundingMode::Up).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(&hundredth, Up)
+    ///         .to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(&hundredth, RoundingMode::Ceiling).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(&hundredth, Ceiling)
+    ///         .to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple(&hundredth, RoundingMode::Nearest).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple(&hundredth, Nearest)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// ```
@@ -231,12 +251,13 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from(-5)).round_to_multiple(Rational::ZERO, RoundingMode::Down)
+    ///     (&Rational::from(-5))
+    ///         .round_to_multiple(Rational::ZERO, Down)
     ///         .to_debug_string(),
     ///     "(0, Greater)"
     /// );
@@ -244,48 +265,38 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
-    ///     (&q).round_to_multiple(hundredth.clone(), RoundingMode::Down).to_debug_string(),
+    ///     (&q).round_to_multiple(hundredth.clone(), Down)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(hundredth.clone(), RoundingMode::Floor).to_debug_string(),
+    ///     (&q).round_to_multiple(hundredth.clone(), Floor)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(hundredth.clone(), RoundingMode::Up).to_debug_string(),
+    ///     (&q).round_to_multiple(hundredth.clone(), Up)
+    ///         .to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(hundredth.clone(), RoundingMode::Ceiling).to_debug_string(),
+    ///     (&q).round_to_multiple(hundredth.clone(), Ceiling)
+    ///         .to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(hundredth.clone(), RoundingMode::Nearest).to_debug_string(),
+    ///     (&q).round_to_multiple(hundredth.clone(), Nearest)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// ```
     fn round_to_multiple(self, other: Rational, mut rm: RoundingMode) -> (Rational, Ordering) {
         if *self == other {
-            return (self.clone(), Ordering::Equal);
+            return (self.clone(), Equal);
         }
         if other == 0u32 {
-            if rm == RoundingMode::Down
-                || rm == RoundingMode::Nearest
-                || rm
-                    == if *self >= 0u32 {
-                        RoundingMode::Floor
-                    } else {
-                        RoundingMode::Ceiling
-                    }
-            {
-                return (
-                    Rational::ZERO,
-                    if *self >= 0u32 {
-                        Ordering::Less
-                    } else {
-                        Ordering::Greater
-                    },
-                );
+            if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
+                return (Rational::ZERO, if *self >= 0u32 { Less } else { Greater });
             } else {
                 panic!("Cannot round {self} to zero using RoundingMode {rm}");
             }
@@ -346,12 +357,13 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from(-5)).round_to_multiple(&Rational::ZERO, RoundingMode::Down)
+    ///     (&Rational::from(-5))
+    ///         .round_to_multiple(&Rational::ZERO, Down)
     ///         .to_debug_string(),
     ///     "(0, Greater)"
     /// );
@@ -359,48 +371,35 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
-    ///     (&q).round_to_multiple(&hundredth, RoundingMode::Down).to_debug_string(),
+    ///     (&q).round_to_multiple(&hundredth, Down).to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(&hundredth, RoundingMode::Floor).to_debug_string(),
+    ///     (&q).round_to_multiple(&hundredth, Floor).to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(&hundredth, RoundingMode::Up).to_debug_string(),
+    ///     (&q).round_to_multiple(&hundredth, Up).to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(&hundredth, RoundingMode::Ceiling).to_debug_string(),
+    ///     (&q).round_to_multiple(&hundredth, Ceiling)
+    ///         .to_debug_string(),
     ///     "(63/20, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple(&hundredth, RoundingMode::Nearest).to_debug_string(),
+    ///     (&q).round_to_multiple(&hundredth, Nearest)
+    ///         .to_debug_string(),
     ///     "(157/50, Less)"
     /// );
     /// ```
     fn round_to_multiple(self, other: &'b Rational, mut rm: RoundingMode) -> (Rational, Ordering) {
         if self == other {
-            return (self.clone(), Ordering::Equal);
+            return (self.clone(), Equal);
         }
         if *other == 0u32 {
-            if rm == RoundingMode::Down
-                || rm == RoundingMode::Nearest
-                || rm
-                    == if *self >= 0u32 {
-                        RoundingMode::Floor
-                    } else {
-                        RoundingMode::Ceiling
-                    }
-            {
-                return (
-                    Rational::ZERO,
-                    if *self >= 0 {
-                        Ordering::Less
-                    } else {
-                        Ordering::Greater
-                    },
-                );
+            if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
+                return (Rational::ZERO, if *self >= 0 { Less } else { Greater });
             } else {
                 panic!("Cannot round {self} to zero using RoundingMode {rm}");
             }
@@ -440,74 +439,47 @@ impl RoundToMultipleAssign<Rational> for Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Rational::from(-5);
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(Rational::ZERO, RoundingMode::Down),
-    ///     Ordering::Greater)
-    /// ;
+    /// assert_eq!(x.round_to_multiple_assign(Rational::ZERO, Down), Greater);
     /// assert_eq!(x, 0);
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(hundredth.clone(), RoundingMode::Down),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.round_to_multiple_assign(hundredth.clone(), Down), Less);
     /// assert_eq!(x.to_string(), "157/50");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(hundredth.clone(), RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.round_to_multiple_assign(hundredth.clone(), Floor), Less);
     /// assert_eq!(x.to_string(), "157/50");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(hundredth.clone(), RoundingMode::Up),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(x.round_to_multiple_assign(hundredth.clone(), Up), Greater);
     /// assert_eq!(x.to_string(), "63/20");
     ///
     /// let mut x = q.clone();
     /// assert_eq!(
-    ///     x.round_to_multiple_assign(hundredth.clone(), RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     x.round_to_multiple_assign(hundredth.clone(), Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "63/20");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(hundredth.clone(), RoundingMode::Nearest),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.round_to_multiple_assign(hundredth.clone(), Nearest), Less);
     /// assert_eq!(x.to_string(), "157/50");
     /// ```
     fn round_to_multiple_assign(&mut self, other: Rational, mut rm: RoundingMode) -> Ordering {
         if *self == other {
-            return Ordering::Equal;
+            return Equal;
         }
         if other == 0u32 {
-            if rm == RoundingMode::Down
-                || rm == RoundingMode::Nearest
-                || rm
-                    == if *self >= 0u32 {
-                        RoundingMode::Floor
-                    } else {
-                        RoundingMode::Ceiling
-                    }
-            {
-                let o = if *self >= 0 {
-                    Ordering::Less
-                } else {
-                    Ordering::Greater
-                };
+            if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
+                let o = if *self >= 0 { Less } else { Greater };
                 *self = Rational::ZERO;
                 return o;
             } else {
@@ -553,62 +525,44 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Rational::from(-5);
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(&Rational::ZERO, RoundingMode::Down),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(x.round_to_multiple_assign(&Rational::ZERO, Down), Greater);
     /// assert_eq!(x, 0);
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(x.round_to_multiple_assign(&hundredth, RoundingMode::Down), Ordering::Less);
+    /// assert_eq!(x.round_to_multiple_assign(&hundredth, Down), Less);
     /// assert_eq!(x.to_string(), "157/50");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(x.round_to_multiple_assign(&hundredth, RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(x.round_to_multiple_assign(&hundredth, Floor), Less);
     /// assert_eq!(x.to_string(), "157/50");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(x.round_to_multiple_assign(&hundredth, RoundingMode::Up), Ordering::Greater);
+    /// assert_eq!(x.round_to_multiple_assign(&hundredth, Up), Greater);
     /// assert_eq!(x.to_string(), "63/20");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_assign(&hundredth, RoundingMode::Ceiling),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(x.round_to_multiple_assign(&hundredth, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "63/20");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(x.round_to_multiple_assign(&hundredth, RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(x.round_to_multiple_assign(&hundredth, Nearest), Less);
     /// assert_eq!(x.to_string(), "157/50");
     /// ```
     fn round_to_multiple_assign(&mut self, other: &'a Rational, mut rm: RoundingMode) -> Ordering {
         if self == other {
-            return Ordering::Equal;
+            return Equal;
         }
         if *other == 0u32 {
-            if rm == RoundingMode::Down
-                || rm == RoundingMode::Nearest
-                || rm
-                    == if *self >= 0u32 {
-                        RoundingMode::Floor
-                    } else {
-                        RoundingMode::Ceiling
-                    }
-            {
-                let o = if *self >= 0u32 {
-                    Ordering::Less
-                } else {
-                    Ordering::Greater
-                };
+            if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
+                let o = if *self >= 0u32 { Less } else { Greater };
                 *self = Rational::ZERO;
                 return o;
             } else {

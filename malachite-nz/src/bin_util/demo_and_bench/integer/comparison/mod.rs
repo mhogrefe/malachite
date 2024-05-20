@@ -12,6 +12,10 @@ pub(crate) fn register(runner: &mut Runner) {
     cmp::register(runner);
     cmp_abs::register(runner);
     eq::register(runner);
+    eq_abs::register(runner);
+    eq_abs_natural::register(runner);
+    eq_abs_primitive_float::register(runner);
+    eq_abs_primitive_int::register(runner);
     hash::register(runner);
     partial_cmp_abs_natural::register(runner);
     partial_cmp_abs_primitive_float::register(runner);
@@ -27,6 +31,10 @@ pub(crate) fn register(runner: &mut Runner) {
 mod cmp;
 mod cmp_abs;
 mod eq;
+mod eq_abs;
+mod eq_abs_natural;
+mod eq_abs_primitive_float;
+mod eq_abs_primitive_int;
 mod hash;
 mod partial_cmp_abs_natural;
 mod partial_cmp_abs_primitive_float;

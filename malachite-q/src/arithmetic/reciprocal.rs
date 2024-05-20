@@ -27,8 +27,14 @@ impl Reciprocal for Rational {
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from_signeds(22, 7).reciprocal().to_string(), "7/22");
-    /// assert_eq!(Rational::from_signeds(7, 22).reciprocal().to_string(), "22/7");
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7).reciprocal().to_string(),
+    ///     "7/22"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(7, 22).reciprocal().to_string(),
+    ///     "22/7"
+    /// );
     /// ```
     #[inline]
     fn reciprocal(mut self) -> Rational {
@@ -58,8 +64,14 @@ impl<'a> Reciprocal for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::from_signeds(22, 7)).reciprocal().to_string(), "7/22");
-    /// assert_eq!((&Rational::from_signeds(7, 22)).reciprocal().to_string(), "22/7");
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7)).reciprocal().to_string(),
+    ///     "7/22"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(7, 22)).reciprocal().to_string(),
+    ///     "22/7"
+    /// );
     /// ```
     fn reciprocal(self) -> Rational {
         assert_ne!(self.numerator, 0, "Cannot take reciprocal of zero");

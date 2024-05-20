@@ -10,8 +10,8 @@ use crate::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign, Uns
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use crate::rounding_modes::RoundingMode::{self, *};
+use core::cmp::Ordering::{self, *};
 
 fn round_to_multiple_unsigned<T: PrimitiveUnsigned>(
     x: T,
@@ -19,46 +19,42 @@ fn round_to_multiple_unsigned<T: PrimitiveUnsigned>(
     rm: RoundingMode,
 ) -> (T, Ordering) {
     match (x, other) {
-        (x, y) if x == y => (x, Ordering::Equal),
+        (x, y) if x == y => (x, Equal),
         (x, y) if y == T::ZERO => match rm {
-            RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
-                (T::ZERO, Ordering::Less)
-            }
+            Down | Floor | Nearest => (T::ZERO, Less),
             _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
         },
         (x, y) => {
             let r = x % y;
             if r == T::ZERO {
-                (x, Ordering::Equal)
+                (x, Equal)
             } else {
                 let floor = x - r;
                 match rm {
-                    RoundingMode::Down | RoundingMode::Floor => (floor, Ordering::Less),
-                    RoundingMode::Up | RoundingMode::Ceiling => {
-                        (floor.checked_add(y).unwrap(), Ordering::Greater)
-                    }
-                    RoundingMode::Nearest => {
+                    Down | Floor => (floor, Less),
+                    Up | Ceiling => (floor.checked_add(y).unwrap(), Greater),
+                    Nearest => {
                         match r.cmp(&(y >> 1)) {
-                            Ordering::Less => (floor, Ordering::Less),
-                            Ordering::Greater => (floor.checked_add(y).unwrap(), Ordering::Greater),
-                            Ordering::Equal => {
+                            Less => (floor, Less),
+                            Greater => (floor.checked_add(y).unwrap(), Greater),
+                            Equal => {
                                 if y.odd() {
-                                    (floor, Ordering::Less)
+                                    (floor, Less)
                                 } else {
                                     // The even multiple of y will have more trailing zeros.
                                     let (ceiling, overflow) = floor.overflowing_add(y);
                                     if floor.trailing_zeros() > ceiling.trailing_zeros() {
-                                        (floor, Ordering::Less)
+                                        (floor, Less)
                                     } else if overflow {
                                         panic!("Cannot round {x} to {y} using RoundingMode {rm}");
                                     } else {
-                                        (ceiling, Ordering::Greater)
+                                        (ceiling, Greater)
                                     }
                                 }
                             }
                         }
                     }
-                    RoundingMode::Exact => {
+                    Exact => {
                         panic!("Cannot round {x} to {y} using RoundingMode {rm}")
                     }
                 }
@@ -103,7 +99,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \N$.
             ///
             /// The following two expressions are equivalent:
-            /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+            /// - `x.round_to_multiple(other, Exact)`
             /// - `{ assert!(x.divisible_by(other)); x }`
             ///
             /// but the latter should be used as it is clearer and more efficient.
@@ -135,7 +131,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// See the [`RoundToMultiple`] documentation for details.
             ///
             /// The following two expressions are equivalent:
-            /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+            /// - `x.round_to_multiple_assign(other, Exact);`
             /// - `assert!(x.divisible_by(other));`
             ///
             /// but the latter should be used as it is clearer and more efficient.
@@ -226,7 +222,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
             ///
             /// The following two expressions are equivalent:
-            /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+            /// - `x.round_to_multiple(other, Exact)`
             /// - `{ assert!(x.divisible_by(other)); x }`
             ///
             /// but the latter should be used as it is clearer and more efficient.
@@ -257,7 +253,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// See the [`RoundToMultiple`] documentation for details.
             ///
             /// The following two expressions are equivalent:
-            /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+            /// - `x.round_to_multiple_assign(other, Exact);`
             /// - `assert!(x.divisible_by(other));`
             ///
             /// but the latter should be used as it is clearer and more efficient.

@@ -12,21 +12,21 @@
 /// # partial_cmp_abs
 /// ```
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::*;
 ///
-/// assert_eq!(123i32.partial_cmp_abs(&-456), Some(Ordering::Less));
-/// assert_eq!(123i32.partial_cmp_abs(&-123), Some(Ordering::Equal));
+/// assert_eq!(123i32.partial_cmp_abs(&-456), Some(Less));
+/// assert_eq!(123i32.partial_cmp_abs(&-123), Some(Equal));
 /// ```
 ///
 /// # cmp_abs
 /// ```
 /// use malachite_base::num::comparison::traits::OrdAbs;
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::*;
 ///
-/// assert_eq!(123u32.cmp_abs(&456), Ordering::Less);
-/// assert_eq!(123u32.cmp_abs(&123), Ordering::Equal);
-/// assert_eq!(123i32.cmp_abs(&-456), Ordering::Less);
-/// assert_eq!(123i32.cmp_abs(&-123), Ordering::Equal);
+/// assert_eq!(123u32.cmp_abs(&456), Less);
+/// assert_eq!(123u32.cmp_abs(&123), Equal);
+/// assert_eq!(123i32.cmp_abs(&-456), Less);
+/// assert_eq!(123i32.cmp_abs(&-123), Equal);
 /// ```
 pub mod cmp_abs;
 /// [`EqAbs`](`traits::EqAbs`), a trait for comparing the absolute values of numbers by equality.

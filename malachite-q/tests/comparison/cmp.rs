@@ -11,7 +11,7 @@ use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
 use num::BigRational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_cmp() {
@@ -52,12 +52,12 @@ fn cmp_properties() {
         assert_eq!(BigRational::from(&x).cmp(&BigRational::from(&y)), ord);
         assert_eq!(rug::Rational::from(&x).cmp(&rug::Rational::from(&y)), ord);
         assert_eq!(y.cmp(&x).reverse(), ord);
-        assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
+        assert_eq!(x == y, x.cmp(&y) == Equal);
         assert_eq!((-y).cmp(&-x), ord);
     });
 
     rational_gen().test_properties(|x| {
-        assert_eq!(x.cmp(&x), Ordering::Equal);
+        assert_eq!(x.cmp(&x), Equal);
     });
 
     rational_triple_gen().test_properties(|(x, y, z)| {

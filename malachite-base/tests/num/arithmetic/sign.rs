@@ -11,38 +11,38 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 fn sign_helper_primitive_int<T: PrimitiveInt>() {
     let test = |n: T, out| {
         assert_eq!(n.sign(), out);
     };
-    test(T::ZERO, Ordering::Equal);
-    test(T::ONE, Ordering::Greater);
-    test(T::exact_from(100), Ordering::Greater);
-    test(T::MAX, Ordering::Greater);
+    test(T::ZERO, Equal);
+    test(T::ONE, Greater);
+    test(T::exact_from(100), Greater);
+    test(T::MAX, Greater);
 }
 
 fn sign_helper_signed<T: PrimitiveSigned>() {
     let test = |n: T, out| {
         assert_eq!(n.sign(), out);
     };
-    test(T::NEGATIVE_ONE, Ordering::Less);
-    test(T::exact_from(-100), Ordering::Less);
-    test(T::MIN, Ordering::Less);
+    test(T::NEGATIVE_ONE, Less);
+    test(T::exact_from(-100), Less);
+    test(T::MIN, Less);
 }
 
 fn sign_helper_primitive_float<T: PrimitiveFloat>() {
     let test = |n: T, out| {
         assert_eq!(n.sign(), out);
     };
-    test(T::ZERO, Ordering::Greater);
-    test(T::NEGATIVE_ZERO, Ordering::Less);
-    test(T::ONE, Ordering::Greater);
-    test(T::NEGATIVE_ONE, Ordering::Less);
-    test(T::INFINITY, Ordering::Greater);
-    test(T::NEGATIVE_INFINITY, Ordering::Less);
-    test(T::NAN, Ordering::Equal);
+    test(T::ZERO, Greater);
+    test(T::NEGATIVE_ZERO, Less);
+    test(T::ONE, Greater);
+    test(T::NEGATIVE_ONE, Less);
+    test(T::INFINITY, Greater);
+    test(T::NEGATIVE_INFINITY, Less);
+    test(T::NAN, Equal);
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn test_sign() {
 fn sign_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen::<T>().test_properties(|n| {
         let sign = n.sign();
-        assert_ne!(sign, Ordering::Less);
+        assert_ne!(sign, Less);
         assert_eq!(n.partial_cmp(&T::ZERO), Some(sign));
     });
 }

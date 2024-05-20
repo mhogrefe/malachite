@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::named::Named;
+use crate::rounding_modes::RoundingMode::*;
 
 /// An enum that specifies how a value should be rounded.
 ///
@@ -73,14 +74,7 @@ pub enum RoundingMode {
 impl_named!(RoundingMode);
 
 /// A list of all six rounding modes.
-pub const ROUNDING_MODES: [RoundingMode; 6] = [
-    RoundingMode::Down,
-    RoundingMode::Up,
-    RoundingMode::Floor,
-    RoundingMode::Ceiling,
-    RoundingMode::Nearest,
-    RoundingMode::Exact,
-];
+pub const ROUNDING_MODES: [RoundingMode; 6] = [Down, Up, Floor, Ceiling, Nearest, Exact];
 
 /// Iterators that generate [`RoundingMode`]s without repetition.
 pub mod exhaustive;

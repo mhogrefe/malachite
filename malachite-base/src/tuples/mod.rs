@@ -91,7 +91,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// # lex_triples_xyx
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_custom_tuples;
 ///
@@ -119,12 +118,33 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// assert_eq!(
 ///     ts.collect_vec(),
 ///     &[
-///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 0, 'c'), ('a', 1, 'a'), ('a', 1, 'b'),
-///         ('a', 1, 'c'), ('a', 2, 'a'), ('a', 2, 'b'), ('a', 2, 'c'), ('b', 0, 'a'),
-///         ('b', 0, 'b'), ('b', 0, 'c'), ('b', 1, 'a'), ('b', 1, 'b'), ('b', 1, 'c'),
-///         ('b', 2, 'a'), ('b', 2, 'b'), ('b', 2, 'c'), ('c', 0, 'a'), ('c', 0, 'b'),
-///         ('c', 0, 'c'), ('c', 1, 'a'), ('c', 1, 'b'), ('c', 1, 'c'), ('c', 2, 'a'),
-///         ('c', 2, 'b'), ('c', 2, 'c')
+///         ('a', 0, 'a'),
+///         ('a', 0, 'b'),
+///         ('a', 0, 'c'),
+///         ('a', 1, 'a'),
+///         ('a', 1, 'b'),
+///         ('a', 1, 'c'),
+///         ('a', 2, 'a'),
+///         ('a', 2, 'b'),
+///         ('a', 2, 'c'),
+///         ('b', 0, 'a'),
+///         ('b', 0, 'b'),
+///         ('b', 0, 'c'),
+///         ('b', 1, 'a'),
+///         ('b', 1, 'b'),
+///         ('b', 1, 'c'),
+///         ('b', 2, 'a'),
+///         ('b', 2, 'b'),
+///         ('b', 2, 'c'),
+///         ('c', 0, 'a'),
+///         ('c', 0, 'b'),
+///         ('c', 0, 'c'),
+///         ('c', 1, 'a'),
+///         ('c', 1, 'b'),
+///         ('c', 1, 'c'),
+///         ('c', 2, 'a'),
+///         ('c', 2, 'b'),
+///         ('c', 2, 'c')
 ///     ]
 /// );
 /// ```
@@ -463,7 +483,7 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// use itertools::Itertools;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_unique_tuples;
-/// use malachite_base::vecs::exhaustive::{UniqueIndices, unique_indices};
+/// use malachite_base::vecs::exhaustive::{unique_indices, UniqueIndices};
 ///
 /// lex_unique_tuples!(
 ///     (pub(crate)),
@@ -506,14 +526,15 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::exhaustive_unique_tuples;
-/// use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
-/// use malachite_base::tuples::exhaustive::{ExhaustiveDependentPairs, exhaustive_dependent_pairs};
-/// use malachite_base::vecs::ExhaustiveVecPermutations;
-/// use malachite_base::vecs::exhaustive::{
-///     ExhaustiveOrderedUniqueCollections,
-///     ExhaustiveUniqueVecsGenerator,
-///     exhaustive_ordered_unique_vecs_fixed_length
+/// use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
+/// use malachite_base::tuples::exhaustive::{
+///     exhaustive_dependent_pairs, ExhaustiveDependentPairs,
 /// };
+/// use malachite_base::vecs::exhaustive::{
+///     exhaustive_ordered_unique_vecs_fixed_length, ExhaustiveOrderedUniqueCollections,
+///     ExhaustiveUniqueVecsGenerator,
+/// };
+/// use malachite_base::vecs::ExhaustiveVecPermutations;
 ///
 /// exhaustive_unique_tuples!(
 ///     (pub(crate)),
@@ -598,7 +619,6 @@ pub mod exhaustive;
 /// # random_pairs_from_single
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::tuples::random::random_pairs_from_single;
@@ -636,7 +656,7 @@ pub mod exhaustive;
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
-/// use malachite_base::random::{EXAMPLE_SEED, Seed};
+/// use malachite_base::random::{Seed, EXAMPLE_SEED};
 /// use malachite_base::random_custom_tuples;
 ///
 /// random_custom_tuples!(
@@ -692,8 +712,7 @@ pub mod exhaustive;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::random_ordered_unique_tuples;
 /// use malachite_base::sets::random::{
-///     random_b_tree_sets_fixed_length,
-///     RandomBTreeSetsFixedLength
+///     random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength,
 /// };
 ///
 /// random_ordered_unique_tuples!(
@@ -705,16 +724,34 @@ pub mod exhaustive;
 ///     [0, 1, 2, 3]
 /// );
 ///
-/// let qs = random_ordered_unique_quadruples(
-///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 10)
-/// );
+/// let qs = random_ordered_unique_quadruples(random_unsigned_inclusive_range::<u8>(
+///     EXAMPLE_SEED,
+///     1,
+///     10,
+/// ));
 /// assert_eq!(
 ///     qs.take(20).collect_vec().as_slice(),
 ///     &[
-///         (2, 5, 6, 8), (3, 5, 7, 9), (1, 2, 6, 8), (3, 4, 6, 7), (3, 6, 9, 10), (4, 6, 8, 10),
-///         (3, 6, 8, 10), (2, 5, 9, 10), (2, 3, 8, 10), (1, 3, 7, 8), (1, 2, 6, 10), (2, 5, 8, 9),
-///         (1, 8, 9, 10), (1, 3, 7, 8), (2, 3, 4, 5), (1, 3, 4, 8), (3, 6, 7, 9), (5, 6, 7, 8),
-///         (3, 4, 5, 9), (4, 6, 9, 10)
+///         (2, 5, 6, 8),
+///         (3, 5, 7, 9),
+///         (1, 2, 6, 8),
+///         (3, 4, 6, 7),
+///         (3, 6, 9, 10),
+///         (4, 6, 8, 10),
+///         (3, 6, 8, 10),
+///         (2, 5, 9, 10),
+///         (2, 3, 8, 10),
+///         (1, 3, 7, 8),
+///         (1, 2, 6, 10),
+///         (2, 5, 8, 9),
+///         (1, 8, 9, 10),
+///         (1, 3, 7, 8),
+///         (2, 3, 4, 5),
+///         (1, 3, 4, 8),
+///         (3, 6, 7, 9),
+///         (5, 6, 7, 8),
+///         (3, 4, 5, 9),
+///         (4, 6, 9, 10)
 ///     ]
 /// );
 /// ```
@@ -737,16 +774,30 @@ pub mod exhaustive;
 ///     [0, 1, 2, 3]
 /// );
 ///
-/// let qs = random_unique_quadruples(
-///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 10)
-/// );
+/// let qs = random_unique_quadruples(random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 10));
 /// assert_eq!(
 ///     qs.take(20).collect_vec().as_slice(),
 ///     &[
-///         (2, 8, 6, 5), (7, 5, 3, 9), (2, 8, 6, 1), (3, 7, 4, 6), (3, 10, 6, 9), (6, 10, 4, 8),
-///         (6, 10, 8, 3), (10, 2, 9, 5), (8, 10, 2, 3), (8, 1, 7, 3), (2, 6, 1, 10), (9, 5, 8, 2),
-///         (8, 1, 9, 10), (7, 3, 8, 1), (3, 2, 5, 4), (3, 8, 4, 1), (9, 7, 6, 3), (5, 7, 8, 6),
-///         (5, 3, 9, 4), (9, 10, 4, 6)
+///         (2, 8, 6, 5),
+///         (7, 5, 3, 9),
+///         (2, 8, 6, 1),
+///         (3, 7, 4, 6),
+///         (3, 10, 6, 9),
+///         (6, 10, 4, 8),
+///         (6, 10, 8, 3),
+///         (10, 2, 9, 5),
+///         (8, 10, 2, 3),
+///         (8, 1, 7, 3),
+///         (2, 6, 1, 10),
+///         (9, 5, 8, 2),
+///         (8, 1, 9, 10),
+///         (7, 3, 8, 1),
+///         (3, 2, 5, 4),
+///         (3, 8, 4, 1),
+///         (9, 7, 6, 3),
+///         (5, 7, 8, 6),
+///         (5, 3, 9, 4),
+///         (9, 10, 4, 6)
 ///     ]
 /// );
 /// ```

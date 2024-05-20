@@ -40,17 +40,40 @@ impl CheckedRoot<u64> for Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(999i32).checked_root(3u64).to_debug_string(), "None");
-    /// assert_eq!(Rational::from(1000i32).checked_root(3u64).to_debug_string(), "Some(10)");
-    /// assert_eq!(Rational::from(1001i32).checked_root(3u64).to_debug_string(), "None");
-    /// assert_eq!(Rational::from(-1000i32).checked_root(3u64).to_debug_string(), "Some(-10)");
-    /// assert_eq!(Rational::from_signeds(22, 7).checked_root(3u64).to_debug_string(), "None");
     /// assert_eq!(
-    ///     Rational::from_signeds(27, 8).checked_root(3u64).to_debug_string(),
+    ///     Rational::from(999i32).checked_root(3u64).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(1000i32).checked_root(3u64).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(1001i32).checked_root(3u64).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(-1000i32)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
+    ///     "Some(-10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(27, 8)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
     ///     "Some(3/2)"
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(-27, 8).checked_root(3u64).to_debug_string(),
+    ///     Rational::from_signeds(-27, 8)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
     ///     "Some(-3/2)"
     /// );
     /// ```
@@ -103,17 +126,40 @@ impl<'a> CheckedRoot<u64> for &'a Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(999i32).checked_root(3u64).to_debug_string(), "None");
-    /// assert_eq!(Rational::from(1000i32).checked_root(3u64).to_debug_string(), "Some(10)");
-    /// assert_eq!(Rational::from(1001i32).checked_root(3u64).to_debug_string(), "None");
-    /// assert_eq!(Rational::from(-1000i32).checked_root(3u64).to_debug_string(), "Some(-10)");
-    /// assert_eq!(Rational::from_signeds(22, 7).checked_root(3u64).to_debug_string(), "None");
     /// assert_eq!(
-    ///     Rational::from_signeds(27, 8).checked_root(3u64).to_debug_string(),
+    ///     Rational::from(999i32).checked_root(3u64).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(1000i32).checked_root(3u64).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(1001i32).checked_root(3u64).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(-1000i32)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
+    ///     "Some(-10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(27, 8)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
     ///     "Some(3/2)"
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(-27, 8).checked_root(3u64).to_debug_string(),
+    ///     Rational::from_signeds(-27, 8)
+    ///         .checked_root(3u64)
+    ///         .to_debug_string(),
     ///     "Some(-3/2)"
     /// );
     /// ```
@@ -166,23 +212,53 @@ impl CheckedRoot<i64> for Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(999i32).checked_root(3i64).to_debug_string(), "None");
-    /// assert_eq!(Rational::from(1000i32).checked_root(3i64).to_debug_string(), "Some(10)");
-    /// assert_eq!(Rational::from(1001i32).checked_root(3i64).to_debug_string(), "None");
-    /// assert_eq!(Rational::from(-1000i32).checked_root(3i64).to_debug_string(), "Some(-10)");
-    /// assert_eq!(Rational::from_signeds(22, 7).checked_root(3i64).to_debug_string(), "None");
     /// assert_eq!(
-    ///     Rational::from_signeds(27, 8).checked_root(3i64).to_debug_string(),
+    ///     Rational::from(999i32).checked_root(3i64).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(1000i32).checked_root(3i64).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(1001i32).checked_root(3i64).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(-1000i32)
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "Some(-10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7)
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(27, 8)
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
     ///     "Some(3/2)"
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(-27, 8).checked_root(3i64).to_debug_string(),
+    ///     Rational::from_signeds(-27, 8)
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
     ///     "Some(-3/2)"
     /// );
     ///
-    /// assert_eq!(Rational::from(1000i32).checked_root(-3i64).to_debug_string(), "Some(1/10)");
     /// assert_eq!(
-    ///     Rational::from_signeds(-27, 8).checked_root(-3i64).to_debug_string(),
+    ///     Rational::from(1000i32)
+    ///         .checked_root(-3i64)
+    ///         .to_debug_string(),
+    ///     "Some(1/10)"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-27, 8)
+    ///         .checked_root(-3i64)
+    ///         .to_debug_string(),
     ///     "Some(-2/3)"
     /// );
     /// ```
@@ -226,23 +302,59 @@ impl<'a> CheckedRoot<i64> for &'a Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::from(999i32)).checked_root(3i64).to_debug_string(), "None");
-    /// assert_eq!((&Rational::from(1000i32)).checked_root(3i64).to_debug_string(), "Some(10)");
-    /// assert_eq!((&Rational::from(1001i32)).checked_root(3i64).to_debug_string(), "None");
-    /// assert_eq!((&Rational::from(-1000i32)).checked_root(3i64).to_debug_string(), "Some(-10)");
-    /// assert_eq!((&Rational::from_signeds(22, 7)).checked_root(3i64).to_debug_string(), "None");
     /// assert_eq!(
-    ///     (&Rational::from_signeds(27, 8)).checked_root(3i64).to_debug_string(),
+    ///     (&Rational::from(999i32))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from(1000i32))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from(1001i32))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from(-1000i32))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "Some(-10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(27, 8))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
     ///     "Some(3/2)"
     /// );
     /// assert_eq!(
-    ///     (&Rational::from_signeds(-27, 8)).checked_root(3i64).to_debug_string(),
+    ///     (&Rational::from_signeds(-27, 8))
+    ///         .checked_root(3i64)
+    ///         .to_debug_string(),
     ///     "Some(-3/2)"
     /// );
     ///
-    /// assert_eq!((&Rational::from(1000i32)).checked_root(-3i64).to_debug_string(), "Some(1/10)");
     /// assert_eq!(
-    ///     (&Rational::from_signeds(-27, 8)).checked_root(-3i64).to_debug_string(),
+    ///     (&Rational::from(1000i32))
+    ///         .checked_root(-3i64)
+    ///         .to_debug_string(),
+    ///     "Some(1/10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-27, 8))
+    ///         .checked_root(-3i64)
+    ///         .to_debug_string(),
     ///     "Some(-2/3)"
     /// );
     /// ```

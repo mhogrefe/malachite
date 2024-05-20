@@ -62,7 +62,9 @@ where
 /// use malachite_base::strings::ToDebugString;
 ///
 /// assert_eq!(
-///     exhaustive_rational_sequences(exhaustive_unsigneds::<u8>()).take(10).collect_vec()
+///     exhaustive_rational_sequences(exhaustive_unsigneds::<u8>())
+///         .take(10)
+///         .collect_vec()
 ///         .to_debug_string(),
 ///     "[[], [[0]], [0], [[1]], [0, [1]], [1], [1, [0]], [0, 0, 0], [0, 0, 0, [1]], [[2]]]"
 /// )

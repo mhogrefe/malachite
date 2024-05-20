@@ -8,7 +8,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::Rational;
@@ -16,8 +16,8 @@ use malachite_q::Rational;
 pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ordering> {
     match (x, other) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) => Some(Ordering::Greater),
-        (float_negative_infinity!(), _) => Some(Ordering::Less),
+        (float_infinity!(), _) => Some(Greater),
+        (float_negative_infinity!(), _) => Some(Less),
         (float_either_zero!(), y) => 0u32.partial_cmp(y),
         (
             Float(Finite {
@@ -28,17 +28,17 @@ pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ord
             y,
         ) => Some(if *y == 0u32 {
             if *s_x {
-                Ordering::Greater
+                Greater
             } else {
-                Ordering::Less
+                Less
             }
         } else {
             let s_cmp = s_x.cmp(&(*y > 0));
-            if s_cmp != Ordering::Equal {
+            if s_cmp != Equal {
                 return Some(s_cmp);
             }
             let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
-            if ord_cmp != Ordering::Equal {
+            if ord_cmp != Equal {
                 if *s_x {
                     ord_cmp
                 } else {
@@ -81,8 +81,8 @@ impl PartialOrd<Rational> for Float {
     fn partial_cmp(&self, other: &Rational) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) => None,
-            (float_infinity!(), _) => Some(Ordering::Greater),
-            (float_negative_infinity!(), _) => Some(Ordering::Less),
+            (float_infinity!(), _) => Some(Greater),
+            (float_negative_infinity!(), _) => Some(Less),
             (float_either_zero!(), y) => 0u32.partial_cmp(y),
             (
                 Float(Finite {
@@ -94,17 +94,17 @@ impl PartialOrd<Rational> for Float {
                 y,
             ) => Some(if *y == 0u32 {
                 if *s_x {
-                    Ordering::Greater
+                    Greater
                 } else {
-                    Ordering::Less
+                    Less
                 }
             } else {
                 let s_cmp = s_x.cmp(&(*y > 0));
-                if s_cmp != Ordering::Equal {
+                if s_cmp != Equal {
                     return Some(s_cmp);
                 }
                 let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
-                if ord_cmp != Ordering::Equal {
+                if ord_cmp != Equal {
                     if *s_x {
                         ord_cmp
                     } else {
@@ -114,13 +114,12 @@ impl PartialOrd<Rational> for Float {
                     let shift = e_x - i64::exact_from(significand_bits(significand_x));
                     let abs_shift = shift.unsigned_abs();
                     let prod_cmp = match shift.sign() {
-                        Ordering::Equal => {
+                        Equal => {
                             (significand_x * other.denominator_ref()).cmp(other.numerator_ref())
                         }
-                        Ordering::Greater => ((significand_x * other.denominator_ref())
-                            << abs_shift)
+                        Greater => ((significand_x * other.denominator_ref()) << abs_shift)
                             .cmp(other.numerator_ref()),
-                        Ordering::Less => {
+                        Less => {
                             let n_trailing_zeros = significand_x.trailing_zeros().unwrap();
                             if abs_shift <= n_trailing_zeros {
                                 ((significand_x >> abs_shift) * other.denominator_ref())

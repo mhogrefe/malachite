@@ -36,11 +36,14 @@ impl ModIsReduced for Natural {
     ///
     /// assert_eq!(Natural::ZERO.mod_is_reduced(&Natural::from(5u32)), true);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12).mod_is_reduced(&Natural::from(10u32).pow(12)),
+    ///     Natural::from(10u32)
+    ///         .pow(12)
+    ///         .mod_is_reduced(&Natural::from(10u32).pow(12)),
     ///     false
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12)
+    ///     Natural::from(10u32)
+    ///         .pow(12)
     ///         .mod_is_reduced(&(Natural::from(10u32).pow(12) + Natural::ONE)),
     ///     true
     /// );

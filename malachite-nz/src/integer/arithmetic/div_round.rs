@@ -66,83 +66,83 @@ impl DivRound<Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Down),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     Integer::from(-10).div_round(Integer::from(4), Down),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(3), RoundingMode::Floor),
-    ///     (Integer::from(-333333333334i64), Ordering::Less)
+    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(3), Floor),
+    ///     (Integer::from(-333333333334i64), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Up),
-    ///     (Integer::from(-3), Ordering::Less)
+    ///     Integer::from(-10).div_round(Integer::from(4), Up),
+    ///     (Integer::from(-3), Less)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(3), RoundingMode::Ceiling),
-    ///     (Integer::from(-333333333333i64), Ordering::Greater)
+    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(3), Ceiling),
+    ///     (Integer::from(-333333333333i64), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(5), RoundingMode::Exact),
-    ///     (Integer::from(-2), Ordering::Equal)
+    ///     Integer::from(-10).div_round(Integer::from(5), Exact),
+    ///     (Integer::from(-2), Equal)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-3), Ordering::Greater)
+    ///     Integer::from(-10).div_round(Integer::from(3), Nearest),
+    ///     (Integer::from(-3), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-20).div_round(Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-7), Ordering::Less)
+    ///     Integer::from(-20).div_round(Integer::from(3), Nearest),
+    ///     (Integer::from(-7), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     Integer::from(-10).div_round(Integer::from(4), Nearest),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-14).div_round(Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-4), Ordering::Less)
+    ///     Integer::from(-14).div_round(Integer::from(4), Nearest),
+    ///     (Integer::from(-4), Less)
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Down),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     Integer::from(-10).div_round(Integer::from(-4), Down),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), RoundingMode::Floor),
-    ///     (Integer::from(333333333333i64), Ordering::Less)
+    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), Floor),
+    ///     (Integer::from(333333333333i64), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Up),
-    ///     (Integer::from(3), Ordering::Greater)
+    ///     Integer::from(-10).div_round(Integer::from(-4), Up),
+    ///     (Integer::from(3), Greater)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), RoundingMode::Ceiling),
-    ///     (Integer::from(333333333334i64), Ordering::Greater)
+    ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), Ceiling),
+    ///     (Integer::from(333333333334i64), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(-5), RoundingMode::Exact),
-    ///     (Integer::from(2), Ordering::Equal)
+    ///     Integer::from(-10).div_round(Integer::from(-5), Exact),
+    ///     (Integer::from(2), Equal)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(3), Ordering::Less)
+    ///     Integer::from(-10).div_round(Integer::from(-3), Nearest),
+    ///     (Integer::from(3), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-20).div_round(Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(7), Ordering::Greater)
+    ///     Integer::from(-20).div_round(Integer::from(-3), Nearest),
+    ///     (Integer::from(7), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     Integer::from(-10).div_round(Integer::from(-4), Nearest),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-14).div_round(Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(4), Ordering::Greater)
+    ///     Integer::from(-14).div_round(Integer::from(-4), Nearest),
+    ///     (Integer::from(4), Greater)
     /// );
     /// ```
     #[inline]
@@ -208,83 +208,83 @@ impl<'a> DivRound<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Down),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     Integer::from(-10).div_round(&Integer::from(4), Down),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), RoundingMode::Floor),
-    ///     (Integer::from(-333333333334i64), Ordering::Less)
+    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), Floor),
+    ///     (Integer::from(-333333333334i64), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Up),
-    ///     (Integer::from(-3), Ordering::Less)
+    ///     Integer::from(-10).div_round(&Integer::from(4), Up),
+    ///     (Integer::from(-3), Less)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), RoundingMode::Ceiling),
-    ///     (Integer::from(-333333333333i64), Ordering::Greater)
+    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), Ceiling),
+    ///     (Integer::from(-333333333333i64), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(5), RoundingMode::Exact),
-    ///     (Integer::from(-2), Ordering::Equal)
+    ///     Integer::from(-10).div_round(&Integer::from(5), Exact),
+    ///     (Integer::from(-2), Equal)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-3), Ordering::Greater)
+    ///     Integer::from(-10).div_round(&Integer::from(3), Nearest),
+    ///     (Integer::from(-3), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-20).div_round(&Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-7), Ordering::Less)
+    ///     Integer::from(-20).div_round(&Integer::from(3), Nearest),
+    ///     (Integer::from(-7), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     Integer::from(-10).div_round(&Integer::from(4), Nearest),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-14).div_round(&Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-4), Ordering::Less)
+    ///     Integer::from(-14).div_round(&Integer::from(4), Nearest),
+    ///     (Integer::from(-4), Less)
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Down),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     Integer::from(-10).div_round(&Integer::from(-4), Down),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), RoundingMode::Floor),
-    ///     (Integer::from(333333333333i64), Ordering::Less)
+    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), Floor),
+    ///     (Integer::from(333333333333i64), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Up),
-    ///     (Integer::from(3), Ordering::Greater)
+    ///     Integer::from(-10).div_round(&Integer::from(-4), Up),
+    ///     (Integer::from(3), Greater)
     /// );
     /// assert_eq!(
-    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), RoundingMode::Ceiling),
-    ///     (Integer::from(333333333334i64), Ordering::Greater)
+    ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), Ceiling),
+    ///     (Integer::from(333333333334i64), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(-5), RoundingMode::Exact),
-    ///     (Integer::from(2), Ordering::Equal)
+    ///     Integer::from(-10).div_round(&Integer::from(-5), Exact),
+    ///     (Integer::from(2), Equal)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(3), Ordering::Less)
+    ///     Integer::from(-10).div_round(&Integer::from(-3), Nearest),
+    ///     (Integer::from(3), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-20).div_round(&Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(7), Ordering::Greater)
+    ///     Integer::from(-20).div_round(&Integer::from(-3), Nearest),
+    ///     (Integer::from(7), Greater)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     Integer::from(-10).div_round(&Integer::from(-4), Nearest),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-14).div_round(&Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(4), Ordering::Greater)
+    ///     Integer::from(-14).div_round(&Integer::from(-4), Nearest),
+    ///     (Integer::from(4), Greater)
     /// );
     /// ```
     #[inline]
@@ -350,83 +350,83 @@ impl<'a> DivRound<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Down),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(Integer::from(4), Down),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(3), RoundingMode::Floor),
-    ///     (Integer::from(-333333333334i64), Ordering::Less)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(3), Floor),
+    ///     (Integer::from(-333333333334i64), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Up),
-    ///     (Integer::from(-3), Ordering::Less)
+    ///     Integer::from(-10).div_round(Integer::from(4), Up),
+    ///     (Integer::from(-3), Less)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(3), RoundingMode::Ceiling),
-    ///     (Integer::from(-333333333333i64), Ordering::Greater)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(3), Ceiling),
+    ///     (Integer::from(-333333333333i64), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(5), RoundingMode::Exact),
-    ///     (Integer::from(-2), Ordering::Equal)
+    ///     (&Integer::from(-10)).div_round(Integer::from(5), Exact),
+    ///     (Integer::from(-2), Equal)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-3), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(Integer::from(3), Nearest),
+    ///     (Integer::from(-3), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-20)).div_round(Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-7), Ordering::Less)
+    ///     (&Integer::from(-20)).div_round(Integer::from(3), Nearest),
+    ///     (Integer::from(-7), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(Integer::from(4), Nearest),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-14)).div_round(Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-4), Ordering::Less)
+    ///     (&Integer::from(-14)).div_round(Integer::from(4), Nearest),
+    ///     (Integer::from(-4), Less)
     /// );
     ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Down),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     (&Integer::from(-10)).div_round(Integer::from(-4), Down),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), RoundingMode::Floor),
-    ///     (Integer::from(333333333333i64), Ordering::Less)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), Floor),
+    ///     (Integer::from(333333333333i64), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Up),
-    ///     (Integer::from(3), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(Integer::from(-4), Up),
+    ///     (Integer::from(3), Greater)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), RoundingMode::Ceiling),
-    ///     (Integer::from(333333333334i64), Ordering::Greater)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), Ceiling),
+    ///     (Integer::from(333333333334i64), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(-5), RoundingMode::Exact),
-    ///     (Integer::from(2), Ordering::Equal)
+    ///     (&Integer::from(-10)).div_round(Integer::from(-5), Exact),
+    ///     (Integer::from(2), Equal)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(3), Ordering::Less)
+    ///     (&Integer::from(-10)).div_round(Integer::from(-3), Nearest),
+    ///     (Integer::from(3), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-20)).div_round(Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(7), Ordering::Greater)
+    ///     (&Integer::from(-20)).div_round(Integer::from(-3), Nearest),
+    ///     (Integer::from(7), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     (&Integer::from(-10)).div_round(Integer::from(-4), Nearest),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-14)).div_round(Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(4), Ordering::Greater)
+    ///     (&Integer::from(-14)).div_round(Integer::from(-4), Nearest),
+    ///     (Integer::from(4), Greater)
     /// );
     /// ```
     fn div_round(self, other: Integer, rm: RoundingMode) -> (Integer, Ordering) {
@@ -494,83 +494,83 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Down),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(4), Down),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), RoundingMode::Floor),
-    ///     (Integer::from(-333333333334i64), Ordering::Less)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), Floor),
+    ///     (Integer::from(-333333333334i64), Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Up),
-    ///     (Integer::from(-3), Ordering::Less)
+    ///     Integer::from(-10).div_round(&Integer::from(4), Up),
+    ///     (Integer::from(-3), Less)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), RoundingMode::Ceiling),
-    ///     (Integer::from(-333333333333i64), Ordering::Greater)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(3), Ceiling),
+    ///     (Integer::from(-333333333333i64), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(5), RoundingMode::Exact),
-    ///     (Integer::from(-2), Ordering::Equal)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(5), Exact),
+    ///     (Integer::from(-2), Equal)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-3), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(3), Nearest),
+    ///     (Integer::from(-3), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-20)).div_round(&Integer::from(3), RoundingMode::Nearest),
-    ///     (Integer::from(-7), Ordering::Less)
+    ///     (&Integer::from(-20)).div_round(&Integer::from(3), Nearest),
+    ///     (Integer::from(-7), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-2), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(4), Nearest),
+    ///     (Integer::from(-2), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-14)).div_round(&Integer::from(4), RoundingMode::Nearest),
-    ///     (Integer::from(-4), Ordering::Less)
+    ///     (&Integer::from(-14)).div_round(&Integer::from(4), Nearest),
+    ///     (Integer::from(-4), Less)
     /// );
     ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Down),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), Down),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), RoundingMode::Floor),
-    ///     (Integer::from(333333333333i64), Ordering::Less)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), Floor),
+    ///     (Integer::from(333333333333i64), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Up),
-    ///     (Integer::from(3), Ordering::Greater)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), Up),
+    ///     (Integer::from(3), Greater)
     /// );
     /// assert_eq!(
-    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), RoundingMode::Ceiling),
-    ///     (Integer::from(333333333334i64), Ordering::Greater)
+    ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), Ceiling),
+    ///     (Integer::from(333333333334i64), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(-5), RoundingMode::Exact),
-    ///     (Integer::from(2), Ordering::Equal)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-5), Exact),
+    ///     (Integer::from(2), Equal)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(3), Ordering::Less)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-3), Nearest),
+    ///     (Integer::from(3), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-20)).div_round(&Integer::from(-3), RoundingMode::Nearest),
-    ///     (Integer::from(7), Ordering::Greater)
+    ///     (&Integer::from(-20)).div_round(&Integer::from(-3), Nearest),
+    ///     (Integer::from(7), Greater)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(2), Ordering::Less)
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), Nearest),
+    ///     (Integer::from(2), Less)
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-14)).div_round(&Integer::from(-4), RoundingMode::Nearest),
-    ///     (Integer::from(4), Ordering::Greater)
+    ///     (&Integer::from(-14)).div_round(&Integer::from(-4), Nearest),
+    ///     (Integer::from(4), Greater)
     /// );
     /// ```
     fn div_round(self, other: &'b Integer, rm: RoundingMode) -> (Integer, Ordering) {
@@ -603,90 +603,81 @@ impl DivRoundAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(4), RoundingMode::Down), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(Integer::from(4), Down), Greater);
     /// assert_eq!(n, -2);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(n.div_round_assign(Integer::from(3), RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(3), Floor), Less);
     /// assert_eq!(n, -333333333334i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(4), RoundingMode::Up), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(4), Up), Less);
     /// assert_eq!(n, -3);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(n.div_round_assign(Integer::from(3), RoundingMode::Ceiling), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(Integer::from(3), Ceiling), Greater);
     /// assert_eq!(n, -333333333333i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(5), RoundingMode::Exact), Ordering::Equal);
+    /// assert_eq!(n.div_round_assign(Integer::from(5), Exact), Equal);
     /// assert_eq!(n, -2);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(3), RoundingMode::Nearest), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(Integer::from(3), Nearest), Greater);
     /// assert_eq!(n, -3);
     ///
     /// let mut n = Integer::from(-20);
-    /// assert_eq!(n.div_round_assign(Integer::from(3), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(3), Nearest), Less);
     /// assert_eq!(n, -7);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(4), RoundingMode::Nearest), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(Integer::from(4), Nearest), Greater);
     /// assert_eq!(n, -2);
     ///
     /// let mut n = Integer::from(-14);
-    /// assert_eq!(n.div_round_assign(Integer::from(4), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(4), Nearest), Less);
     /// assert_eq!(n, -4);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(-4), RoundingMode::Down), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(-4), Down), Less);
     /// assert_eq!(n, 2);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(n.div_round_assign(Integer::from(-3), RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(-3), Floor), Less);
     /// assert_eq!(n, 333333333333i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(-4), RoundingMode::Up), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(Integer::from(-4), Up), Greater);
     /// assert_eq!(n, 3);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(
-    ///     n.div_round_assign(Integer::from(-3), RoundingMode::Ceiling),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(Integer::from(-3), Ceiling), Greater);
     /// assert_eq!(n, 333333333334i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(-5), RoundingMode::Exact), Ordering::Equal);
+    /// assert_eq!(n.div_round_assign(Integer::from(-5), Exact), Equal);
     /// assert_eq!(n, 2);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(-3), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(-3), Nearest), Less);
     /// assert_eq!(n, 3);
     ///
     /// let mut n = Integer::from(-20);
-    /// assert_eq!(
-    ///     n.div_round_assign(Integer::from(-3), RoundingMode::Nearest),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(Integer::from(-3), Nearest), Greater);
     /// assert_eq!(n, 7);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(Integer::from(-4), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(Integer::from(-4), Nearest), Less);
     /// assert_eq!(n, 2);
     ///
     /// let mut n = Integer::from(-14);
-    /// assert_eq!(
-    ///     n.div_round_assign(Integer::from(-4), RoundingMode::Nearest),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(Integer::from(-4), Nearest), Greater);
     /// assert_eq!(n, 4);
     /// ```
     fn div_round_assign(&mut self, other: Integer, rm: RoundingMode) -> Ordering {
@@ -723,99 +714,81 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
-    /// use core::cmp::Ordering;
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(4), RoundingMode::Down), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(&Integer::from(4), Down), Greater);
     /// assert_eq!(n, -2);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(n.div_round_assign(&Integer::from(3), RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(3), Floor), Less);
     /// assert_eq!(n, -333333333334i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(4), RoundingMode::Up), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(4), Up), Less);
     /// assert_eq!(n, -3);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(
-    ///     n.div_round_assign(&Integer::from(3), RoundingMode::Ceiling),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(&Integer::from(3), Ceiling), Greater);
     /// assert_eq!(n, -333333333333i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(5), RoundingMode::Exact), Ordering::Equal);
+    /// assert_eq!(n.div_round_assign(&Integer::from(5), Exact), Equal);
     /// assert_eq!(n, -2);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(
-    ///     n.div_round_assign(&Integer::from(3), RoundingMode::Nearest),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(&Integer::from(3), Nearest), Greater);
     /// assert_eq!(n, -3);
     ///
     /// let mut n = Integer::from(-20);
-    /// assert_eq!(n.div_round_assign(&Integer::from(3), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(3), Nearest), Less);
     /// assert_eq!(n, -7);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(
-    ///     n.div_round_assign(&Integer::from(4), RoundingMode::Nearest),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(&Integer::from(4), Nearest), Greater);
     /// assert_eq!(n, -2);
     ///
     /// let mut n = Integer::from(-14);
-    /// assert_eq!(n.div_round_assign(&Integer::from(4), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(4), Nearest), Less);
     /// assert_eq!(n, -4);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(-4), RoundingMode::Down), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(-4), Down), Less);
     /// assert_eq!(n, 2);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(n.div_round_assign(&Integer::from(-3), RoundingMode::Floor), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(-3), Floor), Less);
     /// assert_eq!(n, 333333333333i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(-4), RoundingMode::Up), Ordering::Greater);
+    /// assert_eq!(n.div_round_assign(&Integer::from(-4), Up), Greater);
     /// assert_eq!(n, 3);
     ///
     /// let mut n = -Integer::from(10u32).pow(12);
-    /// assert_eq!(
-    ///     n.div_round_assign(&Integer::from(-3), RoundingMode::Ceiling),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(&Integer::from(-3), Ceiling), Greater);
     /// assert_eq!(n, 333333333334i64);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(-5), RoundingMode::Exact), Ordering::Equal);
+    /// assert_eq!(n.div_round_assign(&Integer::from(-5), Exact), Equal);
     /// assert_eq!(n, 2);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(-3), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(-3), Nearest), Less);
     /// assert_eq!(n, 3);
     ///
     /// let mut n = Integer::from(-20);
-    /// assert_eq!(
-    ///     n.div_round_assign(&Integer::from(-3), RoundingMode::Nearest),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(&Integer::from(-3), Nearest), Greater);
     /// assert_eq!(n, 7);
     ///
     /// let mut n = Integer::from(-10);
-    /// assert_eq!(n.div_round_assign(&Integer::from(-4), RoundingMode::Nearest), Ordering::Less);
+    /// assert_eq!(n.div_round_assign(&Integer::from(-4), Nearest), Less);
     /// assert_eq!(n, 2);
     ///
     /// let mut n = Integer::from(-14);
-    /// assert_eq!(
-    ///     n.div_round_assign(&Integer::from(-4), RoundingMode::Nearest),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(n.div_round_assign(&Integer::from(-4), Nearest), Greater);
     /// assert_eq!(n, 4);
     /// ```
     fn div_round_assign(&mut self, other: &'a Integer, rm: RoundingMode) -> Ordering {

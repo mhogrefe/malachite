@@ -16,7 +16,7 @@ use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::float_primitive_float_pair_gen;
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_float_partial_cmp_abs_primitive_float);
@@ -41,9 +41,9 @@ fn demo_float_partial_cmp_abs_primitive_float<T: PrimitiveFloat>(
     {
         match x.partial_cmp_abs(&y) {
             None => println!("|{}| and |{}| are incomparable", x, NiceFloat(y)),
-            Some(Ordering::Less) => println!("|{}| < |{}|", x, NiceFloat(y)),
-            Some(Ordering::Equal) => println!("|{}| = |{}|", x, NiceFloat(y)),
-            Some(Ordering::Greater) => println!("|{}| > |{}|", x, NiceFloat(y)),
+            Some(Less) => println!("|{}| < |{}|", x, NiceFloat(y)),
+            Some(Equal) => println!("|{}| = |{}|", x, NiceFloat(y)),
+            Some(Greater) => println!("|{}| > |{}|", x, NiceFloat(y)),
         }
     }
 }
@@ -62,9 +62,9 @@ fn demo_float_partial_cmp_abs_primitive_float_debug<T: PrimitiveFloat>(
         let cx = ComparableFloatRef(&x);
         match x.partial_cmp_abs(&y) {
             None => println!("{:#x} and |{}| are incomparable", cx, NiceFloat(y)),
-            Some(Ordering::Less) => println!("{:#x} < |{}|", cx, NiceFloat(y)),
-            Some(Ordering::Equal) => println!("{:#x} = |{}|", cx, NiceFloat(y)),
-            Some(Ordering::Greater) => println!("{:#x} > |{}|", cx, NiceFloat(y)),
+            Some(Less) => println!("{:#x} < |{}|", cx, NiceFloat(y)),
+            Some(Equal) => println!("{:#x} = |{}|", cx, NiceFloat(y)),
+            Some(Greater) => println!("{:#x} > |{}|", cx, NiceFloat(y)),
         }
     }
 }
@@ -80,9 +80,9 @@ fn demo_primitive_float_partial_cmp_abs_float<T: PartialOrdAbs<Float> + Primitiv
     {
         match x.partial_cmp_abs(&y) {
             None => println!("|{}| and |{}| are incomparable", NiceFloat(x), y),
-            Some(Ordering::Less) => println!("|{}| < |{}|", NiceFloat(x), y),
-            Some(Ordering::Equal) => println!("|{}| = |{}|", NiceFloat(x), y),
-            Some(Ordering::Greater) => println!("|{}| > |{}|", NiceFloat(x), y),
+            Some(Less) => println!("|{}| < |{}|", NiceFloat(x), y),
+            Some(Equal) => println!("|{}| = |{}|", NiceFloat(x), y),
+            Some(Greater) => println!("|{}| > |{}|", NiceFloat(x), y),
         }
     }
 }
@@ -99,9 +99,9 @@ fn demo_primitive_float_partial_cmp_abs_float_debug<T: PartialOrdAbs<Float> + Pr
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp_abs(&y) {
             None => println!("|{}| and {:#x} are incomparable", NiceFloat(x), cy),
-            Some(Ordering::Less) => println!("|{}| < {:#x}", NiceFloat(x), cy),
-            Some(Ordering::Equal) => println!("|{}| = {:#x}", NiceFloat(x), cy),
-            Some(Ordering::Greater) => println!("|{}| > {:#x}", NiceFloat(x), cy),
+            Some(Less) => println!("|{}| < {:#x}", NiceFloat(x), cy),
+            Some(Equal) => println!("|{}| = {:#x}", NiceFloat(x), cy),
+            Some(Greater) => println!("|{}| > {:#x}", NiceFloat(x), cy),
         }
     }
 }

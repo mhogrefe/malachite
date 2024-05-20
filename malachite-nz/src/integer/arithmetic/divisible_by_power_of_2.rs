@@ -35,8 +35,14 @@ impl<'a> DivisibleByPowerOf2 for &'a Integer {
     /// assert_eq!(Integer::ZERO.divisible_by_power_of_2(100), true);
     /// assert_eq!(Integer::from(-100).divisible_by_power_of_2(2), true);
     /// assert_eq!(Integer::from(100u32).divisible_by_power_of_2(3), false);
-    /// assert_eq!((-Integer::from(10u32).pow(12)).divisible_by_power_of_2(12), true);
-    /// assert_eq!((-Integer::from(10u32).pow(12)).divisible_by_power_of_2(13), false);
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12)).divisible_by_power_of_2(12),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12)).divisible_by_power_of_2(13),
+    ///     false
+    /// );
     /// ```
     fn divisible_by_power_of_2(self, pow: u64) -> bool {
         self.abs.divisible_by_power_of_2(pow)

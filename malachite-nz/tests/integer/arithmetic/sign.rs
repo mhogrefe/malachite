@@ -14,7 +14,7 @@ use malachite_nz::test_util::generators::integer_gen;
 use malachite_nz::test_util::integer::arithmetic::sign::num_sign;
 use num::BigInt;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -24,11 +24,11 @@ fn test_sign() {
         assert_eq!(num_sign(&BigInt::from_str(s).unwrap()), out);
         assert_eq!(rug::Integer::from_str(s).unwrap().cmp0(), out);
     };
-    test("0", Ordering::Equal);
-    test("123", Ordering::Greater);
-    test("-123", Ordering::Less);
-    test("1000000000000", Ordering::Greater);
-    test("-1000000000000", Ordering::Less);
+    test("0", Equal);
+    test("123", Greater);
+    test("-123", Less);
+    test("1000000000000", Greater);
+    test("-1000000000000", Less);
 }
 
 #[test]

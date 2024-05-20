@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::orderings::ORDERINGS;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::iter::Cloned;
 use core::slice::Iter;
 
@@ -24,18 +24,16 @@ pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::orderings::exhaustive::orderings_increasing;
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::*;
 ///
 /// assert_eq!(
 ///     orderings_increasing().collect_vec(),
-///     &[Ordering::Less, Ordering::Equal, Ordering::Greater]
+///     &[Less, Equal, Greater]
 /// );
 /// ```
 #[inline]
 pub fn orderings_increasing() -> ExhaustiveOrderings {
-    [Ordering::Less, Ordering::Equal, Ordering::Greater]
-        .iter()
-        .cloned()
+    [Less, Equal, Greater].iter().cloned()
 }
 
 /// Generates all [`Ordering`]s, with `Equal` coming first.
@@ -49,11 +47,11 @@ pub fn orderings_increasing() -> ExhaustiveOrderings {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::orderings::exhaustive::exhaustive_orderings;
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::*;
 ///
 /// assert_eq!(
 ///     exhaustive_orderings().collect_vec(),
-///     &[Ordering::Equal, Ordering::Less, Ordering::Greater]
+///     &[Equal, Less, Greater]
 /// );
 /// ```
 #[inline]

@@ -64,29 +64,39 @@ impl RoundToMultipleOfPowerOf2<i64> for Rational {
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple_of_power_of_2(-3, Floor)
+    ///         .to_debug_string(),
     ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Down).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple_of_power_of_2(-3, Down)
+    ///         .to_debug_string(),
     ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Ceiling).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple_of_power_of_2(-3, Ceiling)
+    ///         .to_debug_string(),
     ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Up).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple_of_power_of_2(-3, Up)
+    ///         .to_debug_string(),
     ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Nearest).to_debug_string(),
+    ///     q.clone()
+    ///         .round_to_multiple_of_power_of_2(-3, Nearest)
+    ///         .to_debug_string(),
     ///     "(25/8, Less)"
     /// );
     /// ```
@@ -150,29 +160,34 @@ impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_debug_string(),
+    ///     (&q).round_to_multiple_of_power_of_2(-3, Floor)
+    ///         .to_debug_string(),
     ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Down).to_debug_string(),
+    ///     (&q).round_to_multiple_of_power_of_2(-3, Down)
+    ///         .to_debug_string(),
     ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Ceiling).to_debug_string(),
+    ///     (&q).round_to_multiple_of_power_of_2(-3, Ceiling)
+    ///         .to_debug_string(),
     ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Up).to_debug_string(),
+    ///     (&q).round_to_multiple_of_power_of_2(-3, Up)
+    ///         .to_debug_string(),
     ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Nearest).to_debug_string(),
+    ///     (&q).round_to_multiple_of_power_of_2(-3, Nearest)
+    ///         .to_debug_string(),
     ///     "(25/8, Less)"
     /// );
     /// ```
@@ -206,45 +221,33 @@ impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
     /// use malachite_base::num::conversion::traits::ExactFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Floor),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.round_to_multiple_of_power_of_2_assign(-3, Floor), Less);
+    /// assert_eq!(x.to_string(), "25/8");
+    ///
+    /// let mut x = q.clone();
+    /// assert_eq!(x.round_to_multiple_of_power_of_2_assign(-3, Down), Less);
     /// assert_eq!(x.to_string(), "25/8");
     ///
     /// let mut x = q.clone();
     /// assert_eq!(
-    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Down),
-    ///     Ordering::Less
-    /// );
-    /// assert_eq!(x.to_string(), "25/8");
-    ///
-    /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Ceiling),
-    ///     Ordering::Greater
+    ///     x.round_to_multiple_of_power_of_2_assign(-3, Ceiling),
+    ///     Greater
     /// );
     /// assert_eq!(x.to_string(), "13/4");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Up),
-    ///     Ordering::Greater
-    /// );
+    /// assert_eq!(x.round_to_multiple_of_power_of_2_assign(-3, Up), Greater);
     /// assert_eq!(x.to_string(), "13/4");
     ///
     /// let mut x = q.clone();
-    /// assert_eq!(
-    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Nearest),
-    ///     Ordering::Less
-    /// );
+    /// assert_eq!(x.round_to_multiple_of_power_of_2_assign(-3, Nearest), Less);
     /// assert_eq!(x.to_string(), "25/8");
     /// ```
     fn round_to_multiple_of_power_of_2_assign(&mut self, pow: i64, rm: RoundingMode) -> Ordering {

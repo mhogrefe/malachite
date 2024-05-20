@@ -9,7 +9,7 @@
 use crate::arithmetic::log_base::log_base_helper;
 use crate::Rational;
 use alloc::string::String;
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use core::fmt::{Formatter, Write};
 use malachite_base::num::arithmetic::traits::{
     Abs, CheckedLogBase2, DivExact, DivExactAssign, DivRound, DivisibleBy, Pow, Sign,
@@ -19,7 +19,7 @@ use malachite_base::num::conversion::string::to_sci::write_exponent;
 use malachite_base::num::conversion::traits::{
     ExactFrom, IsInteger, RoundingFrom, ToSci, ToStringBase, WrappingFrom,
 };
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -85,13 +85,25 @@ impl Rational {
     /// use malachite_q::Rational;
     ///
     /// // 3/8 is 0.375 in base 10.
-    /// assert_eq!(Rational::from_signeds(3, 8).length_after_point_in_small_base(10), Some(3));
+    /// assert_eq!(
+    ///     Rational::from_signeds(3, 8).length_after_point_in_small_base(10),
+    ///     Some(3)
+    /// );
     /// // 1/20 is 0.05 in base 10.
-    /// assert_eq!(Rational::from_signeds(1, 20).length_after_point_in_small_base(10), Some(2));
+    /// assert_eq!(
+    ///     Rational::from_signeds(1, 20).length_after_point_in_small_base(10),
+    ///     Some(2)
+    /// );
     /// // 1/7 is non-terminating in base 10.
-    /// assert_eq!(Rational::from_signeds(1, 7).length_after_point_in_small_base(10), None);
+    /// assert_eq!(
+    ///     Rational::from_signeds(1, 7).length_after_point_in_small_base(10),
+    ///     None
+    /// );
     /// // 1/7 is 0.3 in base 21.
-    /// assert_eq!(Rational::from_signeds(1, 7).length_after_point_in_small_base(21), Some(1));
+    /// assert_eq!(
+    ///     Rational::from_signeds(1, 7).length_after_point_in_small_base(21),
+    ///     Some(1)
+    /// );
     /// ```
     pub fn length_after_point_in_small_base(&self, base: u8) -> Option<u64> {
         let d = self.denominator_ref();
@@ -129,10 +141,7 @@ impl Rational {
                 }
                 count
             };
-            length = max(
-                length,
-                count.div_round(u64::from(m), RoundingMode::Ceiling).0,
-            );
+            length = max(length, count.div_round(u64::from(m), Ceiling).0);
         }
         if let Some(temp) = temp {
             if temp == 1 {
@@ -149,13 +158,13 @@ impl Rational {
 pub_test! {floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
     if let Some(log_base) = base.checked_log_base_2() {
         match log_base.sign() {
-            Ordering::Equal => panic!("Cannot take base-1 logarithm"),
-            Ordering::Greater => x
+            Equal => panic!("Cannot take base-1 logarithm"),
+            Greater => x
                 .floor_log_base_2_abs()
-                .div_round(log_base, RoundingMode::Floor).0,
-            Ordering::Less => {
+                .div_round(log_base, Floor).0,
+            Less => {
                 -(x.ceiling_log_base_2_abs()
-                    .div_round(-log_base, RoundingMode::Ceiling).0)
+                    .div_round(-log_base, Ceiling).0)
             }
         }
     } else {
@@ -217,14 +226,14 @@ impl ToSci for Rational {
     /// ```
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_q::Rational;
     ///
     /// let mut options = ToSciOptions::default();
     /// assert!(Rational::from(123u8).fmt_sci_valid(options));
     /// assert!(Rational::from(u128::MAX).fmt_sci_valid(options));
     /// // u128::MAX has more than 16 significant digits
-    /// options.set_rounding_mode(RoundingMode::Exact);
+    /// options.set_rounding_mode(Exact);
     /// assert!(!Rational::from(u128::MAX).fmt_sci_valid(options));
     /// options.set_precision(50);
     /// assert!(Rational::from(u128::MAX).fmt_sci_valid(options));
@@ -248,7 +257,7 @@ impl ToSci for Rational {
                 .length_after_point_in_small_base(options.get_base())
                 .is_some();
         }
-        if options.get_rounding_mode() != RoundingMode::Exact {
+        if options.get_rounding_mode() != Exact {
             return true;
         }
         let q_base = Rational::from(options.get_base());
@@ -290,33 +299,48 @@ impl ToSci for Rational {
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_q::Rational;
     ///
     /// let q = Rational::from_signeds(22, 7);
     /// let mut options = ToSciOptions::default();
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "3.142857142857143");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "3.142857142857143"
+    /// );
     ///
     /// options.set_precision(3);
     /// assert_eq!(q.to_sci_with_options(options).to_string(), "3.14");
     ///
-    /// options.set_rounding_mode(RoundingMode::Ceiling);
+    /// options.set_rounding_mode(Ceiling);
     /// assert_eq!(q.to_sci_with_options(options).to_string(), "3.15");
     ///
     /// options = ToSciOptions::default();
     /// options.set_base(20);
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "3.2h2h2h2h2h2h2h3");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "3.2h2h2h2h2h2h2h3"
+    /// );
     ///
     /// options.set_uppercase();
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "3.2H2H2H2H2H2H2H3");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "3.2H2H2H2H2H2H2H3"
+    /// );
     ///
     /// options.set_base(2);
-    /// options.set_rounding_mode(RoundingMode::Floor);
+    /// options.set_rounding_mode(Floor);
     /// options.set_precision(19);
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "11.001001001001001");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "11.001001001001001"
+    /// );
     ///
     /// options.set_include_trailing_zeros(true);
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "11.00100100100100100");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "11.00100100100100100"
+    /// );
     ///
     /// let q = Rational::from_unsigneds(936851431250u64, 1397u64);
     /// let mut options = ToSciOptions::default();
@@ -331,17 +355,29 @@ impl ToSci for Rational {
     ///
     /// let q = Rational::from_signeds(123i64, 45678909876i64);
     /// let mut options = ToSciOptions::default();
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "2.692708743135418e-9");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "2.692708743135418e-9"
+    /// );
     ///
     /// options.set_neg_exp_threshold(-10);
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "0.000000002692708743135418");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "0.000000002692708743135418"
+    /// );
     ///
     /// let q = Rational::power_of_2(-30i64);
     /// let mut options = ToSciOptions::default();
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "9.313225746154785e-10");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "9.313225746154785e-10"
+    /// );
     ///
     /// options.set_size_complete();
-    /// assert_eq!(q.to_sci_with_options(options).to_string(), "9.31322574615478515625e-10");
+    /// assert_eq!(
+    ///     q.to_sci_with_options(options).to_string(),
+    ///     "9.31322574615478515625e-10"
+    /// );
     /// ```
     fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
         if *self == 0u32 {

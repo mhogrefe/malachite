@@ -11,8 +11,8 @@ use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
-use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use crate::rounding_modes::RoundingMode::{self, *};
+use core::cmp::Ordering::{self, *};
 use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shr_round_unsigned_unsigned<
@@ -24,71 +24,55 @@ fn shr_round_unsigned_unsigned<
     rm: RoundingMode,
 ) -> (T, Ordering) {
     if bits == U::ZERO || x == T::ZERO {
-        return (x, Ordering::Equal);
+        return (x, Equal);
     }
     let width = U::wrapping_from(T::WIDTH);
     match rm {
-        RoundingMode::Down | RoundingMode::Floor if bits >= width => (T::ZERO, Ordering::Less),
-        RoundingMode::Down | RoundingMode::Floor => {
+        Down | Floor if bits >= width => (T::ZERO, Less),
+        Down | Floor => {
             let shifted = x >> bits;
-            (
-                shifted,
-                if shifted << bits == x {
-                    Ordering::Equal
-                } else {
-                    Ordering::Less
-                },
-            )
+            (shifted, if shifted << bits == x { Equal } else { Less })
         }
-        RoundingMode::Up | RoundingMode::Ceiling if bits >= width => (T::ONE, Ordering::Greater),
-        RoundingMode::Up | RoundingMode::Ceiling => {
+        Up | Ceiling if bits >= width => (T::ONE, Greater),
+        Up | Ceiling => {
             let shifted = x >> bits;
             if shifted << bits == x {
-                (shifted, Ordering::Equal)
+                (shifted, Equal)
             } else {
-                (shifted + T::ONE, Ordering::Greater)
+                (shifted + T::ONE, Greater)
             }
         }
-        RoundingMode::Nearest if bits == width && x > T::power_of_2(T::WIDTH - 1) => {
-            (T::ONE, Ordering::Greater)
-        }
-        RoundingMode::Nearest if bits >= width => (T::ZERO, Ordering::Less),
-        RoundingMode::Nearest => {
+        Nearest if bits == width && x > T::power_of_2(T::WIDTH - 1) => (T::ONE, Greater),
+        Nearest if bits >= width => (T::ZERO, Less),
+        Nearest => {
             let bm1 = bits - U::ONE;
             let mostly_shifted = x >> bm1;
             let bm1_zeros = mostly_shifted << bm1 == x;
             if mostly_shifted.even() {
                 // round down
-                (
-                    mostly_shifted >> 1,
-                    if bm1_zeros {
-                        Ordering::Equal
-                    } else {
-                        Ordering::Less
-                    },
-                )
+                (mostly_shifted >> 1, if bm1_zeros { Equal } else { Less })
             } else if !bm1_zeros {
                 // round up
-                ((mostly_shifted >> 1) + T::ONE, Ordering::Greater)
+                ((mostly_shifted >> 1) + T::ONE, Greater)
             } else {
                 // result is half-integer; round to even
                 let shifted: T = mostly_shifted >> 1;
                 if shifted.even() {
-                    (shifted, Ordering::Less)
+                    (shifted, Less)
                 } else {
-                    (shifted + T::ONE, Ordering::Greater)
+                    (shifted + T::ONE, Greater)
                 }
             }
         }
-        RoundingMode::Exact if bits >= width => {
+        Exact if bits >= width => {
             panic!("Right shift is not exact: {x} >> {bits}");
         }
-        RoundingMode::Exact => {
+        Exact => {
             let shifted = x >> bits;
             if shifted << bits != x {
                 panic!("Right shift is not exact: {x} >> {bits}");
             }
-            (shifted, Ordering::Equal)
+            (shifted, Equal)
         }
     }
 }
@@ -102,46 +86,46 @@ fn shr_round_assign_unsigned_unsigned<
     rm: RoundingMode,
 ) -> Ordering {
     if bits == U::ZERO || *x == T::ZERO {
-        return Ordering::Equal;
+        return Equal;
     }
     let width = U::wrapping_from(T::WIDTH);
     match rm {
-        RoundingMode::Down | RoundingMode::Floor if bits >= width => {
+        Down | Floor if bits >= width => {
             *x = T::ZERO;
-            Ordering::Less
+            Less
         }
-        RoundingMode::Down | RoundingMode::Floor => {
+        Down | Floor => {
             let original = *x;
             *x >>= bits;
             if *x << bits == original {
-                Ordering::Equal
+                Equal
             } else {
-                Ordering::Less
+                Less
             }
         }
-        RoundingMode::Up | RoundingMode::Ceiling if bits >= width => {
+        Up | Ceiling if bits >= width => {
             *x = T::ONE;
-            Ordering::Greater
+            Greater
         }
-        RoundingMode::Up | RoundingMode::Ceiling => {
+        Up | Ceiling => {
             let original = *x;
             *x >>= bits;
             if *x << bits == original {
-                Ordering::Equal
+                Equal
             } else {
                 *x += T::ONE;
-                Ordering::Greater
+                Greater
             }
         }
-        RoundingMode::Nearest if bits == width && *x > T::power_of_2(T::WIDTH - 1) => {
+        Nearest if bits == width && *x > T::power_of_2(T::WIDTH - 1) => {
             *x = T::ONE;
-            Ordering::Greater
+            Greater
         }
-        RoundingMode::Nearest if bits >= width => {
+        Nearest if bits >= width => {
             *x = T::ZERO;
-            Ordering::Less
+            Less
         }
-        RoundingMode::Nearest => {
+        Nearest => {
             let original = *x;
             let bm1 = bits - U::ONE;
             *x >>= bm1;
@@ -151,34 +135,34 @@ fn shr_round_assign_unsigned_unsigned<
             if old_x.even() {
                 // round down
                 if bm1_zeros {
-                    Ordering::Equal
+                    Equal
                 } else {
-                    Ordering::Less
+                    Less
                 }
             } else if !bm1_zeros {
                 // round up
                 *x += T::ONE;
-                Ordering::Greater
+                Greater
             } else {
                 // result is half-integer; round to even
                 if x.even() {
-                    Ordering::Less
+                    Less
                 } else {
                     *x += T::ONE;
-                    Ordering::Greater
+                    Greater
                 }
             }
         }
-        RoundingMode::Exact if bits >= width => {
+        Exact if bits >= width => {
             panic!("Right shift is not exact: {} >>= {}", *x, bits);
         }
-        RoundingMode::Exact => {
+        Exact => {
             let original = *x;
             *x >>= bits;
             if *x << bits != original {
                 panic!("Right shift is not exact: {original} >>= {bits}");
             }
-            Ordering::Equal
+            Equal
         }
     }
 }
@@ -195,9 +179,8 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// whether the returned value is less than, equal to, or greater than the exact
                     /// value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the
                     /// first element of the pair, without the [`Ordering`]:
@@ -231,8 +214,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-                    /// $2^b$.
+                    /// Panics if `rm` is `Exact` but `self` is not divisible by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shr_round#shr_round).
@@ -248,9 +230,8 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// indicating whether the assigned value is less than, equal to, or greater
                     /// than the exact value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// See the [`ShrRound`] documentation for details.
                     ///
@@ -258,8 +239,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-                    /// $2^b$.
+                    /// Panics if `rm` is `Exact` but `self` is not divisible by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shr_round#shr_round_assign).
@@ -315,9 +295,8 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// whether the returned value is less than, equal to, or greater than the exact
                     /// value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the
                     /// first element of the pair, without the [`Ordering`]:
@@ -351,8 +330,7 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-                    /// $2^b$.
+                    /// Panics if `rm` is `Exact` but `self` is not divisible by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shr_round#shr_round).
@@ -368,16 +346,14 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// indicating whether the assigned value is less than, equal to, or greater
                     /// than the exact value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-                    /// $2^b$.
+                    /// Panics if `rm` is `Exact` but `self` is not divisible by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shr_round#shr_round_assign).
@@ -414,7 +390,7 @@ fn shr_round_primitive_signed<
             } else {
                 x << bits.unsigned_abs()
             },
-            Ordering::Equal,
+            Equal,
         )
     }
 }
@@ -437,7 +413,7 @@ fn shr_round_assign_primitive_signed<
         } else {
             *x <<= bits.unsigned_abs();
         }
-        Ordering::Equal
+        Equal
     }
 }
 
@@ -454,10 +430,9 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// value. If `bits` is negative, then the returned [`Ordering`] is always
                     /// `Equal`, even if the higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
-                    /// `bits` is non-negative.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`. Rounding
+                    /// might only be necessary if `bits` is non-negative.
                     ///
                     /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the
                     /// first element of the pair, without the [`Ordering`]:
@@ -495,8 +470,8 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by $2^b$.
+                    /// Panics if `bits` is positive and `rm` is `Exact` but `self` is not divisible
+                    /// by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shr_round#shr_round).
@@ -513,10 +488,9 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// than the exact value. If `bits` is negative, then the returned [`Ordering`]
                     /// is always `Equal`, even if the higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
-                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
-                    /// `bits` is non-negative.
+                    /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether
+                    /// `Exact` can be passed, use `self.divisible_by_power_of_2(bits)`. Rounding
+                    /// might only be necessary if `bits` is non-negative.
                     ///
                     /// See the [`ShrRound`] documentation for details.
                     ///
@@ -524,8 +498,8 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by $2^b$.
+                    /// Panics if `bits` is positive and `rm` is `Exact` but `self` is not divisible
+                    /// by $2^b$.
                     ///
                     /// # Examples
                     /// See [here](super::shr_round#shr_round_assign).

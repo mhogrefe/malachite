@@ -16,14 +16,14 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 
 const fn encode(oo: Option<Ordering>) -> u8 {
     match oo {
         None => 9,
-        Some(Ordering::Less) => 0,
-        Some(Ordering::Equal) => 1,
-        Some(Ordering::Greater) => 2,
+        Some(Less) => 0,
+        Some(Equal) => 1,
+        Some(Greater) => 2,
     }
 }
 
@@ -72,7 +72,7 @@ fn partial_cmp_properties() {
     float_pair_gen().test_properties(|(x, y)| {
         let ord = x.partial_cmp(&y);
         assert_eq!(y.partial_cmp(&x).map(Ordering::reverse), ord);
-        assert_eq!(x == y, x.partial_cmp(&y) == Some(Ordering::Equal));
+        assert_eq!(x == y, x.partial_cmp(&y) == Some(Equal));
         assert_eq!((-&y).partial_cmp(&-&x), ord);
         assert_eq!(
             rug::Float::exact_from(&x).partial_cmp(&rug::Float::exact_from(&y)),
@@ -80,7 +80,7 @@ fn partial_cmp_properties() {
         );
         if !x.is_zero() || !y.is_zero() {
             if let Some(ord) = ord {
-                if ord != Ordering::Equal {
+                if ord != Equal {
                     assert_eq!(ComparableFloat(x).cmp(&ComparableFloat(y)), ord);
                 }
             }
@@ -89,7 +89,7 @@ fn partial_cmp_properties() {
 
     float_gen().test_properties(|x| {
         if !x.is_nan() {
-            assert_eq!(x.partial_cmp(&x), Some(Ordering::Equal));
+            assert_eq!(x.partial_cmp(&x), Some(Equal));
             assert!(x <= Float::INFINITY);
             assert!(x >= Float::NEGATIVE_INFINITY);
         }
@@ -144,7 +144,7 @@ fn comparable_float_cmp_properties() {
         let cy = ComparableFloatRef(&y);
         let ord = cx.cmp(&cy);
         assert_eq!(cy.cmp(&cx).reverse(), ord);
-        assert_eq!(cx == cy, cx.cmp(&cy) == Ordering::Equal);
+        assert_eq!(cx == cy, cx.cmp(&cy) == Equal);
         assert_eq!(
             ComparableFloat(x.clone()).cmp(&ComparableFloat(y.clone())),
             ord
@@ -154,7 +154,7 @@ fn comparable_float_cmp_properties() {
 
     float_gen().test_properties(|x| {
         let cx = ComparableFloatRef(&x);
-        assert_eq!(cx.cmp(&cx), Ordering::Equal);
+        assert_eq!(cx.cmp(&cx), Equal);
         assert!(cx <= ComparableFloatRef(&Float::INFINITY));
         assert!(cx >= ComparableFloatRef(&Float::NEGATIVE_INFINITY));
     });

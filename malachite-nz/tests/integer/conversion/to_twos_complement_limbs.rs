@@ -25,7 +25,7 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement_in_place_alt_1, limbs_twos_complement_in_place_alt_2,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
@@ -307,15 +307,15 @@ fn to_twos_complement_limbs_asc_properties() {
             xs.iter().cloned().rev().collect_vec()
         );
         match x.sign() {
-            Ordering::Equal => assert!(xs.is_empty()),
-            Ordering::Greater => {
+            Equal => assert!(xs.is_empty()),
+            Greater => {
                 let last = *xs.last().unwrap();
                 assert!(!last.get_highest_bit());
                 if last == 0 {
                     assert!(xs[xs.len() - 2].get_highest_bit());
                 }
             }
-            Ordering::Less => {
+            Less => {
                 let last = *xs.last().unwrap();
                 assert!(last.get_highest_bit());
                 if last == !0 && xs.len() > 1 {
@@ -339,15 +339,15 @@ fn to_twos_complement_limbs_desc_properties() {
             xs.iter().cloned().rev().collect_vec()
         );
         match x.sign() {
-            Ordering::Equal => assert!(xs.is_empty()),
-            Ordering::Greater => {
+            Equal => assert!(xs.is_empty()),
+            Greater => {
                 let first = xs[0];
                 assert!(!first.get_highest_bit());
                 if first == 0 {
                     assert!(xs[1].get_highest_bit());
                 }
             }
-            Ordering::Less => {
+            Less => {
                 let first = xs[0];
                 assert!(first.get_highest_bit());
                 if first == !0 && xs.len() > 1 {

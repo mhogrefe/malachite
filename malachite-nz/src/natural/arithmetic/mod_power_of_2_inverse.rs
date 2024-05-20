@@ -18,7 +18,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // - out should be just long enough for `pow` bits.
 // - xs should have the same length as out.
@@ -80,7 +80,10 @@ impl ModPowerOf2Inverse for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_power_of_2_inverse(8), Some(Natural::from(171u32)));
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_power_of_2_inverse(8),
+    ///     Some(Natural::from(171u32))
+    /// );
     /// assert_eq!(Natural::from(4u32).mod_power_of_2_inverse(8), None);
     /// ```
     fn mod_power_of_2_inverse(self, pow: u64) -> Option<Natural> {
@@ -96,15 +99,13 @@ impl ModPowerOf2Inverse for Natural {
                 x.mod_power_of_2_inverse(pow).map(Natural::from)
             }
             (Natural(Small(x)), pow) => {
-                let len =
-                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 let mut xs = vec![0; len];
                 xs[0] = x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
             (Natural(Large(mut xs)), pow) => {
-                let len =
-                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 xs.resize(len, 0);
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
@@ -137,7 +138,10 @@ impl<'a> ModPowerOf2Inverse for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_inverse(8), Some(Natural::from(171u32)));
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_power_of_2_inverse(8),
+    ///     Some(Natural::from(171u32))
+    /// );
     /// assert_eq!((&Natural::from(4u32)).mod_power_of_2_inverse(8), None);
     /// ```
     fn mod_power_of_2_inverse(self, pow: u64) -> Option<Natural> {
@@ -153,15 +157,13 @@ impl<'a> ModPowerOf2Inverse for &'a Natural {
                 x.mod_power_of_2_inverse(pow).map(Natural::from)
             }
             (Natural(Small(x)), pow) => {
-                let len =
-                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 let mut xs = vec![0; len];
                 xs[0] = *x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
             (Natural(Large(xs)), pow) => {
-                let len =
-                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 let mut xs = xs.clone();
                 xs.resize(len, 0);
                 mod_power_of_2_inverse_helper(&xs, pow)

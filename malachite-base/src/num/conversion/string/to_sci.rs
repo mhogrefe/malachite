@@ -16,7 +16,7 @@ use crate::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use crate::num::conversion::traits::{ExactFrom, ToSci};
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 use crate::slices::slice_trailing_zeros;
 use alloc::string::String;
 use core::fmt::{Display, Formatter, Write};
@@ -63,7 +63,7 @@ where
 }
 
 fn fmt_sci_valid_unsigned<T: PrimitiveUnsigned>(x: T, options: ToSciOptions) -> bool {
-    if x == T::ZERO || options.rounding_mode != RoundingMode::Exact {
+    if x == T::ZERO || options.rounding_mode != Exact {
         return true;
     }
     match options.size_options {

@@ -11,7 +11,7 @@ use malachite_base::num::conversion::string::options::{
     FromSciStringOptions, SciSizeOptions, ToSciOptions,
 };
 use malachite_base::num::conversion::traits::{FromSciString, ToSci};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::generators::{signed_gen, signed_to_sci_options_pair_gen_var_1};
 use malachite_base::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
@@ -337,40 +337,40 @@ pub fn test_to_sci_with_options() {
 
     options = ToSciOptions::default();
     options.set_precision(2);
-    options.set_rounding_mode(RoundingMode::Nearest); // This is the default
+    options.set_rounding_mode(Nearest); // This is the default
     test("123", options, "1.2e2");
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("123", options, "1.2e2");
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("123", options, "1.2e2");
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("123", options, "1.3e2");
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("123", options, "1.3e2");
 
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("135", options, "1.4e2");
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("135", options, "1.3e2");
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("135", options, "1.3e2");
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("135", options, "1.4e2");
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("135", options, "1.4e2");
 
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("140", options, "1.4e2");
 
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("999", options, "1e3");
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("999", options, "9.9e2");
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("999", options, "9.9e2");
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("999", options, "1e3");
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("999", options, "1e3");
 
     let mut options = ToSciOptions::default();
@@ -652,40 +652,40 @@ pub fn test_to_sci_with_options() {
 
     options = ToSciOptions::default();
     options.set_precision(2);
-    options.set_rounding_mode(RoundingMode::Nearest); // This is the default
+    options.set_rounding_mode(Nearest); // This is the default
     test("-123", options, "-1.2e2");
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("-123", options, "-1.2e2");
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("-123", options, "-1.3e2");
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("-123", options, "-1.3e2");
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("-123", options, "-1.2e2");
 
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("-135", options, "-1.4e2");
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("-135", options, "-1.3e2");
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("-135", options, "-1.4e2");
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("-135", options, "-1.4e2");
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("-135", options, "-1.3e2");
 
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     test("-140", options, "-1.4e2");
 
-    options.set_rounding_mode(RoundingMode::Nearest);
+    options.set_rounding_mode(Nearest);
     test("-999", options, "-1e3");
-    options.set_rounding_mode(RoundingMode::Down);
+    options.set_rounding_mode(Down);
     test("-999", options, "-9.9e2");
-    options.set_rounding_mode(RoundingMode::Floor);
+    options.set_rounding_mode(Floor);
     test("-999", options, "-1e3");
-    options.set_rounding_mode(RoundingMode::Up);
+    options.set_rounding_mode(Up);
     test("-999", options, "-1e3");
-    options.set_rounding_mode(RoundingMode::Ceiling);
+    options.set_rounding_mode(Ceiling);
     test("-999", options, "-9.9e2");
 }
 
@@ -693,7 +693,7 @@ pub fn test_to_sci_with_options() {
 #[test]
 pub fn to_sci_with_options_fail() {
     let mut options = ToSciOptions::default();
-    options.set_rounding_mode(RoundingMode::Exact);
+    options.set_rounding_mode(Exact);
     options.set_precision(2);
     Integer::from(123).to_sci_with_options(options).to_string();
 }
@@ -737,7 +737,7 @@ fn to_sci_properties() {
                 let pow = powers_of_10
                     .entry(log - default_p + 1)
                     .or_insert_with_key(|&p| (&TEN).pow(p));
-                assert_eq!(x.round_to_multiple(&*pow, RoundingMode::Nearest).0, x_from);
+                assert_eq!(x.round_to_multiple(&*pow, Nearest).0, x_from);
             }
         }
     });

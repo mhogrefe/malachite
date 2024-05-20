@@ -24,7 +24,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use core::ops::{BitXor, BitXorAssign};
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
@@ -380,16 +380,16 @@ pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; min_i];
     let mut boundary_seen = false;
     let x = match x_i.cmp(&y_i) {
-        Ordering::Equal => {
+        Equal => {
             limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen)
         }
-        Ordering::Less => {
+        Less => {
             boundary_seen = true;
             out.push(xs[x_i].wrapping_neg());
             out.extend(xs[x_i + 1..y_i].iter().map(|x| !x));
             xs[y_i] ^ (ys[y_i] - 1)
         }
-        Ordering::Greater => {
+        Greater => {
             boundary_seen = true;
             out.extend_from_slice(&ys[y_i..x_i]);
             xs[x_i] ^ ys[x_i]
@@ -475,11 +475,11 @@ pub_test! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     slice_set_zero(&mut out[..min_i]);
     let mut boundary_seen = false;
     match x_i.cmp(&y_i) {
-        Ordering::Equal => {
+        Equal => {
             out[x_i] =
                 limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen);
         }
-        Ordering::Less => {
+        Less => {
             boundary_seen = true;
             out[x_i] = xs[x_i].wrapping_neg();
             for (out, &x) in out[x_i + 1..y_i].iter_mut().zip(xs[x_i + 1..y_i].iter()) {
@@ -487,7 +487,7 @@ pub_test! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
             }
             out[y_i] = xs[y_i] ^ (ys[y_i] - 1);
         }
-        Ordering::Greater => {
+        Greater => {
             boundary_seen = true;
             out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
             out[x_i] = xs[x_i] ^ ys[x_i];
@@ -532,17 +532,17 @@ fn limbs_xor_pos_neg_in_place_left_helper(
     let max_i = max(x_i, y_i);
     let mut boundary_seen = false;
     match x_i.cmp(&y_i) {
-        Ordering::Equal => {
+        Equal => {
             xs[x_i] =
                 limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen);
         }
-        Ordering::Less => {
+        Less => {
             boundary_seen = true;
             xs[x_i].wrapping_neg_assign();
             limbs_not_in_place(&mut xs[x_i + 1..y_i]);
             xs[y_i] ^= ys[y_i] - 1;
         }
-        Ordering::Greater => {
+        Greater => {
             boundary_seen = true;
             xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
             xs[x_i] ^= ys[x_i];
@@ -598,7 +598,7 @@ pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     }
     let mut boundary_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
     match xs_len.cmp(&ys_len) {
-        Ordering::Less => {
+        Less => {
             if boundary_seen {
                 xs.extend_from_slice(&ys[xs_len..]);
             } else {
@@ -607,7 +607,7 @@ pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
                 }
             }
         }
-        Ordering::Greater => {
+        Greater => {
             if !boundary_seen {
                 for x in &mut xs[ys_len..] {
                     *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_seen);
@@ -630,11 +630,11 @@ fn limbs_xor_pos_neg_in_place_right_helper(
     let max_i = max(x_i, y_i);
     let mut boundary_seen = false;
     match x_i.cmp(&y_i) {
-        Ordering::Equal => {
+        Equal => {
             ys[y_i] =
                 limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen);
         }
-        Ordering::Less => {
+        Less => {
             boundary_seen = true;
             ys[x_i] = xs[x_i].wrapping_neg();
             for (y, &x) in ys[x_i + 1..].iter_mut().zip(xs[x_i + 1..y_i].iter()) {
@@ -643,7 +643,7 @@ fn limbs_xor_pos_neg_in_place_right_helper(
             ys[y_i] -= 1;
             ys[y_i] ^= xs[y_i];
         }
-        Ordering::Greater => {
+        Greater => {
             boundary_seen = true;
             ys[x_i] ^= xs[x_i];
         }
@@ -831,8 +831,8 @@ pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
             .map(|(x, y)| x ^ y),
     );
     match xs_len.cmp(&ys_len) {
-        Ordering::Less => out.extend_from_slice(&ys[xs_len..]),
-        Ordering::Greater => out.extend_from_slice(&xs[ys_len..]),
+        Less => out.extend_from_slice(&ys[xs_len..]),
+        Greater => out.extend_from_slice(&xs[ys_len..]),
         _ => {}
     }
     out
@@ -893,8 +893,8 @@ pub_test! {limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         *out = x ^ y;
     }
     match xs_len.cmp(&ys_len) {
-        Ordering::Less => out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]),
-        Ordering::Greater => out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]),
+        Less => out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]),
+        Greater => out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]),
         _ => {}
     }
 }}
@@ -1265,7 +1265,6 @@ impl<'a> BitXor<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::from(-123) ^ Integer::from(-456), 445);
     /// assert_eq!(
@@ -1297,7 +1296,6 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::from(-123) ^ &Integer::from(-456), 445);
     /// assert_eq!(
@@ -1345,7 +1343,6 @@ impl BitXorAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(u32::MAX);
@@ -1389,7 +1386,6 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(u32::MAX);

@@ -13,7 +13,7 @@ use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_ord_abs() {
@@ -48,8 +48,8 @@ fn cmp_abs_properties() {
     });
 
     rational_gen().test_properties(|x| {
-        assert_eq!(x.cmp_abs(&x), Ordering::Equal);
-        assert_eq!(x.cmp_abs(&-&x), Ordering::Equal);
+        assert_eq!(x.cmp_abs(&x), Equal);
+        assert_eq!(x.cmp_abs(&-&x), Equal);
     });
 
     rational_triple_gen().test_properties(|(x, y, z)| {

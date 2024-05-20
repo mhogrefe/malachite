@@ -29,7 +29,7 @@ pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
 /// use itertools::Itertools;
 /// use malachite_base::orderings::random::random_orderings;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use std::cmp::Ordering::{self, Equal, Greater, Less};
+/// use std::cmp::Ordering::*;
 ///
 /// assert_eq!(
 ///     random_orderings(EXAMPLE_SEED).take(10).collect_vec(),

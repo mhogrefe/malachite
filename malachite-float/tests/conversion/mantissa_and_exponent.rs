@@ -18,7 +18,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, primitive_float_signed_pair_gen_var_3,
 };
@@ -33,7 +33,7 @@ use malachite_nz::test_util::generators::{
     natural_signed_pair_gen_var_2, natural_signed_pair_gen_var_4,
 };
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -467,1059 +467,849 @@ fn test_sci_mantissa_and_exponent_round() {
             assert_eq!("None", out);
         }
     }
-    test::<f32>("NaN", "NaN", RoundingMode::Floor, "None");
-    test::<f32>("NaN", "NaN", RoundingMode::Ceiling, "None");
-    test::<f32>("NaN", "NaN", RoundingMode::Down, "None");
-    test::<f32>("NaN", "NaN", RoundingMode::Up, "None");
-    test::<f32>("NaN", "NaN", RoundingMode::Nearest, "None");
-    test::<f32>("NaN", "NaN", RoundingMode::Exact, "None");
+    test::<f32>("NaN", "NaN", Floor, "None");
+    test::<f32>("NaN", "NaN", Ceiling, "None");
+    test::<f32>("NaN", "NaN", Down, "None");
+    test::<f32>("NaN", "NaN", Up, "None");
+    test::<f32>("NaN", "NaN", Nearest, "None");
+    test::<f32>("NaN", "NaN", Exact, "None");
 
-    test::<f32>("Infinity", "Infinity", RoundingMode::Floor, "None");
-    test::<f32>("Infinity", "Infinity", RoundingMode::Ceiling, "None");
-    test::<f32>("Infinity", "Infinity", RoundingMode::Down, "None");
-    test::<f32>("Infinity", "Infinity", RoundingMode::Up, "None");
-    test::<f32>("Infinity", "Infinity", RoundingMode::Nearest, "None");
-    test::<f32>("Infinity", "Infinity", RoundingMode::Exact, "None");
+    test::<f32>("Infinity", "Infinity", Floor, "None");
+    test::<f32>("Infinity", "Infinity", Ceiling, "None");
+    test::<f32>("Infinity", "Infinity", Down, "None");
+    test::<f32>("Infinity", "Infinity", Up, "None");
+    test::<f32>("Infinity", "Infinity", Nearest, "None");
+    test::<f32>("Infinity", "Infinity", Exact, "None");
 
-    test::<f32>("-Infinity", "-Infinity", RoundingMode::Floor, "None");
-    test::<f32>("-Infinity", "-Infinity", RoundingMode::Ceiling, "None");
-    test::<f32>("-Infinity", "-Infinity", RoundingMode::Down, "None");
-    test::<f32>("-Infinity", "-Infinity", RoundingMode::Up, "None");
-    test::<f32>("-Infinity", "-Infinity", RoundingMode::Nearest, "None");
-    test::<f32>("-Infinity", "-Infinity", RoundingMode::Exact, "None");
+    test::<f32>("-Infinity", "-Infinity", Floor, "None");
+    test::<f32>("-Infinity", "-Infinity", Ceiling, "None");
+    test::<f32>("-Infinity", "-Infinity", Down, "None");
+    test::<f32>("-Infinity", "-Infinity", Up, "None");
+    test::<f32>("-Infinity", "-Infinity", Nearest, "None");
+    test::<f32>("-Infinity", "-Infinity", Exact, "None");
 
-    test::<f32>("0.0", "0x0.0", RoundingMode::Floor, "None");
-    test::<f32>("0.0", "0x0.0", RoundingMode::Ceiling, "None");
-    test::<f32>("0.0", "0x0.0", RoundingMode::Down, "None");
-    test::<f32>("0.0", "0x0.0", RoundingMode::Up, "None");
-    test::<f32>("0.0", "0x0.0", RoundingMode::Nearest, "None");
-    test::<f32>("0.0", "0x0.0", RoundingMode::Exact, "None");
+    test::<f32>("0.0", "0x0.0", Floor, "None");
+    test::<f32>("0.0", "0x0.0", Ceiling, "None");
+    test::<f32>("0.0", "0x0.0", Down, "None");
+    test::<f32>("0.0", "0x0.0", Up, "None");
+    test::<f32>("0.0", "0x0.0", Nearest, "None");
+    test::<f32>("0.0", "0x0.0", Exact, "None");
 
-    test::<f32>("-0.0", "-0x0.0", RoundingMode::Floor, "None");
-    test::<f32>("-0.0", "-0x0.0", RoundingMode::Ceiling, "None");
-    test::<f32>("-0.0", "-0x0.0", RoundingMode::Down, "None");
-    test::<f32>("-0.0", "-0x0.0", RoundingMode::Up, "None");
-    test::<f32>("-0.0", "-0x0.0", RoundingMode::Nearest, "None");
-    test::<f32>("-0.0", "-0x0.0", RoundingMode::Exact, "None");
+    test::<f32>("-0.0", "-0x0.0", Floor, "None");
+    test::<f32>("-0.0", "-0x0.0", Ceiling, "None");
+    test::<f32>("-0.0", "-0x0.0", Down, "None");
+    test::<f32>("-0.0", "-0x0.0", Up, "None");
+    test::<f32>("-0.0", "-0x0.0", Nearest, "None");
+    test::<f32>("-0.0", "-0x0.0", Exact, "None");
 
-    test::<f32>("1.0", "0x1.0#1", RoundingMode::Floor, "Some(1.0, 0, Equal)");
-    test::<f32>(
-        "1.0",
-        "0x1.0#1",
-        RoundingMode::Ceiling,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f32>("1.0", "0x1.0#1", RoundingMode::Down, "Some(1.0, 0, Equal)");
-    test::<f32>("1.0", "0x1.0#1", RoundingMode::Up, "Some(1.0, 0, Equal)");
-    test::<f32>(
-        "1.0",
-        "0x1.0#1",
-        RoundingMode::Nearest,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f32>("1.0", "0x1.0#1", RoundingMode::Exact, "Some(1.0, 0, Equal)");
+    test::<f32>("1.0", "0x1.0#1", Floor, "Some(1.0, 0, Equal)");
+    test::<f32>("1.0", "0x1.0#1", Ceiling, "Some(1.0, 0, Equal)");
+    test::<f32>("1.0", "0x1.0#1", Down, "Some(1.0, 0, Equal)");
+    test::<f32>("1.0", "0x1.0#1", Up, "Some(1.0, 0, Equal)");
+    test::<f32>("1.0", "0x1.0#1", Nearest, "Some(1.0, 0, Equal)");
+    test::<f32>("1.0", "0x1.0#1", Exact, "Some(1.0, 0, Equal)");
 
-    test::<f32>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Floor,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Ceiling,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Down,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Up,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Nearest,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Exact,
-        "Some(1.921875, 6, Equal)",
-    );
+    test::<f32>("123.0", "0x7b.0#7", Floor, "Some(1.921875, 6, Equal)");
+    test::<f32>("123.0", "0x7b.0#7", Ceiling, "Some(1.921875, 6, Equal)");
+    test::<f32>("123.0", "0x7b.0#7", Down, "Some(1.921875, 6, Equal)");
+    test::<f32>("123.0", "0x7b.0#7", Up, "Some(1.921875, 6, Equal)");
+    test::<f32>("123.0", "0x7b.0#7", Nearest, "Some(1.921875, 6, Equal)");
+    test::<f32>("123.0", "0x7b.0#7", Exact, "Some(1.921875, 6, Equal)");
 
     test::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.3333333, -2, Less)",
     );
     test::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.3333334, -2, Greater)",
     );
     test::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Down,
+        Down,
         "Some(1.3333333, -2, Less)",
     );
     test::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Up,
+        Up,
         "Some(1.3333334, -2, Greater)",
     );
     test::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.3333334, -2, Greater)",
     );
     test::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
     test::<f32>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.5707963, 1, Less)",
     );
     test::<f32>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.5707964, 1, Greater)",
     );
     test::<f32>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Down,
+        Down,
         "Some(1.5707963, 1, Less)",
     );
     test::<f32>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Up,
+        Up,
         "Some(1.5707964, 1, Greater)",
     );
     test::<f32>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.5707964, 1, Greater)",
     );
-    test::<f32>(
-        "3.141592653589793",
-        "0x3.243f6a8885a3#50",
-        RoundingMode::Exact,
-        "None",
-    );
+    test::<f32>("3.141592653589793", "0x3.243f6a8885a3#50", Exact, "None");
 
     test::<f32>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.8189894, 39, Less)",
     );
     test::<f32>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.8189895, 39, Greater)",
     );
     test::<f32>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Down,
+        Down,
         "Some(1.8189894, 39, Less)",
     );
     test::<f32>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Up,
+        Up,
         "Some(1.8189895, 39, Greater)",
     );
     test::<f32>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.8189894, 39, Less)",
     );
-    test::<f32>(
-        "1000000000000.0",
-        "0xe8d4a51000.0#40",
-        RoundingMode::Exact,
-        "None",
-    );
+    test::<f32>("1000000000000.0", "0xe8d4a51000.0#40", Exact, "None");
 
     test::<f32>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.6543611, 79, Less)",
     );
     test::<f32>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.6543612, 79, Greater)",
     );
     test::<f32>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.6543611, 79, Less)",
     );
     test::<f32>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.6543612, 79, Greater)",
     );
     test::<f32>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.6543612, 79, Greater)",
     );
     test::<f32>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
     test::<f32>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.9999999, -1, Less)",
     );
     test::<f32>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.0, 0, Greater)",
     );
     test::<f32>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.9999999, -1, Less)",
     );
     test::<f32>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.0, 0, Greater)",
     );
     test::<f32>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.0, 0, Greater)",
     );
     test::<f32>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
-    test::<f32>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Floor,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f32>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Ceiling,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f32>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Down,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f32>("-1.0", "-0x1.0#1", RoundingMode::Up, "Some(1.0, 0, Equal)");
-    test::<f32>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Nearest,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f32>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Exact,
-        "Some(1.0, 0, Equal)",
-    );
+    test::<f32>("-1.0", "-0x1.0#1", Floor, "Some(1.0, 0, Equal)");
+    test::<f32>("-1.0", "-0x1.0#1", Ceiling, "Some(1.0, 0, Equal)");
+    test::<f32>("-1.0", "-0x1.0#1", Down, "Some(1.0, 0, Equal)");
+    test::<f32>("-1.0", "-0x1.0#1", Up, "Some(1.0, 0, Equal)");
+    test::<f32>("-1.0", "-0x1.0#1", Nearest, "Some(1.0, 0, Equal)");
+    test::<f32>("-1.0", "-0x1.0#1", Exact, "Some(1.0, 0, Equal)");
 
-    test::<f32>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Floor,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Ceiling,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Down,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Up,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Nearest,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f32>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Exact,
-        "Some(1.921875, 6, Equal)",
-    );
+    test::<f32>("-123.0", "-0x7b.0#7", Floor, "Some(1.921875, 6, Equal)");
+    test::<f32>("-123.0", "-0x7b.0#7", Ceiling, "Some(1.921875, 6, Equal)");
+    test::<f32>("-123.0", "-0x7b.0#7", Down, "Some(1.921875, 6, Equal)");
+    test::<f32>("-123.0", "-0x7b.0#7", Up, "Some(1.921875, 6, Equal)");
+    test::<f32>("-123.0", "-0x7b.0#7", Nearest, "Some(1.921875, 6, Equal)");
+    test::<f32>("-123.0", "-0x7b.0#7", Exact, "Some(1.921875, 6, Equal)");
 
     test::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.3333333, -2, Less)",
     );
     test::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.3333334, -2, Greater)",
     );
     test::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Down,
+        Down,
         "Some(1.3333333, -2, Less)",
     );
     test::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Up,
+        Up,
         "Some(1.3333334, -2, Greater)",
     );
     test::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.3333334, -2, Greater)",
     );
     test::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
     test::<f32>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.5707963, 1, Less)",
     );
     test::<f32>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.5707964, 1, Greater)",
     );
     test::<f32>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Down,
+        Down,
         "Some(1.5707963, 1, Less)",
     );
     test::<f32>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Up,
+        Up,
         "Some(1.5707964, 1, Greater)",
     );
     test::<f32>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.5707964, 1, Greater)",
     );
-    test::<f32>(
-        "-3.141592653589793",
-        "-0x3.243f6a8885a3#50",
-        RoundingMode::Exact,
-        "None",
-    );
+    test::<f32>("-3.141592653589793", "-0x3.243f6a8885a3#50", Exact, "None");
 
     test::<f32>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.8189894, 39, Less)",
     );
     test::<f32>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.8189895, 39, Greater)",
     );
     test::<f32>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Down,
+        Down,
         "Some(1.8189894, 39, Less)",
     );
     test::<f32>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Up,
+        Up,
         "Some(1.8189895, 39, Greater)",
     );
     test::<f32>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.8189894, 39, Less)",
     );
-    test::<f32>(
-        "-1000000000000.0",
-        "-0xe8d4a51000.0#40",
-        RoundingMode::Exact,
-        "None",
-    );
+    test::<f32>("-1000000000000.0", "-0xe8d4a51000.0#40", Exact, "None");
 
     test::<f32>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.6543611, 79, Less)",
     );
     test::<f32>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.6543612, 79, Greater)",
     );
     test::<f32>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.6543611, 79, Less)",
     );
     test::<f32>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.6543612, 79, Greater)",
     );
     test::<f32>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.6543612, 79, Greater)",
     );
     test::<f32>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
     test::<f32>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.9999999, -1, Less)",
     );
     test::<f32>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.0, 0, Greater)",
     );
     test::<f32>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.9999999, -1, Less)",
     );
     test::<f32>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.0, 0, Greater)",
     );
     test::<f32>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.0, 0, Greater)",
     );
     test::<f32>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
-    test::<f64>("NaN", "NaN", RoundingMode::Floor, "None");
-    test::<f64>("NaN", "NaN", RoundingMode::Ceiling, "None");
-    test::<f64>("NaN", "NaN", RoundingMode::Down, "None");
-    test::<f64>("NaN", "NaN", RoundingMode::Up, "None");
-    test::<f64>("NaN", "NaN", RoundingMode::Nearest, "None");
-    test::<f64>("NaN", "NaN", RoundingMode::Exact, "None");
+    test::<f64>("NaN", "NaN", Floor, "None");
+    test::<f64>("NaN", "NaN", Ceiling, "None");
+    test::<f64>("NaN", "NaN", Down, "None");
+    test::<f64>("NaN", "NaN", Up, "None");
+    test::<f64>("NaN", "NaN", Nearest, "None");
+    test::<f64>("NaN", "NaN", Exact, "None");
 
-    test::<f64>("Infinity", "Infinity", RoundingMode::Floor, "None");
-    test::<f64>("Infinity", "Infinity", RoundingMode::Ceiling, "None");
-    test::<f64>("Infinity", "Infinity", RoundingMode::Down, "None");
-    test::<f64>("Infinity", "Infinity", RoundingMode::Up, "None");
-    test::<f64>("Infinity", "Infinity", RoundingMode::Nearest, "None");
-    test::<f64>("Infinity", "Infinity", RoundingMode::Exact, "None");
+    test::<f64>("Infinity", "Infinity", Floor, "None");
+    test::<f64>("Infinity", "Infinity", Ceiling, "None");
+    test::<f64>("Infinity", "Infinity", Down, "None");
+    test::<f64>("Infinity", "Infinity", Up, "None");
+    test::<f64>("Infinity", "Infinity", Nearest, "None");
+    test::<f64>("Infinity", "Infinity", Exact, "None");
 
-    test::<f64>("-Infinity", "-Infinity", RoundingMode::Floor, "None");
-    test::<f64>("-Infinity", "-Infinity", RoundingMode::Ceiling, "None");
-    test::<f64>("-Infinity", "-Infinity", RoundingMode::Down, "None");
-    test::<f64>("-Infinity", "-Infinity", RoundingMode::Up, "None");
-    test::<f64>("-Infinity", "-Infinity", RoundingMode::Nearest, "None");
-    test::<f64>("-Infinity", "-Infinity", RoundingMode::Exact, "None");
+    test::<f64>("-Infinity", "-Infinity", Floor, "None");
+    test::<f64>("-Infinity", "-Infinity", Ceiling, "None");
+    test::<f64>("-Infinity", "-Infinity", Down, "None");
+    test::<f64>("-Infinity", "-Infinity", Up, "None");
+    test::<f64>("-Infinity", "-Infinity", Nearest, "None");
+    test::<f64>("-Infinity", "-Infinity", Exact, "None");
 
-    test::<f64>("0.0", "0x0.0", RoundingMode::Floor, "None");
-    test::<f64>("0.0", "0x0.0", RoundingMode::Ceiling, "None");
-    test::<f64>("0.0", "0x0.0", RoundingMode::Down, "None");
-    test::<f64>("0.0", "0x0.0", RoundingMode::Up, "None");
-    test::<f64>("0.0", "0x0.0", RoundingMode::Nearest, "None");
-    test::<f64>("0.0", "0x0.0", RoundingMode::Exact, "None");
+    test::<f64>("0.0", "0x0.0", Floor, "None");
+    test::<f64>("0.0", "0x0.0", Ceiling, "None");
+    test::<f64>("0.0", "0x0.0", Down, "None");
+    test::<f64>("0.0", "0x0.0", Up, "None");
+    test::<f64>("0.0", "0x0.0", Nearest, "None");
+    test::<f64>("0.0", "0x0.0", Exact, "None");
 
-    test::<f64>("-0.0", "-0x0.0", RoundingMode::Floor, "None");
-    test::<f64>("-0.0", "-0x0.0", RoundingMode::Ceiling, "None");
-    test::<f64>("-0.0", "-0x0.0", RoundingMode::Down, "None");
-    test::<f64>("-0.0", "-0x0.0", RoundingMode::Up, "None");
-    test::<f64>("-0.0", "-0x0.0", RoundingMode::Nearest, "None");
-    test::<f64>("-0.0", "-0x0.0", RoundingMode::Exact, "None");
+    test::<f64>("-0.0", "-0x0.0", Floor, "None");
+    test::<f64>("-0.0", "-0x0.0", Ceiling, "None");
+    test::<f64>("-0.0", "-0x0.0", Down, "None");
+    test::<f64>("-0.0", "-0x0.0", Up, "None");
+    test::<f64>("-0.0", "-0x0.0", Nearest, "None");
+    test::<f64>("-0.0", "-0x0.0", Exact, "None");
 
-    test::<f64>("1.0", "0x1.0#1", RoundingMode::Floor, "Some(1.0, 0, Equal)");
-    test::<f64>(
-        "1.0",
-        "0x1.0#1",
-        RoundingMode::Ceiling,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f64>("1.0", "0x1.0#1", RoundingMode::Down, "Some(1.0, 0, Equal)");
-    test::<f64>("1.0", "0x1.0#1", RoundingMode::Up, "Some(1.0, 0, Equal)");
-    test::<f64>(
-        "1.0",
-        "0x1.0#1",
-        RoundingMode::Nearest,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f64>("1.0", "0x1.0#1", RoundingMode::Exact, "Some(1.0, 0, Equal)");
+    test::<f64>("1.0", "0x1.0#1", Floor, "Some(1.0, 0, Equal)");
+    test::<f64>("1.0", "0x1.0#1", Ceiling, "Some(1.0, 0, Equal)");
+    test::<f64>("1.0", "0x1.0#1", Down, "Some(1.0, 0, Equal)");
+    test::<f64>("1.0", "0x1.0#1", Up, "Some(1.0, 0, Equal)");
+    test::<f64>("1.0", "0x1.0#1", Nearest, "Some(1.0, 0, Equal)");
+    test::<f64>("1.0", "0x1.0#1", Exact, "Some(1.0, 0, Equal)");
 
-    test::<f64>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Floor,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Ceiling,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Down,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Up,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Nearest,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "123.0",
-        "0x7b.0#7",
-        RoundingMode::Exact,
-        "Some(1.921875, 6, Equal)",
-    );
+    test::<f64>("123.0", "0x7b.0#7", Floor, "Some(1.921875, 6, Equal)");
+    test::<f64>("123.0", "0x7b.0#7", Ceiling, "Some(1.921875, 6, Equal)");
+    test::<f64>("123.0", "0x7b.0#7", Down, "Some(1.921875, 6, Equal)");
+    test::<f64>("123.0", "0x7b.0#7", Up, "Some(1.921875, 6, Equal)");
+    test::<f64>("123.0", "0x7b.0#7", Nearest, "Some(1.921875, 6, Equal)");
+    test::<f64>("123.0", "0x7b.0#7", Exact, "Some(1.921875, 6, Equal)");
 
     test::<f64>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Down,
+        Down,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Up,
+        Up,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
-        RoundingMode::Exact,
+        Exact,
         "Some(1.3333333333333333, -2, Equal)",
     );
 
     test::<f64>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Down,
+        Down,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Up,
+        Up,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "3.141592653589793",
         "0x3.243f6a8885a3#50",
-        RoundingMode::Exact,
+        Exact,
         "Some(1.5707963267948966, 1, Equal)",
     );
 
     test::<f64>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Down,
+        Down,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Up,
+        Up,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "1000000000000.0",
         "0xe8d4a51000.0#40",
-        RoundingMode::Exact,
+        Exact,
         "Some(1.8189894035458565, 39, Equal)",
     );
 
     test::<f64>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.6543612251060553, 79, Less)",
     );
     test::<f64>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.6543612251060555, 79, Greater)",
     );
     test::<f64>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.6543612251060553, 79, Less)",
     );
     test::<f64>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.6543612251060555, 79, Greater)",
     );
     test::<f64>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.6543612251060553, 79, Less)",
     );
     test::<f64>(
         "1000000000000000000000000.0",
         "0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
     test::<f64>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.9999999999999998, -1, Less)",
     );
     test::<f64>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.0, 0, Greater)",
     );
     test::<f64>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.9999999999999998, -1, Less)",
     );
     test::<f64>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.0, 0, Greater)",
     );
     test::<f64>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.0, 0, Greater)",
     );
     test::<f64>(
         "0.999999999999999999999999",
         "0x0.ffffffffffffffffffff#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
-    test::<f64>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Floor,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f64>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Ceiling,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f64>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Down,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f64>("-1.0", "-0x1.0#1", RoundingMode::Up, "Some(1.0, 0, Equal)");
-    test::<f64>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Nearest,
-        "Some(1.0, 0, Equal)",
-    );
-    test::<f64>(
-        "-1.0",
-        "-0x1.0#1",
-        RoundingMode::Exact,
-        "Some(1.0, 0, Equal)",
-    );
+    test::<f64>("-1.0", "-0x1.0#1", Floor, "Some(1.0, 0, Equal)");
+    test::<f64>("-1.0", "-0x1.0#1", Ceiling, "Some(1.0, 0, Equal)");
+    test::<f64>("-1.0", "-0x1.0#1", Down, "Some(1.0, 0, Equal)");
+    test::<f64>("-1.0", "-0x1.0#1", Up, "Some(1.0, 0, Equal)");
+    test::<f64>("-1.0", "-0x1.0#1", Nearest, "Some(1.0, 0, Equal)");
+    test::<f64>("-1.0", "-0x1.0#1", Exact, "Some(1.0, 0, Equal)");
 
-    test::<f64>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Floor,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Ceiling,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Down,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Up,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Nearest,
-        "Some(1.921875, 6, Equal)",
-    );
-    test::<f64>(
-        "-123.0",
-        "-0x7b.0#7",
-        RoundingMode::Exact,
-        "Some(1.921875, 6, Equal)",
-    );
+    test::<f64>("-123.0", "-0x7b.0#7", Floor, "Some(1.921875, 6, Equal)");
+    test::<f64>("-123.0", "-0x7b.0#7", Ceiling, "Some(1.921875, 6, Equal)");
+    test::<f64>("-123.0", "-0x7b.0#7", Down, "Some(1.921875, 6, Equal)");
+    test::<f64>("-123.0", "-0x7b.0#7", Up, "Some(1.921875, 6, Equal)");
+    test::<f64>("-123.0", "-0x7b.0#7", Nearest, "Some(1.921875, 6, Equal)");
+    test::<f64>("-123.0", "-0x7b.0#7", Exact, "Some(1.921875, 6, Equal)");
 
     test::<f64>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Down,
+        Down,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Up,
+        Up,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.3333333333333333, -2, Equal)",
     );
     test::<f64>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
-        RoundingMode::Exact,
+        Exact,
         "Some(1.3333333333333333, -2, Equal)",
     );
 
     test::<f64>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Down,
+        Down,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Up,
+        Up,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.5707963267948966, 1, Equal)",
     );
     test::<f64>(
         "-3.141592653589793",
         "-0x3.243f6a8885a3#50",
-        RoundingMode::Exact,
+        Exact,
         "Some(1.5707963267948966, 1, Equal)",
     );
 
     test::<f64>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Down,
+        Down,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Up,
+        Up,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.8189894035458565, 39, Equal)",
     );
     test::<f64>(
         "-1000000000000.0",
         "-0xe8d4a51000.0#40",
-        RoundingMode::Exact,
+        Exact,
         "Some(1.8189894035458565, 39, Equal)",
     );
 
     test::<f64>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.6543612251060553, 79, Less)",
     );
     test::<f64>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.6543612251060555, 79, Greater)",
     );
     test::<f64>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.6543612251060553, 79, Less)",
     );
     test::<f64>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.6543612251060555, 79, Greater)",
     );
     test::<f64>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.6543612251060553, 79, Less)",
     );
     test::<f64>(
         "-1000000000000000000000000.0",
         "-0xd3c21bcecceda1000000.0#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 
     test::<f64>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Floor,
+        Floor,
         "Some(1.9999999999999998, -1, Less)",
     );
     test::<f64>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Ceiling,
+        Ceiling,
         "Some(1.0, 0, Greater)",
     );
     test::<f64>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Down,
+        Down,
         "Some(1.9999999999999998, -1, Less)",
     );
     test::<f64>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Up,
+        Up,
         "Some(1.0, 0, Greater)",
     );
     test::<f64>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Nearest,
+        Nearest,
         "Some(1.0, 0, Greater)",
     );
     test::<f64>(
         "-0.999999999999999999999999",
         "-0x0.ffffffffffffffffffff#80",
-        RoundingMode::Exact,
+        Exact,
         "None",
     );
 }
@@ -2262,13 +2052,13 @@ where
 
             assert!(mantissa >= T::ONE);
             assert!(mantissa < T::TWO);
-            if rm == RoundingMode::Exact {
-                assert_eq!(x_alt.partial_cmp_abs(&x), Some(Ordering::Equal));
+            if rm == Exact {
+                assert_eq!(x_alt.partial_cmp_abs(&x), Some(Equal));
             }
             match rm {
-                RoundingMode::Floor | RoundingMode::Down => assert_ne!(o, Ordering::Greater),
-                RoundingMode::Ceiling | RoundingMode::Up => assert_ne!(o, Ordering::Less),
-                RoundingMode::Exact => assert_eq!(o, Ordering::Equal),
+                Floor | Down => assert_ne!(o, Greater),
+                Ceiling | Up => assert_ne!(o, Less),
+                Exact => assert_eq!(o, Equal),
                 _ => {}
             }
 
@@ -2278,34 +2068,27 @@ where
                 (mantissa, exponent, o)
             );
         } else {
-            assert!(!x.is_finite() || x == 0u32 || rm == RoundingMode::Exact);
+            assert!(!x.is_finite() || x == 0u32 || rm == Exact);
         }
     });
 
     float_gen_var_3().test_properties(|n| {
-        let (floor_mantissa, floor_exponent, floor_o) = n
-            .sci_mantissa_and_exponent_round::<T>(RoundingMode::Floor)
-            .unwrap();
+        let (floor_mantissa, floor_exponent, floor_o) =
+            n.sci_mantissa_and_exponent_round::<T>(Floor).unwrap();
         assert_eq!(
-            n.sci_mantissa_and_exponent_round::<T>(RoundingMode::Down)
-                .unwrap(),
+            n.sci_mantissa_and_exponent_round::<T>(Down).unwrap(),
             (floor_mantissa, floor_exponent, floor_o)
         );
-        let (ceiling_mantissa, ceiling_exponent, ceiling_o) = n
-            .sci_mantissa_and_exponent_round::<T>(RoundingMode::Ceiling)
-            .unwrap();
+        let (ceiling_mantissa, ceiling_exponent, ceiling_o) =
+            n.sci_mantissa_and_exponent_round::<T>(Ceiling).unwrap();
         assert_eq!(
-            n.sci_mantissa_and_exponent_round::<T>(RoundingMode::Up)
-                .unwrap(),
+            n.sci_mantissa_and_exponent_round::<T>(Up).unwrap(),
             (ceiling_mantissa, ceiling_exponent, ceiling_o)
         );
-        let (nearest_mantissa, nearest_exponent, nearest_o) = n
-            .sci_mantissa_and_exponent_round::<T>(RoundingMode::Nearest)
-            .unwrap();
-        if let Some((mantissa, exponent, o)) =
-            n.sci_mantissa_and_exponent_round::<T>(RoundingMode::Exact)
-        {
-            assert_eq!(o, Ordering::Equal);
+        let (nearest_mantissa, nearest_exponent, nearest_o) =
+            n.sci_mantissa_and_exponent_round::<T>(Nearest).unwrap();
+        if let Some((mantissa, exponent, o)) = n.sci_mantissa_and_exponent_round::<T>(Exact) {
+            assert_eq!(o, Equal);
             assert_eq!(floor_mantissa, mantissa);
             assert_eq!(ceiling_mantissa, mantissa);
             assert_eq!(nearest_mantissa, mantissa);
@@ -2313,8 +2096,8 @@ where
             assert_eq!(ceiling_exponent, exponent);
             assert_eq!(nearest_exponent, exponent);
         } else {
-            assert_eq!(floor_o, Ordering::Less);
-            assert_eq!(ceiling_o, Ordering::Greater);
+            assert_eq!(floor_o, Less);
+            assert_eq!(ceiling_o, Greater);
             assert_ne!(
                 (floor_mantissa, floor_exponent),
                 (ceiling_mantissa, ceiling_exponent)

@@ -19,12 +19,10 @@ use crate::unions::Union2;
 /// See usage examples [here](self#random_union2s).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
 /// use malachite_base::num::random::{random_unsigned_range, RandomUnsignedRange};
 /// use malachite_base::random::Seed;
 /// use malachite_base::unions::UnionFromStrError;
+/// use malachite_base::{random_unions, union_struct};
 /// use std::fmt::{self, Display, Formatter};
 /// use std::str::FromStr;
 ///
@@ -167,7 +165,6 @@ use crate::unions::Union2;
 ///     [6, T, O, G, ts, ts_gen],
 ///     [7, S, P, H, ss, ss_gen]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! random_unions {

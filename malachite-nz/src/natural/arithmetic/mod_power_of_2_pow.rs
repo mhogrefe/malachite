@@ -27,7 +27,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // Raise an n-limb number to a power and return the lowest n limbs of the result.
 //
@@ -117,7 +117,7 @@ pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb
 // # Panics
 // Panics if the exponent has trailing zeros or is 1.
 pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
-    let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     xs.resize(out_len, 0);
     let mut scratch = vec![0; out_len];
     limbs_pow_low(xs, es, &mut scratch);
@@ -148,7 +148,10 @@ impl ModPowerOf2Pow<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_power_of_2_pow(Natural::from(10u32), 8), 169);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_power_of_2_pow(Natural::from(10u32), 8),
+    ///     169
+    /// );
     /// assert_eq!(
     ///     Natural::from(11u32).mod_power_of_2_pow(Natural::from(1000u32), 30),
     ///     289109473
@@ -185,7 +188,10 @@ impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(3u32).mod_power_of_2_pow(&Natural::from(10u32), 8), 169);
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_power_of_2_pow(&Natural::from(10u32), 8),
+    ///     169
+    /// );
     /// assert_eq!(
     ///     Natural::from(11u32).mod_power_of_2_pow(&Natural::from(1000u32), 30),
     ///     289109473
@@ -222,7 +228,10 @@ impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_pow(Natural::from(10u32), 8), 169);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_power_of_2_pow(Natural::from(10u32), 8),
+    ///     169
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(11u32)).mod_power_of_2_pow(Natural::from(1000u32), 30),
     ///     289109473
@@ -256,7 +265,10 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_pow(&Natural::from(10u32), 8), 169);
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_power_of_2_pow(&Natural::from(10u32), 8),
+    ///     169
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(11u32)).mod_power_of_2_pow(&Natural::from(1000u32), 30),
     ///     289109473

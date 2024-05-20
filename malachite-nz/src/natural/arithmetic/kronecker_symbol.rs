@@ -735,9 +735,18 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).legendre_symbol(&Natural::from(5u32)), 0);
-    /// assert_eq!(Natural::from(7u32).legendre_symbol(&Natural::from(5u32)), -1);
-    /// assert_eq!(Natural::from(11u32).legendre_symbol(&Natural::from(5u32)), 1);
+    /// assert_eq!(
+    ///     Natural::from(10u32).legendre_symbol(&Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).legendre_symbol(&Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).legendre_symbol(&Natural::from(5u32)),
+    ///     1
+    /// );
     /// ```
     #[inline]
     fn legendre_symbol(self, other: &'a Natural) -> i8 {
@@ -774,9 +783,18 @@ impl<'a> LegendreSymbol<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).legendre_symbol(Natural::from(5u32)), 0);
-    /// assert_eq!((&Natural::from(7u32)).legendre_symbol(Natural::from(5u32)), -1);
-    /// assert_eq!((&Natural::from(11u32)).legendre_symbol(Natural::from(5u32)), 1);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).legendre_symbol(Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).legendre_symbol(Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).legendre_symbol(Natural::from(5u32)),
+    ///     1
+    /// );
     /// ```
     #[inline]
     fn legendre_symbol(self, other: Natural) -> i8 {
@@ -812,9 +830,18 @@ impl<'a, 'b> LegendreSymbol<&'a Natural> for &'b Natural {
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).legendre_symbol(&Natural::from(5u32)), 0);
-    /// assert_eq!((&Natural::from(7u32)).legendre_symbol(&Natural::from(5u32)), -1);
-    /// assert_eq!((&Natural::from(11u32)).legendre_symbol(&Natural::from(5u32)), 1);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).legendre_symbol(&Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).legendre_symbol(&Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).legendre_symbol(&Natural::from(5u32)),
+    ///     1
+    /// );
     /// ```
     #[inline]
     fn legendre_symbol(self, other: &'a Natural) -> i8 {
@@ -921,10 +948,22 @@ impl<'a> JacobiSymbol<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).jacobi_symbol(Natural::from(5u32)), 0);
-    /// assert_eq!((&Natural::from(7u32)).jacobi_symbol(Natural::from(5u32)), -1);
-    /// assert_eq!((&Natural::from(11u32)).jacobi_symbol(Natural::from(5u32)), 1);
-    /// assert_eq!((&Natural::from(11u32)).jacobi_symbol(Natural::from(9u32)), 1);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).jacobi_symbol(Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).jacobi_symbol(Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).jacobi_symbol(Natural::from(5u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).jacobi_symbol(Natural::from(9u32)),
+    ///     1
+    /// );
     /// ```
     #[inline]
     fn jacobi_symbol(self, other: Natural) -> i8 {
@@ -957,10 +996,22 @@ impl<'a, 'b> JacobiSymbol<&'a Natural> for &'b Natural {
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).jacobi_symbol(&Natural::from(5u32)), 0);
-    /// assert_eq!((&Natural::from(7u32)).jacobi_symbol(&Natural::from(5u32)), -1);
-    /// assert_eq!((&Natural::from(11u32)).jacobi_symbol(&Natural::from(5u32)), 1);
-    /// assert_eq!((&Natural::from(11u32)).jacobi_symbol(&Natural::from(9u32)), 1);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).jacobi_symbol(&Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).jacobi_symbol(&Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).jacobi_symbol(&Natural::from(5u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).jacobi_symbol(&Natural::from(9u32)),
+    ///     1
+    /// );
     /// ```
     #[inline]
     fn jacobi_symbol(self, other: &'a Natural) -> i8 {
@@ -990,11 +1041,26 @@ impl KroneckerSymbol<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).kronecker_symbol(Natural::from(5u32)), 0);
-    /// assert_eq!(Natural::from(7u32).kronecker_symbol(Natural::from(5u32)), -1);
-    /// assert_eq!(Natural::from(11u32).kronecker_symbol(Natural::from(5u32)), 1);
-    /// assert_eq!(Natural::from(11u32).kronecker_symbol(Natural::from(9u32)), 1);
-    /// assert_eq!(Natural::from(11u32).kronecker_symbol(Natural::from(8u32)), -1);
+    /// assert_eq!(
+    ///     Natural::from(10u32).kronecker_symbol(Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).kronecker_symbol(Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).kronecker_symbol(Natural::from(5u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).kronecker_symbol(Natural::from(9u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).kronecker_symbol(Natural::from(8u32)),
+    ///     -1
+    /// );
     /// ```
     #[inline]
     fn kronecker_symbol(self, other: Natural) -> i8 {
@@ -1023,11 +1089,26 @@ impl<'a> KroneckerSymbol<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(10u32).kronecker_symbol(&Natural::from(5u32)), 0);
-    /// assert_eq!(Natural::from(7u32).kronecker_symbol(&Natural::from(5u32)), -1);
-    /// assert_eq!(Natural::from(11u32).kronecker_symbol(&Natural::from(5u32)), 1);
-    /// assert_eq!(Natural::from(11u32).kronecker_symbol(&Natural::from(9u32)), 1);
-    /// assert_eq!(Natural::from(11u32).kronecker_symbol(&Natural::from(8u32)), -1);
+    /// assert_eq!(
+    ///     Natural::from(10u32).kronecker_symbol(&Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).kronecker_symbol(&Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).kronecker_symbol(&Natural::from(5u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).kronecker_symbol(&Natural::from(9u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(11u32).kronecker_symbol(&Natural::from(8u32)),
+    ///     -1
+    /// );
     /// ```
     #[inline]
     fn kronecker_symbol(self, other: &'a Natural) -> i8 {
@@ -1056,11 +1137,26 @@ impl<'a> KroneckerSymbol<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).kronecker_symbol(Natural::from(5u32)), 0);
-    /// assert_eq!((&Natural::from(7u32)).kronecker_symbol(Natural::from(5u32)), -1);
-    /// assert_eq!((&Natural::from(11u32)).kronecker_symbol(Natural::from(5u32)), 1);
-    /// assert_eq!((&Natural::from(11u32)).kronecker_symbol(Natural::from(9u32)), 1);
-    /// assert_eq!((&Natural::from(11u32)).kronecker_symbol(Natural::from(8u32)), -1);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).kronecker_symbol(Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).kronecker_symbol(Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).kronecker_symbol(Natural::from(5u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).kronecker_symbol(Natural::from(9u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).kronecker_symbol(Natural::from(8u32)),
+    ///     -1
+    /// );
     /// ```
     #[inline]
     fn kronecker_symbol(self, other: Natural) -> i8 {
@@ -1088,11 +1184,26 @@ impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(10u32)).kronecker_symbol(Natural::from(5u32)), 0);
-    /// assert_eq!((&Natural::from(7u32)).kronecker_symbol(Natural::from(5u32)), -1);
-    /// assert_eq!((&Natural::from(11u32)).kronecker_symbol(Natural::from(5u32)), 1);
-    /// assert_eq!((&Natural::from(11u32)).kronecker_symbol(Natural::from(9u32)), 1);
-    /// assert_eq!((&Natural::from(11u32)).kronecker_symbol(Natural::from(8u32)), -1);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).kronecker_symbol(Natural::from(5u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).kronecker_symbol(Natural::from(5u32)),
+    ///     -1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).kronecker_symbol(Natural::from(5u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).kronecker_symbol(Natural::from(9u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(11u32)).kronecker_symbol(Natural::from(8u32)),
+    ///     -1
+    /// );
     /// ```
     fn kronecker_symbol(self, other: &'a Natural) -> i8 {
         match (self, other) {

@@ -84,7 +84,10 @@ impl Rational {
     ///
     /// let (before_point, after_point) = Rational::from_signeds(22, 7).power_of_2_digits(1);
     /// assert_eq!(before_point.to_debug_string(), "[1, 1]");
-    /// assert_eq!(prefix_to_string(after_point, 10), "[0, 0, 1, 0, 0, 1, 0, 0, 1, 0, ...]");
+    /// assert_eq!(
+    ///     prefix_to_string(after_point, 10),
+    ///     "[0, 0, 1, 0, 0, 1, 0, 0, 1, 0, ...]"
+    /// );
     ///
     /// let (before_point, after_point) = Rational::from_signeds(22, 7).power_of_2_digits(10);
     /// assert_eq!(before_point.to_debug_string(), "[3]");

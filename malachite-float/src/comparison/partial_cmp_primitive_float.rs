@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
@@ -17,18 +17,18 @@ fn float_partial_cmp_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> Opt
     match (x, y) {
         (float_nan!(), _) => None,
         (_, y) if y.is_nan() => None,
-        (float_infinity!(), y) if *y == T::INFINITY => Some(Ordering::Equal),
-        (float_negative_infinity!(), y) if *y == T::NEGATIVE_INFINITY => Some(Ordering::Equal),
-        (float_infinity!(), _) => Some(Ordering::Greater),
-        (float_negative_infinity!(), _) => Some(Ordering::Less),
-        (_, y) if *y == T::NEGATIVE_INFINITY => Some(Ordering::Greater),
-        (_, y) if *y == T::INFINITY => Some(Ordering::Less),
+        (float_infinity!(), y) if *y == T::INFINITY => Some(Equal),
+        (float_negative_infinity!(), y) if *y == T::NEGATIVE_INFINITY => Some(Equal),
+        (float_infinity!(), _) => Some(Greater),
+        (float_negative_infinity!(), _) => Some(Less),
+        (_, y) if *y == T::NEGATIVE_INFINITY => Some(Greater),
+        (_, y) if *y == T::INFINITY => Some(Less),
         (float_either_zero!(), y) => Some(if *y == T::ZERO {
-            Ordering::Equal
+            Equal
         } else if y.is_sign_positive() {
-            Ordering::Less
+            Less
         } else {
-            Ordering::Greater
+            Greater
         }),
         (x, y) if *y == T::ZERO => Some(x.sign()),
         (

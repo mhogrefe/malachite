@@ -14,7 +14,7 @@ use malachite_nz::test_util::generators::{
     integer_primitive_float_primitive_float_triple_gen,
 };
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 
 #[test]
@@ -35,91 +35,39 @@ fn test_partial_cmp_primitive_float() {
         assert_eq!(v.partial_cmp(&rug::Integer::from_str(u).unwrap()), out_rev);
     };
     test("5", f32::NAN, None);
-    test("5", f32::INFINITY, Some(Ordering::Less));
-    test("5", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
+    test("5", f32::INFINITY, Some(Less));
+    test("5", f32::NEGATIVE_INFINITY, Some(Greater));
     test("-5", f32::NAN, None);
-    test("-5", f32::INFINITY, Some(Ordering::Less));
-    test("-5", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
+    test("-5", f32::INFINITY, Some(Less));
+    test("-5", f32::NEGATIVE_INFINITY, Some(Greater));
 
-    test("0", 0.0, Some(Ordering::Equal));
-    test("0", -0.0, Some(Ordering::Equal));
-    test("0", 5.0, Some(Ordering::Less));
-    test("0", -5.0, Some(Ordering::Greater));
-    test("123", 123.0, Some(Ordering::Equal));
-    test("123", 5.0, Some(Ordering::Greater));
-    test("123", -123.0, Some(Ordering::Greater));
-    test("-123", 123.0, Some(Ordering::Less));
-    test("-123", 5.0, Some(Ordering::Less));
-    test("-123", -123.0, Some(Ordering::Equal));
-    test("1000000000000", 123.0, Some(Ordering::Greater));
-    test("-1000000000000", 123.0, Some(Ordering::Less));
+    test("0", 0.0, Some(Equal));
+    test("0", -0.0, Some(Equal));
+    test("0", 5.0, Some(Less));
+    test("0", -5.0, Some(Greater));
+    test("123", 123.0, Some(Equal));
+    test("123", 5.0, Some(Greater));
+    test("123", -123.0, Some(Greater));
+    test("-123", 123.0, Some(Less));
+    test("-123", 5.0, Some(Less));
+    test("-123", -123.0, Some(Equal));
+    test("1000000000000", 123.0, Some(Greater));
+    test("-1000000000000", 123.0, Some(Less));
 
-    test(
-        "1208925819614629174706175",
-        1.2089258e24,
-        Some(Ordering::Less),
-    );
-    test(
-        "1208925819614629174706176",
-        1.2089258e24,
-        Some(Ordering::Equal),
-    );
-    test(
-        "1208925819614629174706177",
-        1.2089258e24,
-        Some(Ordering::Greater),
-    );
-    test(
-        "1208925819614629174706175",
-        -1.2089258e24,
-        Some(Ordering::Greater),
-    );
-    test(
-        "1208925819614629174706176",
-        -1.2089258e24,
-        Some(Ordering::Greater),
-    );
-    test(
-        "1208925819614629174706177",
-        -1.2089258e24,
-        Some(Ordering::Greater),
-    );
-    test(
-        "-1208925819614629174706175",
-        1.2089258e24,
-        Some(Ordering::Less),
-    );
-    test(
-        "-1208925819614629174706176",
-        1.2089258e24,
-        Some(Ordering::Less),
-    );
-    test(
-        "-1208925819614629174706177",
-        1.2089258e24,
-        Some(Ordering::Less),
-    );
-    test(
-        "-1208925819614629174706175",
-        -1.2089258e24,
-        Some(Ordering::Greater),
-    );
-    test(
-        "-1208925819614629174706176",
-        -1.2089258e24,
-        Some(Ordering::Equal),
-    );
-    test(
-        "-1208925819614629174706177",
-        -1.2089258e24,
-        Some(Ordering::Less),
-    );
+    test("1208925819614629174706175", 1.2089258e24, Some(Less));
+    test("1208925819614629174706176", 1.2089258e24, Some(Equal));
+    test("1208925819614629174706177", 1.2089258e24, Some(Greater));
+    test("1208925819614629174706175", -1.2089258e24, Some(Greater));
+    test("1208925819614629174706176", -1.2089258e24, Some(Greater));
+    test("1208925819614629174706177", -1.2089258e24, Some(Greater));
+    test("-1208925819614629174706175", 1.2089258e24, Some(Less));
+    test("-1208925819614629174706176", 1.2089258e24, Some(Less));
+    test("-1208925819614629174706177", 1.2089258e24, Some(Less));
+    test("-1208925819614629174706175", -1.2089258e24, Some(Greater));
+    test("-1208925819614629174706176", -1.2089258e24, Some(Equal));
+    test("-1208925819614629174706177", -1.2089258e24, Some(Less));
 
-    test(
-        "-117886223846050103296",
-        -1.1788622e20,
-        Some(Ordering::Equal),
-    );
+    test("-117886223846050103296", -1.1788622e20, Some(Equal));
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
@@ -141,9 +89,9 @@ where
 
     integer_integer_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n < u && u < m {
-            assert_eq!(n.cmp(&m), Ordering::Less);
+            assert_eq!(n.cmp(&m), Less);
         } else if n > u && u > m {
-            assert_eq!(n.cmp(&m), Ordering::Greater);
+            assert_eq!(n.cmp(&m), Greater);
         }
     });
 

@@ -49,8 +49,8 @@ impl<'a> SignificantBits for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.significant_bits(), 0);

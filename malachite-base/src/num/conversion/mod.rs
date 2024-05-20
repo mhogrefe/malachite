@@ -16,17 +16,21 @@ pub mod digits;
 /// # try_from
 /// ```
 /// use malachite_base::num::conversion::from::{
-///     PrimitiveFloatFromUnsignedError,
-///     PrimitiveFloatFromSignedError,
-///     SignedFromFloatError,
-///     UnsignedFromFloatError
+///     PrimitiveFloatFromSignedError, PrimitiveFloatFromUnsignedError, SignedFromFloatError,
+///     UnsignedFromFloatError,
 /// };
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(NiceFloat::<f32>::try_from(100u8), Ok(NiceFloat(100.0)));
-/// assert_eq!(NiceFloat::<f32>::try_from(u32::MAX), Err(PrimitiveFloatFromUnsignedError));
+/// assert_eq!(
+///     NiceFloat::<f32>::try_from(u32::MAX),
+///     Err(PrimitiveFloatFromUnsignedError)
+/// );
 /// assert_eq!(NiceFloat::<f32>::try_from(100i8), Ok(NiceFloat(100.0)));
-/// assert_eq!(NiceFloat::<f32>::try_from(i32::MAX), Err(PrimitiveFloatFromSignedError));
+/// assert_eq!(
+///     NiceFloat::<f32>::try_from(i32::MAX),
+///     Err(PrimitiveFloatFromSignedError)
+/// );
 ///
 /// assert_eq!(u8::try_from(NiceFloat(100.0f32)), Ok(100));
 /// assert_eq!(
@@ -127,46 +131,40 @@ pub mod digits;
 /// # rounding_from
 /// ```
 /// use malachite_base::num::conversion::traits::RoundingFrom;
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use std::cmp::Ordering;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use std::cmp::Ordering::*;
 ///
-/// assert_eq!(f32::rounding_from(100, RoundingMode::Floor), (100.0, Ordering::Equal));
-/// assert_eq!(f32::rounding_from(100, RoundingMode::Down), (100.0, Ordering::Equal));
-/// assert_eq!(f32::rounding_from(100, RoundingMode::Ceiling), (100.0, Ordering::Equal));
-/// assert_eq!(f32::rounding_from(100, RoundingMode::Up), (100.0, Ordering::Equal));
-/// assert_eq!(f32::rounding_from(100, RoundingMode::Nearest), (100.0, Ordering::Equal));
-/// assert_eq!(f32::rounding_from(100, RoundingMode::Exact), (100.0, Ordering::Equal));
+/// assert_eq!(f32::rounding_from(100, Floor), (100.0, Equal));
+/// assert_eq!(f32::rounding_from(100, Down), (100.0, Equal));
+/// assert_eq!(f32::rounding_from(100, Ceiling), (100.0, Equal));
+/// assert_eq!(f32::rounding_from(100, Up), (100.0, Equal));
+/// assert_eq!(f32::rounding_from(100, Nearest), (100.0, Equal));
+/// assert_eq!(f32::rounding_from(100, Exact), (100.0, Equal));
 ///
+/// assert_eq!(f32::rounding_from(i32::MAX, Floor), (2147483500.0, Less));
+/// assert_eq!(f32::rounding_from(i32::MAX, Down), (2147483500.0, Less));
 /// assert_eq!(
-///     f32::rounding_from(i32::MAX, RoundingMode::Floor),
-///     (2147483500.0, Ordering::Less)
+///     f32::rounding_from(i32::MAX, Ceiling),
+///     (2147483600.0, Greater)
 /// );
+/// assert_eq!(f32::rounding_from(i32::MAX, Up), (2147483600.0, Greater));
 /// assert_eq!(
-///     f32::rounding_from(i32::MAX, RoundingMode::Down),
-///     (2147483500.0, Ordering::Less)
-/// );
-/// assert_eq!(
-///     f32::rounding_from(i32::MAX, RoundingMode::Ceiling),
-///     (2147483600.0, Ordering::Greater)
-/// );
-/// assert_eq!(f32::rounding_from(i32::MAX, RoundingMode::Up), (2147483600.0, Ordering::Greater));
-/// assert_eq!(
-///     f32::rounding_from(i32::MAX, RoundingMode::Nearest),
-///     (2147483600.0, Ordering::Greater)
+///     f32::rounding_from(i32::MAX, Nearest),
+///     (2147483600.0, Greater)
 /// );
 ///
-/// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Floor), (100, Ordering::Equal));
-/// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Down), (100, Ordering::Equal));
-/// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Ceiling), (100, Ordering::Equal));
-/// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Up), (100, Ordering::Equal));
-/// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Nearest), (100, Ordering::Equal));
-/// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Exact), (100, Ordering::Equal));
+/// assert_eq!(u32::rounding_from(100.0f32, Floor), (100, Equal));
+/// assert_eq!(u32::rounding_from(100.0f32, Down), (100, Equal));
+/// assert_eq!(u32::rounding_from(100.0f32, Ceiling), (100, Equal));
+/// assert_eq!(u32::rounding_from(100.0f32, Up), (100, Equal));
+/// assert_eq!(u32::rounding_from(100.0f32, Nearest), (100, Equal));
+/// assert_eq!(u32::rounding_from(100.0f32, Exact), (100, Equal));
 ///
-/// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Floor), (100, Ordering::Less));
-/// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Down), (100, Ordering::Less));
-/// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Ceiling), (101, Ordering::Greater));
-/// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Up), (101, Ordering::Greater));
-/// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Nearest), (100, Ordering::Less));
+/// assert_eq!(u32::rounding_from(100.5f32, Floor), (100, Less));
+/// assert_eq!(u32::rounding_from(100.5f32, Down), (100, Less));
+/// assert_eq!(u32::rounding_from(100.5f32, Ceiling), (101, Greater));
+/// assert_eq!(u32::rounding_from(100.5f32, Up), (101, Greater));
+/// assert_eq!(u32::rounding_from(100.5f32, Nearest), (100, Less));
 /// ```
 pub mod from;
 /// [`JoinHalves`](traits::JoinHalves) and [`SplitInHalf`](traits::SplitInHalf), traits for joining
@@ -208,7 +206,6 @@ pub mod half;
 ///
 /// # is_integer
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::conversion::traits::IsInteger;
 ///
@@ -241,7 +238,6 @@ pub mod is_integer;
 ///
 /// # raw_mantissa_and_exponent
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 ///
@@ -260,7 +256,6 @@ pub mod is_integer;
 ///
 /// # raw_mantissa
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 ///
@@ -277,7 +272,6 @@ pub mod is_integer;
 /// # raw_exponent
 ///
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 ///
@@ -293,7 +287,6 @@ pub mod is_integer;
 ///
 /// # from_raw_mantissa_and_exponent
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
 ///

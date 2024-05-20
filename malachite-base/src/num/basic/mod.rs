@@ -11,9 +11,8 @@ pub mod floats;
 /// The [`PrimitiveInt`](integers::PrimitiveInt) trait.
 ///
 /// ```
-/// use malachite_base::comparison::traits::{Max, Min};
 /// use malachite_base::num::basic::integers::PrimitiveInt;
-/// use malachite_base::num::basic::traits::{One, OneHalf, Two, Zero};
+/// use malachite_base::num::basic::traits::{One, Two, Zero};
 ///
 /// assert_eq!(u32::WIDTH, 32);
 /// assert_eq!(u32::LOG_WIDTH, 5);

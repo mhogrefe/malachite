@@ -18,7 +18,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -78,7 +78,7 @@ pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
     let reduced_index = index & Limb::WIDTH_MASK;
     let zero_bound = slice_leading_zeros(xs);
     match x_i.cmp(&zero_bound) {
-        Ordering::Equal => {
+        Equal => {
             let boundary = &mut xs[x_i];
             // boundary != 0 here
             *boundary -= 1;
@@ -86,13 +86,13 @@ pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
             // boundary != Limb::MAX here
             *boundary += 1;
         }
-        Ordering::Less => {
+        Less => {
             assert!(!limbs_sub_limb_in_place(
                 &mut xs[x_i..],
                 Limb::power_of_2(reduced_index),
             ));
         }
-        Ordering::Greater => {
+        Greater => {
             xs[x_i].clear_bit(reduced_index);
         }
     }
@@ -101,7 +101,7 @@ pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
 fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -> bool {
     let zero_bound = slice_leading_zeros(xs);
     match x_i.cmp(&zero_bound) {
-        Ordering::Equal => {
+        Equal => {
             // xs[x_i] != 0 here
             let mut boundary = xs[x_i] - 1;
             boundary.set_bit(reduced_index);
@@ -109,7 +109,7 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
             xs[x_i] = boundary;
             boundary == 0 && limbs_slice_add_limb_in_place(&mut xs[x_i + 1..], 1)
         }
-        Ordering::Greater => {
+        Greater => {
             xs[x_i].set_bit(reduced_index);
             false
         }
@@ -226,8 +226,8 @@ impl Natural {
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::logic::traits::BitAccess;
 /// use malachite_base::num::basic::traits::{NegativeOne, Zero};
+/// use malachite_base::num::logic::traits::BitAccess;
 /// use malachite_nz::integer::Integer;
 ///
 /// let mut x = Integer::ZERO;
@@ -346,8 +346,8 @@ impl BitAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::ZERO;

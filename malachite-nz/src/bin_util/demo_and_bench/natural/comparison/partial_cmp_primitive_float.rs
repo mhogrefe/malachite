@@ -16,7 +16,7 @@ use malachite_nz::test_util::bench::bucketers::pair_2_pair_1_natural_bit_buckete
 use malachite_nz::test_util::generators::{
     natural_primitive_float_pair_gen, natural_primitive_float_pair_gen_rm,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_natural_partial_cmp_float);
@@ -42,9 +42,9 @@ where
     {
         match n.partial_cmp(&f) {
             None => println!("{} is not comparable with {}", n, NiceFloat(f)),
-            Some(Ordering::Less) => println!("{} < {}", n, NiceFloat(f)),
-            Some(Ordering::Equal) => println!("{} = {}", n, NiceFloat(f)),
-            Some(Ordering::Greater) => println!("{} > {}", n, NiceFloat(f)),
+            Some(Less) => println!("{} < {}", n, NiceFloat(f)),
+            Some(Equal) => println!("{} = {}", n, NiceFloat(f)),
+            Some(Greater) => println!("{} > {}", n, NiceFloat(f)),
         }
     }
 }
@@ -60,9 +60,9 @@ fn demo_float_partial_cmp_natural<T: PartialOrd<Natural> + PrimitiveFloat>(
     {
         match f.partial_cmp(&n) {
             None => println!("{} is not comparable with {}", NiceFloat(f), n),
-            Some(Ordering::Less) => println!("{} < {}", NiceFloat(f), n),
-            Some(Ordering::Equal) => println!("{} = {}", NiceFloat(f), n),
-            Some(Ordering::Greater) => println!("{} > {}", NiceFloat(f), n),
+            Some(Less) => println!("{} < {}", NiceFloat(f), n),
+            Some(Equal) => println!("{} = {}", NiceFloat(f), n),
+            Some(Greater) => println!("{} > {}", NiceFloat(f), n),
         }
     }
 }

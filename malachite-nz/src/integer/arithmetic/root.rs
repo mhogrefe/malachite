@@ -298,12 +298,38 @@ impl CheckedRoot<u64> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(999).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!(Integer::from(1000).checked_root(3).to_debug_string(), "Some(10)");
-    /// assert_eq!(Integer::from(1001).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!(Integer::from(100000000000i64).checked_root(5).to_debug_string(), "None");
-    /// assert_eq!(Integer::from(-100000000000i64).checked_root(5).to_debug_string(), "None");
-    /// assert_eq!(Integer::from(10000000000i64).checked_root(5).to_debug_string(), "Some(100)");
-    /// assert_eq!(Integer::from(-10000000000i64).checked_root(5).to_debug_string(), "Some(-100)");
+    /// assert_eq!(
+    ///     Integer::from(1000).checked_root(3).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(1001).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(100000000000i64)
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-100000000000i64)
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(10000000000i64)
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "Some(100)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10000000000i64)
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "Some(-100)"
+    /// );
     /// ```
     #[inline]
     fn checked_root(self, exp: u64) -> Option<Integer> {
@@ -346,14 +372,40 @@ impl<'a> CheckedRoot<u64> for &'a Integer {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(999)).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!((&Integer::from(1000)).checked_root(3).to_debug_string(), "Some(10)");
-    /// assert_eq!((&Integer::from(1001)).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!((&Integer::from(100000000000i64)).checked_root(5).to_debug_string(), "None");
-    /// assert_eq!((&Integer::from(-100000000000i64)).checked_root(5).to_debug_string(), "None");
-    /// assert_eq!((&Integer::from(10000000000i64)).checked_root(5).to_debug_string(), "Some(100)");
     /// assert_eq!(
-    ///     (&Integer::from(-10000000000i64)).checked_root(5).to_debug_string(),
+    ///     (&Integer::from(999)).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(1000)).checked_root(3).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(1001)).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(100000000000i64))
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-100000000000i64))
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(10000000000i64))
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "Some(100)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10000000000i64))
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
     ///     "Some(-100)"
     /// );
     /// ```

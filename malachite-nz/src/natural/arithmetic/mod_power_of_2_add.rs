@@ -22,7 +22,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the sum of the `Natural` and a `Limb`, mod `2 ^ pow`. Assumes the input is already
@@ -35,7 +35,7 @@ use malachite_base::rounding_modes::RoundingMode;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0) {
+    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0) {
         limbs_add_limb(xs, y)
     } else {
         let mut out = xs.to_vec();
@@ -61,7 +61,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
     y: Limb,
     pow: u64
 ) -> bool {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0) {
+    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0) {
         limbs_slice_add_limb_in_place(xs, y)
     } else {
         if !limbs_slice_add_limb_in_place(xs, y) {
@@ -150,7 +150,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
     ys: &[Limb],
     pow: u64,
 ) -> bool {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0) {
+    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0) {
         limbs_slice_add_greater_in_place_left(xs, ys)
     } else {
         if !limbs_slice_add_greater_in_place_left(xs, ys) {
@@ -174,7 +174,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
 pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if xs_len < max_len && ys_len < max_len {
         limbs_vec_add_in_place_left(xs, ys)
     } else {
@@ -295,7 +295,10 @@ impl ModPowerOf2Add<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.mod_power_of_2_add(Natural::from(2u32), 5), 2);
-    /// assert_eq!(Natural::from(10u32).mod_power_of_2_add(Natural::from(14u32), 4), 8);
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_power_of_2_add(Natural::from(14u32), 4),
+    ///     8
+    /// );
     /// ```
     fn mod_power_of_2_add(mut self, other: Natural, pow: u64) -> Natural {
         self.mod_power_of_2_add_assign(other, pow);
@@ -328,7 +331,10 @@ impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.mod_power_of_2_add(&Natural::from(2u32), 5), 2);
-    /// assert_eq!(Natural::from(10u32).mod_power_of_2_add(&Natural::from(14u32), 4), 8);
+    /// assert_eq!(
+    ///     Natural::from(10u32).mod_power_of_2_add(&Natural::from(14u32), 4),
+    ///     8
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_add(mut self, other: &'a Natural, pow: u64) -> Natural {
@@ -361,8 +367,14 @@ impl<'a> ModPowerOf2Add<Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(Natural::from(2u32), 5), 2);
-    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_add(Natural::from(14u32), 4), 8);
+    /// assert_eq!(
+    ///     (&Natural::ZERO).mod_power_of_2_add(Natural::from(2u32), 5),
+    ///     2
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).mod_power_of_2_add(Natural::from(14u32), 4),
+    ///     8
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_add(self, mut other: Natural, pow: u64) -> Natural {
@@ -396,8 +408,14 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(&Natural::from(2u32), 5), 2);
-    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_add(&Natural::from(14u32), 4), 8);
+    /// assert_eq!(
+    ///     (&Natural::ZERO).mod_power_of_2_add(&Natural::from(2u32), 5),
+    ///     2
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).mod_power_of_2_add(&Natural::from(14u32), 4),
+    ///     8
+    /// );
     /// ```
     fn mod_power_of_2_add(self, other: &'a Natural, pow: u64) -> Natural {
         assert!(

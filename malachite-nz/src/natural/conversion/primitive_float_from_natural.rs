@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -15,7 +15,7 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom, SciMantissaAndExponent,
     WrappingFrom,
 };
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct PrimitiveFloatFromNaturalError;
@@ -52,7 +52,7 @@ macro_rules! float_impls {
             /// See [here](super::primitive_float_from_natural#rounding_from).
             fn rounding_from(value: &'a Natural, rm: RoundingMode) -> ($f, Ordering) {
                 if *value == 0 {
-                    (0.0, Ordering::Equal)
+                    (0.0, Equal)
                 } else {
                     let (mantissa, exponent, o) = value
                         .sci_mantissa_and_exponent_round(rm)
@@ -63,13 +63,11 @@ macro_rules! float_impls {
                         (f, o)
                     } else {
                         match rm {
-                            RoundingMode::Exact => {
+                            Exact => {
                                 panic!("Value cannot be represented exactly as an {}", $f::NAME)
                             }
-                            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                ($f::MAX_FINITE, Ordering::Less)
-                            }
-                            _ => ($f::INFINITY, Ordering::Greater),
+                            Floor | Down | Nearest => ($f::MAX_FINITE, Less),
+                            _ => ($f::INFINITY, Greater),
                         }
                     }
                 }
@@ -97,7 +95,7 @@ macro_rules! float_impls {
                     Ok(0.0)
                 } else {
                     let (mantissa, exponent, _) = value
-                        .sci_mantissa_and_exponent_round(RoundingMode::Exact)
+                        .sci_mantissa_and_exponent_round(Exact)
                         .ok_or(PrimitiveFloatFromNaturalError)?;
                     $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
                         .ok_or(PrimitiveFloatFromNaturalError)
@@ -122,7 +120,7 @@ macro_rules! float_impls {
                     true
                 } else {
                     if let Some((mantissa, exponent, _)) =
-                        value.sci_mantissa_and_exponent_round::<$f>(RoundingMode::Exact)
+                        value.sci_mantissa_and_exponent_round::<$f>(Exact)
                     {
                         let exponent = i64::exact_from(exponent);
                         if !($f::MIN_EXPONENT..=$f::MAX_EXPONENT).contains(&exponent) {

@@ -10,9 +10,8 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::generators::natural_gen;
-use malachite_nz::test_util::generators::natural_primitive_float_pair_gen;
-use std::cmp::Ordering;
+use malachite_nz::test_util::generators::{natural_gen, natural_primitive_float_pair_gen};
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -74,7 +73,8 @@ where
         assert_ne!(n.ne_abs(&x), eq);
 
         assert_eq!(x.eq_abs(&n), eq);
-        assert_eq!(n.partial_cmp_abs(&x) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp_abs(&x) == Some(Equal), eq);
+        assert_eq!(n.eq_abs(&-x), eq);
     });
 
     natural_gen().test_properties(|n| {

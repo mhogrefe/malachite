@@ -17,7 +17,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use core::ops::{BitOr, BitOrAssign};
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
@@ -186,15 +186,15 @@ pub_test! {limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
         let mut out = vec![0; min_i];
         match x_i.cmp(&y_i) {
-            Ordering::Equal => {
+            Equal => {
                 out.push((!xs[x_i] & (ys[y_i] - 1)) + 1);
             }
-            Ordering::Less => {
+            Less => {
                 out.push(xs[x_i].wrapping_neg());
                 out.extend(xs[x_i + 1..y_i].iter().map(|x| !x));
                 out.push(!xs[y_i] & (ys[y_i] - 1));
             }
-            Ordering::Greater => {
+            Greater => {
                 out.extend_from_slice(&ys[y_i..x_i]);
                 out.push(!xs[x_i] & ys[x_i]);
             }
@@ -253,15 +253,15 @@ pub_test! {limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
         slice_set_zero(&mut out[..min_i]);
         match x_i.cmp(&y_i) {
-            Ordering::Equal => {
+            Equal => {
                 out[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
             }
-            Ordering::Less => {
+            Less => {
                 out[x_i] = xs[x_i].wrapping_neg();
                 limbs_not_to_out(&mut out[x_i + 1..y_i], &xs[x_i + 1..y_i]);
                 out[y_i] = !xs[y_i] & (ys[y_i] - 1);
             }
-            Ordering::Greater => {
+            Greater => {
                 out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
                 out[x_i] = !xs[x_i] & ys[x_i];
             }
@@ -314,15 +314,15 @@ pub_test! {limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) ->
     } else {
         let max_i = max(x_i, y_i);
         match x_i.cmp(&y_i) {
-            Ordering::Equal => {
+            Equal => {
                 xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
             }
-            Ordering::Less => {
+            Less => {
                 xs[x_i].wrapping_neg_assign();
                 limbs_not_in_place(&mut xs[x_i + 1..y_i]);
                 xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
             }
-            Ordering::Greater => {
+            Greater => {
                 xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
                 xs[x_i] = !xs[x_i] & ys[x_i];
             }
@@ -377,15 +377,15 @@ pub_test! {limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     } else {
         let max_i = max(x_i, y_i);
         match x_i.cmp(&y_i) {
-            Ordering::Equal => {
+            Equal => {
                 xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
             }
-            Ordering::Less => {
+            Less => {
                 xs[x_i].wrapping_neg_assign();
                 limbs_not_in_place(&mut xs[x_i + 1..y_i]);
                 xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
             }
-            Ordering::Greater => {
+            Greater => {
                 xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
                 xs[x_i] = !xs[x_i] & ys[x_i];
             }
@@ -437,15 +437,15 @@ pub_test! {limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     } else if x_i < ys_len {
         let max_i = max(x_i, y_i);
         match x_i.cmp(&y_i) {
-            Ordering::Equal => {
+            Equal => {
                 ys[y_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
             }
-            Ordering::Less => {
+            Less => {
                 ys[x_i] = xs[x_i].wrapping_neg();
                 limbs_not_to_out(&mut ys[x_i + 1..y_i], &xs[x_i + 1..y_i]);
                 ys[y_i] = !xs[y_i] & (ys[y_i] - 1);
             }
-            Ordering::Greater => {
+            Greater => {
                 ys[x_i] &= !xs[x_i];
             }
         }
@@ -493,12 +493,12 @@ pub_test! {limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
         let mut out = vec![0; min_i];
         let x = match x_i.cmp(&y_i) {
-            Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
-            Ordering::Less => {
+            Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+            Less => {
                 out.extend_from_slice(&xs[x_i..y_i]);
                 xs[y_i] & (ys[y_i] - 1)
             }
-            Ordering::Greater => {
+            Greater => {
                 out.extend_from_slice(&ys[y_i..x_i]);
                 (xs[x_i] - 1) & ys[x_i]
             }
@@ -547,12 +547,12 @@ pub_test! {limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
         slice_set_zero(&mut out[..min_i]);
         let x = match x_i.cmp(&y_i) {
-            Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
-            Ordering::Less => {
+            Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+            Less => {
                 out[x_i..y_i].copy_from_slice(&xs[x_i..y_i]);
                 xs[y_i] & (ys[y_i] - 1)
             }
-            Ordering::Greater => {
+            Greater => {
                 out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
                 (xs[x_i] - 1) & ys[x_i]
             }
@@ -601,9 +601,9 @@ pub_test! {limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
             xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
         }
         xs[max_i] = match x_i.cmp(&y_i) {
-            Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
-            Ordering::Less => xs[y_i] & (ys[y_i] - 1),
-            Ordering::Greater => (xs[x_i] - 1) & ys[x_i],
+            Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+            Less => xs[y_i] & (ys[y_i] - 1),
+            Greater => (xs[x_i] - 1) & ys[x_i],
         };
         for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter()) {
             *x &= y;
@@ -647,9 +647,9 @@ pub_test! {limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
             xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
         }
         xs[max_i] = match x_i.cmp(&y_i) {
-            Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
-            Ordering::Less => xs[y_i] & (ys[y_i] - 1),
-            Ordering::Greater => (xs[x_i] - 1) & ys[x_i],
+            Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+            Less => xs[y_i] & (ys[y_i] - 1),
+            Greater => (xs[x_i] - 1) & ys[x_i],
         };
         for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter()) {
             *x &= y;
@@ -690,9 +690,9 @@ pub_test! {limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) ->
     } else {
         let max_i = max(x_i, y_i);
         let boundary = match x_i.cmp(&y_i) {
-            Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
-            Ordering::Less => xs[y_i] & (ys[y_i] - 1),
-            Ordering::Greater => (xs[x_i] - 1) & ys[x_i],
+            Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+            Less => xs[y_i] & (ys[y_i] - 1),
+            Greater => (xs[x_i] - 1) & ys[x_i],
         };
         if xs_len > ys_len {
             if y_i > x_i {

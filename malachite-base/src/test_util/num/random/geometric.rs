@@ -9,7 +9,7 @@
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::logic::traits::BitAccess;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub fn unadjusted_mean_to_adjusted_mean(unadjusted_mean: f64, limit: f64) -> f64 {
     let m = limit;
@@ -41,14 +41,14 @@ pub fn adjusted_mean_to_unadjusted_mean(adjusted_mean: f64, limit: f64) -> f64 {
         }
         let f_mid = unadjusted_mean_to_adjusted_mean(f64::from_ordered_representation(mid), limit);
         let compare = if f_mid.is_nan() {
-            Ordering::Greater
+            Greater
         } else {
             f_mid.partial_cmp(&adjusted_mean).unwrap()
         };
         match compare {
-            Ordering::Greater => max = mid,
-            Ordering::Less => min = mid + 1,
-            Ordering::Equal => return f64::from_ordered_representation(mid),
+            Greater => max = mid,
+            Less => min = mid + 1,
+            Equal => return f64::from_ordered_representation(mid),
         }
     }
 }

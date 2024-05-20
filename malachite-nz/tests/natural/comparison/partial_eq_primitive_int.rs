@@ -16,7 +16,7 @@ use malachite_nz::test_util::generators::{natural_signed_pair_gen, natural_unsig
 use malachite_nz::test_util::natural::comparison::partial_eq_primitive_int::*;
 use num::BigUint;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -116,7 +116,7 @@ where
         assert_eq!(u == n, eq);
         assert_eq!(u == rug::Integer::from(&n), eq);
         assert_eq!(&Natural::from(u) == &n, eq);
-        assert_eq!(n.partial_cmp(&u) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp(&u) == Some(Equal), eq);
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
@@ -143,7 +143,7 @@ where
         assert_eq!(i == n, eq);
         assert_eq!(i == rug::Integer::from(&n), eq);
         assert_eq!(&Integer::from(i) == &n, eq);
-        assert_eq!(n.partial_cmp(&i) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp(&i) == Some(Equal), eq);
     });
 
     signed_pair_gen_var_7::<T>().test_properties(|(x, y)| {

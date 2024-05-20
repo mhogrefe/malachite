@@ -11,7 +11,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::BitIterable;
 use core::cmp::min;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::marker::PhantomData;
 use core::ops::Index;
 
@@ -225,9 +225,9 @@ fn bits_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
 ) -> PrimitiveSignedBitIterator<U, S> {
     let unsigned = U::wrapping_from(x);
     let significant_bits = match x.sign() {
-        Ordering::Equal => 0,
-        Ordering::Greater => unsigned.significant_bits() + 1,
-        Ordering::Less => (!unsigned).significant_bits() + 1,
+        Equal => 0,
+        Greater => unsigned.significant_bits() + 1,
+        Less => (!unsigned).significant_bits() + 1,
     };
     PrimitiveSignedBitIterator {
         phantom: PhantomData,

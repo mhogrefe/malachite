@@ -427,8 +427,6 @@ pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     }
 }}
 
-// TODO
-
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to the longer
 // slice (or the first one, if they are equally long). Returns a pair of `bool`s. The first is
@@ -841,11 +839,14 @@ impl Sum for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Sum;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use core::iter::Sum;
     ///
-    /// assert_eq!(Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()), 17);
+    /// assert_eq!(
+    ///     Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()),
+    ///     17
+    /// );
     /// ```
     fn sum<I>(xs: I) -> Natural
     where
@@ -876,11 +877,14 @@ impl<'a> Sum<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::Sum;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use core::iter::Sum;
     ///
-    /// assert_eq!(Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()), 17);
+    /// assert_eq!(
+    ///     Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()),
+    ///     17
+    /// );
     /// ```
     fn sum<I>(xs: I) -> Natural
     where

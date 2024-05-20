@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::ops::Mul;
 use malachite_base::num::arithmetic::traits::{CheckedSub, Parity, Pow};
 use malachite_base::num::basic::traits::{One, Zero};
@@ -16,7 +16,7 @@ use malachite_base::num::conversion::string::from_sci_string::{
 };
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 #[doc(hidden)]
 pub trait FromSciStringHelper: Sized {
@@ -98,18 +98,18 @@ where
         if neg_exponent > sig_len {
             let s = if sign { &s[1..] } else { &s[..] };
             return match rm {
-                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                Down | Floor | Nearest => {
                     validate_helper(s, options.get_base())?;
                     Some(T::ZERO)
                 }
-                RoundingMode::Up | RoundingMode::Ceiling => {
+                Up | Ceiling => {
                     if is_zero_helper(s, options.get_base())? {
                         Some(T::ZERO)
                     } else {
                         T::ZERO.up_1(neg)
                     }
                 }
-                RoundingMode::Exact => None,
+                Exact => None,
             };
         }
         let (before_e, after_e) = s.split_at(len - neg_exponent);
@@ -121,28 +121,28 @@ where
             return Some(x);
         }
         match rm {
-            RoundingMode::Down | RoundingMode::Floor => {
+            Down | Floor => {
                 validate_helper(after_e, options.get_base())?;
                 Some(x)
             }
-            RoundingMode::Up | RoundingMode::Ceiling => {
+            Up | Ceiling => {
                 if is_zero_helper(after_e, options.get_base())? {
                     Some(x)
                 } else {
                     x.up_1(neg)
                 }
             }
-            RoundingMode::Exact => {
+            Exact => {
                 if is_zero_helper(after_e, options.get_base())? {
                     Some(x)
                 } else {
                     None
                 }
             }
-            RoundingMode::Nearest => match cmp_half_helper(after_e, options.get_base())? {
-                Ordering::Less => Some(x),
-                Ordering::Greater => x.up_1(neg),
-                Ordering::Equal => {
+            Nearest => match cmp_half_helper(after_e, options.get_base())? {
+                Less => Some(x),
+                Greater => x.up_1(neg),
+                Equal => {
                     if x.even() {
                         Some(x)
                     } else {
@@ -189,7 +189,7 @@ impl FromSciString for Natural {
     /// ```
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
     /// use malachite_base::num::conversion::traits::FromSciString;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from_sci_string("123").unwrap(), 123);
@@ -198,20 +198,38 @@ impl FromSciString for Natural {
     /// assert_eq!(Natural::from_sci_string("1.23e10").unwrap(), 12300000000u64);
     ///
     /// let mut options = FromSciStringOptions::default();
-    /// assert_eq!(Natural::from_sci_string_with_options("123.5", options).unwrap(), 124);
+    /// assert_eq!(
+    ///     Natural::from_sci_string_with_options("123.5", options).unwrap(),
+    ///     124
+    /// );
     ///
-    /// options.set_rounding_mode(RoundingMode::Floor);
-    /// assert_eq!(Natural::from_sci_string_with_options("123.5", options).unwrap(), 123);
+    /// options.set_rounding_mode(Floor);
+    /// assert_eq!(
+    ///     Natural::from_sci_string_with_options("123.5", options).unwrap(),
+    ///     123
+    /// );
     ///
     /// options = FromSciStringOptions::default();
     /// options.set_base(16);
-    /// assert_eq!(Natural::from_sci_string_with_options("ff", options).unwrap(), 255);
+    /// assert_eq!(
+    ///     Natural::from_sci_string_with_options("ff", options).unwrap(),
+    ///     255
+    /// );
     ///
     /// options = FromSciStringOptions::default();
     /// options.set_base(36);
-    /// assert_eq!(Natural::from_sci_string_with_options("1e5", options).unwrap(), 1805);
-    /// assert_eq!(Natural::from_sci_string_with_options("1e+5", options).unwrap(), 60466176);
-    /// assert_eq!(Natural::from_sci_string_with_options("1e-5", options).unwrap(), 0);
+    /// assert_eq!(
+    ///     Natural::from_sci_string_with_options("1e5", options).unwrap(),
+    ///     1805
+    /// );
+    /// assert_eq!(
+    ///     Natural::from_sci_string_with_options("1e+5", options).unwrap(),
+    ///     60466176
+    /// );
+    /// assert_eq!(
+    ///     Natural::from_sci_string_with_options("1e-5", options).unwrap(),
+    ///     0
+    /// );
     /// ```
     #[inline]
     fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Natural> {

@@ -18,7 +18,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
-use core::cmp::{min, Ordering};
+use core::cmp::{min, Ordering::*};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -254,14 +254,14 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
             (Natural(Small(x)), Natural(Large(ref ys))) => Natural::from(limbs_gcd_limb(ys, *x)),
             (Natural(Large(xs)), Natural(Large(ys))) => {
                 let c = limbs_cmp(xs, ys);
-                if c == Ordering::Equal {
+                if c == Equal {
                     return self.clone();
                 }
                 let mut xs = xs.clone();
                 let mut xs: &mut [Limb] = &mut xs;
                 let mut ys = ys.clone();
                 let mut ys: &mut [Limb] = &mut ys;
-                if c == Ordering::Less {
+                if c == Less {
                     swap(&mut xs, &mut ys);
                 }
                 gcd_greater_helper(xs, ys)
@@ -315,8 +315,8 @@ impl GcdAssign<Natural> for Natural {
                 let mut xs: &mut [Limb] = &mut *xs;
                 let mut ys: &mut [Limb] = &mut ys;
                 match limbs_cmp(xs, ys) {
-                    Ordering::Equal => return,
-                    Ordering::Less => {
+                    Equal => return,
+                    Less => {
                         swap(&mut xs, &mut ys);
                     }
                     _ => {}
@@ -370,13 +370,13 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
             }
             (Natural(Large(ref mut xs)), Natural(Large(ys))) => {
                 let c = limbs_cmp(xs, ys);
-                if c == Ordering::Equal {
+                if c == Equal {
                     return;
                 }
                 let mut xs: &mut [Limb] = &mut *xs;
                 let mut ys = ys.clone();
                 let mut ys: &mut [Limb] = &mut ys;
-                if c == Ordering::Less {
+                if c == Less {
                     swap(&mut xs, &mut ys);
                 }
                 *self = gcd_greater_helper(xs, ys);

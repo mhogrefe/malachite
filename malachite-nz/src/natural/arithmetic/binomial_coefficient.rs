@@ -32,7 +32,7 @@ use crate::platform::{
     ONE_LIMB_ODD_FACTORIAL_TABLE, TABLE_2N_MINUS_POPC_2N,
 };
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering};
+use core::cmp::{max, min, Ordering::*};
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, BinomialCoefficient, DivAssignMod, DivExact, Parity, PowerOf2, Square,
     WrappingAddAssign,
@@ -595,10 +595,7 @@ fn binomial_coefficient_helper(n: Natural, k: Limb) -> Natural {
         binomial_coefficient_limb_limb(small_n, k)
     } else {
         (binomial_coefficient_raising_factorial_4(n - Natural::from(k), k)
-            >> k.checked_sub(k >> 1)
-                .unwrap()
-                .checked_sub(k >> 2)
-                .unwrap()
+            >> (k - (k >> 1) - (k >> 2))
                 .checked_sub(Limb::wrapping_from(CountOnes::count_ones(k)))
                 .unwrap())
         .div_exact(Natural::from_owned_limbs_asc(limbs_odd_factorial(
@@ -623,12 +620,30 @@ impl BinomialCoefficient for Natural {
     /// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::binomial_coefficient(Natural::from(4u32), Natural::from(0u32)), 1);
-    /// assert_eq!(Natural::binomial_coefficient(Natural::from(4u32), Natural::from(1u32)), 4);
-    /// assert_eq!(Natural::binomial_coefficient(Natural::from(4u32), Natural::from(2u32)), 6);
-    /// assert_eq!(Natural::binomial_coefficient(Natural::from(4u32), Natural::from(3u32)), 4);
-    /// assert_eq!(Natural::binomial_coefficient(Natural::from(4u32), Natural::from(4u32)), 1);
-    /// assert_eq!(Natural::binomial_coefficient(Natural::from(10u32), Natural::from(5u32)), 252);
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(0u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(1u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(2u32)),
+    ///     6
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(4u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(Natural::from(10u32), Natural::from(5u32)),
+    ///     252
+    /// );
     /// assert_eq!(
     ///     Natural::binomial_coefficient(Natural::from(100u32), Natural::from(50u32)).to_string(),
     ///     "100891344545564193334812497256"
@@ -641,7 +656,7 @@ impl BinomialCoefficient for Natural {
         if k == 0u32 || n == k {
             return Natural::ONE;
         }
-        if double_cmp(&k, &n) == Ordering::Greater {
+        if double_cmp(&k, &n) == Greater {
             k = &n - &k;
         }
         binomial_coefficient_helper(n, Limb::try_from(&k).expect("k is too large"))
@@ -663,11 +678,26 @@ impl<'a> BinomialCoefficient<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(0u32)), 1);
-    /// assert_eq!(Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(1u32)), 4);
-    /// assert_eq!(Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(2u32)), 6);
-    /// assert_eq!(Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(3u32)), 4);
-    /// assert_eq!(Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(4u32)), 1);
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(0u32)),
+    ///     1
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(1u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(2u32)),
+    ///     6
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(4u32)),
+    ///     1
+    /// );
     /// assert_eq!(
     ///     Natural::binomial_coefficient(&Natural::from(10u32), &Natural::from(5u32)),
     ///     252
@@ -685,7 +715,7 @@ impl<'a> BinomialCoefficient<&'a Natural> for Natural {
         if *k == 0u32 || n == k {
             return Natural::ONE;
         }
-        let k = if double_cmp(k, n) == Ordering::Greater {
+        let k = if double_cmp(k, n) == Greater {
             Limb::try_from(&(n - k))
         } else {
             Limb::try_from(k)

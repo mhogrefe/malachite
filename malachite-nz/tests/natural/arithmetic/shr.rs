@@ -12,7 +12,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_gen, unsigned_gen, unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_16,
@@ -476,7 +476,7 @@ where
         assert_eq!(shifted_alt, shifted);
 
         assert!(shifted <= n);
-        assert_eq!((&n).shr_round(u, RoundingMode::Floor).0, shifted);
+        assert_eq!((&n).shr_round(u, Floor).0, shifted);
 
         if u <= U::low_mask(U::WIDTH - 1) {
             let u = S::wrapping_from(u);
@@ -528,7 +528,7 @@ where
         assert!(shifted_alt.is_valid());
         assert_eq!(shifted_alt, shifted);
 
-        assert_eq!(n.shr_round(i, RoundingMode::Floor).0, shifted);
+        assert_eq!(n.shr_round(i, Floor).0, shifted);
     });
 
     natural_gen().test_properties(|n| {

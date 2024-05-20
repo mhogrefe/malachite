@@ -21,7 +21,7 @@ use malachite_base::test_util::stats::common_values_map::common_values_map_debug
 use malachite_base::test_util::stats::median;
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::fmt::Debug;
 
 fn random_union2s_helper<
@@ -161,31 +161,31 @@ fn test_random_union3s() {
         &|seed| random_unsigned_inclusive_range::<u32>(seed, 1, 10),
         &random_orderings,
         &[
-            Union3::C(Ordering::Equal),
+            Union3::C(Equal),
             Union3::A('v'),
             Union3::A('c'),
             Union3::A('q'),
-            Union3::C(Ordering::Greater),
+            Union3::C(Greater),
             Union3::A('i'),
             Union3::B(3),
-            Union3::C(Ordering::Greater),
+            Union3::C(Greater),
             Union3::B(7),
-            Union3::C(Ordering::Greater),
-            Union3::C(Ordering::Greater),
-            Union3::C(Ordering::Greater),
+            Union3::C(Greater),
+            Union3::C(Greater),
+            Union3::C(Greater),
             Union3::B(9),
-            Union3::C(Ordering::Equal),
+            Union3::C(Equal),
             Union3::A('e'),
             Union3::A('p'),
             Union3::A('g'),
             Union3::A('s'),
-            Union3::C(Ordering::Equal),
+            Union3::C(Equal),
             Union3::A('n'),
         ],
         &[
-            (Union3::C(Ordering::Less), 111378),
-            (Union3::C(Ordering::Greater), 111191),
-            (Union3::C(Ordering::Equal), 110903),
+            (Union3::C(Less), 111378),
+            (Union3::C(Greater), 111191),
+            (Union3::C(Equal), 110903),
             (Union3::B(5), 33724),
             (Union3::B(10), 33503),
             (Union3::B(4), 33375),

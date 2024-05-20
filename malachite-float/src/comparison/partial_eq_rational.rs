@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::CheckedLogBase2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -53,7 +53,7 @@ impl PartialEq<Rational> for Float {
                     && if let Some(log_d) = other.denominator_ref().checked_log_base_2() {
                         let n = other.numerator_ref();
                         *exponent == i64::exact_from(n.significant_bits()) - i64::exact_from(log_d)
-                            && significand.cmp_normalized(n) == Ordering::Equal
+                            && significand.cmp_normalized(n) == Equal
                     } else {
                         false
                     }
@@ -79,7 +79,7 @@ impl PartialEq<Float> for Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     ///

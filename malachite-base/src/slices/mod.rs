@@ -171,17 +171,14 @@ pub fn slice_move_left<T: Copy>(xs: &mut [T], starting_index: usize) {
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate malachite_base;
+/// use malachite_base::split_into_chunks;
 ///
-/// fn main() {
-///     let xs = &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-///     split_into_chunks!(xs, 3, [xs_1, xs_2, xs_3], xs_4);
-///     assert_eq!(xs_1, &[0, 1, 2]);
-///     assert_eq!(xs_2, &[3, 4, 5]);
-///     assert_eq!(xs_3, &[6, 7, 8]);
-///     assert_eq!(xs_4, &[9, 10, 11, 12]);
-/// }
+/// let xs = &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+/// split_into_chunks!(xs, 3, [xs_1, xs_2, xs_3], xs_4);
+/// assert_eq!(xs_1, &[0, 1, 2]);
+/// assert_eq!(xs_2, &[3, 4, 5]);
+/// assert_eq!(xs_3, &[6, 7, 8]);
+/// assert_eq!(xs_4, &[9, 10, 11, 12]);
 /// ```
 #[macro_export]
 macro_rules! split_into_chunks {
@@ -216,22 +213,18 @@ macro_rules! split_into_chunks {
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate malachite_base;
-///
 /// use malachite_base::slices::slice_set_zero;
+/// use malachite_base::split_into_chunks_mut;
 ///
-/// fn main() {
-///     let xs = &mut [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-///     split_into_chunks_mut!(xs, 3, [xs_1, xs_2, xs_3], xs_4);
-///     assert_eq!(xs_1, &[0, 1, 2]);
-///     assert_eq!(xs_2, &[3, 4, 5]);
-///     assert_eq!(xs_3, &[6, 7, 8]);
-///     assert_eq!(xs_4, &[9, 10, 11, 12]);
+/// let xs = &mut [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+/// split_into_chunks_mut!(xs, 3, [xs_1, xs_2, xs_3], xs_4);
+/// assert_eq!(xs_1, &[0, 1, 2]);
+/// assert_eq!(xs_2, &[3, 4, 5]);
+/// assert_eq!(xs_3, &[6, 7, 8]);
+/// assert_eq!(xs_4, &[9, 10, 11, 12]);
 ///
-///     slice_set_zero(xs_2);
-///     assert_eq!(xs, &[0, 1, 2, 0, 0, 0, 6, 7, 8, 9, 10, 11, 12]);
-/// }
+/// slice_set_zero(xs_2);
+/// assert_eq!(xs, &[0, 1, 2, 0, 0, 0, 6, 7, 8, 9, 10, 11, 12]);
 /// ```
 #[macro_export]
 macro_rules! split_into_chunks_mut {

@@ -37,35 +37,31 @@ use std::collections::{BTreeSet, HashSet};
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_hash_sets_fixed_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = lex_hash_sets_fixed_length(4, 1..=6).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2, 3, 4},
-///             hashset!{1, 2, 3, 5},
-///             hashset!{1, 2, 3, 6},
-///             hashset!{1, 2, 4, 5},
-///             hashset!{1, 2, 4, 6},
-///             hashset!{1, 2, 5, 6},
-///             hashset!{1, 3, 4, 5},
-///             hashset!{1, 3, 4, 6},
-///             hashset!{1, 3, 5, 6},
-///             hashset!{1, 4, 5, 6},
-///             hashset!{2, 3, 4, 5},
-///             hashset!{2, 3, 4, 6},
-///             hashset!{2, 3, 5, 6},
-///             hashset!{2, 4, 5, 6},
-///             hashset!{3, 4, 5, 6}
-///         ]
-///     );
-/// }
+/// let xss = lex_hash_sets_fixed_length(4, 1..=6).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2, 3, 4},
+///         hashset! {1, 2, 3, 5},
+///         hashset! {1, 2, 3, 6},
+///         hashset! {1, 2, 4, 5},
+///         hashset! {1, 2, 4, 6},
+///         hashset! {1, 2, 5, 6},
+///         hashset! {1, 3, 4, 5},
+///         hashset! {1, 3, 4, 6},
+///         hashset! {1, 3, 5, 6},
+///         hashset! {1, 4, 5, 6},
+///         hashset! {2, 3, 4, 5},
+///         hashset! {2, 3, 4, 6},
+///         hashset! {2, 3, 5, 6},
+///         hashset! {2, 4, 5, 6},
+///         hashset! {3, 4, 5, 6}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_hash_sets_fixed_length<I: Iterator>(
@@ -96,36 +92,32 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_hash_sets;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = shortlex_hash_sets(1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{},
-///             hashset!{1},
-///             hashset!{2},
-///             hashset!{3},
-///             hashset!{4},
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4},
-///             hashset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = shortlex_hash_sets(1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {},
+///         hashset! {1},
+///         hashset! {2},
+///         hashset! {3},
+///         hashset! {4},
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4},
+///         hashset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_hash_sets<I: Clone + Iterator>(
@@ -156,31 +148,27 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_hash_sets_min_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = shortlex_hash_sets_min_length(2, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4},
-///             hashset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = shortlex_hash_sets_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4},
+///         hashset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_hash_sets_min_length<I: Clone + Iterator>(
@@ -216,30 +204,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_hash_sets_length_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = shortlex_hash_sets_length_range(2, 4, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4},
-///         ]
-///     );
-/// }
+/// let xss = shortlex_hash_sets_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_hash_sets_length_range<I: Clone + Iterator>(
@@ -282,30 +266,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_hash_sets_length_inclusive_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = shortlex_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4},
-///         ]
-///     );
-/// }
+/// let xss = shortlex_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_hash_sets_length_inclusive_range<I: Clone + Iterator>(
@@ -337,36 +317,32 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_hash_sets;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = lex_hash_sets(1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{},
-///             hashset!{1},
-///             hashset!{1, 2},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 3, 4},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3},
-///             hashset!{1, 3, 4},
-///             hashset!{1, 4},
-///             hashset!{2},
-///             hashset!{2, 3},
-///             hashset!{2, 3, 4},
-///             hashset!{2, 4},
-///             hashset!{3},
-///             hashset!{3, 4},
-///             hashset!{4}
-///         ]
-///     );
-/// }
+/// let xss = lex_hash_sets(1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {},
+///         hashset! {1},
+///         hashset! {1, 2},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 3, 4},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3},
+///         hashset! {1, 3, 4},
+///         hashset! {1, 4},
+///         hashset! {2},
+///         hashset! {2, 3},
+///         hashset! {2, 3, 4},
+///         hashset! {2, 4},
+///         hashset! {3},
+///         hashset! {3, 4},
+///         hashset! {4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_hash_sets<I: Clone + Iterator>(xs: I) -> LexOrderedUniqueCollections<I, HashSet<I::Item>>
@@ -395,31 +371,27 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_hash_sets_min_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = lex_hash_sets_min_length(2, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 3, 4},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3},
-///             hashset!{1, 3, 4},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 3, 4},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///         ]
-///     );
-/// }
+/// let xss = lex_hash_sets_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 3, 4},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3},
+///         hashset! {1, 3, 4},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 3, 4},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_hash_sets_min_length<I: Clone + Iterator>(
@@ -455,30 +427,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_hash_sets_length_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = lex_hash_sets_length_range(2, 4, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3},
-///             hashset!{1, 3, 4},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 3, 4},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///         ]
-///     );
-/// }
+/// let xss = lex_hash_sets_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3},
+///         hashset! {1, 3, 4},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 3, 4},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_hash_sets_length_range<I: Clone + Iterator>(
@@ -521,30 +489,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_hash_sets_length_inclusive_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = lex_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 2, 4},
-///             hashset!{1, 3},
-///             hashset!{1, 3, 4},
-///             hashset!{1, 4},
-///             hashset!{2, 3},
-///             hashset!{2, 3, 4},
-///             hashset!{2, 4},
-///             hashset!{3, 4},
-///         ]
-///     );
-/// }
+/// let xss = lex_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 2, 4},
+///         hashset! {1, 3},
+///         hashset! {1, 3, 4},
+///         hashset! {1, 4},
+///         hashset! {2, 3},
+///         hashset! {2, 3, 4},
+///         hashset! {2, 4},
+///         hashset! {3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_hash_sets_length_inclusive_range<I: Clone + Iterator>(
@@ -574,35 +538,31 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_hash_sets_fixed_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = exhaustive_hash_sets_fixed_length(4, 1..=6).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///              hashset!{1, 2, 3, 4},
-///              hashset!{1, 2, 3, 5},
-///              hashset!{1, 2, 4, 5},
-///              hashset!{1, 3, 4, 5},
-///              hashset!{2, 3, 4, 5},
-///              hashset!{1, 2, 3, 6},
-///              hashset!{1, 2, 4, 6},
-///              hashset!{1, 3, 4, 6},
-///              hashset!{2, 3, 4, 6},
-///              hashset!{1, 2, 5, 6},
-///              hashset!{1, 3, 5, 6},
-///              hashset!{2, 3, 5, 6},
-///              hashset!{1, 4, 5, 6},
-///              hashset!{2, 4, 5, 6},
-///              hashset!{3, 4, 5, 6}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_hash_sets_fixed_length(4, 1..=6).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2, 3, 4},
+///         hashset! {1, 2, 3, 5},
+///         hashset! {1, 2, 4, 5},
+///         hashset! {1, 3, 4, 5},
+///         hashset! {2, 3, 4, 5},
+///         hashset! {1, 2, 3, 6},
+///         hashset! {1, 2, 4, 6},
+///         hashset! {1, 3, 4, 6},
+///         hashset! {2, 3, 4, 6},
+///         hashset! {1, 2, 5, 6},
+///         hashset! {1, 3, 5, 6},
+///         hashset! {2, 3, 5, 6},
+///         hashset! {1, 4, 5, 6},
+///         hashset! {2, 4, 5, 6},
+///         hashset! {3, 4, 5, 6}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_hash_sets_fixed_length<I: Clone + Iterator>(
@@ -630,36 +590,32 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_hash_sets;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = exhaustive_hash_sets(1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{},
-///             hashset!{1},
-///             hashset!{2},
-///             hashset!{1, 2},
-///             hashset!{3},
-///             hashset!{1, 3},
-///             hashset!{2, 3},
-///             hashset!{1, 2, 3},
-///             hashset!{4},
-///             hashset!{1, 4},
-///             hashset!{2, 4},
-///             hashset!{1, 2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4},
-///             hashset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_hash_sets(1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {},
+///         hashset! {1},
+///         hashset! {2},
+///         hashset! {1, 2},
+///         hashset! {3},
+///         hashset! {1, 3},
+///         hashset! {2, 3},
+///         hashset! {1, 2, 3},
+///         hashset! {4},
+///         hashset! {1, 4},
+///         hashset! {2, 4},
+///         hashset! {1, 2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4},
+///         hashset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_hash_sets<I: Clone + Iterator>(
@@ -687,31 +643,27 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_hash_sets_min_length;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = exhaustive_hash_sets_min_length(2, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{2, 3},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 4},
-///             hashset!{1, 2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4},
-///             hashset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_hash_sets_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {2, 3},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 4},
+///         hashset! {1, 2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4},
+///         hashset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_hash_sets_min_length<I: Clone + Iterator>(
@@ -744,30 +696,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_hash_sets_length_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = exhaustive_hash_sets_length_range(2, 4, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{2, 3},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 4},
-///             hashset!{1, 2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_hash_sets_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {2, 3},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 4},
+///         hashset! {1, 2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_hash_sets_length_range<I: Clone + Iterator>(
@@ -805,30 +753,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_hash_sets_length_inclusive_range;
+/// use maplit::hashset;
 ///
-/// fn main() {
-///     let xss = exhaustive_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             hashset!{1, 2},
-///             hashset!{1, 3},
-///             hashset!{2, 3},
-///             hashset!{1, 2, 3},
-///             hashset!{1, 4},
-///             hashset!{2, 4},
-///             hashset!{1, 2, 4},
-///             hashset!{3, 4},
-///             hashset!{1, 3, 4},
-///             hashset!{2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         hashset! {1, 2},
+///         hashset! {1, 3},
+///         hashset! {2, 3},
+///         hashset! {1, 2, 3},
+///         hashset! {1, 4},
+///         hashset! {2, 4},
+///         hashset! {1, 2, 4},
+///         hashset! {3, 4},
+///         hashset! {1, 3, 4},
+///         hashset! {2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_hash_sets_length_inclusive_range<I: Clone + Iterator>(
@@ -861,35 +805,31 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_b_tree_sets_fixed_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = lex_b_tree_sets_fixed_length(4, 1..=6).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2, 3, 4},
-///             btreeset!{1, 2, 3, 5},
-///             btreeset!{1, 2, 3, 6},
-///             btreeset!{1, 2, 4, 5},
-///             btreeset!{1, 2, 4, 6},
-///             btreeset!{1, 2, 5, 6},
-///             btreeset!{1, 3, 4, 5},
-///             btreeset!{1, 3, 4, 6},
-///             btreeset!{1, 3, 5, 6},
-///             btreeset!{1, 4, 5, 6},
-///             btreeset!{2, 3, 4, 5},
-///             btreeset!{2, 3, 4, 6},
-///             btreeset!{2, 3, 5, 6},
-///             btreeset!{2, 4, 5, 6},
-///             btreeset!{3, 4, 5, 6}
-///         ]
-///     );
-/// }
+/// let xss = lex_b_tree_sets_fixed_length(4, 1..=6).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2, 3, 4},
+///         btreeset! {1, 2, 3, 5},
+///         btreeset! {1, 2, 3, 6},
+///         btreeset! {1, 2, 4, 5},
+///         btreeset! {1, 2, 4, 6},
+///         btreeset! {1, 2, 5, 6},
+///         btreeset! {1, 3, 4, 5},
+///         btreeset! {1, 3, 4, 6},
+///         btreeset! {1, 3, 5, 6},
+///         btreeset! {1, 4, 5, 6},
+///         btreeset! {2, 3, 4, 5},
+///         btreeset! {2, 3, 4, 6},
+///         btreeset! {2, 3, 5, 6},
+///         btreeset! {2, 4, 5, 6},
+///         btreeset! {3, 4, 5, 6}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_b_tree_sets_fixed_length<I: Iterator>(
@@ -920,36 +860,32 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_b_tree_sets;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = shortlex_b_tree_sets(1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{},
-///             btreeset!{1},
-///             btreeset!{2},
-///             btreeset!{3},
-///             btreeset!{4},
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4},
-///             btreeset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = shortlex_b_tree_sets(1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {},
+///         btreeset! {1},
+///         btreeset! {2},
+///         btreeset! {3},
+///         btreeset! {4},
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4},
+///         btreeset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_b_tree_sets<I: Clone + Iterator>(
@@ -980,31 +916,27 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_b_tree_sets_min_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = shortlex_b_tree_sets_min_length(2, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4},
-///             btreeset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = shortlex_b_tree_sets_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4},
+///         btreeset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_b_tree_sets_min_length<I: Clone + Iterator>(
@@ -1040,30 +972,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_b_tree_sets_length_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = shortlex_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4},
-///         ]
-///     );
-/// }
+/// let xss = shortlex_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_b_tree_sets_length_range<I: Clone + Iterator>(
@@ -1106,30 +1034,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::shortlex_b_tree_sets_length_inclusive_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = shortlex_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4},
-///         ]
-///     );
-/// }
+/// let xss = shortlex_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_b_tree_sets_length_inclusive_range<I: Clone + Iterator>(
@@ -1161,36 +1085,32 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_b_tree_sets;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = lex_b_tree_sets(1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{},
-///             btreeset!{1},
-///             btreeset!{1, 2},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 3, 4},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3},
-///             btreeset!{1, 3, 4},
-///             btreeset!{1, 4},
-///             btreeset!{2},
-///             btreeset!{2, 3},
-///             btreeset!{2, 3, 4},
-///             btreeset!{2, 4},
-///             btreeset!{3},
-///             btreeset!{3, 4},
-///             btreeset!{4}
-///         ]
-///     );
-/// }
+/// let xss = lex_b_tree_sets(1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {},
+///         btreeset! {1},
+///         btreeset! {1, 2},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 3, 4},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3},
+///         btreeset! {1, 3, 4},
+///         btreeset! {1, 4},
+///         btreeset! {2},
+///         btreeset! {2, 3},
+///         btreeset! {2, 3, 4},
+///         btreeset! {2, 4},
+///         btreeset! {3},
+///         btreeset! {3, 4},
+///         btreeset! {4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_b_tree_sets<I: Clone + Iterator>(
@@ -1221,31 +1141,27 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_b_tree_sets_min_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = lex_b_tree_sets_min_length(2, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 3, 4},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3},
-///             btreeset!{1, 3, 4},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 3, 4},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///         ]
-///     );
-/// }
+/// let xss = lex_b_tree_sets_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 3, 4},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3},
+///         btreeset! {1, 3, 4},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 3, 4},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_b_tree_sets_min_length<I: Clone + Iterator>(
@@ -1281,30 +1197,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_b_tree_sets_length_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = lex_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3},
-///             btreeset!{1, 3, 4},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 3, 4},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///         ]
-///     );
-/// }
+/// let xss = lex_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3},
+///         btreeset! {1, 3, 4},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 3, 4},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_b_tree_sets_length_range<I: Clone + Iterator>(
@@ -1347,30 +1259,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::lex_b_tree_sets_length_inclusive_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = lex_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 2, 4},
-///             btreeset!{1, 3},
-///             btreeset!{1, 3, 4},
-///             btreeset!{1, 4},
-///             btreeset!{2, 3},
-///             btreeset!{2, 3, 4},
-///             btreeset!{2, 4},
-///             btreeset!{3, 4},
-///         ]
-///     );
-/// }
+/// let xss = lex_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 2, 4},
+///         btreeset! {1, 3},
+///         btreeset! {1, 3, 4},
+///         btreeset! {1, 4},
+///         btreeset! {2, 3},
+///         btreeset! {2, 3, 4},
+///         btreeset! {2, 4},
+///         btreeset! {3, 4},
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn lex_b_tree_sets_length_inclusive_range<I: Clone + Iterator>(
@@ -1400,35 +1308,31 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_b_tree_sets_fixed_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = exhaustive_b_tree_sets_fixed_length(4, 1..=6).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2, 3, 4},
-///             btreeset!{1, 2, 3, 5},
-///             btreeset!{1, 2, 4, 5},
-///             btreeset!{1, 3, 4, 5},
-///             btreeset!{2, 3, 4, 5},
-///             btreeset!{1, 2, 3, 6},
-///             btreeset!{1, 2, 4, 6},
-///             btreeset!{1, 3, 4, 6},
-///             btreeset!{2, 3, 4, 6},
-///             btreeset!{1, 2, 5, 6},
-///             btreeset!{1, 3, 5, 6},
-///             btreeset!{2, 3, 5, 6},
-///             btreeset!{1, 4, 5, 6},
-///             btreeset!{2, 4, 5, 6},
-///             btreeset!{3, 4, 5, 6}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_b_tree_sets_fixed_length(4, 1..=6).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2, 3, 4},
+///         btreeset! {1, 2, 3, 5},
+///         btreeset! {1, 2, 4, 5},
+///         btreeset! {1, 3, 4, 5},
+///         btreeset! {2, 3, 4, 5},
+///         btreeset! {1, 2, 3, 6},
+///         btreeset! {1, 2, 4, 6},
+///         btreeset! {1, 3, 4, 6},
+///         btreeset! {2, 3, 4, 6},
+///         btreeset! {1, 2, 5, 6},
+///         btreeset! {1, 3, 5, 6},
+///         btreeset! {2, 3, 5, 6},
+///         btreeset! {1, 4, 5, 6},
+///         btreeset! {2, 4, 5, 6},
+///         btreeset! {3, 4, 5, 6}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_b_tree_sets_fixed_length<I: Clone + Iterator>(
@@ -1456,36 +1360,32 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_b_tree_sets;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = exhaustive_b_tree_sets(1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{},
-///             btreeset!{1},
-///             btreeset!{2},
-///             btreeset!{1, 2},
-///             btreeset!{3},
-///             btreeset!{1, 3},
-///             btreeset!{2, 3},
-///             btreeset!{1, 2, 3},
-///             btreeset!{4},
-///             btreeset!{1, 4},
-///             btreeset!{2, 4},
-///             btreeset!{1, 2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4},
-///             btreeset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_b_tree_sets(1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {},
+///         btreeset! {1},
+///         btreeset! {2},
+///         btreeset! {1, 2},
+///         btreeset! {3},
+///         btreeset! {1, 3},
+///         btreeset! {2, 3},
+///         btreeset! {1, 2, 3},
+///         btreeset! {4},
+///         btreeset! {1, 4},
+///         btreeset! {2, 4},
+///         btreeset! {1, 2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4},
+///         btreeset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_b_tree_sets<I: Clone + Iterator>(
@@ -1516,31 +1416,27 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_b_tree_sets_min_length;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = exhaustive_b_tree_sets_min_length(2, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{2, 3},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 4},
-///             btreeset!{1, 2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4},
-///             btreeset!{1, 2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_b_tree_sets_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {2, 3},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 4},
+///         btreeset! {1, 2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4},
+///         btreeset! {1, 2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_b_tree_sets_min_length<I: Clone + Iterator>(
@@ -1573,30 +1469,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_b_tree_sets_length_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = exhaustive_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{2, 3},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 4},
-///             btreeset!{1, 2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {2, 3},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 4},
+///         btreeset! {1, 2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_b_tree_sets_length_range<I: Clone + Iterator>(
@@ -1634,30 +1526,26 @@ where
 ///
 /// # Examples
 /// ```
-/// #[macro_use]
-/// extern crate maplit;
-///
 /// use itertools::Itertools;
 /// use malachite_base::sets::exhaustive::exhaustive_b_tree_sets_length_inclusive_range;
+/// use maplit::btreeset;
 ///
-/// fn main() {
-///     let xss = exhaustive_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
-///     assert_eq!(
-///         xss,
-///         &[
-///             btreeset!{1, 2},
-///             btreeset!{1, 3},
-///             btreeset!{2, 3},
-///             btreeset!{1, 2, 3},
-///             btreeset!{1, 4},
-///             btreeset!{2, 4},
-///             btreeset!{1, 2, 4},
-///             btreeset!{3, 4},
-///             btreeset!{1, 3, 4},
-///             btreeset!{2, 3, 4}
-///         ]
-///     );
-/// }
+/// let xss = exhaustive_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         btreeset! {1, 2},
+///         btreeset! {1, 3},
+///         btreeset! {2, 3},
+///         btreeset! {1, 2, 3},
+///         btreeset! {1, 4},
+///         btreeset! {2, 4},
+///         btreeset! {1, 2, 4},
+///         btreeset! {3, 4},
+///         btreeset! {1, 3, 4},
+///         btreeset! {2, 3, 4}
+///     ]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_b_tree_sets_length_inclusive_range<I: Clone + Iterator>(

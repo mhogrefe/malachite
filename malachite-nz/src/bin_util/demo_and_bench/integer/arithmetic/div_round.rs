@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -138,7 +138,7 @@ fn benchmark_integer_div_round_down_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer.div_round(Integer, RoundingMode::Down)",
+        "Integer.div_round(Integer, Down)",
         BenchmarkType::LibraryComparison,
         integer_pair_gen_var_1_rm().get(gm, config),
         gm.name(),
@@ -146,9 +146,10 @@ fn benchmark_integer_div_round_down_library_comparison(
         file_name,
         &pair_2_pair_1_integer_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.div_round(y, RoundingMode::Down))
-            }),
+            (
+                "Malachite",
+                &mut |(_, (x, y))| no_out!(x.div_round(y, Down)),
+            ),
             ("rug", &mut |((x, y), _)| no_out!(x.div_trunc(y))),
         ],
     );
@@ -161,7 +162,7 @@ fn benchmark_integer_div_round_floor_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer.div_round(Integer, RoundingMode::Floor)",
+        "Integer.div_round(Integer, Floor)",
         BenchmarkType::LibraryComparison,
         integer_pair_gen_var_1_nrm().get(gm, config),
         gm.name(),
@@ -170,7 +171,7 @@ fn benchmark_integer_div_round_floor_library_comparison(
         &triple_3_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| {
-                no_out!(x.div_round(y, RoundingMode::Floor))
+                no_out!(x.div_round(y, Floor))
             }),
             ("num", &mut |((x, y), _, _)| no_out!(x.div_floor(&y))),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.div_floor(y))),
@@ -185,7 +186,7 @@ fn benchmark_integer_div_round_ceiling_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer.div_round(Integer, RoundingMode::Ceiling)",
+        "Integer.div_round(Integer, Ceiling)",
         BenchmarkType::LibraryComparison,
         integer_pair_gen_var_1_rm().get(gm, config),
         gm.name(),
@@ -194,7 +195,7 @@ fn benchmark_integer_div_round_ceiling_library_comparison(
         &pair_2_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.div_round(y, RoundingMode::Ceiling))
+                no_out!(x.div_round(y, Ceiling))
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.div_ceil(y))),
         ],
@@ -209,7 +210,7 @@ fn benchmark_integer_div_round_ceiling_algorithms(
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer.div_round(Integer, RoundingMode::Ceiling)",
+        "Integer.div_round(Integer, Ceiling)",
         BenchmarkType::Algorithms,
         integer_pair_gen_var_1().get(gm, config),
         gm.name(),
@@ -217,9 +218,7 @@ fn benchmark_integer_div_round_ceiling_algorithms(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [
-            ("standard", &mut |(x, y)| {
-                no_out!(x.div_round(y, RoundingMode::Ceiling))
-            }),
+            ("standard", &mut |(x, y)| no_out!(x.div_round(y, Ceiling))),
             ("using ceiling_div_mod", &mut |(x, y)| {
                 no_out!(x.ceiling_div_mod(y).0)
             }),

@@ -10,7 +10,10 @@ use crate::arithmetic::traits::SimplestRationalInInterval;
 use crate::conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
 use crate::conversion::traits::ContinuedFraction;
 use crate::Rational;
-use core::cmp::{max, min, Ordering};
+use core::cmp::{
+    max, min,
+    Ordering::{self, *},
+};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMul, Ceiling, Floor, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};
@@ -114,19 +117,19 @@ impl Rational {
     /// # Examples
     /// ```
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(
     ///     Rational::from_signeds(1, 2).cmp_complexity(&Rational::from_signeds(1, 3)),
-    ///     Ordering::Less
+    ///     Less
     /// );
     /// assert_eq!(
     ///     Rational::from_signeds(1, 2).cmp_complexity(&Rational::from_signeds(3, 2)),
-    ///     Ordering::Less
+    ///     Less
     /// );
     /// assert_eq!(
     ///     Rational::from_signeds(1, 2).cmp_complexity(&Rational::from_signeds(-1, 2)),
-    ///     Ordering::Less
+    ///     Less
     /// );
     /// ```
     pub fn cmp_complexity(&self, other: &Rational) -> Ordering {
@@ -416,7 +419,7 @@ impl SimplestRationalInInterval for Rational {
         }
         let mut best = Rational::simplest_rational_in_open_interval(x, y);
         for q in [x, y] {
-            if q.cmp_complexity(&best) == Ordering::Less {
+            if q.cmp_complexity(&best) == Less {
                 best = q.clone();
             }
         }

@@ -10,7 +10,7 @@ use malachite_base::nevers::Never;
 use malachite_base::options::option_from_str;
 use malachite_base::orderings::ordering_from_str;
 use malachite_base::vecs::{vec_from_str, vec_from_str_custom};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::fmt::Debug;
 use std::str::FromStr;
 
@@ -56,7 +56,7 @@ fn test_vec_from_str_custom() {
     vec_from_str_custom_helper(
         &ordering_from_str,
         "[Less, Greater]",
-        Some(vec![Ordering::Less, Ordering::Greater]),
+        Some(vec![Less, Greater]),
     );
     vec_from_str_custom_helper(
         &option_from_str,

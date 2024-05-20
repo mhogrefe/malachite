@@ -37,8 +37,14 @@ impl ModAdd<Natural, Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_add(Natural::from(3u32), Natural::from(5u32)), 3);
-    /// assert_eq!(Natural::from(7u32).mod_add(Natural::from(5u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::ZERO.mod_add(Natural::from(3u32), Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_add(Natural::from(5u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
@@ -74,8 +80,14 @@ impl<'a> ModAdd<Natural, &'a Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_add(Natural::from(3u32), &Natural::from(5u32)), 3);
-    /// assert_eq!(Natural::from(7u32).mod_add(Natural::from(5u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::ZERO.mod_add(Natural::from(3u32), &Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_add(Natural::from(5u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `c`
@@ -111,8 +123,14 @@ impl<'a> ModAdd<&'a Natural, Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_add(&Natural::from(3u32), Natural::from(5u32)), 3);
-    /// assert_eq!(Natural::from(7u32).mod_add(&Natural::from(5u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::ZERO.mod_add(&Natural::from(3u32), Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_add(&Natural::from(5u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `m`
@@ -148,8 +166,14 @@ impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_add(&Natural::from(3u32), &Natural::from(5u32)), 3);
-    /// assert_eq!(Natural::from(7u32).mod_add(&Natural::from(5u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     Natural::ZERO.mod_add(&Natural::from(3u32), &Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_add(&Natural::from(5u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` is
@@ -186,11 +210,15 @@ impl<'a> ModAdd<Natural, Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::ZERO).mod_add(Natural::from(3u32), Natural::from(5u32)).to_string(),
+    ///     (&Natural::ZERO)
+    ///         .mod_add(Natural::from(3u32), Natural::from(5u32))
+    ///         .to_string(),
     ///     "3"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_add(Natural::from(5u32), Natural::from(10u32)).to_string(),
+    ///     (&Natural::from(7u32))
+    ///         .mod_add(Natural::from(5u32), Natural::from(10u32))
+    ///         .to_string(),
     ///     "2"
     /// );
     /// ```
@@ -228,8 +256,14 @@ impl<'a, 'b> ModAdd<Natural, &'b Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_add(Natural::from(3u32), &Natural::from(5u32)), 3);
-    /// assert_eq!((&Natural::from(7u32)).mod_add(Natural::from(5u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::ZERO).mod_add(Natural::from(3u32), &Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_add(Natural::from(5u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `m`
@@ -265,8 +299,14 @@ impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_add(&Natural::from(3u32), Natural::from(5u32)), 3);
-    /// assert_eq!((&Natural::from(7u32)).mod_add(&Natural::from(5u32), Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::ZERO).mod_add(&Natural::from(3u32), Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_add(&Natural::from(5u32), Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `c`
@@ -310,8 +350,14 @@ impl<'a, 'b, 'c> ModAdd<&'b Natural, &'c Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_add(&Natural::from(3u32), &Natural::from(5u32)), 3);
-    /// assert_eq!((&Natural::from(7u32)).mod_add(&Natural::from(5u32), &Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::ZERO).mod_add(&Natural::from(3u32), &Natural::from(5u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_add(&Natural::from(5u32), &Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,

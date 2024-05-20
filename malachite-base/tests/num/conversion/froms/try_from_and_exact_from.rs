@@ -16,7 +16,7 @@ use malachite_base::num::conversion::from::{
 };
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_13, primitive_float_gen_var_14, signed_gen,
     signed_gen_var_7, unsigned_gen, unsigned_gen_var_18,
@@ -189,7 +189,7 @@ where
         let u = T::exact_from(f);
         assert_eq!(NiceFloat::<U>::exact_from(u), f);
         assert_eq!(T::try_from(f).unwrap(), u);
-        assert_eq!(T::rounding_from(f.0, RoundingMode::Exact).0, u);
+        assert_eq!(T::rounding_from(f.0, Exact).0, u);
     });
 }
 
@@ -217,7 +217,7 @@ where
         let i = T::exact_from(f);
         assert_eq!(NiceFloat::<U>::exact_from(i), f);
         assert_eq!(T::try_from(f).unwrap(), i);
-        assert_eq!(T::rounding_from(f.0, RoundingMode::Exact).0, i);
+        assert_eq!(T::rounding_from(f.0, Exact).0, i);
     });
 }
 
@@ -240,7 +240,7 @@ where
         let f = NiceFloat::<T>::exact_from(u);
         assert_eq!(U::exact_from(f), u);
         assert_eq!(NiceFloat::<T>::try_from(u).unwrap(), f);
-        assert_eq!(NiceFloat(T::rounding_from(u, RoundingMode::Exact).0), f);
+        assert_eq!(NiceFloat(T::rounding_from(u, Exact).0), f);
     });
 }
 
@@ -263,7 +263,7 @@ where
         let f = NiceFloat::<T>::exact_from(i);
         assert_eq!(U::exact_from(f), i);
         assert_eq!(NiceFloat::<T>::try_from(i).unwrap(), f);
-        assert_eq!(NiceFloat(T::rounding_from(i, RoundingMode::Exact).0), f);
+        assert_eq!(NiceFloat(T::rounding_from(i, Exact).0), f);
     });
 }
 

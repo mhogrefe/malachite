@@ -23,7 +23,10 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::{max, Ordering};
+use core::cmp::{
+    max,
+    Ordering::{self, *},
+};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, ModPowerOf2, ModPowerOf2Sub, NegAssign, NegModPowerOf2, OverflowingAddAssign,
@@ -34,7 +37,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 const WIDTH_M1: u64 = Limb::WIDTH - 1;
@@ -79,7 +82,7 @@ pub fn sub_float_significands_in_place(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -90,12 +93,8 @@ pub fn sub_float_significands_in_place(
                     }
                     (o, false, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -107,7 +106,7 @@ pub fn sub_float_significands_in_place(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -133,7 +132,7 @@ pub fn sub_float_significands_in_place(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -144,12 +143,8 @@ pub fn sub_float_significands_in_place(
                     }
                     (o, false, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -161,7 +156,7 @@ pub fn sub_float_significands_in_place(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -187,7 +182,7 @@ pub fn sub_float_significands_in_place(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -198,12 +193,8 @@ pub fn sub_float_significands_in_place(
                     }
                     (o, false, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         xs,
@@ -215,7 +206,7 @@ pub fn sub_float_significands_in_place(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -233,7 +224,7 @@ pub fn sub_float_significands_in_place(
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out, xs, *x_exp, x_prec, ys, y_exp, y_prec, out_prec, rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -244,16 +235,12 @@ pub fn sub_float_significands_in_place(
                     }
                     (o, false, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out, xs, *x_exp, x_prec, ys, y_exp, y_prec, out_prec, rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -297,7 +284,7 @@ pub fn sub_float_significands_in_place_ref(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -308,12 +295,8 @@ pub fn sub_float_significands_in_place_ref(
                     }
                     (o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -325,7 +308,7 @@ pub fn sub_float_significands_in_place_ref(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -351,7 +334,7 @@ pub fn sub_float_significands_in_place_ref(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -362,12 +345,8 @@ pub fn sub_float_significands_in_place_ref(
                     }
                     (o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -379,7 +358,7 @@ pub fn sub_float_significands_in_place_ref(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -405,7 +384,7 @@ pub fn sub_float_significands_in_place_ref(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -416,12 +395,8 @@ pub fn sub_float_significands_in_place_ref(
                     }
                     (o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         xs,
@@ -433,7 +408,7 @@ pub fn sub_float_significands_in_place_ref(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -451,7 +426,7 @@ pub fn sub_float_significands_in_place_ref(
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out, xs, *x_exp, x_prec, ys, y_exp, y_prec, out_prec, rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -462,16 +437,12 @@ pub fn sub_float_significands_in_place_ref(
                     }
                     (o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (diff_exp, o, neg) = sub_float_significands_general(
                         &mut out, xs, *x_exp, x_prec, ys, y_exp, y_prec, out_prec, rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     if *out.last().unwrap() == 0 {
@@ -515,17 +486,13 @@ pub fn sub_float_significands_ref_ref<'a>(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (Natural(Small(out[0])), out_exp, o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         &[*x],
@@ -537,7 +504,7 @@ pub fn sub_float_significands_ref_ref<'a>(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (
@@ -566,17 +533,13 @@ pub fn sub_float_significands_ref_ref<'a>(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (Natural(Small(out[0])), out_exp, o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         &[*x],
@@ -588,7 +551,7 @@ pub fn sub_float_significands_ref_ref<'a>(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (
@@ -617,17 +580,13 @@ pub fn sub_float_significands_ref_ref<'a>(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (Natural(Small(out[0])), out_exp, o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o, neg) = sub_float_significands_general(
                         &mut out,
                         xs,
@@ -639,7 +598,7 @@ pub fn sub_float_significands_ref_ref<'a>(
                         out_prec,
                         rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (
@@ -660,21 +619,17 @@ pub fn sub_float_significands_ref_ref<'a>(
                     let (out_exp, o, neg) = sub_float_significands_general(
                         &mut out, xs, x_exp, x_prec, ys, y_exp, y_prec, out_prec, rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (Natural(Small(out[0])), out_exp, o, neg)
                 } else {
-                    let mut out = vec![
-                        0;
-                        usize::exact_from(
-                            out_prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0
-                        )
-                    ];
+                    let mut out =
+                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
                     let (out_exp, o, neg) = sub_float_significands_general(
                         &mut out, xs, x_exp, x_prec, ys, y_exp, y_prec, out_prec, rm,
                     );
-                    if rm == RoundingMode::Exact && o != Ordering::Equal {
+                    if rm == Exact && o != Equal {
                         panic!("Inexact float subtraction")
                     }
                     (
@@ -916,9 +871,9 @@ fn sub_float_significands_same_prec_lt_w(
     {
         let (mut diff, sticky_bit, round_bit, shift_bit, neg) = if x_exp == y_exp {
             let (a0, neg) = match x.cmp(&y) {
-                Ordering::Equal => return (0, 0, Ordering::Equal, false),
-                Ordering::Less => (y - x, true),
-                Ordering::Greater => (x - y, false),
+                Equal => return (0, 0, Equal, false),
+                Less => (y - x, true),
+                Greater => (x - y, false),
             };
             let leading_zeros = a0.leading_zeros();
             x_exp = x_exp
@@ -992,38 +947,28 @@ fn sub_float_significands_same_prec_lt_w(
             }
         };
         if round_bit == 0 && sticky_bit == 0 {
-            (diff, x_exp, Ordering::Equal, neg)
+            (diff, x_exp, Equal, neg)
         } else {
             if neg {
                 rm.neg_assign();
             }
             match rm {
-                RoundingMode::Exact => panic!("Inexact float subtraction"),
-                RoundingMode::Nearest => {
+                Exact => panic!("Inexact float subtraction"),
+                Nearest => {
                     if round_bit == 0 || (sticky_bit == 0 && (diff & shift_bit) == 0) {
-                        (diff, x_exp, Ordering::Less, neg)
+                        (diff, x_exp, Less, neg)
                     } else if diff.overflowing_add_assign(shift_bit) {
-                        (
-                            HIGH_BIT,
-                            x_exp.checked_add(1).unwrap(),
-                            Ordering::Greater,
-                            neg,
-                        )
+                        (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
                     } else {
-                        (diff, x_exp, Ordering::Greater, neg)
+                        (diff, x_exp, Greater, neg)
                     }
                 }
-                RoundingMode::Floor | RoundingMode::Down => (diff, x_exp, Ordering::Less, neg),
-                RoundingMode::Ceiling | RoundingMode::Up => {
+                Floor | Down => (diff, x_exp, Less, neg),
+                Ceiling | Up => {
                     if diff.overflowing_add_assign(shift_bit) {
-                        (
-                            HIGH_BIT,
-                            x_exp.checked_add(1).unwrap(),
-                            Ordering::Greater,
-                            neg,
-                        )
+                        (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
                     } else {
-                        (diff, x_exp, Ordering::Greater, neg)
+                        (diff, x_exp, Greater, neg)
                     }
                 }
             }
@@ -1041,9 +986,9 @@ fn sub_float_significands_same_prec_w(
 ) -> (Limb, i64, Ordering, bool) {
     let (mut diff, sticky_bit, round_bit, neg) = if x_exp == y_exp {
         let (a0, neg) = match x.cmp(&y) {
-            Ordering::Equal => return (0, 0, Ordering::Equal, false),
-            Ordering::Less => (y - x, true),
-            Ordering::Greater => (x - y, false),
+            Equal => return (0, 0, Equal, false),
+            Less => (y - x, true),
+            Greater => (x - y, false),
         };
         let leading_zeros = LeadingZeros::leading_zeros(a0);
         x_exp = x_exp
@@ -1134,38 +1079,28 @@ fn sub_float_significands_same_prec_w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (diff, x_exp, Ordering::Equal, neg)
+        (diff, x_exp, Equal, neg)
     } else {
         if neg {
             rm.neg_assign();
         }
         match rm {
-            RoundingMode::Exact => panic!("Inexact float subtraction"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float subtraction"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (diff & 1) == 0) {
-                    (diff, x_exp, Ordering::Less, neg)
+                    (diff, x_exp, Less, neg)
                 } else if diff.overflowing_add_assign(1) {
-                    (
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
-                        neg,
-                    )
+                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
                 } else {
-                    (diff, x_exp, Ordering::Greater, neg)
+                    (diff, x_exp, Greater, neg)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => (diff, x_exp, Ordering::Less, neg),
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (diff, x_exp, Less, neg),
+            Ceiling | Up => {
                 if diff.overflowing_add_assign(1) {
-                    (
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
-                        neg,
-                    )
+                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
                 } else {
-                    (diff, x_exp, Ordering::Greater, neg)
+                    (diff, x_exp, Greater, neg)
                 }
             }
         }
@@ -1194,7 +1129,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
             a1.wrapping_sub_assign(1);
         }
         let neg = if a1 == 0 && a0 == 0 {
-            return (0, 0, 0, Ordering::Equal, false);
+            return (0, 0, 0, Equal, false);
         } else if a1 >= x_1 {
             // out = x - y mod 2 ^ (2 * Limb::WIDTH)
             let overflow = a0.overflowing_neg_assign();
@@ -1368,16 +1303,16 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (diff_0, diff_1, x_exp, Ordering::Equal, neg)
+        (diff_0, diff_1, x_exp, Equal, neg)
     } else {
         if neg {
             rm.neg_assign();
         }
         match rm {
-            RoundingMode::Exact => panic!("Inexact float subtraction"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float subtraction"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (diff_0 & shift_bit) == 0) {
-                    (diff_0, diff_1, x_exp, Ordering::Less, neg)
+                    (diff_0, diff_1, x_exp, Less, neg)
                 } else if diff_0.overflowing_add_assign(shift_bit)
                     && diff_1.overflowing_add_assign(1)
                 {
@@ -1385,27 +1320,25 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                         diff_0,
                         HIGH_BIT,
                         x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
+                        Greater,
                         neg,
                     )
                 } else {
-                    (diff_0, diff_1, x_exp, Ordering::Greater, neg)
+                    (diff_0, diff_1, x_exp, Greater, neg)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => {
-                (diff_0, diff_1, x_exp, Ordering::Less, neg)
-            }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (diff_0, diff_1, x_exp, Less, neg),
+            Ceiling | Up => {
                 if diff_0.overflowing_add_assign(shift_bit) && diff_1.overflowing_add_assign(1) {
                     (
                         diff_0,
                         HIGH_BIT,
                         x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
+                        Greater,
                         neg,
                     )
                 } else {
-                    (diff_0, diff_1, x_exp, Ordering::Greater, neg)
+                    (diff_0, diff_1, x_exp, Greater, neg)
                 }
             }
         }
@@ -1429,7 +1362,7 @@ fn sub_float_significands_same_prec_2w(
             a1.wrapping_sub_assign(1);
         }
         let neg = if a1 == 0 && a0 == 0 {
-            return (0, 0, 0, Ordering::Equal, false);
+            return (0, 0, 0, Equal, false);
         } else if a1 >= x_1 {
             // since B/2 <= x_1, y_1 < B with B = 2 ^ Limb::WIDTH, if no borrow we have 0 <= x_1 -
             // y_1 - x < B / 2, where x = (x_0 < y_0) is 0 or 1, thus a1 < B / 2 <= x_1
@@ -1622,42 +1555,40 @@ fn sub_float_significands_same_prec_2w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (diff_0, diff_1, x_exp, Ordering::Equal, neg)
+        (diff_0, diff_1, x_exp, Equal, neg)
     } else {
         if neg {
             rm.neg_assign();
         }
         match rm {
-            RoundingMode::Exact => panic!("Inexact float subtraction"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float subtraction"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (diff_0 & 1) == 0) {
-                    (diff_0, diff_1, x_exp, Ordering::Less, neg)
+                    (diff_0, diff_1, x_exp, Less, neg)
                 } else if diff_0.overflowing_add_assign(1) && diff_1.overflowing_add_assign(1) {
                     (
                         diff_0,
                         HIGH_BIT,
                         x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
+                        Greater,
                         neg,
                     )
                 } else {
-                    (diff_0, diff_1, x_exp, Ordering::Greater, neg)
+                    (diff_0, diff_1, x_exp, Greater, neg)
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => {
-                (diff_0, diff_1, x_exp, Ordering::Less, neg)
-            }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (diff_0, diff_1, x_exp, Less, neg),
+            Ceiling | Up => {
                 if diff_0.overflowing_add_assign(1) && diff_1.overflowing_add_assign(1) {
                     (
                         diff_0,
                         HIGH_BIT,
                         x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
+                        Greater,
                         neg,
                     )
                 } else {
-                    (diff_0, diff_1, x_exp, Ordering::Greater, neg)
+                    (diff_0, diff_1, x_exp, Greater, neg)
                 }
             }
         }
@@ -1691,7 +1622,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
             a2.wrapping_sub_assign(1);
         }
         let neg = if a2 == 0 && a1 == 0 && a0 == 0 {
-            return (0, 0, 0, 0, Ordering::Equal, false);
+            return (0, 0, 0, 0, Equal, false);
         } else if a2 >= x_2 {
             // a = x - y mod 2 ^ (3 * Limb::WIDTH)
             let overflow_1 = a0.overflowing_neg_assign();
@@ -1972,16 +1903,16 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
-        (diff_0, diff_1, diff_2, x_exp, Ordering::Equal, neg)
+        (diff_0, diff_1, diff_2, x_exp, Equal, neg)
     } else {
         if neg {
             rm.neg_assign();
         }
         match rm {
-            RoundingMode::Exact => panic!("Inexact float subtraction"),
-            RoundingMode::Nearest => {
+            Exact => panic!("Inexact float subtraction"),
+            Nearest => {
                 if round_bit == 0 || (sticky_bit == 0 && (diff_0 & shift_bit) == 0) {
-                    (diff_0, diff_1, diff_2, x_exp, Ordering::Less, neg)
+                    (diff_0, diff_1, diff_2, x_exp, Less, neg)
                 } else {
                     if diff_0.overflowing_add_assign(shift_bit) {
                         diff_1.wrapping_add_assign(1);
@@ -1995,18 +1926,16 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                             diff_1,
                             HIGH_BIT,
                             x_exp.checked_add(1).unwrap(),
-                            Ordering::Greater,
+                            Greater,
                             neg,
                         )
                     } else {
-                        (diff_0, diff_1, diff_2, x_exp, Ordering::Greater, neg)
+                        (diff_0, diff_1, diff_2, x_exp, Greater, neg)
                     }
                 }
             }
-            RoundingMode::Floor | RoundingMode::Down => {
-                (diff_0, diff_1, diff_2, x_exp, Ordering::Less, neg)
-            }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Floor | Down => (diff_0, diff_1, diff_2, x_exp, Less, neg),
+            Ceiling | Up => {
                 if diff_0.overflowing_add_assign(shift_bit) {
                     diff_1.wrapping_add_assign(1);
                 }
@@ -2019,11 +1948,11 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                         diff_1,
                         HIGH_BIT,
                         x_exp.checked_add(1).unwrap(),
-                        Ordering::Greater,
+                        Greater,
                         neg,
                     )
                 } else {
-                    (diff_0, diff_1, diff_2, x_exp, Ordering::Greater, neg)
+                    (diff_0, diff_1, diff_2, x_exp, Greater, neg)
                 }
             }
         }
@@ -2131,11 +2060,11 @@ fn cmp_size_helper(
     y_exp: i64,
     prec: u64,
 ) -> (usize, usize, bool) {
-    let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     let nm1 = n - 1;
     let mut k = nm1;
     let neg = match x_exp.cmp(&y_exp) {
-        Ordering::Equal => {
+        Equal => {
             // Check mantissa since exponents are equal
             let mut x_y_equal = false;
             while xs[k] == ys[k] {
@@ -2152,8 +2081,8 @@ fn cmp_size_helper(
                 xs[k] < ys[k]
             }
         }
-        Ordering::Less => true,
-        Ordering::Greater => false,
+        Less => true,
+        Greater => false,
     };
     (n, k, neg)
 }
@@ -2174,7 +2103,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
         // of the output is the same as the precision of the inputs, and the most-significant limb
         // is therefore nonzero.
         *out.last_mut().unwrap() = 0;
-        return (0, Ordering::Equal, false);
+        return (0, Equal, false);
     }
     let nm1 = n - 1;
     if neg {
@@ -2251,7 +2180,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
             }
             // No rounding is necessary since the result is exact
             assert!(out[nm1].get_highest_bit());
-            return (x_exp, Ordering::Equal, neg);
+            return (x_exp, Equal, neg);
         } else if exp_diff == 1 || goto_sub_d1_no_lose || goto_sub_d1_lose {
             // ```
             // | <-- x -->
@@ -2282,7 +2211,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 assert!(out[nm1].get_highest_bit());
                 if y0 == 0 {
                     // Result is exact: no need of rounding!
-                    return (x_exp, Ordering::Equal, neg);
+                    return (x_exp, Equal, neg);
                 }
                 // - y0 is non-zero, thus we have to subtract 1 / 2 * ulp(out).
                 // - However, we know (see analysis above) that this cannot make the exponent
@@ -2344,7 +2273,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                         *out_last = HIGH_BIT;
                     }
                     // No Normalize is needed, no Rounding is needed
-                    return (x_exp, Ordering::Equal, neg);
+                    return (x_exp, Equal, neg);
                 } else if xs[l - 1] > yl_shifted {
                     // - cl_shifted is the shifted value c'[l]
                     // - |x| - |y| >= 1 / 2 * W ^ n
@@ -2479,7 +2408,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
         // round_bit/round_bit_2/sticky_bit_2 as 1 if non-zero.
         sticky_bit = round_bit_2 | sticky_bit_2;
         if round_bit == 0 && sticky_bit == 0 {
-            return (x_exp, Ordering::Equal, neg);
+            return (x_exp, Equal, neg);
         }
         out_power_of_2 = limbs_is_power_of_2(out);
         if out_power_of_2 && round_bit != 0 {
@@ -2499,8 +2428,8 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
         rm.neg_assign();
     }
     match rm {
-        RoundingMode::Exact => panic!("Inexact float subtraction"),
-        RoundingMode::Nearest => {
+        Exact => panic!("Inexact float subtraction"),
+        Nearest => {
             if out_power_of_2 {
                 assert_eq!(round_bit, 0);
                 // Since we are at the end of the binade, we have in fact round_bit = round_bit_2
@@ -2511,7 +2440,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
             if (prec == 1 || out[0] & shift_bit == 0 || round_bit == 0)
                 && (sticky_bit == 0 || round_bit == 0)
             {
-                (x_exp, Ordering::Greater, neg)
+                (x_exp, Greater, neg)
             } else {
                 limbs_sub_limb_in_place(out, shift_bit);
                 if out_power_of_2 {
@@ -2519,19 +2448,19 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                     out[nm1] |= HIGH_BIT;
                     x_exp = x_exp.checked_sub(1).unwrap();
                 }
-                (x_exp, Ordering::Less, neg)
+                (x_exp, Less, neg)
             }
         }
-        RoundingMode::Floor | RoundingMode::Down => {
+        Floor | Down => {
             limbs_sub_limb_in_place(out, shift_bit);
             if out_power_of_2 {
                 // deal with cancellation
                 out[nm1] |= HIGH_BIT;
                 x_exp = x_exp.checked_sub(1).unwrap();
             }
-            (x_exp, Ordering::Less, neg)
+            (x_exp, Less, neg)
         }
-        RoundingMode::Ceiling | RoundingMode::Up => (x_exp, Ordering::Greater, neg),
+        Ceiling | Up => (x_exp, Greater, neg),
     }
 }
 
@@ -2637,7 +2566,7 @@ fn sub_float_significands_same_prec_ge_3w_val_val<'a>(
         // of the output is the same as the precision of the inputs, and the most-significant limb
         // is therefore nonzero.
         *xs.last_mut().unwrap() = 0;
-        return (0, Ordering::Equal, false);
+        return (0, Equal, false);
     }
     if neg {
         rm.neg_assign();
@@ -2664,7 +2593,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref(
         // of the output is the same as the precision of the inputs, and the most-significant limb
         // is therefore nonzero.
         *xs.last_mut().unwrap() = 0;
-        return (0, Ordering::Equal, false);
+        return (0, Equal, false);
     }
     if neg {
         let (exp, o) =
@@ -2685,7 +2614,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
     prec: u64,
     rm: RoundingMode,
 ) -> (i64, Ordering) {
-    let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     let nm1 = n - 1;
     let mut k = nm1;
     let exp_diff = u64::exact_from(x_exp - y_exp);
@@ -2758,7 +2687,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
             }
             // No rounding is necessary since the result is exact
             assert!(xs[nm1].get_highest_bit());
-            return (x_exp, Ordering::Equal);
+            return (x_exp, Equal);
         } else if exp_diff == 1 || goto_sub_d1_no_lose || goto_sub_d1_lose {
             // ```
             // | <-- x -->
@@ -2789,7 +2718,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 assert!(xs[nm1].get_highest_bit());
                 if y0 == 0 {
                     // Result is exact: no need of rounding!
-                    return (x_exp, Ordering::Equal);
+                    return (x_exp, Equal);
                 }
                 // - y0 is non-zero, thus we have to subtract 1 / 2 * ulp(out).
                 // - However, we know (see analysis above) that this cannot make the exponent
@@ -2851,7 +2780,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                         *xs_last = HIGH_BIT;
                     }
                     // No Normalize is needed, no Rounding is needed
-                    return (x_exp, Ordering::Equal);
+                    return (x_exp, Equal);
                 } else if xs[l - 1] > yl_shifted {
                     // - cl_shifted is the shifted value c'[l]
                     // - |x| - |y| >= 1 / 2 * W ^ n
@@ -2984,7 +2913,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
         // round_bit/round_bit_2/sticky_bit_2 as 1 if non-zero.
         sticky_bit = round_bit_2 | sticky_bit_2;
         if round_bit == 0 && sticky_bit == 0 {
-            return (x_exp, Ordering::Equal);
+            return (x_exp, Equal);
         }
         out_power_of_2 = limbs_is_power_of_2(xs);
         if out_power_of_2 && round_bit != 0 {
@@ -3001,8 +2930,8 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
     // Now if out is a power of two, necessary round_bit = 0, which means the exact result is always
     // in (pred(xs), xs), and the bounds cannot be attained
     match rm {
-        RoundingMode::Exact => panic!("Inexact float subtraction"),
-        RoundingMode::Nearest => {
+        Exact => panic!("Inexact float subtraction"),
+        Nearest => {
             if out_power_of_2 {
                 assert_eq!(round_bit, 0);
                 // Since we are at the end of the binade, we have in fact round_bit = round_bit_2
@@ -3013,7 +2942,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
             if (prec == 1 || xs[0] & shift_bit == 0 || round_bit == 0)
                 && (sticky_bit == 0 || round_bit == 0)
             {
-                (x_exp, Ordering::Greater)
+                (x_exp, Greater)
             } else {
                 limbs_sub_limb_in_place(xs, shift_bit);
                 if out_power_of_2 {
@@ -3021,19 +2950,19 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                     xs[nm1] |= HIGH_BIT;
                     x_exp = x_exp.checked_sub(1).unwrap();
                 }
-                (x_exp, Ordering::Less)
+                (x_exp, Less)
             }
         }
-        RoundingMode::Floor | RoundingMode::Down => {
+        Floor | Down => {
             limbs_sub_limb_in_place(xs, shift_bit);
             if out_power_of_2 {
                 // deal with cancellation
                 xs[nm1] |= HIGH_BIT;
                 x_exp = x_exp.checked_sub(1).unwrap();
             }
-            (x_exp, Ordering::Less)
+            (x_exp, Less)
         }
-        RoundingMode::Ceiling | RoundingMode::Up => (x_exp, Ordering::Greater),
+        Ceiling | Up => (x_exp, Greater),
     }
 }
 
@@ -3125,7 +3054,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
     prec: u64,
     rm: RoundingMode,
 ) -> (i64, Ordering) {
-    let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     let nm1 = n - 1;
     let mut k = nm1;
     let exp_diff = u64::exact_from(x_exp - y_exp);
@@ -3198,7 +3127,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
             }
             // No rounding is necessary since the result is exact
             assert!(ys[nm1].get_highest_bit());
-            return (x_exp, Ordering::Equal);
+            return (x_exp, Equal);
         } else if exp_diff == 1 || goto_sub_d1_no_lose || goto_sub_d1_lose {
             // ```
             // | <-- x -->
@@ -3229,7 +3158,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 assert!(ys[nm1].get_highest_bit());
                 if y0 == 0 {
                     // Result is exact: no need of rounding!
-                    return (x_exp, Ordering::Equal);
+                    return (x_exp, Equal);
                 }
                 // - y0 is non-zero, thus we have to subtract 1 / 2 * ulp(out).
                 // - However, we know (see analysis above) that this cannot make the exponent
@@ -3291,7 +3220,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                         *ys_last = HIGH_BIT;
                     }
                     // No Normalize is needed, no Rounding is needed
-                    return (x_exp, Ordering::Equal);
+                    return (x_exp, Equal);
                 } else if xs[l - 1] > yl_shifted {
                     // - cl_shifted is the shifted value c'[l]
                     // - |x| - |y| >= 1 / 2 * W ^ n
@@ -3426,7 +3355,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
         // round_bit/round_bit_2/sticky_bit_2 as 1 if non-zero.
         sticky_bit = round_bit_2 | sticky_bit_2;
         if round_bit == 0 && sticky_bit == 0 {
-            return (x_exp, Ordering::Equal);
+            return (x_exp, Equal);
         }
         ys_power_of_2 = limbs_is_power_of_2(ys);
         if ys_power_of_2 && round_bit != 0 {
@@ -3443,8 +3372,8 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
     // Now if out is a power of two, necessary round_bit = 0, which means the exact result is always
     // in (pred(ys), ys), and the bounds cannot be attained
     match rm {
-        RoundingMode::Exact => panic!("Inexact float subtraction"),
-        RoundingMode::Nearest => {
+        Exact => panic!("Inexact float subtraction"),
+        Nearest => {
             if ys_power_of_2 {
                 assert_eq!(round_bit, 0);
                 // Since we are at the end of the binade, we have in fact round_bit = round_bit_2
@@ -3455,7 +3384,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
             if (prec == 1 || ys[0] & shift_bit == 0 || round_bit == 0)
                 && (sticky_bit == 0 || round_bit == 0)
             {
-                (x_exp, Ordering::Greater)
+                (x_exp, Greater)
             } else {
                 limbs_sub_limb_in_place(ys, shift_bit);
                 if ys_power_of_2 {
@@ -3463,19 +3392,19 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                     ys[nm1] |= HIGH_BIT;
                     x_exp = x_exp.checked_sub(1).unwrap();
                 }
-                (x_exp, Ordering::Less)
+                (x_exp, Less)
             }
         }
-        RoundingMode::Floor | RoundingMode::Down => {
+        Floor | Down => {
             limbs_sub_limb_in_place(ys, shift_bit);
             if ys_power_of_2 {
                 // deal with cancellation
                 ys[nm1] |= HIGH_BIT;
                 x_exp = x_exp.checked_sub(1).unwrap();
             }
-            (x_exp, Ordering::Less)
+            (x_exp, Less)
         }
-        RoundingMode::Ceiling | RoundingMode::Up => (x_exp, Ordering::Greater),
+        Ceiling | Up => (x_exp, Greater),
     }
 }
 
@@ -3503,7 +3432,7 @@ fn exponent_shift_compare<'a>(
     let mut yi_done = false;
     let mut res = 0;
     if sdiff_exp >= 0 {
-        sign = Ordering::Greater; // assumes |x| > |y|; will be changed if not.
+        sign = Greater; // assumes |x| > |y|; will be changed if not.
         diff_exp = u64::exact_from(sdiff_exp);
         let mut cancel = 0;
         // If diff_exp != 0, i.e. diff_exp > 0, then |x| > |y|. Otherwise...
@@ -3526,7 +3455,7 @@ fn exponent_shift_compare<'a>(
             if xi_done {
                 // |x| = |y|
                 if yi_done {
-                    return (Ordering::Equal, cancel);
+                    return (Equal, cancel);
                 }
                 // x has been read entirely, but not y. Thus |x| <= |y|. Swap xs and ys, and take
                 // the opposite sign for the symmetric case below (simulating a swap). Note:
@@ -3538,7 +3467,7 @@ fn exponent_shift_compare<'a>(
                 swap(&mut x_prec, &mut y_prec);
                 xi_done = yi_done;
                 yi_done = true;
-                sign = Ordering::Less;
+                sign = Less;
             }
             if yi_done {
                 // y discards exactly the upper part of x
@@ -3553,7 +3482,7 @@ fn exponent_shift_compare<'a>(
                         xi -= 1;
                     }
                     if xi_done {
-                        return (Ordering::Equal, cancel);
+                        return (Equal, cancel);
                     }
                     res += Limb::WIDTH;
                 }
@@ -3572,12 +3501,12 @@ fn exponent_shift_compare<'a>(
                 swap(&mut xi_done, &mut yi_done);
                 swap(&mut x_exp, &mut y_exp);
                 swap(&mut x_prec, &mut y_prec);
-                sign = Ordering::Less;
+                sign = Less;
             }
         }
     } else {
         // We necessarily have |x| < |y|.
-        sign = Ordering::Less;
+        sign = Less;
         diff_exp = u64::exact_from(sdiff_exp.checked_neg().unwrap());
         swap(&mut xs, &mut ys);
         swap(&mut xi, &mut yi);
@@ -3794,7 +3723,7 @@ fn round_helper(
             let x = xs[i];
             round_bit = x & mask;
             sticky_bit = x & (mask - 1);
-            if rm == RoundingMode::Nearest || round_bit == 0 {
+            if rm == Nearest || round_bit == 0 {
                 let mut to = i;
                 let mut n = xs_len - out_len;
                 while n != 0 && sticky_bit == 0 {
@@ -3810,7 +3739,7 @@ fn round_helper(
             let x = xs[i - 1];
             round_bit = x & HIGH_BIT;
             sticky_bit = x & WIDTH_M1_MASK;
-            if rm == RoundingMode::Nearest || round_bit == 0 {
+            if rm == Nearest || round_bit == 0 {
                 let mut to = i - 1;
                 let mut n = xs_len - out_len - 1;
                 while n != 0 && sticky_bit == 0 {
@@ -3824,12 +3753,12 @@ fn round_helper(
         let xs_hi = &xs[i..];
         let ulp_mask = !(ulp - 1);
         match rm {
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Exact => {
+            Floor | Down | Exact => {
                 out.copy_from_slice(xs_hi);
                 out[0] &= ulp_mask;
                 (if sticky_bit | round_bit != 0 { -1 } else { 0 }, false)
             }
-            RoundingMode::Ceiling | RoundingMode::Up => {
+            Ceiling | Up => {
                 if sticky_bit | round_bit == 0 {
                     out.copy_from_slice(xs_hi);
                     out[0] &= ulp_mask;
@@ -3843,7 +3772,7 @@ fn round_helper(
                     (1, increment)
                 }
             }
-            RoundingMode::Nearest => {
+            Nearest => {
                 if round_bit == 0 {
                     out.copy_from_slice(xs_hi);
                     out[0] &= ulp_mask;
@@ -3891,13 +3820,13 @@ fn sub_float_significands_general<'a>(
     let out_len = out.len();
     let mut add_exp = 0;
     let (sign, cancel) = exponent_shift_compare(xs, x_exp, x_prec, ys, y_exp, y_prec);
-    if sign == Ordering::Equal {
+    if sign == Equal {
         // x == y. Return exact number 0. Setting the most-significant limb to 0 is a sufficient
         // signal to the caller that the entire output is 0, since in every other case the precision
         // of the output is the same as the precision of the inputs, and the most-significant limb
         // is therefore nonzero.
         *out.last_mut().unwrap() = 0;
-        return (0, Ordering::Equal, false);
+        return (0, Equal, false);
     }
     // sign != 0, so that cancel has a valid value.
     //
@@ -3915,7 +3844,7 @@ fn sub_float_significands_general<'a>(
     //      But if it is an addition, sign(x) and sign(y) are opposed!
     //      So sign(out) = -sign(x)
     // ```
-    let neg = sign == Ordering::Less;
+    let neg = sign == Less;
     if neg {
         // swap x and y so that |x| > |y|
         swap(&mut xs, &mut ys);
@@ -3941,7 +3870,7 @@ fn sub_float_significands_general<'a>(
         if increment_exp {
             exp_a += 1;
         }
-        if inexact == 0 && rm != RoundingMode::Down && rm != RoundingMode::Floor {
+        if inexact == 0 && rm != Down && rm != Floor {
             // out = x, but the exact value of x - y is a bit below. Then, except for directed
             // rounding similar to toward zero and before overflow checking: a is the correctly
             // rounded value and since |x| - |y| < |out|, the ternary value is given by the sign of
@@ -4130,7 +4059,7 @@ fn sub_float_significands_general<'a>(
     let mut cmp_low = 0;
     let mut goto_truncate = false;
     let mut goto_end_of_sub = false;
-    if rm == RoundingMode::Nearest {
+    if rm == Nearest {
         if shift != 0 {
             let half_shift_bit = shift_bit >> 1;
             // Can decide except when carry = 2 ^ (sh - 1) [middle] or carry = 0 [truncate, but
@@ -4154,7 +4083,7 @@ fn sub_float_significands_general<'a>(
             }
         }
     } else if carry != 0 {
-        if rm == RoundingMode::Floor || rm == RoundingMode::Down || rm == RoundingMode::Exact {
+        if rm == Floor || rm == Down || rm == Exact {
             inexact = -1;
         } else {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
@@ -4213,9 +4142,9 @@ fn sub_float_significands_general<'a>(
             if cmp_low == 0 {
                 // case 1 or 3
                 cmp_low = match xx.cmp(&yy) {
-                    Ordering::Greater => 1,
-                    Ordering::Less => -2 + k,
-                    Ordering::Equal => 0,
+                    Greater => 1,
+                    Less => -2 + k,
+                    Equal => 0,
                 };
             }
             // Case 1 for k=0 splits into 7 subcases:
@@ -4239,7 +4168,7 @@ fn sub_float_significands_general<'a>(
             //
             // The case rounding to nearest with sh=0 is special since one couldn't subtract above
             // 1/2 ulp in the trailing limb of the result
-            if rm == RoundingMode::Nearest && shift == 0 && k == 0 {
+            if rm == Nearest && shift == 0 && k == 0 {
                 // case 1 for k = 0
                 // - add one ulp if xx > yy + half
                 // - truncate if yy - half < xx < yy + half
@@ -4271,19 +4200,19 @@ fn sub_float_significands_general<'a>(
                 }
             }
             match cmp_low.sign() {
-                Ordering::Less => {
+                Less => {
                     // low(x) - low(y) < 0: either truncate or subtract one ulp
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down => {
+                        Floor | Down => {
                             limbs_sub_limb_in_place(out, shift_bit);
                             inexact = -1;
                             goto_end_of_sub = true;
                         }
-                        RoundingMode::Ceiling | RoundingMode::Up | RoundingMode::Exact => {
+                        Ceiling | Up | Exact => {
                             inexact = 1;
                             goto_truncate = true;
                         }
-                        RoundingMode::Nearest => {
+                        Nearest => {
                             // - If cmp_low < 0 and xx > yy, then -0.5 ulp < low(x) - low(y) < 0,
                             //   whatever the value of shift.
                             // - If shift > 0, then cmp_low < 0 implies that the initial neglected
@@ -4321,14 +4250,14 @@ fn sub_float_significands_general<'a>(
                         }
                     }
                 }
-                Ordering::Greater => {
+                Greater => {
                     // 0 < low(x) - low(y): either truncate or add one ulp
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Exact => {
+                        Floor | Down | Exact => {
                             inexact = -1;
                             goto_truncate = true;
                         }
-                        RoundingMode::Ceiling | RoundingMode::Up => {
+                        Ceiling | Up => {
                             if limbs_slice_add_limb_in_place(out, shift_bit) {
                                 // result is a power of 2: 11111111111111 + 1 = 1000000000000000
                                 out[out_len - 1] = HIGH_BIT;
@@ -4338,9 +4267,9 @@ fn sub_float_significands_general<'a>(
                             inexact = 1;
                             goto_truncate = true;
                         }
-                        RoundingMode::Nearest => {
+                        Nearest => {
                             match xx.cmp(&yy) {
-                                Ordering::Greater => {
+                                Greater => {
                                     // If sh = 0, then xx > yy means that low(x) - low(y) > 0.5 ulp,
                                     // and similarly when cmp_low = 2.
                                     if cmp_low == 2 {
@@ -4364,12 +4293,12 @@ fn sub_float_significands_general<'a>(
                                     }
                                     goto_truncate = true;
                                 }
-                                Ordering::Less => {
+                                Less => {
                                     // 0 < low(x) - low(y) < 0.5 ulp, cases 1c, 1b3, 2b3 and 2c
                                     inexact = -1;
                                     goto_truncate = true;
                                 }
-                                Ordering::Equal => {
+                                Equal => {
                                     // The only case where we can't conclude is xx = yy, i.e.,
                                     // low(x) - low(y) = 0.5 ulp (up to now), thus we don't know if
                                     // we must truncate or add one ulp.
@@ -4410,7 +4339,7 @@ fn sub_float_significands_general<'a>(
             k = 1;
         }
         if !goto_truncate && !goto_end_of_sub {
-            inexact = if rm == RoundingMode::Nearest && cmp_low != 0 {
+            inexact = if rm == Nearest && cmp_low != 0 {
                 // Even rounding rule
                 if (out[0] >> shift) & 1 != 0 {
                     if cmp_low < 0 {

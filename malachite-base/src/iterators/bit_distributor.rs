@@ -130,11 +130,14 @@ impl BitDistributor {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+    /// use malachite_base::iterators::bit_distributor::{
+    ///     BitDistributor, BitDistributorOutputType,
+    /// };
     ///
-    /// BitDistributor::new(
-    ///     &[BitDistributorOutputType::normal(2), BitDistributorOutputType::tiny()]
-    /// );
+    /// BitDistributor::new(&[
+    ///     BitDistributorOutputType::normal(2),
+    ///     BitDistributorOutputType::tiny(),
+    /// ]);
     /// ```
     pub fn new(output_types: &[BitDistributorOutputType]) -> BitDistributor {
         let mut distributor = BitDistributor::new_without_init(output_types);
@@ -154,7 +157,9 @@ impl BitDistributor {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+    /// use malachite_base::iterators::bit_distributor::{
+    ///     BitDistributor, BitDistributorOutputType,
+    /// };
     ///
     /// let bd = BitDistributor::new(&[
     ///     BitDistributorOutputType::normal(2),
@@ -249,7 +254,9 @@ impl BitDistributor {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+    /// use malachite_base::iterators::bit_distributor::{
+    ///     BitDistributor, BitDistributorOutputType,
+    /// };
     ///
     /// let mut bd = BitDistributor::new(&[BitDistributorOutputType::normal(2); 3]);
     /// assert_eq!(
@@ -288,7 +295,9 @@ impl BitDistributor {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+    /// use malachite_base::iterators::bit_distributor::{
+    ///     BitDistributor, BitDistributorOutputType,
+    /// };
     ///
     /// let mut bd = BitDistributor::new(&[BitDistributorOutputType::normal(1)]);
     /// let mut outputs = Vec::new();
@@ -321,7 +330,9 @@ impl BitDistributor {
     /// # Examples
     /// ```
     /// use itertools::Itertools;
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+    /// use malachite_base::iterators::bit_distributor::{
+    ///     BitDistributor, BitDistributorOutputType,
+    /// };
     ///
     /// let mut bd = BitDistributor::new(&[BitDistributorOutputType::normal(1); 2]);
     /// let mut outputs = Vec::new();
@@ -330,7 +341,16 @@ impl BitDistributor {
     ///     bd.increment_counter();
     /// }
     /// let expected_outputs: &[&[usize]] = &[
-    ///     &[0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 2], &[0, 3], &[1, 2], &[1, 3], &[2, 0], &[2, 1]
+    ///     &[0, 0],
+    ///     &[0, 1],
+    ///     &[1, 0],
+    ///     &[1, 1],
+    ///     &[0, 2],
+    ///     &[0, 3],
+    ///     &[1, 2],
+    ///     &[1, 3],
+    ///     &[2, 0],
+    ///     &[2, 1],
     /// ];
     /// assert_eq!(outputs, expected_outputs);
     /// ```

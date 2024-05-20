@@ -13,7 +13,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_q::test_util::arithmetic::sign::num_sign;
 use malachite_q::test_util::bench::bucketers::triple_3_rational_bit_bucketer;
 use malachite_q::test_util::generators::{rational_gen, rational_gen_nrm};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_sign);
@@ -23,9 +23,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_integer_sign(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in rational_gen().get(gm, config).take(limit) {
         match x.sign() {
-            Ordering::Less => println!("{x} is negative"),
-            Ordering::Equal => println!("{x} is zero"),
-            Ordering::Greater => println!("{x} is positive"),
+            Less => println!("{x} is negative"),
+            Equal => println!("{x} is zero"),
+            Greater => println!("{x} is positive"),
         }
     }
 }

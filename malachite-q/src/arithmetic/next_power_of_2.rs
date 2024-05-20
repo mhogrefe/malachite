@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{NextPowerOf2, NextPowerOf2Assign, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -36,7 +36,10 @@ impl NextPowerOf2 for Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from(123).next_power_of_2(), 128);
-    /// assert_eq!(Rational::from_signeds(1, 10).next_power_of_2().to_string(), "1/8");
+    /// assert_eq!(
+    ///     Rational::from_signeds(1, 10).next_power_of_2().to_string(),
+    ///     "1/8"
+    /// );
     /// ```
     #[inline]
     fn next_power_of_2(self) -> Rational {
@@ -44,8 +47,8 @@ impl NextPowerOf2 for Rational {
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         match self.numerator.cmp_normalized(&self.denominator) {
-            Ordering::Equal => return self,
-            Ordering::Greater => exponent += 1,
+            Equal => return self,
+            Greater => exponent += 1,
             _ => {}
         }
         Rational::power_of_2(exponent)
@@ -76,13 +79,18 @@ impl<'a> NextPowerOf2 for &'a Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!((&Rational::from(123)).next_power_of_2(), 128);
-    /// assert_eq!((&Rational::from_signeds(1, 10)).next_power_of_2().to_string(), "1/8");
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(1, 10))
+    ///         .next_power_of_2()
+    ///         .to_string(),
+    ///     "1/8"
+    /// );
     /// ```
     fn next_power_of_2(self) -> Rational {
         assert!(*self > 0);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
-        if self.numerator.cmp_normalized(&self.denominator) == Ordering::Greater {
+        if self.numerator.cmp_normalized(&self.denominator) == Greater {
             exponent += 1;
         }
         Rational::power_of_2(exponent)
@@ -109,7 +117,6 @@ impl NextPowerOf2Assign for Rational {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// let mut x = Rational::from(123);
     /// x.next_power_of_2_assign();

@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -21,12 +21,8 @@ where
 {
     match (x, y) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Ordering::Greater),
-        (float_either_zero!(), y) => Some(if *y == T::ZERO {
-            Ordering::Equal
-        } else {
-            Ordering::Less
-        }),
+        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Greater),
+        (float_either_zero!(), y) => Some(if *y == T::ZERO { Equal } else { Less }),
         (
             Float(Finite {
                 exponent: e_x,
@@ -35,9 +31,9 @@ where
             }),
             y,
         ) => Some(if *y == T::ZERO {
-            Ordering::Greater
+            Greater
         } else if *e_x <= 0 {
-            Ordering::Less
+            Less
         } else {
             e_x.unsigned_abs()
                 .cmp(&y.significant_bits())
@@ -100,12 +96,8 @@ where
 {
     match (x, y) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Ordering::Greater),
-        (float_either_zero!(), y) => Some(if *y == T::ZERO {
-            Ordering::Equal
-        } else {
-            Ordering::Less
-        }),
+        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Greater),
+        (float_either_zero!(), y) => Some(if *y == T::ZERO { Equal } else { Less }),
         (
             Float(Finite {
                 exponent: e_x,
@@ -114,9 +106,9 @@ where
             }),
             y,
         ) => Some(if *y == T::ZERO {
-            Ordering::Greater
+            Greater
         } else if *e_x <= 0 {
-            Ordering::Less
+            Less
         } else {
             e_x.unsigned_abs()
                 .cmp(&y.significant_bits())

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{string_gen, string_gen_var_2};
 use std::str::FromStr;
@@ -16,12 +16,12 @@ fn test_from_str() {
     let test = |s, out| {
         assert_eq!(RoundingMode::from_str(s), out);
     };
-    test("Down", Ok(RoundingMode::Down));
-    test("Up", Ok(RoundingMode::Up));
-    test("Floor", Ok(RoundingMode::Floor));
-    test("Ceiling", Ok(RoundingMode::Ceiling));
-    test("Nearest", Ok(RoundingMode::Nearest));
-    test("Exact", Ok(RoundingMode::Exact));
+    test("Down", Ok(Down));
+    test("Up", Ok(Up));
+    test("Floor", Ok(Floor));
+    test("Ceiling", Ok(Ceiling));
+    test("Nearest", Ok(Nearest));
+    test("Exact", Ok(Exact));
 
     test("", Err("".to_string()));
     test("abc", Err("abc".to_string()));

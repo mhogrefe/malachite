@@ -14,7 +14,7 @@ use malachite_base::test_util::generators::{signed_pair_gen_var_7, unsigned_pair
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_signed_pair_gen, natural_unsigned_pair_gen};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -96,7 +96,7 @@ where
         assert_eq!(u.eq_abs(&n), eq);
         assert_eq!(u == n, eq);
         assert_eq!(&Natural::from(u) == &n, eq);
-        assert_eq!(n.partial_cmp_abs(&u) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp_abs(&u) == Some(Equal), eq);
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
@@ -117,7 +117,10 @@ where
 
         assert_eq!(i.eq_abs(&n), eq);
         // TODO assert_eq!(Integer::from(i).eq_abs(&n), eq);
-        assert_eq!(n.partial_cmp_abs(&i) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp_abs(&i) == Some(Equal), eq);
+        if i != T::MIN {
+            assert_eq!(n.eq_abs(&-i), eq);
+        }
     });
 
     signed_pair_gen_var_7::<T>().test_properties(|(x, y)| {

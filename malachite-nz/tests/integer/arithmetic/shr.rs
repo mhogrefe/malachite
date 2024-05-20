@@ -13,7 +13,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     signed_gen, signed_unsigned_pair_gen_var_1, unsigned_gen,
 };
@@ -337,7 +337,7 @@ where
         assert_eq!(shifted_alt, shifted);
 
         assert!(shifted.le_abs(&n));
-        assert_eq!((&n).shr_round(u, RoundingMode::Floor).0, shifted);
+        assert_eq!((&n).shr_round(u, Floor).0, shifted);
     });
 
     integer_unsigned_unsigned_triple_gen_var_3::<T>().test_properties(|(n, u, v)| {
@@ -394,7 +394,7 @@ where
         assert_eq!(shifted_alt, shifted);
         assert!(shifted_alt.is_valid());
 
-        assert_eq!((&n).shr_round(i, RoundingMode::Floor).0, shifted);
+        assert_eq!((&n).shr_round(i, Floor).0, shifted);
 
         if i >= T::ZERO {
             assert_eq!(n >> i.unsigned_abs(), shifted);

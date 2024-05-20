@@ -9,7 +9,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -246,7 +246,7 @@ fn benchmark_f32_rounding_from_down_rational_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "f32::rounding_from(Rational, RoundingMode::Down)",
+        "f32::rounding_from(Rational, Down)",
         BenchmarkType::LibraryComparison,
         rational_gen_rm().get(gm, config),
         gm.name(),
@@ -255,7 +255,7 @@ fn benchmark_f32_rounding_from_down_rational_library_comparison(
         &pair_2_rational_bit_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, n)| {
-                no_out!(f32::rounding_from(n, RoundingMode::Down))
+                no_out!(f32::rounding_from(n, Down))
             }),
             ("rug", &mut |(n, _)| no_out!(n.to_f32())),
         ],
@@ -269,7 +269,7 @@ fn benchmark_f64_rounding_from_down_rational_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "f64::rounding_from(Rational, RoundingMode::Down)",
+        "f64::rounding_from(Rational, Down)",
         BenchmarkType::LibraryComparison,
         rational_gen_rm().get(gm, config),
         gm.name(),
@@ -278,7 +278,7 @@ fn benchmark_f64_rounding_from_down_rational_library_comparison(
         &pair_2_rational_bit_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, n)| {
-                no_out!(f64::rounding_from(n, RoundingMode::Down))
+                no_out!(f64::rounding_from(n, Down))
             }),
             ("rug", &mut |(n, _)| no_out!(n.to_f64())),
         ],

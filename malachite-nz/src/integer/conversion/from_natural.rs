@@ -24,7 +24,10 @@ impl Integer {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Integer::from_sign_and_abs(true, Natural::from(123u32)), 123);
-    /// assert_eq!(Integer::from_sign_and_abs(false, Natural::from(123u32)), -123);
+    /// assert_eq!(
+    ///     Integer::from_sign_and_abs(false, Natural::from(123u32)),
+    ///     -123
+    /// );
     /// ```
     pub fn from_sign_and_abs(sign: bool, abs: Natural) -> Integer {
         Integer {
@@ -50,8 +53,14 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Integer::from_sign_and_abs_ref(true, &Natural::from(123u32)), 123);
-    /// assert_eq!(Integer::from_sign_and_abs_ref(false, &Natural::from(123u32)), -123);
+    /// assert_eq!(
+    ///     Integer::from_sign_and_abs_ref(true, &Natural::from(123u32)),
+    ///     123
+    /// );
+    /// assert_eq!(
+    ///     Integer::from_sign_and_abs_ref(false, &Natural::from(123u32)),
+    ///     -123
+    /// );
     /// ```
     pub fn from_sign_and_abs_ref(sign: bool, abs: &Natural) -> Integer {
         Integer {
@@ -74,7 +83,10 @@ impl From<Natural> for Integer {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Integer::from(Natural::from(123u32)), 123);
-    /// assert_eq!(Integer::from(Natural::from(10u32).pow(12)), 1000000000000u64);
+    /// assert_eq!(
+    ///     Integer::from(Natural::from(10u32).pow(12)),
+    ///     1000000000000u64
+    /// );
     /// ```
     fn from(value: Natural) -> Integer {
         Integer {
@@ -101,7 +113,10 @@ impl<'a> From<&'a Natural> for Integer {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Integer::from(&Natural::from(123u32)), 123);
-    /// assert_eq!(Integer::from(&Natural::from(10u32).pow(12)), 1000000000000u64);
+    /// assert_eq!(
+    ///     Integer::from(&Natural::from(10u32).pow(12)),
+    ///     1000000000000u64
+    /// );
     /// ```
     fn from(value: &'a Natural) -> Integer {
         Integer {

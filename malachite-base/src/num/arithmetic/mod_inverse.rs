@@ -14,7 +14,7 @@ use crate::num::arithmetic::traits::ModInverse;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 
 // This is a variation of `n_xgcd` from `ulong_extras/xgcd.c`, FLINT 2.7.1.
 pub_test! {mod_inverse_binary<
@@ -136,7 +136,7 @@ pub_test! {mod_inverse_binary<
     }
     let limit = (m >> 1u32).wrapping_neg();
     if inverse < limit {
-        let k = (limit - inverse).div_round(m, RoundingMode::Ceiling).0;
+        let k = (limit - inverse).div_round(m, Ceiling).0;
         inverse.wrapping_add_assign(m.wrapping_mul(k));
     }
     Some(if inverse.get_highest_bit() {

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::Sign;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 
 macro_rules! impl_sign_primitive_int {
     ($t:ident) => {
@@ -49,11 +49,11 @@ macro_rules! impl_sign_primitive_float {
             #[inline]
             fn sign(&self) -> Ordering {
                 if self.is_nan() {
-                    Ordering::Equal
+                    Equal
                 } else if self.is_sign_positive() {
-                    Ordering::Greater
+                    Greater
                 } else {
-                    Ordering::Less
+                    Less
                 }
             }
         }

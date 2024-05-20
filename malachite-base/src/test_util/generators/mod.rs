@@ -2810,6 +2810,15 @@ pub fn unsigned_rounding_mode_pair_gen_var_2<
     )
 }
 
+// All `(T, RoundingMode)`s where `T` is small, unsigned, and positive.
+pub fn unsigned_rounding_mode_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(T, RoundingMode)>
+{
+    Generator::new_no_special(
+        &exhaustive_primitive_int_rounding_mode_pair_gen_var_1,
+        &random_unsigned_rounding_mode_pair_gen_var_2,
+    )
+}
+
 // -- (PrimitiveUnsigned, String) --
 
 // All `(u8, String)` that, when passed to `Natural::from_string_base`, return a `Some`.

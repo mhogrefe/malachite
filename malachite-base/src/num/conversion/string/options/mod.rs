@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::{self, *};
 
 /// A `struct` determining how much "detail" should be used when creating a scientific-notation
 /// string.
@@ -87,7 +87,7 @@ impl Default for ToSciOptions {
     fn default() -> ToSciOptions {
         ToSciOptions {
             base: 10,
-            rounding_mode: RoundingMode::Nearest,
+            rounding_mode: Nearest,
             size_options: SciSizeOptions::default(),
             neg_exp_threshold: -6,
             lowercase: true,
@@ -259,7 +259,7 @@ impl Default for FromSciStringOptions {
     fn default() -> FromSciStringOptions {
         FromSciStringOptions {
             base: 10,
-            rounding_mode: RoundingMode::Nearest,
+            rounding_mode: Nearest,
         }
     }
 }

@@ -14,7 +14,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::from::{SignedFromFloatError, UnsignedFromFloatError};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_float::test_util::common::parse_hex_string;
@@ -26,7 +26,7 @@ use malachite_float::Float;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -236,424 +236,202 @@ fn test_rounding_from_float() {
     where
         for<'a> T: RoundingFrom<&'a Float>,
     {
-        test_helper::<T>(
-            "-Infinity",
-            "-Infinity",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-Infinity",
-            "-Infinity",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-Infinity",
-            "-Infinity",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-Infinity", "-Infinity", Ceiling, "0", Greater);
+        test_helper::<T>("-Infinity", "-Infinity", Down, "0", Greater);
+        test_helper::<T>("-Infinity", "-Infinity", Nearest, "0", Greater);
 
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Floor, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Ceiling, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Down, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Up, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Nearest, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Exact, "0", Ordering::Equal);
+        test_helper::<T>("0.0", "0x0.0", Floor, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Ceiling, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Down, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Up, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Nearest, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Exact, "0", Equal);
 
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Floor, "0", Ordering::Equal);
-        test_helper::<T>(
-            "-0.0",
-            "-0x0.0",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Equal,
-        );
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Down, "0", Ordering::Equal);
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Up, "0", Ordering::Equal);
-        test_helper::<T>(
-            "-0.0",
-            "-0x0.0",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Equal,
-        );
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Exact, "0", Ordering::Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Floor, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Ceiling, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Down, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Up, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Nearest, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Exact, "0", Equal);
 
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Floor, "1", Ordering::Equal);
-        test_helper::<T>(
-            "1.0",
-            "0x1.0#1",
-            RoundingMode::Ceiling,
-            "1",
-            Ordering::Equal,
-        );
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Down, "1", Ordering::Equal);
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Up, "1", Ordering::Equal);
-        test_helper::<T>(
-            "1.0",
-            "0x1.0#1",
-            RoundingMode::Nearest,
-            "1",
-            Ordering::Equal,
-        );
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Exact, "1", Ordering::Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Floor, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Ceiling, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Down, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Up, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Nearest, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Exact, "1", Equal);
 
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Floor, "2", Ordering::Equal);
-        test_helper::<T>(
-            "2.0",
-            "0x2.0#1",
-            RoundingMode::Ceiling,
-            "2",
-            Ordering::Equal,
-        );
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Down, "2", Ordering::Equal);
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Up, "2", Ordering::Equal);
-        test_helper::<T>(
-            "2.0",
-            "0x2.0#1",
-            RoundingMode::Nearest,
-            "2",
-            Ordering::Equal,
-        );
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Exact, "2", Ordering::Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Floor, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Ceiling, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Down, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Up, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Nearest, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Exact, "2", Equal);
 
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Floor, "0", Ordering::Less);
-        test_helper::<T>(
-            "0.5",
-            "0x0.8#1",
-            RoundingMode::Ceiling,
-            "1",
-            Ordering::Greater,
-        );
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Down, "0", Ordering::Less);
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Up, "1", Ordering::Greater);
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Nearest, "0", Ordering::Less);
+        test_helper::<T>("0.5", "0x0.8#1", Floor, "0", Less);
+        test_helper::<T>("0.5", "0x0.8#1", Ceiling, "1", Greater);
+        test_helper::<T>("0.5", "0x0.8#1", Down, "0", Less);
+        test_helper::<T>("0.5", "0x0.8#1", Up, "1", Greater);
+        test_helper::<T>("0.5", "0x0.8#1", Nearest, "0", Less);
 
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Floor,
+            Floor,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Up,
+            Up,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Nearest,
+            Nearest,
             "0",
-            Ordering::Less,
+            Less,
         );
 
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Floor,
+            Floor,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Up,
+            Up,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Nearest,
+            Nearest,
             "1",
-            Ordering::Greater,
+            Greater,
         );
 
-        test_helper::<T>("1.5", "0x1.8#2", RoundingMode::Floor, "1", Ordering::Less);
-        test_helper::<T>(
-            "1.5",
-            "0x1.8#2",
-            RoundingMode::Ceiling,
-            "2",
-            Ordering::Greater,
-        );
-        test_helper::<T>("1.5", "0x1.8#2", RoundingMode::Down, "1", Ordering::Less);
-        test_helper::<T>("1.5", "0x1.8#2", RoundingMode::Up, "2", Ordering::Greater);
-        test_helper::<T>(
-            "1.5",
-            "0x1.8#2",
-            RoundingMode::Nearest,
-            "2",
-            Ordering::Greater,
-        );
+        test_helper::<T>("1.5", "0x1.8#2", Floor, "1", Less);
+        test_helper::<T>("1.5", "0x1.8#2", Ceiling, "2", Greater);
+        test_helper::<T>("1.5", "0x1.8#2", Down, "1", Less);
+        test_helper::<T>("1.5", "0x1.8#2", Up, "2", Greater);
+        test_helper::<T>("1.5", "0x1.8#2", Nearest, "2", Greater);
 
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Floor, "2", Ordering::Less);
-        test_helper::<T>(
-            "2.5",
-            "0x2.8#3",
-            RoundingMode::Ceiling,
-            "3",
-            Ordering::Greater,
-        );
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Down, "2", Ordering::Less);
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Up, "3", Ordering::Greater);
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Nearest, "2", Ordering::Less);
+        test_helper::<T>("2.5", "0x2.8#3", Floor, "2", Less);
+        test_helper::<T>("2.5", "0x2.8#3", Ceiling, "3", Greater);
+        test_helper::<T>("2.5", "0x2.8#3", Down, "2", Less);
+        test_helper::<T>("2.5", "0x2.8#3", Up, "3", Greater);
+        test_helper::<T>("2.5", "0x2.8#3", Nearest, "2", Less);
 
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Floor,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Ceiling,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Down,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Up,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Nearest,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Exact,
-            "123",
-            Ordering::Equal,
-        );
+        test_helper::<T>("123.0", "0x7b.0#7", Floor, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Ceiling, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Down, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Up, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Nearest, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Exact, "123", Equal);
 
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-1.0", "-0x1.0#1", Ceiling, "0", Greater);
+        test_helper::<T>("-1.0", "-0x1.0#1", Down, "0", Greater);
+        test_helper::<T>("-1.0", "-0x1.0#1", Nearest, "0", Greater);
 
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-2.0", "-0x2.0#1", Ceiling, "0", Greater);
+        test_helper::<T>("-2.0", "-0x2.0#1", Down, "0", Greater);
+        test_helper::<T>("-2.0", "-0x2.0#1", Nearest, "0", Greater);
 
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-0.5", "-0x0.8#1", Ceiling, "0", Greater);
+        test_helper::<T>("-0.5", "-0x0.8#1", Down, "0", Greater);
+        test_helper::<T>("-0.5", "-0x0.8#1", Nearest, "0", Greater);
 
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Nearest,
+            Nearest,
             "0",
-            Ordering::Greater,
+            Greater,
         );
 
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Nearest,
+            Nearest,
             "0",
-            Ordering::Greater,
+            Greater,
         );
 
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-1.5", "-0x1.8#2", Ceiling, "0", Greater);
+        test_helper::<T>("-1.5", "-0x1.8#2", Down, "0", Greater);
+        test_helper::<T>("-1.5", "-0x1.8#2", Nearest, "0", Greater);
 
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-2.5", "-0x2.8#3", Ceiling, "0", Greater);
+        test_helper::<T>("-2.5", "-0x2.8#3", Down, "0", Greater);
+        test_helper::<T>("-2.5", "-0x2.8#3", Nearest, "0", Greater);
 
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-123.0", "-0x7b.0#7", Ceiling, "0", Greater);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Down, "0", Greater);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Nearest, "0", Greater);
     }
     apply_fn_to_unsigneds!(test_helper_u);
 
@@ -662,571 +440,286 @@ fn test_rounding_from_float() {
     where
         for<'a> T: RoundingFrom<&'a Float>,
     {
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Floor, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Ceiling, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Down, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Up, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Nearest, "0", Ordering::Equal);
-        test_helper::<T>("0.0", "0x0.0", RoundingMode::Exact, "0", Ordering::Equal);
+        test_helper::<T>("0.0", "0x0.0", Floor, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Ceiling, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Down, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Up, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Nearest, "0", Equal);
+        test_helper::<T>("0.0", "0x0.0", Exact, "0", Equal);
 
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Floor, "0", Ordering::Equal);
-        test_helper::<T>(
-            "-0.0",
-            "-0x0.0",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Equal,
-        );
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Down, "0", Ordering::Equal);
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Up, "0", Ordering::Equal);
-        test_helper::<T>(
-            "-0.0",
-            "-0x0.0",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Equal,
-        );
-        test_helper::<T>("-0.0", "-0x0.0", RoundingMode::Exact, "0", Ordering::Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Floor, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Ceiling, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Down, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Up, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Nearest, "0", Equal);
+        test_helper::<T>("-0.0", "-0x0.0", Exact, "0", Equal);
 
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Floor, "1", Ordering::Equal);
-        test_helper::<T>(
-            "1.0",
-            "0x1.0#1",
-            RoundingMode::Ceiling,
-            "1",
-            Ordering::Equal,
-        );
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Down, "1", Ordering::Equal);
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Up, "1", Ordering::Equal);
-        test_helper::<T>(
-            "1.0",
-            "0x1.0#1",
-            RoundingMode::Nearest,
-            "1",
-            Ordering::Equal,
-        );
-        test_helper::<T>("1.0", "0x1.0#1", RoundingMode::Exact, "1", Ordering::Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Floor, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Ceiling, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Down, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Up, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Nearest, "1", Equal);
+        test_helper::<T>("1.0", "0x1.0#1", Exact, "1", Equal);
 
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Floor, "2", Ordering::Equal);
-        test_helper::<T>(
-            "2.0",
-            "0x2.0#1",
-            RoundingMode::Ceiling,
-            "2",
-            Ordering::Equal,
-        );
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Down, "2", Ordering::Equal);
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Up, "2", Ordering::Equal);
-        test_helper::<T>(
-            "2.0",
-            "0x2.0#1",
-            RoundingMode::Nearest,
-            "2",
-            Ordering::Equal,
-        );
-        test_helper::<T>("2.0", "0x2.0#1", RoundingMode::Exact, "2", Ordering::Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Floor, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Ceiling, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Down, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Up, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Nearest, "2", Equal);
+        test_helper::<T>("2.0", "0x2.0#1", Exact, "2", Equal);
 
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Floor, "0", Ordering::Less);
-        test_helper::<T>(
-            "0.5",
-            "0x0.8#1",
-            RoundingMode::Ceiling,
-            "1",
-            Ordering::Greater,
-        );
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Down, "0", Ordering::Less);
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Up, "1", Ordering::Greater);
-        test_helper::<T>("0.5", "0x0.8#1", RoundingMode::Nearest, "0", Ordering::Less);
+        test_helper::<T>("0.5", "0x0.8#1", Floor, "0", Less);
+        test_helper::<T>("0.5", "0x0.8#1", Ceiling, "1", Greater);
+        test_helper::<T>("0.5", "0x0.8#1", Down, "0", Less);
+        test_helper::<T>("0.5", "0x0.8#1", Up, "1", Greater);
+        test_helper::<T>("0.5", "0x0.8#1", Nearest, "0", Less);
 
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Floor,
+            Floor,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Up,
+            Up,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
-            RoundingMode::Nearest,
+            Nearest,
             "0",
-            Ordering::Less,
+            Less,
         );
 
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Floor,
+            Floor,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Up,
+            Up,
             "1",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "0.6666666666666666",
             "0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Nearest,
+            Nearest,
             "1",
-            Ordering::Greater,
+            Greater,
         );
 
-        test_helper::<T>("1.5", "0x1.8#2", RoundingMode::Floor, "1", Ordering::Less);
-        test_helper::<T>(
-            "1.5",
-            "0x1.8#2",
-            RoundingMode::Ceiling,
-            "2",
-            Ordering::Greater,
-        );
-        test_helper::<T>("1.5", "0x1.8#2", RoundingMode::Down, "1", Ordering::Less);
-        test_helper::<T>("1.5", "0x1.8#2", RoundingMode::Up, "2", Ordering::Greater);
-        test_helper::<T>(
-            "1.5",
-            "0x1.8#2",
-            RoundingMode::Nearest,
-            "2",
-            Ordering::Greater,
-        );
+        test_helper::<T>("1.5", "0x1.8#2", Floor, "1", Less);
+        test_helper::<T>("1.5", "0x1.8#2", Ceiling, "2", Greater);
+        test_helper::<T>("1.5", "0x1.8#2", Down, "1", Less);
+        test_helper::<T>("1.5", "0x1.8#2", Up, "2", Greater);
+        test_helper::<T>("1.5", "0x1.8#2", Nearest, "2", Greater);
 
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Floor, "2", Ordering::Less);
-        test_helper::<T>(
-            "2.5",
-            "0x2.8#3",
-            RoundingMode::Ceiling,
-            "3",
-            Ordering::Greater,
-        );
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Down, "2", Ordering::Less);
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Up, "3", Ordering::Greater);
-        test_helper::<T>("2.5", "0x2.8#3", RoundingMode::Nearest, "2", Ordering::Less);
+        test_helper::<T>("2.5", "0x2.8#3", Floor, "2", Less);
+        test_helper::<T>("2.5", "0x2.8#3", Ceiling, "3", Greater);
+        test_helper::<T>("2.5", "0x2.8#3", Down, "2", Less);
+        test_helper::<T>("2.5", "0x2.8#3", Up, "3", Greater);
+        test_helper::<T>("2.5", "0x2.8#3", Nearest, "2", Less);
 
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Floor,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Ceiling,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Down,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Up,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Nearest,
-            "123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "123.0",
-            "0x7b.0#7",
-            RoundingMode::Exact,
-            "123",
-            Ordering::Equal,
-        );
+        test_helper::<T>("123.0", "0x7b.0#7", Floor, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Ceiling, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Down, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Up, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Nearest, "123", Equal);
+        test_helper::<T>("123.0", "0x7b.0#7", Exact, "123", Equal);
 
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Floor,
-            "-1",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Ceiling,
-            "-1",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Down,
-            "-1",
-            Ordering::Equal,
-        );
-        test_helper::<T>("-1.0", "-0x1.0#1", RoundingMode::Up, "-1", Ordering::Equal);
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Nearest,
-            "-1",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-1.0",
-            "-0x1.0#1",
-            RoundingMode::Exact,
-            "-1",
-            Ordering::Equal,
-        );
+        test_helper::<T>("-1.0", "-0x1.0#1", Floor, "-1", Equal);
+        test_helper::<T>("-1.0", "-0x1.0#1", Ceiling, "-1", Equal);
+        test_helper::<T>("-1.0", "-0x1.0#1", Down, "-1", Equal);
+        test_helper::<T>("-1.0", "-0x1.0#1", Up, "-1", Equal);
+        test_helper::<T>("-1.0", "-0x1.0#1", Nearest, "-1", Equal);
+        test_helper::<T>("-1.0", "-0x1.0#1", Exact, "-1", Equal);
 
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Floor,
-            "-2",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Ceiling,
-            "-2",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Down,
-            "-2",
-            Ordering::Equal,
-        );
-        test_helper::<T>("-2.0", "-0x2.0#1", RoundingMode::Up, "-2", Ordering::Equal);
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Nearest,
-            "-2",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-2.0",
-            "-0x2.0#1",
-            RoundingMode::Exact,
-            "-2",
-            Ordering::Equal,
-        );
+        test_helper::<T>("-2.0", "-0x2.0#1", Floor, "-2", Equal);
+        test_helper::<T>("-2.0", "-0x2.0#1", Ceiling, "-2", Equal);
+        test_helper::<T>("-2.0", "-0x2.0#1", Down, "-2", Equal);
+        test_helper::<T>("-2.0", "-0x2.0#1", Up, "-2", Equal);
+        test_helper::<T>("-2.0", "-0x2.0#1", Nearest, "-2", Equal);
+        test_helper::<T>("-2.0", "-0x2.0#1", Exact, "-2", Equal);
 
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Floor,
-            "-1",
-            Ordering::Less,
-        );
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Ceiling,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Down,
-            "0",
-            Ordering::Greater,
-        );
-        test_helper::<T>("-0.5", "-0x0.8#1", RoundingMode::Up, "-1", Ordering::Less);
-        test_helper::<T>(
-            "-0.5",
-            "-0x0.8#1",
-            RoundingMode::Nearest,
-            "0",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-0.5", "-0x0.8#1", Floor, "-1", Less);
+        test_helper::<T>("-0.5", "-0x0.8#1", Ceiling, "0", Greater);
+        test_helper::<T>("-0.5", "-0x0.8#1", Down, "0", Greater);
+        test_helper::<T>("-0.5", "-0x0.8#1", Up, "-1", Less);
+        test_helper::<T>("-0.5", "-0x0.8#1", Nearest, "0", Greater);
 
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Floor,
+            Floor,
             "-1",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Up,
+            Up,
             "-1",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
-            RoundingMode::Nearest,
+            Nearest,
             "0",
-            Ordering::Greater,
+            Greater,
         );
 
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Floor,
+            Floor,
             "-1",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Ceiling,
+            Ceiling,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Down,
+            Down,
             "0",
-            Ordering::Greater,
+            Greater,
         );
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Up,
+            Up,
             "-1",
-            Ordering::Less,
+            Less,
         );
         test_helper::<T>(
             "-0.6666666666666666",
             "-0x0.aaaaaaaaaaaaa8#53",
-            RoundingMode::Nearest,
+            Nearest,
             "-1",
-            Ordering::Less,
+            Less,
         );
 
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Floor,
-            "-2",
-            Ordering::Less,
-        );
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Ceiling,
-            "-1",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Down,
-            "-1",
-            Ordering::Greater,
-        );
-        test_helper::<T>("-1.5", "-0x1.8#2", RoundingMode::Up, "-2", Ordering::Less);
-        test_helper::<T>(
-            "-1.5",
-            "-0x1.8#2",
-            RoundingMode::Nearest,
-            "-2",
-            Ordering::Less,
-        );
+        test_helper::<T>("-1.5", "-0x1.8#2", Floor, "-2", Less);
+        test_helper::<T>("-1.5", "-0x1.8#2", Ceiling, "-1", Greater);
+        test_helper::<T>("-1.5", "-0x1.8#2", Down, "-1", Greater);
+        test_helper::<T>("-1.5", "-0x1.8#2", Up, "-2", Less);
+        test_helper::<T>("-1.5", "-0x1.8#2", Nearest, "-2", Less);
 
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Floor,
-            "-3",
-            Ordering::Less,
-        );
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Ceiling,
-            "-2",
-            Ordering::Greater,
-        );
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Down,
-            "-2",
-            Ordering::Greater,
-        );
-        test_helper::<T>("-2.5", "-0x2.8#3", RoundingMode::Up, "-3", Ordering::Less);
-        test_helper::<T>(
-            "-2.5",
-            "-0x2.8#3",
-            RoundingMode::Nearest,
-            "-2",
-            Ordering::Greater,
-        );
+        test_helper::<T>("-2.5", "-0x2.8#3", Floor, "-3", Less);
+        test_helper::<T>("-2.5", "-0x2.8#3", Ceiling, "-2", Greater);
+        test_helper::<T>("-2.5", "-0x2.8#3", Down, "-2", Greater);
+        test_helper::<T>("-2.5", "-0x2.8#3", Up, "-3", Less);
+        test_helper::<T>("-2.5", "-0x2.8#3", Nearest, "-2", Greater);
 
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Floor,
-            "-123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Ceiling,
-            "-123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Down,
-            "-123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Up,
-            "-123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Nearest,
-            "-123",
-            Ordering::Equal,
-        );
-        test_helper::<T>(
-            "-123.0",
-            "-0x7b.0#7",
-            RoundingMode::Exact,
-            "-123",
-            Ordering::Equal,
-        );
+        test_helper::<T>("-123.0", "-0x7b.0#7", Floor, "-123", Equal);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Ceiling, "-123", Equal);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Down, "-123", Equal);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Up, "-123", Equal);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Nearest, "-123", Equal);
+        test_helper::<T>("-123.0", "-0x7b.0#7", Exact, "-123", Equal);
     }
     apply_fn_to_signeds!(test_helper_i);
 }
 
 fn unsigned_rounding_from_float_fail_helper<T: PrimitiveUnsigned + RoundingFrom<Float>>() {
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Floor));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Down));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Up));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Nearest));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(Float::NAN, Floor));
+    assert_panic!(T::rounding_from(Float::NAN, Ceiling));
+    assert_panic!(T::rounding_from(Float::NAN, Down));
+    assert_panic!(T::rounding_from(Float::NAN, Up));
+    assert_panic!(T::rounding_from(Float::NAN, Nearest));
+    assert_panic!(T::rounding_from(Float::NAN, Exact));
 
-    assert_panic!(T::rounding_from(Float::INFINITY, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(Float::INFINITY, RoundingMode::Up));
-    assert_panic!(T::rounding_from(Float::INFINITY, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(Float::INFINITY, Ceiling));
+    assert_panic!(T::rounding_from(Float::INFINITY, Up));
+    assert_panic!(T::rounding_from(Float::INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(
-        Float::NEGATIVE_INFINITY,
-        RoundingMode::Floor
-    ));
-    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, RoundingMode::Up));
-    assert_panic!(T::rounding_from(
-        Float::NEGATIVE_INFINITY,
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Floor));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Up));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, RoundingMode::Floor));
-    assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, RoundingMode::Up));
-    assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, Floor));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, Up));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, Exact));
 
-    assert_panic!(T::rounding_from(
-        Float::from_unsigned_times_power_of_2(3u8, -1),
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(Float::from(3u8) >> 1, Exact));
 }
 
 fn signed_rounding_from_float_fail_helper<T: PrimitiveSigned + RoundingFrom<Float>>() {
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Floor));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Down));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Up));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Nearest));
-    assert_panic!(T::rounding_from(Float::NAN, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(Float::NAN, Floor));
+    assert_panic!(T::rounding_from(Float::NAN, Ceiling));
+    assert_panic!(T::rounding_from(Float::NAN, Down));
+    assert_panic!(T::rounding_from(Float::NAN, Up));
+    assert_panic!(T::rounding_from(Float::NAN, Nearest));
+    assert_panic!(T::rounding_from(Float::NAN, Exact));
 
-    assert_panic!(T::rounding_from(Float::INFINITY, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(Float::INFINITY, RoundingMode::Up));
-    assert_panic!(T::rounding_from(Float::INFINITY, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(Float::INFINITY, Ceiling));
+    assert_panic!(T::rounding_from(Float::INFINITY, Up));
+    assert_panic!(T::rounding_from(Float::INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(
-        Float::NEGATIVE_INFINITY,
-        RoundingMode::Floor
-    ));
-    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, RoundingMode::Up));
-    assert_panic!(T::rounding_from(
-        Float::NEGATIVE_INFINITY,
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Floor));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Up));
+    assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(
-        Float::from_unsigned_times_power_of_2(3u8, -1),
-        RoundingMode::Exact
-    ));
-    assert_panic!(T::rounding_from(
-        Float::from_signed_times_power_of_2(-3i8, -1),
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(Float::from(3u8) >> 1, Exact));
+    assert_panic!(T::rounding_from(Float::from(-3i8) >> 1, Exact));
 }
 
 #[test]
@@ -1240,38 +733,26 @@ fn unsigned_rounding_from_float_ref_fail_helper<T: PrimitiveUnsigned>()
 where
     for<'a> T: RoundingFrom<&'a Float>,
 {
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Floor));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Down));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Up));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Nearest));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(&Float::NAN, Floor));
+    assert_panic!(T::rounding_from(&Float::NAN, Ceiling));
+    assert_panic!(T::rounding_from(&Float::NAN, Down));
+    assert_panic!(T::rounding_from(&Float::NAN, Up));
+    assert_panic!(T::rounding_from(&Float::NAN, Nearest));
+    assert_panic!(T::rounding_from(&Float::NAN, Exact));
 
-    assert_panic!(T::rounding_from(&Float::INFINITY, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(&Float::INFINITY, RoundingMode::Up));
-    assert_panic!(T::rounding_from(&Float::INFINITY, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(&Float::INFINITY, Ceiling));
+    assert_panic!(T::rounding_from(&Float::INFINITY, Up));
+    assert_panic!(T::rounding_from(&Float::INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(
-        &Float::NEGATIVE_INFINITY,
-        RoundingMode::Floor
-    ));
-    assert_panic!(T::rounding_from(
-        &Float::NEGATIVE_INFINITY,
-        RoundingMode::Up
-    ));
-    assert_panic!(T::rounding_from(
-        &Float::NEGATIVE_INFINITY,
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Floor));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Up));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, RoundingMode::Floor));
-    assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, RoundingMode::Up));
-    assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, Floor));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, Up));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, Exact));
 
-    assert_panic!(T::rounding_from(
-        &Float::from_unsigned_times_power_of_2(3u8, -1),
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(&(Float::from(3u8) >> 1), Exact));
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -1279,38 +760,23 @@ fn signed_rounding_from_float_ref_fail_helper<T: PrimitiveSigned>()
 where
     for<'a> T: RoundingFrom<&'a Float>,
 {
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Floor));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Down));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Up));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Nearest));
-    assert_panic!(T::rounding_from(&Float::NAN, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(&Float::NAN, Floor));
+    assert_panic!(T::rounding_from(&Float::NAN, Ceiling));
+    assert_panic!(T::rounding_from(&Float::NAN, Down));
+    assert_panic!(T::rounding_from(&Float::NAN, Up));
+    assert_panic!(T::rounding_from(&Float::NAN, Nearest));
+    assert_panic!(T::rounding_from(&Float::NAN, Exact));
 
-    assert_panic!(T::rounding_from(&Float::INFINITY, RoundingMode::Ceiling));
-    assert_panic!(T::rounding_from(&Float::INFINITY, RoundingMode::Up));
-    assert_panic!(T::rounding_from(&Float::INFINITY, RoundingMode::Exact));
+    assert_panic!(T::rounding_from(&Float::INFINITY, Ceiling));
+    assert_panic!(T::rounding_from(&Float::INFINITY, Up));
+    assert_panic!(T::rounding_from(&Float::INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(
-        &Float::NEGATIVE_INFINITY,
-        RoundingMode::Floor
-    ));
-    assert_panic!(T::rounding_from(
-        &Float::NEGATIVE_INFINITY,
-        RoundingMode::Up
-    ));
-    assert_panic!(T::rounding_from(
-        &Float::NEGATIVE_INFINITY,
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Floor));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Up));
+    assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(
-        &Float::from_unsigned_times_power_of_2(3u8, -1),
-        RoundingMode::Exact
-    ));
-    assert_panic!(T::rounding_from(
-        &Float::from_signed_times_power_of_2(-3i8, -1),
-        RoundingMode::Exact
-    ));
+    assert_panic!(T::rounding_from(&(Float::from(3u8) >> 1), Exact));
+    assert_panic!(T::rounding_from(&(Float::from(-3i8) >> 1), Exact));
 }
 
 #[test]
@@ -1404,19 +870,19 @@ where
 
         assert_eq!(n.partial_cmp(&x), Some(o));
         match (x >= T::ZERO, rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     float_gen_var_5().test_properties(|x| {
-        let floor = T::rounding_from(&x, RoundingMode::Floor);
+        let floor = T::rounding_from(&x, Floor);
         if x <= T::MAX {
             assert_eq!(floor.0, Rational::exact_from(&x).floor());
         }
@@ -1424,38 +890,38 @@ where
         if floor.0 != T::MAX {
             assert!(floor.0 + T::ONE > x);
         }
-        assert_eq!(T::rounding_from(&x, RoundingMode::Down), floor);
+        assert_eq!(T::rounding_from(&x, Down), floor);
 
-        let nearest = T::rounding_from(&x, RoundingMode::Nearest);
+        let nearest = T::rounding_from(&x, Nearest);
         if x <= T::MAX {
-            let ceiling = T::rounding_from(&x, RoundingMode::Ceiling);
+            let ceiling = T::rounding_from(&x, Ceiling);
             assert_eq!(ceiling.0, Rational::exact_from(&x).ceiling());
             assert!(ceiling.0 >= x);
             if x > T::ZERO {
                 assert!(ceiling.0 - T::ONE < x);
             }
-            assert_eq!(T::rounding_from(&x, RoundingMode::Up), ceiling);
+            assert_eq!(T::rounding_from(&x, Up), ceiling);
             assert!(nearest == floor || nearest == ceiling);
             assert!(
                 (Rational::from(nearest.0) - Rational::exact_from(x)).le_abs(&Rational::ONE_HALF)
             );
         } else {
-            assert!(nearest == (T::MAX, Ordering::Less));
+            assert!(nearest == (T::MAX, Less));
         }
     });
 
     unsigned_gen::<T>().test_properties(|n| {
         let x = Float::from(n);
-        let no = (n, Ordering::Equal);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Floor), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Down), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Ceiling), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Up), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Nearest), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Exact), no);
+        let no = (n, Equal);
+        assert_eq!(T::rounding_from(&x, Floor), no);
+        assert_eq!(T::rounding_from(&x, Down), no);
+        assert_eq!(T::rounding_from(&x, Ceiling), no);
+        assert_eq!(T::rounding_from(&x, Up), no);
+        assert_eq!(T::rounding_from(&x, Nearest), no);
+        assert_eq!(T::rounding_from(&x, Exact), no);
 
-        let x = Float::from_unsigned_times_power_of_2((no.0 << 1) | T::ONE, -1);
-        assert!(T::rounding_from(x, RoundingMode::Nearest).0.even());
+        let x = Float::from((no.0 << 1) | T::ONE) >> 1;
+        assert!(T::rounding_from(x, Nearest).0.even());
     });
 }
 
@@ -1478,13 +944,13 @@ where
 
         assert_eq!(n.partial_cmp(&x), Some(o));
         match (x >= T::ZERO, rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
@@ -1492,7 +958,7 @@ where
     float_gen_var_4().test_properties(|x| {
         let mut o_floor = None;
         if x >= T::MIN {
-            let floor = T::rounding_from(&x, RoundingMode::Floor);
+            let floor = T::rounding_from(&x, Floor);
             assert!(floor.0 <= x);
             if x <= T::MAX {
                 assert_eq!(floor.0, Rational::exact_from(&x).floor());
@@ -1501,21 +967,14 @@ where
                 assert!(floor.0 + T::ONE > x);
             }
             assert_eq!(
-                T::rounding_from(
-                    &x,
-                    if x >= T::ZERO {
-                        RoundingMode::Down
-                    } else {
-                        RoundingMode::Up
-                    }
-                ),
+                T::rounding_from(&x, if x >= T::ZERO { Down } else { Up }),
                 floor
             );
             o_floor = Some(floor);
         }
         let mut o_ceiling = None;
         if x <= T::MAX {
-            let ceiling = T::rounding_from(&x, RoundingMode::Ceiling);
+            let ceiling = T::rounding_from(&x, Ceiling);
             assert!(ceiling.0 >= x);
             if x >= T::MIN {
                 assert_eq!(ceiling.0, Rational::exact_from(&x).ceiling());
@@ -1524,19 +983,12 @@ where
                 assert!(ceiling.0 - T::ONE < x);
             }
             assert_eq!(
-                T::rounding_from(
-                    &x,
-                    if x >= T::ZERO {
-                        RoundingMode::Up
-                    } else {
-                        RoundingMode::Down
-                    }
-                ),
+                T::rounding_from(&x, if x >= T::ZERO { Up } else { Down }),
                 ceiling
             );
             o_ceiling = Some(ceiling);
         }
-        let nearest = T::rounding_from(&x, RoundingMode::Nearest);
+        let nearest = T::rounding_from(&x, Nearest);
         if let Some(floor) = o_floor {
             if let Some(ceiling) = o_ceiling {
                 assert!(nearest == floor || nearest == ceiling);
@@ -1551,16 +1003,16 @@ where
 
     signed_gen::<T>().test_properties(|n| {
         let x = Float::from(n);
-        let no = (n, Ordering::Equal);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Floor), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Down), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Ceiling), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Up), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Nearest), no);
-        assert_eq!(T::rounding_from(&x, RoundingMode::Exact), no);
+        let no = (n, Equal);
+        assert_eq!(T::rounding_from(&x, Floor), no);
+        assert_eq!(T::rounding_from(&x, Down), no);
+        assert_eq!(T::rounding_from(&x, Ceiling), no);
+        assert_eq!(T::rounding_from(&x, Up), no);
+        assert_eq!(T::rounding_from(&x, Nearest), no);
+        assert_eq!(T::rounding_from(&x, Exact), no);
 
-        let x = Float::from_signed_times_power_of_2((no.0 << 1) | T::ONE, -1);
-        assert!(T::rounding_from(x, RoundingMode::Nearest).0.even());
+        let x = Float::from((no.0 << 1) | T::ONE) >> 1;
+        assert!(T::rounding_from(x, Nearest).0.even());
     });
 }
 

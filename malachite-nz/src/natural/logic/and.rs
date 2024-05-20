@@ -14,7 +14,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::mem::swap;
 use core::ops::{BitAnd, BitAndAssign};
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -143,15 +143,15 @@ pub_test! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys.len()) {
-        Ordering::Equal => {
+        Equal => {
             limbs_slice_and_same_length_in_place_left(xs, ys);
             None
         }
-        Ordering::Greater => {
+        Greater => {
             limbs_slice_and_same_length_in_place_left(&mut xs[..ys_len], ys);
             Some(ys_len)
         }
-        Ordering::Less => {
+        Less => {
             limbs_slice_and_same_length_in_place_left(xs, &ys[..xs_len]);
             None
         }
@@ -197,15 +197,15 @@ pub_test! {limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
-        Ordering::Equal => {
+        Equal => {
             limbs_slice_and_same_length_in_place_left(xs, ys);
             false
         }
-        Ordering::Less => {
+        Less => {
             limbs_slice_and_same_length_in_place_left(xs, &ys[..xs_len]);
             false
         }
-        Ordering::Greater => {
+        Greater => {
             limbs_slice_and_same_length_in_place_left(ys, &xs[..ys_len]);
             true
         }

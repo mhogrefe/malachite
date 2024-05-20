@@ -26,16 +26,19 @@ impl Pow<u64> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Integer::from(-3).pow(100).to_string(),
     ///     "515377520732011331036461129765621272702107522001"
     /// );
     /// assert_eq!(
-    ///     Integer::from_str("-12345678987654321").unwrap().pow(3).to_string(),
+    ///     Integer::from_str("-12345678987654321")
+    ///         .unwrap()
+    ///         .pow(3)
+    ///         .to_string(),
     ///     "-1881676411868862234942354805142998028003108518161"
     /// );
     /// ```
@@ -63,16 +66,18 @@ impl<'a> Pow<u64> for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Integer::from(-3)).pow(100).to_string(),
     ///     "515377520732011331036461129765621272702107522001"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from_str("-12345678987654321").unwrap()).pow(3).to_string(),
+    ///     (&Integer::from_str("-12345678987654321").unwrap())
+    ///         .pow(3)
+    ///         .to_string(),
     ///     "-1881676411868862234942354805142998028003108518161"
     /// );
     /// ```
@@ -100,17 +105,23 @@ impl PowAssign<u64> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// let mut x = Integer::from(-3);
     /// x.pow_assign(100);
-    /// assert_eq!(x.to_string(), "515377520732011331036461129765621272702107522001");
+    /// assert_eq!(
+    ///     x.to_string(),
+    ///     "515377520732011331036461129765621272702107522001"
+    /// );
     ///
     /// let mut x = Integer::from_str("-12345678987654321").unwrap();
     /// x.pow_assign(3);
-    /// assert_eq!(x.to_string(), "-1881676411868862234942354805142998028003108518161");
+    /// assert_eq!(
+    ///     x.to_string(),
+    ///     "-1881676411868862234942354805142998028003108518161"
+    /// );
     /// ```
     fn pow_assign(&mut self, exp: u64) {
         self.sign = self.sign || exp.even();

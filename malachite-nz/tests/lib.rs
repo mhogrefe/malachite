@@ -100,6 +100,10 @@ pub mod integer {
         pub mod cmp;
         pub mod cmp_abs;
         pub mod eq;
+        pub mod eq_abs;
+        pub mod eq_abs_natural;
+        pub mod eq_abs_primitive_float;
+        pub mod eq_abs_primitive_int;
         pub mod hash;
         pub mod partial_cmp_abs_natural;
         pub mod partial_cmp_abs_primitive_float;

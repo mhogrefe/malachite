@@ -81,9 +81,9 @@ impl<'a> SignificantBits for &'a Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::basic::traits::{NaN, One};
+    /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::NAN.significant_bits(), 1);

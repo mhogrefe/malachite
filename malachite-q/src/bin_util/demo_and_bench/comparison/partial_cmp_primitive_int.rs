@@ -17,7 +17,7 @@ use malachite_q::test_util::generators::{
     rational_unsigned_pair_gen_rm,
 };
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_rational_partial_cmp_unsigned);
@@ -55,9 +55,9 @@ fn demo_rational_partial_cmp_unsigned<T: PrimitiveUnsigned>(
         .take(limit)
     {
         match n.partial_cmp(&u).unwrap() {
-            Ordering::Less => println!("{n} < {u}"),
-            Ordering::Equal => println!("{n} = {u}"),
-            Ordering::Greater => println!("{n} > {u}"),
+            Less => println!("{n} < {u}"),
+            Equal => println!("{n} = {u}"),
+            Greater => println!("{n} > {u}"),
         }
     }
 }
@@ -71,9 +71,9 @@ fn demo_rational_partial_cmp_signed<T: PrimitiveSigned>(
 {
     for (n, i) in rational_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp(&i).unwrap() {
-            Ordering::Less => println!("{n} < {i}"),
-            Ordering::Equal => println!("{n} = {i}"),
-            Ordering::Greater => println!("{n} > {i}"),
+            Less => println!("{n} < {i}"),
+            Equal => println!("{n} = {i}"),
+            Greater => println!("{n} > {i}"),
         }
     }
 }
@@ -88,9 +88,9 @@ fn demo_unsigned_partial_cmp_rational<T: PartialOrd<Rational> + PrimitiveUnsigne
         .take(limit)
     {
         match u.partial_cmp(&n).unwrap() {
-            Ordering::Less => println!("{u} < {n}"),
-            Ordering::Equal => println!("{u} = {n}"),
-            Ordering::Greater => println!("{u} > {n}"),
+            Less => println!("{u} < {n}"),
+            Equal => println!("{u} = {n}"),
+            Greater => println!("{u} > {n}"),
         }
     }
 }
@@ -102,9 +102,9 @@ fn demo_signed_partial_cmp_rational<T: PartialOrd<Rational> + PrimitiveSigned>(
 ) {
     for (n, i) in rational_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match i.partial_cmp(&n).unwrap() {
-            Ordering::Less => println!("{i} < {n}"),
-            Ordering::Equal => println!("{i} = {n}"),
-            Ordering::Greater => println!("{i} > {n}"),
+            Less => println!("{i} < {n}"),
+            Equal => println!("{i} = {n}"),
+            Greater => println!("{i} > {n}"),
         }
     }
 }

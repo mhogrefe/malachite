@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 use malachite_base::num::logic::traits::SignificantBits;
 
@@ -36,7 +36,7 @@ macro_rules! impl_float {
                     let (m, e) = other.integer_mantissa_and_exponent();
                     if let Ok(e) = u64::try_from(e) {
                         self.significant_bits() == m.significant_bits() + e
-                            && self.cmp_normalized(&Natural::from(m)) == Ordering::Equal
+                            && self.cmp_normalized(&Natural::from(m)) == Equal
                     } else {
                         false
                     }

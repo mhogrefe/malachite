@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::NegAssign;
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::{self, *};
 use core::ops::Neg;
 
 /// Returns the negative of a [`RoundingMode`].
@@ -21,14 +21,14 @@ use core::ops::Neg;
 ///
 /// # Examples
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode::*;
 ///
-/// assert_eq!(-RoundingMode::Down, RoundingMode::Down);
-/// assert_eq!(-RoundingMode::Up, RoundingMode::Up);
-/// assert_eq!(-RoundingMode::Floor, RoundingMode::Ceiling);
-/// assert_eq!(-RoundingMode::Ceiling, RoundingMode::Floor);
-/// assert_eq!(-RoundingMode::Nearest, RoundingMode::Nearest);
-/// assert_eq!(-RoundingMode::Exact, RoundingMode::Exact);
+/// assert_eq!(-Down, Down);
+/// assert_eq!(-Up, Up);
+/// assert_eq!(-Floor, Ceiling);
+/// assert_eq!(-Ceiling, Floor);
+/// assert_eq!(-Nearest, Nearest);
+/// assert_eq!(-Exact, Exact);
 /// ```
 impl Neg for RoundingMode {
     type Output = RoundingMode;
@@ -36,8 +36,8 @@ impl Neg for RoundingMode {
     #[inline]
     fn neg(self) -> RoundingMode {
         match self {
-            RoundingMode::Floor => RoundingMode::Ceiling,
-            RoundingMode::Ceiling => RoundingMode::Floor,
+            Floor => Ceiling,
+            Ceiling => Floor,
             rm => rm,
         }
     }
@@ -56,22 +56,22 @@ impl NegAssign for RoundingMode {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegAssign;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     ///
-    /// let mut rm = RoundingMode::Down;
+    /// let mut rm = Down;
     /// rm.neg_assign();
-    /// assert_eq!(rm, RoundingMode::Down);
+    /// assert_eq!(rm, Down);
     ///
-    /// let mut rm = RoundingMode::Floor;
+    /// let mut rm = Floor;
     /// rm.neg_assign();
-    /// assert_eq!(rm, RoundingMode::Ceiling);
+    /// assert_eq!(rm, Ceiling);
     /// ```
     #[inline]
     fn neg_assign(&mut self) {
-        if *self == RoundingMode::Floor {
-            *self = RoundingMode::Ceiling;
-        } else if *self == RoundingMode::Ceiling {
-            *self = RoundingMode::Floor
+        if *self == Floor {
+            *self = Ceiling;
+        } else if *self == Ceiling {
+            *self = Floor
         }
     }
 }

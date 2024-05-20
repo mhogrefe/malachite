@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 
 impl Sign for Rational {
@@ -24,21 +24,21 @@ impl Sign for Rational {
     /// use malachite_base::num::arithmetic::traits::Sign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
+    /// use std::cmp::Ordering::*;
     ///
-    /// assert_eq!(Rational::ZERO.sign(), Ordering::Equal);
-    /// assert_eq!(Rational::from_signeds(22, 7).sign(), Ordering::Greater);
-    /// assert_eq!(Rational::from_signeds(-22, 7).sign(), Ordering::Less);
+    /// assert_eq!(Rational::ZERO.sign(), Equal);
+    /// assert_eq!(Rational::from_signeds(22, 7).sign(), Greater);
+    /// assert_eq!(Rational::from_signeds(-22, 7).sign(), Less);
     /// ```
     fn sign(&self) -> Ordering {
         if self.sign {
             if self.numerator == 0 {
-                Ordering::Equal
+                Equal
             } else {
-                Ordering::Greater
+                Greater
             }
         } else {
-            Ordering::Less
+            Less
         }
     }
 }

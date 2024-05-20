@@ -12,7 +12,7 @@ use crate::num::conversion::traits::{
     ExactFrom, PowerOf2DigitIterable, PowerOf2DigitIterator, WrappingFrom,
 };
 use crate::num::logic::traits::BitBlockAccess;
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 use core::marker::PhantomData;
 
 /// A double-ended iterator over the base-$2^k$ digits of an unsigned primitive integer.
@@ -93,14 +93,15 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
-    /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
+    /// use malachite_base::num::conversion::traits::{
+    ///     PowerOf2DigitIterable, PowerOf2DigitIterator,
+    /// };
     ///
-    /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
+    /// let digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
     /// assert_eq!(digits.get(0), 0);
     ///
     /// // 107 = 1101011b
-    /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
+    /// let digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
     /// assert_eq!(digits.get(0), 3);
     /// assert_eq!(digits.get(1), 2);
     /// assert_eq!(digits.get(2), 2);
@@ -124,10 +125,7 @@ fn power_of_2_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
             log_base
         );
     }
-    let significant_digits = x
-        .significant_bits()
-        .div_round(log_base, RoundingMode::Ceiling)
-        .0;
+    let significant_digits = x.significant_bits().div_round(log_base, Ceiling).0;
     PrimitivePowerOf2DigitIterator {
         value: x,
         log_base,

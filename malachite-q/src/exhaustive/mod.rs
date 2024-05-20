@@ -15,7 +15,7 @@ use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator,
 };
@@ -317,8 +317,8 @@ impl<I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<I> {
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::Natural;
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_nz::natural::Natural;
 /// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
 /// use malachite_q::Rational;
 ///
@@ -350,7 +350,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
     assert_ne!(d, 0u32);
     RationalsWithDenominator {
         numerators: exhaustive_integer_range_to_infinity(
-            Integer::rounding_from(a * Rational::from(&d), RoundingMode::Ceiling).0,
+            Integer::rounding_from(a * Rational::from(&d), Ceiling).0,
         ),
         denominator: d,
     }
@@ -378,8 +378,8 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::Natural;
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_nz::natural::Natural;
 /// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_negative_infinity;
 /// use malachite_q::Rational;
 ///
@@ -411,7 +411,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
     assert_ne!(d, 0u32);
     RationalsWithDenominator {
         numerators: exhaustive_integer_range_to_negative_infinity(
-            Integer::rounding_from(a * Rational::from(&d), RoundingMode::Floor).0,
+            Integer::rounding_from(a * Rational::from(&d), Floor).0,
         ),
         denominator: d,
     }
@@ -450,7 +450,9 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 ///         Natural::from(2u32),
 ///         Rational::from_signeds(1i32, 3),
 ///         Rational::from_signeds(5i32, 2)
-///     ).collect_vec().to_debug_string(),
+///     )
+///     .collect_vec()
+///     .to_debug_string(),
 ///     "[1/2, 3/2]"
 /// );
 /// assert_eq!(
@@ -458,7 +460,9 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 ///         Natural::from(2u32),
 ///         Rational::from_signeds(-5i32, 3),
 ///         Rational::from_signeds(5i32, 2)
-///     ).collect_vec().to_debug_string(),
+///     )
+///     .collect_vec()
+///     .to_debug_string(),
 ///     "[1/2, -1/2, 3/2, -3/2]"
 /// );
 /// assert_eq!(
@@ -466,7 +470,9 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 ///         Natural::from(10u32),
 ///         Rational::try_from_float_simplest(std::f64::consts::E).unwrap(),
 ///         Rational::try_from_float_simplest(std::f64::consts::PI).unwrap(),
-///     ).collect_vec().to_debug_string(),
+///     )
+///     .collect_vec()
+///     .to_debug_string(),
 ///     "[29/10, 31/10]"
 /// );
 /// ```
@@ -478,9 +484,9 @@ pub fn exhaustive_rationals_with_denominator_range(
     assert_ne!(d, 0u32);
     assert!(a < b);
     let q_d = Rational::from(&d);
-    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
+    let a_i = Integer::rounding_from(a * &q_d, Ceiling).0;
     let upper_included = b.denominator_ref() == &d;
-    let mut b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0;
+    let mut b_i = Integer::rounding_from(b * q_d, Floor).0;
     if !upper_included {
         b_i += Integer::ONE;
     }
@@ -523,7 +529,9 @@ pub fn exhaustive_rationals_with_denominator_range(
 ///         Natural::from(2u32),
 ///         Rational::from_signeds(1i32, 3),
 ///         Rational::from_signeds(5i32, 2)
-///     ).collect_vec().to_debug_string(),
+///     )
+///     .collect_vec()
+///     .to_debug_string(),
 ///     "[1/2, 3/2, 5/2]"
 /// );
 /// assert_eq!(
@@ -531,7 +539,9 @@ pub fn exhaustive_rationals_with_denominator_range(
 ///         Natural::from(2u32),
 ///         Rational::from_signeds(-5i32, 3),
 ///         Rational::from_signeds(5i32, 2)
-///     ).collect_vec().to_debug_string(),
+///     )
+///     .collect_vec()
+///     .to_debug_string(),
 ///     "[1/2, -1/2, 3/2, -3/2, 5/2]"
 /// );
 /// assert_eq!(
@@ -539,7 +549,9 @@ pub fn exhaustive_rationals_with_denominator_range(
 ///         Natural::from(10u32),
 ///         Rational::try_from_float_simplest(std::f64::consts::E).unwrap(),
 ///         Rational::try_from_float_simplest(std::f64::consts::PI).unwrap(),
-///     ).collect_vec().to_debug_string(),
+///     )
+///     .collect_vec()
+///     .to_debug_string(),
 ///     "[29/10, 31/10]"
 /// );
 /// ```
@@ -551,8 +563,8 @@ pub fn exhaustive_rationals_with_denominator_inclusive_range(
     assert_ne!(d, 0u32);
     assert!(a <= b);
     let q_d = Rational::from(&d);
-    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
-    let b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0 + Integer::ONE;
+    let a_i = Integer::rounding_from(a * &q_d, Ceiling).0;
+    let b_i = Integer::rounding_from(b * q_d, Floor).0 + Integer::ONE;
     RationalsWithDenominator {
         numerators: exhaustive_integer_range(a_i, b_i),
         denominator: d,
@@ -736,9 +748,9 @@ impl Iterator for ExhaustiveRationalRangeToNegativeInfinity {
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         exhaustive_rational_range_to_negative_infinity(
-///             Rational::exact_from(std::f64::consts::PI)
-///         ),
+///         exhaustive_rational_range_to_negative_infinity(Rational::exact_from(
+///             std::f64::consts::PI
+///         )),
 ///         20
 ///     ),
 ///     "[0, 1/2, 1, 1/3, -1, -1/2, 2, 1/4, -2, 3/2, 3, -1/3, -3, -3/2, -4, 1/5, -5, 5/2, -6, \

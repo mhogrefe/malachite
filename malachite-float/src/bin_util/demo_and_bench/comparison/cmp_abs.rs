@@ -15,7 +15,7 @@ use malachite_float::test_util::bench::bucketers::{
 };
 use malachite_float::test_util::generators::{float_pair_gen, float_pair_gen_rm};
 use malachite_float::{ComparableFloat, ComparableFloatRef};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_partial_cmp_abs);
@@ -34,9 +34,9 @@ fn demo_float_partial_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in float_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp_abs(&y) {
             None => println!("|{x}| and |{y}| are incomparable"),
-            Some(Ordering::Less) => println!("|{x}| < |{y}|"),
-            Some(Ordering::Equal) => println!("|{x}| = |{y}|"),
-            Some(Ordering::Greater) => println!("|{x}| > |{y}|"),
+            Some(Less) => println!("|{x}| < |{y}|"),
+            Some(Equal) => println!("|{x}| = |{y}|"),
+            Some(Greater) => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -47,9 +47,9 @@ fn demo_float_partial_cmp_abs_debug(gm: GenMode, config: &GenConfig, limit: usiz
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp_abs(&y) {
             None => println!("|{cx:#x}| and |{cy:#x}| are incomparable"),
-            Some(Ordering::Less) => println!("|{cx:#x}| < |{cy:#x}|"),
-            Some(Ordering::Equal) => println!("|{cx:#x}| = |{cy:#x}|"),
-            Some(Ordering::Greater) => println!("|{cx:#x}| > |{cy:#x}|"),
+            Some(Less) => println!("|{cx:#x}| < |{cy:#x}|"),
+            Some(Equal) => println!("|{cx:#x}| = |{cy:#x}|"),
+            Some(Greater) => println!("|{cx:#x}| > |{cy:#x}|"),
         }
     }
 }
@@ -60,9 +60,9 @@ fn demo_comparable_float_partial_cmp_abs(gm: GenMode, config: &GenConfig, limit:
         let cy = ComparableFloat(y.clone());
         match cx.partial_cmp_abs(&cy) {
             None => println!("|{x}| and |{y}| are incomparable"),
-            Some(Ordering::Less) => println!("|{x}| < |{y}|"),
-            Some(Ordering::Equal) => println!("|{x}| = |{y}|"),
-            Some(Ordering::Greater) => println!("|{x}| > |{y}|"),
+            Some(Less) => println!("|{x}| < |{y}|"),
+            Some(Equal) => println!("|{x}| = |{y}|"),
+            Some(Greater) => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -73,9 +73,9 @@ fn demo_comparable_float_partial_cmp_abs_debug(gm: GenMode, config: &GenConfig, 
         let cy = ComparableFloat(y);
         match cx.partial_cmp_abs(&cy) {
             None => println!("|{cx}| and |{cy}| are incomparable"),
-            Some(Ordering::Less) => println!("|{cx:#x}| < |{cy:#x}|"),
-            Some(Ordering::Equal) => println!("|{cx:#x}| = |{cy:#x}|"),
-            Some(Ordering::Greater) => println!("|{cx:#x}| > |{cy:#x}|"),
+            Some(Less) => println!("|{cx:#x}| < |{cy:#x}|"),
+            Some(Equal) => println!("|{cx:#x}| = |{cy:#x}|"),
+            Some(Greater) => println!("|{cx:#x}| > |{cy:#x}|"),
         }
     }
 }
@@ -86,9 +86,9 @@ fn demo_comparable_float_ref_partial_cmp_abs(gm: GenMode, config: &GenConfig, li
         let cy = ComparableFloatRef(&y);
         match cx.partial_cmp_abs(&cy) {
             None => println!("|{x}| and |{y}| are incomparable"),
-            Some(Ordering::Less) => println!("|{x}| < |{y}|"),
-            Some(Ordering::Equal) => println!("|{x}| = |{y}|"),
-            Some(Ordering::Greater) => println!("|{x}| > |{y}|"),
+            Some(Less) => println!("|{x}| < |{y}|"),
+            Some(Equal) => println!("|{x}| = |{y}|"),
+            Some(Greater) => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -99,9 +99,9 @@ fn demo_comparable_float_ref_partial_cmp_abs_debug(gm: GenMode, config: &GenConf
         let cy = ComparableFloatRef(&y);
         match cx.partial_cmp_abs(&cy) {
             None => println!("|{cx}| and |{cy}| are incomparable"),
-            Some(Ordering::Less) => println!("|{cx:#x}| < |{cy:#x}|"),
-            Some(Ordering::Equal) => println!("|{cx:#x}| = |{cy:#x}|"),
-            Some(Ordering::Greater) => println!("|{cx:#x}| > |{cy:#x}|"),
+            Some(Less) => println!("|{cx:#x}| < |{cy:#x}|"),
+            Some(Equal) => println!("|{cx:#x}| = |{cy:#x}|"),
+            Some(Greater) => println!("|{cx:#x}| > |{cy:#x}|"),
         }
     }
 }

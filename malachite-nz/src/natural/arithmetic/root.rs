@@ -30,7 +30,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, DivMod, DivRound,
@@ -41,7 +41,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_trailing_zeros};
 
 // # Worst-case complexity
@@ -321,12 +321,12 @@ fn limbs_root_to_out_internal(
             if qs[qs_len - 1] == 0 {
                 qs_len -= 1;
             }
-            pow_cmp = Ordering::Greater;
+            pow_cmp = Greater;
             // if S^k > floor(U/2^input_bits), the root approximation was too large
             let mut need_adjust = qs_len > rs_len;
             if !need_adjust && qs_len == rs_len {
                 pow_cmp = limbs_cmp_same_length(&qs[..rs_len], &rs[..rs_len]);
-                need_adjust = pow_cmp == Ordering::Greater;
+                need_adjust = pow_cmp == Greater;
             }
             if need_adjust {
                 assert!(!limbs_sub_limb_in_place(ss_trimmed, 1));
@@ -359,7 +359,7 @@ fn limbs_root_to_out_internal(
             usize::exact_from((input_bits + next_bits - 1) >> Limb::LOG_WIDTH) + 1 - input_len;
         // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
         // - R = R - Q = floor(X / 2 ^ input_bits) - S ^ exp
-        if pow_cmp == Ordering::Equal {
+        if pow_cmp == Equal {
             rs_len = next_len;
             save_2 = 0;
             save_1 = 0;
@@ -464,11 +464,11 @@ fn limbs_root_to_out_internal(
             let pow_xs = limbs_pow(&ss[..ss_len], exp);
             qs[..pow_xs.len()].copy_from_slice(&pow_xs);
             qs_len = pow_xs.len();
-            pow_cmp = Ordering::Greater;
+            pow_cmp = Greater;
             let mut need_adjust = qs_len > xs_len;
             if !need_adjust && qs_len == xs_len {
                 pow_cmp = limbs_cmp_same_length(&qs[..xs_len], &xs[..xs_len]);
-                need_adjust = pow_cmp == Ordering::Greater;
+                need_adjust = pow_cmp == Greater;
             }
             if need_adjust {
                 assert!(!limbs_sub_limb_in_place(&mut ss[..ss_len], 1));
@@ -479,7 +479,7 @@ fn limbs_root_to_out_internal(
         }
         // Sometimes two corrections are needed with log_based_root.
         assert!(c <= NEEDED_CORRECTIONS);
-        rs_len = usize::from(pow_cmp != Ordering::Equal);
+        rs_len = usize::from(pow_cmp != Equal);
         if rs_len != 0 && out_rem_is_some {
             limbs_sub_greater_to_out(rs, &xs[..xs_len], &qs[..qs_len]);
             rs_len = xs_len;
@@ -564,7 +564,7 @@ pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     let mut out = vec![
         0;
         xs.len()
-            .div_round(usize::exact_from(exp), RoundingMode::Ceiling).0
+            .div_round(usize::exact_from(exp), Ceiling).0
     ];
     let inexact = limbs_floor_root_to_out(&mut out, xs, exp);
     (out, inexact)
@@ -580,7 +580,7 @@ pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let mut root_out = vec![
         0;
         xs.len()
-            .div_round(usize::exact_from(exp), RoundingMode::Ceiling).0
+            .div_round(usize::exact_from(exp), Ceiling).0
     ];
     let mut rem_out = vec![0; xs.len()];
     let rem_len = limbs_root_rem_to_out(&mut root_out, &mut rem_out, xs, exp);
@@ -881,11 +881,30 @@ impl CheckedRoot<u64> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(999u16).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!(Natural::from(1000u16).checked_root(3).to_debug_string(), "Some(10)");
-    /// assert_eq!(Natural::from(1001u16).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!(Natural::from(100000000000u64).checked_root(5).to_debug_string(), "None");
-    /// assert_eq!(Natural::from(10000000000u64).checked_root(5).to_debug_string(), "Some(100)");
+    /// assert_eq!(
+    ///     Natural::from(999u16).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(1000u16).checked_root(3).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(1001u16).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(100000000000u64)
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10000000000u64)
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "Some(100)"
+    /// );
     /// ```
     fn checked_root(self, exp: u64) -> Option<Natural> {
         match exp {
@@ -937,12 +956,28 @@ impl<'a> CheckedRoot<u64> for &'a Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(999u16)).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!((&Natural::from(1000u16)).checked_root(3).to_debug_string(), "Some(10)");
-    /// assert_eq!((&Natural::from(1001u16)).checked_root(3).to_debug_string(), "None");
-    /// assert_eq!((&Natural::from(100000000000u64)).checked_root(5).to_debug_string(), "None");
     /// assert_eq!(
-    ///     (&Natural::from(10000000000u64)).checked_root(5).to_debug_string(),
+    ///     (&Natural::from(999u16)).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(1000u16)).checked_root(3).to_debug_string(),
+    ///     "Some(10)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(1001u16)).checked_root(3).to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(100000000000u64))
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
+    ///     "None"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10000000000u64))
+    ///         .checked_root(5)
+    ///         .to_debug_string(),
     ///     "Some(100)"
     /// );
     /// ```
@@ -990,9 +1025,18 @@ impl RootRem<u64> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(999u16).root_rem(3).to_debug_string(), "(9, 270)");
-    /// assert_eq!(Natural::from(1000u16).root_rem(3).to_debug_string(), "(10, 0)");
-    /// assert_eq!(Natural::from(1001u16).root_rem(3).to_debug_string(), "(10, 1)");
+    /// assert_eq!(
+    ///     Natural::from(999u16).root_rem(3).to_debug_string(),
+    ///     "(9, 270)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(1000u16).root_rem(3).to_debug_string(),
+    ///     "(10, 0)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(1001u16).root_rem(3).to_debug_string(),
+    ///     "(10, 1)"
+    /// );
     /// assert_eq!(
     ///     Natural::from(100000000000u64).root_rem(5).to_debug_string(),
     ///     "(158, 1534195232)"
@@ -1043,11 +1087,22 @@ impl<'a> RootRem<u64> for &'a Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(999u16)).root_rem(3).to_debug_string(), "(9, 270)");
-    /// assert_eq!((&Natural::from(1000u16)).root_rem(3).to_debug_string(), "(10, 0)");
-    /// assert_eq!((&Natural::from(1001u16)).root_rem(3).to_debug_string(), "(10, 1)");
     /// assert_eq!(
-    ///     (&Natural::from(100000000000u64)).root_rem(5).to_debug_string(),
+    ///     (&Natural::from(999u16)).root_rem(3).to_debug_string(),
+    ///     "(9, 270)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(1000u16)).root_rem(3).to_debug_string(),
+    ///     "(10, 0)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(1001u16)).root_rem(3).to_debug_string(),
+    ///     "(10, 1)"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(100000000000u64))
+    ///         .root_rem(5)
+    ///         .to_debug_string(),
     ///     "(158, 1534195232)"
     /// );
     /// ```

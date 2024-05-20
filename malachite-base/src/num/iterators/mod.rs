@@ -10,7 +10,7 @@ use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType
 use crate::num::arithmetic::traits::{DivMod, DivisibleBy};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::marker::PhantomData;
 
 #[doc(hidden)]
@@ -367,13 +367,13 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
     assert!(in_chunk_size <= T::WIDTH);
     assert!(out_chunk_size <= U::WIDTH);
     match in_chunk_size.cmp(&out_chunk_size) {
-        Ordering::Equal => {
+        Equal => {
             return IteratorToBitChunks::SameWidth(same_width_iterator_to_bit_chunks(
                 xs,
                 in_chunk_size,
             ))
         }
-        Ordering::Less => {
+        Less => {
             if out_chunk_size.divisible_by(in_chunk_size) {
                 return IteratorToBitChunks::EvenMultiple(even_multiple_iterator_to_bit_chunks(
                     xs,
@@ -382,7 +382,7 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
                 ));
             }
         }
-        Ordering::Greater => {
+        Greater => {
             let (multiple, remainder) = in_chunk_size.div_mod(out_chunk_size);
             if remainder == 0 {
                 return IteratorToBitChunks::EvenFraction(even_fraction_iterator_to_bit_chunks(

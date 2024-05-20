@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -1783,7 +1783,7 @@ fn benchmark_float_add_algorithms(gm: GenMode, config: &GenConfig, limit: usize,
             ("naive", &mut |(x, y)| {
                 let xsb = x.significant_bits();
                 let ysb = y.significant_bits();
-                no_out!(add_prec_round_naive(x, y, max(xsb, ysb), RoundingMode::Nearest).0)
+                no_out!(add_prec_round_naive(x, y, max(xsb, ysb), Nearest).0)
             }),
         ],
     );
@@ -1864,7 +1864,7 @@ fn benchmark_float_add_prec_algorithms(
         &mut [
             ("default", &mut |(x, y, prec)| no_out!(x.add_prec(y, prec))),
             ("naive", &mut |(x, y, prec)| {
-                no_out!(add_prec_round_naive(x, y, prec, RoundingMode::Nearest))
+                no_out!(add_prec_round_naive(x, y, prec, Nearest))
             }),
         ],
     );
@@ -2164,7 +2164,7 @@ fn benchmark_float_add_rational_algorithms(
             ("naive", &mut |(x, y)| {
                 let xsb = x.significant_bits();
                 let ysb = y.significant_bits();
-                no_out!(add_rational_prec_round_naive(x, y, max(xsb, ysb), RoundingMode::Nearest).0)
+                no_out!(add_rational_prec_round_naive(x, y, max(xsb, ysb), Nearest).0)
             }),
         ],
     );
@@ -2291,12 +2291,7 @@ fn benchmark_float_add_rational_prec_algorithms(
                 no_out!(x.add_rational_prec(y, prec))
             }),
             ("naive", &mut |(x, y, prec)| {
-                no_out!(add_rational_prec_round_naive(
-                    x,
-                    y,
-                    prec,
-                    RoundingMode::Nearest
-                ))
+                no_out!(add_rational_prec_round_naive(x, y, prec, Nearest))
             }),
         ],
     );

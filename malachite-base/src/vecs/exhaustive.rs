@@ -24,7 +24,10 @@ use crate::tuples::exhaustive::{
 use crate::vecs::{exhaustive_vec_permutations, ExhaustiveVecPermutations};
 use alloc::vec;
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering};
+use core::cmp::{
+    max, min,
+    Ordering::{self, *},
+};
 use core::iter::{empty, once, FromIterator, Once, Zip};
 use core::marker::PhantomData;
 use core::mem::take;
@@ -60,10 +63,8 @@ pub struct LexFixedLengthVecsOutput {
 /// [here](self#lex_vecs_fixed_length_2_inputs).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::lex_vecs_fixed_length;
 /// use malachite_base::vecs::exhaustive::{validate_oi_map, LexFixedLengthVecsOutput};
 ///
 /// lex_vecs_fixed_length!(
@@ -135,7 +136,6 @@ pub struct LexFixedLengthVecsOutput {
 ///     [6, O, ts, ts_outputs],
 ///     [7, P, ss, ss_outputs]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! lex_vecs_fixed_length {
@@ -506,10 +506,6 @@ where
 /// [here](self#exhaustive_vecs_fixed_length_2_inputs).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate itertools;
-/// # extern crate malachite_base;
-/// # fn main() {
 /// use itertools::Itertools;
 /// use malachite_base::exhaustive_vecs_fixed_length;
 /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
@@ -588,7 +584,6 @@ where
 ///     [6, O, ts, ts_done, ts_outputs],
 ///     [7, P, ss, ss_done, ss_outputs]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! exhaustive_vecs_fixed_length {
@@ -2600,7 +2595,10 @@ where
 /// let mut pattern = vec![false, false, false, true, true, true, true];
 /// let mut bit_count = 4;
 /// next_bit_pattern(&mut pattern, &mut bit_count, 2, 4);
-/// assert_eq!(pattern, &[true, false, false, false, false, false, false, true]);
+/// assert_eq!(
+///     pattern,
+///     &[true, false, false, false, false, false, false, true]
+/// );
 /// assert_eq!(bit_count, 2);
 /// ```
 pub fn next_bit_pattern(
@@ -3209,7 +3207,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_fixed_length;
 ///
-/// let xss = lex_unique_vecs_fixed_length(4, 1..=6).take(20).collect_vec();
+/// let xss = lex_unique_vecs_fixed_length(4, 1..=6)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -3399,7 +3399,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_min_length;
 ///
-/// let xss = shortlex_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
+/// let xss = shortlex_unique_vecs_min_length(2, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -3464,7 +3466,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_length_range;
 ///
-/// let xss = shortlex_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
+/// let xss = shortlex_unique_vecs_length_range(2, 4, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -3536,7 +3540,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_length_inclusive_range;
 ///
-/// let xss = shortlex_unique_vecs_length_inclusive_range(2, 3, 1..=4).take(20).collect_vec();
+/// let xss = shortlex_unique_vecs_length_inclusive_range(2, 3, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -3580,7 +3586,7 @@ fn compare_indexed_vecs_lex<T>(xs: &[(usize, T)], ys: &[(usize, T)]) -> Ordering
     let ys_len = ys.len();
     for i in 0..min(xs_len, ys_len) {
         let o = xs[i].0.cmp(&ys[i].0);
-        if o != Ordering::Equal {
+        if o != Equal {
             return o;
         }
     }
@@ -3646,7 +3652,7 @@ where
             let choose = if let Some(xs) = &self.next_xss[i] {
                 if let Some(min_i) = min_i {
                     let ys: &Option<Vec<(usize, I::Item)>> = &self.next_xss[min_i];
-                    compare_indexed_vecs_lex(xs, ys.as_ref().unwrap()) == Ordering::Less
+                    compare_indexed_vecs_lex(xs, ys.as_ref().unwrap()) == Less
                 } else {
                     true
                 }
@@ -3827,7 +3833,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_length_range;
 ///
-/// let xss = lex_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
+/// let xss = lex_unique_vecs_length_range(2, 4, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -4082,7 +4090,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_fixed_length;
 ///
-/// let xss = exhaustive_unique_vecs_fixed_length(4, 1..=6).take(20).collect_vec();
+/// let xss = exhaustive_unique_vecs_fixed_length(4, 1..=6)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -4243,7 +4253,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_min_length;
 ///
-/// let xss = exhaustive_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
+/// let xss = exhaustive_unique_vecs_min_length(2, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -4308,7 +4320,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_range;
 ///
-/// let xss = exhaustive_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
+/// let xss = exhaustive_unique_vecs_length_range(2, 4, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -4374,7 +4388,9 @@ where
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_inclusive_range;
 ///
-/// let xss = exhaustive_unique_vecs_length_inclusive_range(2, 3, 1..=4).take(20).collect_vec();
+/// let xss = exhaustive_unique_vecs_length_inclusive_range(2, 3, 1..=4)
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -4555,9 +4571,25 @@ impl Iterator for ExhaustiveCombinedKCompositions {
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[1, 1, 2], &[1, 1, 3], &[1, 2, 1], &[1, 1, 4], &[2, 1, 1], &[1, 2, 2], &[1, 3, 1],
-///         &[1, 2, 3], &[2, 1, 2], &[1, 3, 2], &[2, 2, 1], &[3, 1, 1], &[1, 4, 1], &[2, 1, 3],
-///         &[2, 2, 2], &[2, 3, 1], &[3, 1, 2], &[3, 2, 1], &[4, 1, 1]
+///         &[1, 1, 2],
+///         &[1, 1, 3],
+///         &[1, 2, 1],
+///         &[1, 1, 4],
+///         &[2, 1, 1],
+///         &[1, 2, 2],
+///         &[1, 3, 1],
+///         &[1, 2, 3],
+///         &[2, 1, 2],
+///         &[1, 3, 2],
+///         &[2, 2, 1],
+///         &[3, 1, 1],
+///         &[1, 4, 1],
+///         &[2, 1, 3],
+///         &[2, 2, 2],
+///         &[2, 3, 1],
+///         &[3, 1, 2],
+///         &[3, 2, 1],
+///         &[4, 1, 1]
 ///     ]
 /// );
 /// ```

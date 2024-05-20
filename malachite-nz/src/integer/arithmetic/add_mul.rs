@@ -206,10 +206,13 @@ impl AddMul<Integer, Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), Integer::from(4u32)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).add_mul(Integer::from(3u32), Integer::from(4u32)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .add_mul(Integer::from(0x10000), -Integer::from(10u32).pow(12)),
+    ///         .add_mul(Integer::from(0x10000), -Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -241,10 +244,13 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), &Integer::from(4u32)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).add_mul(Integer::from(3u32), &Integer::from(4u32)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .add_mul(Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
+    ///         .add_mul(Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -276,10 +282,13 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), Integer::from(4u32)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).add_mul(&Integer::from(3u32), Integer::from(4u32)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .add_mul(&Integer::from(0x10000), -Integer::from(10u32).pow(12)),
+    ///         .add_mul(&Integer::from(0x10000), -Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -311,10 +320,13 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
+    /// assert_eq!(
+    ///     Integer::from(10u32).add_mul(&Integer::from(3u32), &Integer::from(4u32)),
+    ///     22
+    /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12))
-    ///             .add_mul(&Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
+    ///         .add_mul(&Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```
@@ -352,7 +364,7 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     /// );
     /// assert_eq!(
     ///     (&-Integer::from(10u32).pow(12))
-    ///             .add_mul(&Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
+    ///         .add_mul(&Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
     ///     -65537000000000000i64
     /// );
     /// ```

@@ -33,7 +33,10 @@ impl Square for Rational {
     ///
     /// assert_eq!(Rational::ZERO.square(), 0);
     /// assert_eq!(Rational::from_signeds(22, 7).square().to_string(), "484/49");
-    /// assert_eq!(Rational::from_signeds(-22, 7).square().to_string(), "484/49");
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).square().to_string(),
+    ///     "484/49"
+    /// );
     /// ```
     #[inline]
     fn square(mut self) -> Rational {
@@ -65,8 +68,14 @@ impl<'a> Square for &'a Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!((&Rational::ZERO).square(), 0);
-    /// assert_eq!((&Rational::from_signeds(22, 7)).square().to_string(), "484/49");
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).square().to_string(), "484/49");
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7)).square().to_string(),
+    ///     "484/49"
+    /// );
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).square().to_string(),
+    ///     "484/49"
+    /// );
     /// ```
     #[inline]
     fn square(self) -> Rational {

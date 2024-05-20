@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 #[cfg(not(any(feature = "test_build", feature = "random")))]
 use malachite_base::num::arithmetic::traits::Ln;
 use malachite_base::num::arithmetic::traits::{
@@ -20,7 +20,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base::num::conversion::traits::{RoundingFrom, SciMantissaAndExponent};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 fn approx_log_helper(x: &Rational) -> f64 {
     let (mantissa, exponent): (f64, i64) = x.sci_mantissa_and_exponent();
@@ -45,7 +45,10 @@ impl Rational {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(NiceFloat(Rational::from(10i32).approx_log()), NiceFloat(2.3025850929940455));
+    /// assert_eq!(
+    ///     NiceFloat(Rational::from(10i32).approx_log()),
+    ///     NiceFloat(2.3025850929940455)
+    /// );
     /// assert_eq!(
     ///     NiceFloat(Rational::from(10i32).pow(100u64).approx_log()),
     ///     NiceFloat(230.25850929940455)
@@ -81,39 +84,35 @@ pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
     if *x == 1u32 {
         return (0, true);
     }
-    let mut log = i64::rounding_from(
-        approx_log_helper(x) / approx_log_helper(base),
-        RoundingMode::Floor,
-    )
-    .0;
+    let mut log = i64::rounding_from(approx_log_helper(x) / approx_log_helper(base), Floor).0;
     let mut power = base.pow(log);
     if *base > 1u32 {
         match power.cmp_abs(x) {
-            Ordering::Equal => (log, true),
-            Ordering::Less => loop {
+            Equal => (log, true),
+            Less => loop {
                 power *= base;
                 match power.cmp_abs(x) {
-                    Ordering::Equal => {
+                    Equal => {
                         return (log + 1, true);
                     }
-                    Ordering::Less => {
+                    Less => {
                         log += 1;
                     }
-                    Ordering::Greater => {
+                    Greater => {
                         return (log, false);
                     }
                 }
             },
-            Ordering::Greater => loop {
+            Greater => loop {
                 power /= base;
                 match power.cmp_abs(x) {
-                    Ordering::Equal => {
+                    Equal => {
                         return (log - 1, true);
                     }
-                    Ordering::Less => {
+                    Less => {
                         return (log - 1, false);
                     }
-                    Ordering::Greater => {
+                    Greater => {
                         log -= 1;
                     }
                 }
@@ -121,31 +120,31 @@ pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
         }
     } else {
         match power.cmp_abs(x) {
-            Ordering::Equal => (log, true),
-            Ordering::Less => loop {
+            Equal => (log, true),
+            Less => loop {
                 power /= base;
                 match power.cmp_abs(x) {
-                    Ordering::Equal => {
+                    Equal => {
                         return (log - 1, true);
                     }
-                    Ordering::Less => {
+                    Less => {
                         log -= 1;
                     }
-                    Ordering::Greater => {
+                    Greater => {
                         return (log - 1, false);
                     }
                 }
             },
-            Ordering::Greater => loop {
+            Greater => loop {
                 power *= base;
                 match power.cmp_abs(x) {
-                    Ordering::Equal => {
+                    Equal => {
                         return (log + 1, true);
                     }
-                    Ordering::Less => {
+                    Less => {
                         return (log, false);
                     }
-                    Ordering::Greater => {
+                    Greater => {
                         log += 1;
                     }
                 }
@@ -179,10 +178,22 @@ impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::FloorLogBase;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(80u32).floor_log_base(&Rational::from(3u32)), 3);
-    /// assert_eq!(Rational::from(81u32).floor_log_base(&Rational::from(3u32)), 4);
-    /// assert_eq!(Rational::from(82u32).floor_log_base(&Rational::from(3u32)), 4);
-    /// assert_eq!(Rational::from(4294967296u64).floor_log_base(&Rational::from(10u32)), 9);
+    /// assert_eq!(
+    ///     Rational::from(80u32).floor_log_base(&Rational::from(3u32)),
+    ///     3
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(81u32).floor_log_base(&Rational::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(82u32).floor_log_base(&Rational::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(4294967296u64).floor_log_base(&Rational::from(10u32)),
+    ///     9
+    /// );
     /// assert_eq!(
     ///     Rational::from_signeds(936851431250i64, 1397).floor_log_base(&Rational::from(10u32)),
     ///     8
@@ -226,17 +237,28 @@ impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(80u32).ceiling_log_base(&Rational::from(3u32)), 4);
-    /// assert_eq!(Rational::from(81u32).ceiling_log_base(&Rational::from(3u32)), 4);
-    /// assert_eq!(Rational::from(82u32).ceiling_log_base(&Rational::from(3u32)), 5);
-    /// assert_eq!(Rational::from(4294967296u64).ceiling_log_base(&Rational::from(10u32)), 10);
+    /// assert_eq!(
+    ///     Rational::from(80u32).ceiling_log_base(&Rational::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(81u32).ceiling_log_base(&Rational::from(3u32)),
+    ///     4
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(82u32).ceiling_log_base(&Rational::from(3u32)),
+    ///     5
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(4294967296u64).ceiling_log_base(&Rational::from(10u32)),
+    ///     10
+    /// );
     /// assert_eq!(
     ///     Rational::from_signeds(936851431250i64, 1397).ceiling_log_base(&Rational::from(10u32)),
     ///     9
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(5153632, 16807)
-    ///             .ceiling_log_base(&Rational::from_signeds(22, 7)),
+    ///     Rational::from_signeds(5153632, 16807).ceiling_log_base(&Rational::from_signeds(22, 7)),
     ///     5
     /// );
     /// ```
@@ -285,17 +307,28 @@ impl<'a, 'b> CheckedLogBase<&'b Rational> for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from(80u32).checked_log_base(&Rational::from(3u32)), None);
-    /// assert_eq!(Rational::from(81u32).checked_log_base(&Rational::from(3u32)), Some(4));
-    /// assert_eq!(Rational::from(82u32).checked_log_base(&Rational::from(3u32)), None);
-    /// assert_eq!(Rational::from(4294967296u64).checked_log_base(&Rational::from(10u32)), None);
+    /// assert_eq!(
+    ///     Rational::from(80u32).checked_log_base(&Rational::from(3u32)),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(81u32).checked_log_base(&Rational::from(3u32)),
+    ///     Some(4)
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(82u32).checked_log_base(&Rational::from(3u32)),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     Rational::from(4294967296u64).checked_log_base(&Rational::from(10u32)),
+    ///     None
+    /// );
     /// assert_eq!(
     ///     Rational::from_signeds(936851431250i64, 1397).checked_log_base(&Rational::from(10u32)),
     ///     None
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(5153632, 16807)
-    ///             .checked_log_base(&Rational::from_signeds(22, 7)),
+    ///     Rational::from_signeds(5153632, 16807).checked_log_base(&Rational::from_signeds(22, 7)),
     ///     Some(5)
     /// );
     /// ```

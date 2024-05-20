@@ -15,7 +15,7 @@ use malachite_q::test_util::bench::bucketers::{
     pair_2_pair_rational_max_bit_bucketer, pair_rational_max_bit_bucketer,
 };
 use malachite_q::test_util::generators::{rational_pair_gen, rational_pair_gen_rm};
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_cmp_abs);
@@ -34,9 +34,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_rational_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         match x.cmp_abs(&y) {
-            Ordering::Less => println!("|{x}| < |{y}|"),
-            Ordering::Equal => println!("|{x}| = |{y}|"),
-            Ordering::Greater => println!("|{x}| > |{y}|"),
+            Less => println!("|{x}| < |{y}|"),
+            Equal => println!("|{x}| = |{y}|"),
+            Greater => println!("|{x}| > |{y}|"),
         }
     }
 }

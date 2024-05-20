@@ -9,13 +9,13 @@
 use crate::arithmetic::is_power_of_2::float_is_signed_min;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::from::{SignedFromFloatError, UnsignedFromFloatError};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -27,18 +27,14 @@ where
     match f {
         float_nan!() => panic!("Can't convert NaN to {}", T::NAME),
         float_infinity!() => match rm {
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::MAX, Ordering::Less)
-            }
+            Floor | Down | Nearest => (T::MAX, Less),
             _ => panic!("Can't convert Infinity to {} using {}", T::NAME, rm),
         },
         float_negative_infinity!() => match rm {
-            RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::ZERO, Ordering::Greater)
-            }
+            Ceiling | Down | Nearest => (T::ZERO, Greater),
             _ => panic!("Can't convert -Infinity to {} using {}", T::NAME, rm),
         },
-        float_either_zero!() => (T::ZERO, Ordering::Equal),
+        float_either_zero!() => (T::ZERO, Equal),
         Float(Finite {
             sign,
             exponent,
@@ -47,26 +43,20 @@ where
         }) => {
             if !sign {
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::ZERO, Ordering::Greater)
-                    }
+                    Ceiling | Down | Nearest => (T::ZERO, Greater),
                     _ => panic!("Cannot convert negative Float to {} using {}", T::NAME, rm),
                 }
             } else if exponent < 0 {
                 match rm {
-                    RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::ZERO, Ordering::Less)
-                    }
-                    RoundingMode::Ceiling | RoundingMode::Up => (T::ONE, Ordering::Greater),
-                    RoundingMode::Exact => {
+                    Floor | Down | Nearest => (T::ZERO, Less),
+                    Ceiling | Up => (T::ONE, Greater),
+                    Exact => {
                         panic!("Cannot convert Float to {} using {}", T::NAME, rm)
                     }
                 }
             } else if exponent > i64::wrapping_from(T::WIDTH) {
                 match rm {
-                    RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::MAX, Ordering::Less)
-                    }
+                    Floor | Down | Nearest => (T::MAX, Less),
                     _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
                 }
             } else {
@@ -75,15 +65,13 @@ where
                 let (n, o) = if sb >= eb {
                     significand.shr_round(sb - eb, rm)
                 } else {
-                    (significand << (eb - sb), Ordering::Equal)
+                    (significand << (eb - sb), Equal)
                 };
                 let (n, o) = if let Ok(n) = T::try_from(&n) {
                     (n, o)
                 } else {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MAX, Ordering::Less)
-                        }
+                        Floor | Down | Nearest => (T::MAX, Less),
                         _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
                     }
                 };
@@ -104,18 +92,14 @@ where
     match f {
         float_nan!() => panic!("Can't convert NaN to {}", T::NAME),
         float_infinity!() => match rm {
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::MAX, Ordering::Less)
-            }
+            Floor | Down | Nearest => (T::MAX, Less),
             _ => panic!("Can't convert Infinity to {} using {}", T::NAME, rm),
         },
         float_negative_infinity!() => match rm {
-            RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::ZERO, Ordering::Greater)
-            }
+            Ceiling | Down | Nearest => (T::ZERO, Greater),
             _ => panic!("Can't convert -Infinity to {} using {}", T::NAME, rm),
         },
-        float_either_zero!() => (T::ZERO, Ordering::Equal),
+        float_either_zero!() => (T::ZERO, Equal),
         Float(Finite {
             sign,
             exponent,
@@ -124,26 +108,20 @@ where
         }) => {
             if !sign {
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::ZERO, Ordering::Greater)
-                    }
+                    Ceiling | Down | Nearest => (T::ZERO, Greater),
                     _ => panic!("Cannot convert negative Float to {} using {}", T::NAME, rm),
                 }
             } else if *exponent < 0 {
                 match rm {
-                    RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::ZERO, Ordering::Less)
-                    }
-                    RoundingMode::Ceiling | RoundingMode::Up => (T::ONE, Ordering::Greater),
-                    RoundingMode::Exact => {
+                    Floor | Down | Nearest => (T::ZERO, Less),
+                    Ceiling | Up => (T::ONE, Greater),
+                    Exact => {
                         panic!("Cannot convert Float to {} using {}", T::NAME, rm)
                     }
                 }
             } else if *exponent > i64::wrapping_from(T::WIDTH) {
                 match rm {
-                    RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::MAX, Ordering::Less)
-                    }
+                    Floor | Down | Nearest => (T::MAX, Less),
                     _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
                 }
             } else {
@@ -152,15 +130,13 @@ where
                 let (n, o) = if sb >= eb {
                     significand.shr_round(sb - eb, rm)
                 } else {
-                    (significand << (eb - sb), Ordering::Equal)
+                    (significand << (eb - sb), Equal)
                 };
                 let (n, o) = if let Ok(n) = T::try_from(&n) {
                     (n, o)
                 } else {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MAX, Ordering::Less)
-                        }
+                        Floor | Down | Nearest => (T::MAX, Less),
                         _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
                     }
                 };
@@ -403,18 +379,14 @@ where
     match f {
         float_nan!() => panic!("Can't convert NaN to {}", T::NAME),
         float_infinity!() => match rm {
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::MAX, Ordering::Less)
-            }
+            Floor | Down | Nearest => (T::MAX, Less),
             _ => panic!("Can't convert Infinity to {} using {}", T::NAME, rm),
         },
         float_negative_infinity!() => match rm {
-            RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::MIN, Ordering::Greater)
-            }
+            Ceiling | Down | Nearest => (T::MIN, Greater),
             _ => panic!("Can't convert -Infinity to {} using {}", T::NAME, rm),
         },
-        float_either_zero!() => (T::ZERO, Ordering::Equal),
+        float_either_zero!() => (T::ZERO, Equal),
         Float(Finite {
             sign,
             exponent,
@@ -424,19 +396,15 @@ where
             if sign {
                 if exponent < 0 {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::ZERO, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => (T::ONE, Ordering::Greater),
-                        RoundingMode::Exact => {
+                        Floor | Down | Nearest => (T::ZERO, Less),
+                        Ceiling | Up => (T::ONE, Greater),
+                        Exact => {
                             panic!("Cannot convert Float to Integer using {rm}")
                         }
                     }
                 } else if exponent >= i64::wrapping_from(T::WIDTH) {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MAX, Ordering::Less)
-                        }
+                        Floor | Down | Nearest => (T::MAX, Less),
                         _ => {
                             panic!("Cannot convert Float to Integer using {rm}")
                         }
@@ -447,15 +415,13 @@ where
                     let (n, o) = if sb >= eb {
                         significand.shr_round(sb - eb, rm)
                     } else {
-                        (significand << (eb - sb), Ordering::Equal)
+                        (significand << (eb - sb), Equal)
                     };
                     let (n, o) = if let Ok(n) = T::try_from(&n) {
                         (n, o)
                     } else {
                         match rm {
-                            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                (T::MAX, Ordering::Less)
-                            }
+                            Floor | Down | Nearest => (T::MAX, Less),
                             _ => {
                                 panic!("Cannot convert large Float to {} using {}", T::NAME, rm)
                             }
@@ -465,11 +431,9 @@ where
                 }
             } else if exponent < 0 {
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::ZERO, Ordering::Greater)
-                    }
-                    RoundingMode::Floor | RoundingMode::Up => (T::NEGATIVE_ONE, Ordering::Less),
-                    RoundingMode::Exact => {
+                    Ceiling | Down | Nearest => (T::ZERO, Greater),
+                    Floor | Up => (T::NEGATIVE_ONE, Less),
+                    Exact => {
                         panic!("Cannot convert Float to Integer using {rm}")
                     }
                 }
@@ -477,9 +441,7 @@ where
                 // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok because the
                 // next else block handles it.
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::MIN, Ordering::Greater)
-                    }
+                    Ceiling | Down | Nearest => (T::MIN, Greater),
                     _ => {
                         panic!("Cannot convert Float to Integer using {rm}")
                     }
@@ -490,15 +452,13 @@ where
                 let (n, o) = if sb >= eb {
                     significand.shr_round(sb - eb, -rm)
                 } else {
-                    (significand << (eb - sb), Ordering::Equal)
+                    (significand << (eb - sb), Equal)
                 };
                 let (n, o) = if let Ok(n) = T::try_from(&-n) {
                     (n, o.reverse())
                 } else {
                     match rm {
-                        RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MIN, Ordering::Greater)
-                        }
+                        Ceiling | Down | Nearest => (T::MIN, Greater),
                         _ => panic!(
                             "Cannot convert large negative Float to {} using {}",
                             T::NAME,
@@ -520,18 +480,14 @@ where
     match f {
         float_nan!() => panic!("Can't convert NaN to {}", T::NAME),
         float_infinity!() => match rm {
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::MAX, Ordering::Less)
-            }
+            Floor | Down | Nearest => (T::MAX, Less),
             _ => panic!("Can't convert Infinity to {} using {}", T::NAME, rm),
         },
         float_negative_infinity!() => match rm {
-            RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                (T::MIN, Ordering::Greater)
-            }
+            Ceiling | Down | Nearest => (T::MIN, Greater),
             _ => panic!("Can't convert -Infinity to {} using {}", T::NAME, rm),
         },
-        float_either_zero!() => (T::ZERO, Ordering::Equal),
+        float_either_zero!() => (T::ZERO, Equal),
         Float(Finite {
             sign,
             exponent,
@@ -541,19 +497,15 @@ where
             if *sign {
                 if *exponent < 0 {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::ZERO, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => (T::ONE, Ordering::Greater),
-                        RoundingMode::Exact => {
+                        Floor | Down | Nearest => (T::ZERO, Less),
+                        Ceiling | Up => (T::ONE, Greater),
+                        Exact => {
                             panic!("Cannot convert Float to Integer using {rm}")
                         }
                     }
                 } else if *exponent >= i64::wrapping_from(T::WIDTH) {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MAX, Ordering::Less)
-                        }
+                        Floor | Down | Nearest => (T::MAX, Less),
                         _ => {
                             panic!("Cannot convert Float to Integer using {rm}")
                         }
@@ -564,15 +516,13 @@ where
                     let (n, o) = if sb >= eb {
                         significand.shr_round(sb - eb, rm)
                     } else {
-                        (significand << (eb - sb), Ordering::Equal)
+                        (significand << (eb - sb), Equal)
                     };
                     let (n, o) = if let Ok(n) = T::try_from(&n) {
                         (n, o)
                     } else {
                         match rm {
-                            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                (T::MAX, Ordering::Less)
-                            }
+                            Floor | Down | Nearest => (T::MAX, Less),
                             _ => {
                                 panic!("Cannot convert large Float to {} using {}", T::NAME, rm)
                             }
@@ -582,11 +532,9 @@ where
                 }
             } else if *exponent < 0 {
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::ZERO, Ordering::Greater)
-                    }
-                    RoundingMode::Floor | RoundingMode::Up => (T::NEGATIVE_ONE, Ordering::Less),
-                    RoundingMode::Exact => {
+                    Ceiling | Down | Nearest => (T::ZERO, Greater),
+                    Floor | Up => (T::NEGATIVE_ONE, Less),
+                    Exact => {
                         panic!("Cannot convert Float to Integer using {rm}")
                     }
                 }
@@ -594,9 +542,7 @@ where
                 // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok because the
                 // next else block handles it.
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                        (T::MIN, Ordering::Greater)
-                    }
+                    Ceiling | Down | Nearest => (T::MIN, Greater),
                     _ => {
                         panic!("Cannot convert Float to Integer using {rm}")
                     }
@@ -607,15 +553,13 @@ where
                 let (n, o) = if sb >= eb {
                     significand.shr_round(sb - eb, -rm)
                 } else {
-                    (significand << (eb - sb), Ordering::Equal)
+                    (significand << (eb - sb), Equal)
                 };
                 let (n, o) = if let Ok(n) = T::try_from(&-n) {
                     (n, o.reverse())
                 } else {
                     match rm {
-                        RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                            (T::MIN, Ordering::Greater)
-                        }
+                        Ceiling | Down | Nearest => (T::MIN, Greater),
                         _ => panic!(
                             "Cannot convert large negative Float to {} using {}",
                             T::NAME,

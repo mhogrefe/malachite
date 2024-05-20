@@ -15,7 +15,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_q::test_util::bench::bucketers::pair_1_rational_bit_bucketer;
 use malachite_q::test_util::generators::{rational_signed_pair_gen, rational_unsigned_pair_gen};
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_rational_partial_cmp_abs_unsigned);
@@ -73,9 +73,9 @@ fn demo_rational_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
         .take(limit)
     {
         match n.partial_cmp_abs(&u).unwrap() {
-            Ordering::Less => println!("|{n}| < |{u}|"),
-            Ordering::Equal => println!("|{n}| = |{u}|"),
-            Ordering::Greater => println!("|{n}| > |{u}|"),
+            Less => println!("|{n}| < |{u}|"),
+            Equal => println!("|{n}| = |{u}|"),
+            Greater => println!("|{n}| > |{u}|"),
         }
     }
 }
@@ -89,9 +89,9 @@ fn demo_rational_partial_cmp_abs_signed<T: PrimitiveSigned>(
 {
     for (n, i) in rational_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp_abs(&i).unwrap() {
-            Ordering::Less => println!("|{n}| < |{i}|"),
-            Ordering::Equal => println!("|{n}| = |{i}|"),
-            Ordering::Greater => println!("|{n}| > |{i}|"),
+            Less => println!("|{n}| < |{i}|"),
+            Equal => println!("|{n}| = |{i}|"),
+            Greater => println!("|{n}| > |{i}|"),
         }
     }
 }
@@ -106,9 +106,9 @@ fn demo_unsigned_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + Primitive
         .take(limit)
     {
         match u.partial_cmp_abs(&n).unwrap() {
-            Ordering::Less => println!("|{u}| < |{n}|"),
-            Ordering::Equal => println!("|{u}| = |{n}|"),
-            Ordering::Greater => println!("|{u}| > |{n}|"),
+            Less => println!("|{u}| < |{n}|"),
+            Equal => println!("|{u}| = |{n}|"),
+            Greater => println!("|{u}| > |{n}|"),
         }
     }
 }
@@ -120,9 +120,9 @@ fn demo_signed_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveSi
 ) {
     for (n, i) in rational_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match i.partial_cmp_abs(&n).unwrap() {
-            Ordering::Less => println!("|{i}| < |{n}|"),
-            Ordering::Equal => println!("|{i}| = |{n}|"),
-            Ordering::Greater => println!("|{i}| > |{n}|"),
+            Less => println!("|{i}| < |{n}|"),
+            Equal => println!("|{i}| = |{n}|"),
+            Greater => println!("|{i}| > |{n}|"),
         }
     }
 }

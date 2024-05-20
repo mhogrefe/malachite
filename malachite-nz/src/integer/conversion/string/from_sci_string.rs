@@ -71,7 +71,7 @@ impl FromSciString for Integer {
     /// ```
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
     /// use malachite_base::num::conversion::traits::FromSciString;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from_sci_string("123").unwrap(), 123);
@@ -80,14 +80,23 @@ impl FromSciString for Integer {
     /// assert_eq!(Integer::from_sci_string("1.23e10").unwrap(), 12300000000i64);
     ///
     /// let mut options = FromSciStringOptions::default();
-    /// assert_eq!(Integer::from_sci_string_with_options("123.5", options).unwrap(), 124);
+    /// assert_eq!(
+    ///     Integer::from_sci_string_with_options("123.5", options).unwrap(),
+    ///     124
+    /// );
     ///
-    /// options.set_rounding_mode(RoundingMode::Floor);
-    /// assert_eq!(Integer::from_sci_string_with_options("123.5", options).unwrap(), 123);
+    /// options.set_rounding_mode(Floor);
+    /// assert_eq!(
+    ///     Integer::from_sci_string_with_options("123.5", options).unwrap(),
+    ///     123
+    /// );
     ///
     /// options = FromSciStringOptions::default();
     /// options.set_base(16);
-    /// assert_eq!(Integer::from_sci_string_with_options("ff", options).unwrap(), 255);
+    /// assert_eq!(
+    ///     Integer::from_sci_string_with_options("ff", options).unwrap(),
+    ///     255
+    /// );
     /// ```
     #[inline]
     fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Integer> {

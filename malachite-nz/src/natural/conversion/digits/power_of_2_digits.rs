@@ -10,7 +10,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::{min, Ordering};
+use core::cmp::{min, Ordering::*};
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivRound, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -19,7 +19,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits, WrappingFrom};
 use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_trailing_zeros;
 
 impl Natural {
@@ -39,7 +39,7 @@ impl Natural {
         }
         let digit_len = self
             .significant_bits()
-            .div_round(log_base, RoundingMode::Ceiling).0;
+            .div_round(log_base, Ceiling).0;
         let mut digits = Vec::with_capacity(usize::exact_from(digit_len));
         let mut previous_index = 0;
         for _ in 0..digit_len {
@@ -328,19 +328,18 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// assert_eq!(
     ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::ZERO, 6)
-    ///             .to_debug_string(),
+    ///         .to_debug_string(),
     ///     "[]"
     /// );
     /// assert_eq!(
-    ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::TWO, 6)
-    ///             .to_debug_string(),
+    ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::TWO, 6).to_debug_string(),
     ///     "[2]"
     /// );
     ///
     /// // 123_10 = 173_8
     /// assert_eq!(
     ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::from(123u32), 3)
-    ///             .to_debug_string(),
+    ///         .to_debug_string(),
     ///     "[3, 7, 1]"
     /// );
     /// ```
@@ -437,19 +436,19 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// assert_eq!(
     ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::ZERO, 6)
-    ///             .to_debug_string(),
+    ///         .to_debug_string(),
     ///     "[]"
     /// );
     /// assert_eq!(
     ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::TWO, 6)
-    ///             .to_debug_string(),
+    ///         .to_debug_string(),
     ///     "[2]"
     /// );
     ///
     /// // 123_10 = 173_8
     /// assert_eq!(
     ///     PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::from(123u32), 3)
-    ///             .to_debug_string(),
+    ///         .to_debug_string(),
     ///     "[1, 7, 3]"
     /// );
     /// ```
@@ -519,7 +518,7 @@ impl PowerOf2Digits<Natural> for Natural {
         if let Some(log_log_base) = log_base.checked_log_base_2() {
             let mut limbs = Vec::new();
             match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                Ordering::Equal => {
+                Equal => {
                     for digit in digits {
                         if digit.significant_bits() > log_base {
                             return None;
@@ -527,7 +526,7 @@ impl PowerOf2Digits<Natural> for Natural {
                         limbs.push(Limb::wrapping_from(&digit));
                     }
                 }
-                Ordering::Less => {
+                Less => {
                     for chunk in &digits.chunks(usize::wrapping_from(Limb::WIDTH >> log_log_base)) {
                         let mut limb = 0;
                         let mut offset = 0;
@@ -541,7 +540,7 @@ impl PowerOf2Digits<Natural> for Natural {
                         limbs.push(limb);
                     }
                 }
-                Ordering::Greater => {
+                Greater => {
                     let mut offset = 0;
                     let chunk_size = usize::wrapping_from(log_base >> Limb::LOG_WIDTH);
                     for digit in digits {
@@ -630,7 +629,7 @@ impl PowerOf2Digits<Natural> for Natural {
         if let Some(log_log_base) = log_base.checked_log_base_2() {
             let mut limbs = Vec::new();
             match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                Ordering::Equal => {
+                Equal => {
                     for digit in digits {
                         if digit.significant_bits() > log_base {
                             return None;
@@ -639,7 +638,7 @@ impl PowerOf2Digits<Natural> for Natural {
                     }
                     limbs.reverse();
                 }
-                Ordering::Less => {
+                Less => {
                     let digits = digits.collect_vec();
                     for chunk in digits.rchunks(usize::wrapping_from(Limb::WIDTH >> log_log_base)) {
                         let mut limb = 0;
@@ -654,7 +653,7 @@ impl PowerOf2Digits<Natural> for Natural {
                         limbs.push(limb);
                     }
                 }
-                Ordering::Greater => {
+                Greater => {
                     let digits = digits.collect_vec();
                     let mut offset = 0;
                     let chunk_size = usize::wrapping_from(log_base >> Limb::LOG_WIDTH);
@@ -691,7 +690,7 @@ impl Natural {
         assert_ne!(log_base, 0);
         let digit_len = self
             .significant_bits()
-            .div_round(log_base, RoundingMode::Ceiling).0;
+            .div_round(log_base, Ceiling).0;
         let mut digits = Vec::with_capacity(usize::exact_from(digit_len));
         let mut previous_index = 0;
         for _ in 0..digit_len {

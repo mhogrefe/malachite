@@ -150,7 +150,10 @@ impl<'a> ModInverse<Natural> for &'a Natural {
     ///     (&Natural::from(3u32)).mod_inverse(Natural::from(10u32)),
     ///     Some(Natural::from(7u32))
     /// );
-    /// assert_eq!((&Natural::from(4u32)).mod_inverse(Natural::from(10u32)), None);
+    /// assert_eq!(
+    ///     (&Natural::from(4u32)).mod_inverse(Natural::from(10u32)),
+    ///     None
+    /// );
     /// ```
     fn mod_inverse(self, m: Natural) -> Option<Natural> {
         assert_ne!(*self, 0u32);
@@ -193,7 +196,10 @@ impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
     ///     (&Natural::from(3u32)).mod_inverse(&Natural::from(10u32)),
     ///     Some(Natural::from(7u32))
     /// );
-    /// assert_eq!((&Natural::from(4u32)).mod_inverse(&Natural::from(10u32)), None);
+    /// assert_eq!(
+    ///     (&Natural::from(4u32)).mod_inverse(&Natural::from(10u32)),
+    ///     None
+    /// );
     /// ```
     fn mod_inverse(self, m: &'a Natural) -> Option<Natural> {
         assert_ne!(*self, 0u32);

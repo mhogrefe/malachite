@@ -102,9 +102,12 @@ impl Rational {
     /// assert_eq!(prefix_to_string(after_point, 10), "[]");
     ///
     /// let (before_point, after_point) =
-    ///         Rational::from_signeds(22, 7).digits(&Natural::from(10u32));
+    ///     Rational::from_signeds(22, 7).digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
-    /// assert_eq!(prefix_to_string(after_point, 10), "[1, 4, 2, 8, 5, 7, 1, 4, 2, 8, ...]");
+    /// assert_eq!(
+    ///     prefix_to_string(after_point, 10),
+    ///     "[1, 4, 2, 8, 5, 7, 1, 4, 2, 8, ...]"
+    /// );
     /// ```
     pub fn digits(&self, base: &Natural) -> (Vec<Natural>, RationalDigits) {
         if let Some(log_base) = base.checked_log_base_2() {

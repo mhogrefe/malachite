@@ -59,7 +59,7 @@ fn test_limbs_mod_pow_odd() {
     // - bit_index != 0
     // - !limbs_get_bit(es, bit_index - 1)
     // - bit_index >= windowsize
-    // - limbs_cmp_same_length(out, ms) == Ordering::Less
+    // - limbs_cmp_same_length(out, ms) == Less
     test(&[10; 3], &[3], &[20], &[105], &[51, 10, 10]);
     // - ms_len != 1 in to_redc
     // - end < len in get_bits
@@ -71,7 +71,7 @@ fn test_limbs_mod_pow_odd() {
         &[135, 797],
         &[2939877551, 399, 10],
     );
-    // - limbs_cmp_same_length(out, ms) != Ordering::Less
+    // - limbs_cmp_same_length(out, ms) != Less
     test(&[10; 3], &[3], &[2], &[9], &[0, 10, 10]);
     // - ms_len >= REDC_1_TO_REDC_N_THRESHOLD
     // - REDC_1_TO_REDC_N_THRESHOLD <= ms_len < MUL_TOOM22_THRESHOLD in select_fns

@@ -12,7 +12,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{DivExact, Factorial, Gcd, Parity};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub fn binomial_coefficient_naive_1(n: Natural, mut k: Natural) -> Natural {
     if k > n {
@@ -21,7 +21,7 @@ pub fn binomial_coefficient_naive_1(n: Natural, mut k: Natural) -> Natural {
     if k == 0u32 || n == k {
         return Natural::ONE;
     }
-    if double_cmp(&k, &n) == Ordering::Greater {
+    if double_cmp(&k, &n) == Greater {
         k = &n - &k;
     }
     let k_u64 = u64::exact_from(&k);
@@ -37,7 +37,7 @@ pub fn binomial_coefficient_naive_2(n: Natural, mut k: Natural) -> Natural {
     if k == 0u32 || n == k {
         return Natural::ONE;
     }
-    if double_cmp(&k, &n) == Ordering::Greater {
+    if double_cmp(&k, &n) == Greater {
         k = &n - &k;
     }
     if k == 1u32 {

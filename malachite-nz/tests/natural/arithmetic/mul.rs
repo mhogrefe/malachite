@@ -1534,9 +1534,9 @@ fn test_limbs_mul_greater_to_out_toom_22() {
         assert_eq!(out, out_after);
     };
     // - s != n
-    // - !(xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less)
+    // - !(xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Less)
     // - t != n
-    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) != Ordering::Less
+    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) != Less
     // - s <= t
     // - !v_neg_1_neg
     // - carry <= 2
@@ -1546,7 +1546,7 @@ fn test_limbs_mul_greater_to_out_toom_22() {
         &[10; 6],
         &[6, 17, 34, 31, 20, 0],
     );
-    // - xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less
+    // - xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Less
     // - v_neg_1_neg
     test(
         &[2, 0, 4],
@@ -1556,14 +1556,14 @@ fn test_limbs_mul_greater_to_out_toom_22() {
     );
     test(&[1; 3], &series(1, 3), &[5; 8], &[1, 3, 6, 5, 3, 0, 5, 5]);
     // - s == n
-    // - limbs_cmp_same_length(ys0, ys1) != Ordering::Less
+    // - limbs_cmp_same_length(ys0, ys1) != Less
     // - t == n
-    // - limbs_cmp_same_length(ys0, ys1) == Ordering::Less
+    // - limbs_cmp_same_length(ys0, ys1) == Less
     test(&[1; 4], &series(1, 4), &[5; 8], &[1, 3, 6, 10, 9, 7, 4, 0]);
-    // - limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
-    // - limbs_cmp_same_length(&b0[..n], &b1[..n]) != Ordering::Less
+    // - limbs_cmp_same_length(&a0[..n], &a1[..n]) == Less
+    // - limbs_cmp_same_length(&b0[..n], &b1[..n]) != Less
     test(&series(1, 4), &[1; 4], &[5; 8], &[1, 3, 6, 10, 9, 7, 4, 0]);
-    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
+    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Less
     test(
         &series(1, 5),
         &[1, 0, 0, 4],
@@ -1786,9 +1786,9 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // - !(ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less)
+    // - !(ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Less)
     // - t == n
-    // - limbs_cmp_same_length(ys0, ys1) == Ordering::Less
+    // - limbs_cmp_same_length(ys0, ys1) == Less
     // - ap1hi != 1 and ap1hi != 2
     // - !bp1hi
     // - hi == 0 first time
@@ -1802,7 +1802,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         vec![10; 10],
         vec![6, 17, 34, 58, 76, 94, 88, 71, 42, 0],
     );
-    // - limbs_cmp_same_length(ys0, ys1) != Ordering::Less
+    // - limbs_cmp_same_length(ys0, ys1) != Less
     // - ap1hi == 2
     // - bp1hi
     // - !v_neg_1_neg
@@ -1812,7 +1812,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         vec![10; 10],
         vec![1, 0, 0, 0, u32::MAX, u32::MAX, u32::MAX - 1, u32::MAX, u32::MAX, u32::MAX],
     );
-    // - ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less
+    // - ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Less
     test(
         vec![0, 0, 1, 1, 0, 1],
         vec![0, 0, 0, 1],
@@ -1820,7 +1820,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         vec![0, 0, 0, 0, 0, 1, 1, 0, 1, 0],
     );
     // - t != n
-    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
+    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Less
     // - s + t <= n
     test(
         vec![0, 0, 0, 0, 0, 0, 1],
@@ -1828,7 +1828,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         vec![10; 12],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // - !(slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less)
+    // - !(slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Less)
     test(
         vec![0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 1, 0, 1],
@@ -1939,9 +1939,9 @@ fn test_limbs_mul_greater_to_out_toom_33() {
         limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // - carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less
+    // - carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Less
     // - s != n
-    // - carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Ordering::Less
+    // - carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Less
     // - t != n
     // - s <= t
     // - !v_neg_1
@@ -1973,8 +1973,8 @@ fn test_limbs_mul_greater_to_out_toom_33() {
         vec![10; 10],
         vec![6, 17, 34, 58, 90, 94, 88, 71, 42, 0],
     );
-    // - !(carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less)
-    // - !(carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Ordering::Less)
+    // - !(carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Less)
+    // - !(carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Less)
     test(
         vec![u32::MAX; 5],
         vec![u32::MAX; 5],
@@ -2049,7 +2049,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
     };
     // - v_neg_1_neg
     // - t == n
-    // - limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) == Less
     // - s <= t
     // - as1[n] not 1, 2, or 3
     test(
@@ -2061,7 +2061,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
     // - !v_neg_1_neg
     // - s != n
     // - t != n
-    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less)
     test(
         series(2, 7),
         series(3, 3),
@@ -2075,7 +2075,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
         vec![10; 11],
         vec![6, 17, 34, 46, 58, 70, 82, 94, 76, 45, 0],
     );
-    // - limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) != Less
     test(
         vec![0, 0, 0, 1],
         vec![1, 1],
@@ -2189,7 +2189,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
         vec![10; 6],
         vec![4203348572, 3202027474, 4170951291, 2012723103, 3609216593, 690273745],
     );
-    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less
     test(
         vec![
             0,
@@ -2290,7 +2290,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
     };
     // - n_high < n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
     // - !v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // - limbs_cmp_same_length(small_scratch, bsm1) != Ordering::Less
+    // - limbs_cmp_same_length(small_scratch, bsm1) != Less
     // - s <= t
     // - !v_neg_2neg in limbs_mul_toom_interpolate_6points
     // - !v_neg_1_neg in limbs_mul_toom_interpolate_6points
@@ -2308,8 +2308,8 @@ fn test_limbs_mul_greater_to_out_toom_43() {
     // - n_high >= n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
     // - v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
     // - t != n
-    // - limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less
-    // - *bsm1last == 0 && limbs_cmp_same_length(bsm1init, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(small_scratch, bsm1) == Less
+    // - *bsm1last == 0 && limbs_cmp_same_length(bsm1init, ys_1) == Less
     // - s > t
     test(
         series(2, 12),
@@ -2767,9 +2767,9 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     // - degree.even() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // - !v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // - t != n
-    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less)
     // - !v_neg_1_neg
-    // - !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
+    // - !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Less)
     // - degree.even() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
     // - !v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
     test(
@@ -2789,7 +2789,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     );
     // - n_high != n in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // - t == n
-    // - limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) == Less
     // - v_neg_1_neg
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -2797,15 +2797,15 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         &[10; 20],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         &[0, 0, 0, 0, 1],
         &[10; 20],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // - limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
-    // - limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) != Less
+    // - limbs_cmp_same_length(bsm1, ys_1) == Less
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         &[0, 0, 1, 0, 0, 1],
@@ -2828,7 +2828,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             3650814344, 1121996596, 3441179979, 3561879910, 1574546788, 1514489709,
         ],
     );
-    // - limbs_cmp_same_length(bsm1, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(bsm1, ys_1) != Less
     test(
         &[
             2331447040, 1003213663, 1873981685, 3371337621, 3796896013, 4144448610, 2569252563,
@@ -2842,7 +2842,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             3374007062, 3091178442, 1888125000, 2974781424, 307612679, 174629431,
         ],
     );
-    // - slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Less
     test(
         &rle_decode(&[
             (32767, 1),
@@ -2984,8 +2984,8 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // - !(*bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less)
-    // - limbs_cmp_same_length(bs2, &out[..n + 1]) != Ordering::Less
+    // - !(*bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Less)
+    // - limbs_cmp_same_length(bs2, &out[..n + 1]) != Less
     // - *asm1last != 1 && *asm1last != 2
     // - *as1last == 0
     test(
@@ -2994,7 +2994,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         vec![10; 8],
         vec![6, 17, 34, 46, 58, 49, 30, 0],
     );
-    // - *bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less
+    // - *bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Less
     // - *as1last == 2
     // - *bs1last == 1
     test(
@@ -3016,7 +3016,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             1782966412,
         ],
     );
-    // - limbs_cmp_same_length(bs2, &out[..n + 1]) == Ordering::Less
+    // - limbs_cmp_same_length(bs2, &out[..n + 1]) == Less
     // - *as1last > 2
     test(
         vec![
@@ -3371,7 +3371,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
     // - degree_u >= 5 in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // - degree.odd() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // - t == n
-    // - limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) == Less
     // - v_neg_1_neg_b
     // - *as1last == 0
     test(
@@ -3380,17 +3380,17 @@ fn test_limbs_mul_greater_to_out_toom_62() {
         &[10; 8],
         &[6, 17, 24, 31, 38, 45, 28, 0],
     );
-    // - limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) != Less
     // - !v_neg_1_neg_b
     // - t >= n
-    // - limbs_cmp_same_length(&bsm1, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(&bsm1, ys_1) == Less
     test(
         &[0, 0, 0, 0, 0, 1],
         &[1, 1],
         &[10; 8],
         &[0, 0, 0, 0, 0, 1, 1, 0],
     );
-    // - limbs_cmp_same_length(&bsm1, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(&bsm1, ys_1) != Less
     test(
         &[0, 0, 0, 0, 0, 1],
         &[2, 1],
@@ -3398,9 +3398,9 @@ fn test_limbs_mul_greater_to_out_toom_62() {
         &[0, 0, 0, 0, 0, 2, 1, 0],
     );
     // - t != n
-    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less)
     // - t < n
-    // - !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
+    // - !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Less)
     // - *as1last == 2
     test(
         &[
@@ -3471,7 +3471,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             1307127829,
         ],
     );
-    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Less
     test(
         &rle_decode(&[(u32::MAX, 17), (31, 1), (0, 5), (4294967232, 1), (u32::MAX, 12)]),
         &[u32::MAX, 63, 0, 0, 0, 0, 4227858432, u32::MAX, u32::MAX, u32::MAX, u32::MAX],
@@ -3526,7 +3526,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             u32::MAX,
         ],
     );
-    // - slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Less
     test(
         &rle_decode(&[(1073741823, 1), (0, 7), (4290772992, 1), (u32::MAX, 8)]),
         &[0xfff00000, u32::MAX, 0, 0xffffff8, 4294443008],
@@ -3631,7 +3631,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
         assert_eq!(out, out_after);
     };
     // - n == t
-    // - !(!carry && limbs_cmp_same_length(scratch2lo, ys_1) == Ordering::Less)
+    // - !(!carry && limbs_cmp_same_length(scratch2lo, ys_1) == Less)
     // - s <= t
     test(
         series(2, 17),
@@ -3693,7 +3693,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
             2805842653, 2980411632, 2879849003, 22987084, 2408312078, 212023482, 336282883,
         ],
     );
-    // - !carry && limbs_cmp_same_length(scratch2lo, ys_1) == Ordering::Less
+    // - !carry && limbs_cmp_same_length(scratch2lo, ys_1) == Less
     // - s > t
     test(
         vec![

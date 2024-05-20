@@ -21,7 +21,7 @@ use crate::sets::random::{
     RandomBTreeSetsFixedLength,
 };
 use crate::vecs::exhaustive::validate_oi_map;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::{repeat, Repeat};
@@ -103,10 +103,8 @@ pub const fn random_vecs_fixed_length_from_single<I: Iterator>(
 /// [here](self#random_vecs_fixed_length_2_inputs).
 ///
 /// ```
-/// # #[macro_use]
-/// # extern crate malachite_base;
-/// # fn main() {
 /// use malachite_base::random::Seed;
+/// use malachite_base::random_vecs_fixed_length;
 /// use malachite_base::vecs::exhaustive::validate_oi_map;
 ///
 /// random_vecs_fixed_length!(
@@ -178,7 +176,6 @@ pub const fn random_vecs_fixed_length_from_single<I: Iterator>(
 ///     [6, O, ts, ts_gen],
 ///     [7, P, ss, ss_gen]
 /// );
-/// # }
 /// ```
 #[macro_export]
 macro_rules! random_vecs_fixed_length {
@@ -670,12 +667,12 @@ where
                 out.push(x);
             } else {
                 match x.cmp(&out[0]) {
-                    Ordering::Equal => {}
-                    Ordering::Greater => {
+                    Equal => {}
+                    Greater => {
                         out.push(x);
                         break;
                     }
-                    Ordering::Less => {
+                    Less => {
                         out.insert(0, x);
                         break;
                     }
@@ -1001,13 +998,8 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_ordered_unique_vecs_min_length;
 ///
-/// let xs = random_ordered_unique_vecs_min_length(
-///     EXAMPLE_SEED,
-///     2,
-///     &random_primitive_ints::<u8>,
-///     6,
-///     1
-/// );
+/// let xs =
+///     random_ordered_unique_vecs_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
 /// let values = xs.take(20).collect_vec();
 /// assert_eq!(
 ///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
@@ -1085,12 +1077,8 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_ordered_unique_vecs_length_range;
 ///
-/// let xs = random_ordered_unique_vecs_length_range(
-///     EXAMPLE_SEED,
-///     2,
-///     5,
-///     &random_primitive_ints::<u8>
-/// );
+/// let xs =
+///     random_ordered_unique_vecs_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
 /// let values = xs.take(20).collect_vec();
 /// assert_eq!(
 ///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
@@ -1163,7 +1151,7 @@ where
 ///     EXAMPLE_SEED,
 ///     2,
 ///     4,
-///     &random_primitive_ints::<u8>
+///     &random_primitive_ints::<u8>,
 /// );
 /// let values = xs.take(20).collect_vec();
 /// assert_eq!(
@@ -1522,13 +1510,7 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_unique_vecs_min_length;
 ///
-/// let xs = random_unique_vecs_min_length(
-///     EXAMPLE_SEED,
-///     2,
-///     &random_primitive_ints::<u8>,
-///     6,
-///     1
-/// );
+/// let xs = random_unique_vecs_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
 /// let values = xs.take(20).collect_vec();
 /// assert_eq!(
 ///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
@@ -1602,12 +1584,7 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_unique_vecs_length_range;
 ///
-/// let xs = random_unique_vecs_length_range(
-///     EXAMPLE_SEED,
-///     2,
-///     5,
-///     &random_primitive_ints::<u8>
-/// );
+/// let xs = random_unique_vecs_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
 /// let values = xs.take(20).collect_vec();
 /// assert_eq!(
 ///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
@@ -1672,12 +1649,8 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_unique_vecs_length_inclusive_range;
 ///
-/// let xs = random_unique_vecs_length_inclusive_range(
-///     EXAMPLE_SEED,
-///     2,
-///     4,
-///     &random_primitive_ints::<u8>
-/// );
+/// let xs =
+///     random_unique_vecs_length_inclusive_range(EXAMPLE_SEED, 2, 4, &random_primitive_ints::<u8>);
 /// let values = xs.take(20).collect_vec();
 /// assert_eq!(
 ///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),

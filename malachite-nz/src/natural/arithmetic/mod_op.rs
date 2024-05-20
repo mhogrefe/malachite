@@ -57,7 +57,7 @@ use crate::platform::{
     MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use core::mem::swap;
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
@@ -229,7 +229,7 @@ pub_test! {limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let (d_0, ds_init_init) = ds_init.split_last().unwrap();
     let d_0 = *d_0;
     let ns_hi = &mut ns[n_len - d_len..];
-    if limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal {
+    if limbs_cmp_same_length(ns_hi, ds) >= Equal {
         limbs_sub_same_length_in_place_left(ns_hi, ds);
     }
     let mut n_1 = ns[n_len - 1];
@@ -375,7 +375,7 @@ pub_test! {limbs_mod_divide_and_conquer(
             // Handle highest_q up front, for simplicity.
             let ns = &mut ns[q_len - 1..];
             let ns_tail = &mut ns[1..];
-            if limbs_cmp_same_length(ns_tail, ds) >= Ordering::Equal {
+            if limbs_cmp_same_length(ns_tail, ds) >= Equal {
                 assert!(!limbs_sub_same_length_in_place_left(ns_tail, ds));
             }
             // A single iteration of schoolbook: One 3/2 division, followed by the bignum update and
@@ -517,7 +517,7 @@ fn limbs_mod_barrett_preinverted(
     let q_len = n_len - d_len;
     let qs = &mut qs[..q_len];
     let (ns_lo, ns_hi) = ns.split_at(q_len);
-    if limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal {
+    if limbs_cmp_same_length(ns_hi, ds) >= Equal {
         limbs_sub_same_length_to_out(rs, ns_hi, ds);
     } else {
         rs.copy_from_slice(ns_hi);
@@ -585,7 +585,7 @@ fn limbs_mod_barrett_preinverted(
                 r -= 1;
             }
         }
-        if limbs_cmp_same_length(rs, ds) >= Ordering::Equal {
+        if limbs_cmp_same_length(rs, ds) >= Equal {
             // This is executed with about 76% probability.
             limbs_sub_same_length_in_place_left(rs, ds);
         }
@@ -1518,18 +1518,19 @@ impl Mod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32).mod_op(Natural::from(10u32)), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .mod_op(Natural::from_str("1234567890987").unwrap()),
-    ///      530068894399u64
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .mod_op(Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
     /// );
     /// ```
     #[inline]
@@ -1563,18 +1564,19 @@ impl<'a> Mod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32).mod_op(&Natural::from(10u32)), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .mod_op(&Natural::from_str("1234567890987").unwrap()),
-    ///      530068894399u64
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .mod_op(&Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
     /// );
     /// ```
     #[inline]
@@ -1608,18 +1610,18 @@ impl<'a> Mod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!((&Natural::from(23u32)).mod_op(Natural::from(10u32)), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .mod_op(Natural::from_str("1234567890987").unwrap()),
-    ///      530068894399u64
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///         .mod_op(Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
     /// );
     /// ```
     #[inline]
@@ -1653,18 +1655,18 @@ impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!((&Natural::from(23u32)).mod_op(&Natural::from(10u32)), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .mod_op(&Natural::from_str("1234567890987").unwrap()),
-    ///      530068894399u64
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///         .mod_op(&Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
     /// );
     /// ```
     #[inline]
@@ -1696,9 +1698,9 @@ impl ModAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -1739,9 +1741,9 @@ impl<'a> ModAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -1785,16 +1787,16 @@ impl Rem<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) % Natural::from(10u32), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap() %
-    ///             Natural::from_str("1234567890987").unwrap(),
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///         % Natural::from_str("1234567890987").unwrap(),
     ///     530068894399u64
     /// );
     /// ```
@@ -1832,16 +1834,16 @@ impl<'a> Rem<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) % &Natural::from(10u32), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap() %
-    ///             &Natural::from_str("1234567890987").unwrap(),
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///         % &Natural::from_str("1234567890987").unwrap(),
     ///     530068894399u64
     /// );
     /// ```
@@ -1879,16 +1881,16 @@ impl<'a> Rem<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) % Natural::from(10u32), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     &Natural::from_str("1000000000000000000000000").unwrap() %
-    ///             Natural::from_str("1234567890987").unwrap(),
+    ///     &Natural::from_str("1000000000000000000000000").unwrap()
+    ///         % Natural::from_str("1234567890987").unwrap(),
     ///     530068894399u64
     /// );
     /// ```
@@ -1936,16 +1938,16 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) % &Natural::from(10u32), 3);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     &Natural::from_str("1000000000000000000000000").unwrap() %
-    ///             &Natural::from_str("1234567890987").unwrap(),
+    ///     &Natural::from_str("1000000000000000000000000").unwrap()
+    ///         % &Natural::from_str("1234567890987").unwrap(),
     ///     530068894399u64
     /// );
     /// ```
@@ -1992,8 +1994,8 @@ impl RemAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2036,8 +2038,8 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::Natural;
     /// use core::str::FromStr;
+    /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2092,18 +2094,19 @@ impl NegMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(Natural::from(23u32).neg_mod(Natural::from(10u32)), 7);
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .neg_mod(Natural::from_str("1234567890987").unwrap()),
-    ///      704498996588u64
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .neg_mod(Natural::from_str("1234567890987").unwrap()),
+    ///     704498996588u64
     /// );
     /// ```
     #[inline]
@@ -2138,18 +2141,19 @@ impl<'a> NegMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(Natural::from(23u32).neg_mod(&Natural::from(10u32)), 7);
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .neg_mod(&Natural::from_str("1234567890987").unwrap()),
-    ///      704498996588u64
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .neg_mod(&Natural::from_str("1234567890987").unwrap()),
+    ///     704498996588u64
     /// );
     /// ```
     #[inline]
@@ -2184,18 +2188,18 @@ impl<'a> NegMod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!((&Natural::from(23u32)).neg_mod(Natural::from(10u32)), 7);
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .neg_mod(Natural::from_str("1234567890987").unwrap()),
-    ///      704498996588u64
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///         .neg_mod(Natural::from_str("1234567890987").unwrap()),
+    ///     704498996588u64
     /// );
     /// ```
     fn neg_mod(self, other: Natural) -> Natural {
@@ -2233,18 +2237,18 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!((&Natural::from(23u32)).neg_mod(&Natural::from(10u32)), 7);
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .neg_mod(&Natural::from_str("1234567890987").unwrap()),
-    ///      704498996588u64
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///         .neg_mod(&Natural::from_str("1234567890987").unwrap()),
+    ///     704498996588u64
     /// );
     /// ```
     fn neg_mod(self, other: &'b Natural) -> Natural {
@@ -2280,9 +2284,9 @@ impl NegModAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);
@@ -2325,9 +2329,9 @@ impl<'a> NegModAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);

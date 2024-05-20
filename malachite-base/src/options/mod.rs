@@ -39,11 +39,11 @@ pub fn option_from_str<T: FromStr>(src: &str) -> Option<Option<T>> {
 /// ```
 /// use malachite_base::options::{option_from_str, option_from_str_custom};
 /// use malachite_base::orderings::ordering_from_str;
-/// use std::cmp::Ordering;
+/// use std::cmp::Ordering::{self, *};
 ///
 /// assert_eq!(
 ///     option_from_str_custom::<Ordering>(&ordering_from_str, "Some(Less)"),
-///     Some(Some(Ordering::Less))
+///     Some(Some(Less))
 /// );
 /// assert_eq!(
 ///     option_from_str_custom::<Option<bool>>(&option_from_str, "Some(Some(false))"),

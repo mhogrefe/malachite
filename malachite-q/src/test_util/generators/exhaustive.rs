@@ -33,7 +33,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::{reshape_2_1_to_3, It};
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
@@ -296,8 +296,7 @@ pub fn exhaustive_rational_signed_rounding_mode_triple_gen_var_1(
             BitDistributorOutputType::tiny(),
         )
         .filter(|(x, i, rm)| {
-            *rm != RoundingMode::Exact
-                || x.denominator_ref().is_power_of_2() && (x >> *i).is_integer()
+            *rm != Exact || x.denominator_ref().is_power_of_2() && (x >> *i).is_integer()
         }),
     )
 }
@@ -457,16 +456,9 @@ pub(crate) fn round_to_multiple_rational_filter(t: &(Rational, Rational, Roundin
     if x == y {
         true
     } else if *y == 0u32 {
-        rm == RoundingMode::Down
-            || rm
-                == (if *x >= 0 {
-                    RoundingMode::Floor
-                } else {
-                    RoundingMode::Ceiling
-                })
-            || rm == RoundingMode::Nearest
+        rm == Down || rm == (if *x >= 0 { Floor } else { Ceiling }) || rm == Nearest
     } else {
-        rm != RoundingMode::Exact || (x / y).is_integer()
+        rm != Exact || (x / y).is_integer()
     }
 }
 
@@ -580,8 +572,8 @@ pub fn exhaustive_rational_rounding_mode_pair_gen() -> It<(Rational, RoundingMod
 pub fn exhaustive_rational_rounding_mode_pair_gen_var_1() -> It<(Rational, RoundingMode)> {
     Box::new(
         lex_pairs(exhaustive_rationals(), exhaustive_rounding_modes()).filter(|(x, rm)| match rm {
-            RoundingMode::Floor | RoundingMode::Up => *x >= 0u32,
-            RoundingMode::Exact => Natural::convertible_from(x),
+            Floor | Up => *x >= 0u32,
+            Exact => Natural::convertible_from(x),
             _ => true,
         }),
     )
@@ -590,7 +582,7 @@ pub fn exhaustive_rational_rounding_mode_pair_gen_var_1() -> It<(Rational, Round
 pub fn exhaustive_rational_rounding_mode_pair_gen_var_2() -> It<(Rational, RoundingMode)> {
     Box::new(
         lex_pairs(exhaustive_rationals(), exhaustive_rounding_modes())
-            .filter(|(x, rm)| *rm != RoundingMode::Exact || x.is_integer()),
+            .filter(|(x, rm)| *rm != Exact || x.is_integer()),
     )
 }
 
@@ -602,10 +594,10 @@ where
 {
     Box::new(
         lex_pairs(exhaustive_rationals(), exhaustive_rounding_modes()).filter(|(x, rm)| match rm {
-            RoundingMode::Floor => *x >= T::MIN,
-            RoundingMode::Ceiling => *x <= T::MAX,
-            RoundingMode::Up => *x >= T::MIN && *x <= T::MAX,
-            RoundingMode::Exact => T::convertible_from(x),
+            Floor => *x >= T::MIN,
+            Ceiling => *x <= T::MAX,
+            Up => *x >= T::MIN && *x <= T::MAX,
+            Exact => T::convertible_from(x),
             _ => true,
         }),
     )
@@ -629,10 +621,10 @@ where
     Box::new(
         lex_pairs(exhaustive_rationals(), exhaustive_rounding_modes()).filter(move |(x, rm)| {
             match rm {
-                RoundingMode::Floor => *x >= min,
-                RoundingMode::Ceiling => *x <= max,
-                RoundingMode::Up => *x >= min && *x <= max,
-                RoundingMode::Exact => T::convertible_from(x),
+                Floor => *x >= min,
+                Ceiling => *x <= max,
+                Up => *x >= min && *x <= max,
+                Exact => T::convertible_from(x),
                 _ => true,
             }
         }),

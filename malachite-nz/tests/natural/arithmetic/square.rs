@@ -110,17 +110,17 @@ fn test_limbs_square_to_out_toom_2() {
     {
         test(&[0, 0], &[10; 5], &[0, 0, 0, 0, 10]);
         // - s == n
-        // - limbs_cmp_same_length(&a0[..n], &a1[..n]) != Ordering::Less
+        // - limbs_cmp_same_length(&a0[..n], &a1[..n]) != Less
         // - !TOOM2MAYBE_SQR_TOOM2 || a.len() < SQR_TOOM2_THRESHOLD in
         //   limbs_square_to_out_toom_2recursive
         // - cy <= 2
         test(&[1, 1], &[10; 5], &[1, 2, 1, 0, 10]);
-        // - limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
+        // - limbs_cmp_same_length(&a0[..n], &a1[..n]) == Less
         test(&[123, 456], &[10; 5], &[15129, 112176, 207936, 0, 10]);
         // - s != n
-        // - a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less
+        // - a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Less
         test(&[0, 0, 1], &[0, 0, 0, 0, 0, 0], &[0, 0, 0, 0, 1, 0]);
-        // - !(a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less)
+        // - !(a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Less)
         test(&[0, 1, 1], &[0, 0, 0, 0, 0, 0], &[0, 0, 1, 2, 1, 0]);
         // - TOOM2MAYBE_SQR_TOOM2 && a.len() >= SQR_TOOM2_THRESHOLD in
         //   limbs_square_to_out_toom_2recursive
@@ -541,7 +541,7 @@ fn test_limbs_square_to_out_toom_3() {
     #[cfg(feature = "32_bit_limbs")]
     {
         test(&[0; 3], &[10; 7], &[0, 0, 0, 0, 0, 0, 10]);
-        // - carry != 0 || limbs_cmp_same_length(scratch_lo, xs_1) != Ordering::Less
+        // - carry != 0 || limbs_cmp_same_length(scratch_lo, xs_1) != Less
         // - s == n
         // - SMALLER_RECURSION_TOOM_3
         // - TOOM3MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD in
@@ -556,7 +556,7 @@ fn test_limbs_square_to_out_toom_3() {
             &[10; 7],
             &[15129, 112176, 402030, 719568, 622521, 0, 10],
         );
-        // - carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Ordering::Less
+        // - carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Less
         test(
             &[0, 0, 0, 1, 1],
             &[10; 12],

@@ -8,11 +8,11 @@
 
 /// Comparison of [`Natural`](crate::natural::Natural)s.
 pub mod cmp;
-/// Equality of the absolute values of a [`Natural`](crate::natural::Natural)s and a primitive float
+/// Equality of the absolute values of a [`Natural`](crate::natural::Natural) and a primitive float.
 ///
 /// # eq_abs
 /// ```
-/// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
 /// use malachite_base::num::comparison::traits::EqAbs;
 /// use malachite_nz::natural::Natural;
 ///
@@ -37,7 +37,7 @@ pub mod cmp;
 /// assert_eq!(f64::NEGATIVE_INFINITY.eq_abs(&Natural::ZERO), false);
 /// ```
 pub mod eq_abs_primitive_float;
-/// Equality of the absolute values of a [`Natural`](crate::natural::Natural)s and a primitive
+/// Equality of the absolute values of a [`Natural`](crate::natural::Natural) and a primitive
 /// integer.
 ///
 /// # eq_abs
@@ -70,7 +70,6 @@ pub mod eq_abs_primitive_int;
 ///
 /// # partial_cmp_abs
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::natural::Natural;
@@ -124,7 +123,6 @@ pub mod partial_cmp_abs_primitive_int;
 ///
 /// # partial_cmp
 /// ```
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_nz::natural::Natural;
 ///
 /// assert!(Natural::from(123u32) > 122.5f32);

@@ -15,7 +15,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -41,7 +41,7 @@ fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
             // We need a term m such that previous_denominator + denominator * m is as large as
             // possible without exceeding max_denominator.
             let m = (max_denominator - &previous_denominator) / &denominator;
-            let half_n = (&n).shr_round(1, RoundingMode::Ceiling).0;
+            let half_n = (&n).shr_round(1, Ceiling).0;
             if m < half_n {
             } else if m == half_n && n.even() {
                 let previous_convergent = Rational {
@@ -122,12 +122,15 @@ impl Approximate for Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::exact_from(std::f64::consts::PI).approximate(&Natural::from(1000u32))
+    ///     Rational::exact_from(std::f64::consts::PI)
+    ///         .approximate(&Natural::from(1000u32))
     ///         .to_string(),
     ///     "355/113"
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(333i32, 1000).approximate(&Natural::from(100u32)).to_string(),
+    ///     Rational::from_signeds(333i32, 1000)
+    ///         .approximate(&Natural::from(100u32))
+    ///         .to_string(),
     ///     "1/3"
     /// );
     /// ```
@@ -143,7 +146,7 @@ impl Approximate for Rational {
             return self;
         }
         if *max_denominator == 1u32 {
-            return Rational::from(Integer::rounding_from(self, RoundingMode::Nearest).0);
+            return Rational::from(Integer::rounding_from(self, Nearest).0);
         }
         approximate_helper(&self, max_denominator)
     }
@@ -178,13 +181,15 @@ impl<'a> Approximate for &'a Rational {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::exact_from(std::f64::consts::PI)).approximate(&Natural::from(1000u32))
-    ///             .to_string(),
+    ///     (&Rational::exact_from(std::f64::consts::PI))
+    ///         .approximate(&Natural::from(1000u32))
+    ///         .to_string(),
     ///     "355/113"
     /// );
     /// assert_eq!(
-    ///     (&Rational::from_signeds(333i32, 1000)).approximate(&Natural::from(100u32))
-    ///             .to_string(),
+    ///     (&Rational::from_signeds(333i32, 1000))
+    ///         .approximate(&Natural::from(100u32))
+    ///         .to_string(),
     ///     "1/3"
     /// );
     /// ```
@@ -200,7 +205,7 @@ impl<'a> Approximate for &'a Rational {
             return self.clone();
         }
         if *max_denominator == 1u32 {
-            return Rational::from(Integer::rounding_from(self, RoundingMode::Nearest).0);
+            return Rational::from(Integer::rounding_from(self, Nearest).0);
         }
         approximate_helper(self, max_denominator)
     }
@@ -242,7 +247,7 @@ impl ApproximateAssign for Rational {
         assert_ne!(*max_denominator, 0);
         if self.denominator_ref() <= max_denominator {
         } else if *max_denominator == 1u32 {
-            *self = Rational::from(Integer::rounding_from(&*self, RoundingMode::Nearest).0);
+            *self = Rational::from(Integer::rounding_from(&*self, Nearest).0);
         } else {
             *self = approximate_helper(&*self, max_denominator);
         }

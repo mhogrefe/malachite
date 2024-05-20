@@ -39,7 +39,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -289,7 +289,7 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if max_len > len << 1 {
         return limbs_square(xs);
     }
@@ -325,7 +325,7 @@ pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Ve
 pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if max_len > len << 1 {
         return limbs_square(xs);
     }
@@ -370,15 +370,18 @@ impl ModPowerOf2Square for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.mod_power_of_2_square(2), 0);
     /// assert_eq!(Natural::from(5u32).mod_power_of_2_square(3), 1);
     /// assert_eq!(
-    ///     Natural::from_str("12345678987654321").unwrap().mod_power_of_2_square(64).to_string(),
+    ///     Natural::from_str("12345678987654321")
+    ///         .unwrap()
+    ///         .mod_power_of_2_square(64)
+    ///         .to_string(),
     ///     "16556040056090124897"
     /// );
     /// ```
@@ -409,16 +412,17 @@ impl<'a> ModPowerOf2Square for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Natural::ZERO).mod_power_of_2_square(2), 0);
     /// assert_eq!((&Natural::from(5u32)).mod_power_of_2_square(3), 1);
     /// assert_eq!(
     ///     (&Natural::from_str("12345678987654321").unwrap())
-    ///         .mod_power_of_2_square(64).to_string(),
+    ///         .mod_power_of_2_square(64)
+    ///         .to_string(),
     ///     "16556040056090124897"
     /// );
     /// ```
@@ -464,10 +468,10 @@ impl ModPowerOf2SquareAssign for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// let mut n = Natural::ZERO;
     /// n.mod_power_of_2_square_assign(2);

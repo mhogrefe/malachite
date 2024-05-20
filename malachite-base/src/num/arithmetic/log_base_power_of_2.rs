@@ -11,7 +11,7 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
-use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode::*;
 
 #[cfg(feature = "test_build")]
 pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
@@ -164,9 +164,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
             #[inline]
             fn floor_log_base_power_of_2(self, pow: u64) -> i64 {
                 assert!(self > 0.0);
-                self.sci_exponent()
-                    .div_round(i64::exact_from(pow), RoundingMode::Floor)
-                    .0
+                self.sci_exponent().div_round(i64::exact_from(pow), Floor).0
             }
         }
 

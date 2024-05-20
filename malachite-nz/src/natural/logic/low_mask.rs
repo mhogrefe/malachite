@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOf2Assign, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 // Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
 //
@@ -25,7 +25,7 @@ use malachite_base::rounding_modes::RoundingMode;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
-    let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0;
+    let len = bits.shr_round(Limb::LOG_WIDTH, Ceiling).0;
     let remaining_bits = bits & Limb::WIDTH_MASK;
     let mut xs = vec![Limb::MAX; usize::exact_from(len)];
     if remaining_bits != 0 {
@@ -54,7 +54,10 @@ impl LowMask for Natural {
     ///
     /// assert_eq!(Natural::low_mask(0), 0);
     /// assert_eq!(Natural::low_mask(3), 7);
-    /// assert_eq!(Natural::low_mask(100).to_string(), "1267650600228229401496703205375");
+    /// assert_eq!(
+    ///     Natural::low_mask(100).to_string(),
+    ///     "1267650600228229401496703205375"
+    /// );
     /// ```
     fn low_mask(bits: u64) -> Natural {
         if bits <= Limb::WIDTH {

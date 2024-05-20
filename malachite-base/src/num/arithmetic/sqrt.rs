@@ -26,8 +26,8 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::logic::traits::SignificantBits;
-use crate::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
+use crate::rounding_modes::RoundingMode::*;
+use core::cmp::Ordering::*;
 
 const U8_SQUARES: [u8; 16] = [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225];
 
@@ -136,15 +136,11 @@ pub(crate) fn floor_inverse_checked_binary<T: PrimitiveUnsigned, F: Fn(T) -> Opt
         if high <= low {
             return low;
         }
-        let mid: T = low
-            .checked_add(high)
-            .unwrap()
-            .shr_round(1, RoundingMode::Ceiling)
-            .0;
+        let mid: T = low.checked_add(high).unwrap().shr_round(1, Ceiling).0;
         match f(mid).map(|mid| mid.cmp(&x)) {
-            Some(Ordering::Equal) => return mid,
-            Some(Ordering::Less) => low = mid,
-            Some(Ordering::Greater) | None => high = mid - T::ONE,
+            Some(Equal) => return mid,
+            Some(Less) => low = mid,
+            Some(Greater) | None => high = mid - T::ONE,
         }
     }
 }
@@ -153,7 +149,7 @@ pub_test! {floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     if x < T::TWO {
         x
     } else {
-        let p = T::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling).0);
+        let p = T::power_of_2(x.significant_bits().shr_round(1, Ceiling).0);
         floor_inverse_checked_binary(T::checked_square, x, p >> 1, p)
     }
 }}
@@ -283,17 +279,17 @@ fn floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64
         sqrt.square()
     };
     match square.cmp(&x) {
-        Ordering::Equal => sqrt,
-        Ordering::Less => loop {
+        Equal => sqrt,
+        Less => loop {
             square = square.checked_add((sqrt << 1) + T::ONE).unwrap();
             sqrt += T::ONE;
             match square.cmp(&x) {
-                Ordering::Equal => return sqrt,
-                Ordering::Less => {}
-                Ordering::Greater => return sqrt - T::ONE,
+                Equal => return sqrt,
+                Less => {}
+                Greater => return sqrt - T::ONE,
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             square -= (sqrt << 1) - T::ONE;
             sqrt -= T::ONE;
             if square <= x {
@@ -321,21 +317,21 @@ fn ceiling_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f
         sqrt.square()
     };
     match square.cmp(&x) {
-        Ordering::Equal => sqrt,
-        Ordering::Less => loop {
+        Equal => sqrt,
+        Less => loop {
             square = square.checked_add((sqrt << 1) + T::ONE).unwrap();
             sqrt += T::ONE;
             if square >= x {
                 return sqrt;
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             square -= (sqrt << 1) - T::ONE;
             sqrt -= T::ONE;
             match square.cmp(&x) {
-                Ordering::Equal => return sqrt,
-                Ordering::Greater => {}
-                Ordering::Less => return sqrt + T::ONE,
+                Equal => return sqrt,
+                Greater => {}
+                Less => return sqrt + T::ONE,
             }
         },
     }
@@ -359,23 +355,23 @@ fn checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f
         sqrt.square()
     };
     match square.cmp(&x) {
-        Ordering::Equal => Some(sqrt),
-        Ordering::Less => loop {
+        Equal => Some(sqrt),
+        Less => loop {
             square = square.checked_add((sqrt << 1) + T::ONE).unwrap();
             sqrt += T::ONE;
             match square.cmp(&x) {
-                Ordering::Equal => return Some(sqrt),
-                Ordering::Less => {}
-                Ordering::Greater => return None,
+                Equal => return Some(sqrt),
+                Less => {}
+                Greater => return None,
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             square -= (sqrt << 1) - T::ONE;
             sqrt -= T::ONE;
             match square.cmp(&x) {
-                Ordering::Equal => return Some(sqrt),
-                Ordering::Less => return None,
-                Ordering::Greater => {}
+                Equal => return Some(sqrt),
+                Less => return None,
+                Greater => {}
             }
         },
     }
@@ -400,21 +396,21 @@ fn sqrt_rem_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) 
         sqrt.square()
     };
     match square.cmp(&x) {
-        Ordering::Equal => (sqrt, T::ZERO),
-        Ordering::Less => loop {
+        Equal => (sqrt, T::ZERO),
+        Less => loop {
             square = square.checked_add((sqrt << 1) + T::ONE).unwrap();
             sqrt += T::ONE;
             match square.cmp(&x) {
-                Ordering::Equal => return (sqrt, T::ZERO),
-                Ordering::Less => {}
-                Ordering::Greater => {
+                Equal => return (sqrt, T::ZERO),
+                Less => {}
+                Greater => {
                     square -= (sqrt << 1) - T::ONE;
                     sqrt -= T::ONE;
                     return (sqrt, x - square);
                 }
             }
         },
-        Ordering::Greater => loop {
+        Greater => loop {
             square -= (sqrt << 1) - T::ONE;
             sqrt -= T::ONE;
             if square <= x {
@@ -435,7 +431,7 @@ fn floor_sqrt_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .round_to_multiple_of_power_of_2(1, Floor)
         .0;
     sqrt_rem_newton::<U, S>(x << shift).0 >> (shift >> 1)
 }
@@ -451,7 +447,7 @@ fn ceiling_sqrt_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .round_to_multiple_of_power_of_2(1, Floor)
         .0;
     let (mut sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     sqrt >>= shift >> 1;
@@ -472,7 +468,7 @@ fn checked_sqrt_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .round_to_multiple_of_power_of_2(1, Floor)
         .0;
     let (sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     if rem == U::ZERO {
@@ -493,7 +489,7 @@ fn sqrt_rem_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .round_to_multiple_of_power_of_2(1, Floor)
         .0;
     let (mut sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     if shift == 0 {

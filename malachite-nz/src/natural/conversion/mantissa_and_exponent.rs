@@ -13,7 +13,7 @@ use crate::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, ShrRound, Sign,
 };
@@ -23,7 +23,7 @@ use malachite_base::num::conversion::traits::{
     ExactFrom, FromOtherTypeSlice, IntegerMantissaAndExponent, SciMantissaAndExponent, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 impl Natural {
@@ -50,12 +50,11 @@ impl Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::{self, *};
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::num::float::NiceFloat;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::{self, *};
     /// use malachite_nz::natural::Natural;
-    /// use core::cmp::Ordering;
     ///
     /// let test = |n: Natural, rm: RoundingMode, out: Option<(f32, u64, Ordering)>| {
     ///     assert_eq!(
@@ -64,52 +63,32 @@ impl Natural {
     ///         out.map(|(m, e, o)| (NiceFloat(m), e, o))
     ///     );
     /// };
-    /// test(Natural::from(3u32), RoundingMode::Floor, Some((1.5, 1, Ordering::Equal)));
-    /// test(Natural::from(3u32), RoundingMode::Down, Some((1.5, 1, Ordering::Equal)));
-    /// test(Natural::from(3u32), RoundingMode::Ceiling, Some((1.5, 1, Ordering::Equal)));
-    /// test(Natural::from(3u32), RoundingMode::Up, Some((1.5, 1, Ordering::Equal)));
-    /// test(Natural::from(3u32), RoundingMode::Nearest, Some((1.5, 1, Ordering::Equal)));
-    /// test(Natural::from(3u32), RoundingMode::Exact, Some((1.5, 1, Ordering::Equal)));
+    /// test(Natural::from(3u32), Floor, Some((1.5, 1, Equal)));
+    /// test(Natural::from(3u32), Down, Some((1.5, 1, Equal)));
+    /// test(Natural::from(3u32), Ceiling, Some((1.5, 1, Equal)));
+    /// test(Natural::from(3u32), Up, Some((1.5, 1, Equal)));
+    /// test(Natural::from(3u32), Nearest, Some((1.5, 1, Equal)));
+    /// test(Natural::from(3u32), Exact, Some((1.5, 1, Equal)));
     ///
-    /// test(
-    ///     Natural::from(123u32),
-    ///     RoundingMode::Floor,
-    ///     Some((1.921875, 6, Ordering::Equal)),
-    /// );
-    /// test(
-    ///     Natural::from(123u32),
-    ///     RoundingMode::Down,
-    ///     Some((1.921875, 6, Ordering::Equal)),
-    /// );
-    /// test(
-    ///     Natural::from(123u32),
-    ///     RoundingMode::Ceiling,
-    ///     Some((1.921875, 6, Ordering::Equal)),
-    /// );
-    /// test(Natural::from(123u32), RoundingMode::Up, Some((1.921875, 6, Ordering::Equal)));
-    /// test(
-    ///     Natural::from(123u32),
-    ///     RoundingMode::Nearest,
-    ///     Some((1.921875, 6, Ordering::Equal)),
-    /// );
-    /// test(
-    ///     Natural::from(123u32),
-    ///     RoundingMode::Exact,
-    ///     Some((1.921875, 6, Ordering::Equal)),
-    /// );
+    /// test(Natural::from(123u32), Floor, Some((1.921875, 6, Equal)));
+    /// test(Natural::from(123u32), Down, Some((1.921875, 6, Equal)));
+    /// test(Natural::from(123u32), Ceiling, Some((1.921875, 6, Equal)));
+    /// test(Natural::from(123u32), Up, Some((1.921875, 6, Equal)));
+    /// test(Natural::from(123u32), Nearest, Some((1.921875, 6, Equal)));
+    /// test(Natural::from(123u32), Exact, Some((1.921875, 6, Equal)));
     ///
     /// test(
     ///     Natural::from(1000000000u32),
-    ///     RoundingMode::Nearest,
-    ///     Some((1.8626451, 29, Ordering::Equal)),
+    ///     Nearest,
+    ///     Some((1.8626451, 29, Equal)),
     /// );
     /// test(
     ///     Natural::from(10u32).pow(52),
-    ///     RoundingMode::Nearest,
-    ///     Some((1.670478, 172, Ordering::Greater)),
+    ///     Nearest,
+    ///     Some((1.670478, 172, Greater)),
     /// );
     ///
-    /// test(Natural::from(10u32).pow(52), RoundingMode::Exact, None);
+    /// test(Natural::from(10u32).pow(52), Exact, None);
     /// ```
     pub fn sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         &self,
@@ -122,7 +101,7 @@ impl Natural {
         let mut exponent = T::MANTISSA_WIDTH;
         let significant_bits;
         let mut exact = true;
-        let mut half_compare = Ordering::Less; // (mantissa - floor(mantissa)).cmp(&0.5)
+        let mut half_compare = Less; // (mantissa - floor(mantissa)).cmp(&0.5)
         let mut highest_discarded_limb = 0;
         match self {
             Natural(Small(x)) => {
@@ -141,7 +120,7 @@ impl Natural {
                     most_significant_limbs[0] = xs[len - 3];
                     exponent += u64::exact_from(len - 3) << Limb::LOG_WIDTH;
                     if !slice_test_zero(&xs[..len - 3]) {
-                        if rm == RoundingMode::Exact {
+                        if rm == Exact {
                             return None;
                         }
                         exact = false;
@@ -155,7 +134,7 @@ impl Natural {
         let shift =
             i128::wrapping_from(T::MANTISSA_WIDTH + 1) - i128::wrapping_from(significant_bits);
         match shift.sign() {
-            Ordering::Greater => {
+            Greater => {
                 let mut shift = u64::exact_from(shift);
                 exponent -= shift;
                 let limbs_to_shift = shift >> Limb::LOG_WIDTH;
@@ -169,21 +148,21 @@ impl Natural {
                     limbs_slice_shl_in_place(&mut most_significant_limbs, shift);
                 }
             }
-            Ordering::Less => {
+            Less => {
                 let mut shift = u64::exact_from(-shift);
                 let one_index = limbs_index_of_next_true_bit(&most_significant_limbs, 0).unwrap();
                 if one_index < shift {
-                    if rm == RoundingMode::Exact {
+                    if rm == Exact {
                         return None;
                     }
-                    if rm == RoundingMode::Nearest {
+                    if rm == Nearest {
                         // If `exact` is true here, that means all lower limbs are 0
                         half_compare = if exact && one_index == shift - 1 {
-                            Ordering::Equal
+                            Equal
                         } else if limbs_get_bit(&most_significant_limbs, shift - 1) {
-                            Ordering::Greater
+                            Greater
                         } else {
-                            Ordering::Less
+                            Less
                         };
                     }
                     exact = false;
@@ -198,8 +177,8 @@ impl Natural {
                     limbs_slice_shr_in_place(&mut most_significant_limbs, shift);
                 }
             }
-            Ordering::Equal => {
-                if !exact && rm == RoundingMode::Nearest {
+            Equal => {
+                if !exact && rm == Nearest {
                     // len is at least 4, since the only way `exact` is false at this point is if
                     // xs[..len - 3] is nonzero
                     half_compare = highest_discarded_limb.cmp(&Limb::power_of_2(Limb::WIDTH - 1));
@@ -211,28 +190,19 @@ impl Natural {
         let mantissa =
             T::from_raw_mantissa_and_exponent(raw_mantissa, u64::wrapping_from(T::MAX_EXPONENT));
         let increment = !exact
-            && (rm == RoundingMode::Up
-                || rm == RoundingMode::Ceiling
-                || rm == RoundingMode::Nearest
-                    && (half_compare == Ordering::Greater
-                        || half_compare == Ordering::Equal && raw_mantissa.odd()));
+            && (rm == Up
+                || rm == Ceiling
+                || rm == Nearest
+                    && (half_compare == Greater || half_compare == Equal && raw_mantissa.odd()));
         Some(if increment {
             let next_mantissa = mantissa.next_higher();
             if next_mantissa == T::TWO {
-                (T::ONE, exponent + 1, Ordering::Greater)
+                (T::ONE, exponent + 1, Greater)
             } else {
-                (next_mantissa, exponent, Ordering::Greater)
+                (next_mantissa, exponent, Greater)
             }
         } else {
-            (
-                mantissa,
-                exponent,
-                if exact {
-                    Ordering::Equal
-                } else {
-                    Ordering::Less
-                },
-            )
+            (mantissa, exponent, if exact { Equal } else { Less })
         })
     }
 
@@ -266,53 +236,45 @@ impl Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
-    /// use malachite_base::rounding_modes::RoundingMode;
-    /// use malachite_nz::natural::Natural;
-    /// use core::cmp::Ordering;
+    /// use core::cmp::Ordering::{self, *};
     /// use core::str::FromStr;
+    /// use malachite_base::rounding_modes::RoundingMode::{self, *};
+    /// use malachite_nz::natural::Natural;
     ///
-    /// let test = |
-    ///     mantissa: f32,
-    ///     exponent: u64,
-    ///     rm: RoundingMode,
-    ///     out: Option<(Natural, Ordering)>
-    /// | {
-    ///     assert_eq!(
-    ///         Natural::from_sci_mantissa_and_exponent_round(mantissa, exponent, rm),
-    ///         out
-    ///     );
-    /// };
-    /// test(1.5, 1, RoundingMode::Floor, Some((Natural::from(3u32), Ordering::Equal)));
-    /// test(1.5, 1, RoundingMode::Down, Some((Natural::from(3u32), Ordering::Equal)));
-    /// test(1.5, 1, RoundingMode::Ceiling, Some((Natural::from(3u32), Ordering::Equal)));
-    /// test(1.5, 1, RoundingMode::Up, Some((Natural::from(3u32), Ordering::Equal)));
-    /// test(1.5, 1, RoundingMode::Nearest, Some((Natural::from(3u32), Ordering::Equal)));
-    /// test(1.5, 1, RoundingMode::Exact, Some((Natural::from(3u32), Ordering::Equal)));
+    /// let test =
+    ///     |mantissa: f32, exponent: u64, rm: RoundingMode, out: Option<(Natural, Ordering)>| {
+    ///         assert_eq!(
+    ///             Natural::from_sci_mantissa_and_exponent_round(mantissa, exponent, rm),
+    ///             out
+    ///         );
+    ///     };
+    /// test(1.5, 1, Floor, Some((Natural::from(3u32), Equal)));
+    /// test(1.5, 1, Down, Some((Natural::from(3u32), Equal)));
+    /// test(1.5, 1, Ceiling, Some((Natural::from(3u32), Equal)));
+    /// test(1.5, 1, Up, Some((Natural::from(3u32), Equal)));
+    /// test(1.5, 1, Nearest, Some((Natural::from(3u32), Equal)));
+    /// test(1.5, 1, Exact, Some((Natural::from(3u32), Equal)));
     ///
-    /// test(1.51, 1, RoundingMode::Floor, Some((Natural::from(3u32), Ordering::Less)));
-    /// test(1.51, 1, RoundingMode::Down, Some((Natural::from(3u32), Ordering::Less)));
-    /// test(1.51, 1, RoundingMode::Ceiling, Some((Natural::from(4u32), Ordering::Greater)));
-    /// test(1.51, 1, RoundingMode::Up, Some((Natural::from(4u32), Ordering::Greater)));
-    /// test(1.51, 1, RoundingMode::Nearest, Some((Natural::from(3u32), Ordering::Less)));
-    /// test(1.51, 1, RoundingMode::Exact, None);
+    /// test(1.51, 1, Floor, Some((Natural::from(3u32), Less)));
+    /// test(1.51, 1, Down, Some((Natural::from(3u32), Less)));
+    /// test(1.51, 1, Ceiling, Some((Natural::from(4u32), Greater)));
+    /// test(1.51, 1, Up, Some((Natural::from(4u32), Greater)));
+    /// test(1.51, 1, Nearest, Some((Natural::from(3u32), Less)));
+    /// test(1.51, 1, Exact, None);
     ///
     /// test(
     ///     1.670478,
     ///     172,
-    ///     RoundingMode::Nearest,
-    ///     Some(
-    ///         (
-    ///             Natural::from_str("10000000254586612611935772707803116801852191350456320")
-    ///                 .unwrap(),
-    ///             Ordering::Equal
-    ///         )
-    ///     ),
+    ///     Nearest,
+    ///     Some((
+    ///         Natural::from_str("10000000254586612611935772707803116801852191350456320").unwrap(),
+    ///         Equal,
+    ///     )),
     /// );
     ///
-    /// test(2.0, 1, RoundingMode::Floor, None);
-    /// test(10.0, 1, RoundingMode::Floor, None);
-    /// test(0.5, 1, RoundingMode::Floor, None);
+    /// test(2.0, 1, Floor, None);
+    /// test(10.0, 1, Floor, None);
+    /// test(0.5, 1, Floor, None);
     /// ```
     #[inline]
     pub fn from_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
@@ -329,16 +291,16 @@ impl Natural {
             Some((
                 Natural::from(integer_mantissa)
                     << (sci_exponent + u64::exact_from(integer_exponent)),
-                Ordering::Equal,
+                Equal,
             ))
         } else {
             let integer_exponent = u64::exact_from(-integer_exponent);
             if integer_exponent <= sci_exponent {
                 Some((
                     Natural::from(integer_mantissa) << (sci_exponent - integer_exponent),
-                    Ordering::Equal,
+                    Equal,
                 ))
-            } else if rm == RoundingMode::Exact {
+            } else if rm == Exact {
                 None
             } else {
                 Some(Natural::from(integer_mantissa).shr_round(integer_exponent - sci_exponent, rm))
@@ -480,11 +442,19 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let n = <&Natural as IntegerMantissaAndExponent<_, _, _>>
-    ///     ::from_integer_mantissa_and_exponent(Natural::from(123u32), 0).unwrap();
+    /// let n =
+    ///     <&Natural as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
+    ///         Natural::from(123u32),
+    ///         0,
+    ///     )
+    ///     .unwrap();
     /// assert_eq!(n, 123);
-    /// let n = <&Natural as IntegerMantissaAndExponent<_, _, _>>
-    ///     ::from_integer_mantissa_and_exponent(Natural::from(25u32), 2).unwrap();
+    /// let n =
+    ///     <&Natural as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
+    ///         Natural::from(25u32),
+    ///         2,
+    ///     )
+    ///     .unwrap();
     /// assert_eq!(n, 100);
     /// ```
     #[inline]
@@ -521,9 +491,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, u64) {
-                let (m, e, _) = self
-                    .sci_mantissa_and_exponent_round(RoundingMode::Nearest)
-                    .unwrap();
+                let (m, e, _) = self.sci_mantissa_and_exponent_round(Nearest).unwrap();
                 (m, e)
             }
 
@@ -557,12 +525,8 @@ macro_rules! impl_mantissa_and_exponent {
                 sci_mantissa: $t,
                 sci_exponent: u64,
             ) -> Option<Natural> {
-                Natural::from_sci_mantissa_and_exponent_round(
-                    sci_mantissa,
-                    sci_exponent,
-                    RoundingMode::Nearest,
-                )
-                .map(|p| p.0)
+                Natural::from_sci_mantissa_and_exponent_round(sci_mantissa, sci_exponent, Nearest)
+                    .map(|p| p.0)
             }
         }
     };

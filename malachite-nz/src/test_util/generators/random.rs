@@ -114,7 +114,7 @@ use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::random::random_rounding_modes;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::{
     permute_1_3_2, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4, GenConfig, It,
 };
@@ -134,7 +134,7 @@ use malachite_base::vecs::random::{
 };
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use num::{BigInt, BigUint};
-use std::cmp::{max, Ordering};
+use std::cmp::{max, Ordering::*};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
@@ -726,7 +726,7 @@ pub fn random_integer_integer_rounding_mode_triple_gen_var_1(
             &random_rounding_modes,
         )
         .map(|(x, y, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (x * &y, y, rm)
             } else {
                 (x, y, rm)
@@ -1008,7 +1008,7 @@ where
         )
         .map(|(n, i, rm)| {
             (
-                if i < T::ZERO && rm == RoundingMode::Exact {
+                if i < T::ZERO && rm == Exact {
                     n >> i
                 } else {
                     n
@@ -1047,7 +1047,7 @@ where
         )
         .map(|(n, i, rm)| {
             (
-                if i > T::ZERO && rm == RoundingMode::Exact {
+                if i > T::ZERO && rm == Exact {
                     n << i
                 } else {
                     n
@@ -1171,7 +1171,7 @@ pub fn random_integer_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
             },
         )
         .map(|(mut x, y)| {
-            x.round_to_multiple_of_power_of_2_assign(y.exact_into(), RoundingMode::Down);
+            x.round_to_multiple_of_power_of_2_assign(y.exact_into(), Down);
             (x, y)
         }),
     )
@@ -1355,9 +1355,9 @@ pub fn random_integer_unsigned_unsigned_natural_triple_gen_var_1<T: PrimitiveUns
             },
         )
         .filter_map(|(x, y, z, w)| match y.cmp(&z) {
-            Ordering::Less => Some((x, y, z, w)),
-            Ordering::Greater => Some((x, z, y, w)),
-            Ordering::Equal => None,
+            Less => Some((x, y, z, w)),
+            Greater => Some((x, z, y, w)),
+            Equal => None,
         }),
     )
 }
@@ -1387,7 +1387,7 @@ pub fn random_integer_unsigned_rounding_mode_triple_gen_var_1(
             &random_rounding_modes,
         )
         .map(|(n, u, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (n << u, u, rm)
             } else {
                 (n, u, rm)
@@ -1421,7 +1421,7 @@ where
             },
             &random_rounding_modes,
         )
-        .map(|(n, u, rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
+        .map(|(n, u, rm)| (if rm == Exact { n << u } else { n }, u, rm)),
     )
 }
 
@@ -1460,7 +1460,7 @@ pub fn random_integer_rounding_mode_pair_gen_var_1<
             },
             &random_rounding_modes,
         )
-        .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+        .filter(|&(ref n, rm)| rm != Exact || T::convertible_from(n)),
     )
 }
 
@@ -2602,7 +2602,7 @@ pub fn random_natural_natural_rounding_mode_triple_gen_var_1(
             &random_rounding_modes,
         )
         .map(|(x, y, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (x * &y, y, rm)
             } else {
                 (x, y, rm)
@@ -2919,7 +2919,7 @@ where
         )
         .map(|(n, i, rm)| {
             (
-                if i < T::ZERO && rm == RoundingMode::Exact {
+                if i < T::ZERO && rm == Exact {
                     n >> i
                 } else {
                     n
@@ -2958,7 +2958,7 @@ where
         )
         .map(|(n, i, rm)| {
             (
-                if i > T::ZERO && rm == RoundingMode::Exact {
+                if i > T::ZERO && rm == Exact {
                     n << i
                 } else {
                     n
@@ -3150,7 +3150,7 @@ pub fn random_natural_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>(
             },
         )
         .map(|(mut x, y)| {
-            x.round_to_multiple_of_power_of_2_assign(y.exact_into(), RoundingMode::Down);
+            x.round_to_multiple_of_power_of_2_assign(y.exact_into(), Down);
             (x, y)
         }),
     )
@@ -3469,9 +3469,9 @@ pub fn random_natural_unsigned_unsigned_natural_triple_gen_var_1<T: PrimitiveUns
             },
         )
         .filter_map(|(x, y, z, w)| match y.cmp(&z) {
-            Ordering::Less => Some((x, y, z, w)),
-            Ordering::Greater => Some((x, z, y, w)),
-            Ordering::Equal => None,
+            Less => Some((x, y, z, w)),
+            Greater => Some((x, z, y, w)),
+            Equal => None,
         }),
     )
 }
@@ -3504,7 +3504,7 @@ where
             &random_rounding_modes,
         )
         .map(|(n, u, rm)| {
-            if rm == RoundingMode::Exact {
+            if rm == Exact {
                 (n << u, u, rm)
             } else {
                 (n, u, rm)
@@ -3531,9 +3531,7 @@ impl Iterator for NaturalUnsignedBoolVecTripleGenerator {
         let log_base = self.log_bases.next().unwrap();
         let bs = (&mut self.bs)
             .take(usize::exact_from(
-                x.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-                    .0,
+                x.significant_bits().div_round(log_base, Ceiling).0,
             ))
             .collect();
         Some((x, log_base, bs))
@@ -3609,7 +3607,7 @@ pub fn random_natural_rounding_mode_pair_gen_var_1<
             },
             &random_rounding_modes,
         )
-        .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+        .filter(|&(ref n, rm)| rm != Exact || T::convertible_from(n)),
     )
 }
 

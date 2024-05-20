@@ -9,12 +9,12 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 macro_rules! impl_partial_ord_limb {
     ($u: ident) => {
@@ -29,7 +29,7 @@ macro_rules! impl_partial_ord_limb {
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 match *self {
                     Natural(Small(small)) => small.partial_cmp(other),
-                    Natural(Large(_)) => Some(Ordering::Greater),
+                    Natural(Large(_)) => Some(Greater),
                 }
             }
         }
@@ -122,10 +122,10 @@ macro_rules! impl_partial_ord_larger_than_limb {
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 let limb_count = other
                     .significant_bits()
-                    .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                    .shr_round(Limb::LOG_WIDTH, Ceiling)
                     .0;
                 let limb_count_cmp = self.limb_count().cmp(&limb_count);
-                if limb_count_cmp != Ordering::Equal || limb_count == 0 {
+                if limb_count_cmp != Equal || limb_count == 0 {
                     return Some(limb_count_cmp);
                 }
                 let width = Limb::WIDTH;
@@ -134,12 +134,12 @@ macro_rules! impl_partial_ord_larger_than_limb {
                 for limb in self.limbs().rev() {
                     i -= width;
                     let limb_cmp = limb.cmp(&Limb::wrapping_from((other & mask) >> i));
-                    if limb_cmp != Ordering::Equal {
+                    if limb_cmp != Equal {
                         return Some(limb_cmp);
                     }
                     mask >>= width;
                 }
-                Some(Ordering::Equal)
+                Some(Equal)
             }
         }
     };
@@ -157,7 +157,7 @@ macro_rules! impl_signed {
             /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 if *other < 0 {
-                    Some(Ordering::Greater)
+                    Some(Greater)
                 } else {
                     self.partial_cmp(&other.unsigned_abs())
                 }

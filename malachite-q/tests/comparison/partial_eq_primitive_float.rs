@@ -12,7 +12,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use malachite_q::Rational;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -63,7 +63,7 @@ where
         assert_eq!(rug::Rational::from(&n) == f, eq);
         assert_eq!(f == n, eq);
         assert_eq!(f == rug::Rational::from(&n), eq);
-        assert_eq!(n.partial_cmp(&f) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp(&f) == Some(Equal), eq);
         if f.is_finite() {
             assert_eq!(PartialEq::<Rational>::eq(&n, &Rational::exact_from(f)), eq);
         }

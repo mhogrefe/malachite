@@ -8,7 +8,7 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
 
@@ -19,7 +19,7 @@ where
     if x.sign {
         x.abs.partial_cmp(other)
     } else {
-        Some(Ordering::Less)
+        Some(Less)
     }
 }
 
@@ -67,10 +67,10 @@ where
         if *other >= S::ZERO {
             x.abs.partial_cmp(&other.unsigned_abs())
         } else {
-            Some(Ordering::Greater)
+            Some(Greater)
         }
     } else if *other >= S::ZERO {
-        Some(Ordering::Less)
+        Some(Less)
     } else {
         other.unsigned_abs().partial_cmp(&x.abs)
     }

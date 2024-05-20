@@ -12,7 +12,9 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{
+    signed_gen, signed_gen_var_5, unsigned_gen, unsigned_gen_var_5,
+};
 use malachite_nz::integer::Integer;
 use malachite_q::test_util::generators::{
     rational_gen, rational_signed_pair_gen_var_1, rational_unsigned_pair_gen_var_1,
@@ -222,8 +224,11 @@ where
         assert_eq!(&n >> T::ZERO, n);
     });
 
-    unsigned_gen_var_5::<T>().test_properties(|u| {
+    unsigned_gen::<T>().test_properties(|u| {
         assert_eq!(Rational::ZERO >> u, 0);
+    });
+
+    unsigned_gen_var_5::<T>().test_properties(|u| {
         assert!((Rational::ONE >> u).is_power_of_2());
     });
 }
@@ -267,6 +272,10 @@ where
 
     signed_gen::<T>().test_properties(|i| {
         assert_eq!(Rational::ZERO >> i, 0);
+    });
+
+    signed_gen_var_5::<T>().test_properties(|i| {
+        assert!((Rational::ONE >> i).is_power_of_2());
     });
 }
 

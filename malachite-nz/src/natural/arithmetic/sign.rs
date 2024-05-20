@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 
 impl Sign for Natural {
@@ -21,19 +21,19 @@ impl Sign for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::Sign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use core::cmp::Ordering;
     ///
-    /// assert_eq!(Natural::ZERO.sign(), Ordering::Equal);
-    /// assert_eq!(Natural::from(123u32).sign(), Ordering::Greater);
+    /// assert_eq!(Natural::ZERO.sign(), Equal);
+    /// assert_eq!(Natural::from(123u32).sign(), Greater);
     /// ```
     fn sign(&self) -> Ordering {
         if *self == 0 {
-            Ordering::Equal
+            Equal
         } else {
-            Ordering::Greater
+            Greater
         }
     }
 }

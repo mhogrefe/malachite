@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Ceiling, CeilingAssign, Floor};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
@@ -64,7 +64,7 @@ fn ceiling_properties() {
         assert!(ceiling_alt.is_valid());
         assert_eq!(ceiling_alt, ceiling);
 
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Ceiling).0, ceiling);
+        assert_eq!(Integer::rounding_from(&x, Ceiling).0, ceiling);
         assert!(ceiling >= x);
         assert!(&ceiling - Integer::ONE < x);
         assert_eq!(ceiling, Rational::from(&ceiling).ceiling());

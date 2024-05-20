@@ -17,7 +17,7 @@ use malachite_q::test_util::generators::{
     rational_pair_gen_var_6,
 };
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_cmp_complexity);
@@ -43,9 +43,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_rational_cmp_complexity(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         match x.cmp_complexity(&y) {
-            Ordering::Less => println!("{x} c< {y}"),
-            Ordering::Equal => println!("{x} c= {y}"),
-            Ordering::Greater => println!("{x} c> {y}"),
+            Less => println!("{x} c< {y}"),
+            Equal => println!("{x} c= {y}"),
+            Greater => println!("{x} c> {y}"),
         }
     }
 }

@@ -32,8 +32,8 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert!(Natural::ZERO.to_bits_asc().is_empty());
@@ -77,8 +77,8 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert!(Natural::ZERO.to_bits_desc().is_empty());
@@ -111,14 +111,18 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::empty;
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
-    /// use core::iter::empty;
     ///
     /// assert_eq!(Natural::from_bits_asc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
-    ///     Natural::from_bits_asc([true, false, false, true, false, true, true].iter().cloned()),
+    ///     Natural::from_bits_asc(
+    ///         [true, false, false, true, false, true, true]
+    ///             .iter()
+    ///             .cloned()
+    ///     ),
     ///     105
     /// );
     /// ```
@@ -148,14 +152,18 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::iter::empty;
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
-    /// use core::iter::empty;
     ///
     /// assert_eq!(Natural::from_bits_desc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
-    ///     Natural::from_bits_desc([true, true, false, true, false, false, true].iter().cloned()),
+    ///     Natural::from_bits_desc(
+    ///         [true, true, false, true, false, false, true]
+    ///             .iter()
+    ///             .cloned()
+    ///     ),
     ///     105
     /// );
     /// ```

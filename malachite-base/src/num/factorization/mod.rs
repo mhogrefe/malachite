@@ -31,8 +31,14 @@ pub mod prime_sieve;
 /// use itertools::Itertools;
 /// use malachite_base::num::factorization::traits::Primes;
 ///
-/// assert_eq!(u8::primes_less_than_or_equal_to(&10).collect_vec(), &[2, 3, 5, 7]);
-/// assert_eq!(u16::primes_less_than_or_equal_to(&11).collect_vec(), &[2, 3, 5, 7, 11]);
+/// assert_eq!(
+///     u8::primes_less_than_or_equal_to(&10).collect_vec(),
+///     &[2, 3, 5, 7]
+/// );
+/// assert_eq!(
+///     u16::primes_less_than_or_equal_to(&11).collect_vec(),
+///     &[2, 3, 5, 7, 11]
+/// );
 /// assert_eq!(
 ///     u32::primes_less_than_or_equal_to(&100).collect_vec(),
 ///     &[

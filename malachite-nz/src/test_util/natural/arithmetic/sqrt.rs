@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{PowerOf2, ShrRound, Square};
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use malachite_base::rounding_modes::RoundingMode::*;
+use std::cmp::Ordering::*;
 
 pub(crate) fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(
     f: F,
@@ -23,11 +23,11 @@ pub(crate) fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(
         if high <= low {
             return low;
         }
-        let mid = (&low + &high).shr_round(1, RoundingMode::Ceiling).0;
+        let mid = (&low + &high).shr_round(1, Ceiling).0;
         match f(&mid).cmp(x) {
-            Ordering::Equal => return mid,
-            Ordering::Less => low = mid,
-            Ordering::Greater => high = mid - Natural::ONE,
+            Equal => return mid,
+            Less => low = mid,
+            Greater => high = mid - Natural::ONE,
         }
     }
 }
@@ -36,7 +36,7 @@ pub fn floor_sqrt_binary(x: &Natural) -> Natural {
     if x < &Natural::TWO {
         x.clone()
     } else {
-        let p = Natural::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling).0);
+        let p = Natural::power_of_2(x.significant_bits().shr_round(1, Ceiling).0);
         floor_inverse_binary(|x| x.square(), x, &p >> 1, p)
     }
 }

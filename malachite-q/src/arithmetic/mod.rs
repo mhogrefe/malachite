@@ -96,17 +96,29 @@ pub mod round_to_multiple_of_power_of_2;
 /// assert_eq!(Rational::from(123) << 2i16, 492);
 /// assert_eq!((Rational::from(123) << -2i16).to_string(), "123/4");
 /// assert_eq!((Rational::from_signeds(7, 22) << 2i16).to_string(), "14/11");
-/// assert_eq!((Rational::from_signeds(22, 7) << -2i16).to_string(), "11/14");
+/// assert_eq!(
+///     (Rational::from_signeds(22, 7) << -2i16).to_string(),
+///     "11/14"
+/// );
 ///
 /// assert_eq!(&Rational::ZERO << 10u8, 0);
 /// assert_eq!(&Rational::from(123) << 2u16, 492);
-/// assert_eq!((&Rational::from_signeds(7, 22) << 2u16).to_string(), "14/11");
+/// assert_eq!(
+///     (&Rational::from_signeds(7, 22) << 2u16).to_string(),
+///     "14/11"
+/// );
 ///
 /// assert_eq!(&Rational::ZERO << 10i8, 0);
 /// assert_eq!(&Rational::from(123) << 2i16, 492);
 /// assert_eq!((&Rational::from(123) << -2i16).to_string(), "123/4");
-/// assert_eq!((&Rational::from_signeds(7, 22) << 2i16).to_string(), "14/11");
-/// assert_eq!((&Rational::from_signeds(22, 7) << -2i16).to_string(), "11/14");
+/// assert_eq!(
+///     (&Rational::from_signeds(7, 22) << 2i16).to_string(),
+///     "14/11"
+/// );
+/// assert_eq!(
+///     (&Rational::from_signeds(22, 7) << -2i16).to_string(),
+///     "11/14"
+/// );
 /// ```
 ///
 /// # shl_assign
@@ -162,17 +174,29 @@ pub mod shl;
 /// assert_eq!((Rational::from(123) >> 2i16).to_string(), "123/4");
 /// assert_eq!(Rational::from(123) >> -2i16, 492);
 /// assert_eq!((Rational::from_signeds(22, 7) >> 2i16).to_string(), "11/14");
-/// assert_eq!((Rational::from_signeds(7, 22) >> -2i16).to_string(), "14/11");
+/// assert_eq!(
+///     (Rational::from_signeds(7, 22) >> -2i16).to_string(),
+///     "14/11"
+/// );
 ///
 /// assert_eq!(&Rational::ZERO >> 10u8, 0);
 /// assert_eq!((&Rational::from(123) >> 2u16).to_string(), "123/4");
-/// assert_eq!((&Rational::from_signeds(22, 7) >> 2u16).to_string(), "11/14");
+/// assert_eq!(
+///     (&Rational::from_signeds(22, 7) >> 2u16).to_string(),
+///     "11/14"
+/// );
 ///
 /// assert_eq!(&Rational::ZERO >> 10i8, 0);
 /// assert_eq!((&Rational::from(123) >> 2i16).to_string(), "123/4");
 /// assert_eq!(&Rational::from(123) >> -2i16, 492);
-/// assert_eq!((&Rational::from_signeds(22, 7) >> 2i16).to_string(), "11/14");
-/// assert_eq!((&Rational::from_signeds(7, 22) >> -2i16).to_string(), "14/11");
+/// assert_eq!(
+///     (&Rational::from_signeds(22, 7) >> 2i16).to_string(),
+///     "11/14"
+/// );
+/// assert_eq!(
+///     (&Rational::from_signeds(7, 22) >> -2i16).to_string(),
+///     "14/11"
+/// );
 /// ```
 ///
 /// # shr_assign

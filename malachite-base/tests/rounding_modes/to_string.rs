@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::generators::rounding_mode_gen;
 use malachite_base::test_util::rounding_modes::ROUNDING_MODE_CHARS;
@@ -17,12 +17,12 @@ fn test_to_string() {
     let test = |rm: RoundingMode, out| {
         assert_eq!(rm.to_string(), out);
     };
-    test(RoundingMode::Down, "Down");
-    test(RoundingMode::Up, "Up");
-    test(RoundingMode::Floor, "Floor");
-    test(RoundingMode::Ceiling, "Ceiling");
-    test(RoundingMode::Nearest, "Nearest");
-    test(RoundingMode::Exact, "Exact");
+    test(Down, "Down");
+    test(Up, "Up");
+    test(Floor, "Floor");
+    test(Ceiling, "Ceiling");
+    test(Nearest, "Nearest");
+    test(Exact, "Exact");
 }
 
 #[test]

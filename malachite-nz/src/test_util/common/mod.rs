@@ -16,7 +16,7 @@ use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use num::bigint::Sign;
 use num::{BigInt, BigUint};
 use rug::integer::Order;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[cfg(feature = "32_bit_limbs")]
 impl From<&BigUint> for Natural {
@@ -103,9 +103,9 @@ impl From<&Integer> for BigInt {
     #[inline]
     fn from(n: &Integer) -> BigInt {
         let sign = match n.sign() {
-            Ordering::Less => Sign::Minus,
-            Ordering::Equal => Sign::NoSign,
-            Ordering::Greater => Sign::Plus,
+            Less => Sign::Minus,
+            Equal => Sign::NoSign,
+            Greater => Sign::Plus,
         };
         BigInt::from_biguint(sign, BigUint::from(n.unsigned_abs_ref()))
     }

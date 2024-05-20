@@ -12,7 +12,7 @@ use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_13, primitive_float_gen_var_2,
@@ -21,7 +21,7 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 #[test]
 fn test_rounding_from_f32() {
@@ -31,142 +31,87 @@ fn test_rounding_from_f32() {
         assert!(x.is_valid());
         assert_eq!(o, o_out);
     };
-    test(0.0, RoundingMode::Exact, "0", Ordering::Equal);
-    test(-0.0, RoundingMode::Exact, "0", Ordering::Equal);
-    test(123.0, RoundingMode::Exact, "123", Ordering::Equal);
-    test(1.0e9, RoundingMode::Exact, "1000000000", Ordering::Equal);
-    test(1.0e9, RoundingMode::Exact, "1000000000", Ordering::Equal);
-    test(
-        4294967295.0,
-        RoundingMode::Exact,
-        "4294967296",
-        Ordering::Equal,
-    );
-    test(
-        4294967296.0,
-        RoundingMode::Exact,
-        "4294967296",
-        Ordering::Equal,
-    );
-    test(
-        18446744073709551615.0,
-        RoundingMode::Exact,
-        "18446744073709551616",
-        Ordering::Equal,
-    );
-    test(
-        18446744073709551616.0,
-        RoundingMode::Exact,
-        "18446744073709551616",
-        Ordering::Equal,
-    );
-    test(
-        1.0e20,
-        RoundingMode::Exact,
-        "100000002004087734272",
-        Ordering::Equal,
-    );
-    test(
-        1.23e20,
-        RoundingMode::Exact,
-        "122999999650278146048",
-        Ordering::Equal,
-    );
-    test(
-        1.6777216e7,
-        RoundingMode::Exact,
-        "16777216",
-        Ordering::Equal,
-    );
-    test(
-        1.6777218e7,
-        RoundingMode::Exact,
-        "16777218",
-        Ordering::Equal,
-    );
+    test(0.0, Exact, "0", Equal);
+    test(-0.0, Exact, "0", Equal);
+    test(123.0, Exact, "123", Equal);
+    test(1.0e9, Exact, "1000000000", Equal);
+    test(1.0e9, Exact, "1000000000", Equal);
+    test(4294967295.0, Exact, "4294967296", Equal);
+    test(4294967296.0, Exact, "4294967296", Equal);
+    test(18446744073709551615.0, Exact, "18446744073709551616", Equal);
+    test(18446744073709551616.0, Exact, "18446744073709551616", Equal);
+    test(1.0e20, Exact, "100000002004087734272", Equal);
+    test(1.23e20, Exact, "122999999650278146048", Equal);
+    test(1.6777216e7, Exact, "16777216", Equal);
+    test(1.6777218e7, Exact, "16777218", Equal);
 
-    test(123.1, RoundingMode::Floor, "123", Ordering::Less);
-    test(123.1, RoundingMode::Down, "123", Ordering::Less);
-    test(123.1, RoundingMode::Ceiling, "124", Ordering::Greater);
-    test(123.1, RoundingMode::Up, "124", Ordering::Greater);
-    test(123.1, RoundingMode::Nearest, "123", Ordering::Less);
+    test(123.1, Floor, "123", Less);
+    test(123.1, Down, "123", Less);
+    test(123.1, Ceiling, "124", Greater);
+    test(123.1, Up, "124", Greater);
+    test(123.1, Nearest, "123", Less);
 
-    test(123.9, RoundingMode::Floor, "123", Ordering::Less);
-    test(123.9, RoundingMode::Down, "123", Ordering::Less);
-    test(123.9, RoundingMode::Ceiling, "124", Ordering::Greater);
-    test(123.9, RoundingMode::Up, "124", Ordering::Greater);
-    test(123.9, RoundingMode::Nearest, "124", Ordering::Greater);
+    test(123.9, Floor, "123", Less);
+    test(123.9, Down, "123", Less);
+    test(123.9, Ceiling, "124", Greater);
+    test(123.9, Up, "124", Greater);
+    test(123.9, Nearest, "124", Greater);
 
-    test(123.5, RoundingMode::Nearest, "124", Ordering::Greater);
-    test(124.5, RoundingMode::Nearest, "124", Ordering::Less);
-    test(-0.99, RoundingMode::Ceiling, "0", Ordering::Greater);
-    test(-0.99, RoundingMode::Down, "0", Ordering::Greater);
-    test(-0.499, RoundingMode::Nearest, "0", Ordering::Greater);
-    test(-0.5, RoundingMode::Nearest, "0", Ordering::Greater);
+    test(123.5, Nearest, "124", Greater);
+    test(124.5, Nearest, "124", Less);
+    test(-0.99, Ceiling, "0", Greater);
+    test(-0.99, Down, "0", Greater);
+    test(-0.499, Nearest, "0", Greater);
+    test(-0.5, Nearest, "0", Greater);
 
-    test(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Nearest,
-        "0",
-        Ordering::Greater,
-    );
-    test(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Down,
-        "0",
-        Ordering::Greater,
-    );
-    test(
-        f32::NEGATIVE_INFINITY,
-        RoundingMode::Ceiling,
-        "0",
-        Ordering::Greater,
-    );
-    test(-123.0, RoundingMode::Nearest, "0", Ordering::Greater);
-    test(-123.0, RoundingMode::Down, "0", Ordering::Greater);
-    test(-123.0, RoundingMode::Ceiling, "0", Ordering::Greater);
+    test(f32::NEGATIVE_INFINITY, Nearest, "0", Greater);
+    test(f32::NEGATIVE_INFINITY, Down, "0", Greater);
+    test(f32::NEGATIVE_INFINITY, Ceiling, "0", Greater);
+    test(-123.0, Nearest, "0", Greater);
+    test(-123.0, Down, "0", Greater);
+    test(-123.0, Ceiling, "0", Greater);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_1() {
-    Natural::rounding_from(f32::NAN, RoundingMode::Floor);
+    Natural::rounding_from(f32::NAN, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_2() {
-    Natural::rounding_from(f32::INFINITY, RoundingMode::Floor);
+    Natural::rounding_from(f32::INFINITY, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_3() {
-    Natural::rounding_from(f32::NEGATIVE_INFINITY, RoundingMode::Floor);
+    Natural::rounding_from(f32::NEGATIVE_INFINITY, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_4() {
-    Natural::rounding_from(123.1, RoundingMode::Exact);
+    Natural::rounding_from(123.1, Exact);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_5() {
-    Natural::rounding_from(-123.0, RoundingMode::Floor);
+    Natural::rounding_from(-123.0, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_6() {
-    Natural::rounding_from(-0.1, RoundingMode::Floor);
+    Natural::rounding_from(-0.1, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f32_fail_7() {
-    Natural::rounding_from(-0.1, RoundingMode::Up);
+    Natural::rounding_from(-0.1, Up);
 }
 
 #[test]
@@ -177,157 +122,102 @@ fn test_rounding_from_f64() {
         assert!(x.is_valid());
         assert_eq!(o, o_out);
     };
-    test(0.0, RoundingMode::Exact, "0", Ordering::Equal);
-    test(-0.0, RoundingMode::Exact, "0", Ordering::Equal);
-    test(123.0, RoundingMode::Exact, "123", Ordering::Equal);
-    test(1.0e9, RoundingMode::Exact, "1000000000", Ordering::Equal);
-    test(1.0e9, RoundingMode::Exact, "1000000000", Ordering::Equal);
-    test(
-        4294967295.0,
-        RoundingMode::Exact,
-        "4294967295",
-        Ordering::Equal,
-    );
-    test(
-        4294967296.0,
-        RoundingMode::Exact,
-        "4294967296",
-        Ordering::Equal,
-    );
-    test(
-        18446744073709551615.0,
-        RoundingMode::Exact,
-        "18446744073709551616",
-        Ordering::Equal,
-    );
-    test(
-        18446744073709551616.0,
-        RoundingMode::Exact,
-        "18446744073709551616",
-        Ordering::Equal,
-    );
-    test(
-        1.0e20,
-        RoundingMode::Exact,
-        "100000000000000000000",
-        Ordering::Equal,
-    );
-    test(
-        1.23e20,
-        RoundingMode::Exact,
-        "123000000000000000000",
-        Ordering::Equal,
-    );
+    test(0.0, Exact, "0", Equal);
+    test(-0.0, Exact, "0", Equal);
+    test(123.0, Exact, "123", Equal);
+    test(1.0e9, Exact, "1000000000", Equal);
+    test(1.0e9, Exact, "1000000000", Equal);
+    test(4294967295.0, Exact, "4294967295", Equal);
+    test(4294967296.0, Exact, "4294967296", Equal);
+    test(18446744073709551615.0, Exact, "18446744073709551616", Equal);
+    test(18446744073709551616.0, Exact, "18446744073709551616", Equal);
+    test(1.0e20, Exact, "100000000000000000000", Equal);
+    test(1.23e20, Exact, "123000000000000000000", Equal);
     test(
         1.0e100,
-        RoundingMode::Exact,
+        Exact,
         "100000000000000001590289110975991804683608085639452813897813275577478387721703810608134699\
         85856815104",
-        Ordering::Equal,
+        Equal,
     );
     test(
         1.23e100,
-        RoundingMode::Exact,
+        Exact,
         "123000000000000008366862950845375853795062237854139353014252897832358837028676639186389822\
         00322686976",
-        Ordering::Equal,
+        Equal,
     );
-    test(
-        9.007199254740992e15,
-        RoundingMode::Exact,
-        "9007199254740992",
-        Ordering::Equal,
-    );
-    test(
-        9.007199254740994e15,
-        RoundingMode::Exact,
-        "9007199254740994",
-        Ordering::Equal,
-    );
+    test(9.007199254740992e15, Exact, "9007199254740992", Equal);
+    test(9.007199254740994e15, Exact, "9007199254740994", Equal);
 
-    test(123.1, RoundingMode::Floor, "123", Ordering::Less);
-    test(123.1, RoundingMode::Down, "123", Ordering::Less);
-    test(123.1, RoundingMode::Ceiling, "124", Ordering::Greater);
-    test(123.1, RoundingMode::Up, "124", Ordering::Greater);
-    test(123.1, RoundingMode::Nearest, "123", Ordering::Less);
+    test(123.1, Floor, "123", Less);
+    test(123.1, Down, "123", Less);
+    test(123.1, Ceiling, "124", Greater);
+    test(123.1, Up, "124", Greater);
+    test(123.1, Nearest, "123", Less);
 
-    test(123.9, RoundingMode::Floor, "123", Ordering::Less);
-    test(123.9, RoundingMode::Down, "123", Ordering::Less);
-    test(123.9, RoundingMode::Ceiling, "124", Ordering::Greater);
-    test(123.9, RoundingMode::Up, "124", Ordering::Greater);
-    test(123.9, RoundingMode::Nearest, "124", Ordering::Greater);
+    test(123.9, Floor, "123", Less);
+    test(123.9, Down, "123", Less);
+    test(123.9, Ceiling, "124", Greater);
+    test(123.9, Up, "124", Greater);
+    test(123.9, Nearest, "124", Greater);
 
-    test(123.5, RoundingMode::Nearest, "124", Ordering::Greater);
-    test(124.5, RoundingMode::Nearest, "124", Ordering::Less);
-    test(-0.99, RoundingMode::Ceiling, "0", Ordering::Greater);
-    test(-0.99, RoundingMode::Down, "0", Ordering::Greater);
-    test(-0.499, RoundingMode::Nearest, "0", Ordering::Greater);
-    test(-0.5, RoundingMode::Nearest, "0", Ordering::Greater);
+    test(123.5, Nearest, "124", Greater);
+    test(124.5, Nearest, "124", Less);
+    test(-0.99, Ceiling, "0", Greater);
+    test(-0.99, Down, "0", Greater);
+    test(-0.499, Nearest, "0", Greater);
+    test(-0.5, Nearest, "0", Greater);
 
-    test(
-        f64::NEGATIVE_INFINITY,
-        RoundingMode::Nearest,
-        "0",
-        Ordering::Greater,
-    );
-    test(
-        f64::NEGATIVE_INFINITY,
-        RoundingMode::Down,
-        "0",
-        Ordering::Greater,
-    );
-    test(
-        f64::NEGATIVE_INFINITY,
-        RoundingMode::Ceiling,
-        "0",
-        Ordering::Greater,
-    );
+    test(f64::NEGATIVE_INFINITY, Nearest, "0", Greater);
+    test(f64::NEGATIVE_INFINITY, Down, "0", Greater);
+    test(f64::NEGATIVE_INFINITY, Ceiling, "0", Greater);
 
-    test(-123.0, RoundingMode::Nearest, "0", Ordering::Greater);
-    test(-123.0, RoundingMode::Down, "0", Ordering::Greater);
-    test(-123.0, RoundingMode::Ceiling, "0", Ordering::Greater);
+    test(-123.0, Nearest, "0", Greater);
+    test(-123.0, Down, "0", Greater);
+    test(-123.0, Ceiling, "0", Greater);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_1() {
-    Natural::rounding_from(f64::NAN, RoundingMode::Floor);
+    Natural::rounding_from(f64::NAN, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_2() {
-    Natural::rounding_from(f64::INFINITY, RoundingMode::Floor);
+    Natural::rounding_from(f64::INFINITY, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_3() {
-    Natural::rounding_from(f64::NEGATIVE_INFINITY, RoundingMode::Floor);
+    Natural::rounding_from(f64::NEGATIVE_INFINITY, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_4() {
-    Natural::rounding_from(123.1, RoundingMode::Exact);
+    Natural::rounding_from(123.1, Exact);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_5() {
-    Natural::rounding_from(-123.0, RoundingMode::Floor);
+    Natural::rounding_from(-123.0, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_6() {
-    Natural::rounding_from(-0.1, RoundingMode::Floor);
+    Natural::rounding_from(-0.1, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rounding_from_f64_fail_7() {
-    Natural::rounding_from(-0.1, RoundingMode::Up);
+    Natural::rounding_from(-0.1, Up);
 }
 
 #[test]
@@ -712,47 +602,47 @@ where
         assert!(n.is_valid());
         assert_eq!(n.partial_cmp(&f), Some(o));
         match (f.is_sign_positive(), rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     primitive_float_gen_var_2::<T>().test_properties(|f| {
-        let no = Natural::rounding_from(f, RoundingMode::Exact);
+        let no = Natural::rounding_from(f, Exact);
         assert!(no.0.is_valid());
-        assert_eq!(no.1, Ordering::Equal);
-        assert_eq!(no, Natural::rounding_from(f, RoundingMode::Floor));
-        assert_eq!(no, Natural::rounding_from(f, RoundingMode::Ceiling));
-        assert_eq!(no, Natural::rounding_from(f, RoundingMode::Down));
-        assert_eq!(no, Natural::rounding_from(f, RoundingMode::Up));
-        assert_eq!(no, Natural::rounding_from(f, RoundingMode::Nearest));
-        let (f_alt, o) = T::rounding_from(&no.0, RoundingMode::Exact);
-        assert_eq!(o, Ordering::Equal);
+        assert_eq!(no.1, Equal);
+        assert_eq!(no, Natural::rounding_from(f, Floor));
+        assert_eq!(no, Natural::rounding_from(f, Ceiling));
+        assert_eq!(no, Natural::rounding_from(f, Down));
+        assert_eq!(no, Natural::rounding_from(f, Up));
+        assert_eq!(no, Natural::rounding_from(f, Nearest));
+        let (f_alt, o) = T::rounding_from(&no.0, Exact);
+        assert_eq!(o, Equal);
         assert_eq!(NiceFloat(f_alt), NiceFloat(f));
     });
 
     primitive_float_gen_var_3::<T>().test_properties(|f| {
-        let n_floor = Natural::rounding_from(f, RoundingMode::Floor);
+        let n_floor = Natural::rounding_from(f, Floor);
         assert!(n_floor.0.is_valid());
-        assert_eq!(n_floor.1, Ordering::Less);
-        let n_ceiling = (&n_floor.0 + Natural::ONE, Ordering::Greater);
-        assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Ceiling));
-        assert_eq!(n_floor, Natural::rounding_from(f, RoundingMode::Down));
-        assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Up));
-        let n_nearest = Natural::rounding_from(f, RoundingMode::Nearest);
+        assert_eq!(n_floor.1, Less);
+        let n_ceiling = (&n_floor.0 + Natural::ONE, Greater);
+        assert_eq!(n_ceiling, Natural::rounding_from(f, Ceiling));
+        assert_eq!(n_floor, Natural::rounding_from(f, Down));
+        assert_eq!(n_ceiling, Natural::rounding_from(f, Up));
+        let n_nearest = Natural::rounding_from(f, Nearest);
         assert!(n_nearest == n_floor || n_nearest == n_ceiling);
     });
 
     primitive_float_gen_var_4::<T>().test_properties(|f| {
-        let floor = Natural::rounding_from(f, RoundingMode::Floor);
-        let ceiling = (&floor.0 + Natural::ONE, Ordering::Greater);
-        let nearest = Natural::rounding_from(f, RoundingMode::Nearest);
+        let floor = Natural::rounding_from(f, Floor);
+        let ceiling = (&floor.0 + Natural::ONE, Greater);
+        let nearest = Natural::rounding_from(f, Nearest);
         assert_eq!(nearest, if floor.0.even() { floor } else { ceiling });
     });
 }
@@ -779,11 +669,8 @@ where
     primitive_float_gen_var_2::<T>().test_properties(|f| {
         let n = Natural::exact_from(f);
         assert!(n.is_valid());
-        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Exact).0);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Exact).0),
-            NiceFloat(f)
-        );
+        assert_eq!(n, Natural::rounding_from(f, Exact).0);
+        assert_eq!(NiceFloat(T::rounding_from(&n, Exact).0), NiceFloat(f));
     });
 
     primitive_float_gen_var_3::<T>().test_properties(|f| {

@@ -23,7 +23,7 @@ impl DivExact<Integer> for Integer {
     /// If you are unsure whether the division will be exact, use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(other, RoundingMode::Exact)`.
+    /// `self.div_round(other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -37,17 +37,18 @@ impl DivExact<Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!(Integer::from(-56088).div_exact(Integer::from(456)), -123);
     ///
     /// // -123456789000 * -987654321000 = 121932631112635269000000
     /// assert_eq!(
-    ///     Integer::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(Integer::from_str("-987654321000").unwrap()),
+    ///     Integer::from_str("121932631112635269000000")
+    ///         .unwrap()
+    ///         .div_exact(Integer::from_str("-987654321000").unwrap()),
     ///     -123456789000i64
     /// );
     /// ```
@@ -72,7 +73,7 @@ impl<'a> DivExact<&'a Integer> for Integer {
     /// If you are unsure whether the division will be exact, use `self / &other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(&other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(&other, RoundingMode::Exact)`.
+    /// `self.div_round(&other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -86,17 +87,18 @@ impl<'a> DivExact<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!(Integer::from(-56088).div_exact(&Integer::from(456)), -123);
     ///
     /// // -123456789000 * -987654321000 = 121932631112635269000000
     /// assert_eq!(
-    ///     Integer::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(&Integer::from_str("-987654321000").unwrap()),
+    ///     Integer::from_str("121932631112635269000000")
+    ///         .unwrap()
+    ///         .div_exact(&Integer::from_str("-987654321000").unwrap()),
     ///     -123456789000i64
     /// );
     /// ```
@@ -121,7 +123,7 @@ impl<'a> DivExact<Integer> for &'a Integer {
     /// If you are unsure whether the division will be exact, use `&self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
-    /// `(&self).div_round(other, RoundingMode::Exact)`.
+    /// `(&self).div_round(other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -135,9 +137,9 @@ impl<'a> DivExact<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!((&Integer::from(-56088)).div_exact(Integer::from(456)), -123);
@@ -145,7 +147,7 @@ impl<'a> DivExact<Integer> for &'a Integer {
     /// // -123456789000 * -987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     (&Integer::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(Integer::from_str("-987654321000").unwrap()),
+    ///         .div_exact(Integer::from_str("-987654321000").unwrap()),
     ///     -123456789000i64
     /// );
     /// ```
@@ -172,24 +174,27 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     /// If you are unsure whether the division will be exact, use `&self / &other` instead. If
     /// you're unsure and you want to know, use `(&self).div_mod(&other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `(&self).div_round(&other, RoundingMode::Exact)`.
+    /// `(&self).div_round(&other, Exact)`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
-    /// assert_eq!((&Integer::from(-56088)).div_exact(&Integer::from(456)), -123);
+    /// assert_eq!(
+    ///     (&Integer::from(-56088)).div_exact(&Integer::from(456)),
+    ///     -123
+    /// );
     ///
     /// // -123456789000 * -987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     (&Integer::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(&Integer::from_str("-987654321000").unwrap()),
+    ///         .div_exact(&Integer::from_str("-987654321000").unwrap()),
     ///     -123456789000i64
     /// );
     /// ```
@@ -214,7 +219,7 @@ impl DivExactAssign<Integer> for Integer {
     /// If you are unsure whether the division will be exact, use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round_assign(other, RoundingMode::Exact)`.
+    /// `self.div_round_assign(other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -228,9 +233,9 @@ impl DivExactAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// let mut x = Integer::from(-56088);
@@ -260,7 +265,7 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// If you are unsure whether the division will be exact, use `self /= &other` instead. If
     /// you're unsure and you want to know, use `self.div_assign_mod(&other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round_assign(&other, RoundingMode::Exact)`.
+    /// `self.div_round_assign(&other, Exact)`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -274,9 +279,9 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
-    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// let mut x = Integer::from(-56088);

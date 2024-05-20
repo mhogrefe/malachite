@@ -27,7 +27,7 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::natural::comparison::cmp::natural_cmp_normalized_naive;
 use num::BigUint;
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -36,10 +36,10 @@ fn test_limbs_cmp_same_length() {
     let test = |xs: &[Limb], ys: &[Limb], out| {
         assert_eq!(limbs_cmp_same_length(xs, ys), out);
     };
-    test(&[3], &[5], Ordering::Less);
-    test(&[3, 0], &[5, 0], Ordering::Less);
-    test(&[1, 2], &[2, 1], Ordering::Greater);
-    test(&[1, 2, 3], &[1, 2, 3], Ordering::Equal);
+    test(&[3], &[5], Less);
+    test(&[3, 0], &[5, 0], Less);
+    test(&[1, 2], &[2, 1], Greater);
+    test(&[1, 2, 3], &[1, 2, 3], Equal);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -55,10 +55,10 @@ fn test_limbs_cmp() {
     let test = |xs: &[Limb], ys: &[Limb], out| {
         assert_eq!(limbs_cmp(xs, ys), out);
     };
-    test(&[3], &[5], Ordering::Less);
-    test(&[3, 1], &[5], Ordering::Greater);
-    test(&[1, 2], &[2, 1, 3], Ordering::Less);
-    test(&[1, 2, 3], &[1, 2, 3], Ordering::Equal);
+    test(&[3], &[5], Less);
+    test(&[3, 1], &[5], Greater);
+    test(&[1, 2], &[2, 1, 3], Less);
+    test(&[1, 2, 3], &[1, 2, 3], Equal);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -67,12 +67,12 @@ fn test_limbs_cmp_normalized() {
     let test = |xs: &[Limb], ys: &[Limb], out| {
         assert_eq!(limbs_cmp_normalized(xs, ys), out);
     };
-    test(&[5], &[6], Ordering::Less);
-    test(&[1], &[8], Ordering::Equal);
-    test(&[0, 0, 1], &[8], Ordering::Equal);
-    test(&[17], &[3], Ordering::Less);
-    test(&[1, 1, 1], &[1, 1], Ordering::Greater);
-    test(&[1, 0, 1], &[1, 1], Ordering::Less);
+    test(&[5], &[6], Less);
+    test(&[1], &[8], Equal);
+    test(&[0, 0, 1], &[8], Equal);
+    test(&[17], &[3], Less);
+    test(&[1, 1, 1], &[1, 1], Greater);
+    test(&[1, 0, 1], &[1, 1], Less);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -119,13 +119,13 @@ fn test_cmp_normalized() {
         assert_eq!(x.cmp_normalized(&y), out);
         assert_eq!(natural_cmp_normalized_naive(&x, &y), out);
     };
-    test("1", "4", Ordering::Equal);
-    test("5", "6", Ordering::Less);
-    test("3", "17", Ordering::Greater);
-    test("9", "36", Ordering::Equal);
-    test("117886223846050103296", "409", Ordering::Equal);
-    test("117886223846050103295", "409", Ordering::Less);
-    test("117886223846050103297", "409", Ordering::Greater);
+    test("1", "4", Equal);
+    test("5", "6", Less);
+    test("3", "17", Greater);
+    test("9", "36", Equal);
+    test("117886223846050103296", "409", Equal);
+    test("117886223846050103295", "409", Less);
+    test("117886223846050103297", "409", Greater);
 }
 
 #[test]
@@ -155,18 +155,16 @@ fn limbs_cmp_same_length_properties() {
     });
 
     unsigned_vec_gen().test_properties_with_config(&config, |xs| {
-        assert_eq!(limbs_cmp_same_length(&xs, &xs), Ordering::Equal);
+        assert_eq!(limbs_cmp_same_length(&xs, &xs), Equal);
     });
 
     unsigned_vec_triple_gen_var_29().test_properties_with_config(&config, |(xs, ys, zs)| {
-        if limbs_cmp_same_length(&xs, &ys) == Ordering::Less
-            && limbs_cmp_same_length(&ys, &zs) == Ordering::Less
+        if limbs_cmp_same_length(&xs, &ys) == Less && limbs_cmp_same_length(&ys, &zs) == Less {
+            assert_eq!(limbs_cmp_same_length(&xs, &zs), Less);
+        } else if limbs_cmp_same_length(&xs, &ys) == Greater
+            && limbs_cmp_same_length(&ys, &zs) == Greater
         {
-            assert_eq!(limbs_cmp_same_length(&xs, &zs), Ordering::Less);
-        } else if limbs_cmp_same_length(&xs, &ys) == Ordering::Greater
-            && limbs_cmp_same_length(&ys, &zs) == Ordering::Greater
-        {
-            assert_eq!(limbs_cmp_same_length(&xs, &zs), Ordering::Greater);
+            assert_eq!(limbs_cmp_same_length(&xs, &zs), Greater);
         }
     });
 }
@@ -186,16 +184,14 @@ fn limbs_cmp_properties() {
     });
 
     unsigned_vec_gen_var_3().test_properties_with_config(&config, |xs| {
-        assert_eq!(limbs_cmp(&xs, &xs), Ordering::Equal);
+        assert_eq!(limbs_cmp(&xs, &xs), Equal);
     });
 
     unsigned_vec_triple_gen_var_30().test_properties_with_config(&config, |(xs, ys, zs)| {
-        if limbs_cmp(&xs, &ys) == Ordering::Less && limbs_cmp(&ys, &zs) == Ordering::Less {
-            assert_eq!(limbs_cmp(&xs, &zs), Ordering::Less);
-        } else if limbs_cmp(&xs, &ys) == Ordering::Greater
-            && limbs_cmp(&ys, &zs) == Ordering::Greater
-        {
-            assert_eq!(limbs_cmp(&xs, &zs), Ordering::Greater);
+        if limbs_cmp(&xs, &ys) == Less && limbs_cmp(&ys, &zs) == Less {
+            assert_eq!(limbs_cmp(&xs, &zs), Less);
+        } else if limbs_cmp(&xs, &ys) == Greater && limbs_cmp(&ys, &zs) == Greater {
+            assert_eq!(limbs_cmp(&xs, &zs), Greater);
         }
     });
 }
@@ -222,12 +218,12 @@ fn cmp_properties() {
         assert_eq!(BigUint::from(&x).cmp(&BigUint::from(&y)), cmp);
         assert_eq!(rug::Integer::from(&x).cmp(&rug::Integer::from(&y)), cmp);
         assert_eq!(y.cmp(&x).reverse(), cmp);
-        assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
+        assert_eq!(x == y, x.cmp(&y) == Equal);
         assert_eq!((-y).cmp(&(-x)), cmp);
     });
 
     natural_gen().test_properties(|x| {
-        assert_eq!(x.cmp(&x), Ordering::Equal);
+        assert_eq!(x.cmp(&x), Equal);
         assert!(x >= Natural::ZERO);
     });
 
@@ -253,16 +249,14 @@ fn cmp_normalized_properties() {
     });
 
     natural_gen_var_2().test_properties(|x| {
-        assert_eq!(x.cmp_normalized(&x), Ordering::Equal);
+        assert_eq!(x.cmp_normalized(&x), Equal);
     });
 
     natural_triple_gen_var_6().test_properties(|(x, y, z)| {
-        if x.cmp_normalized(&y) == Ordering::Less && y.cmp_normalized(&z) == Ordering::Less {
-            assert_eq!(x.cmp_normalized(&z), Ordering::Less);
-        } else if x.cmp_normalized(&y) == Ordering::Greater
-            && y.cmp_normalized(&z) == Ordering::Greater
-        {
-            assert_eq!(x.cmp_normalized(&z), Ordering::Greater);
+        if x.cmp_normalized(&y) == Less && y.cmp_normalized(&z) == Less {
+            assert_eq!(x.cmp_normalized(&z), Less);
+        } else if x.cmp_normalized(&y) == Greater && y.cmp_normalized(&z) == Greater {
+            assert_eq!(x.cmp_normalized(&z), Greater);
         }
     });
 }

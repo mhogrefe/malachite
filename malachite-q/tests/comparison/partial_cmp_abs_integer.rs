@@ -14,7 +14,7 @@ use malachite_q::test_util::generators::{
     rational_rational_integer_triple_gen,
 };
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 
 #[test]
@@ -34,49 +34,25 @@ fn test_partial_cmp_abs_rational_integer() {
         assert_eq!(le, v.ge_abs(&u));
         assert_eq!(ge, v.le_abs(&u));
     };
-    test("0", "0", Some(Ordering::Equal), false, false, true, true);
-    test("0", "5", Some(Ordering::Less), true, false, true, false);
+    test("0", "0", Some(Equal), false, false, true, true);
+    test("0", "5", Some(Less), true, false, true, false);
+    test("123", "123", Some(Equal), false, false, true, true);
+    test("123", "124", Some(Less), true, false, true, false);
+    test("123", "122", Some(Greater), false, true, false, true);
     test(
+        "1000000000000",
         "123",
-        "123",
-        Some(Ordering::Equal),
-        false,
-        false,
-        true,
-        true,
-    );
-    test("123", "124", Some(Ordering::Less), true, false, true, false);
-    test(
-        "123",
-        "122",
-        Some(Ordering::Greater),
+        Some(Greater),
         false,
         true,
         false,
         true,
     );
-    test(
-        "1000000000000",
-        "123",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
-    test(
-        "123",
-        "1000000000000",
-        Some(Ordering::Less),
-        true,
-        false,
-        true,
-        false,
-    );
+    test("123", "1000000000000", Some(Less), true, false, true, false);
     test(
         "1000000000000",
         "1000000000000",
-        Some(Ordering::Equal),
+        Some(Equal),
         false,
         false,
         true,
@@ -85,7 +61,7 @@ fn test_partial_cmp_abs_rational_integer() {
     test(
         "-1000000000000",
         "1000000000000",
-        Some(Ordering::Equal),
+        Some(Equal),
         false,
         false,
         true,
@@ -94,45 +70,21 @@ fn test_partial_cmp_abs_rational_integer() {
     test(
         "-1000000000000",
         "0",
-        Some(Ordering::Greater),
+        Some(Greater),
         false,
         true,
         false,
         true,
     );
 
-    test("0", "-5", Some(Ordering::Less), true, false, true, false);
-    test(
-        "-123",
-        "-123",
-        Some(Ordering::Equal),
-        false,
-        false,
-        true,
-        true,
-    );
-    test(
-        "-123",
-        "-124",
-        Some(Ordering::Less),
-        true,
-        false,
-        true,
-        false,
-    );
-    test(
-        "-123",
-        "-122",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
+    test("0", "-5", Some(Less), true, false, true, false);
+    test("-123", "-123", Some(Equal), false, false, true, true);
+    test("-123", "-124", Some(Less), true, false, true, false);
+    test("-123", "-122", Some(Greater), false, true, false, true);
     test(
         "-1000000000000",
         "-123",
-        Some(Ordering::Greater),
+        Some(Greater),
         false,
         true,
         false,
@@ -141,7 +93,7 @@ fn test_partial_cmp_abs_rational_integer() {
     test(
         "-123",
         "-1000000000000",
-        Some(Ordering::Less),
+        Some(Less),
         true,
         false,
         true,
@@ -150,7 +102,7 @@ fn test_partial_cmp_abs_rational_integer() {
     test(
         "-1000000000000",
         "-1000000000000",
-        Some(Ordering::Equal),
+        Some(Equal),
         false,
         false,
         true,
@@ -159,7 +111,7 @@ fn test_partial_cmp_abs_rational_integer() {
     test(
         "1000000000000",
         "-1000000000000",
-        Some(Ordering::Equal),
+        Some(Equal),
         false,
         false,
         true,
@@ -168,77 +120,21 @@ fn test_partial_cmp_abs_rational_integer() {
     test(
         "1000000000000",
         "0",
-        Some(Ordering::Greater),
+        Some(Greater),
         false,
         true,
         false,
         true,
     );
 
-    test(
-        "99/100",
-        "1",
-        Some(Ordering::Less),
-        true,
-        false,
-        true,
-        false,
-    );
-    test(
-        "101/100",
-        "1",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
-    test(
-        "22/7",
-        "3",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
-    test("22/7", "4", Some(Ordering::Less), true, false, true, false);
-    test(
-        "-99/100",
-        "-1",
-        Some(Ordering::Less),
-        true,
-        false,
-        true,
-        false,
-    );
-    test(
-        "-101/100",
-        "-1",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
-    test(
-        "-22/7",
-        "-3",
-        Some(Ordering::Greater),
-        false,
-        true,
-        false,
-        true,
-    );
-    test(
-        "-22/7",
-        "-4",
-        Some(Ordering::Less),
-        true,
-        false,
-        true,
-        false,
-    );
+    test("99/100", "1", Some(Less), true, false, true, false);
+    test("101/100", "1", Some(Greater), false, true, false, true);
+    test("22/7", "3", Some(Greater), false, true, false, true);
+    test("22/7", "4", Some(Less), true, false, true, false);
+    test("-99/100", "-1", Some(Less), true, false, true, false);
+    test("-101/100", "-1", Some(Greater), false, true, false, true);
+    test("-22/7", "-3", Some(Greater), false, true, false, true);
+    test("-22/7", "-4", Some(Less), true, false, true, false);
 }
 
 #[test]

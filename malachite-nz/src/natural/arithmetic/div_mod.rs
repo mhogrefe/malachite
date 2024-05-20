@@ -4,7 +4,7 @@
 //
 //      `mpn_dcpi1_div_qr`, `mpn_dcpi1_div_qr_n`, `mpn_preinv_mu_div_qr_itch`,
 //      `mpn_preinv_mu_div_qr`, `mpn_mu_div_qr_choose_in`, `mpn_mu_div_qr2`, `mpn_mu_div_qr`,
-//      `mpn_mu_div_qr_itch`, and `mpn_sbpi1_div_qr` contributed to the GNU project by Torbjorn
+//      `mpn_mu_div_qr_itch`, and `mpn_sbpi1_div_qr` contributed to the GNU project by Torbjörn
 //      Granlund.
 //
 //      `mpn_invertappr`, `mpn_bc_invertappr`, and `mpn_ni_invertappr` contributed to the GNU
@@ -56,7 +56,7 @@ use crate::platform::{
     INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::{min, Ordering};
+use core::cmp::{min, Ordering::*};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
@@ -576,7 +576,7 @@ pub_crate_test! {limbs_div_mod_schoolbook(
     let ds_except_last = &ds[..d_len - 1];
     let ds_except_last_two = &ds[..d_len - 2];
     let ns_hi = &mut ns[n_len - d_len..];
-    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal;
+    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Equal;
     if highest_q {
         limbs_sub_same_length_in_place_left(ns_hi, ds);
     }
@@ -753,7 +753,7 @@ pub_test! {limbs_div_mod_divide_and_conquer(
             // Handle highest_q up front, for simplicity.
             let ns_hi = &mut ns[q_len - 1..];
             let ns_hi_hi = &mut ns_hi[1..];
-            highest_q = limbs_cmp_same_length(ns_hi_hi, ds) >= Ordering::Equal;
+            highest_q = limbs_cmp_same_length(ns_hi_hi, ds) >= Equal;
             if highest_q {
                 assert!(!limbs_sub_same_length_in_place_left(ns_hi_hi, ds));
             }
@@ -1052,13 +1052,13 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
                 assert!(limbs_sub_same_length_in_place_left(scratch_lo, ds_hi));
             }
             // 1 <= carry <= 3 here.
-            if limbs_cmp_same_length(scratch_lo, ds_hi) == Ordering::Greater {
+            if limbs_cmp_same_length(scratch_lo, ds_hi) == Greater {
                 assert!(!limbs_sub_same_length_in_place_left(scratch_lo, ds_hi));
                 carry += 1;
             }
             let (scratch_lo, scratch_mid) = scratch_lo.split_at_mut(diff);
             let (ds_hi_lo, ds_hi_hi) = ds_hi.split_at(diff);
-            let borrow = limbs_cmp_same_length(scratch_lo, ds_hi_lo) == Ordering::Greater;
+            let borrow = limbs_cmp_same_length(scratch_lo, ds_hi_lo) == Greater;
             assert!(!limbs_sub_same_length_with_borrow_in_to_out(
                 &mut scratch_hi[diff..],
                 ds_hi_hi,
@@ -1179,7 +1179,7 @@ pub_crate_test! {limbs_div_barrett_large_product(
     if d_len + i_len > scratch_len {
         let (rs_hi_lo, rs_hi_hi) = rs_hi.split_at(scratch_len - d_len);
         let carry_1 = limbs_sub_greater_in_place_left(scratch, rs_hi_hi);
-        let carry_2 = limbs_cmp_same_length(rs_hi_lo, &scratch[d_len..]) == Ordering::Less;
+        let carry_2 = limbs_cmp_same_length(rs_hi_lo, &scratch[d_len..]) == Less;
         if !carry_1 && carry_2 {
             assert!(!limbs_slice_add_limb_in_place(scratch, 1));
         } else {
@@ -1211,7 +1211,7 @@ fn limbs_div_mod_barrett_preinverted(
     let q_len = n_len - d_len;
     let qs = &mut qs[..q_len];
     let (ns_lo, ns_hi) = ns.split_at(q_len);
-    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal;
+    let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Equal;
     if highest_q {
         limbs_sub_same_length_to_out(rs, ns_hi, ds);
     } else {
@@ -1281,7 +1281,7 @@ fn limbs_div_mod_barrett_preinverted(
                 r -= 1;
             }
         }
-        if limbs_cmp_same_length(rs, ds) >= Ordering::Equal {
+        if limbs_cmp_same_length(rs, ds) >= Equal {
             // This is executed with about 76% probability.
             assert!(!limbs_slice_add_limb_in_place(qs, 1));
             limbs_sub_same_length_in_place_left(rs, ds);
@@ -1934,18 +1934,25 @@ impl DivMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(Natural::from(23u32).div_mod(Natural::from(10u32)).to_debug_string(), "(2, 3)");
+    /// assert_eq!(
+    ///     Natural::from(23u32)
+    ///         .div_mod(Natural::from(10u32))
+    ///         .to_debug_string(),
+    ///     "(2, 3)"
+    /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .div_mod(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .div_mod(Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -1983,21 +1990,25 @@ impl<'a> DivMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     Natural::from(23u32).div_mod(&Natural::from(10u32)).to_debug_string(),
+    ///     Natural::from(23u32)
+    ///         .div_mod(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .div_mod(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .div_mod(&Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2035,21 +2046,24 @@ impl<'a> DivMod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).div_mod(Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .div_mod(Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .div_mod(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///         .div_mod(Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2105,21 +2119,24 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).div_mod(&Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .div_mod(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .div_mod(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///         .div_mod(&Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2178,9 +2195,9 @@ impl DivAssignMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2189,7 +2206,10 @@ impl DivAssignMod<Natural> for Natural {
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    /// assert_eq!(x.div_assign_mod(Natural::from_str("1234567890987").unwrap()), 530068894399u64);
+    /// assert_eq!(
+    ///     x.div_assign_mod(Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
+    /// );
     /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
@@ -2252,9 +2272,9 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2328,18 +2348,25 @@ impl DivRem<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(Natural::from(23u32).div_rem(Natural::from(10u32)).to_debug_string(), "(2, 3)");
+    /// assert_eq!(
+    ///     Natural::from(23u32)
+    ///         .div_rem(Natural::from(10u32))
+    ///         .to_debug_string(),
+    ///     "(2, 3)"
+    /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .div_rem(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .div_rem(Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2378,21 +2405,25 @@ impl<'a> DivRem<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     Natural::from(23u32).div_rem(&Natural::from(10u32)).to_debug_string(),
+    ///     Natural::from(23u32)
+    ///         .div_rem(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .div_rem(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .div_rem(&Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2431,21 +2462,24 @@ impl<'a> DivRem<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).div_rem(Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .div_rem(Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .div_rem(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///         .div_rem(Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2484,21 +2518,24 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).div_rem(&Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .div_rem(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .div_rem(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///         .div_rem(&Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
@@ -2538,9 +2575,9 @@ impl DivAssignRem<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2549,7 +2586,10 @@ impl DivAssignRem<Natural> for Natural {
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    /// assert_eq!(x.div_assign_rem(Natural::from_str("1234567890987").unwrap()), 530068894399u64);
+    /// assert_eq!(
+    ///     x.div_assign_rem(Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
+    /// );
     /// assert_eq!(x, 810000006723u64);
     /// ```
     #[inline]
@@ -2589,9 +2629,9 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2639,22 +2679,25 @@ impl CeilingDivNegMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     Natural::from(23u32).ceiling_div_neg_mod(Natural::from(10u32)).to_debug_string(),
+    ///     Natural::from(23u32)
+    ///         .ceiling_div_neg_mod(Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())
-    ///             .to_debug_string(),
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006724, 704498996588)"
     /// );
     /// ```
@@ -2692,22 +2735,25 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     Natural::from(23u32).ceiling_div_neg_mod(&Natural::from(10u32)).to_debug_string(),
+    ///     Natural::from(23u32)
+    ///         .ceiling_div_neg_mod(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000000000000000").unwrap()
-    ///             .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())
-    ///             .to_debug_string(),
+    ///     Natural::from_str("1000000000000000000000000")
+    ///         .unwrap()
+    ///         .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006724, 704498996588)"
     /// );
     /// ```
@@ -2745,22 +2791,24 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).ceiling_div_neg_mod(Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .ceiling_div_neg_mod(Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())
-    ///             .to_debug_string(),
+    ///         .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006724, 704498996588)"
     /// );
     /// ```
@@ -2801,22 +2849,24 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     (&Natural::from(23u32)).ceiling_div_neg_mod(&Natural::from(10u32)).to_debug_string(),
+    ///     (&Natural::from(23u32))
+    ///         .ceiling_div_neg_mod(&Natural::from(10u32))
+    ///         .to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
     ///     (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///             .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())
-    ///             .to_debug_string(),
+    ///         .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())
+    ///         .to_debug_string(),
     ///     "(810000006724, 704498996588)"
     /// );
     /// ```
@@ -2858,9 +2908,9 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);
@@ -2914,9 +2964,9 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
-    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);

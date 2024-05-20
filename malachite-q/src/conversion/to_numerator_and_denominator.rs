@@ -72,11 +72,17 @@ impl Rational {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Rational::from_str("2/3").unwrap().to_numerator_and_denominator().to_debug_string(),
+    ///     Rational::from_str("2/3")
+    ///         .unwrap()
+    ///         .to_numerator_and_denominator()
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     /// assert_eq!(
-    ///     Rational::from_str("0").unwrap().to_numerator_and_denominator().to_debug_string(),
+    ///     Rational::from_str("0")
+    ///         .unwrap()
+    ///         .to_numerator_and_denominator()
+    ///         .to_debug_string(),
     ///     "(0, 1)"
     /// );
     /// ```
@@ -135,11 +141,17 @@ impl Rational {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Rational::from_str("2/3").unwrap().into_numerator_and_denominator().to_debug_string(),
+    ///     Rational::from_str("2/3")
+    ///         .unwrap()
+    ///         .into_numerator_and_denominator()
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     /// assert_eq!(
-    ///     Rational::from_str("0").unwrap().into_numerator_and_denominator().to_debug_string(),
+    ///     Rational::from_str("0")
+    ///         .unwrap()
+    ///         .into_numerator_and_denominator()
+    ///         .to_debug_string(),
     ///     "(0, 1)"
     /// );
     /// ```
@@ -197,11 +209,17 @@ impl Rational {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Rational::from_str("2/3").unwrap().numerator_and_denominator_ref().to_debug_string(),
+    ///     Rational::from_str("2/3")
+    ///         .unwrap()
+    ///         .numerator_and_denominator_ref()
+    ///         .to_debug_string(),
     ///     "(2, 3)"
     /// );
     /// assert_eq!(
-    ///     Rational::from_str("0").unwrap().numerator_and_denominator_ref().to_debug_string(),
+    ///     Rational::from_str("0")
+    ///         .unwrap()
+    ///         .numerator_and_denominator_ref()
+    ///         .to_debug_string(),
     ///     "(0, 1)"
     /// );
     /// ```

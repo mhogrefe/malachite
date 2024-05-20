@@ -18,7 +18,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
 
@@ -123,11 +123,7 @@ pub(crate) fn limbs_assign_bits_helper(
 ) {
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
     let small_end = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
-    let width = usize::exact_from(
-        (end - start)
-            .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
-            .0,
-    );
+    let width = usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if width < bits.len() {
         bits = &bits[..width];
     }
@@ -212,9 +208,18 @@ impl BitBlockAccess for Natural {
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(16, 48), 0xef011234u32);
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(4, 16), 0x567u32);
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(0, 100), 0xabcdef0112345678u64);
+    /// assert_eq!(
+    ///     Natural::from(0xabcdef0112345678u64).get_bits(16, 48),
+    ///     0xef011234u32
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(0xabcdef0112345678u64).get_bits(4, 16),
+    ///     0x567u32
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(0xabcdef0112345678u64).get_bits(0, 100),
+    ///     0xabcdef0112345678u64
+    /// );
     /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(10, 10), 0);
     /// ```
     fn get_bits(&self, start: u64, end: u64) -> Natural {
@@ -257,13 +262,22 @@ impl BitBlockAccess for Natural {
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(16, 48), 0xef011234u32);
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(4, 16), 0x567u32);
+    /// assert_eq!(
+    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(16, 48),
+    ///     0xef011234u32
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(4, 16),
+    ///     0x567u32
+    /// );
     /// assert_eq!(
     ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(0, 100),
     ///     0xabcdef0112345678u64
     /// );
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(10, 10), 0);
+    /// assert_eq!(
+    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(10, 10),
+    ///     0
+    /// );
     /// ```
     fn get_bits_owned(self, start: u64, end: u64) -> Natural {
         match self {

@@ -15,7 +15,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_q::test_util::bench::bucketers::pair_1_rational_bit_bucketer;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_rational_partial_cmp_abs_float);
@@ -38,9 +38,9 @@ fn demo_rational_partial_cmp_abs_float<T: PrimitiveFloat>(
     {
         match n.partial_cmp_abs(&f) {
             None => println!("{} is not comparable with {}", n, NiceFloat(f)),
-            Some(Ordering::Less) => println!("|{}| < |{}|", n, NiceFloat(f)),
-            Some(Ordering::Equal) => println!("|{}| = |{}|", n, NiceFloat(f)),
-            Some(Ordering::Greater) => println!("|{}| > |{}|", n, NiceFloat(f)),
+            Some(Less) => println!("|{}| < |{}|", n, NiceFloat(f)),
+            Some(Equal) => println!("|{}| = |{}|", n, NiceFloat(f)),
+            Some(Greater) => println!("|{}| > |{}|", n, NiceFloat(f)),
         }
     }
 }
@@ -56,9 +56,9 @@ fn demo_float_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveFlo
     {
         match f.partial_cmp_abs(&n) {
             None => println!("{} is not comparable with {}", NiceFloat(f), n),
-            Some(Ordering::Less) => println!("|{}| < |{}|", NiceFloat(f), n),
-            Some(Ordering::Equal) => println!("|{}| = |{}|", NiceFloat(f), n),
-            Some(Ordering::Greater) => println!("|{}| > |{}|", NiceFloat(f), n),
+            Some(Less) => println!("|{}| < |{}|", NiceFloat(f), n),
+            Some(Equal) => println!("|{}| = |{}|", NiceFloat(f), n),
+            Some(Greater) => println!("|{}| > |{}|", NiceFloat(f), n),
         }
     }
 }

@@ -8,12 +8,12 @@
 
 use crate::InnerFloat::{Finite, Infinity, Zero};
 use crate::{significand_bits, Float};
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 
 impl RoundingFrom<Float> for Natural {
@@ -44,46 +44,42 @@ impl RoundingFrom<Float> for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::NegativeInfinity;
     /// use malachite_base::num::conversion::traits::RoundingFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(Float::from(1.5), RoundingMode::Floor).to_debug_string(),
+    ///     Natural::rounding_from(Float::from(1.5), Floor).to_debug_string(),
     ///     "(1, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Float::from(1.5), RoundingMode::Ceiling).to_debug_string(),
+    ///     Natural::rounding_from(Float::from(1.5), Ceiling).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Float::from(1.5), RoundingMode::Nearest).to_debug_string(),
+    ///     Natural::rounding_from(Float::from(1.5), Nearest).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(Float::NEGATIVE_INFINITY, RoundingMode::Down).to_debug_string(),
+    ///     Natural::rounding_from(Float::NEGATIVE_INFINITY, Down).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Float::NEGATIVE_INFINITY, RoundingMode::Ceiling)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Float::NEGATIVE_INFINITY, Ceiling).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(Float::NEGATIVE_INFINITY, RoundingMode::Nearest)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(Float::NEGATIVE_INFINITY, Nearest).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// ```
     fn rounding_from(f: Float, rm: RoundingMode) -> (Natural, Ordering) {
         match f {
-            float_either_zero!() => (Natural::ZERO, Ordering::Equal),
+            float_either_zero!() => (Natural::ZERO, Equal),
             float_negative_infinity!() => match rm {
-                RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                    (Natural::ZERO, Ordering::Greater)
-                }
+                Ceiling | Down | Nearest => (Natural::ZERO, Greater),
                 _ => panic!("Can't convert -Infinity to Natural using {rm}"),
             },
             Float(Finite {
@@ -94,20 +90,14 @@ impl RoundingFrom<Float> for Natural {
             }) => {
                 if !sign {
                     match rm {
-                        RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                            (Natural::ZERO, Ordering::Greater)
-                        }
+                        Ceiling | Down | Nearest => (Natural::ZERO, Greater),
                         _ => panic!("Cannot convert negative number to Natural using {rm}"),
                     }
                 } else if exponent < 0 {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (Natural::ZERO, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (Natural::ONE, Ordering::Greater)
-                        }
-                        RoundingMode::Exact => panic!("Cannot convert Float to Natural using {rm}"),
+                        Floor | Down | Nearest => (Natural::ZERO, Less),
+                        Ceiling | Up => (Natural::ONE, Greater),
+                        Exact => panic!("Cannot convert Float to Natural using {rm}"),
                     }
                 } else {
                     let sb = significand_bits(&significand);
@@ -115,7 +105,7 @@ impl RoundingFrom<Float> for Natural {
                     if sb >= eb {
                         significand.shr_round(sb - eb, rm)
                     } else {
-                        (significand << (eb - sb), Ordering::Equal)
+                        (significand << (eb - sb), Equal)
                     }
                 }
             }
@@ -152,47 +142,42 @@ impl<'a> RoundingFrom<&'a Float> for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::NegativeInfinity;
     /// use malachite_base::num::conversion::traits::RoundingFrom;
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(&Float::from(1.5), RoundingMode::Floor).to_debug_string(),
+    ///     Natural::rounding_from(&Float::from(1.5), Floor).to_debug_string(),
     ///     "(1, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Float::from(1.5), RoundingMode::Ceiling).to_debug_string(),
+    ///     Natural::rounding_from(&Float::from(1.5), Ceiling).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Float::from(1.5), RoundingMode::Nearest).to_debug_string(),
+    ///     Natural::rounding_from(&Float::from(1.5), Nearest).to_debug_string(),
     ///     "(2, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     Natural::rounding_from(&Float::NEGATIVE_INFINITY, RoundingMode::Down)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Float::NEGATIVE_INFINITY, Down).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Float::NEGATIVE_INFINITY, RoundingMode::Ceiling)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Float::NEGATIVE_INFINITY, Ceiling).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::rounding_from(&Float::NEGATIVE_INFINITY, RoundingMode::Nearest)
-    ///         .to_debug_string(),
+    ///     Natural::rounding_from(&Float::NEGATIVE_INFINITY, Nearest).to_debug_string(),
     ///     "(0, Greater)"
     /// );
     /// ```
     fn rounding_from(f: &'a Float, rm: RoundingMode) -> (Natural, Ordering) {
         match f {
-            float_either_zero!() => (Natural::ZERO, Ordering::Equal),
+            float_either_zero!() => (Natural::ZERO, Equal),
             float_negative_infinity!() => match rm {
-                RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                    (Natural::ZERO, Ordering::Greater)
-                }
+                Ceiling | Down | Nearest => (Natural::ZERO, Greater),
                 _ => panic!("Can't convert -Infinity to Natural using {rm}"),
             },
             Float(Finite {
@@ -203,20 +188,14 @@ impl<'a> RoundingFrom<&'a Float> for Natural {
             }) => {
                 if !sign {
                     match rm {
-                        RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
-                            (Natural::ZERO, Ordering::Greater)
-                        }
+                        Ceiling | Down | Nearest => (Natural::ZERO, Greater),
                         _ => panic!("Cannot convert -Infinity to Natural using {rm}"),
                     }
                 } else if *exponent < 0 {
                     match rm {
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            (Natural::ZERO, Ordering::Less)
-                        }
-                        RoundingMode::Ceiling | RoundingMode::Up => {
-                            (Natural::ONE, Ordering::Greater)
-                        }
-                        RoundingMode::Exact => panic!("Cannot convert Float to Natural using {rm}"),
+                        Floor | Down | Nearest => (Natural::ZERO, Less),
+                        Ceiling | Up => (Natural::ONE, Greater),
+                        Exact => panic!("Cannot convert Float to Natural using {rm}"),
                     }
                 } else {
                     let sb = significand_bits(significand);
@@ -224,7 +203,7 @@ impl<'a> RoundingFrom<&'a Float> for Natural {
                     if sb >= eb {
                         significand.shr_round(sb - eb, rm)
                     } else {
-                        (significand << (eb - sb), Ordering::Equal)
+                        (significand << (eb - sb), Equal)
                     }
                 }
             }
@@ -259,7 +238,10 @@ impl TryFrom<Float> for Natural {
     /// assert_eq!(Natural::try_from(Float::from(123.0)).unwrap(), 123);
     ///
     /// assert_eq!(Natural::try_from(Float::from(-123.0)), Err(FloatNegative));
-    /// assert_eq!(Natural::try_from(Float::from(1.5)), Err(FloatNonIntegerOrOutOfRange));
+    /// assert_eq!(
+    ///     Natural::try_from(Float::from(1.5)),
+    ///     Err(FloatNonIntegerOrOutOfRange)
+    /// );
     /// assert_eq!(Natural::try_from(Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Natural::try_from(Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
@@ -322,7 +304,10 @@ impl<'a> TryFrom<&'a Float> for Natural {
     /// assert_eq!(Natural::try_from(&Float::from(123.0)).unwrap(), 123);
     ///
     /// assert_eq!(Natural::try_from(&Float::from(-123.0)), Err(FloatNegative));
-    /// assert_eq!(Natural::try_from(&Float::from(1.5)), Err(FloatNonIntegerOrOutOfRange));
+    /// assert_eq!(
+    ///     Natural::try_from(&Float::from(1.5)),
+    ///     Err(FloatNonIntegerOrOutOfRange)
+    /// );
     /// assert_eq!(Natural::try_from(&Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Natural::try_from(&Float::NAN), Err(FloatInfiniteOrNan));
     /// ```

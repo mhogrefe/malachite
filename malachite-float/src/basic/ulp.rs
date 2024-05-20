@@ -46,7 +46,6 @@ impl Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeOne, One, Zero};
-    /// use malachite_nz::natural::Natural;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::NAN.ulp(), None);
@@ -59,7 +58,9 @@ impl Float {
     /// let s = Float::one_prec(100).ulp().map(|x| x.to_string());
     /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("2.0e-30"));
     ///
-    /// let s = Float::from(std::f64::consts::PI).ulp().map(|x| x.to_string());
+    /// let s = Float::from(std::f64::consts::PI)
+    ///     .ulp()
+    ///     .map(|x| x.to_string());
     /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("4.0e-16"));
     ///
     /// let s = Float::power_of_2(100u64).ulp().map(|x| x.to_string());
@@ -100,8 +101,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeOne, One, Zero};
-    /// use malachite_nz::natural::Natural;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::ONE;
@@ -185,8 +185,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeOne, One, Zero};
-    /// use malachite_nz::natural::Natural;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::ONE;

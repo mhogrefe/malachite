@@ -173,8 +173,8 @@ impl BitAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;

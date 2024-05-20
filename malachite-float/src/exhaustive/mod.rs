@@ -87,13 +87,17 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponentAndPrecision {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_positive_floats_with_sci_exponent_and_precision(0, 4)
-///         .map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &["1.0#4", "1.1#4", "1.2#4", "1.4#4", "1.5#4", "1.6#4", "1.8#4", "1.9#4"]
 /// );
 ///
 /// assert_eq!(
 ///     exhaustive_positive_floats_with_sci_exponent_and_precision(2, 5)
-///         .map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "4.0#5", "4.2#5", "4.5#5", "4.8#5", "5.0#5", "5.2#5", "5.5#5", "5.8#5", "6.0#5",
 ///         "6.2#5", "6.5#5", "6.8#5", "7.0#5", "7.2#5", "7.5#5", "7.8#5"
@@ -204,7 +208,10 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponent {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_positive_floats_with_sci_exponent(0)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "1.0#1", "1.0#2", "1.5#2", "1.0#3", "1.2#3", "1.5#3", "1.8#3", "1.0#4", "1.1#4",
 ///         "1.2#4", "1.4#4", "1.5#4", "1.6#4", "1.8#4", "1.9#4", "1.0#5", "1.06#5", "1.12#5",
@@ -214,7 +221,10 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponent {
 ///
 /// assert_eq!(
 ///     exhaustive_positive_floats_with_sci_exponent(2)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "4.0#1", "4.0#2", "6.0#2", "4.0#3", "5.0#3", "6.0#3", "7.0#3", "4.0#4", "4.5#4",
 ///         "5.0#4", "5.5#4", "6.0#4", "6.5#4", "7.0#4", "7.5#4", "4.0#5", "4.2#5", "4.5#5",
@@ -317,7 +327,10 @@ impl Iterator for ExhaustivePositiveFloatsWithPrecision {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_positive_floats_with_precision(1)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "1.0#1", "2.0#1", "0.5#1", "0.2#1", "4.0#1", "8.0#1", "0.1#1", "3.0e1#1", "2.0e1#1",
 ///         "0.06#1", "0.03#1", "0.02#1", "6.0e1#1", "1.0e2#1", "0.008#1", "0.002#1", "3.0e2#1",
@@ -327,7 +340,10 @@ impl Iterator for ExhaustivePositiveFloatsWithPrecision {
 ///
 /// assert_eq!(
 ///     exhaustive_positive_floats_with_precision(10)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "1.0#10", "2.0#10", "1.002#10", "0.5#10", "1.004#10", "2.004#10", "1.006#10", "4.0#10",
 ///         "1.008#10", "2.008#10", "1.01#10", "0.501#10", "1.012#10", "2.012#10", "1.014#10",
@@ -393,7 +409,10 @@ impl Iterator for ExhaustiveFloatsWithPrecision {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_floats_with_precision(1)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "0.5#1", "-0.5#1", "0.2#1", "-0.2#1", "4.0#1",
 ///         "-4.0#1", "8.0#1", "-8.0#1", "0.1#1", "-0.1#1", "3.0e1#1", "-3.0e1#1", "2.0e1#1",
@@ -403,11 +422,31 @@ impl Iterator for ExhaustiveFloatsWithPrecision {
 ///
 /// assert_eq!(
 ///     exhaustive_floats_with_precision(10)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
-///         "1.0#10", "-1.0#10", "2.0#10", "-2.0#10", "1.002#10", "-1.002#10", "0.5#10", "-0.5#10",
-///         "1.004#10", "-1.004#10", "2.004#10", "-2.004#10", "1.006#10", "-1.006#10", "4.0#10",
-///         "-4.0#10", "1.008#10", "-1.008#10", "2.008#10", "-2.008#10"
+///         "1.0#10",
+///         "-1.0#10",
+///         "2.0#10",
+///         "-2.0#10",
+///         "1.002#10",
+///         "-1.002#10",
+///         "0.5#10",
+///         "-0.5#10",
+///         "1.004#10",
+///         "-1.004#10",
+///         "2.004#10",
+///         "-2.004#10",
+///         "1.006#10",
+///         "-1.006#10",
+///         "4.0#10",
+///         "-4.0#10",
+///         "1.008#10",
+///         "-1.008#10",
+///         "2.008#10",
+///         "-2.008#10"
 ///     ]
 /// );
 /// ```
@@ -492,7 +531,10 @@ impl Iterator for ExhaustivePositiveFiniteFloats {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_positive_finite_floats()
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "1.0#1", "2.0#1", "1.0#2", "0.5#1", "1.5#2", "2.0#2", "1.0#3", "4.0#1", "1.2#3",
 ///         "3.0#2", "1.5#3", "0.5#2", "1.8#3", "2.0#3", "1.0#4", "0.2#1", "1.1#4", "2.5#3",
@@ -540,7 +582,10 @@ impl Iterator for ExhaustiveNegativeFiniteFloats {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_negative_finite_floats()
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "-1.0#1", "-2.0#1", "-1.0#2", "-0.5#1", "-1.5#2", "-2.0#2", "-1.0#3", "-4.0#1",
 ///         "-1.2#3", "-3.0#2", "-1.5#3", "-0.5#2", "-1.8#3", "-2.0#3", "-1.0#4", "-0.2#1",
@@ -600,7 +645,10 @@ impl Iterator for ExhaustiveNonzeroFiniteFloats {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_nonzero_finite_floats()
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "0.5#1", "-0.5#1", "1.5#2",
 ///         "-1.5#2", "2.0#2", "-2.0#2", "1.0#3", "-1.0#3", "4.0#1", "-4.0#1", "1.2#3", "-1.2#3",
@@ -638,7 +686,10 @@ type ExhaustiveNonNegativeFiniteFloats = Chain<Once<Float>, ExhaustivePositiveFi
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_non_negative_finite_floats()
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "0.0", "1.0#1", "2.0#1", "1.0#2", "0.5#1", "1.5#2", "2.0#2", "1.0#3", "4.0#1", "1.2#3",
 ///         "3.0#2", "1.5#3", "0.5#2", "1.8#3", "2.0#3", "1.0#4", "0.2#1", "1.1#4", "2.5#3",
@@ -672,7 +723,10 @@ type ExhaustiveNonPositiveFiniteFloats = Chain<Once<Float>, ExhaustiveNegativeFi
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_non_positive_finite_floats()
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "-0.0", "-1.0#1", "-2.0#1", "-1.0#2", "-0.5#1", "-1.5#2", "-2.0#2", "-1.0#3", "-4.0#1",
 ///         "-1.2#3", "-3.0#2", "-1.5#3", "-0.5#2", "-1.8#3", "-2.0#3", "-1.0#4", "-0.2#1",
@@ -704,7 +758,10 @@ type ExhaustiveFloats = Chain<IntoIter<Float>, ExhaustiveNonzeroFiniteFloats>;
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_finite_floats()
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
 ///         "0.0", "-0.0", "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "0.5#1",
 ///         "-0.5#1", "1.5#2", "-1.5#2", "2.0#2", "-2.0#2", "1.0#3", "-1.0#3", "4.0#1", "-4.0#1",
@@ -736,14 +793,61 @@ pub fn exhaustive_finite_floats() -> ExhaustiveFloats {
 /// // The number after the '#' is the precision.
 /// assert_eq!(
 ///     exhaustive_floats()
-///         .take(50).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///         .take(50)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
-///         "NaN", "Infinity", "-Infinity", "0.0", "-0.0", "1.0#1", "-1.0#1", "2.0#1", "-2.0#1",
-///         "1.0#2", "-1.0#2", "0.5#1", "-0.5#1", "1.5#2", "-1.5#2", "2.0#2", "-2.0#2", "1.0#3",
-///         "-1.0#3", "4.0#1", "-4.0#1", "1.2#3", "-1.2#3", "3.0#2", "-3.0#2", "1.5#3", "-1.5#3",
-///         "0.5#2", "-0.5#2", "1.8#3", "-1.8#3", "2.0#3", "-2.0#3", "1.0#4", "-1.0#4", "0.2#1",
-///         "-0.2#1", "1.1#4", "-1.1#4", "2.5#3", "-2.5#3", "1.2#4", "-1.2#4", "0.8#2", "-0.8#2",
-///         "1.4#4", "-1.4#4", "3.0#3", "-3.0#3", "1.5#4"
+///         "NaN",
+///         "Infinity",
+///         "-Infinity",
+///         "0.0",
+///         "-0.0",
+///         "1.0#1",
+///         "-1.0#1",
+///         "2.0#1",
+///         "-2.0#1",
+///         "1.0#2",
+///         "-1.0#2",
+///         "0.5#1",
+///         "-0.5#1",
+///         "1.5#2",
+///         "-1.5#2",
+///         "2.0#2",
+///         "-2.0#2",
+///         "1.0#3",
+///         "-1.0#3",
+///         "4.0#1",
+///         "-4.0#1",
+///         "1.2#3",
+///         "-1.2#3",
+///         "3.0#2",
+///         "-3.0#2",
+///         "1.5#3",
+///         "-1.5#3",
+///         "0.5#2",
+///         "-0.5#2",
+///         "1.8#3",
+///         "-1.8#3",
+///         "2.0#3",
+///         "-2.0#3",
+///         "1.0#4",
+///         "-1.0#4",
+///         "0.2#1",
+///         "-0.2#1",
+///         "1.1#4",
+///         "-1.1#4",
+///         "2.5#3",
+///         "-2.5#3",
+///         "1.2#4",
+///         "-1.2#4",
+///         "0.8#2",
+///         "-0.8#2",
+///         "1.4#4",
+///         "-1.4#4",
+///         "3.0#3",
+///         "-3.0#3",
+///         "1.5#4"
 ///     ]
 /// );
 /// ```

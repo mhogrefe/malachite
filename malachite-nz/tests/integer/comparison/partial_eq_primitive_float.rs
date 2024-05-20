@@ -14,7 +14,7 @@ use malachite_nz::test_util::generators::{
     integer_primitive_float_pair_gen, natural_primitive_float_pair_gen,
 };
 use rug;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -81,7 +81,7 @@ where
         assert_eq!(rug::Integer::from(&n) == f, eq);
         assert_eq!(f == n, eq);
         assert_eq!(f == rug::Integer::from(&n), eq);
-        assert_eq!(n.partial_cmp(&f) == Some(Ordering::Equal), eq);
+        assert_eq!(n.partial_cmp(&f) == Some(Equal), eq);
         if eq {
             assert!(f.is_integer());
         }

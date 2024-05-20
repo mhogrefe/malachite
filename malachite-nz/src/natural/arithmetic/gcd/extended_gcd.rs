@@ -37,7 +37,7 @@ use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::{max, Ordering};
+use core::cmp::{max, Ordering::*};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -107,10 +107,8 @@ impl<'a> GcdSubdivideStepContext for ExtendedGcdContext<'a> {
             if d == -1 {
                 // Must return the smallest cofactor, +us1 or -us0
                 let c = limbs_cmp_same_length(&self.us0[..us_len], &self.us1[..us_len]);
-                assert!(
-                    c != Ordering::Equal || us_len == 1 && self.us0[0] == 1 && self.us1[0] == 1
-                );
-                d = i8::from(c == Ordering::Less);
+                assert!(c != Equal || us_len == 1 && self.us0[0] == 1 && self.us1[0] == 1);
+                d = i8::from(c == Less);
             }
             let ss = if d == 0 {
                 &mut *self.us1
@@ -269,8 +267,8 @@ fn limbs_extended_gcd_same_length_lehmer<'a>(
         // one.
         gs[0] = xs[0];
         let c = limbs_cmp_same_length(&us0[..us_len], &us1[..us_len]);
-        assert!(c != Ordering::Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
-        let ss_sign = c != Ordering::Less;
+        assert!(c != Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
+        let ss_sign = c != Less;
         let u = if ss_sign { us1 } else { us0 };
         us_len -= slice_trailing_zeros(&u[..us_len]);
         ss[..us_len].copy_from_slice(&u[..us_len]);
@@ -632,15 +630,15 @@ pub fn limbs_extended_gcd(
     // |v| <= a
     // ```
     assert!(*xs.last().unwrap() != 0 || *ys.last().unwrap() != 0);
-    if limbs_cmp_same_length(xs, ys) == Ordering::Equal {
+    if limbs_cmp_same_length(xs, ys) == Equal {
         // Must return the smallest cofactor, +us1 or -us0
         gs[..n].copy_from_slice(xs);
         let c = limbs_cmp_same_length(&us0[..us_len], &us1[..us_len]);
         // c == 0 can happen only when A = (2k+1) G, B = 2 G. And in this case we choose the
         // cofactor + 1, corresponding to G = A - k B, rather than -1, corresponding to G = - A +
         // (k+1) B.
-        assert!(c != Ordering::Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
-        if c == Ordering::Less {
+        assert!(c != Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
+        if c == Less {
             us_len -= slice_trailing_zeros(&us0[..us_len]);
             ss[..us_len].copy_from_slice(&us0[..us_len]);
             ss_sign = false;
@@ -654,7 +652,7 @@ pub fn limbs_extended_gcd(
     } else if us0[0] == 0 && us_len == 1 {
         fail_on_untested_path(
             "limbs_extended_gcd, \
-            limbs_cmp_same_length(..) != Ordering::Equal && us0[0] == 0 && us_len == 1",
+            limbs_cmp_same_length(..) != Equal && us0[0] == 0 && us_len == 1",
         );
         assert_eq!(us1[0], 1);
         // g = u a + v b = (u us1 - v us0) A + (...) B = u A + (...) B
@@ -784,11 +782,15 @@ impl ExtendedGcd for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(3u32).extended_gcd(Natural::from(5u32)).to_debug_string(),
+    ///     Natural::from(3u32)
+    ///         .extended_gcd(Natural::from(5u32))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(240u32).extended_gcd(Natural::from(46u32)).to_debug_string(),
+    ///     Natural::from(240u32)
+    ///         .extended_gcd(Natural::from(46u32))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// ```
@@ -840,11 +842,15 @@ impl<'a> ExtendedGcd<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(3u32).extended_gcd(&Natural::from(5u32)).to_debug_string(),
+    ///     Natural::from(3u32)
+    ///         .extended_gcd(&Natural::from(5u32))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(240u32).extended_gcd(&Natural::from(46u32)).to_debug_string(),
+    ///     Natural::from(240u32)
+    ///         .extended_gcd(&Natural::from(46u32))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// ```
@@ -896,11 +902,15 @@ impl<'a> ExtendedGcd<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(3u32)).extended_gcd(Natural::from(5u32)).to_debug_string(),
+    ///     (&Natural::from(3u32))
+    ///         .extended_gcd(Natural::from(5u32))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(240u32)).extended_gcd(Natural::from(46u32)).to_debug_string(),
+    ///     (&Natural::from(240u32))
+    ///         .extended_gcd(Natural::from(46u32))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// ```
@@ -952,11 +962,15 @@ impl<'a, 'b> ExtendedGcd<&'a Natural> for &'b Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     (&Natural::from(3u32)).extended_gcd(&Natural::from(5u32)).to_debug_string(),
+    ///     (&Natural::from(3u32))
+    ///         .extended_gcd(&Natural::from(5u32))
+    ///         .to_debug_string(),
     ///     "(1, 2, -1)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(240u32)).extended_gcd(&Natural::from(46u32)).to_debug_string(),
+    ///     (&Natural::from(240u32))
+    ///         .extended_gcd(&Natural::from(46u32))
+    ///         .to_debug_string(),
     ///     "(2, -9, 47)"
     /// );
     /// ```

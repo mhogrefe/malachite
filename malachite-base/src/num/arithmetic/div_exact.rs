@@ -26,7 +26,7 @@ macro_rules! impl_div_exact {
             /// If you are unsure whether the division will be exact, use `self / other` instead. If
             /// you're unsure and you want to know, use `self.div_mod(other)` and check whether the
             /// remainder is zero. If you want a function that panics if the division is not exact,
-            /// use `self.div_round(other, RoundingMode::Exact)`.
+            /// use `self.div_round(other, Exact)`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -56,7 +56,7 @@ macro_rules! impl_div_exact {
             /// If you are unsure whether the division will be exact, use `self /= other` instead.
             /// If you're unsure and you want to know, use `self.div_assign_mod(other)` and check
             /// whether the remainder is zero. If you want a function that panics if the division is
-            /// not exact, use `self.div_round_assign(other, RoundingMode::Exact)`.
+            /// not exact, use `self.div_round_assign(other, Exact)`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

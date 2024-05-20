@@ -13,7 +13,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::pair_float_integer_max_complexity_bucketer;
 use malachite_float::test_util::generators::float_integer_pair_gen;
 use malachite_float::ComparableFloatRef;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_partial_cmp_abs_integer);
@@ -29,9 +29,9 @@ fn demo_float_partial_cmp_abs_integer(gm: GenMode, config: &GenConfig, limit: us
     for (x, y) in float_integer_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp_abs(&y) {
             None => println!("|{x}| and |{y}| are incomparable"),
-            Some(Ordering::Less) => println!("|{x}| < |{y}|"),
-            Some(Ordering::Equal) => println!("|{x}| = |{y}|"),
-            Some(Ordering::Greater) => println!("|{x}| > |{y}|"),
+            Some(Less) => println!("|{x}| < |{y}|"),
+            Some(Equal) => println!("|{x}| = |{y}|"),
+            Some(Greater) => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -41,9 +41,9 @@ fn demo_float_partial_cmp_abs_integer_debug(gm: GenMode, config: &GenConfig, lim
         let cx = ComparableFloatRef(&x);
         match x.partial_cmp_abs(&y) {
             None => println!("|{cx:#x}| and {y:#x} are incomparable"),
-            Some(Ordering::Less) => println!("|{cx:#x}| < |{y:#x}|"),
-            Some(Ordering::Equal) => println!("|{cx:#x}| = |{y:#x}|"),
-            Some(Ordering::Greater) => println!("|{cx:#x}| > |{y:#x}|"),
+            Some(Less) => println!("|{cx:#x}| < |{y:#x}|"),
+            Some(Equal) => println!("|{cx:#x}| = |{y:#x}|"),
+            Some(Greater) => println!("|{cx:#x}| > |{y:#x}|"),
         }
     }
 }
@@ -52,9 +52,9 @@ fn demo_integer_partial_cmp_abs_float(gm: GenMode, config: &GenConfig, limit: us
     for (y, x) in float_integer_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp_abs(&y) {
             None => println!("|{x}| and |{y}| are incomparable"),
-            Some(Ordering::Less) => println!("|{x}| < |{y}|"),
-            Some(Ordering::Equal) => println!("|{x}| = |{y}|"),
-            Some(Ordering::Greater) => println!("|{x}| > |{y}|"),
+            Some(Less) => println!("|{x}| < |{y}|"),
+            Some(Equal) => println!("|{x}| = |{y}|"),
+            Some(Greater) => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -64,9 +64,9 @@ fn demo_integer_partial_cmp_abs_float_debug(gm: GenMode, config: &GenConfig, lim
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp_abs(&y) {
             None => println!("|{x:#x}| and |{cy:#x}| are incomparable"),
-            Some(Ordering::Less) => println!("|{x:#x}| < |{cy:#x}|"),
-            Some(Ordering::Equal) => println!("|{x:#x}| = |{cy:#x}|"),
-            Some(Ordering::Greater) => println!("|{x:#x}| > |{cy:#x}|"),
+            Some(Less) => println!("|{x:#x}| < |{cy:#x}|"),
+            Some(Equal) => println!("|{x:#x}| = |{cy:#x}|"),
+            Some(Greater) => println!("|{x:#x}| > |{cy:#x}|"),
         }
     }
 }

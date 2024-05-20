@@ -446,7 +446,10 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.to_twos_complement_limbs_asc().is_empty());
     ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_asc(), &[123]);
-    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_asc(), &[4294967173]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).to_twos_complement_limbs_asc(),
+    ///         &[4294967173]
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from(10u32).pow(12).to_twos_complement_limbs_asc(),
@@ -504,7 +507,10 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.to_twos_complement_limbs_desc().is_empty());
     ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_desc(), &[123]);
-    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_desc(), &[4294967173]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).to_twos_complement_limbs_desc(),
+    ///         &[4294967173]
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from(10u32).pow(12).to_twos_complement_limbs_desc(),
@@ -555,10 +561,15 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.into_twos_complement_limbs_asc().is_empty());
     ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_asc(), &[123]);
-    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_asc(), &[4294967173]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).into_twos_complement_limbs_asc(),
+    ///         &[4294967173]
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::from(10u32).pow(12).into_twos_complement_limbs_asc(),
+    ///         Integer::from(10u32)
+    ///             .pow(12)
+    ///             .into_twos_complement_limbs_asc(),
     ///         &[3567587328, 232]
     ///     );
     ///     assert_eq!(
@@ -612,10 +623,15 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.into_twos_complement_limbs_desc().is_empty());
     ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_desc(), &[123]);
-    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_desc(), &[4294967173]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).into_twos_complement_limbs_desc(),
+    ///         &[4294967173]
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::from(10u32).pow(12).into_twos_complement_limbs_desc(),
+    ///         Integer::from(10u32)
+    ///             .pow(12)
+    ///             .into_twos_complement_limbs_desc(),
     ///         &[232, 3567587328]
     ///     );
     ///     assert_eq!(
@@ -656,51 +672,88 @@ impl Integer {
     ///
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.twos_complement_limbs().next().is_none());
-    ///     assert_eq!(Integer::from(123).twos_complement_limbs().collect_vec(), &[123]);
-    ///     assert_eq!(Integer::from(-123).twos_complement_limbs().collect_vec(), &[4294967173]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::from(10u32).pow(12).twos_complement_limbs().collect_vec(),
-    ///         &[3567587328, 232]
-    ///     );
-    ///     // Sign-extension for a non-negative `Integer`
-    ///     assert_eq!(
-    ///         Integer::from(4294967295i64).twos_complement_limbs().collect_vec(),
-    ///         &[4294967295, 0]
+    ///         Integer::from(123).twos_complement_limbs().collect_vec(),
+    ///         &[123]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::from(10u32).pow(12)).twos_complement_limbs().collect_vec(),
-    ///         &[727379968, 4294967063]
-    ///     );
-    ///     // Sign-extension for a negative `Integer`
-    ///     assert_eq!(
-    ///         (-Integer::from(4294967295i64)).twos_complement_limbs().collect_vec(),
-    ///         &[1, 4294967295]
-    ///     );
-    ///
-    ///     assert!(Integer::ZERO.twos_complement_limbs().rev().next().is_none());
-    ///     assert_eq!(Integer::from(123).twos_complement_limbs().rev().collect_vec(), &[123]);
-    ///     assert_eq!(
-    ///         Integer::from(-123).twos_complement_limbs().rev().collect_vec(),
+    ///         Integer::from(-123).twos_complement_limbs().collect_vec(),
     ///         &[4294967173]
     ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::from(10u32).pow(12).twos_complement_limbs().rev().collect_vec(),
+    ///         Integer::from(10u32)
+    ///             .pow(12)
+    ///             .twos_complement_limbs()
+    ///             .collect_vec(),
+    ///         &[3567587328, 232]
+    ///     );
+    ///     // Sign-extension for a non-negative `Integer`
+    ///     assert_eq!(
+    ///         Integer::from(4294967295i64)
+    ///             .twos_complement_limbs()
+    ///             .collect_vec(),
+    ///         &[4294967295, 0]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::from(10u32).pow(12))
+    ///             .twos_complement_limbs()
+    ///             .collect_vec(),
+    ///         &[727379968, 4294967063]
+    ///     );
+    ///     // Sign-extension for a negative `Integer`
+    ///     assert_eq!(
+    ///         (-Integer::from(4294967295i64))
+    ///             .twos_complement_limbs()
+    ///             .collect_vec(),
+    ///         &[1, 4294967295]
+    ///     );
+    ///
+    ///     assert!(Integer::ZERO.twos_complement_limbs().next_back().is_none());
+    ///     assert_eq!(
+    ///         Integer::from(123)
+    ///             .twos_complement_limbs()
+    ///             .rev()
+    ///             .collect_vec(),
+    ///         &[123]
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from(-123)
+    ///             .twos_complement_limbs()
+    ///             .rev()
+    ///             .collect_vec(),
+    ///         &[4294967173]
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::from(10u32)
+    ///             .pow(12)
+    ///             .twos_complement_limbs()
+    ///             .rev()
+    ///             .collect_vec(),
     ///         &[232, 3567587328]
     ///     );
     ///     // Sign-extension for a non-negative `Integer`
     ///     assert_eq!(
-    ///         Integer::from(4294967295i64).twos_complement_limbs().rev().collect_vec(),
+    ///         Integer::from(4294967295i64)
+    ///             .twos_complement_limbs()
+    ///             .rev()
+    ///             .collect_vec(),
     ///         &[0, 4294967295]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::from(10u32).pow(12)).twos_complement_limbs().rev().collect_vec(),
+    ///         (-Integer::from(10u32).pow(12))
+    ///             .twos_complement_limbs()
+    ///             .rev()
+    ///             .collect_vec(),
     ///         &[4294967063, 727379968]
     ///     );
     ///     // Sign-extension for a negative `Integer`
     ///     assert_eq!(
-    ///         (-Integer::from(4294967295i64)).twos_complement_limbs().rev().collect_vec(),
+    ///         (-Integer::from(4294967295i64))
+    ///             .twos_complement_limbs()
+    ///             .rev()
+    ///             .collect_vec(),
     ///         &[4294967295, 1]
     ///     );
     /// }

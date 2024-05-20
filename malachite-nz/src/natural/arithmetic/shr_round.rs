@@ -21,7 +21,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
+use core::cmp::Ordering::{self, *};
 use core::ops::{Shl, ShlAssign};
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -29,7 +29,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
 
@@ -48,7 +48,7 @@ use malachite_base::vecs::vec_delete_left;
 pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
-        (vec![1], Ordering::Greater)
+        (vec![1], Greater)
     } else {
         let (xs_lo, xs_hi) = xs.split_at(delete_count);
         let mut exact = slice_test_zero(xs_lo);
@@ -63,9 +63,9 @@ pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
         (
             out,
             if exact {
-                Ordering::Equal
+                Equal
             } else {
-                Ordering::Greater
+                Greater
             },
         )
     }
@@ -80,14 +80,7 @@ pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
 fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
-        (
-            Vec::new(),
-            if slice_test_zero(xs) {
-                Ordering::Equal
-            } else {
-                Ordering::Less
-            },
-        )
+        (Vec::new(), if slice_test_zero(xs) { Equal } else { Less })
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
         let (xs_lo, xs_hi) = xs.split_at(delete_count);
@@ -98,16 +91,9 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, O
         }
         if !out.is_empty() && out[0].odd() {
             limbs_vec_add_limb_in_place(&mut out, 1);
-            (out, Ordering::Greater)
+            (out, Greater)
         } else {
-            (
-                out,
-                if exact {
-                    Ordering::Equal
-                } else {
-                    Ordering::Less
-                },
-            )
+            (out, if exact { Equal } else { Less })
         }
     }
 }
@@ -126,13 +112,13 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, O
 // bits / Limb::WIDTH)`.
 pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     if bits == 0 {
-        (xs.to_vec(), Ordering::Equal)
+        (xs.to_vec(), Equal)
     } else {
         let d = slice_test_zero(xs) || limbs_divisible_by_power_of_2(xs, bits - 1);
         if !limbs_get_bit(xs, bits - 1) {
             (
                 limbs_shr(xs, bits),
-                if d { Ordering::Equal } else { Ordering::Less },
+                if d { Equal } else { Less },
             )
         } else if d {
             limbs_shr_round_half_integer_to_even(xs, bits)
@@ -175,17 +161,17 @@ pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 pub_test! {
     limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<(Vec<Limb>, Ordering)> {
     match rm {
-        RoundingMode::Down | RoundingMode::Floor => Some((
+        Down | Floor => Some((
             limbs_shr(xs, bits),
             if limbs_divisible_by_power_of_2(xs, bits) {
-                Ordering::Equal
+                Equal
             } else {
-                Ordering::Less
+                Less
             },
         )),
-        RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(xs, bits)),
-        RoundingMode::Nearest => Some(limbs_shr_round_nearest(xs, bits)),
-        RoundingMode::Exact => limbs_shr_exact(xs, bits).map(|ss| (ss, Ordering::Equal)),
+        Up | Ceiling => Some(limbs_shr_round_up(xs, bits)),
+        Nearest => Some(limbs_shr_round_nearest(xs, bits)),
+        Exact => limbs_shr_exact(xs, bits).map(|ss| (ss, Equal)),
     }
 }}
 
@@ -207,7 +193,7 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ord
     if delete_count >= xs.len() {
         xs.truncate(1);
         xs[0] = 1;
-        Ordering::Greater
+        Greater
     } else {
         let mut exact = slice_test_zero(&xs[..delete_count]);
         let small_bits = bits & Limb::WIDTH_MASK;
@@ -219,9 +205,9 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ord
             limbs_vec_add_limb_in_place(xs, 1);
         }
         if exact {
-            Ordering::Equal
+            Equal
         } else {
-            Ordering::Greater
+            Greater
         }
     }
 }}
@@ -235,11 +221,7 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ord
 fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
-        let o = if slice_test_zero(xs) {
-            Ordering::Equal
-        } else {
-            Ordering::Less
-        };
+        let o = if slice_test_zero(xs) { Equal } else { Less };
         xs.clear();
         o
     } else {
@@ -251,11 +233,11 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
         }
         if !xs.is_empty() && xs[0].odd() {
             limbs_vec_add_limb_in_place(xs, 1);
-            Ordering::Greater
+            Greater
         } else if exact {
-            Ordering::Equal
+            Equal
         } else {
-            Ordering::Less
+            Less
         }
     }
 }
@@ -273,15 +255,15 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 // where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
 pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     if bits == 0 {
-        Ordering::Equal
+        Equal
     } else {
         let d = slice_test_zero(xs) || limbs_divisible_by_power_of_2(xs, bits - 1);
         if !limbs_get_bit(xs, bits - 1) {
             limbs_vec_shr_in_place(xs, bits);
             if d {
-                Ordering::Equal
+                Equal
             } else {
-                Ordering::Less
+                Less
             }
         } else if d {
             limbs_vec_shr_round_half_integer_to_even_in_place(xs, bits)
@@ -329,23 +311,23 @@ pub_test! {limbs_vec_shr_round_in_place(
     rm: RoundingMode,
 ) -> (bool, Ordering) {
     match rm {
-        RoundingMode::Down | RoundingMode::Floor => {
+        Down | Floor => {
             let exact = limbs_divisible_by_power_of_2(xs, bits);
             limbs_vec_shr_in_place(xs, bits);
             (
                 true,
                 if exact {
-                    Ordering::Equal
+                    Equal
                 } else {
-                    Ordering::Less
+                    Less
                 },
             )
         }
-        RoundingMode::Up | RoundingMode::Ceiling => {
+        Up | Ceiling => {
             (true, limbs_vec_shr_round_up_in_place(xs, bits))
         }
-        RoundingMode::Nearest => (true, limbs_vec_shr_round_nearest_in_place(xs, bits)),
-        RoundingMode::Exact => (limbs_vec_shr_exact_in_place(xs, bits), Ordering::Equal),
+        Nearest => (true, limbs_vec_shr_round_nearest_in_place(xs, bits)),
+        Exact => (limbs_vec_shr_exact_in_place(xs, bits), Equal),
     }
 }}
 
@@ -359,8 +341,8 @@ where
     Limb: ShrRound<T, Output = Limb>,
 {
     match (x, bits) {
-        (&Natural::ZERO, _) => (x.clone(), Ordering::Equal),
-        (_, bits) if bits == T::ZERO => (x.clone(), Ordering::Equal),
+        (&Natural::ZERO, _) => (x.clone(), Equal),
+        (_, bits) if bits == T::ZERO => (x.clone(), Equal),
         (Natural(Small(ref small)), bits) => {
             let (s, o) = small.shr_round(bits, rm);
             (Natural(Small(s)), o)
@@ -385,8 +367,8 @@ where
     Limb: ShrRoundAssign<T>,
 {
     match (&mut *x, bits) {
-        (&mut Natural::ZERO, _) => Ordering::Equal,
-        (_, bits) if bits == T::ZERO => Ordering::Equal,
+        (&mut Natural::ZERO, _) => Equal,
+        (_, bits) if bits == T::ZERO => Equal,
         (Natural(Small(ref mut small)), bits) => small.shr_round_assign(bits, rm),
         (Natural(Large(ref mut limbs)), bits) => {
             let (b, o) = limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm);
@@ -409,9 +391,8 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// indicating whether the returned value is less than, equal to, or greater than the
             /// exact value.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether `Exact` can
+            /// be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -449,8 +430,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// where $T$ is time, $M$ is additional memory and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if `rm` is `Exact` but `self` is not divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -469,9 +449,8 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// indicating whether the returned value is less than, equal to, or greater than the
             /// exact value.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether `Exact` can
+            /// be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -510,8 +489,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// $m$ is `max(1, self.significant_bits() - bits)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if `rm` is `Exact` but `self` is not divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -526,9 +504,8 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// specified rounding mode, in place. An [`Ordering`] is returned, indicating whether
             /// the assigned value is less than, equal to, or greater than the exact value.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>=`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` or `Down` is equivalent to using `>>=`. To test whether `Exact` can
+            /// be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// See the [`ShrRound`] documentation for details.
             ///
@@ -540,8 +517,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if `rm` is `Exact` but `self` is not divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round_assign).
@@ -565,7 +541,7 @@ where
     if bits >= S::ZERO {
         x.shr_round(bits.unsigned_abs(), rm)
     } else {
-        (x << bits.unsigned_abs(), Ordering::Equal)
+        (x << bits.unsigned_abs(), Equal)
     }
 }
 
@@ -581,7 +557,7 @@ where
         x.shr_round_assign(bits.unsigned_abs(), rm)
     } else {
         *x <<= bits.unsigned_abs();
-        Ordering::Equal
+        Equal
     }
 }
 
@@ -596,9 +572,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// than the exact value. If `bits` is negative, then the returned [`Ordering`] is
             /// always `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether `Exact` can
+            /// be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -637,8 +612,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -658,9 +633,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// greater than the exact value. If `bits` is negative, then the returned [`Ordering`]
             /// is always `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether `Exact` can
+            /// be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
             /// element of the pair, without the [`Ordering`]:
@@ -707,8 +681,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round).
@@ -725,9 +699,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// exact value. If `bits` is negative, then the returned [`Ordering`] is always
             /// `Equal`, even if the higher bits of the result are lost.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_2(bits)`.
+            /// Passing `Floor` or `Down` is equivalent to using `>>`. To test whether `Exact` can
+            /// be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// See the [`ShrRound`] documentation for details.
             ///
@@ -740,8 +713,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
-            /// `self` is not divisible by $2^k$.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
             /// See [here](super::shr_round#shr_round_assign).

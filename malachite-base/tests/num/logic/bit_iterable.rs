@@ -16,7 +16,7 @@ use malachite_base::test_util::generators::{
     signed_bool_vec_pair_gen_var_1, signed_gen, signed_unsigned_pair_gen_var_1,
     unsigned_bool_vec_pair_gen_var_1, unsigned_gen, unsigned_gen_var_5, unsigned_pair_gen_var_2,
 };
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::ops::Index;
 
 #[test]
@@ -134,9 +134,9 @@ where
     signed_gen::<T>().test_properties(|i| {
         let unsigned = <T as UnsignedAbs>::Output::wrapping_from(i);
         let significant_bits = match i.sign() {
-            Ordering::Equal => 0,
-            Ordering::Greater => unsigned.significant_bits() + 1,
-            Ordering::Less => (!unsigned).significant_bits() + 1,
+            Equal => 0,
+            Greater => unsigned.significant_bits() + 1,
+            Less => (!unsigned).significant_bits() + 1,
         };
         test_double_ended_iterator_size_hint(i.bits(), usize::exact_from(significant_bits));
     });

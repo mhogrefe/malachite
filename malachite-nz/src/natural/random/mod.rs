@@ -26,7 +26,7 @@ use malachite_base::num::random::geometric::{
 use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitSource};
 use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
 use malachite_base::random::Seed;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 
 /// Generates a random [`Natural`] with a given maximum bit length.
 ///
@@ -55,7 +55,7 @@ use malachite_base::rounding_modes::RoundingMode;
 ///
 /// assert_eq!(
 ///     get_random_natural_with_up_to_bits(&mut random_primitive_ints(EXAMPLE_SEED), 100)
-///             .to_string(),
+///         .to_string(),
 ///     "976558340558744279591984426865"
 /// );
 /// ```
@@ -65,9 +65,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
     }
     #[cfg(feature = "32_bit_limbs")]
     let mut xs = iterator_to_bit_chunks(
-        xs.take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
-        )),
+        xs.take(usize::exact_from(bits.shr_round(u64::LOG_WIDTH, Ceiling).0)),
         u64::WIDTH,
         u32::WIDTH,
     )
@@ -75,9 +73,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
     .collect_vec();
     #[cfg(not(feature = "32_bit_limbs"))]
     let mut xs = xs
-        .take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
-        ))
+        .take(usize::exact_from(bits.shr_round(u64::LOG_WIDTH, Ceiling).0))
         .collect_vec();
     limbs_slice_mod_power_of_2_in_place(&mut xs, bits);
     Natural::from_owned_limbs_asc(xs)
@@ -119,9 +115,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
     }
     #[cfg(feature = "32_bit_limbs")]
     let mut xs = iterator_to_bit_chunks(
-        xs.take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
-        )),
+        xs.take(usize::exact_from(bits.shr_round(u64::LOG_WIDTH, Ceiling).0)),
         u64::WIDTH,
         u32::WIDTH,
     )
@@ -129,9 +123,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
     .collect_vec();
     #[cfg(not(feature = "32_bit_limbs"))]
     let mut xs = xs
-        .take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
-        ))
+        .take(usize::exact_from(bits.shr_round(u64::LOG_WIDTH, Ceiling).0))
         .collect_vec();
     limbs_slice_mod_power_of_2_in_place(&mut xs, bits);
     limbs_slice_set_bit(&mut xs, bits - 1);
@@ -259,7 +251,6 @@ impl<I: Iterator<Item = u64>> Iterator for RandomNaturals<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_naturals;
-/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_naturals(EXAMPLE_SEED, 32, 1), 10),
@@ -317,7 +308,6 @@ pub fn random_naturals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_positive_naturals;
-/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     prefix_to_string(random_positive_naturals(EXAMPLE_SEED, 32, 1), 10),
@@ -387,7 +377,6 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::striped_random_naturals;
-/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     prefix_to_string(striped_random_naturals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
@@ -445,10 +434,12 @@ pub fn striped_random_naturals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::striped_random_positive_naturals;
-/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_positive_naturals(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     prefix_to_string(
+///         striped_random_positive_naturals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         10
+///     ),
 ///     "[16, 4, 128, 34391195648, 75493376, 9007199120523391, 8, 8796094070783, 8, \
 ///     950737950171027935941967741439, ...]"
 /// )
@@ -525,7 +516,10 @@ impl Iterator for RandomNaturalsLessThan {
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
-///     prefix_to_string(random_naturals_less_than(EXAMPLE_SEED, Natural::from(10u32)), 10),
+///     prefix_to_string(
+///         random_naturals_less_than(EXAMPLE_SEED, Natural::from(10u32)),
+///         10
+///     ),
 ///     "[1, 7, 5, 7, 9, 2, 8, 2, 4, 6, ...]"
 /// )
 /// ```
@@ -585,11 +579,7 @@ impl Iterator for UniformRandomNaturalRange {
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         uniform_random_natural_range(
-///             EXAMPLE_SEED,
-///             Natural::from(10u32),
-///             Natural::from(100u32)
-///         ),
+///         uniform_random_natural_range(EXAMPLE_SEED, Natural::from(10u32), Natural::from(100u32)),
 ///         10
 ///     ),
 ///     "[97, 17, 94, 37, 56, 32, 96, 11, 17, 39, ...]"
@@ -1090,13 +1080,13 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::striped_random_natural_range;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
 ///         striped_random_natural_range(EXAMPLE_SEED, Natural::ONE, Natural::from(7u32), 4, 1)
-///                 .map(|x| x.to_binary_string()),
+///             .map(|x| x.to_binary_string()),
 ///         10
 ///     ),
 ///     "[1, 1, 1, 110, 1, 110, 10, 11, 11, 100, ...]"
@@ -1148,8 +1138,8 @@ pub fn striped_random_natural_range(
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::striped_random_natural_inclusive_range;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1159,7 +1149,8 @@ pub fn striped_random_natural_range(
 ///             Natural::from(6u32),
 ///             4,
 ///             1
-///         ).map(|x| x.to_binary_string()),
+///         )
+///         .map(|x| x.to_binary_string()),
 ///         10
 ///     ),
 ///     "[1, 1, 1, 110, 1, 110, 10, 11, 11, 100, ...]"
@@ -1175,9 +1166,7 @@ pub fn striped_random_natural_inclusive_range(
     assert!(a <= b);
     let diff_bits = (&a ^ &b).significant_bits();
     let mask = Natural::low_mask(diff_bits);
-    let lo_template = (&a)
-        .round_to_multiple_of_power_of_2(diff_bits, RoundingMode::Floor)
-        .0;
+    let lo_template = (&a).round_to_multiple_of_power_of_2(diff_bits, Floor).0;
     let hi_template = &lo_template | mask;
     StripedRandomNaturalInclusiveRange {
         a,

@@ -23,13 +23,19 @@
 /// ```
 /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
 /// use malachite_base::num::conversion::traits::FromSciString;
-/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode::*;
 ///
 /// let mut options = FromSciStringOptions::default();
-/// assert_eq!(u8::from_sci_string_with_options("123.5", options), Some(124));
+/// assert_eq!(
+///     u8::from_sci_string_with_options("123.5", options),
+///     Some(124)
+/// );
 ///
-/// options.set_rounding_mode(RoundingMode::Floor);
-/// assert_eq!(u8::from_sci_string_with_options("123.5", options), Some(123));
+/// options.set_rounding_mode(Floor);
+/// assert_eq!(
+///     u8::from_sci_string_with_options("123.5", options),
+///     Some(123)
+/// );
 ///
 /// options = FromSciStringOptions::default();
 /// options.set_base(16);
@@ -62,7 +68,7 @@ pub mod options;
 /// ```
 /// use malachite_base::num::conversion::string::options::ToSciOptions;
 /// use malachite_base::num::conversion::traits::ToSci;
-/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode::*;
 ///
 /// let mut options = ToSciOptions::default();
 /// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "123456");
@@ -70,14 +76,17 @@ pub mod options;
 /// options.set_precision(3);
 /// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.23e5");
 ///
-/// options.set_rounding_mode(RoundingMode::Ceiling);
+/// options.set_rounding_mode(Ceiling);
 /// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.24e5");
 ///
 /// options.set_e_uppercase();
 /// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.24E5");
 ///
 /// options.set_force_exponent_plus_sign(true);
-/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.24E+5");
+/// assert_eq!(
+///     123456u32.to_sci_with_options(options).to_string(),
+///     "1.24E+5"
+/// );
 ///
 /// options = ToSciOptions::default();
 /// options.set_base(36);
@@ -88,22 +97,28 @@ pub mod options;
 ///
 /// options.set_base(2);
 /// options.set_precision(10);
-/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.1110001e16");
+/// assert_eq!(
+///     123456u32.to_sci_with_options(options).to_string(),
+///     "1.1110001e16"
+/// );
 ///
 /// options.set_include_trailing_zeros(true);
-/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.111000100e16");
+/// assert_eq!(
+///     123456u32.to_sci_with_options(options).to_string(),
+///     "1.111000100e16"
+/// );
 /// ```
 ///
 /// # fmt_sci_valid
 /// ```
 /// use malachite_base::num::conversion::string::options::ToSciOptions;
 /// use malachite_base::num::conversion::traits::ToSci;
-/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode::*;
 ///
 /// let mut options = ToSciOptions::default();
 /// assert!(123u8.fmt_sci_valid(options));
 /// assert!(u128::MAX.fmt_sci_valid(options));
-/// options.set_rounding_mode(RoundingMode::Exact);
+/// options.set_rounding_mode(Exact);
 /// assert!(!u128::MAX.fmt_sci_valid(options)); // u128::MAX has more than 16 significant digits
 /// options.set_precision(50);
 /// assert!(u128::MAX.fmt_sci_valid(options));

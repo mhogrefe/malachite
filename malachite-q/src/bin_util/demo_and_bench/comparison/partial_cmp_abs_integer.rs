@@ -12,7 +12,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_q::test_util::bench::bucketers::rational_integer_max_bit_bucketer;
 use malachite_q::test_util::generators::rational_integer_pair_gen;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_partial_cmp_abs_integer);
@@ -41,9 +41,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_rational_partial_cmp_abs_integer(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in rational_integer_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp_abs(&y).unwrap() {
-            Ordering::Less => println!("|{x}| < |{y}|"),
-            Ordering::Equal => println!("|{x}| = |{y}|"),
-            Ordering::Greater => println!("|{x}| > |{y}|"),
+            Less => println!("|{x}| < |{y}|"),
+            Equal => println!("|{x}| = |{y}|"),
+            Greater => println!("|{x}| > |{y}|"),
         }
     }
 }
@@ -51,9 +51,9 @@ fn demo_rational_partial_cmp_abs_integer(gm: GenMode, config: &GenConfig, limit:
 fn demo_integer_partial_cmp_abs_rational(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in rational_integer_pair_gen().get(gm, config).take(limit) {
         match y.partial_cmp_abs(&x).unwrap() {
-            Ordering::Less => println!("|{y}| < |{x}|"),
-            Ordering::Equal => println!("|{y}| = |{x}|"),
-            Ordering::Greater => println!("|{y}| > |{x}|"),
+            Less => println!("|{y}| < |{x}|"),
+            Equal => println!("|{y}| = |{x}|"),
+            Greater => println!("|{y}| > |{x}|"),
         }
     }
 }

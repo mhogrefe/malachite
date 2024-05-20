@@ -17,7 +17,7 @@ use crate::natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::logic::traits::{
     CheckedHammingDistance, CountOnes, CountZeros, HammingDistance,
 };
@@ -51,13 +51,13 @@ fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: 
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
-        Ordering::Equal => limbs_hamming_distance_same_length(&xs[i + 1..], &ys[i + 1..]),
-        Ordering::Less => {
+        Equal => limbs_hamming_distance_same_length(&xs[i + 1..], &ys[i + 1..]),
+        Less => {
             let (ys_lo, ys_hi) = ys.split_at(xs_len);
             limbs_hamming_distance_same_length(&ys_lo[i + 1..], &xs[i + 1..])
                 + limbs_count_ones(ys_hi)
         }
-        Ordering::Greater => {
+        Greater => {
             let (xs_lo, xs_hi) = xs.split_at(ys_len);
             limbs_hamming_distance_same_length(&xs_lo[i + 1..], &ys[i + 1..])
                 + limbs_count_ones(xs_hi)
@@ -121,14 +121,14 @@ pub_test! {limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = slice_leading_zeros(xs);
     let ys_i = slice_leading_zeros(ys);
     match xs_i.cmp(&ys_i) {
-        Ordering::Equal => {
+        Equal => {
             xs[xs_i]
                 .wrapping_neg()
                 .hamming_distance(ys[ys_i].wrapping_neg())
                 + limbs_hamming_distance_neg_leading_limbs_helper(xs, ys, xs_i)
         }
-        Ordering::Less => limbs_hamming_distance_neg_helper(xs, ys, xs_i, ys_i),
-        Ordering::Greater => limbs_hamming_distance_neg_helper(ys, xs, ys_i, xs_i),
+        Less => limbs_hamming_distance_neg_helper(xs, ys, xs_i, ys_i),
+        Greater => limbs_hamming_distance_neg_helper(ys, xs, ys_i, xs_i),
     }
 }}
 
@@ -172,10 +172,19 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
     /// use malachite_base::num::logic::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(123).checked_hamming_distance(&Integer::from(123)), Some(0));
+    /// assert_eq!(
+    ///     Integer::from(123).checked_hamming_distance(&Integer::from(123)),
+    ///     Some(0)
+    /// );
     /// // 105 = 1101001b, 123 = 1111011
-    /// assert_eq!(Integer::from(-105).checked_hamming_distance(&Integer::from(-123)), Some(2));
-    /// assert_eq!(Integer::from(-105).checked_hamming_distance(&Integer::from(123)), None);
+    /// assert_eq!(
+    ///     Integer::from(-105).checked_hamming_distance(&Integer::from(-123)),
+    ///     Some(2)
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-105).checked_hamming_distance(&Integer::from(123)),
+    ///     None
+    /// );
     /// ```
     fn checked_hamming_distance(self, other: &Integer) -> Option<u64> {
         match (self.sign, other.sign) {

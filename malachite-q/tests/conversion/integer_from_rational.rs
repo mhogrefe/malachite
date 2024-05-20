@@ -12,13 +12,13 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
 };
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::test_util::generators::{rational_gen, rational_rounding_mode_pair_gen_var_2};
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -105,55 +105,55 @@ fn test_rounding_from_rational() {
         assert!(n.is_valid());
         assert_eq!(o, o_out);
     };
-    test("123", RoundingMode::Floor, "123", Ordering::Equal);
-    test("123", RoundingMode::Down, "123", Ordering::Equal);
-    test("123", RoundingMode::Ceiling, "123", Ordering::Equal);
-    test("123", RoundingMode::Up, "123", Ordering::Equal);
-    test("123", RoundingMode::Nearest, "123", Ordering::Equal);
-    test("123", RoundingMode::Exact, "123", Ordering::Equal);
+    test("123", Floor, "123", Equal);
+    test("123", Down, "123", Equal);
+    test("123", Ceiling, "123", Equal);
+    test("123", Up, "123", Equal);
+    test("123", Nearest, "123", Equal);
+    test("123", Exact, "123", Equal);
 
-    test("-123", RoundingMode::Floor, "-123", Ordering::Equal);
-    test("-123", RoundingMode::Down, "-123", Ordering::Equal);
-    test("-123", RoundingMode::Ceiling, "-123", Ordering::Equal);
-    test("-123", RoundingMode::Up, "-123", Ordering::Equal);
-    test("-123", RoundingMode::Nearest, "-123", Ordering::Equal);
-    test("-123", RoundingMode::Exact, "-123", Ordering::Equal);
+    test("-123", Floor, "-123", Equal);
+    test("-123", Down, "-123", Equal);
+    test("-123", Ceiling, "-123", Equal);
+    test("-123", Up, "-123", Equal);
+    test("-123", Nearest, "-123", Equal);
+    test("-123", Exact, "-123", Equal);
 
-    test("22/7", RoundingMode::Floor, "3", Ordering::Less);
-    test("22/7", RoundingMode::Down, "3", Ordering::Less);
-    test("22/7", RoundingMode::Ceiling, "4", Ordering::Greater);
-    test("22/7", RoundingMode::Up, "4", Ordering::Greater);
-    test("22/7", RoundingMode::Nearest, "3", Ordering::Less);
+    test("22/7", Floor, "3", Less);
+    test("22/7", Down, "3", Less);
+    test("22/7", Ceiling, "4", Greater);
+    test("22/7", Up, "4", Greater);
+    test("22/7", Nearest, "3", Less);
 
-    test("-22/7", RoundingMode::Floor, "-4", Ordering::Less);
-    test("-22/7", RoundingMode::Down, "-3", Ordering::Greater);
-    test("-22/7", RoundingMode::Ceiling, "-3", Ordering::Greater);
-    test("-22/7", RoundingMode::Up, "-4", Ordering::Less);
-    test("-22/7", RoundingMode::Nearest, "-3", Ordering::Greater);
+    test("-22/7", Floor, "-4", Less);
+    test("-22/7", Down, "-3", Greater);
+    test("-22/7", Ceiling, "-3", Greater);
+    test("-22/7", Up, "-4", Less);
+    test("-22/7", Nearest, "-3", Greater);
 
-    test("7/2", RoundingMode::Floor, "3", Ordering::Less);
-    test("7/2", RoundingMode::Down, "3", Ordering::Less);
-    test("7/2", RoundingMode::Ceiling, "4", Ordering::Greater);
-    test("7/2", RoundingMode::Up, "4", Ordering::Greater);
-    test("7/2", RoundingMode::Nearest, "4", Ordering::Greater);
+    test("7/2", Floor, "3", Less);
+    test("7/2", Down, "3", Less);
+    test("7/2", Ceiling, "4", Greater);
+    test("7/2", Up, "4", Greater);
+    test("7/2", Nearest, "4", Greater);
 
-    test("9/2", RoundingMode::Floor, "4", Ordering::Less);
-    test("9/2", RoundingMode::Down, "4", Ordering::Less);
-    test("9/2", RoundingMode::Ceiling, "5", Ordering::Greater);
-    test("9/2", RoundingMode::Up, "5", Ordering::Greater);
-    test("9/2", RoundingMode::Nearest, "4", Ordering::Less);
+    test("9/2", Floor, "4", Less);
+    test("9/2", Down, "4", Less);
+    test("9/2", Ceiling, "5", Greater);
+    test("9/2", Up, "5", Greater);
+    test("9/2", Nearest, "4", Less);
 }
 
 #[test]
 #[should_panic]
 fn integer_rounding_from_rational_fail() {
-    Integer::rounding_from(Rational::from_str("22/7").unwrap(), RoundingMode::Exact);
+    Integer::rounding_from(Rational::from_str("22/7").unwrap(), Exact);
 }
 
 #[test]
 #[should_panic]
 fn integer_rounding_from_rational_ref_fail() {
-    Integer::rounding_from(&Rational::from_str("22/7").unwrap(), RoundingMode::Exact);
+    Integer::rounding_from(&Rational::from_str("22/7").unwrap(), Exact);
 }
 
 #[test]
@@ -195,52 +195,52 @@ fn integer_from_rational_properties() {
 
         assert_eq!(n.partial_cmp(&x), Some(o));
         match (x >= 0, rm) {
-            (_, RoundingMode::Floor) | (true, RoundingMode::Down) | (false, RoundingMode::Up) => {
-                assert_ne!(o, Ordering::Greater)
+            (_, Floor) | (true, Down) | (false, Up) => {
+                assert_ne!(o, Greater)
             }
-            (_, RoundingMode::Ceiling) | (true, RoundingMode::Up) | (false, RoundingMode::Down) => {
-                assert_ne!(o, Ordering::Less)
+            (_, Ceiling) | (true, Up) | (false, Down) => {
+                assert_ne!(o, Less)
             }
-            (_, RoundingMode::Exact) => assert_eq!(o, Ordering::Equal),
+            (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
     });
 
     rational_gen().test_properties(|x| {
-        let floor = Integer::rounding_from(&x, RoundingMode::Floor);
+        let floor = Integer::rounding_from(&x, Floor);
         assert_eq!(floor.0, (&x).floor());
         assert!(floor.0 <= x);
         assert!(&floor.0 + Integer::ONE > x);
 
-        let ceiling = Integer::rounding_from(&x, RoundingMode::Ceiling);
+        let ceiling = Integer::rounding_from(&x, Ceiling);
         assert_eq!(ceiling.0, (&x).ceiling());
         assert!(ceiling.0 >= x);
         assert!(&ceiling.0 - Integer::ONE < x);
 
         if x >= 0 {
-            assert_eq!(Integer::rounding_from(&x, RoundingMode::Down), floor);
-            assert_eq!(Integer::rounding_from(&x, RoundingMode::Up), ceiling);
+            assert_eq!(Integer::rounding_from(&x, Down), floor);
+            assert_eq!(Integer::rounding_from(&x, Up), ceiling);
         } else {
-            assert_eq!(Integer::rounding_from(&x, RoundingMode::Down), ceiling);
-            assert_eq!(Integer::rounding_from(&x, RoundingMode::Up), floor);
+            assert_eq!(Integer::rounding_from(&x, Down), ceiling);
+            assert_eq!(Integer::rounding_from(&x, Up), floor);
         }
 
-        let nearest = Integer::rounding_from(&x, RoundingMode::Nearest);
+        let nearest = Integer::rounding_from(&x, Nearest);
         assert!(nearest == floor || nearest == ceiling);
         assert!((Rational::from(nearest.0) - x).le_abs(&Rational::ONE_HALF));
     });
 
     integer_gen().test_properties(|n| {
         let x = Rational::from(&n);
-        let no = (n, Ordering::Equal);
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Floor), no);
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Down), no);
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Ceiling), no);
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Up), no);
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Nearest), no);
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Exact), no);
+        let no = (n, Equal);
+        assert_eq!(Integer::rounding_from(&x, Floor), no);
+        assert_eq!(Integer::rounding_from(&x, Down), no);
+        assert_eq!(Integer::rounding_from(&x, Ceiling), no);
+        assert_eq!(Integer::rounding_from(&x, Up), no);
+        assert_eq!(Integer::rounding_from(&x, Nearest), no);
+        assert_eq!(Integer::rounding_from(&x, Exact), no);
 
         let x = Rational::from_integers((no.0 << 1) | Integer::ONE, Integer::TWO);
-        assert!(Integer::rounding_from(x, RoundingMode::Nearest).0.even());
+        assert!(Integer::rounding_from(x, Nearest).0.even());
     });
 }

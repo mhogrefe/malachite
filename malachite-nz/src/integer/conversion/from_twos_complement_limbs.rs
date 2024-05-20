@@ -97,7 +97,10 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert_eq!(Integer::from_twos_complement_limbs_desc(&[]), 0);
     ///     assert_eq!(Integer::from_twos_complement_limbs_desc(&[123]), 123);
-    ///     assert_eq!(Integer::from_twos_complement_limbs_desc(&[4294967173]), -123);
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_desc(&[4294967173]),
+    ///         -123
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from_twos_complement_limbs_desc(&[232, 3567587328]),
@@ -141,8 +144,14 @@ impl Integer {
     ///
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert_eq!(Integer::from_owned_twos_complement_limbs_asc(vec![]), 0);
-    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_asc(vec![123]), 123);
-    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_asc(vec![4294967173]), -123);
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![123]),
+    ///         123
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![4294967173]),
+    ///         -123
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from_owned_twos_complement_limbs_asc(vec![3567587328, 232]),
@@ -195,8 +204,14 @@ impl Integer {
     ///
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert_eq!(Integer::from_owned_twos_complement_limbs_desc(vec![]), 0);
-    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_desc(vec![123]), 123);
-    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_desc(vec![4294967173]), -123);
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![123]),
+    ///         123
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![4294967173]),
+    ///         -123
+    ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from_owned_twos_complement_limbs_desc(vec![232, 3567587328]),

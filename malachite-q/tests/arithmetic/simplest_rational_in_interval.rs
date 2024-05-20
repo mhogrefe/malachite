@@ -16,7 +16,7 @@ use malachite_q::test_util::generators::{
     rational_triple_gen_var_2, rational_triple_gen_var_3,
 };
 use malachite_q::Rational;
-use std::cmp::Ordering;
+use std::cmp::Ordering::*;
 use std::str::FromStr;
 
 #[test]
@@ -105,20 +105,18 @@ fn cmp_complexity_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let ord = x.cmp_complexity(&y);
         assert_eq!(y.cmp_complexity(&x).reverse(), ord);
-        assert_eq!(x == y, x.cmp_complexity(&y) == Ordering::Equal);
+        assert_eq!(x == y, x.cmp_complexity(&y) == Equal);
     });
 
     rational_gen().test_properties(|x| {
-        assert_eq!(x.cmp_complexity(&x), Ordering::Equal);
+        assert_eq!(x.cmp_complexity(&x), Equal);
     });
 
     rational_triple_gen().test_properties(|(x, y, z)| {
-        if x.cmp_complexity(&y) == Ordering::Less && y.cmp_complexity(&z) == Ordering::Less {
-            assert!(x.cmp_complexity(&z) == Ordering::Less);
-        } else if x.cmp_complexity(&y) == Ordering::Greater
-            && y.cmp_complexity(&z) == Ordering::Greater
-        {
-            assert!(x.cmp_complexity(&z) == Ordering::Greater);
+        if x.cmp_complexity(&y) == Less && y.cmp_complexity(&z) == Less {
+            assert!(x.cmp_complexity(&z) == Less);
+        } else if x.cmp_complexity(&y) == Greater && y.cmp_complexity(&z) == Greater {
+            assert!(x.cmp_complexity(&z) == Greater);
         }
     });
 }
@@ -143,7 +141,7 @@ fn simplest_rational_in_open_interval_properties() {
 
     rational_triple_gen_var_2().test_properties(|(x, y, z)| {
         let q = Rational::simplest_rational_in_open_interval(&x, &z);
-        assert!(q.cmp_complexity(&y) <= Ordering::Equal);
+        assert!(q.cmp_complexity(&y) <= Equal);
     });
 }
 
@@ -166,7 +164,7 @@ fn simplest_rational_in_closed_interval_properties() {
 
     rational_triple_gen_var_3().test_properties(|(x, y, z)| {
         let q = Rational::simplest_rational_in_closed_interval(&x, &z);
-        assert!(q.cmp_complexity(&y) <= Ordering::Equal);
+        assert!(q.cmp_complexity(&y) <= Equal);
     });
 
     rational_gen().test_properties(|x| {

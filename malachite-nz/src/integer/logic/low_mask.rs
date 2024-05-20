@@ -30,7 +30,10 @@ impl LowMask for Integer {
     ///
     /// assert_eq!(Integer::low_mask(0), 0);
     /// assert_eq!(Integer::low_mask(3), 7);
-    /// assert_eq!(Integer::low_mask(100).to_string(), "1267650600228229401496703205375");
+    /// assert_eq!(
+    ///     Integer::low_mask(100).to_string(),
+    ///     "1267650600228229401496703205375"
+    /// );
     /// ```
     #[inline]
     fn low_mask(bits: u64) -> Integer {
