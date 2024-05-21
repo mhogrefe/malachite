@@ -77,7 +77,7 @@ impl Float {
     /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
     /// or greater than the original value.
     ///
-    /// If you're only using [`Nearest`], try using [`Float::from_unsigned_prec`] instead.
+    /// If you're only using `Nearest`, try using [`Float::from_unsigned_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -107,7 +107,7 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the integer's number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_unsigned_prec_round`].
     ///
     /// # Worst-case complexity
@@ -132,7 +132,7 @@ impl Float {
     /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
     /// or greater than the original value.
     ///
-    /// If you're only using [`Nearest`], try using [`Float::from_signed_prec`] instead.
+    /// If you're only using `Nearest`, try using [`Float::from_signed_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -162,7 +162,7 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the integer's number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_signed_prec_round`].
     ///
     /// # Worst-case complexity
@@ -190,7 +190,7 @@ macro_rules! impl_from_unsigned {
             ///
             /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's
             /// number of significant bits. If you want to specify a different precision, try
-            /// [`Float::from_unsigned_prec`]. This may require rounding, which uses [`Nearest`] by
+            /// [`Float::from_unsigned_prec`]. This may require rounding, which uses `Nearest` by
             /// default. To specify a rounding mode as well as a precision, try
             /// [`Float::from_unsigned_prec_round`].
             ///
@@ -215,7 +215,7 @@ macro_rules! impl_from_signed {
             ///
             /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's
             /// number of significant bits. If you want to specify a different precision, try
-            /// [`Float::from_signed_prec`]. This may require rounding, which uses [`Nearest`] by
+            /// [`Float::from_signed_prec`]. This may require rounding, which uses `Nearest` by
             /// default. To specify a rounding mode as well as a precision, try
             /// [`Float::from_signed_prec_round`].
             ///

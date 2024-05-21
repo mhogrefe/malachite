@@ -38,7 +38,7 @@ impl Float {
     /// or greater than the original value. (Although a NaN is not comparable to anything,
     /// converting a NaN to a NaN will also return `Equal`, indicating an exact conversion.)
     ///
-    /// If you're only using [`Nearest`], try using [`Float::from_primitive_float_prec`] instead.
+    /// If you're only using `Nearest`, try using [`Float::from_primitive_float_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -88,7 +88,7 @@ impl Float {
     /// comparable to anything, converting a NaN to a NaN will also return `Equal`, indicating an
     /// exact conversion.)
     ///
-    /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
+    /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_primitive_float_prec_round`].
     ///
     /// # Worst-case complexity
@@ -139,7 +139,7 @@ macro_rules! impl_from_primitive_float {
             /// equal to the maximum precision of any primitive float in the same binade (for normal
             /// `f32`s this is 24, and for normal `f64`s it is 53). If you want to specify a
             /// different precision, try [`Float::from_primitive_float_prec`]. This may require
-            /// rounding, which uses [`Nearest`] by default. To specify a rounding mode as well as a
+            /// rounding, which uses `Nearest` by default. To specify a rounding mode as well as a
             /// precision, try [`Float::from_primitive_float_prec_round`].
             ///
             /// # Worst-case complexity
