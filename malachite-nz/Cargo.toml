@@ -38,14 +38,14 @@ embed-doc-image = { version = "0.1.4", optional = true }
 malachite-nz = { path = ".", features = ["test_build"] }
 
 [build-dependencies]
-pyo3-build-config = { version = "0.20.3", features = ["resolve-config"] }
+pyo3-build-config = { version = "0.20.3", features = ["resolve-config"], optional = true }
 
 [features]
 32_bit_limbs = []
 random = ["malachite-base/random"]
-enable_pyo3 = ["pyo3"]
+enable_pyo3 = ["pyo3", "pyo3-build-config"]
 enable_serde = ["serde"]
-test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug", "pyo3", "indoc"]
+test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug", "pyo3", "pyo3-build-config", "indoc"]
 bin_build = ["test_build"]
 float_helpers = []
 doc-images = ["embed-doc-image"]
