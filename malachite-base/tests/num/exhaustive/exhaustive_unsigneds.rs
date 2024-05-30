@@ -22,14 +22,14 @@ where
             .take(20)
             .collect_vec(),
         &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-    )
+    );
 }
 
 fn exhaustive_unsigneds_long_helper<T: PrimitiveUnsigned>(last_20: &[T]) {
     let expected_len = usize::power_of_2(T::WIDTH);
     let xs = exhaustive_unsigneds::<T>();
     assert_eq!(xs.clone().count(), expected_len);
-    assert_eq!(xs.skip(expected_len - 20).collect_vec(), last_20)
+    assert_eq!(xs.skip(expected_len - 20).collect_vec(), last_20);
 }
 
 #[test]

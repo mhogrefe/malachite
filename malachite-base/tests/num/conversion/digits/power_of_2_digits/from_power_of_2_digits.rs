@@ -24,7 +24,7 @@ pub fn test_from_power_of_2_digits_asc() {
         out: T,
     ) {
         assert_eq!(
-            T::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+            T::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap(),
             out
         );
     }
@@ -40,7 +40,7 @@ pub fn test_from_power_of_2_digits_asc() {
         digits: &[U],
     ) {
         assert_eq!(
-            T::from_power_of_2_digits_asc(log_base, digits.iter().cloned()),
+            T::from_power_of_2_digits_asc(log_base, digits.iter().copied()),
             None
         );
     }
@@ -54,11 +54,11 @@ fn from_power_of_2_digits_asc_fail_helper<
 >() {
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_2_digits_asc(U::WIDTH + 1, digits.iter().cloned());
+        T::from_power_of_2_digits_asc(U::WIDTH + 1, digits.iter().copied());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_2_digits_asc(0, digits.iter().cloned());
+        T::from_power_of_2_digits_asc(0, digits.iter().copied());
     });
 }
 
@@ -75,7 +75,7 @@ pub fn test_from_power_of_2_digits_desc() {
         out: T,
     ) {
         assert_eq!(
-            T::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+            T::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap(),
             out
         );
     }
@@ -91,7 +91,7 @@ pub fn test_from_power_of_2_digits_desc() {
         digits: &[U],
     ) {
         assert_eq!(
-            T::from_power_of_2_digits_desc(log_base, digits.iter().cloned()),
+            T::from_power_of_2_digits_desc(log_base, digits.iter().copied()),
             None
         );
     }
@@ -105,11 +105,11 @@ fn from_power_of_2_digits_desc_fail_helper<
 >() {
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_2_digits_desc(U::WIDTH + 1, digits.iter().cloned());
+        T::from_power_of_2_digits_desc(U::WIDTH + 1, digits.iter().copied());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_2_digits_desc(0, digits.iter().cloned());
+        T::from_power_of_2_digits_desc(0, digits.iter().copied());
     });
 }
 
@@ -123,13 +123,13 @@ fn from_power_of_2_digits_asc_helper<
     U: PrimitiveUnsigned,
 >() {
     unsigned_vec_unsigned_pair_gen_var_6::<U>().test_properties(|(digits, log_base)| {
-        T::from_power_of_2_digits_asc(log_base, digits.iter().cloned());
+        T::from_power_of_2_digits_asc(log_base, digits.iter().copied());
     });
 
     unsigned_vec_unsigned_pair_gen_var_2::<T, U>().test_properties(|(digits, log_base)| {
-        let n = T::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
+        let n = T::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap();
         assert_eq!(
-            T::from_power_of_2_digits_desc(log_base, digits.iter().rev().cloned()).unwrap(),
+            T::from_power_of_2_digits_desc(log_base, digits.iter().rev().copied()).unwrap(),
             n
         );
         let trailing_zeros = slice_trailing_zeros(&digits);
@@ -157,13 +157,13 @@ fn from_power_of_2_digits_desc_helper<
     U: PrimitiveUnsigned,
 >() {
     unsigned_vec_unsigned_pair_gen_var_6::<U>().test_properties(|(digits, log_base)| {
-        T::from_power_of_2_digits_desc(log_base, digits.iter().cloned());
+        T::from_power_of_2_digits_desc(log_base, digits.iter().copied());
     });
 
     unsigned_vec_unsigned_pair_gen_var_3::<T, U>().test_properties(|(digits, log_base)| {
-        let n = T::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+        let n = T::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap();
         assert_eq!(
-            T::from_power_of_2_digits_asc(log_base, digits.iter().rev().cloned()).unwrap(),
+            T::from_power_of_2_digits_asc(log_base, digits.iter().rev().copied()).unwrap(),
             n
         );
         let leading_zeros = slice_leading_zeros(&digits);

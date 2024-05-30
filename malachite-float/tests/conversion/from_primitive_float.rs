@@ -1386,10 +1386,10 @@ where
             );
             match (x >= T::ZERO, rm) {
                 (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater)
+                    assert_ne!(o, Greater);
                 }
                 (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less)
+                    assert_ne!(o, Less);
                 }
                 (_, Exact) => assert_eq!(o, Equal),
                 _ => {}

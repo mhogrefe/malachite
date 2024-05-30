@@ -23,14 +23,14 @@ path = "src/bin.rs"
 [dependencies]
 itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
 libm = { version = "0.2.8", default-features = false }
-malachite-base = { version = "0.4.9", default-features = false }
+malachite-base = { version = "0.4.9", default-features = false, path = "../malachite-base" }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
 indoc = { version = "2.0.4", optional = true}
 pyo3 = { version = "0.21.2", optional = true }
 serde_json = { version = "1.0.105", optional = true }
-num = { version = "0.4.1", optional = true, features = ["serde"] }
-rug = { version = "1.21.0", default-features = false, optional = true, features = ["integer", "serde"] }
+num = { version = "0.4.3", optional = true, features = ["serde"] }
+rug = { version = "1.24.1", default-features = false, optional = true, features = ["integer", "serde"] }
 
 embed-doc-image = { version = "0.1.4", optional = true }
 

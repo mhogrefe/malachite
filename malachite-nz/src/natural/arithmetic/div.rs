@@ -439,7 +439,7 @@ pub_test! {limbs_div_schoolbook(
                 if carry {
                     n_1.wrapping_add_assign(d_1);
                     if limbs_slice_add_same_length_in_place_left(
-                        &mut ns[..i + 1],
+                        &mut ns[..=i],
                         &ds_suffix[..ds_suffix.len() - 1],
                     ) {
                         n_1.wrapping_add_assign(1);
@@ -486,7 +486,7 @@ pub_test! {limbs_div_schoolbook(
         let ns = ns_init;
         {
             let (ns_last, ns_init) = ns.split_last_mut().unwrap();
-            for i in 3..d_len_s + 1 {
+            for i in 3..=d_len_s {
                 let q = qs[d_len_s - i];
                 let carry = limbs_sub_mul_limb_same_length_in_place_left(
                     &mut ns_init[offset - i..],
@@ -792,7 +792,7 @@ pub_crate_test! {limbs_div_schoolbook_approx(
         let j = i + a;
         if n_1 == d_1 && ns[j] == d_0 {
             q = Limb::MAX;
-            limbs_sub_mul_limb_same_length_in_place_left(&mut ns[j - d_len_minus_1..j + 1], ds, q);
+            limbs_sub_mul_limb_same_length_in_place_left(&mut ns[j - d_len_minus_1..=j], ds, q);
             n_1 = ns[j]; // update n_1, last loop's value will now be invalid
         } else {
             let n;
@@ -829,11 +829,11 @@ pub_crate_test! {limbs_div_schoolbook_approx(
             let j = i + a;
             if !flag || n_1 >= d_1 {
                 q = Limb::MAX;
-                let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..j + 1], ds, q);
+                let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..=j], ds, q);
                 if n_1 != carry {
                     if flag && n_1 < carry {
                         q.wrapping_sub_assign(1);
-                        limbs_slice_add_same_length_in_place_left(&mut ns[b..j + 1], ds);
+                        limbs_slice_add_same_length_in_place_left(&mut ns[b..=j], ds);
                     } else {
                         flag = false;
                     }
@@ -855,7 +855,7 @@ pub_crate_test! {limbs_div_schoolbook_approx(
                 ns[j - 1] = n_0;
                 if carry {
                     n_1.wrapping_add_assign(d_1);
-                    if limbs_slice_add_same_length_in_place_left(&mut ns[b..j], &ds[..i + 1]) {
+                    if limbs_slice_add_same_length_in_place_left(&mut ns[b..j], &ds[..=i]) {
                         n_1.wrapping_add_assign(1);
                     }
                     q.wrapping_sub_assign(1);
@@ -1000,7 +1000,7 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
         // Perform the typically smaller block first.
         if q_len_mod_d_len == 1 {
             // Handle highest_q up front, for simplicity.
-            let ns_2 = &mut ns_hi[1..d_len + 1];
+            let ns_2 = &mut ns_hi[1..=d_len];
             highest_q = limbs_cmp_same_length(ns_2, ds) >= Equal;
             if highest_q {
                 assert!(!limbs_sub_same_length_in_place_left(ns_2, ds));
@@ -1106,7 +1106,7 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
         let ns = &mut ns[offset + (d_len >> 1) - d_len..];
         let q_save = qs[offset];
         limbs_div_divide_and_conquer_approx_helper(qs, ns, ds, d_inv, &mut scratch);
-        slice_move_left(&mut qs[..offset + 1], 1);
+        slice_move_left(&mut qs[..=offset], 1);
         qs[offset] = q_save;
     } else {
         let offset = a - q_len;
@@ -1284,7 +1284,7 @@ fn limbs_div_barrett_approx_preinverted(
             let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
             limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
         } else {
-            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
+            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len);
         }
         let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
         // Subtract the product from the partial remainder combined with new limbs from the dividend

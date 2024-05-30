@@ -725,7 +725,7 @@ fn limbs_fft_combine_bits(
         if shift_bits >= Limb::WIDTH {
             remaining_len -= 1;
             out = &mut out[1..];
-            shift_bits -= Limb::WIDTH
+            shift_bits -= Limb::WIDTH;
         }
     }
 }
@@ -1613,7 +1613,7 @@ fn limbs_fft_mulmod_2expp1<'a>(
     let size = ((n * w) >> Limb::LOG_WIDTH) + 1;
     let two_n = n << 1;
     let (out, scratch) = scratch.split_at_mut(two_n);
-    let xs = &mut xs[..limbs + 1];
+    let xs = &mut xs[..=limbs];
     let (_, xs_init) = xs.split_last_mut().unwrap();
     let j = limbs_fft_split_bits(xss, xs_init, bits);
     for ps in &mut xss[j..] {
@@ -1768,7 +1768,7 @@ fn limbs_fft_mulmod_2expp1_same<'a>(
     let size = ((n * w) >> Limb::LOG_WIDTH) + 1;
     let two_n = n << 1;
     let (out, scratch) = scratch.split_at_mut(two_n);
-    let xs = &mut xs[..limbs + 1];
+    let xs = &mut xs[..=limbs];
     let (_, xs_init) = xs.split_last_mut().unwrap();
     let j = limbs_fft_split_bits(xss, xs_init, bits);
     for ps in &mut xss[j..] {

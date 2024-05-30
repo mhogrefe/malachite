@@ -23,7 +23,7 @@ pub fn test_from_digits_asc() {
         digits: &[U],
         out: T,
     ) {
-        assert_eq!(T::from_digits_asc(&base, digits.iter().cloned()), Some(out));
+        assert_eq!(T::from_digits_asc(&base, digits.iter().copied()), Some(out));
     }
     test_ok::<u8, u64>(64, &[], 0);
     test_ok::<u8, u64>(64, &[0, 0, 0], 0);
@@ -42,7 +42,7 @@ pub fn test_from_digits_asc() {
     test_ok::<u64, u32>(123, &[87, 19, 8, 0, 0, 0], 123456);
 
     fn test_err<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(base: U, digits: &[U]) {
-        assert_eq!(T::from_digits_asc(&base, digits.iter().cloned()), None);
+        assert_eq!(T::from_digits_asc(&base, digits.iter().copied()), None);
     }
     test_err::<u8, u64>(64, &[1; 1000]);
     test_err::<u8, u64>(2, &[2]);
@@ -52,11 +52,11 @@ pub fn test_from_digits_asc() {
 fn from_digits_asc_fail_helper<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>() {
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_digits_asc(&U::ZERO, digits.iter().cloned());
+        T::from_digits_asc(&U::ZERO, digits.iter().copied());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_digits_asc(&U::ONE, digits.iter().cloned());
+        T::from_digits_asc(&U::ONE, digits.iter().copied());
     });
 }
 
@@ -68,7 +68,7 @@ pub fn test_from_digits_desc() {
         out: T,
     ) {
         assert_eq!(
-            T::from_digits_desc(&base, digits.iter().cloned()),
+            T::from_digits_desc(&base, digits.iter().copied()),
             Some(out)
         );
     }
@@ -89,7 +89,7 @@ pub fn test_from_digits_desc() {
     test_ok::<u64, u32>(123, &[0, 0, 0, 8, 19, 87], 123456);
 
     fn test_err<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(base: U, digits: &[U]) {
-        assert_eq!(T::from_digits_desc(&base, digits.iter().cloned()), None);
+        assert_eq!(T::from_digits_desc(&base, digits.iter().copied()), None);
     }
     test_err::<u8, u64>(64, &[1; 1000]);
     test_err::<u8, u64>(2, &[2]);
@@ -99,11 +99,11 @@ pub fn test_from_digits_desc() {
 fn from_digits_desc_fail_helper<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>() {
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_digits_desc(&U::ZERO, digits.iter().cloned());
+        T::from_digits_desc(&U::ZERO, digits.iter().copied());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_digits_desc(&U::ONE, digits.iter().cloned());
+        T::from_digits_desc(&U::ONE, digits.iter().copied());
     });
 }
 
@@ -122,13 +122,13 @@ fn from_digits_asc_helper<
     U: PrimitiveUnsigned + SaturatingFrom<T>,
 >() {
     unsigned_vec_unsigned_pair_gen_var_9::<U>().test_properties(|(digits, base)| {
-        T::from_digits_asc(&base, digits.iter().cloned());
+        T::from_digits_asc(&base, digits.iter().copied());
     });
 
     unsigned_vec_unsigned_pair_gen_var_8::<U, T>().test_properties(|(digits, base)| {
-        let n = T::from_digits_asc(&base, digits.iter().cloned()).unwrap();
+        let n = T::from_digits_asc(&base, digits.iter().copied()).unwrap();
         assert_eq!(
-            T::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
+            T::from_digits_desc(&base, digits.iter().rev().copied()).unwrap(),
             n
         );
         let trailing_zeros = slice_trailing_zeros(&digits);
@@ -156,13 +156,13 @@ fn from_digits_desc_helper<
     U: PrimitiveUnsigned + SaturatingFrom<T>,
 >() {
     unsigned_vec_unsigned_pair_gen_var_9::<U>().test_properties(|(digits, base)| {
-        T::from_digits_asc(&base, digits.iter().cloned());
+        T::from_digits_asc(&base, digits.iter().copied());
     });
 
     unsigned_vec_unsigned_pair_gen_var_7::<U, T>().test_properties(|(digits, base)| {
-        let n = T::from_digits_desc(&base, digits.iter().cloned()).unwrap();
+        let n = T::from_digits_desc(&base, digits.iter().copied()).unwrap();
         assert_eq!(
-            T::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),
+            T::from_digits_asc(&base, digits.iter().rev().copied()).unwrap(),
             n
         );
         let leading_zeros = slice_leading_zeros(&digits);

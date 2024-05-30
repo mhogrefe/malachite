@@ -17,10 +17,10 @@ use malachite_nz::test_util::bench::bucketers::pair_1_integer_bit_bucketer;
 use malachite_nz::test_util::generators::{integer_signed_pair_gen, integer_unsigned_pair_gen};
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_integer_partial_eq_unsigned);
-    register_signed_demos!(runner, demo_integer_partial_eq_signed);
-    register_unsigned_demos!(runner, demo_unsigned_partial_eq_integer);
-    register_signed_demos!(runner, demo_signed_partial_eq_integer);
+    register_unsigned_demos!(runner, demo_integer_partial_eq_abs_unsigned);
+    register_signed_demos!(runner, demo_integer_partial_eq_abs_signed);
+    register_unsigned_demos!(runner, demo_unsigned_partial_eq_abs_integer);
+    register_signed_demos!(runner, demo_signed_partial_eq_abs_integer);
 
     register_unsigned_benches!(runner, benchmark_integer_eq_abs_unsigned);
     register_signed_benches!(runner, benchmark_integer_eq_abs_signed);
@@ -28,7 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_signed_eq_abs_integer);
 }
 
-fn demo_integer_partial_eq_unsigned<T: PrimitiveUnsigned>(
+fn demo_integer_partial_eq_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -44,8 +44,11 @@ fn demo_integer_partial_eq_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_integer_partial_eq_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
-where
+fn demo_integer_partial_eq_abs_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     Integer: EqAbs<T>,
 {
     for (n, i) in integer_signed_pair_gen::<T>().get(gm, config).take(limit) {
@@ -57,7 +60,7 @@ where
     }
 }
 
-fn demo_unsigned_partial_eq_integer<T: EqAbs<Integer> + PrimitiveUnsigned>(
+fn demo_unsigned_partial_eq_abs_integer<T: EqAbs<Integer> + PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -71,7 +74,7 @@ fn demo_unsigned_partial_eq_integer<T: EqAbs<Integer> + PrimitiveUnsigned>(
     }
 }
 
-fn demo_signed_partial_eq_integer<T: EqAbs<Integer> + PrimitiveSigned>(
+fn demo_signed_partial_eq_abs_integer<T: EqAbs<Integer> + PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

@@ -9,7 +9,7 @@
 use malachite_base::iterators::first_and_last;
 
 fn first_and_last_helper(xs: &[u8], result: Option<(u8, u8)>) {
-    assert_eq!(first_and_last(&mut xs.iter().cloned()), result);
+    assert_eq!(first_and_last(&mut xs.iter().copied()), result);
 }
 
 #[test]

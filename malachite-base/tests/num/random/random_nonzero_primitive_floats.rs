@@ -25,7 +25,7 @@ fn random_nonzero_primitive_floats_helper<T: CheckedToF64 + PrimitiveFloat>(
         expected_common_values,
         expected_median,
         expected_moment_stats,
-    )
+    );
 }
 
 #[test]

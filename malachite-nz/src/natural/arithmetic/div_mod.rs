@@ -923,10 +923,10 @@ pub_test! {limbs_invert_basecase_approx(
             limbs_div_mod_by_two_limb_normalized(is, scratch, ds);
         } else {
             let d_inv = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
-            if !MAYBE_DCP1_DIVAPPR {
-                limbs_div_schoolbook_approx(is, scratch, ds, d_inv);
-            } else {
+            if MAYBE_DCP1_DIVAPPR {
                 limbs_div_approx_helper(is, scratch, ds, d_inv);
+            } else {
+                limbs_div_schoolbook_approx(is, scratch, ds, d_inv);
             }
             assert!(!limbs_sub_limb_in_place(&mut is[..d_len], 1));
             return false;
@@ -1011,14 +1011,14 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
                 vec![0; limbs_mul_greater_to_out_scratch_len(ds_hi.len(), is_hi.len())];
             limbs_mul_greater_to_out(scratch, ds_hi, is_hi, &mut mul_scratch);
             limbs_slice_add_same_length_in_place_left(
-                &mut scratch[previous_size..size + 1],
-                &ds_hi[..diff + 1],
+                &mut scratch[previous_size..=size],
+                &ds_hi[..=diff],
             );
         } else {
             // Remember we truncated mod B ^ (d + 1) We computed (truncated) xp of length d + 1 <-
             // 1.is * 0.ds Use B ^ mul_size - 1 wraparound
             limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds_hi, is_hi, &mut scratch2);
-            let scratch = &mut scratch[..mul_size + 1];
+            let scratch = &mut scratch[..=mul_size];
             // We computed {xp, mul_size} <- {is, previous_d} * {ds, d} mod (B ^ mul_size - 1) We
             // know that 2 * |is * ds + ds * B ^ previous_d - B ^ {previous_d + d}| < B ^ mul_size
             // - 1 Add ds * B ^ previous_d mod (B ^ mul_size - 1)
@@ -1070,7 +1070,7 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
             // "negative" residue class
             assert!(scratch[size] >= Limb::MAX - 1);
             if condition {
-                assert!(!limbs_sub_limb_in_place(&mut scratch[..size + 1], 1));
+                assert!(!limbs_sub_limb_in_place(&mut scratch[..=size], 1));
             }
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(size);
             if scratch_hi[0] != Limb::MAX {
@@ -1249,7 +1249,7 @@ fn limbs_div_mod_barrett_preinverted(
             let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
             limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
         } else {
-            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
+            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len);
         }
         let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
         // Subtract the product from the partial remainder combined with new limbs from the
@@ -1755,18 +1755,18 @@ pub(crate) fn limbs_div_mod_balanced(
         let mask = Limb::MAX >> bits;
         ns_shifted[0] |= ns[i_len - 1] & mask;
         // Update partial remainder with partially used divisor limb.
-        let (ns_shifted_last, ns_shifted_init) = ns_shifted[..q_len + 1].split_last_mut().unwrap();
+        let (ns_shifted_last, ns_shifted_init) = ns_shifted[..=q_len].split_last_mut().unwrap();
         let carry_2 = limbs_sub_mul_limb_same_length_in_place_left(
             ns_shifted_init,
             qs_lo,
             ds[i_len - 1] & mask,
         );
-        if q_len != r_len {
-            assert!(*ns_shifted_last >= carry_2);
-            ns_shifted_last.wrapping_sub_assign(carry_2);
-        } else {
+        if q_len == r_len {
             (*ns_shifted_last, q_too_large) = carry_1.overflowing_sub(carry_2);
             r_len += 1;
+        } else {
+            assert!(*ns_shifted_last >= carry_2);
+            ns_shifted_last.wrapping_sub_assign(carry_2);
         }
         i_len_alt -= 1;
     }

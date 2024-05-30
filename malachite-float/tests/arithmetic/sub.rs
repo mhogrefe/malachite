@@ -10831,10 +10831,10 @@ fn sub_prec_round_properties() {
 
         match (r_diff.is_some() && *r_diff.as_ref().unwrap() >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
@@ -11173,10 +11173,10 @@ fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     };
     match (r_diff.is_some() && *r_diff.as_ref().unwrap() >= 0u32, rm) {
         (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater)
+            assert_ne!(o, Greater);
         }
         (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less)
+            assert_ne!(o, Less);
         }
         (_, Exact) => assert_eq!(o, Equal),
         _ => {}
@@ -11550,10 +11550,10 @@ fn sub_rational_prec_round_properties() {
 
             match (r_diff.is_some() && *r_diff.as_ref().unwrap() >= 0u32, rm) {
                 (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater)
+                    assert_ne!(o, Greater);
                 }
                 (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less)
+                    assert_ne!(o, Less);
                 }
                 (_, Exact) => assert_eq!(o, Equal),
                 _ => {}
@@ -11817,10 +11817,10 @@ fn sub_rational_round_properties() {
 
         match (r_diff.is_some() && *r_diff.as_ref().unwrap() >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}

@@ -80,7 +80,7 @@ fn convertible_from_helper_primitive_int_unsigned<
 >() {
     unsigned_gen::<U>().test_properties(|u| {
         let convertible = T::convertible_from(u);
-        assert_eq!(convertible, T::try_from(u).is_ok())
+        assert_eq!(convertible, T::try_from(u).is_ok());
     });
 }
 
@@ -90,7 +90,7 @@ fn convertible_from_helper_primitive_int_signed<
 >() {
     signed_gen::<U>().test_properties(|i| {
         let convertible = T::convertible_from(i);
-        assert_eq!(convertible, T::try_from(i).is_ok())
+        assert_eq!(convertible, T::try_from(i).is_ok());
     });
 }
 
@@ -100,7 +100,7 @@ fn convertible_from_helper_primitive_int_primitive_float<
 >() {
     primitive_float_gen::<U>().test_properties(|f| {
         let convertible = T::convertible_from(f);
-        assert_eq!(convertible, T::try_from(NiceFloat(f)).is_ok())
+        assert_eq!(convertible, T::try_from(NiceFloat(f)).is_ok());
     });
 }
 
@@ -113,7 +113,7 @@ where
 {
     unsigned_gen::<U>().test_properties(|u| {
         let convertible = T::convertible_from(u);
-        assert_eq!(convertible, NiceFloat::<T>::try_from(u).is_ok())
+        assert_eq!(convertible, NiceFloat::<T>::try_from(u).is_ok());
     });
 }
 
@@ -126,7 +126,7 @@ where
 {
     signed_gen::<U>().test_properties(|i| {
         let convertible = T::convertible_from(i);
-        assert_eq!(convertible, NiceFloat::<T>::try_from(i).is_ok())
+        assert_eq!(convertible, NiceFloat::<T>::try_from(i).is_ok());
     });
 }
 

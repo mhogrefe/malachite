@@ -76,11 +76,10 @@ impl OrdAbs for Rational {
         let d_cmp = self.denominator.cmp(&other.denominator);
         if n_cmp == Equal && d_cmp == Equal {
             return Equal;
-        } else {
-            let nd_cmp = n_cmp.cmp(&d_cmp);
-            if nd_cmp != Equal {
-                return nd_cmp;
-            }
+        }
+        let nd_cmp = n_cmp.cmp(&d_cmp);
+        if nd_cmp != Equal {
+            return nd_cmp;
         }
         // Then compare floor ∘ log_2 ∘ abs
         let log_cmp = self

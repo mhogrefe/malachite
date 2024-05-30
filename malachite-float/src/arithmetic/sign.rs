@@ -41,15 +41,14 @@ impl Sign for Float {
     /// assert_eq!(Float::NEGATIVE_ONE.sign(), Less);
     /// ```
     fn sign(&self) -> Ordering {
-        match self {
-            Float(Infinity { sign }) | Float(Zero { sign }) | Float(Finite { sign, .. }) => {
-                if *sign {
-                    Greater
-                } else {
-                    Less
-                }
+        if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
+            if *sign {
+                Greater
+            } else {
+                Less
             }
-            _ => panic!(),
+        } else {
+            panic!()
         }
     }
 }

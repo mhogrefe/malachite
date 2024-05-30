@@ -54,9 +54,8 @@ pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u6
             {
                 if result < Limb::WIDTH {
                     return Some((u64::wrapping_from(i) << Limb::LOG_WIDTH) + result);
-                } else {
-                    starting_index = 0;
                 }
+                starting_index = 0;
             }
         }
         Less => {
@@ -102,9 +101,8 @@ pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64
             .index_of_next_true_bit(within_limb_index)
         {
             return (u64::wrapping_from(i) << Limb::LOG_WIDTH) + result;
-        } else {
-            starting_index = 0;
         }
+        starting_index = 0;
     } else {
         starting_index -= after_boundary_offset;
     }

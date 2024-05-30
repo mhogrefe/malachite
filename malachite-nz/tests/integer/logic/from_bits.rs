@@ -21,7 +21,7 @@ use malachite_nz::test_util::integer::logic::from_bits::{
 #[test]
 fn test_from_bits_asc_and_from_bit_iterator_asc() {
     let test = |bits: &[bool], out| {
-        let x = Integer::from_bits_asc(bits.iter().cloned());
+        let x = Integer::from_bits_asc(bits.iter().copied());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -75,7 +75,7 @@ fn test_from_bits_asc_and_from_bit_iterator_asc() {
 #[test]
 fn test_from_bits_desc() {
     let test = |bits: &[bool], out| {
-        let x = Integer::from_bits_desc(bits.iter().cloned());
+        let x = Integer::from_bits_desc(bits.iter().copied());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -133,11 +133,11 @@ fn test_from_bits_desc() {
 #[test]
 fn from_bits_asc_properties() {
     bool_vec_gen().test_properties(|bits| {
-        let x = Integer::from_bits_asc(bits.iter().cloned());
+        let x = Integer::from_bits_asc(bits.iter().copied());
         assert!(x.is_valid());
-        assert_eq!(from_bits_asc_naive(bits.iter().cloned()), x);
-        assert_eq!(from_bits_asc_alt::<Integer, _>(bits.iter().cloned()), x);
-        assert_eq!(Integer::from_bits_desc(bits.iter().cloned().rev()), x);
+        assert_eq!(from_bits_asc_naive(bits.iter().copied()), x);
+        assert_eq!(from_bits_asc_alt::<Integer, _>(bits.iter().copied()), x);
+        assert_eq!(Integer::from_bits_desc(bits.iter().copied().rev()), x);
         assert_eq!(bits.iter().all(|b| !b), x == 0);
         if SignedLimb::convertible_from(&x) {
             assert_eq!(SignedLimb::from_bits_asc(bits.into_iter()), x);
@@ -148,11 +148,11 @@ fn from_bits_asc_properties() {
 #[test]
 fn from_bits_desc_properties() {
     bool_vec_gen().test_properties(|bits| {
-        let x = Integer::from_bits_desc(bits.iter().cloned());
+        let x = Integer::from_bits_desc(bits.iter().copied());
         assert!(x.is_valid());
-        assert_eq!(from_bits_desc_naive(bits.iter().cloned()), x);
-        assert_eq!(from_bits_desc_alt::<Integer, _>(bits.iter().cloned()), x);
-        assert_eq!(Integer::from_bits_asc(bits.iter().cloned().rev()), x);
+        assert_eq!(from_bits_desc_naive(bits.iter().copied()), x);
+        assert_eq!(from_bits_desc_alt::<Integer, _>(bits.iter().copied()), x);
+        assert_eq!(Integer::from_bits_asc(bits.iter().copied().rev()), x);
         assert_eq!(bits.iter().all(|b| !b), x == 0);
         if SignedLimb::convertible_from(&x) {
             assert_eq!(SignedLimb::from_bits_desc(bits.into_iter()), x);

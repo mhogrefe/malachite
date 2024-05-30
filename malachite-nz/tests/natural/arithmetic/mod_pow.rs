@@ -441,38 +441,38 @@ fn mod_pow_fail() {
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_pow_assign(Natural::from(3u32), Natural::ZERO)
+        x.mod_pow_assign(Natural::from(3u32), Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::from(30u32);
-        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_pow_assign(Natural::from(3u32), &Natural::ZERO)
+        x.mod_pow_assign(Natural::from(3u32), &Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::from(30u32);
-        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_pow_assign(&Natural::from(3u32), Natural::ZERO)
+        x.mod_pow_assign(&Natural::from(3u32), Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::from(30u32);
-        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_pow_assign(&Natural::from(3u32), &Natural::ZERO)
+        x.mod_pow_assign(&Natural::from(3u32), &Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::from(30u32);
-        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE);
     });
 }
 

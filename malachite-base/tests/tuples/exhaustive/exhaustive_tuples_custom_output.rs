@@ -135,7 +135,7 @@ fn test_exhaustive_pairs_and_exhaustive_pairs_custom_output() {
         ],
     );
     exhaustive_pairs_helper(
-        ['a', 'b', 'c'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
         exhaustive_orderings(),
         9,
         &[
@@ -152,7 +152,7 @@ fn test_exhaustive_pairs_and_exhaustive_pairs_custom_output() {
     );
     exhaustive_pairs_helper(
         exhaustive_pairs(exhaustive_orderings(), exhaustive_bools()),
-        exhaustive_triples_from_single([Less, Greater].iter().cloned()),
+        exhaustive_triples_from_single([Less, Greater].iter().copied()),
         48,
         &[
             ((Equal, false), (Less, Less, Less)),
@@ -318,8 +318,8 @@ fn test_exhaustive_triples_and_exhaustive_triples_custom_output() {
         ],
     );
     exhaustive_triples_helper(
-        ['a', 'b', 'c'].iter().cloned(),
-        ["xx", "yy", "zz"].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
+        ["xx", "yy", "zz"].iter().copied(),
         0..3,
         27,
         &[

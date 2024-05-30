@@ -21,7 +21,7 @@ where
 {
     match (x, y) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Greater),
+        (Float(Infinity { .. }), _) => Some(Greater),
         (float_either_zero!(), y) => Some(if *y == T::ZERO { Equal } else { Less }),
         (
             Float(Finite {
@@ -96,7 +96,7 @@ where
 {
     match (x, y) {
         (float_nan!(), _) => None,
-        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Greater),
+        (Float(Infinity { .. }), _) => Some(Greater),
         (float_either_zero!(), y) => Some(if *y == T::ZERO { Equal } else { Less }),
         (
             Float(Finite {

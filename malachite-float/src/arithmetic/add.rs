@@ -376,7 +376,7 @@ impl Float {
                             precision: prec,
                             significand: diff,
                         });
-                        (diff, if *x_sign != neg { o } else { o.reverse() })
+                        (diff, if *x_sign == neg { o.reverse() } else { o })
                     }
                 }
             }
@@ -392,7 +392,7 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
+            (Float(NaN | Infinity { .. }), _) => Equal,
             (float_negative_zero!(), y) => {
                 if y == 0u32 {
                     Equal
@@ -459,7 +459,7 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
+            (Float(NaN | Infinity { .. }), _) => Equal,
             (float_negative_zero!(), y) => {
                 if *y == 0u32 {
                     Equal
@@ -668,7 +668,7 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
+            (Float(NaN | Infinity { .. }), _) => Equal,
             (float_negative_zero!(), y) => {
                 let o;
                 (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
@@ -738,7 +738,7 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (float_nan!() | float_infinity!() | float_negative_infinity!(), _) => Equal,
+            (Float(NaN | Infinity { .. }), _) => Equal,
             (float_negative_zero!(), y) => {
                 let o;
                 (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
@@ -951,8 +951,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the specified precision and with the specified
     /// rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1039,8 +1039,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the specified precision and with the specified
     /// rounding mode. The first [`Float`] is taken by value and the second by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1127,8 +1127,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the specified precision and with the specified
     /// rounding mode. The first [`Float`] is taken by reference and the second by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1215,8 +1215,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the specified precision and with the specified
     /// rounding mode. Both [`Float`]s are taken by reference. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1302,8 +1302,7 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// Both [`Float`]s are taken by value. An [`Ordering`] is also returned, indicating whether the
     /// rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
-    /// comparable to any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Equal`.
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -1359,7 +1358,7 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// The first [`Float`] is taken by value and the second by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
     /// returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
@@ -1416,7 +1415,7 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// The first [`Float`] is taken by reference and the second by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
     /// returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
@@ -1473,8 +1472,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result to the nearest value of the specified precision.
     /// Both [`Float`]s are taken by reference. An [`Ordering`] is also returned, indicating whether
     /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
-    /// not comparable to any other [`Float`], whenever this function returns a `NaN` it also
-    /// returns `Equal`.
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -1530,7 +1529,7 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result with the specified rounding mode. Both [`Float`]s
     /// are taken by value. An [`Ordering`] is also returned, indicating whether the rounded sum is
     /// less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1603,8 +1602,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result with the specified rounding mode. The first
     /// [`Float`] is taken by value and the second by reference. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1677,8 +1676,8 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result with the specified rounding mode. The first
     /// [`Float`] is taken by reference and the second by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1751,7 +1750,7 @@ impl Float {
     /// Adds two [`Float`]s, rounding the result with the specified rounding mode. Both [`Float`]s
     /// are taken by reference. An [`Ordering`] is also returned, indicating whether the rounded sum
     /// is less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1824,8 +1823,8 @@ impl Float {
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result to the specified precision and
     /// with the specified rounding mode. The [`Float`] on the right-hand side is taken by value. An
     /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1899,7 +1898,7 @@ impl Float {
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result to the specified precision and
     /// with the specified rounding mode. The [`Float`] on the right-hand side is taken by
     /// reference. An [`Ordering`] is returned, indicating whether the rounded sum is less than,
-    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any other
+    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
     /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
@@ -1991,8 +1990,8 @@ impl Float {
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result to the nearest value of the
     /// specified precision. The [`Float`] on the right-hand side is taken by value. An [`Ordering`]
     /// is returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function sets
+    /// the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2041,8 +2040,8 @@ impl Float {
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result to the nearest value of the
     /// specified precision. The [`Float`] on the right-hand side is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2091,7 +2090,7 @@ impl Float {
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result with the specified rounding
     /// mode. The [`Float`] on the right-hand side is taken by value. An [`Ordering`] is returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets the
     /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
@@ -2154,8 +2153,8 @@ impl Float {
     /// Adds a [`Float`] to a [`Float`] in place, rounding the result with the specified rounding
     /// mode. The [`Float`] on the right-hand side is taken by reference. An [`Ordering`] is
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function sets
+    /// the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -2217,8 +2216,8 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the specified precision and with
     /// the specified rounding mode. The [`Float`] and the [`Rational`] are both taken by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2311,7 +2310,7 @@ impl Float {
     /// the specified rounding mode. The [`Float`] is taken by value and the [`Rational`] by
     /// reference. An  [`Ordering`] is also returned, indicating whether the rounded sum is less
     /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2421,7 +2420,7 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the specified precision and with
     /// the specified rounding mode. The [`Float`] is taken by reference and the [`Rational`] by
     /// value. An [`Ordering`] is also returned, indicating whether the rounded sum is less than,
-    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any other
+    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
     /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
@@ -2531,8 +2530,8 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the specified precision and with
     /// the specified rounding mode. The [`Float`] and the [`Rational`] are both taken by reference.
     /// An [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to,
-    /// or greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// or greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2641,8 +2640,8 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] and the [`Rational`] are both are taken by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2700,8 +2699,8 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by value and the [`Rational`] by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2759,8 +2758,8 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by reference and the [`Rational`] by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2818,8 +2817,8 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] and the [`Rational`] are both are taken by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -2877,7 +2876,7 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result with the specified rounding mode.
     /// The [`Float`] and the [`Rational`] are both are taken by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
     /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
@@ -2951,7 +2950,7 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result with the specified rounding mode.
     /// The [`Float`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
     /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
@@ -3030,7 +3029,7 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result with the specified rounding mode.
     /// The [`Float`] is taken by reference and the [`Float`] by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
     /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
@@ -3109,7 +3108,7 @@ impl Float {
     /// Adds a [`Float`] and a [`Rational`], rounding the result with the specified rounding mode.
     /// The [`Float`] and the [`Rational`] are both are taken by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
     /// returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
@@ -3188,8 +3187,8 @@ impl Float {
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the specified precision
     /// and with the specified rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is
     /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any other [`Float`], whenever this function
-    /// sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function sets
+    /// the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -3285,8 +3284,8 @@ impl Float {
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the specified precision
     /// and with the specified rounding mode. The [`Rational`] is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -3383,7 +3382,7 @@ impl Float {
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the nearest value of the
     /// specified precision. The [`Rational`] is taken by value. An [`Ordering`] is returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets the
     /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
@@ -3442,7 +3441,7 @@ impl Float {
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the nearest value of the
     /// specified precision. The [`Rational`] is taken by reference. An [`Ordering`] is returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets the
     /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
@@ -3501,8 +3500,8 @@ impl Float {
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result with the specified rounding
     /// mode. The [`Rational`] is taken by value. An [`Ordering`] is returned, indicating whether
     /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
-    /// not comparable to any other [`Float`], whenever this function sets the [`Float`] to `NaN` it
-    /// also returns `Equal`.
+    /// not comparable to any [`Float`], whenever this function sets the [`Float`] to `NaN` it also
+    /// returns `Equal`.
     ///
     /// The precision of the output is the precision of the input [`Float`]. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3574,8 +3573,8 @@ impl Float {
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result with the specified rounding
     /// mode. The [`Rational`] is taken by reference. An [`Ordering`] is returned, indicating
     /// whether the rounded sum is less than, equal to, or greater than the exact sum. Although
-    /// `NaN`s are not comparable to any other [`Float`], whenever this function sets the [`Float`]
-    /// to `NaN` it also returns `Equal`.
+    /// `NaN`s are not comparable to any [`Float`], whenever this function sets the [`Float`] to
+    /// `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the input [`Float`]. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3924,7 +3923,7 @@ impl AddAssign<Float> for Float {
     /// - If $x+y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x+y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// Special cases: See the `+` documenation for information on special cases.
+    /// See the `+` documentation for information on special cases.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::add_prec_assign`] instead. If you want to specify the output precision, consider
@@ -3999,7 +3998,7 @@ impl<'a> AddAssign<&'a Float> for Float {
     /// - If $x+y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x+y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// Special cases: See the `+` documenation for information on special cases.
+    /// See the `+` documentation for information on special cases.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::add_prec_assign_ref`] instead. If you want to specify the output precision,

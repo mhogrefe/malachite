@@ -94,7 +94,7 @@ fn trim_be_limbs(xs: &mut Vec<Limb>) {
         match xs.iter().position(|&limb| limb != Limb::MAX) {
             None => *xs = vec![Limb::MAX],
             Some(i) => {
-                let i = if !xs[i].get_highest_bit() { i - 1 } else { i };
+                let i = if xs[i].get_highest_bit() { i } else { i - 1 };
                 vec_delete_left(xs, i);
             }
         }
@@ -117,12 +117,12 @@ fn from_twos_complement_limbs_asc_properties() {
     unsigned_vec_gen().test_properties_with_config(&config, |xs| {
         let x = Integer::from_twos_complement_limbs_asc(&xs);
         assert_eq!(Integer::from_owned_twos_complement_limbs_asc(xs.clone()), x);
-        let mut trimmed_xs = xs.iter().cloned().rev().collect_vec();
+        let mut trimmed_xs = xs.iter().copied().rev().collect_vec();
         trim_be_limbs(&mut trimmed_xs);
         trimmed_xs.reverse();
         assert_eq!(x.to_twos_complement_limbs_asc(), trimmed_xs);
         assert_eq!(
-            Integer::from_owned_twos_complement_limbs_desc(xs.iter().cloned().rev().collect()),
+            Integer::from_owned_twos_complement_limbs_desc(xs.iter().copied().rev().collect()),
             x
         );
         if match x.sign() {
@@ -157,7 +157,7 @@ fn from_twos_complement_limbs_desc_properties() {
         trim_be_limbs(&mut trimmed_xs);
         assert_eq!(x.to_twos_complement_limbs_desc(), trimmed_xs);
         assert_eq!(
-            Integer::from_owned_twos_complement_limbs_asc(xs.iter().cloned().rev().collect()),
+            Integer::from_owned_twos_complement_limbs_asc(xs.iter().copied().rev().collect()),
             x
         );
         if match x.sign() {

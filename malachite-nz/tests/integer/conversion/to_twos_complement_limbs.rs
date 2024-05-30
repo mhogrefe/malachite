@@ -304,7 +304,7 @@ fn to_twos_complement_limbs_asc_properties() {
         assert_eq!(Integer::from_twos_complement_limbs_asc(&xs), x);
         assert_eq!(
             x.to_twos_complement_limbs_desc(),
-            xs.iter().cloned().rev().collect_vec()
+            xs.iter().copied().rev().collect_vec()
         );
         match x.sign() {
             Equal => assert!(xs.is_empty()),
@@ -336,7 +336,7 @@ fn to_twos_complement_limbs_desc_properties() {
         assert_eq!(Integer::from_twos_complement_limbs_desc(&xs), x);
         assert_eq!(
             x.to_twos_complement_limbs_asc(),
-            xs.iter().cloned().rev().collect_vec()
+            xs.iter().copied().rev().collect_vec()
         );
         match x.sign() {
             Equal => assert!(xs.is_empty()),
@@ -369,7 +369,7 @@ fn twos_complement_limbs_properties() {
                 xs.insert(i, limbs.next().unwrap());
                 i += 1;
             } else {
-                xs.insert(i, limbs.next_back().unwrap())
+                xs.insert(i, limbs.next_back().unwrap());
             }
         }
         assert!(limbs.next().is_none());

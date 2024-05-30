@@ -142,7 +142,7 @@ impl Natural {
                     shift.mod_power_of_2_assign(Limb::LOG_WIDTH);
                     let limbs_to_shift = usize::wrapping_from(limbs_to_shift);
                     most_significant_limbs.copy_within(..3 - limbs_to_shift, limbs_to_shift);
-                    slice_set_zero(&mut most_significant_limbs[..limbs_to_shift])
+                    slice_set_zero(&mut most_significant_limbs[..limbs_to_shift]);
                 }
                 if shift != 0 {
                     limbs_slice_shl_in_place(&mut most_significant_limbs, shift);

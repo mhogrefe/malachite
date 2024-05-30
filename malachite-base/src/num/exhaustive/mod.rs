@@ -278,9 +278,7 @@ pub fn primitive_int_increasing_range<T: PrimitiveInt>(
     a: T,
     b: T,
 ) -> PrimitiveIntIncreasingRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     PrimitiveIntIncreasingRange {
         a: Some(a),
         b: Some(b),
@@ -317,9 +315,7 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
     a: T,
     b: T,
 ) -> PrimitiveIntIncreasingRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     PrimitiveIntIncreasingRange {
         a: Some(a),
         b: b.checked_add(T::ONE),
@@ -355,9 +351,7 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 /// )
 /// ```
 pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSignedRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     if a >= T::ZERO {
         ExhaustiveSignedRange::NonNegative(primitive_int_increasing_range(a, b))
     } else if b <= T::ZERO {
@@ -403,9 +397,7 @@ pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
     a: T,
     b: T,
 ) -> ExhaustiveSignedRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     if a >= T::ZERO {
         ExhaustiveSignedRange::NonNegative(primitive_int_increasing_inclusive_range(a, b))
     } else if b <= T::ZERO {
@@ -507,13 +499,12 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 ) -> PrimitiveFloatIncreasingRange<T> {
     assert!(!a.is_nan());
     assert!(!b.is_nan());
-    if NiceFloat(a) > NiceFloat(b) {
-        panic!(
-            "a must be less than or equal to b. a: {}, b: {}",
-            NiceFloat(a),
-            NiceFloat(b)
-        );
-    }
+    assert!(
+        NiceFloat(a) <= NiceFloat(b),
+        "a must be less than or equal to b. a: {}, b: {}",
+        NiceFloat(a),
+        NiceFloat(b)
+    );
     PrimitiveFloatIncreasingRange {
         phantom: PhantomData,
         xs: primitive_int_increasing_range(
@@ -577,13 +568,12 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 ) -> PrimitiveFloatIncreasingRange<T> {
     assert!(!a.is_nan());
     assert!(!b.is_nan());
-    if NiceFloat(a) > NiceFloat(b) {
-        panic!(
-            "a must be less than or equal to b. a: {}, b: {}",
-            NiceFloat(a),
-            NiceFloat(b)
-        );
-    }
+    assert!(
+        NiceFloat(a) <= NiceFloat(b),
+        "a must be less than or equal to b. a: {}, b: {}",
+        NiceFloat(a),
+        NiceFloat(b)
+    );
     PrimitiveFloatIncreasingRange {
         phantom: PhantomData,
         xs: primitive_int_increasing_inclusive_range(

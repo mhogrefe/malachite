@@ -128,12 +128,12 @@ pub_test! {limbs_mod_mul_two_limbs(
 
     // at most two subtractions of n, use q as temp space
     let (q_2, q_1, q_0) = Limb::xxx_sub_yyy_to_zzz(w_2, w_1, w_0, 0, m_1, m_0);
-    if !q_2.get_highest_bit() {
+    if q_2.get_highest_bit() {
         let (w_2, w_1, w_0) = Limb::xxx_sub_yyy_to_zzz(q_2, q_1, q_0, 0, m_1, m_0);
-        if !w_2.get_highest_bit() {
-            (w_1, w_0)
-        } else {
+        if w_2.get_highest_bit() {
             (q_1, q_0)
+        } else {
+            (w_1, w_0)
         }
     } else {
         (w_1, w_0)
@@ -208,7 +208,7 @@ impl Natural {
             (&mut Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
                 let (r_1, r_0) =
                     limbs_mod_mul_two_limbs(0, x, ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0);
-                *self = Natural::from_owned_limbs_asc(vec![r_0, r_1])
+                *self = Natural::from_owned_limbs_asc(vec![r_0, r_1]);
             }
             (&mut Natural(Large(ref mut xs)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
                 let (r_1, r_0) =
@@ -929,7 +929,7 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
-                x.mod_mul_precomputed_two_limbs_assign(&y, &m, inv_2, inv_1, inv_0)
+                x.mod_mul_precomputed_two_limbs_assign(&y, &m, inv_2, inv_1, inv_0);
             }
             (x, y, m, _) => {
                 *x *= y;
@@ -998,7 +998,7 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
-                x.mod_mul_precomputed_two_limbs_assign(&y, m, inv_2, inv_1, inv_0)
+                x.mod_mul_precomputed_two_limbs_assign(&y, m, inv_2, inv_1, inv_0);
             }
             (x, y, m, _) => {
                 *x *= y;
@@ -1067,7 +1067,7 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
-                x.mod_mul_precomputed_two_limbs_assign(y, &m, inv_2, inv_1, inv_0)
+                x.mod_mul_precomputed_two_limbs_assign(y, &m, inv_2, inv_1, inv_0);
             }
             (x, y, m, _) => {
                 *x *= y;
@@ -1137,7 +1137,7 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
-                x.mod_mul_precomputed_two_limbs_assign(y, m, inv_2, inv_1, inv_0)
+                x.mod_mul_precomputed_two_limbs_assign(y, m, inv_2, inv_1, inv_0);
             }
             (x, y, m, _) => {
                 *x *= y;
@@ -1520,7 +1520,7 @@ impl ModMulAssign<Natural, Natural> for Natural {
     #[inline]
     fn mod_mul_assign(&mut self, other: Natural, m: Natural) {
         let data = precompute_mod_mul_data_helper(&m);
-        self.mod_mul_precomputed_assign(other, m, &data)
+        self.mod_mul_precomputed_assign(other, m, &data);
     }
 }
 
@@ -1559,7 +1559,7 @@ impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
     /// are taken by value, `m` is taken by reference, and `a == b`.
     #[inline]
     fn mod_mul_assign(&mut self, other: Natural, m: &'a Natural) {
-        self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m))
+        self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m));
     }
 }
 
@@ -1597,7 +1597,7 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
     #[inline]
     fn mod_mul_assign(&mut self, other: &'a Natural, m: Natural) {
         let data = precompute_mod_mul_data_helper(&m);
-        self.mod_mul_precomputed_assign(other, m, &data)
+        self.mod_mul_precomputed_assign(other, m, &data);
     }
 }
 
@@ -1635,6 +1635,6 @@ impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
     /// taken by value, `c` and `m` are taken by reference, and `a == b`.
     #[inline]
     fn mod_mul_assign(&mut self, other: &'a Natural, m: &'b Natural) {
-        self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m))
+        self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m));
     }
 }

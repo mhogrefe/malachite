@@ -111,10 +111,10 @@ fn split_into_chunks_properties() {
             1 => split_into_chunks_helper!(xs, len, 2, [xs_1], xs_2),
             2 => split_into_chunks_helper!(xs, len, 3, [xs_1, xs_2], xs_3),
             3 => {
-                split_into_chunks_helper!(xs, len, 4, [xs_1, xs_2, xs_3], xs_4)
+                split_into_chunks_helper!(xs, len, 4, [xs_1, xs_2, xs_3], xs_4);
             }
             4 => {
-                split_into_chunks_helper!(xs, len, 5, [xs_1, xs_2, xs_3, xs_4], xs_5)
+                split_into_chunks_helper!(xs, len, 5, [xs_1, xs_2, xs_3, xs_4], xs_5);
             }
             5 => split_into_chunks_helper!(xs, len, 6, [xs_1, xs_2, xs_3, xs_4, xs_5], xs_6),
             6 => split_into_chunks_helper!(xs, len, 7, [xs_1, xs_2, xs_3, xs_4, xs_5, xs_6], xs_7),
@@ -161,10 +161,10 @@ fn split_into_chunks_mut_properties() {
             1 => split_into_chunks_mut_helper!(xs, len, 2, [xs_1], xs_2),
             2 => split_into_chunks_mut_helper!(xs, len, 3, [xs_1, xs_2], xs_3),
             3 => {
-                split_into_chunks_mut_helper!(xs, len, 4, [xs_1, xs_2, xs_3], xs_4)
+                split_into_chunks_mut_helper!(xs, len, 4, [xs_1, xs_2, xs_3], xs_4);
             }
             4 => {
-                split_into_chunks_mut_helper!(xs, len, 5, [xs_1, xs_2, xs_3, xs_4], xs_5)
+                split_into_chunks_mut_helper!(xs, len, 5, [xs_1, xs_2, xs_3, xs_4], xs_5);
             }
             5 => split_into_chunks_mut_helper!(xs, len, 6, [xs_1, xs_2, xs_3, xs_4, xs_5], xs_6),
             6 => {
@@ -174,7 +174,7 @@ fn split_into_chunks_mut_properties() {
                     7,
                     [xs_1, xs_2, xs_3, xs_4, xs_5, xs_6],
                     xs_7
-                )
+                );
             }
             7 => split_into_chunks_mut_helper!(
                 xs,

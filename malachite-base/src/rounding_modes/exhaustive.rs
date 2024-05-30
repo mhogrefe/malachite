@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rounding_modes::{RoundingMode, ROUNDING_MODES};
-use core::iter::Cloned;
+use core::iter::Copied;
 use core::slice::Iter;
 
-pub type ExhaustiveRoundingModes = Cloned<Iter<'static, RoundingMode>>;
+pub type ExhaustiveRoundingModes = Copied<Iter<'static, RoundingMode>>;
 
 /// Generates all [`RoundingMode`]s.
 ///
@@ -32,5 +32,5 @@ pub type ExhaustiveRoundingModes = Cloned<Iter<'static, RoundingMode>>;
 /// ```
 #[inline]
 pub fn exhaustive_rounding_modes() -> ExhaustiveRoundingModes {
-    ROUNDING_MODES.iter().cloned()
+    ROUNDING_MODES.iter().copied()
 }

@@ -131,7 +131,7 @@ pub fn jacobi_symbol_unsigned_fast_2_2<T: PrimitiveUnsigned>(mut a: T, mut b: T)
         loop {
             a >>= 1;
             if two.get_bit(1) {
-                s.neg_assign()
+                s.neg_assign();
             }
             if a.odd() {
                 break;
@@ -159,7 +159,7 @@ pub fn jacobi_symbol_unsigned_fast_2_2<T: PrimitiveUnsigned>(mut a: T, mut b: T)
         loop {
             a >>= 1;
             if two.get_bit(1) {
-                s.neg_assign()
+                s.neg_assign();
             }
             if a.odd() {
                 break;

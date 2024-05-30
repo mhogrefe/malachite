@@ -592,7 +592,7 @@ pub fn random_rational_signed_pair_gen_var_4<T: PrimitiveSigned>(
                             config.get_or("small_signed_mean_n", 32),
                             config.get_or("small_signed_mean_d", 1),
                         )
-                        .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
+                        .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
                     },
                 )
             },
@@ -833,7 +833,7 @@ pub fn random_rational_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
                             config.get_or("small_unsigned_mean_n", 32),
                             config.get_or("small_unsigned_mean_d", 1),
                         )
-                        .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
+                        .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
                     },
                 )
             },

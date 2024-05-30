@@ -46,6 +46,7 @@ fn limbs_mod_power_of_2_inverse(out: &mut [Limb], xs: &[Limb], pow: u64, scratch
     limbs_slice_mod_power_of_2_in_place(out, pow);
 }
 
+#[allow(clippy::unnecessary_wraps)]
 fn mod_power_of_2_inverse_helper(xs: &[Limb], pow: u64) -> Option<Natural> {
     let len = xs.len();
     let mut big_scratch = vec![0; len * 3];

@@ -179,7 +179,7 @@ pub_test! {limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bo
 // Panics if `xs` is empty.
 pub_test! {limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_and_limb_neg_in_place(xs, y) {
-        xs.push(1)
+        xs.push(1);
     }
 }}
 
@@ -783,7 +783,7 @@ impl Natural {
         match (&mut *self, other) {
             (Natural(Small(x)), y) => *self = y.and_pos_limb_neg(x.wrapping_neg()),
             (Natural(Large(ref xs)), Natural(Small(y))) => {
-                *self = Natural(Small(xs[0].wrapping_neg() & *y))
+                *self = Natural(Small(xs[0].wrapping_neg() & *y));
             }
             (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_vec_and_pos_neg_in_place_right(ys, xs);
@@ -1048,7 +1048,7 @@ impl BitAndAssign<Integer> for Integer {
             (true, false) => self.abs.and_assign_pos_neg(&other.abs),
             (false, true) => {
                 self.sign = true;
-                self.abs.and_assign_neg_pos(other.abs)
+                self.abs.and_assign_neg_pos(other.abs);
             }
             (false, false) => self.abs.and_assign_neg_neg(other.abs),
         }
@@ -1089,7 +1089,7 @@ impl<'a> BitAndAssign<&'a Integer> for Integer {
             (true, false) => self.abs.and_assign_pos_neg(&other.abs),
             (false, true) => {
                 self.sign = true;
-                self.abs.and_assign_neg_pos_ref(&other.abs)
+                self.abs.and_assign_neg_pos_ref(&other.abs);
             }
             (false, false) => self.abs.and_assign_neg_neg_ref(&other.abs),
         }

@@ -149,13 +149,12 @@ impl Iterator for ExhaustiveChars {
                     let limit = if self.ascii_only { '\u{7f}' } else { char::MAX };
                     if self.c == limit {
                         return None;
-                    } else {
+                    }
+                    increment_char(&mut self.c);
+                    while !self.c.is_ascii_control()
+                        && (self.c.is_ascii() || CharType::NonAsciiGraphic.contains(self.c))
+                    {
                         increment_char(&mut self.c);
-                        while !self.c.is_ascii_control()
-                            && (self.c.is_ascii() || CharType::NonAsciiGraphic.contains(self.c))
-                        {
-                            increment_char(&mut self.c);
-                        }
                     }
                 }
             }

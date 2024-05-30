@@ -392,7 +392,9 @@ fn shr_properties_helper_signed<T: PrimitiveSigned>()
 where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
     Float: Shl<T, Output = Float> + ShrAssign<T> + Shr<T, Output = Float>,
-    for<'a> &'a Float: Shr<T, Output = Float> + Shr<<T as UnsignedAbs>::Output, Output = Float>,
+    for<'a> &'a Float: Shl<T, Output = Float>
+        + Shr<T, Output = Float>
+        + Shr<<T as UnsignedAbs>::Output, Output = Float>,
     i64: TryFrom<T>,
 {
     float_signed_pair_gen_var_2::<T>().test_properties(|(n, i)| {
@@ -423,7 +425,7 @@ where
         }
         assert_eq!(ComparableFloat(-&n >> i), ComparableFloat(-(&n >> i)));
         if let Some(neg_i) = i.checked_neg() {
-            assert_eq!(ComparableFloat(&n >> neg_i), ComparableFloat(n << i));
+            assert_eq!(ComparableFloat(&n >> neg_i), ComparableFloat(&n << i));
         }
     });
 

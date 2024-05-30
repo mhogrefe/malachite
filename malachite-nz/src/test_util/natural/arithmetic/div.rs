@@ -171,14 +171,14 @@ pub fn limbs_div_limb_to_out_alt(out: &mut [Limb], ns: &[Limb], d: Limb) {
         }
         out[len_minus_1] = Limb::from(adjust);
         let d_inv = limbs_invert_limb(d);
-        limbs_div_limb_normalized_to_out(out, &ns[..len_minus_1], highest_limb, d, d_inv)
+        limbs_div_limb_normalized_to_out(out, &ns[..len_minus_1], highest_limb, d, d_inv);
     } else {
         let d = d << bits;
         let ns_high = limbs_shl_to_out(out, ns, bits);
         let d_inv = limbs_invert_limb(d);
         let r;
         (out[len_minus_1], r) = div_mod_by_preinversion(ns_high, out[len_minus_1], d, d_inv);
-        limbs_div_limb_normalized_in_place(&mut out[..len_minus_1], r, d, d_inv)
+        limbs_div_limb_normalized_in_place(&mut out[..len_minus_1], r, d, d_inv);
     }
 }
 
@@ -199,13 +199,13 @@ pub fn limbs_div_limb_in_place_alt(ns: &mut [Limb], d: Limb) {
         }
         ns[len_minus_1] = Limb::from(adjust);
         let d_inv = limbs_invert_limb(d);
-        limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], highest_limb, d, d_inv)
+        limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], highest_limb, d, d_inv);
     } else {
         let d = d << bits;
         let ns_high = limbs_slice_shl_in_place(ns, bits);
         let d_inv = limbs_invert_limb(d);
         let r;
         (ns[len_minus_1], r) = div_mod_by_preinversion(ns_high, ns[len_minus_1], d, d_inv);
-        limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], r, d, d_inv)
+        limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], r, d, d_inv);
     }
 }

@@ -36,7 +36,7 @@ pub fn random_primitive_floats_helper_helper<
             actual_moment_stats
         ),
         (
-            expected_values.iter().cloned().map(NiceFloat).collect_vec(),
+            expected_values.iter().copied().map(NiceFloat).collect_vec(),
             expected_common_values
                 .iter()
                 .map(|&(x, freq)| (NiceFloat(x), freq))
@@ -71,7 +71,7 @@ pub fn special_random_primitive_floats_helper_helper<
             actual_moment_stats
         ),
         (
-            expected_values.iter().cloned().map(NiceFloat).collect_vec(),
+            expected_values.iter().copied().map(NiceFloat).collect_vec(),
             expected_common_values
                 .iter()
                 .map(|&(x, freq)| (NiceFloat(x), freq))

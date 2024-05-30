@@ -835,9 +835,8 @@ impl<I: Iterator, P: Fn(&I::Item) -> bool> Iterator for TakeWhileExtra<I, P> {
                     return Some(x);
                 } else if self.false_seen {
                     return None;
-                } else {
-                    self.false_seen = true;
                 }
+                self.false_seen = true;
             } else {
                 return None;
             }
@@ -1277,14 +1276,12 @@ pub(crate) fn round_to_multiple_signed_filter_map<
     y: S,
     rm: RoundingMode,
 ) -> Option<(S, S, RoundingMode)> {
-    if rm != Exact {
-        if round_to_multiple_signed_helper(x, y, rm) {
-            Some((x, y, rm))
-        } else {
-            None
-        }
-    } else {
+    if rm == Exact {
         x.checked_mul(y).map(|product| (product, y, rm))
+    } else if round_to_multiple_signed_helper(x, y, rm) {
+        Some((x, y, rm))
+    } else {
+        None
     }
 }
 
@@ -1527,7 +1524,7 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_17<T: PrimitiveSigned, U: Primiti
         .interleave(exhaustive_pairs_big_tiny(
             exhaustive_negative_signeds(),
             exhaustive_unsigneds::<U>()
-                .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | U::ONE)),
+                .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | U::ONE)),
         )),
     )
 }
@@ -1995,7 +1992,7 @@ impl<T: PrimitiveFloat> ExhaustiveDependentPairsYsGenerator<(u64, i64), (u64, i6
     #[inline]
     fn get_ys(&self, p: &(u64, i64)) -> It<(u64, i64)> {
         let &(mantissa, exponent) = p;
-        Box::new(exhaustive_natural_signeds().flat_map(move |i| {
+        Box::new(exhaustive_natural_signeds().filter_map(move |i| {
             Some((
                 mantissa.arithmetic_checked_shl(i)?,
                 exponent.checked_sub(i)?,
@@ -2747,7 +2744,7 @@ pub fn exhaustive_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>() -> It<(T, T
 pub fn exhaustive_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
     Box::new(
         exhaustive_triples_from_single(exhaustive_unsigneds::<T>())
-            .flat_map(|(x, y, z)| Some((x, y, max(x, y).checked_add(z)?.checked_add(T::ONE)?))),
+            .filter_map(|(x, y, z)| Some((x, y, max(x, y).checked_add(z)?.checked_add(T::ONE)?))),
     )
 }
 
@@ -2930,9 +2927,9 @@ pub fn exhaustive_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>() -> It<(T,
 
 pub fn exhaustive_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> It<(T, T, T, T)> {
     Box::new(
-        exhaustive_quadruples_from_single(exhaustive_unsigneds::<T>()).flat_map(|(x, y, z, w)| {
-            Some((x, y, z, max!(x, y, z).checked_add(w)?.checked_add(T::ONE)?))
-        }),
+        exhaustive_quadruples_from_single(exhaustive_unsigneds::<T>()).filter_map(
+            |(x, y, z, w)| Some((x, y, z, max!(x, y, z).checked_add(w)?.checked_add(T::ONE)?)),
+        ),
     )
 }
 
@@ -2954,7 +2951,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_6<T: PrimitiveUnsigned, U: Primitiv
 ) -> It<(T, T, U, T)> {
     Box::new(
         exhaustive_quadruples_xxyx(exhaustive_unsigneds::<T>(), exhaustive_unsigneds::<U>())
-            .flat_map(|(x, y, z, w)| {
+            .filter_map(|(x, y, z, w)| {
                 Some((x, y, z, max(x, y).checked_add(w)?.checked_add(T::ONE)?))
             }),
     )
@@ -2964,7 +2961,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_7<T: PrimitiveUnsigned, U: Primitiv
 ) -> It<(T, U, U, T)> {
     Box::new(
         exhaustive_quadruples_xyyx(exhaustive_unsigneds::<T>(), exhaustive_unsigneds::<U>())
-            .flat_map(|(x, y, z, w)| Some((x, y, z, x.checked_add(w)?.checked_add(T::ONE)?))),
+            .filter_map(|(x, y, z, w)| Some((x, y, z, x.checked_add(w)?.checked_add(T::ONE)?))),
     )
 }
 
@@ -4631,7 +4628,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_5<T: PrimitiveUnsigned>() -> It<(Vec
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let n = x.checked_add(2)?;
                 let len: u64 = n.arithmetic_checked_shl(1)?;
                 let len = len.checked_add(y)?;
@@ -4673,7 +4670,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(Vec
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let in_len = x.checked_add(1)?;
                 let mut out_len: u64 = in_len.shr_round(1, Ceiling).0;
                 out_len = out_len.checked_add(y)?;
@@ -4790,10 +4787,10 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_12<T: PrimitiveUnsigned>() -> It<(Ve
             UnsignedVecPairLenGenerator1,
         )
         .filter_map(|(_, (ns, ds))| {
-            if *ds.last().unwrap() != T::ZERO {
-                Some((ns, ds))
-            } else {
+            if *ds.last().unwrap() == T::ZERO {
                 None
+            } else {
+                Some((ns, ds))
             }
         }),
     )
@@ -4886,7 +4883,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_19<T: PrimitiveUnsigned>() -> It<(Ve
 
 pub fn exhaustive_unsigned_vec_pair_gen_var_20<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
     Box::new(exhaustive_pairs_from_single(
-        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<T>()).flat_map(|mut xs| {
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<T>()).filter_map(|mut xs| {
             let last = xs.last_mut().unwrap();
             *last = last.checked_add(T::ONE)?;
             Some(xs)
@@ -5119,11 +5116,13 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_11<T: Primit
                 BitDistributorOutputType::normal(1),
             ),
             // TODO
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, i)| {
-                let y = y.checked_add(i)?;
-                let x = x.checked_add(y)?;
-                Some((x, y, i))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(x, y, i)| {
+                    let y = y.checked_add(i)?;
+                    let x = x.checked_add(y)?;
+                    Some((x, y, i))
+                },
+            ),
             UnsignedVecPairLenAndIndexGenerator,
         )
         .map(|p| p.1),
@@ -5204,7 +5203,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24<T: Primit
                 BitDistributorOutputType::normal(1),
             ),
             // TODO
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, i)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, i)| {
                 let x = x.checked_add(i)?;
                 Some((x, x, i))
             }),
@@ -5256,7 +5255,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let y = y.checked_add(1)?;
                 let x = x.checked_add(y.arithmetic_checked_shl(1)?)?;
                 Some((x, y))
@@ -5354,12 +5353,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_2<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let y = y.checked_add(1)?;
-                let x = x.checked_add(y)?;
-                let o = x.checked_add(y)?.checked_add(o)?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let y = y.checked_add(1)?;
+                    let x = x.checked_add(y)?;
+                    let o = x.checked_add(y)?.checked_add(o)?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .map(|p| p.1),
@@ -5374,12 +5375,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_3<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let y = y.checked_add(1)?;
-                let x = x.checked_add(1)?;
-                let o = x.checked_add(y)?.checked_add(o)?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let y = y.checked_add(1)?;
+                    let x = x.checked_add(1)?;
+                    let o = x.checked_add(y)?.checked_add(o)?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .map(|p| p.1),
@@ -5396,7 +5399,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_24<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let y = y.checked_add(1)?;
                 let x = x.checked_add(y)?;
                 Some((x, y))
@@ -5415,7 +5418,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_25<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let y = y.checked_add(2)?;
                 let x = x.checked_add(y.arithmetic_checked_shl(1)?)?;
                 Some((x, y))
@@ -5434,7 +5437,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_26<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let y = y.checked_add(2)?;
                 let x = x.checked_add(y)?;
                 Some((x, y))
@@ -5517,13 +5520,15 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_28<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, z)| {
-                let in_len = x.checked_add(1)?;
-                let mut out_len: u64 = in_len.shr_round(1, Ceiling).0;
-                out_len = out_len.checked_add(y)?;
-                let rem_len = in_len.checked_add(z)?;
-                Some((out_len, rem_len, in_len))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(x, y, z)| {
+                    let in_len = x.checked_add(1)?;
+                    let mut out_len: u64 = in_len.shr_round(1, Ceiling).0;
+                    out_len = out_len.checked_add(y)?;
+                    let rem_len = in_len.checked_add(z)?;
+                    Some((out_len, rem_len, in_len))
+                },
+            ),
             UnsignedVecSqrtRemGenerator3,
         )
         .map(|p| p.1),
@@ -5560,7 +5565,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_31<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let x = x.checked_add(y)?;
                 Some((x, y))
             }),
@@ -5578,10 +5583,12 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_32<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let o = max(x, y).checked_add(o)?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let o = max(x, y).checked_add(o)?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .map(|p| p.1),
@@ -5639,12 +5646,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_33<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let x = x.checked_add(1)?;
-                let y = y.checked_add(1)?;
-                let o = o.checked_add(x)?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let x = x.checked_add(1)?;
+                    let y = y.checked_add(1)?;
+                    let o = o.checked_add(x)?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator2,
         )
         .map(|p| p.1),
@@ -5659,12 +5668,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_34<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let x = x.checked_add(1)?;
-                let y = y.checked_add(1)?;
-                let o = o.checked_add(max(x, y))?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let x = x.checked_add(1)?;
+                    let y = y.checked_add(1)?;
+                    let o = o.checked_add(max(x, y))?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator2,
         )
         .map(|p| p.1),
@@ -5679,12 +5690,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_35<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let x = x.checked_add(1)?;
-                let y = y.checked_add(1)?;
-                let o = o.checked_add(min(x, y))?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let x = x.checked_add(1)?;
+                    let y = y.checked_add(1)?;
+                    let o = o.checked_add(min(x, y))?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator2,
         )
         .map(|p| p.1),
@@ -5717,11 +5730,13 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_40<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
-                let x = x.checked_add(y)?;
-                let o = o.checked_add(x)?;
-                Some((o, x, y))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(o, x, y)| {
+                    let x = x.checked_add(y)?;
+                    let o = o.checked_add(x)?;
+                    Some((o, x, y))
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .map(|p| p.1),
@@ -5748,12 +5763,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_50<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, z)| {
-                let y = y.checked_add(1)?;
-                let x = x.checked_add(y)?;
-                let z = z.checked_add(y.arithmetic_checked_shl(1)?)?;
-                Some((x, y, z))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(x, y, z)| {
+                    let y = y.checked_add(1)?;
+                    let x = x.checked_add(y)?;
+                    let z = z.checked_add(y.arithmetic_checked_shl(1)?)?;
+                    Some((x, y, z))
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .filter_map(|(_, (x, mut y, z)): (_, (Vec<T>, Vec<T>, Vec<T>))| {
@@ -5775,12 +5792,14 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_51<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, z)| {
-                let y = y.checked_add(5)?;
-                let x = x.checked_add(y)?;
-                let z = z.checked_add(y.arithmetic_checked_shl(1)?)?;
-                Some((x, y, z))
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(x, y, z)| {
+                    let y = y.checked_add(5)?;
+                    let x = x.checked_add(y)?;
+                    let z = z.checked_add(y.arithmetic_checked_shl(1)?)?;
+                    Some((x, y, z))
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .filter_map(|(_, (x, mut y, z)): (_, (Vec<T>, Vec<T>, Vec<T>))| {
@@ -5802,25 +5821,27 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_52<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, z)| {
-                let q = x.checked_add(3)?;
-                let n = y.checked_add(9)?;
-                let d = z.checked_add(6)?;
-                if n < d {
-                    return None;
-                }
-                let q_alt = n - d + 1;
-                if (q_alt << 1) > n || q_alt > d {
-                    return None;
-                }
-                let n_alt = q_alt << 1;
-                let d_alt = q_alt;
-                if q >= q_alt && d_alt >= 6 && n_alt >= d_alt + 3 && d_alt >= q_alt {
-                    Some((q, n, d))
-                } else {
-                    None
-                }
-            }),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(x, y, z)| {
+                    let q = x.checked_add(3)?;
+                    let n = y.checked_add(9)?;
+                    let d = z.checked_add(6)?;
+                    if n < d {
+                        return None;
+                    }
+                    let q_alt = n - d + 1;
+                    if (q_alt << 1) > n || q_alt > d {
+                        return None;
+                    }
+                    let n_alt = q_alt << 1;
+                    let d_alt = q_alt;
+                    if q >= q_alt && d_alt >= 6 && n_alt >= d_alt + 3 && d_alt >= q_alt {
+                        Some((q, n, d))
+                    } else {
+                        None
+                    }
+                },
+            ),
             UnsignedVecTripleLenGenerator1,
         )
         .filter_map(|(_, (x, y, mut z)): (_, (Vec<T>, Vec<T>, Vec<T>))| {
@@ -5866,7 +5887,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_57<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
                 |(r_len, n_len, d_len)| {
                     let d_len = d_len.checked_add(2)?;
                     let r_len = r_len.checked_add(d_len)?;
@@ -5894,7 +5915,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_59<T: PrimitiveUnsigned>(
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
                 |(xs_len, ys_len, zs_len)| {
                     let ys_len = ys_len.checked_add(2)?;
                     let zs_len = zs_len.checked_add(2)?;
@@ -5971,7 +5992,7 @@ pub fn exhaustive_large_type_gen_var_2<T: PrimitiveUnsigned>() -> It<(Vec<T>, Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            Box::new(exhaustive_unsigneds::<u64>().flat_map(|x| {
+            Box::new(exhaustive_unsigneds::<u64>().filter_map(|x| {
                 let len = x.checked_add(9)?;
                 let n = len.shr_round(1, Ceiling).0;
                 Some((n, len))
@@ -6017,7 +6038,7 @@ pub fn exhaustive_large_type_gen_var_9<T: PrimitiveUnsigned>() -> It<(Vec<T>, Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(|(x, y)| {
                 let x = x.checked_add(y)?;
                 Some((x, y))
             }),

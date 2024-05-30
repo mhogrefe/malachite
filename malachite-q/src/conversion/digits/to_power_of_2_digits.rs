@@ -30,12 +30,11 @@ pub(crate) fn to_power_of_2_digits_helper(
         if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
             let repeating = digits.drain(previous_i..).collect();
             return (before_point, RationalSequence::from_vecs(digits, repeating));
-        } else {
-            remainder <<= log_base;
-            let floor = (&remainder).floor().unsigned_abs();
-            digits.push(floor.clone());
-            remainder -= Rational::from(floor);
         }
+        remainder <<= log_base;
+        let floor = (&remainder).floor().unsigned_abs();
+        digits.push(floor.clone());
+        remainder -= Rational::from(floor);
     }
     unreachable!()
 }

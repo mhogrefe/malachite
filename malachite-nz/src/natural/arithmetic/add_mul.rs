@@ -24,7 +24,7 @@ use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
 // and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
@@ -80,7 +80,7 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
         *x = out.lower_half();
         carry = out >> Limb::WIDTH;
     }
-    Limb::exact_from(carry)
+    Limb::wrapping_from(carry)
 }}
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
@@ -114,7 +114,7 @@ pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
         *y = out.lower_half();
         carry = out >> Limb::WIDTH;
     }
-    Limb::exact_from(carry)
+    Limb::wrapping_from(carry)
 }}
 
 // Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
@@ -578,7 +578,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs)
+                limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }
@@ -617,7 +617,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs)
+                limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }
@@ -656,7 +656,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs)
+                limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }
@@ -695,7 +695,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs)
+                limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }

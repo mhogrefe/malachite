@@ -113,7 +113,7 @@ impl Integer {
     /// }
     /// ```
     pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Integer {
-        Integer::from_owned_twos_complement_limbs_asc(xs.iter().cloned().rev().collect())
+        Integer::from_owned_twos_complement_limbs_asc(xs.iter().copied().rev().collect())
     }
 
     /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that less

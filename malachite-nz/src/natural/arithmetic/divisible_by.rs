@@ -463,7 +463,7 @@ impl Natural {
     fn limb_divisible_by_natural(&self, other: Limb) -> bool {
         match (other, self) {
             (0, _) => true,
-            (_, &Natural::ZERO) | (_, &Natural(Large(_))) => false,
+            (_, &Natural::ZERO | &Natural(Large(_))) => false,
             (x, &Natural(Small(small))) => x.divisible_by(small),
         }
     }

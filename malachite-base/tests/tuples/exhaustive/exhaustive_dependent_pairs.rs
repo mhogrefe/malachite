@@ -80,7 +80,7 @@ fn exhaustive_dependent_pairs_finite_ys_helper<I: Clone + Iterator, Y>(
 #[test]
 fn test_exhaustive_dependent_pairs() {
     exhaustive_dependent_pairs_finite_ys_helper(
-        [1, 2, 3].iter().cloned(),
+        [1, 2, 3].iter().copied(),
         hashmap! {
             1 => &[100, 101, 102][..],
             2 => &[200, 201, 202][..],
@@ -91,7 +91,7 @@ fn test_exhaustive_dependent_pairs() {
         &[(1, 100), (2, 200), (3, 300), (1, 101), (1, 102), (2, 201), (3, 301), (3, 302), (2, 202)],
     );
     exhaustive_dependent_pairs_finite_ys_helper(
-        ["cat", "dog", "mouse", "dog", "cat"].iter().cloned(),
+        ["cat", "dog", "mouse", "dog", "cat"].iter().copied(),
         hashmap! { "cat" => &[2, 3, 4][..], "dog" => &[20][..], "mouse" => &[30, 40][..] },
         &[
             ("cat", 2),
@@ -131,21 +131,21 @@ fn test_exhaustive_dependent_pairs() {
         ],
     );
     exhaustive_dependent_pairs_finite_ys_helper(
-        [1, 2, 3, 2, 3, 2, 2].iter().cloned(),
+        [1, 2, 3, 2, 3, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[(1, 100), (3, 300), (1, 101), (3, 300), (1, 102), (3, 301), (3, 302), (3, 301), (3, 302)],
         &[(1, 100), (3, 300), (1, 101), (3, 301), (3, 300), (1, 102), (3, 301), (3, 302), (3, 302)],
         &[(1, 100), (3, 300), (3, 300), (1, 101), (1, 102), (3, 301), (3, 301), (3, 302), (3, 302)],
     );
     exhaustive_dependent_pairs_finite_ys_helper(
-        [].iter().cloned(),
+        [].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
         &[],
         &[],
     );
     exhaustive_dependent_pairs_finite_ys_helper(
-        [2, 2, 2, 2, 2].iter().cloned(),
+        [2, 2, 2, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
         &[],
@@ -198,7 +198,7 @@ fn exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper<I: Clone + It
 #[test]
 fn test_exhaustive_dependent_pairs_stop_after_empty_ys() {
     exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper(
-        [1, 2, 3].iter().cloned(),
+        [1, 2, 3].iter().copied(),
         hashmap! {
             1 => &[100, 101, 102][..],
             2 => &[200, 201, 202][..],
@@ -209,7 +209,7 @@ fn test_exhaustive_dependent_pairs_stop_after_empty_ys() {
         &[(1, 100), (2, 200), (3, 300), (1, 101), (1, 102), (2, 201), (3, 301), (3, 302), (2, 202)],
     );
     exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper(
-        ["cat", "dog", "mouse", "dog", "cat"].iter().cloned(),
+        ["cat", "dog", "mouse", "dog", "cat"].iter().copied(),
         hashmap! { "cat" => &[2, 3, 4][..], "dog" => &[20][..], "mouse" => &[30, 40][..] },
         &[
             ("cat", 2),
@@ -250,21 +250,21 @@ fn test_exhaustive_dependent_pairs_stop_after_empty_ys() {
     );
     // Notice difference from `exhaustive_dependent_pairs`
     exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper(
-        [1, 2, 3, 2, 3, 2, 2].iter().cloned(),
+        [1, 2, 3, 2, 3, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[(1, 100)],
         &[(1, 100)],
         &[(1, 100)],
     );
     exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper(
-        [].iter().cloned(),
+        [].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
         &[],
         &[],
     );
     exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper(
-        [2, 2, 2, 2, 2].iter().cloned(),
+        [2, 2, 2, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
         &[],

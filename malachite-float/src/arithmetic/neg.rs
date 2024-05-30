@@ -178,11 +178,8 @@ impl NegAssign for Float {
     /// assert_eq!(x, Float::ONE);
     /// ```
     fn neg_assign(&mut self) {
-        match self {
-            Float(Infinity { sign }) | Float(Zero { sign }) | Float(Finite { sign, .. }) => {
-                sign.not_assign();
-            }
-            _ => {}
+        if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
+            sign.not_assign();
         }
     }
 }

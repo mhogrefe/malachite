@@ -58,9 +58,7 @@ impl PartialOrdAbs<Rational> for Float {
                 Greater
             } else {
                 let ord_cmp = (e_x - 1).cmp(&y.floor_log_base_2_abs());
-                if ord_cmp != Equal {
-                    ord_cmp
-                } else {
+                if ord_cmp == Equal {
                     let shift = e_x - i64::exact_from(significand_bits(significand_x));
                     let abs_shift = shift.unsigned_abs();
                     match shift.sign() {
@@ -80,6 +78,8 @@ impl PartialOrdAbs<Rational> for Float {
                             }
                         }
                     }
+                } else {
+                    ord_cmp
                 }
             }),
         }

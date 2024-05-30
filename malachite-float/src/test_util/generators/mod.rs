@@ -297,50 +297,6 @@ pub fn float_float_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generato
     )
 }
 
-// All triples of float, float, and unsigned, where both `Float`s are positive and have the same
-// precision, which is less than or equal to `Limb::WIDTH`, and the unsigned is positive and less
-// than `Limb::WIDTH`.
-pub fn float_float_unsigned_triple_gen_var_2() -> Generator<(Float, Float, u64)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_triple_gen_var_2,
-        &random_float_float_unsigned_triple_gen_var_2,
-        &special_random_float_float_unsigned_triple_gen_var_2,
-    )
-}
-
-// All triples of float, float, and unsigned, where both `Float`s are positive and have the same
-// precision, which is less than or equal to `Limb::WIDTH`, and the unsigned is equal to
-// `Limb::WIDTH`.
-pub fn float_float_unsigned_triple_gen_var_3() -> Generator<(Float, Float, u64)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_triple_gen_var_3,
-        &random_float_float_unsigned_triple_gen_var_3,
-        &special_random_float_float_unsigned_triple_gen_var_3,
-    )
-}
-
-// All triples of float, float, and unsigned, where both `Float`s are positive and have the same
-// precision, which is greater than `Limb::WIDTH` and less than or equal to `Limb::WIDTH * 2`, and
-// the unsigned is greater than `Limb::WIDTH` and less than `Limb::WIDTH * 2`.
-pub fn float_float_unsigned_triple_gen_var_4() -> Generator<(Float, Float, u64)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_triple_gen_var_4,
-        &random_float_float_unsigned_triple_gen_var_4,
-        &special_random_float_float_unsigned_triple_gen_var_4,
-    )
-}
-
-// All triples of float, float, and unsigned, where both `Float`s are positive and have the same
-// precision, which is greater than `Limb::WIDTH * 2` and less than or equal to `Limb::WIDTH * 3`,
-// and the unsigned is greater than `Limb::WIDTH * 2` and less than `Limb::WIDTH * 3`.
-pub fn float_float_unsigned_triple_gen_var_5() -> Generator<(Float, Float, u64)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_triple_gen_var_5,
-        &random_float_float_unsigned_triple_gen_var_5,
-        &special_random_float_float_unsigned_triple_gen_var_5,
-    )
-}
-
 // -- (Float, Float, PrimitiveUnsigned, RoundingMode) --
 
 // All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::add_prec_round`.
@@ -370,56 +326,6 @@ pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_3(
         &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_3,
         &random_float_float_unsigned_rounding_mode_quadruple_gen_var_3,
         &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_3,
-    )
-}
-
-// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::mul_prec_round`, where
-// both `Float`s are positive and have the same precision, which is less than or equal to
-// `Limb::WIDTH`, and the unsigned is positive and less than `Limb::WIDTH`.
-pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_4(
-) -> Generator<(Float, Float, u64, RoundingMode)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_4,
-        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_4,
-        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_4,
-    )
-}
-
-// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::mul_prec_round`, where
-// both `Float`s are positive and have the same precision, which is less than or equal to
-// `Limb::WIDTH`, and the unsigned is equal to `Limb::WIDTH`.
-pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_5(
-) -> Generator<(Float, Float, u64, RoundingMode)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_5,
-        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_5,
-        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_5,
-    )
-}
-
-// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::mul_prec_round`, where
-// both `Float`s are positive and have the same precision, which is greater than `Limb::WIDTH` and
-// less than or equal to `Limb::WIDTH * 2`, and the unsigned is greater than `Limb::WIDTH` and less
-// than `Limb::WIDTH * 2`.
-pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_6(
-) -> Generator<(Float, Float, u64, RoundingMode)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_6,
-        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_6,
-        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_6,
-    )
-}
-
-// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::mul_prec_round`, where
-// both `Float`s are positive and have the same precision, which is greater than `Limb::WIDTH * 2`
-// and less than or equal to `Limb::WIDTH * 3`, and the unsigned is greater than `Limb::WIDTH * 2`
-// and less than `Limb::WIDTH * 3`.
-pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_7(
-) -> Generator<(Float, Float, u64, RoundingMode)> {
-    Generator::new(
-        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_7,
-        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_7,
-        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_7,
     )
 }
 
@@ -654,6 +560,68 @@ pub fn float_float_rounding_mode_triple_gen_var_16_rm() -> Generator<(
                 special_random_float_float_rounding_mode_triple_gen_var_16(config),
             )
         },
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::mul_round`, where the
+// `Float`s have the same precision, which is greater than zero and less than `Limb::WIDTH`.
+pub fn float_float_rounding_mode_triple_gen_var_17() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_17,
+        &random_float_float_rounding_mode_triple_gen_var_17,
+        &special_random_float_float_rounding_mode_triple_gen_var_17,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::mul_round`, where the
+// `Float`s have the same precision, which is `Limb::WIDTH`.
+pub fn float_float_rounding_mode_triple_gen_var_18() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_18,
+        &random_float_float_rounding_mode_triple_gen_var_18,
+        &special_random_float_float_rounding_mode_triple_gen_var_18,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::mul_round`, where the
+// `Float`s have the same precision, which is greater than `Limb::WIDTH` and less than twice
+// `Limb::WIDTH`.
+pub fn float_float_rounding_mode_triple_gen_var_19() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_19,
+        &random_float_float_rounding_mode_triple_gen_var_19,
+        &special_random_float_float_rounding_mode_triple_gen_var_19,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::mul_round`, where the
+// `Float`s have the same precision, which is twice `Limb::WIDTH`.
+pub fn float_float_rounding_mode_triple_gen_var_20() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_20,
+        &random_float_float_rounding_mode_triple_gen_var_20,
+        &special_random_float_float_rounding_mode_triple_gen_var_20,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::mul_round`, where the
+// `Float`s have the same precision, which is greater than twice `Limb::WIDTH` and less than three
+// times `Limb::WIDTH`.
+pub fn float_float_rounding_mode_triple_gen_var_21() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_21,
+        &random_float_float_rounding_mode_triple_gen_var_21,
+        &special_random_float_float_rounding_mode_triple_gen_var_21,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::mul_round`, where the
+// `Float`s have the same precision, which is greater than or equal to three times `Limb::WIDTH`.
+pub fn float_float_rounding_mode_triple_gen_var_22() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_22,
+        &random_float_float_rounding_mode_triple_gen_var_22,
+        &special_random_float_float_rounding_mode_triple_gen_var_22,
     )
 }
 

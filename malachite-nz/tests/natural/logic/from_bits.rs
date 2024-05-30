@@ -23,7 +23,7 @@ use malachite_nz::test_util::natural::logic::from_bits::{
 #[test]
 fn test_from_bits_asc() {
     let test = |bits: &[bool], out| {
-        let x = Natural::from_bits_asc(bits.iter().cloned());
+        let x = Natural::from_bits_asc(bits.iter().copied());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -61,7 +61,7 @@ fn test_from_bits_asc() {
 #[test]
 fn test_from_bits_desc() {
     let test = |bits: &[bool], out| {
-        let x = Natural::from_bits_desc(bits.iter().cloned());
+        let x = Natural::from_bits_desc(bits.iter().copied());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -102,19 +102,19 @@ fn from_bits_asc_properties() {
     config.insert("mean_length_n", 1024);
     config.insert("mean_stripe_n", 512);
     bool_vec_gen().test_properties_with_config(&config, |bits| {
-        let x = Natural::from_bits_asc(bits.iter().cloned());
+        let x = Natural::from_bits_asc(bits.iter().copied());
         assert!(x.is_valid());
-        assert_eq!(from_bits_asc_naive(bits.iter().cloned()), x);
-        assert_eq!(from_bits_asc_alt::<Natural, _>(bits.iter().cloned()), x);
+        assert_eq!(from_bits_asc_naive(bits.iter().copied()), x);
+        assert_eq!(from_bits_asc_alt::<Natural, _>(bits.iter().copied()), x);
         let mut trimmed_bits = bits
             .iter()
-            .cloned()
+            .copied()
             .rev()
             .skip_while(|&bit| !bit)
             .collect_vec();
         trimmed_bits.reverse();
         assert_eq!(x.to_bits_asc(), trimmed_bits);
-        assert_eq!(Natural::from_bits_desc(bits.iter().cloned().rev()), x);
+        assert_eq!(Natural::from_bits_desc(bits.iter().copied().rev()), x);
         if !bits.is_empty() && *bits.last().unwrap() {
             assert_eq!(x.to_bits_asc(), *bits);
         }
@@ -131,21 +131,21 @@ fn from_bits_desc_properties() {
     config.insert("mean_length_n", 1024);
     config.insert("mean_stripe_n", 512);
     bool_vec_gen().test_properties_with_config(&config, |bits| {
-        let x = Natural::from_bits_desc(bits.iter().cloned());
+        let x = Natural::from_bits_desc(bits.iter().copied());
         assert!(x.is_valid());
-        assert_eq!(from_bits_desc_naive(bits.iter().cloned()), x);
-        assert_eq!(from_bits_desc_alt::<Natural, _>(bits.iter().cloned()), x);
+        assert_eq!(from_bits_desc_naive(bits.iter().copied()), x);
+        assert_eq!(from_bits_desc_alt::<Natural, _>(bits.iter().copied()), x);
         assert_eq!(
             x.to_bits_desc(),
-            bits.iter().cloned().skip_while(|&b| !b).collect_vec()
+            bits.iter().copied().skip_while(|&b| !b).collect_vec()
         );
-        assert_eq!(Natural::from_bits_asc(bits.iter().cloned().rev()), x);
+        assert_eq!(Natural::from_bits_asc(bits.iter().copied().rev()), x);
         if !bits.is_empty() && bits[0] {
             assert_eq!(x.to_bits_desc(), *bits);
         }
         assert_eq!(bits.iter().all(|b| !b), x == 0);
         if Limb::convertible_from(&x) {
-            assert_eq!(Limb::from_bits_desc(bits.iter().cloned()), x);
+            assert_eq!(Limb::from_bits_desc(bits.iter().copied()), x);
         }
     });
 }

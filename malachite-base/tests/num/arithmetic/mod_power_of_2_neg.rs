@@ -43,11 +43,11 @@ fn mod_power_of_2_neg_fail() {
 fn mod_power_of_2_neg_assign_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
         let mut x = T::ONE;
-        x.mod_power_of_2_neg_assign(0)
+        x.mod_power_of_2_neg_assign(0);
     });
     assert_panic!({
         let mut x = T::from(200u8);
-        x.mod_power_of_2_neg_assign(7)
+        x.mod_power_of_2_neg_assign(7);
     });
 }
 

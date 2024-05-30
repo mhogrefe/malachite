@@ -36,13 +36,13 @@ fn test_from_power_of_2_digits_asc() {
         Natural: From<T> + PowerOf2Digits<T>,
     {
         assert_eq!(
-            Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied())
                 .unwrap()
                 .to_string(),
             out
         );
         assert_eq!(
-            Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().copied())
                 .unwrap()
                 .to_string(),
             out
@@ -77,9 +77,9 @@ fn test_from_power_of_2_digits_asc() {
     where
         Natural: From<T> + PowerOf2Digits<T>,
     {
-        assert!(Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).is_none());
+        assert!(Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied()).is_none());
         assert!(
-            Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned()).is_none()
+            Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().copied()).is_none()
         );
     }
     test_err::<u8>(1, &[2]);
@@ -91,11 +91,11 @@ where
 {
     assert_panic!(Natural::from_power_of_2_digits_asc(
         0,
-        [T::ZERO].iter().cloned()
+        [T::ZERO].iter().copied()
     ));
     assert_panic!(Natural::from_power_of_2_digits_asc(
         T::WIDTH + 1,
-        [T::TWO].iter().cloned()
+        [T::TWO].iter().copied()
     ));
 }
 
@@ -111,7 +111,7 @@ fn test_from_power_of_2_digits_desc() {
         Natural: PowerOf2Digits<T>,
     {
         assert_eq!(
-            Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied())
                 .unwrap()
                 .to_string(),
             out
@@ -146,7 +146,7 @@ fn test_from_power_of_2_digits_desc() {
     where
         Natural: PowerOf2Digits<T>,
     {
-        assert!(Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).is_none());
+        assert!(Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).is_none());
     }
     test_err::<u8>(1, &[2]);
 }
@@ -157,11 +157,11 @@ where
 {
     assert_panic!(Natural::from_power_of_2_digits_desc(
         0,
-        [T::ZERO].iter().cloned()
+        [T::ZERO].iter().copied()
     ));
     assert_panic!(Natural::from_power_of_2_digits_desc(
         T::WIDTH + 1,
-        [T::TWO].iter().cloned()
+        [T::TWO].iter().copied()
     ));
 }
 
@@ -299,7 +299,7 @@ where
     unsigned_vec_unsigned_pair_gen_var_11().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned());
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied());
             assert_eq!(
                 n.is_some(),
                 digits.iter().all(|x| x.significant_bits() <= log_base),
@@ -310,14 +310,14 @@ where
     unsigned_vec_unsigned_pair_gen_var_10().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap();
             assert_eq!(
-                Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
+                Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().copied())
                     .unwrap(),
                 n
             );
             assert_eq!(
-                Natural::from_power_of_2_digits_desc(log_base, digits.iter().rev().cloned())
+                Natural::from_power_of_2_digits_desc(log_base, digits.iter().rev().copied())
                     .unwrap(),
                 n
             );
@@ -340,9 +340,9 @@ where
     unsigned_vec_unsigned_pair_gen_var_2::<Limb, T>().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Limb::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
+            let n = Limb::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap();
             assert_eq!(
-                Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+                Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap(),
                 Natural::try_from(Integer::from(n)).unwrap()
             );
         },
@@ -358,7 +358,7 @@ fn from_power_of_2_digits_asc_properties() {
     config.insert("mean_length_n", 32);
     unsigned_vec_gen().test_properties_with_config(&config, |xs| {
         assert_eq!(
-            Natural::from_power_of_2_digits_asc(Limb::WIDTH, xs.iter().cloned()).unwrap(),
+            Natural::from_power_of_2_digits_asc(Limb::WIDTH, xs.iter().copied()).unwrap(),
             Natural::from_limbs_asc(&xs)
         );
     });
@@ -376,7 +376,7 @@ where
     unsigned_vec_unsigned_pair_gen_var_11().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned());
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied());
             assert_eq!(
                 n.is_some(),
                 digits.iter().all(|x| x.significant_bits() <= log_base)
@@ -387,9 +387,9 @@ where
     unsigned_vec_unsigned_pair_gen_var_10().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap();
             assert_eq!(
-                Natural::from_power_of_2_digits_asc(log_base, digits.iter().rev().cloned())
+                Natural::from_power_of_2_digits_asc(log_base, digits.iter().rev().copied())
                     .unwrap(),
                 n
             );
@@ -412,10 +412,10 @@ where
     unsigned_vec_unsigned_pair_gen_var_3::<Limb, T>().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Limb::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+            let n = Limb::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap();
             let natural_n: Natural = From::<Limb>::from(n);
             assert_eq!(
-                Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+                Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap(),
                 natural_n
             );
         },
@@ -431,7 +431,7 @@ fn from_power_of_2_digits_desc_properties() {
     config.insert("mean_length_n", 32);
     unsigned_vec_gen().test_properties_with_config(&config, |xs| {
         assert_eq!(
-            Natural::from_power_of_2_digits_desc(Limb::WIDTH, xs.iter().cloned()).unwrap(),
+            Natural::from_power_of_2_digits_desc(Limb::WIDTH, xs.iter().copied()).unwrap(),
             Natural::from_limbs_desc(&xs)
         );
     });
@@ -487,8 +487,8 @@ fn from_power_of_2_digits_asc_natural_properties() {
     unsigned_vec_unsigned_pair_gen_var_10::<Limb>().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned());
-            let digits = digits.iter().cloned().map(Natural::from).collect_vec();
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied());
+            let digits = digits.iter().copied().map(Natural::from).collect_vec();
             assert_eq!(
                 Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()),
                 n
@@ -542,8 +542,8 @@ fn from_power_of_2_digits_desc_natural_properties() {
     unsigned_vec_unsigned_pair_gen_var_10::<Limb>().test_properties_with_config(
         &config,
         |(digits, log_base)| {
-            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
-            let digits = digits.iter().cloned().map(Natural::from).collect_vec();
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap();
+            let digits = digits.iter().copied().map(Natural::from).collect_vec();
             assert_eq!(
                 Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
                 n

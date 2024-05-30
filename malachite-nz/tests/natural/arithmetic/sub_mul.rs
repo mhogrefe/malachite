@@ -492,7 +492,7 @@ fn limbs_sub_mul_limb_same_length_in_place_left_properties() {
                 xs,
                 ys,
                 z,
-            )
+            );
         },
     );
 }
@@ -510,7 +510,7 @@ fn limbs_sub_mul_limb_greater_in_place_left_properties() {
                 xs,
                 ys,
                 z,
-            )
+            );
         },
     );
 }
@@ -551,7 +551,7 @@ fn limbs_sub_mul_limb_same_length_in_place_right_properties() {
                 xs,
                 ys,
                 z
-            )
+            );
         },
     );
 }
@@ -569,7 +569,7 @@ fn limbs_sub_mul_limb_greater_in_place_right_properties() {
                 xs,
                 ys,
                 z
-            )
+            );
         },
     );
 }

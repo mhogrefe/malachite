@@ -49,7 +49,7 @@ fn lex_dependent_pairs_helper<I: Iterator, Y>(
 #[test]
 fn test_lex_dependent_pairs() {
     lex_dependent_pairs_helper(
-        [1, 2, 3].iter().cloned(),
+        [1, 2, 3].iter().copied(),
         hashmap! {
             1 => &[100, 101, 102][..],
             2 => &[200, 201, 202][..],
@@ -58,7 +58,7 @@ fn test_lex_dependent_pairs() {
         &[(1, 100), (1, 101), (1, 102), (2, 200), (2, 201), (2, 202), (3, 300), (3, 301), (3, 302)],
     );
     lex_dependent_pairs_helper(
-        ["cat", "dog", "mouse", "dog", "cat"].iter().cloned(),
+        ["cat", "dog", "mouse", "dog", "cat"].iter().copied(),
         hashmap! { "cat" => &[2, 3, 4][..], "dog" => &[20][..], "mouse" => &[30, 40][..] },
         &[
             ("cat", 2),
@@ -74,17 +74,17 @@ fn test_lex_dependent_pairs() {
         ],
     );
     lex_dependent_pairs_helper(
-        [1, 2, 3, 2, 3, 2, 2].iter().cloned(),
+        [1, 2, 3, 2, 3, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[(1, 100), (1, 101), (1, 102), (3, 300), (3, 301), (3, 302), (3, 300), (3, 301), (3, 302)],
     );
     lex_dependent_pairs_helper(
-        [].iter().cloned(),
+        [].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
     );
     lex_dependent_pairs_helper(
-        [2, 2, 2, 2, 2].iter().cloned(),
+        [2, 2, 2, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
     );
@@ -107,7 +107,7 @@ fn lex_dependent_pairs_stop_after_empty_ys_helper<I: Iterator, Y>(
 #[test]
 fn test_lex_dependent_pairs_stop_after_empty_ys() {
     lex_dependent_pairs_stop_after_empty_ys_helper(
-        [1, 2, 3].iter().cloned(),
+        [1, 2, 3].iter().copied(),
         hashmap! {
             1 => &[100, 101, 102][..],
             2 => &[200, 201, 202][..],
@@ -116,7 +116,7 @@ fn test_lex_dependent_pairs_stop_after_empty_ys() {
         &[(1, 100), (1, 101), (1, 102), (2, 200), (2, 201), (2, 202), (3, 300), (3, 301), (3, 302)],
     );
     lex_dependent_pairs_stop_after_empty_ys_helper(
-        ["cat", "dog", "mouse", "dog", "cat"].iter().cloned(),
+        ["cat", "dog", "mouse", "dog", "cat"].iter().copied(),
         hashmap! { "cat" => &[2, 3, 4][..], "dog" => &[20][..], "mouse" => &[30, 40][..] },
         &[
             ("cat", 2),
@@ -133,17 +133,17 @@ fn test_lex_dependent_pairs_stop_after_empty_ys() {
     );
     // Notice difference from `lex_dependent_pairs`
     lex_dependent_pairs_stop_after_empty_ys_helper(
-        [1, 2, 3, 2, 3, 2, 2].iter().cloned(),
+        [1, 2, 3, 2, 3, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[(1, 100), (1, 101), (1, 102)],
     );
     lex_dependent_pairs_stop_after_empty_ys_helper(
-        [].iter().cloned(),
+        [].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
     );
     lex_dependent_pairs_stop_after_empty_ys_helper(
-        [2, 2, 2, 2, 2].iter().cloned(),
+        [2, 2, 2, 2, 2].iter().copied(),
         hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] },
         &[],
     );

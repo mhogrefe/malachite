@@ -65,7 +65,7 @@ fn bits_properties() {
                 bit_vec.insert(i, bits.next().unwrap());
                 i += 1;
             } else {
-                bit_vec.insert(i, bits.next_back().unwrap())
+                bit_vec.insert(i, bits.next_back().unwrap());
             }
         }
         assert!(bits.next().is_none());

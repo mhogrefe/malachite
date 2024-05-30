@@ -329,12 +329,12 @@ pub_test! {limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) ->
         }
         if xs_len < ys_len {
             for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..xs_len].iter()) {
-                *x = !*x & y
+                *x = !*x & y;
             }
             true
         } else {
             for (x, y) in xs[max_i + 1..ys_len].iter_mut().zip(ys[max_i + 1..].iter()) {
-                *x = !*x & y
+                *x = !*x & y;
             }
             slice_set_zero(&mut xs[ys_len..]);
             false
@@ -392,12 +392,12 @@ pub_test! {limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
         }
         if xs_len < ys_len {
             for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..xs_len].iter()) {
-                *x = !*x & y
+                *x = !*x & y;
             }
             xs.extend_from_slice(&ys[xs_len..]);
         } else {
             for (x, y) in xs[max_i + 1..ys_len].iter_mut().zip(ys[max_i + 1..].iter()) {
-                *x = !*x & y
+                *x = !*x & y;
             }
             xs.truncate(ys_len);
         }
@@ -1053,7 +1053,7 @@ impl BitOrAssign<Integer> for Integer {
             (true, true) => self.abs.bitor_assign(other.abs),
             (true, false) => {
                 self.sign = false;
-                self.abs.or_assign_pos_neg(other.abs)
+                self.abs.or_assign_pos_neg(other.abs);
             }
             (false, true) => self.abs.or_assign_neg_pos(other.abs),
             (false, false) => self.abs.or_assign_neg_neg(other.abs),
@@ -1090,7 +1090,7 @@ impl<'a> BitOrAssign<&'a Integer> for Integer {
             (true, true) => self.abs.bitor_assign(&other.abs),
             (true, false) => {
                 self.sign = false;
-                self.abs.or_assign_pos_neg_ref(&other.abs)
+                self.abs.or_assign_pos_neg_ref(&other.abs);
             }
             (false, true) => self.abs.or_assign_neg_pos_ref(&other.abs),
             (false, false) => self.abs.or_assign_neg_neg_ref(&other.abs),

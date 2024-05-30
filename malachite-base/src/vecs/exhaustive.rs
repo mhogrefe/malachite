@@ -181,9 +181,8 @@ macro_rules! lex_vecs_fixed_length {
                         return false;
                     } else if i == 0 {
                         return true;
-                    } else {
-                        output.counter = 0;
                     }
+                    output.counter = 0;
                 }
                 false
             }
@@ -349,9 +348,8 @@ where
                 return false;
             } else if i == 0 {
                 return true;
-            } else {
-                *counter = 0;
             }
+            *counter = 0;
         }
         false
     }
@@ -822,9 +820,7 @@ where
         if Some(self.i) == self.limit {
             None
         } else {
-            if self.i == u64::MAX {
-                panic!("Too many iterations");
-            }
+            assert!(self.i != u64::MAX, "Too many iterations");
             loop {
                 let mut all_are_valid = true;
                 for i in 0..usize::exact_from(self.len) {
@@ -2314,11 +2310,10 @@ where
                         // [3].
                         self.done = true;
                         return None;
-                    } else {
-                        // For example, if xs is [0, 1, 2, 3] and max_len is 1, then the next set of
-                        // indices after [0] is [1].
-                        self.indices.push(next_x);
                     }
+                    // For example, if xs is [0, 1, 2, 3] and max_len is 1, then the next set of
+                    // indices after [0] is [1].
+                    self.indices.push(next_x);
                 }
             }
         }
@@ -3630,9 +3625,8 @@ where
                 if let Some(x) = self.xs_for_prefix.next() {
                     prefix.push(x);
                     return Some(prefix.clone());
-                } else {
-                    self.max = prefix.len();
                 }
+                self.max = prefix.len();
             }
         }
         if self.phase_1_vec.is_some() {

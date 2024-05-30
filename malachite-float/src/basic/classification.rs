@@ -48,7 +48,7 @@ impl Float {
     /// ```
     #[inline]
     pub const fn is_finite(&self) -> bool {
-        matches!(self, Float(Zero { .. }) | Float(Finite { .. }))
+        matches!(self, Float(Zero { .. } | Finite { .. }))
     }
 
     /// Determines whether a [`Float`] is infinite.
@@ -182,9 +182,7 @@ impl Float {
     pub const fn is_sign_positive(&self) -> bool {
         match self {
             float_nan!() => false,
-            Float(Infinity { sign }) | Float(Finite { sign, .. }) | Float(Zero { sign, .. }) => {
-                *sign
-            }
+            Float(Infinity { sign } | Finite { sign, .. } | Zero { sign, .. }) => *sign,
         }
     }
 
@@ -213,9 +211,7 @@ impl Float {
     pub const fn is_sign_negative(&self) -> bool {
         match self {
             float_nan!() => false,
-            Float(Infinity { sign }) | Float(Finite { sign, .. }) | Float(Zero { sign, .. }) => {
-                !*sign
-            }
+            Float(Infinity { sign } | Finite { sign, .. } | Zero { sign, .. }) => !*sign,
         }
     }
 
@@ -332,7 +328,7 @@ impl Float {
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
     pub fn into_finite(self) -> Option<Float> {
         match self {
-            float_nan!() | float_either_infinity!() => None,
+            Float(NaN | Infinity { .. }) => None,
             x => Some(x),
         }
     }
@@ -360,7 +356,7 @@ impl Float {
     /// ```
     pub fn to_finite(&self) -> Option<Float> {
         match self {
-            float_nan!() | float_either_infinity!() => None,
+            Float(NaN | Infinity { .. }) => None,
             x => Some(x.clone()),
         }
     }

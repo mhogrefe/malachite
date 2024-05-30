@@ -176,7 +176,7 @@ pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[
     let ys_len = ys.len();
     let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     if xs_len < max_len && ys_len < max_len {
-        limbs_vec_add_in_place_left(xs, ys)
+        limbs_vec_add_in_place_left(xs, ys);
     } else {
         let carry = if xs_len >= ys_len {
             limbs_slice_mod_power_of_2_add_greater_in_place_left(xs, ys, pow)
@@ -251,7 +251,7 @@ impl Natural {
             (_, 0, _) => {}
             (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
-                small.mod_power_of_2_add_assign(other, pow)
+                small.mod_power_of_2_add_assign(other, pow);
             }
             (&mut Natural(Small(ref mut small)), other, _) => {
                 let (sum, overflow) = small.overflowing_add(other);

@@ -62,11 +62,10 @@ impl PartialOrdAbs<Natural> for Rational {
         let d_cmp = self.denominator.cmp(&Natural::ONE);
         if n_cmp == Equal && d_cmp == Equal {
             return Some(Equal);
-        } else {
-            let nd_cmp = n_cmp.cmp(&d_cmp);
-            if nd_cmp != Equal {
-                return Some(nd_cmp);
-            }
+        }
+        let nd_cmp = n_cmp.cmp(&d_cmp);
+        if nd_cmp != Equal {
+            return Some(nd_cmp);
         }
         // Then compare floor ∘ log_2 ∘ abs
         let log_cmp = self

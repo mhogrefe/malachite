@@ -452,7 +452,7 @@ fn ceiling_sqrt_newton_helper<
     let (mut sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     sqrt >>= shift >> 1;
     if rem != U::ZERO {
-        sqrt += U::ONE
+        sqrt += U::ONE;
     }
     sqrt
 }

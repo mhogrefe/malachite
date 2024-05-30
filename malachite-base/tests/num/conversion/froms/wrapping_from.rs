@@ -50,7 +50,7 @@ fn wrapping_from_helper_primitive_int_unsigned<
 >() {
     unsigned_gen::<U>().test_properties(|u| {
         let result = T::wrapping_from(u);
-        assert_eq!(result, T::overflowing_from(u).0)
+        assert_eq!(result, T::overflowing_from(u).0);
     });
 }
 
@@ -60,7 +60,7 @@ fn wrapping_from_helper_primitive_int_signed<
 >() {
     signed_gen::<U>().test_properties(|i| {
         let result = T::wrapping_from(i);
-        assert_eq!(result, T::overflowing_from(i).0)
+        assert_eq!(result, T::overflowing_from(i).0);
     });
 }
 

@@ -267,10 +267,10 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
         scratch_hi[1..n + h2 + 2].copy_from_slice(&xs[h1 - 1 - odd..(n << 1) - odd]);
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(n + 1); // scratch_hi len is n + h1 + 3
-    let r_hi = limbs_sqrt_rem_helper(out_hi, &mut scratch_hi[h1 + 1..n + h2 + 1], 0, scratch_lo);
+    let r_hi = limbs_sqrt_rem_helper(out_hi, &mut scratch_hi[h1 + 1..=n + h2], 0, scratch_lo);
     if r_hi {
         assert!(limbs_sub_same_length_in_place_left(
-            &mut scratch_hi[h1 + 1..n + 1],
+            &mut scratch_hi[h1 + 1..=n],
             out_hi
         ));
     }

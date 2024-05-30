@@ -97,20 +97,20 @@ where
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_shr_assign(T::exact_from(3u8), Natural::ZERO)
+        x.mod_shr_assign(T::exact_from(3u8), Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::exact_from(30);
-        x.mod_shr_assign(T::exact_from(3u8), Natural::ONE)
+        x.mod_shr_assign(T::exact_from(3u8), Natural::ONE);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_shr_assign(T::exact_from(3u8), &Natural::ZERO)
+        x.mod_shr_assign(T::exact_from(3u8), &Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::exact_from(30);
-        x.mod_shr_assign(T::exact_from(3u8), &Natural::ONE)
+        x.mod_shr_assign(T::exact_from(3u8), &Natural::ONE);
     });
 }
 

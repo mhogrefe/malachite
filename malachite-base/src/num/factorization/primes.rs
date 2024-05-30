@@ -137,13 +137,12 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesIterator<T> {
                 return p;
             } else if self.limit == T::MAX {
                 return None;
-            } else {
-                self.limit.saturating_mul_assign(T::TWO);
-                let j = self.xs.j;
-                self.xs = T::primes_less_than_or_equal_to(&self.limit);
-                self.xs.i = 3;
-                self.xs.j = j;
             }
+            self.limit.saturating_mul_assign(T::TWO);
+            let j = self.xs.j;
+            self.xs = T::primes_less_than_or_equal_to(&self.limit);
+            self.xs.i = 3;
+            self.xs.j = j;
         }
     }
 }

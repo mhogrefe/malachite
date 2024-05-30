@@ -1212,10 +1212,10 @@ fn round_to_multiple_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         }
         match rm {
             Floor | Down => {
-                assert!(rounded <= x)
+                assert!(rounded <= x);
             }
             Ceiling | Up => {
-                assert!(rounded >= x)
+                assert!(rounded >= x);
             }
             Exact => assert_eq!(rounded, x),
             Nearest => {
@@ -1297,10 +1297,10 @@ fn round_to_multiple_properties_helper_signed<
         assert_eq!(rounded.cmp(&x), o);
         match (x >= S::ZERO, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}

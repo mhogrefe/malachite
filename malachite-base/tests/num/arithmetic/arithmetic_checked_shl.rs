@@ -68,7 +68,7 @@ where
         if let Some(shifted) = n.arithmetic_checked_shl(u) {
             assert!(shifted >= n);
             if n != T::ZERO {
-                assert_eq!(shifted >> u, n)
+                assert_eq!(shifted >> u, n);
             }
         } else {
             assert_ne!(n, T::ZERO);
@@ -129,7 +129,7 @@ where
         if let Some(shifted) = n.arithmetic_checked_shl(u) {
             assert!(shifted.ge_abs(&n));
             if n != T::ZERO {
-                assert_eq!(shifted >> u, n)
+                assert_eq!(shifted >> u, n);
             }
         } else {
             assert_ne!(n, T::ZERO);

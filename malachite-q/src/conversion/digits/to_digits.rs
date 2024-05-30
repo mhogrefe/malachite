@@ -34,12 +34,11 @@ fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSeque
         if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
             let repeating = digits.drain(previous_i..).collect();
             return (before_point, RationalSequence::from_vecs(digits, repeating));
-        } else {
-            remainder *= &base;
-            let floor = (&remainder).floor().unsigned_abs();
-            digits.push(floor.clone());
-            remainder -= Rational::from(floor);
         }
+        remainder *= &base;
+        let floor = (&remainder).floor().unsigned_abs();
+        digits.push(floor.clone());
+        remainder -= Rational::from(floor);
     }
     unreachable!()
 }

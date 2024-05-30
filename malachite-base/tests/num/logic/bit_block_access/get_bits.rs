@@ -22,7 +22,7 @@ use std::panic::catch_unwind;
 pub fn test_get_bits_unsigned() {
     fn test<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>(x: T, start: u64, end: u64, out: T) {
         assert_eq!(x.get_bits(start, end), out);
-        assert_eq!(get_bits_naive::<T, T>(&x, start, end), out)
+        assert_eq!(get_bits_naive::<T, T>(&x, start, end), out);
     }
     test(0xabcdu16, 4, 8, 0xc);
     test(0xabcdu16, 12, 100, 0xa);
@@ -46,7 +46,7 @@ pub fn test_get_bits_signed() {
         out: U,
     ) {
         assert_eq!(x.get_bits(start, end), out);
-        assert_eq!(get_bits_naive::<T, U>(&x, start, end), out)
+        assert_eq!(get_bits_naive::<T, U>(&x, start, end), out);
     }
     test(-0x5433i16, 4, 8, 0xc);
     test(-0x5433i16, 5, 9, 14);

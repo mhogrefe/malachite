@@ -15,7 +15,7 @@ fn next_less_than_helper<T: PrimitiveUnsigned>(limit: T, expected_values: &[T]) 
     let mut range_generator = variable_range_generator(EXAMPLE_SEED);
     let mut xs = Vec::with_capacity(20);
     for _ in 0..20 {
-        xs.push(range_generator.next_less_than(limit))
+        xs.push(range_generator.next_less_than(limit));
     }
     assert_eq!(xs, expected_values);
 }

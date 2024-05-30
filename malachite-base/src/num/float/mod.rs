@@ -118,9 +118,9 @@ impl<T: PrimitiveFloat> Hash for NiceFloat<T> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         let f = self.0;
         if f.is_nan() {
-            "NaN".hash(state)
+            "NaN".hash(state);
         } else {
-            f.to_bits().hash(state)
+            f.to_bits().hash(state);
         }
     }
 }

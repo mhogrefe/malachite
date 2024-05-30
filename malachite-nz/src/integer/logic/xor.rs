@@ -1036,7 +1036,7 @@ impl Natural {
             Natural(Small(ref mut small)) => {
                 let result = *small ^ other;
                 if result == 0 {
-                    *self = Natural(Large(vec![0, 1]))
+                    *self = Natural(Large(vec![0, 1]));
                 } else {
                     *small = result.wrapping_neg();
                 }
@@ -1357,12 +1357,12 @@ impl BitXorAssign<Integer> for Integer {
             (true, true) => self.abs.bitxor_assign(other.abs),
             (true, false) => {
                 self.sign = false;
-                self.abs.xor_assign_pos_neg(other.abs)
+                self.abs.xor_assign_pos_neg(other.abs);
             }
             (false, true) => self.abs.xor_assign_neg_pos(other.abs),
             (false, false) => {
                 self.sign = true;
-                self.abs.xor_assign_neg_neg(other.abs)
+                self.abs.xor_assign_neg_neg(other.abs);
             }
         }
     }
@@ -1400,12 +1400,12 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
             (true, true) => self.abs.bitxor_assign(&other.abs),
             (true, false) => {
                 self.sign = false;
-                self.abs.xor_assign_pos_neg_ref(&other.abs)
+                self.abs.xor_assign_pos_neg_ref(&other.abs);
             }
             (false, true) => self.abs.xor_assign_neg_pos_ref(&other.abs),
             (false, false) => {
                 self.sign = true;
-                self.abs.xor_assign_neg_neg_ref(&other.abs)
+                self.abs.xor_assign_neg_neg_ref(&other.abs);
             }
         }
     }

@@ -23,7 +23,7 @@ fn helper(d: &str, a: &str, out: &str) {
             20
         ),
         out
-    )
+    );
 }
 
 #[test]

@@ -22,12 +22,12 @@ use std::panic::catch_unwind;
 #[test]
 pub fn test_from_bits_asc() {
     fn test_unsigned<T: PrimitiveUnsigned>(bits: &[bool], out: T) {
-        assert_eq!(T::from_bits_asc(bits.iter().cloned()), out);
+        assert_eq!(T::from_bits_asc(bits.iter().copied()), out);
         assert_eq!(
-            from_bits_asc_unsigned_naive::<T, _>(bits.iter().cloned()),
+            from_bits_asc_unsigned_naive::<T, _>(bits.iter().copied()),
             out
         );
-        assert_eq!(from_bits_asc_alt::<T, _>(bits.iter().cloned()), out);
+        assert_eq!(from_bits_asc_alt::<T, _>(bits.iter().copied()), out);
     }
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
@@ -44,12 +44,12 @@ pub fn test_from_bits_asc() {
     test_unsigned(&[true; 8], u8::MAX);
 
     fn test_signed<T: PrimitiveSigned>(bits: &[bool], out: T) {
-        assert_eq!(T::from_bits_asc(bits.iter().cloned()), out);
+        assert_eq!(T::from_bits_asc(bits.iter().copied()), out);
         assert_eq!(
-            from_bits_asc_signed_naive::<T, _>(bits.iter().cloned()),
+            from_bits_asc_signed_naive::<T, _>(bits.iter().copied()),
             out
         );
-        assert_eq!(from_bits_asc_alt::<T, _>(bits.iter().cloned()), out);
+        assert_eq!(from_bits_asc_alt::<T, _>(bits.iter().copied()), out);
     }
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
@@ -89,7 +89,7 @@ fn from_bits_asc_fail_helper_unsigned<T: PrimitiveUnsigned>() {
 
 fn from_bits_asc_fail_helper_signed<T: PrimitiveSigned>() {
     assert_panic!(T::from_bits_asc(
-        repeat_n(false, 200).chain([true, false].iter().cloned())
+        repeat_n(false, 200).chain([true, false].iter().copied())
     ));
     assert_panic!(T::from_bits_asc(repeat_n(false, 200).chain(once(true))));
 }
@@ -103,8 +103,8 @@ fn from_bits_asc_fail() {
 #[test]
 pub fn test_from_bits_desc() {
     fn test_unsigned<T: PrimitiveUnsigned>(bits: &[bool], out: T) {
-        assert_eq!(T::from_bits_desc(bits.iter().cloned()), out);
-        assert_eq!(from_bits_desc_alt::<T, _>(bits.iter().cloned()), out);
+        assert_eq!(T::from_bits_desc(bits.iter().copied()), out);
+        assert_eq!(from_bits_desc_alt::<T, _>(bits.iter().copied()), out);
     }
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
@@ -121,8 +121,8 @@ pub fn test_from_bits_desc() {
     test_unsigned(&[true; 8], u8::MAX);
 
     fn test_signed<T: PrimitiveSigned>(bits: &[bool], out: T) {
-        assert_eq!(T::from_bits_desc(bits.iter().cloned()), out);
-        assert_eq!(from_bits_desc_alt::<T, _>(bits.iter().cloned()), out);
+        assert_eq!(T::from_bits_desc(bits.iter().copied()), out);
+        assert_eq!(from_bits_desc_alt::<T, _>(bits.iter().copied()), out);
     }
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
@@ -162,7 +162,7 @@ fn from_bits_desc_fail_helper_unsigned<T: PrimitiveUnsigned>() {
 
 fn from_bits_desc_fail_helper_signed<T: PrimitiveSigned>() {
     assert_panic!(T::from_bits_desc(
-        [false, true].iter().cloned().chain(repeat_n(false, 200))
+        [false, true].iter().copied().chain(repeat_n(false, 200))
     ));
     assert_panic!(T::from_bits_desc(once(true).chain(repeat_n(false, 200))));
 }
@@ -175,9 +175,9 @@ fn from_bits_desc_fail() {
 
 fn from_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     bool_vec_gen_var_1::<T>().test_properties(|bs| {
-        let n = T::from_bits_asc(bs.iter().cloned());
-        assert_eq!(from_bits_asc_unsigned_naive::<T, _>(bs.iter().cloned()), n);
-        assert_eq!(from_bits_asc_alt::<T, _>(bs.iter().cloned()), n);
+        let n = T::from_bits_asc(bs.iter().copied());
+        assert_eq!(from_bits_asc_unsigned_naive::<T, _>(bs.iter().copied()), n);
+        assert_eq!(from_bits_asc_alt::<T, _>(bs.iter().copied()), n);
         let trailing_falses = bs.iter().rev().take_while(|&&bit| !bit).count();
         let trimmed_bits = bs[..bs.len() - trailing_falses].to_vec();
         assert_eq!(n.to_bits_asc(), trimmed_bits);
@@ -190,9 +190,9 @@ fn from_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
 fn from_bits_asc_properties_helper_signed<T: PrimitiveSigned>() {
     bool_vec_gen_var_2::<T>().test_properties(|bs| {
-        let n = T::from_bits_asc(bs.iter().cloned());
-        assert_eq!(from_bits_asc_signed_naive::<T, _>(bs.iter().cloned()), n);
-        assert_eq!(from_bits_asc_alt::<T, _>(bs.iter().cloned()), n);
+        let n = T::from_bits_asc(bs.iter().copied());
+        assert_eq!(from_bits_asc_signed_naive::<T, _>(bs.iter().copied()), n);
+        assert_eq!(from_bits_asc_alt::<T, _>(bs.iter().copied()), n);
         let trimmed_bits = if bs.iter().all(|&bit| !bit) {
             Vec::new()
         } else {
@@ -201,7 +201,7 @@ fn from_bits_asc_properties_helper_signed<T: PrimitiveSigned>() {
             } else {
                 bs.iter().rev().take_while(|&&bit| !bit).count()
             };
-            bs[..bs.len() - sign_bits + 1].to_vec()
+            bs[..=bs.len() - sign_bits].to_vec()
         };
         assert_eq!(n.to_bits_asc(), trimmed_bits);
     });
@@ -220,8 +220,8 @@ fn from_bits_asc_properties() {
 
 fn from_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     bool_vec_gen_var_3::<T>().test_properties(|bs| {
-        let n = T::from_bits_desc(bs.iter().cloned());
-        assert_eq!(from_bits_desc_alt::<T, _>(bs.iter().cloned()), n);
+        let n = T::from_bits_desc(bs.iter().copied());
+        assert_eq!(from_bits_desc_alt::<T, _>(bs.iter().copied()), n);
         let leading_falses = bs.iter().take_while(|&&bit| !bit).count();
         let trimmed_bits = bs[leading_falses..].to_vec();
         assert_eq!(n.to_bits_desc(), trimmed_bits);
@@ -234,8 +234,8 @@ fn from_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
 fn from_bits_desc_properties_helper_signed<T: PrimitiveSigned>() {
     bool_vec_gen_var_4::<T>().test_properties(|bs| {
-        let n = T::from_bits_desc(bs.iter().cloned());
-        assert_eq!(from_bits_desc_alt::<T, _>(bs.iter().cloned()), n);
+        let n = T::from_bits_desc(bs.iter().copied());
+        assert_eq!(from_bits_desc_alt::<T, _>(bs.iter().copied()), n);
         let trimmed_bits = if bs.iter().all(|&bit| !bit) {
             Vec::new()
         } else {

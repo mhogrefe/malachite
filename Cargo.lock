@@ -480,10 +480,10 @@ name = "malachite-float"
 version = "0.4.9"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.4.9",
  "malachite-float 0.4.9",
- "malachite-nz 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-q 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.4.9",
+ "malachite-q 0.4.9",
  "num",
  "rug",
  "serde",

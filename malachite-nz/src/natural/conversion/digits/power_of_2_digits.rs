@@ -30,13 +30,11 @@ impl Natural {
         log_base: u64,
     ) -> Vec<T> {
         assert_ne!(log_base, 0);
-        if log_base > T::WIDTH {
-            panic!(
+            assert!(log_base <= T::WIDTH,
                 "type {:?} is too small for a digit of width {}",
                 T::NAME,
                 log_base
             );
-        }
         let digit_len = self
             .significant_bits()
             .div_round(log_base, Ceiling).0;
@@ -58,13 +56,11 @@ impl Natural {
         Natural: From<T>,
     {
         assert_ne!(log_base, 0);
-        if log_base > T::WIDTH {
-            panic!(
+            assert!(log_base <= T::WIDTH,
                 "type {:?} is too small for a digit of width {}",
                 T::NAME,
                 log_base
             );
-        }
         let mut n = Natural::ZERO;
         let mut previous_index = 0;
         for digit in digits {
@@ -84,20 +80,19 @@ where
     Limb: PowerOf2Digits<T>,
 {
     assert_ne!(log_base, 0);
-    if log_base > T::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            T::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= T::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        T::NAME,
+        log_base
+    );
     let limbs = match *x {
         Natural(Small(ref small)) => {
             return PowerOf2Digits::<T>::to_power_of_2_digits_asc(small, min(log_base, Limb::WIDTH))
         }
         Natural(Large(ref limbs)) => limbs,
     };
-    let mut digits = iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base)
+    let mut digits = iterator_to_bit_chunks(limbs.iter().copied(), Limb::WIDTH, log_base)
         .map(Option::unwrap)
         .collect_vec();
     digits.truncate(digits.len() - slice_trailing_zeros(&digits));
@@ -121,13 +116,12 @@ where
     Limb: WrappingFrom<T>,
 {
     assert_ne!(log_base, 0);
-    if log_base > T::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            T::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= T::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        T::NAME,
+        log_base
+    );
     let mut limbs = Vec::new();
     for digit in iterator_to_bit_chunks(digits, log_base, Limb::WIDTH) {
         limbs.push(digit?);
@@ -143,16 +137,15 @@ where
     Limb: WrappingFrom<T>,
 {
     assert_ne!(log_base, 0);
-    if log_base > T::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            T::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= T::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        T::NAME,
+        log_base
+    );
     let digits = digits.collect_vec();
     let mut limbs = Vec::new();
-    for digit in iterator_to_bit_chunks(digits.iter().cloned().rev(), log_base, Limb::WIDTH) {
+    for digit in iterator_to_bit_chunks(digits.iter().copied().rev(), log_base, Limb::WIDTH) {
         limbs.push(digit?);
     }
     Some(Natural::from_owned_limbs_asc(limbs))
@@ -351,7 +344,7 @@ impl PowerOf2Digits<Natural> for Natural {
                 min(log_base, Limb::WIDTH),
             )
             .iter()
-            .cloned()
+            .copied()
             .map(Natural::from)
             .collect();
         }

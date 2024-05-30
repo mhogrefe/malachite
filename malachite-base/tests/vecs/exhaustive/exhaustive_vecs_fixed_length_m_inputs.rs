@@ -107,7 +107,7 @@ fn test_exhaustive_vecs_fixed_length_1_input() {
         ],
     );
     exhaustive_vecs_fixed_length_1_input_helper(
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         2,
         Some(9),
         &[
@@ -123,7 +123,7 @@ fn test_exhaustive_vecs_fixed_length_1_input() {
         ],
     );
     exhaustive_vecs_fixed_length_1_input_helper(
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         3,
         Some(27),
         &[
@@ -195,8 +195,8 @@ fn exhaustive_vecs_fixed_length_2_inputs_helper<
     let output_types = get_sample_output_types(len);
     let output_configs: Vec<(BitDistributorOutputType, usize)> = output_types[0]
         .iter()
-        .cloned()
-        .zip(input_indices.iter().cloned())
+        .copied()
+        .zip(input_indices.iter().copied())
         .collect();
     let xss = exhaustive_vecs_fixed_length_2_inputs(xs.clone(), ys.clone(), &output_configs);
     let xss_prefix = xss.clone().take(20).collect_vec();
@@ -214,8 +214,8 @@ fn exhaustive_vecs_fixed_length_2_inputs_helper<
     for alt_output_types in &output_types[1..] {
         let output_configs: Vec<(BitDistributorOutputType, usize)> = alt_output_types
             .iter()
-            .cloned()
-            .zip(input_indices.iter().cloned())
+            .copied()
+            .zip(input_indices.iter().copied())
             .collect();
         let xss = exhaustive_vecs_fixed_length_2_inputs(xs.clone(), ys.clone(), &output_configs);
         xss.clone().take(20).for_each(drop);
@@ -267,7 +267,7 @@ fn test_exhaustive_vecs_fixed_length_2_inputs() {
     );
     exhaustive_vecs_fixed_length_2_inputs_helper(
         &exhaustive_ascii_chars(),
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         2,
         &[0, 1],
         Some(384),
@@ -296,7 +296,7 @@ fn test_exhaustive_vecs_fixed_length_2_inputs() {
     );
     exhaustive_vecs_fixed_length_2_inputs_helper(
         &exhaustive_ascii_chars(),
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         3,
         &[0, 1, 1],
         Some(1152),
@@ -325,7 +325,7 @@ fn test_exhaustive_vecs_fixed_length_2_inputs() {
     );
     exhaustive_vecs_fixed_length_2_inputs_helper(
         &exhaustive_ascii_chars(),
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         3,
         &[0, 1, 0],
         Some(49152),

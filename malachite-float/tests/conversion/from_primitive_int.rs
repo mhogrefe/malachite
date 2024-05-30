@@ -933,10 +933,10 @@ where
         assert_eq!(float_n.partial_cmp(&n), Some(o));
         match rm {
             Floor | Down => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             Ceiling | Up => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             Exact => assert_eq!(o, Equal),
             _ => {}
@@ -1016,10 +1016,10 @@ where
         assert_eq!(float_n.partial_cmp(&n), Some(o));
         match (n >= T::ZERO, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}

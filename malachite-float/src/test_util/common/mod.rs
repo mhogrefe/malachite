@@ -87,10 +87,11 @@ impl From<&rug::Float> for Float {
     }
 }
 
-fn convert_prec(prec: &u64) -> Result<u32, ()> {
-    u32::try_from(*prec).map_err(|_| ())
+fn convert_prec(prec: u64) -> Result<u32, ()> {
+    u32::try_from(prec).map_err(|_| ())
 }
 
+#[allow(clippy::unnecessary_wraps)]
 fn special_float(prec: u32, value: Special) -> Result<rug::Float, ()> {
     Ok(rug::Float::with_val_round(prec, value, Round::Zero).0)
 }
@@ -120,7 +121,7 @@ impl TryFrom<&Float> for rug::Float {
                 significand,
             }) => {
                 let mut f = rug::Float::with_val_round(
-                    convert_prec(precision)?,
+                    convert_prec(*precision)?,
                     rug::Integer::from(significand),
                     Round::Zero,
                 )
@@ -161,9 +162,8 @@ where
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
             return T::rounding_from(&result, Nearest).0;
-        } else {
-            result = f(x, T::max_precision_for_sci_exponent(e));
         }
+        result = f(x, T::max_precision_for_sci_exponent(e));
     }
     if result > T::MAX_FINITE {
         T::INFINITY
@@ -194,9 +194,8 @@ where
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
             return T::rounding_from(&result, Nearest).0;
-        } else {
-            result = f(x, y, T::max_precision_for_sci_exponent(e));
         }
+        result = f(x, y, T::max_precision_for_sci_exponent(e));
     }
     if result > T::MAX_FINITE {
         T::INFINITY

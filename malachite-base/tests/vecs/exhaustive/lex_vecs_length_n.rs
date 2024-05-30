@@ -129,8 +129,8 @@ fn test_lex_vecs_length_2() {
         ],
     );
     lex_vecs_length_2_finite_helper(
-        ['a', 'b', 'c'].iter().cloned(),
-        ['x', 'y', 'z'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
+        ['x', 'y', 'z'].iter().copied(),
         9,
         &[
             &['a', 'x'],
@@ -145,8 +145,8 @@ fn test_lex_vecs_length_2() {
         ],
     );
     lex_vecs_length_2_finite_helper(
-        lex_vecs_length_2(exhaustive_orderings(), [Less, Greater].iter().cloned()),
-        exhaustive_vecs_fixed_length_from_single(3, [Less, Greater].iter().cloned()),
+        lex_vecs_length_2(exhaustive_orderings(), [Less, Greater].iter().copied()),
+        exhaustive_vecs_fixed_length_from_single(3, [Less, Greater].iter().copied()),
         48,
         &[
             &[vec![Equal, Less], vec![Less, Less, Less]],
@@ -328,9 +328,9 @@ fn test_lex_vecs_length_3() {
         ],
     );
     lex_vecs_length_3_finite_helper(
-        ['a', 'b', 'c'].iter().cloned(),
-        ['x', 'y', 'z'].iter().cloned(),
-        ['0', '1', '2'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
+        ['x', 'y', 'z'].iter().copied(),
+        ['0', '1', '2'].iter().copied(),
         27,
         &[
             &['a', 'x', '0'],

@@ -48,7 +48,7 @@ pub fn limbs_product(out: &mut [Limb], factors: &mut [Limb]) -> usize {
         let carry = limbs_mul_limb_to_out(out, &factors[..size], factors[factors_len]);
         out[size] = carry;
         if carry != 0 {
-            size += 1
+            size += 1;
         }
         size
     } else {

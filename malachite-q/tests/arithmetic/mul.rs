@@ -163,7 +163,7 @@ fn mul_properties() {
             assert_eq!(
                 (&x).reciprocal() * (&y).reciprocal(),
                 (&product).reciprocal()
-            )
+            );
         }
         assert_eq!(-&x * &y, -&product);
         assert_eq!(x * -y, -product);

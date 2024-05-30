@@ -246,7 +246,7 @@ fn mod_power_of_2_square_fail() {
 
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_square_assign(0)
+        x.mod_power_of_2_square_assign(0);
     });
 }
 

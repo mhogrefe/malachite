@@ -105,7 +105,7 @@ impl Natural {
     /// }
     /// ```
     pub fn from_limbs_desc(xs: &[Limb]) -> Natural {
-        Natural::from_owned_limbs_asc(xs.iter().cloned().rev().collect())
+        Natural::from_owned_limbs_asc(xs.iter().copied().rev().collect())
     }
 
     /// Converts a [`Vec`] of [limbs](crate#limbs) to a [`Natural`].

@@ -34,11 +34,11 @@ impl Display for Rational {
             f.write_char('-')?;
         }
         let result = Display::fmt(&self.numerator, f);
-        if self.denominator != 1 {
+        if self.denominator == 1 {
+            result
+        } else {
             f.write_char('/')?;
             Display::fmt(&self.denominator, f)
-        } else {
-            result
         }
     }
 }

@@ -215,9 +215,7 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 /// ```
 #[inline]
 pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesFromVec<T> {
-    if xs.is_empty() {
-        panic!("empty Vec");
-    }
+    assert!(!xs.is_empty(), "empty Vec");
     let indices = random_unsigneds_less_than(seed, u64::exact_from(xs.len()));
     RandomValuesFromVec { xs, indices }
 }

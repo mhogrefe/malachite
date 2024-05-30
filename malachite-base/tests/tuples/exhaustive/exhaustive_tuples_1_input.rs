@@ -93,7 +93,7 @@ fn test_exhaustive_pairs_1_input() {
         ],
     );
     exhaustive_pairs_1_input_helper(
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         Some(9),
         &[
             ('x', 'x'),
@@ -144,7 +144,7 @@ fn exhaustive_triples_1_input_helper<T, I: Clone + Iterator<Item = T>>(
 #[test]
 fn test_exhaustive_triples_1_input() {
     exhaustive_triples_1_input_helper(
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         Some(27),
         &[
             ('x', 'x', 'x'),

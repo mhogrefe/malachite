@@ -51,8 +51,8 @@ fn limbs_eq_mod_power_of_2_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bo
     if i >= len {
         xs == ys
     } else {
-        let (xs_last, xs_init) = xs[..i + 1].split_last().unwrap();
-        let (ys_last, ys_init) = ys[..i + 1].split_last().unwrap();
+        let (xs_last, xs_init) = xs[..=i].split_last().unwrap();
+        let (ys_last, ys_init) = ys[..=i].split_last().unwrap();
         xs_init == ys_init && xs_last.eq_mod_power_of_2(*ys_last, pow & Limb::WIDTH_MASK)
     }
 }
@@ -69,8 +69,8 @@ fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
         xs_lo == ys
             && limbs_divisible_by_power_of_2(xs_hi, pow - Limb::WIDTH * u64::wrapping_from(ys_len))
     } else {
-        let (xs_last, xs_init) = xs[..i + 1].split_last().unwrap();
-        let (ys_last, ys_init) = ys[..i + 1].split_last().unwrap();
+        let (xs_last, xs_init) = xs[..=i].split_last().unwrap();
+        let (ys_last, ys_init) = ys[..=i].split_last().unwrap();
         xs_init == ys_init && xs_last.eq_mod_power_of_2(*ys_last, pow & Limb::WIDTH_MASK)
     }
 }

@@ -27,15 +27,13 @@ fn mod_power_of_2_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
 
 fn mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(x: &mut T, pow: u64) {
     if *x != T::ZERO && pow < T::WIDTH {
-        *x &= T::low_mask(pow)
+        *x &= T::low_mask(pow);
     }
 }
 
 #[inline]
 fn neg_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
-    if x != T::ZERO && pow > T::WIDTH {
-        panic!("{}", ERROR_MESSAGE);
-    }
+    assert!(x == T::ZERO || pow <= T::WIDTH, "{ERROR_MESSAGE}");
     x.wrapping_neg().mod_power_of_2(pow)
 }
 
@@ -189,9 +187,7 @@ fn mod_power_of_2_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSig
     x: S,
     pow: u64,
 ) -> U {
-    if x < S::ZERO && pow > S::WIDTH {
-        panic!("{}", ERROR_MESSAGE);
-    }
+    assert!(x >= S::ZERO || pow <= S::WIDTH, "{ERROR_MESSAGE}");
     U::wrapping_from(x).mod_power_of_2(pow)
 }
 

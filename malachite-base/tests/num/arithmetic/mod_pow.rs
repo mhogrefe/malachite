@@ -79,11 +79,11 @@ fn mod_pow_fail() {
 fn mod_pow_assign_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
         let mut x = T::ZERO;
-        x.mod_pow_assign(10, T::ZERO)
+        x.mod_pow_assign(10, T::ZERO);
     });
     assert_panic!({
         let mut x = T::from(123u8);
-        x.mod_pow_assign(10, T::from(123u8))
+        x.mod_pow_assign(10, T::from(123u8));
     });
 }
 
@@ -124,7 +124,7 @@ fn mod_pow_properties_helper_helper<T: PrimitiveUnsigned, F: Fn(T, u64, T) -> T>
 
 fn mod_pow_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_triple_gen_var_15::<T, u64>().test_properties(|(x, exp, m)| {
-        mod_pow_properties_helper_helper(x, exp, m, simple_binary_mod_pow)
+        mod_pow_properties_helper_helper(x, exp, m, simple_binary_mod_pow);
     });
 
     unsigned_triple_gen_var_14::<T, u64>()

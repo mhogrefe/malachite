@@ -17,8 +17,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the specified precision and with the
     /// specified rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded difference is less than, equal to, or greater than
-    /// the exact difference. Although `NaN`s are not comparable to any other [`Float`], whenever
-    /// this function returns a `NaN` it also returns `Equal`.
+    /// the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -108,7 +108,7 @@ impl Float {
     /// specified rounding mode. The first [`Float`] is taken by value and the second by reference.
     /// An [`Ordering`] is also returned, indicating whether the rounded difference is less than,
     /// equal to, or greater than the exact difference. Although `NaN`s are not comparable to any
-    /// other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -198,7 +198,7 @@ impl Float {
     /// specified rounding mode. The first [`Float`] is taken by reference and the second by value.
     /// An [`Ordering`] is also returned, indicating whether the rounded difference is less than,
     /// equal to, or greater than the exact difference. Although `NaN`s are not comparable to any
-    /// other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -286,8 +286,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the specified precision and with the
     /// specified rounding mode. Both [`Float`]s are taken by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded difference is less than, equal to, or greater than
-    /// the exact difference. Although `NaN`s are not comparable to any other [`Float`], whenever
-    /// this function returns a `NaN` it also returns `Equal`.
+    /// the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -375,8 +375,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the nearest value of the specified
     /// precision. Both [`Float`]s are taken by value. An [`Ordering`] is also returned, indicating
     /// whether the rounded difference is less than, equal to, or greater than the exact difference.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -436,7 +436,7 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the nearest value of the specified
     /// precision. The first [`Float`] is taken by value and the second by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded difference is less than, equal
-    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any other
+    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any
     /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
@@ -497,7 +497,7 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the nearest value of the specified
     /// precision. The first [`Float`] is taken by reference and the second by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded difference is less than, equal
-    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any other
+    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any
     /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
@@ -558,8 +558,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the nearest value of the specified
     /// precision. Both [`Float`]s are taken by reference. An [`Ordering`] is also returned,
     /// indicating whether the rounded difference is less than, equal to, or greater than the exact
-    /// difference. Although `NaN`s are not comparable to any other [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// difference. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -619,8 +619,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result with the specified rounding mode. Both
     /// [`Float`]s are taken by value. An [`Ordering`] is also returned, indicating whether the
     /// rounded difference is less than, equal to, or greater than the exact difference. Although
-    /// `NaN`s are not comparable to any other [`Float`], whenever this function returns a `NaN` it
-    /// also returns `Equal`.
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -694,8 +694,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result with the specified rounding mode. The
     /// [`Float`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded difference is less than, equal to, or greater than
-    /// the exact difference. Although `NaN`s are not comparable to any other [`Float`], whenever
-    /// this function returns a `NaN` it also returns `Equal`.
+    /// the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -769,8 +769,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result with the specified rounding mode. The
     /// [`Float`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded difference is less than, equal to, or greater than
-    /// the exact difference. Although `NaN`s are not comparable to any other [`Float`], whenever
-    /// this function returns a `NaN` it also returns `Equal`.
+    /// the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -844,8 +844,8 @@ impl Float {
     /// Subtracts two [`Float`]s, rounding the result with the specified rounding mode. Both
     /// [`Float`]s are taken by reference. An [`Ordering`] is also returned, indicating whether the
     /// rounded difference is less than, equal to, or greater than the exact difference. Although
-    /// `NaN`s are not comparable to any other [`Float`], whenever this function returns a `NaN` it
-    /// also returns `Equal`.
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -920,8 +920,8 @@ impl Float {
     /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
     /// taken by value. An [`Ordering`] is returned, indicating whether the rounded difference is
     /// less than, equal to, or greater than the exact difference. Although `NaN`s are not
-    /// comparable to any other [`Float`], whenever this function sets the [`Float`] to `NaN` it
-    /// also returns `Equal`.
+    /// comparable to any [`Float`], whenever this function sets the [`Float`] to `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -996,8 +996,8 @@ impl Float {
     /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
     /// taken by reference. An [`Ordering`] is returned, indicating whether the rounded difference
     /// is less than, equal to, or greater than the exact difference. Although `NaN`s are not
-    /// comparable to any other [`Float`], whenever this function sets the [`Float`] to `NaN` it
-    /// also returns `Equal`.
+    /// comparable to any [`Float`], whenever this function sets the [`Float`] to `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1088,8 +1088,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, rounding the result to the nearest value of
     /// the specified precision. The [`Float`] on the right-hand side is taken by value. An
     /// [`Ordering`] is returned, indicating whether the rounded difference is less than, equal to,
-    /// or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// or greater than the exact difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -1138,8 +1138,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, rounding the result to the nearest value of
     /// the specified precision. The [`Float`] on the right-hand side is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the rounded difference is less than, equal to,
-    /// or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// or greater than the exact difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -1188,8 +1188,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, rounding the result with the specified
     /// rounding mode. The [`Float`] on the right-hand side is taken by value. An [`Ordering`] is
     /// returned, indicating whether the rounded difference is less than, equal to, or greater than
-    /// the exact difference. Although `NaN`s are not comparable to any other [`Float`], whenever
-    /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1251,8 +1251,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, rounding the result with the specified
     /// rounding mode. The [`Float`] on the right-hand side is taken by reference. An [`Ordering`]
     /// is returned, indicating whether the rounded difference is less than, equal to, or greater
-    /// than the exact difference. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// than the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precision of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -1315,7 +1315,7 @@ impl Float {
     /// with the specified rounding mode. The [`Float`] and the [`Rational`] are both taken by
     /// value. An [`Ordering`] is also returned, indicating whether the rounded difference is less
     /// than, equal to, or greater than the exact difference. Although `NaN`s are not comparable to
-    /// any other [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1408,8 +1408,7 @@ impl Float {
     /// with the specified rounding mode. The [`Float`] is taken by value and the [`Rational`] by
     /// reference. An [`Ordering`] is also returned, indicating whether the rounded difference is
     /// less than, equal to, or greater than the exact difference. Although `NaN`s are not
-    /// comparable to any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Equal`.
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1520,8 +1519,7 @@ impl Float {
     /// with the specified rounding mode. The [`Float`] is taken by reference and the [`Rational`]
     /// by value. An [`Ordering`] is also returned, indicating whether the rounded difference is
     /// less than, equal to, or greater than the exact difference. Although `NaN`s are not
-    /// comparable to any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Equal`.
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1631,8 +1629,7 @@ impl Float {
     /// with the specified rounding mode. The [`Float`] and the [`Rational`] are both taken by
     /// reference. An [`Ordering`] is also returned, indicating whether the rounded difference is
     /// less than, equal to, or greater than the exact difference. Although `NaN`s are not
-    /// comparable to any other [`Float`], whenever this function returns a `NaN` it also returns
-    /// `Equal`.
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1741,8 +1738,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] and the [`Rational`] are both are taken by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded difference is less than, equal
-    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`],  whenever this function returns a `NaN` it also returns `Equal`.
+    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -1800,8 +1797,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by value and the [`Rational`] by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded difference is less than, equal
-    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`],  whenever this function returns a `NaN` it also returns `Equal`.
+    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -1859,8 +1856,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by reference and the [`Rational`] by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded difference is less than, equal
-    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`],  whenever this function returns a `NaN` it also returns `Equal`.
+    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -1918,8 +1915,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] and the [`Rational`] are both are taken by reference. An
     /// [`Ordering`] is also returned, indicating whether the rounded difference is less than, equal
-    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`],  whenever this function returns a `NaN` it also returns `Equal`.
+    /// to, or greater than the exact difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -1977,8 +1974,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result with the specified rounding
     /// mode. The [`Float`] and the [`Rational`] are both are taken by value. An [`Ordering`] is
     /// also returned, indicating whether the rounded difference is less than, equal to, or greater
-    /// than the exact difference. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// than the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -2052,8 +2049,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result with the specified rounding
     /// mode. The [`Float`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is
     /// also returned, indicating whether the rounded difference is less than, equal to, or greater
-    /// than the exact difference. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// than the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -2132,8 +2129,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result with the specified rounding
     /// mode. The [`Float`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is
     /// also returned, indicating whether the rounded difference is less than, equal to, or greater
-    /// than the exact difference. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// than the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -2212,8 +2209,8 @@ impl Float {
     /// Subtracts a [`Float`] by a [`Rational`], rounding the result with the specified rounding
     /// mode. The [`Float`] and the [`Rational`] are both are taken by reference. An [`Ordering`] is
     /// also returned, indicating whether the rounded difference is less than, equal to, or greater
-    /// than the exact difference. Although `NaN`s are not comparable to any other [`Float`],
-    /// whenever this function returns a `NaN` it also returns `Equal`.
+    /// than the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the [`Float`] input. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -2292,8 +2289,8 @@ impl Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, rounding the result to the specified
     /// precision and with the specified rounding mode. The [`Rational`] is taken by value. An
     /// [`Ordering`] is returned, indicating whether the rounded difference is less than, equal to,
-    /// or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// or greater than the exact difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2389,8 +2386,8 @@ impl Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, rounding the result to the specified
     /// precision and with the specified rounding mode. The [`Rational`] is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the rounded difference is less than, equal to,
-    /// or greater than the exact difference. Although `NaN`s are not comparable to any other
-    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// or greater than the exact difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -2487,8 +2484,8 @@ impl Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, rounding the result to the nearest value
     /// of the specified precision. The [`Rational`] is taken by value. An [`Ordering`] is returned,
     /// indicating whether the rounded difference is less than, equal to, or greater than the exact
-    /// difference. Although `NaN`s are not comparable to any other [`Float`], whenever this
-    /// function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// difference. Although `NaN`s are not comparable to any [`Float`], whenever this function sets
+    /// the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -2546,8 +2543,8 @@ impl Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, rounding the result to the nearest value
     /// of the specified precision. The [`Rational`] is taken by reference. An [`Ordering`] is
     /// returned, indicating whether the rounded difference is less than, equal to, or greater than
-    /// the exact difference. Although `NaN`s are not comparable to any other [`Float`], whenever
-    /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// the exact difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// If the difference is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
@@ -2605,7 +2602,7 @@ impl Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, rounding the result with the specified
     /// rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is returned, indicating
     /// whether the rounded difference is less than, equal to, or greater than the exact difference.
-    /// Although `NaN`s are not comparable to any other [`Float`], whenever this function sets the
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets the
     /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the input [`Float`]. See [`RoundingMode`]
@@ -2678,8 +2675,8 @@ impl Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, rounding the result with the specified
     /// rounding mode. The [`Rational`] is taken by reference. An [`Ordering`] is returned,
     /// indicating whether the rounded difference is less than, equal to, or greater than the exact
-    /// difference. Although `NaN`s are not comparable to any other [`Float`], whenever this
-    /// function sets the [`Float`] to `NaN` it also returns `Equal`.
+    /// difference. Although `NaN`s are not comparable to any [`Float`], whenever this function sets
+    /// the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the precision of the input [`Float`]. See [`RoundingMode`]
     /// for a description of the possible rounding modes.
@@ -3047,7 +3044,7 @@ impl SubAssign<Float> for Float {
     /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// Special cases: See the `-` documenation for information on special cases.
+    /// See the `-` documentation for information on special cases.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_assign`] instead. If you want to specify the output precision, consider
@@ -3122,7 +3119,7 @@ impl<'a> SubAssign<&'a Float> for Float {
     /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// Special cases: See the `-` documenation for information on special cases.
+    /// See the `-` documentation for information on special cases.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_assign`] instead. If you want to specify the output precision, consider

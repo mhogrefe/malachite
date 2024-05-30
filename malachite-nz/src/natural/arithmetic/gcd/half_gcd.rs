@@ -1136,9 +1136,8 @@ fn limbs_half_gcd_step(
     let (x_high, a_low, y_high, b_low) = if n == s + 1 {
         if mask < 4 {
             return limbs_gcd_subdivide_step(xs, ys, s, a, scratch);
-        } else {
-            (xs[n - 1], xs[n - 2], ys[n - 1], ys[n - 2])
         }
+        (xs[n - 1], xs[n - 2], ys[n - 1], ys[n - 2])
     } else if mask.get_highest_bit() {
         (xs[n - 1], xs[n - 2], ys[n - 1], ys[n - 2])
     } else {
@@ -1313,8 +1312,8 @@ fn limbs_half_gcd_approx(
             assert_ne!(offset, 0);
             let xs = &mut xs[offset - 1..];
             let ys = &mut ys[offset - 1..];
-            let (xs_head, xs_tail) = xs[..n + 1].split_first_mut().unwrap();
-            let (ys_head, ys_tail) = ys[..n + 1].split_first_mut().unwrap();
+            let (xs_head, xs_tail) = xs[..=n].split_first_mut().unwrap();
+            let (ys_head, ys_tail) = ys[..=n].split_first_mut().unwrap();
             let comp_bits = Limb::WIDTH - extra_bits;
             *xs_head = limbs_slice_shr_in_place(xs_tail, comp_bits);
             *ys_head = limbs_slice_shr_in_place(ys_tail, comp_bits);

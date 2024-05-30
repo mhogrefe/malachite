@@ -69,7 +69,18 @@
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
     clippy::uninlined_format_args,
-    clippy::unused_self
+    clippy::unused_self,
+    clippy::if_not_else,
+    clippy::manual_assert,
+    clippy::range_plus_one,
+    clippy::redundant_else,
+    clippy::semicolon_if_nothing_returned,
+    clippy::borrow_as_ptr,
+    clippy::cloned_instead_of_copied,
+    clippy::flat_map_option,
+    clippy::unnecessary_wraps,
+    clippy::unnested_or_patterns,
+    clippy::trivially_copy_pass_by_ref
 )]
 #![cfg_attr(not(any(feature = "test_build", feature = "random")), no_std)]
 

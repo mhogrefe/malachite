@@ -28,7 +28,7 @@ fn shortlex_vecs_from_element_iterator_helper<I: Iterator<Item = u64>, J: Clone 
 fn test_shortlex_vecs_from_element_iterator() {
     shortlex_vecs_from_element_iterator_helper(empty(), exhaustive_bools(), &[]);
     shortlex_vecs_from_element_iterator_helper(
-        [2, 1, 2].iter().cloned(),
+        [2, 1, 2].iter().copied(),
         exhaustive_bools(),
         &[
             &[false, false],
@@ -70,7 +70,7 @@ fn test_shortlex_vecs_from_element_iterator() {
         ],
     );
     shortlex_vecs_from_element_iterator_helper(
-        [2, 1, 0, 2].iter().cloned(),
+        [2, 1, 0, 2].iter().copied(),
         exhaustive_bools(),
         &[
             &[false, false],
@@ -87,5 +87,5 @@ fn test_shortlex_vecs_from_element_iterator() {
         ],
     );
     // Stops after first empty ys
-    shortlex_vecs_from_element_iterator_helper([0, 0, 1, 0].iter().cloned(), nevers(), &[&[], &[]]);
+    shortlex_vecs_from_element_iterator_helper([0, 0, 1, 0].iter().copied(), nevers(), &[&[], &[]]);
 }

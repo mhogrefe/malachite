@@ -283,7 +283,7 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
         match (self, exp) {
             _ if pow == 0 => Natural::ZERO,
             (_, &Natural::ZERO) => Natural::ONE,
-            (&Natural::ZERO, _) | (&Natural::ONE, _) | (_, &Natural::ONE) => self.clone(),
+            (&Natural::ZERO | &Natural::ONE, _) | (_, &Natural::ONE) => self.clone(),
             (Natural(Small(x)), Natural(Small(e)))
                 if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
             {
@@ -377,11 +377,11 @@ impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
         match (&mut *self, exp) {
             _ if pow == 0 => *self = Natural::ZERO,
             (_, &Natural::ZERO) => *self = Natural::ONE,
-            (&mut Natural::ZERO, _) | (&mut Natural::ONE, _) | (_, &Natural::ONE) => {}
+            (&mut (Natural::ZERO | Natural::ONE), _) | (_, &Natural::ONE) => {}
             (Natural(Small(ref mut x)), Natural(Small(e)))
                 if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
             {
-                x.mod_power_of_2_pow_assign(u64::wrapping_from(*e), pow)
+                x.mod_power_of_2_pow_assign(u64::wrapping_from(*e), pow);
             }
             (_, Natural(Small(e))) => {
                 let xs = self.promote_in_place();

@@ -83,7 +83,7 @@ fn test_sci_mantissa_and_exponent_round() {
         assert_eq!(
             actual_out.map(|(m, e, o)| (NiceFloat(m), e, o)),
             out.map(|(m, e, o)| (NiceFloat(m), e, o))
-        )
+        );
     };
     test("3", Floor, Some((1.5, 1, Equal)));
     test("3", Down, Some((1.5, 1, Equal)));

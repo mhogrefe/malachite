@@ -12,7 +12,7 @@ use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 pub fn limbs_twos_complement_in_place_alt_1(limbs: &mut [Limb]) -> bool {
-    let i = limbs.iter().cloned().take_while(|&x| x == 0).count();
+    let i = limbs.iter().copied().take_while(|&x| x == 0).count();
     let len = limbs.len();
     if i == len {
         return true;

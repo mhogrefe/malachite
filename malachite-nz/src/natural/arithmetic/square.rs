@@ -1156,7 +1156,7 @@ impl SquareAssign for Natural {
     /// ```
     fn square_assign(&mut self) {
         match self {
-            &mut Natural::ZERO | &mut Natural::ONE => {}
+            &mut (Natural::ZERO | Natural::ONE) => {}
             Natural(Small(x)) => {
                 let (upper, lower) = Limb::x_mul_y_to_zz(*x, *x);
                 if upper == 0 {

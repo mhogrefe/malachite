@@ -1851,10 +1851,10 @@ where
         assert_eq!(n.divisible_by_power_of_2(u.exact_into()), o == Equal);
         match (n >= 0, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
@@ -1945,10 +1945,10 @@ where
 
         match (n >= 0, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}

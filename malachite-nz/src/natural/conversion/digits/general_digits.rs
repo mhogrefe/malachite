@@ -198,10 +198,10 @@ pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
         const DIGIT_SHIFT: u64 = Limb::WIDTH - 4;
         const LIMIT: usize = MP_BASES_CHARS_PER_LIMB_10
             - 4usize.wrapping_sub(MP_BASES_NORMALIZATION_STEPS_10 as usize);
-        rs[1..xs_len + 1].copy_from_slice(xs);
+        rs[1..=xs_len].copy_from_slice(xs);
         while xs_len > 1 {
             limbs_div_mod_extra_in_place(
-                &mut rs[..xs_len + 1],
+                &mut rs[..=xs_len],
                 1,
                 MP_BASES_BIG_BASE_10,
                 MP_BASES_BIG_BASE_INVERTED_10,
@@ -241,10 +241,10 @@ pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
         let big_base_inverted = get_big_base_inverted(base);
         let normalization_steps = LeadingZeros::leading_zeros(big_base);
         let limb_base = Limb::wrapping_from(base);
-        rs[1..xs_len + 1].copy_from_slice(&xs[..xs_len]);
+        rs[1..=xs_len].copy_from_slice(&xs[..xs_len]);
         while xs_len > 1 {
             limbs_div_mod_extra_in_place(
-                &mut rs[..xs_len + 1],
+                &mut rs[..=xs_len],
                 1,
                 big_base,
                 big_base_inverted,
@@ -949,12 +949,12 @@ fn to_digits_asc_divide_and_conquer_limb<
         if base <= SQRT_MAX_LIMB {
             match x {
                 Natural(Small(x)) => {
-                    digits.extend_from_slice(&x.to_digits_asc(&T::wrapping_from(base)))
+                    digits.extend_from_slice(&x.to_digits_asc(&T::wrapping_from(base)));
                 }
                 Natural(Large(ref mut xs)) => limbs_to_digits_basecase(digits, xs, base),
             }
         } else {
-            to_digits_asc_naive_primitive(digits, &x, T::exact_from(base))
+            to_digits_asc_naive_primitive(digits, &x, T::exact_from(base));
         }
     } else {
         let (q, r) = x.div_mod(&powers[power_index]);
@@ -984,7 +984,7 @@ fn to_digits_asc_divide_and_conquer(
 ) {
     let bits = x.significant_bits();
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
-        to_digits_asc_naive(digits, x, base)
+        to_digits_asc_naive(digits, x, base);
     } else {
         let (q, r) = x.div_mod(&powers[power_index]);
         let start_len = digits.len();
@@ -1307,7 +1307,7 @@ where
                 size = 1;
             }
         } else {
-            let (out_last, out_init) = out[..size + 1].split_last_mut().unwrap();
+            let (out_last, out_init) = out[..=size].split_last_mut().unwrap();
             let mut carry = limbs_slice_mul_limb_in_place(out_init, big_base);
             if limbs_slice_add_limb_in_place(out_init, y) {
                 carry += 1;
@@ -1353,7 +1353,7 @@ where
             size = 1;
         }
     } else {
-        let (out_last, out_init) = out[..size + 1].split_last_mut().unwrap();
+        let (out_last, out_init) = out[..=size].split_last_mut().unwrap();
         let mut carry = limbs_slice_mul_limb_in_place(out_init, big_base);
         if limbs_slice_add_limb_in_place(out_init, y) {
             carry += 1;
@@ -1422,7 +1422,7 @@ where
     if out_len_hi == 0 {
         // Zero +1 limb here, to avoid reading an allocated but uninitialized limb in
         // limbs_slice_add_limb_in_place below.
-        slice_set_zero(&mut out[..adjusted_power_len + 1]);
+        slice_set_zero(&mut out[..=adjusted_power_len]);
     } else {
         let (out_lo, out_hi) = out.split_at_mut(shift);
         let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(power.power.len(), out_len_hi)];

@@ -15,7 +15,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 fn mod_inverse_simple_helper(x: Natural, m: Natural) -> Option<Natural> {
     let (gcd, _, inverse) = (&m).extended_gcd(x);
-    if gcd != 1u32 {
+    if gcd == 1u32 {
         None
     } else {
         Some(if inverse < 0u32 {

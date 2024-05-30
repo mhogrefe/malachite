@@ -478,13 +478,12 @@ where
     Limb: PowerOf2DigitIterable<T, PowerOf2DigitIterator = PrimitivePowerOf2DigitIterator<Limb, T>>,
 {
     assert_ne!(log_base, 0);
-    if log_base > T::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            T::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= T::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        T::NAME,
+        log_base
+    );
     match x {
         Natural(Small(small)) => NaturalPowerOf2DigitPrimitiveIterator::Small(
             PowerOf2DigitIterable::<T>::power_of_2_digits(*small, log_base),

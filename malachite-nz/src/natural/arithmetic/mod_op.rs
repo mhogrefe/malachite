@@ -554,7 +554,7 @@ fn limbs_mod_barrett_preinverted(
             let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
             limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
         } else {
-            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
+            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len);
         }
         let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
         // Subtract the product from the partial remainder combined with new limbs from the
@@ -714,9 +714,9 @@ pub_test! {limbs_mod_barrett(
     let qs = &mut qs[..q_len];
     // Test whether 2 * d_len - n_len > MU_DIV_QR_SKEW_THRESHOLD
     if d_len <= q_len + MU_DIV_QR_SKEW_THRESHOLD {
-        limbs_mod_barrett_helper(qs, &mut rs[..d_len], ns, ds, scratch)
+        limbs_mod_barrett_helper(qs, &mut rs[..d_len], ns, ds, scratch);
     } else {
-        limbs_mod_barrett_large_helper(qs, rs, ns, ds, scratch)
+        limbs_mod_barrett_large_helper(qs, rs, ns, ds, scratch);
     }
 }}
 
@@ -1485,7 +1485,7 @@ impl Natural {
             (_, 0) => panic!("division by zero"),
             (Natural(Small(ref mut small)), other) => *small %= other,
             (Natural(Large(ref mut limbs)), other) => {
-                *self = Natural(Small(limbs_mod_limb(limbs, other)))
+                *self = Natural(Small(limbs_mod_limb(limbs, other)));
             }
         }
     }

@@ -69,8 +69,7 @@ pub_crate_test! {limbs_mul_limb_with_carry_to_out(
     let y = DoubleLimb::from(y);
     for (out, x) in out[..xs.len()].iter_mut().zip(xs.iter()) {
         let product = DoubleLimb::from(*x) * y + DoubleLimb::from(carry);
-        *out = product.lower_half();
-        carry = product.upper_half();
+        (carry, *out) = product.split_in_half();
     }
     carry
 }}

@@ -67,11 +67,10 @@ impl Ord for Rational {
         let d_cmp = self.denominator.cmp(&other.denominator);
         if n_cmp == Equal && d_cmp == Equal {
             return Equal;
-        } else {
-            let nd_cmp = n_cmp.cmp(&d_cmp);
-            if nd_cmp != Equal {
-                return if self.sign { nd_cmp } else { nd_cmp.reverse() };
-            }
+        }
+        let nd_cmp = n_cmp.cmp(&d_cmp);
+        if nd_cmp != Equal {
+            return if self.sign { nd_cmp } else { nd_cmp.reverse() };
         }
         // Then compare floor ∘ log_2 ∘ abs
         let log_cmp = self

@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::iter::Cloned;
+use core::iter::Copied;
 use core::slice::Iter;
 
 /// An iterator that generates both [`bool`]s.
 ///
 /// This `struct` is created by [`exhaustive_bools`]; see its documentation for more.
-pub type ExhaustiveBools = Cloned<Iter<'static, bool>>;
+pub type ExhaustiveBools = Copied<Iter<'static, bool>>;
 
 /// Generates both [`bool`]s.
 ///
@@ -30,5 +30,5 @@ pub type ExhaustiveBools = Cloned<Iter<'static, bool>>;
 /// ```
 #[inline]
 pub fn exhaustive_bools() -> ExhaustiveBools {
-    [false, true].iter().cloned()
+    [false, true].iter().copied()
 }
