@@ -46,11 +46,11 @@ fn mod_neg_fail() {
 fn mod_neg_assign_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
         let mut x = T::ZERO;
-        x.mod_neg_assign(T::ZERO)
+        x.mod_neg_assign(T::ZERO);
     });
     assert_panic!({
         let mut x = T::from(123u8);
-        x.mod_neg_assign(T::from(123u8))
+        x.mod_neg_assign(T::from(123u8));
     });
 }
 

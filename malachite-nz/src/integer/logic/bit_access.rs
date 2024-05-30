@@ -138,9 +138,10 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
-    if x_i >= xs.len() || limbs_clear_bit_neg_helper(xs, x_i, reduced_index) {
-        panic!("Setting bit cannot be done within existing slice");
-    }
+    assert!(
+        x_i < xs.len() && !limbs_clear_bit_neg_helper(xs, x_i, reduced_index),
+        "Setting bit cannot be done within existing slice"
+    );
 }
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
@@ -193,7 +194,7 @@ impl Natural {
             }
             Natural(Large(ref mut limbs)) => {
                 limbs_set_bit_neg(limbs, index);
-                self.trim()
+                self.trim();
             }
         }
     }

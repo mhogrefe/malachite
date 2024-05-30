@@ -60,11 +60,10 @@ impl PartialOrd<Integer> for Rational {
         let d_cmp = self.denominator.cmp(&Natural::ONE);
         if n_cmp == Equal && d_cmp == Equal {
             return Some(Equal);
-        } else {
-            let nd_cmp = n_cmp.cmp(&d_cmp);
-            if nd_cmp != Equal {
-                return Some(if self.sign { nd_cmp } else { nd_cmp.reverse() });
-            }
+        }
+        let nd_cmp = n_cmp.cmp(&d_cmp);
+        if nd_cmp != Equal {
+            return Some(if self.sign { nd_cmp } else { nd_cmp.reverse() });
         }
         let log_cmp = self
             .floor_log_base_2_abs()

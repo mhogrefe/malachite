@@ -154,12 +154,12 @@ pub fn run_benchmark<'a, I: Iterator>(
 ) where
     I::Item: Clone,
 {
-    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
-        panic!(
-            "Bad benchmark: {title}. \
+    assert_eq!(
+        benchmark_type == BenchmarkType::Single,
+        series.len() == 1,
+        "Bad benchmark: {title}. \
              Benchmarks should have type Single iff they have only one series.",
-        );
-    }
+    );
     if limit == 0 {
         return;
     }
@@ -171,9 +171,7 @@ pub fn run_benchmark<'a, I: Iterator>(
     };
     println!("benchmarking {generation_mode_name} {title}");
     let colors = ["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
-    if series.len() > colors.len() {
-        panic!("not enough available colors");
-    }
+    assert!(series.len() <= colors.len(), "not enough available colors");
     let mut series_options = Vec::new();
     for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {
         series_options.push(BenchmarkSeriesOptions {
@@ -209,12 +207,12 @@ pub fn run_benchmark_old<'a, I: Iterator>(
 ) where
     I::Item: Clone,
 {
-    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
-        panic!(
-            "Bad benchmark: {title}. \
+    assert_eq!(
+        benchmark_type == BenchmarkType::Single,
+        series.len() == 1,
+        "Bad benchmark: {title}. \
              Benchmarks should have type Single iff they have only one series.",
-        );
-    }
+    );
     if limit == 0 {
         return;
     }
@@ -226,9 +224,7 @@ pub fn run_benchmark_old<'a, I: Iterator>(
     };
     println!("benchmarking {generation_mode_name} {title}");
     let colors = ["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
-    if series.len() > colors.len() {
-        panic!("not enough available colors");
-    }
+    assert!(series.len() <= colors.len(), "not enough available colors");
     let mut series_options = Vec::new();
     for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {
         series_options.push(BenchmarkSeriesOptions {

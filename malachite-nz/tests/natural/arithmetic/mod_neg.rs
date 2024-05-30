@@ -75,20 +75,20 @@ fn mod_neg_fail() {
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_neg_assign(Natural::ZERO)
+        x.mod_neg_assign(Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::from(30u32);
-        x.mod_neg_assign(Natural::ONE)
+        x.mod_neg_assign(Natural::ONE);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_neg_assign(&Natural::ZERO)
+        x.mod_neg_assign(&Natural::ZERO);
     });
     assert_panic!({
         let mut x = Natural::from(30u32);
-        x.mod_neg_assign(&Natural::ONE)
+        x.mod_neg_assign(&Natural::ONE);
     });
 }
 

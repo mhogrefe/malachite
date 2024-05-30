@@ -126,10 +126,10 @@ fn round_to_multiple_of_power_of_2_properties_helper_unsigned<T: PrimitiveUnsign
         }
         match rm {
             Floor | Down => {
-                assert!(rounded <= n)
+                assert!(rounded <= n);
             }
             Ceiling | Up => {
-                assert!(rounded >= n)
+                assert!(rounded >= n);
             }
             Exact => assert_eq!(rounded, n),
             Nearest => {
@@ -231,10 +231,10 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<
         assert_eq!(rounded.cmp(&n), o);
         match (n >= S::ZERO, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}

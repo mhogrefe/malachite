@@ -30,6 +30,6 @@ impl NotAssign for bool {
     /// ```
     #[inline]
     fn not_assign(&mut self) {
-        *self = !*self
+        *self = !*self;
     }
 }

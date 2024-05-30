@@ -120,10 +120,9 @@ fn from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     } else if sci_exponent < T::MIN_NORMAL_EXPONENT {
         if adjusted_exponent < T::MIN_EXPONENT {
             return None;
-        } else {
-            raw_exponent = 0;
-            raw_mantissa = integer_mantissa << (adjusted_exponent - T::MIN_EXPONENT);
         }
+        raw_exponent = 0;
+        raw_mantissa = integer_mantissa << (adjusted_exponent - T::MIN_EXPONENT);
     } else if mantissa_bits > T::MANTISSA_WIDTH + 1 {
         return None;
     } else {

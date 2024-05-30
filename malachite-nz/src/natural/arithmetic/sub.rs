@@ -545,6 +545,10 @@ impl Sub<Natural> for Natural {
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by value.
     ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
@@ -576,6 +580,10 @@ impl<'a> Sub<&'a Natural> for Natural {
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference.
+    ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -609,6 +617,10 @@ impl<'a> Sub<Natural> for &'a Natural {
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
     /// by value.
     ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
@@ -639,6 +651,10 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference.
+    ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -671,6 +687,10 @@ impl SubAssign<Natural> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value.
     ///
+    /// $$
+    /// x \gets x - y.
+    /// $$
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
@@ -694,15 +714,20 @@ impl SubAssign<Natural> for Natural {
     /// assert_eq!(x, 0);
     /// ```
     fn sub_assign(&mut self, other: Natural) {
-        if self.sub_assign_no_panic(other) {
-            panic!("Cannot subtract a Natural from a smaller Natural");
-        }
+        assert!(
+            !self.sub_assign_no_panic(other),
+            "Cannot subtract a Natural from a smaller Natural"
+        );
     }
 }
 
 impl<'a> SubAssign<&'a Natural> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
+    ///
+    /// $$
+    /// x \gets x - y.
+    /// $$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -727,8 +752,9 @@ impl<'a> SubAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 0);
     /// ```
     fn sub_assign(&mut self, other: &'a Natural) {
-        if self.sub_assign_ref_no_panic(other) {
-            panic!("Cannot subtract a Natural from a smaller Natural");
-        }
+        assert!(
+            !self.sub_assign_ref_no_panic(other),
+            "Cannot subtract a Natural from a smaller Natural"
+        );
     }
 }

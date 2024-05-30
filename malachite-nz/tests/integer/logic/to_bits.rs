@@ -355,7 +355,7 @@ fn to_bits_asc_properties() {
         assert_eq!(to_bits_asc_naive(&x), bits);
         assert_eq!(to_bits_asc_alt(&x), bits);
         assert_eq!(x.bits().collect_vec(), bits);
-        assert_eq!(Integer::from_bits_asc(bits.iter().cloned()), x);
+        assert_eq!(Integer::from_bits_asc(bits.iter().copied()), x);
         if x != 0 {
             assert_eq!(*bits.last().unwrap(), x < 0);
         }
@@ -377,7 +377,7 @@ fn to_bits_desc_properties() {
         assert_eq!(to_bits_desc_naive(&x), bits);
         assert_eq!(to_bits_desc_alt(&x), bits);
         assert_eq!(x.bits().rev().collect_vec(), bits);
-        assert_eq!(Integer::from_bits_desc(bits.iter().cloned()), x);
+        assert_eq!(Integer::from_bits_desc(bits.iter().copied()), x);
         if x != 0 {
             assert_eq!(bits[0], x < 0);
         }

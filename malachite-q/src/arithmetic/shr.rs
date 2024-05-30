@@ -25,7 +25,7 @@ where
         x.numerator >>= bits_64;
     } else {
         x.denominator <<= bits_64 - numerator_zeros;
-        x.numerator >>= numerator_zeros
+        x.numerator >>= numerator_zeros;
     }
 }
 

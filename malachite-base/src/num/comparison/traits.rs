@@ -50,7 +50,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// [`partial_cmp_abs`](Self::partial_cmp_abs).
     #[inline]
     fn le_abs(&self, other: &Rhs) -> bool {
-        matches!(self.partial_cmp_abs(other), Some(Less) | Some(Equal))
+        matches!(self.partial_cmp_abs(other), Some(Less | Equal))
     }
 
     /// Determines whether the absolute value of one number is greater than the absolute value of
@@ -72,7 +72,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// [`partial_cmp_abs`](Self::partial_cmp_abs).
     #[inline]
     fn ge_abs(&self, other: &Rhs) -> bool {
-        matches!(self.partial_cmp_abs(other), Some(Greater) | Some(Equal))
+        matches!(self.partial_cmp_abs(other), Some(Greater | Equal))
     }
 }
 

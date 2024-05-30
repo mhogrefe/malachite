@@ -2169,7 +2169,7 @@ pub fn special_random_signed_unsigned_pair_gen_var_14<T: PrimitiveSigned, U: Pri
                             config.get_or("small_unsigned_mean_n", 32),
                             config.get_or("small_unsigned_mean_d", 1),
                         )
-                        .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | U::ONE))
+                        .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | U::ONE))
                     },
                 )
             },
@@ -3174,7 +3174,7 @@ pub fn special_random_unsigned_signed_unsigned_triple_gen_var_2<
                 )
             },
         )
-        .flat_map(|(x, y, z): (T, S, T)| match x.cmp(&z) {
+        .filter_map(|(x, y, z): (T, S, T)| match x.cmp(&z) {
             Equal => None,
             Less => Some((x, y, z)),
             Greater => Some((z, y, x)),
@@ -3206,7 +3206,7 @@ pub fn special_random_unsigned_signed_unsigned_triple_gen_var_3<
                 )
             },
         )
-        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+        .filter_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
             Equal => None,
             Less => Some((x, y, z)),
             Greater => Some((z, y, x)),
@@ -4603,7 +4603,7 @@ pub fn special_random_unsigned_triple_gen_var_12<T: PrimitiveUnsigned>(
             config.get_or("mean_stripe_n", T::WIDTH >> 1),
             config.get_or("mean_stripe_d", 1),
         ))
-        .flat_map(|(x, y, z)| {
+        .filter_map(|(x, y, z)| {
             let ranking = [(x, 0), (y, 1), (z, 2)];
             let (hi, next_hi) = get_two_highest(&ranking);
             if hi.0 == next_hi.0 {
@@ -4662,7 +4662,7 @@ pub fn special_random_unsigned_triple_gen_var_14<T: PrimitiveUnsigned, U: Primit
                 )
             },
         )
-        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+        .filter_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
             Equal => None,
             Less => Some((x, y, z)),
             Greater => Some((z, y, x)),
@@ -4691,7 +4691,7 @@ pub fn special_random_unsigned_triple_gen_var_15<T: PrimitiveUnsigned, U: Primit
                 )
             },
         )
-        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+        .filter_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
             Equal => None,
             Less => Some((x, y, z)),
             Greater => Some((z, y, x)),
@@ -4832,7 +4832,7 @@ pub fn special_random_unsigned_triple_gen_var_18<T: PrimitiveUnsigned, U: Primit
                 )
             },
         )
-        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+        .filter_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
             Equal => None,
             Less => Some((x, y, z)),
             Greater => Some((z, y, x)),
@@ -5070,7 +5070,7 @@ pub fn special_random_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>(
             config.get_or("mean_stripe_n", T::WIDTH >> 1),
             config.get_or("mean_stripe_d", 1),
         ))
-        .flat_map(|(x, y, z, w)| {
+        .filter_map(|(x, y, z, w)| {
             let ranking = [(x, 0), (y, 1), (z, 2), (w, 3)];
             let (hi, next_hi) = get_two_highest(&ranking);
             if hi.0 == next_hi.0 {
@@ -5139,7 +5139,7 @@ pub fn special_random_unsigned_quadruple_gen_var_6<T: PrimitiveUnsigned, U: Prim
                 )
             },
         )
-        .flat_map(|(x, y, z, w)| {
+        .filter_map(|(x, y, z, w)| {
             let ranking = [(x, 0), (y, 1), (w, 2)];
             let (hi, next_hi) = get_two_highest(&ranking);
             if hi.0 == next_hi.0 {
@@ -5176,7 +5176,7 @@ pub fn special_random_unsigned_quadruple_gen_var_7<T: PrimitiveUnsigned, U: Prim
                 )
             },
         )
-        .flat_map(|(x, y, z, w)| match x.cmp(&w) {
+        .filter_map(|(x, y, z, w)| match x.cmp(&w) {
             Equal => None,
             Less => Some((x, y, z, w)),
             Greater => Some((w, y, z, x)),
@@ -6397,7 +6397,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
             for _ in 0..digit_count {
                 digits.push(U::from_bits_asc(
                     get_striped_bool_vec(&mut self.striped_bit_source, log_base).into_iter(),
-                ))
+                ));
             }
             if digits_valid::<T, U>(log_base, &digits) {
                 return Some((digits, log_base));
@@ -7722,7 +7722,7 @@ pub fn special_random_unsigned_vec_pair_gen_var_5<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let out_len = x.checked_add(2)?;
             let len: u64 = out_len.arithmetic_checked_shl(1)?;
             let len = len.checked_add(y)?;
@@ -7777,7 +7777,7 @@ pub fn special_random_unsigned_vec_pair_gen_var_6<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let in_len = x.checked_add(1)?;
             let mut out_len: u64 = in_len.shr_round(1, Ceiling).0;
             out_len = out_len.checked_add(y)?;
@@ -8060,7 +8060,7 @@ pub fn special_random_unsigned_vec_pair_gen_var_20<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         )
-        .flat_map(|mut xs| {
+        .filter_map(|mut xs| {
             let last = xs.last_mut().unwrap();
             *last = last.checked_add(T::ONE)?;
             Some(xs)
@@ -8399,7 +8399,7 @@ pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_11<T: Pr
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let x = x.checked_add(y)?;
             let o = o.checked_add(x)?;
             Some((o, x, y))
@@ -8538,7 +8538,7 @@ pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24<T: Pr
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, i)| {
+        .filter_map(|(x, i)| {
             let x = x.checked_add(i)?;
             Some((x, x, i))
         }),
@@ -8584,7 +8584,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let y = y.checked_add(1)?;
             let x = x.checked_add(y.arithmetic_checked_shl(1)?)?;
             Some((x, y))
@@ -8654,7 +8654,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_2<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let y = y.checked_add(1)?;
             let x = x.checked_add(y)?;
             let o = x.checked_add(y)?.checked_add(o)?;
@@ -8678,7 +8678,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_3<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let y = y.checked_add(1)?;
             let x = x.checked_add(1)?;
             let o = x.checked_add(y)?.checked_add(o)?;
@@ -8704,7 +8704,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_24<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let y = y.checked_add(1)?;
             let x = x.checked_add(y)?;
             Some((x, y))
@@ -8727,7 +8727,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_25<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let y = y.checked_add(2)?;
             let x = x.checked_add(y.arithmetic_checked_shl(1)?)?;
             Some((x, y))
@@ -8750,7 +8750,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_26<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let y = y.checked_add(2)?;
             let x = x.checked_add(y)?;
             Some((x, y))
@@ -8839,7 +8839,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_28<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y, z)| {
+        .filter_map(|(x, y, z)| {
             let in_len = x.checked_add(1)?;
             let mut out_len: u64 = in_len.shr_round(1, Ceiling).0;
             out_len = out_len.checked_add(y)?;
@@ -8897,7 +8897,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_31<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(x, y)| {
+        .filter_map(|(x, y)| {
             let x = x.checked_add(y)?;
             Some((x, y))
         }),
@@ -8919,7 +8919,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_32<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let o = max(x, y).checked_add(o)?;
             Some((o, x, y))
         }),
@@ -8973,7 +8973,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_33<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let x = x.checked_add(1)?;
             let y = y.checked_add(1)?;
             let o = o.checked_add(x)?;
@@ -8997,7 +8997,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_34<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let x = x.checked_add(1)?;
             let y = y.checked_add(1)?;
             let o = o.checked_add(max(x, y))?;
@@ -9021,7 +9021,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_35<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let x = x.checked_add(1)?;
             let y = y.checked_add(1)?;
             let o = o.checked_add(min(x, y))?;
@@ -9079,7 +9079,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_40<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(|(o, x, y)| {
+        .filter_map(|(o, x, y)| {
             let x = x.checked_add(y)?;
             let o = o.checked_add(x)?;
             Some((o, x, y))
@@ -9135,7 +9135,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_50<T: PrimitiveUnsigned>(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(x, y, z)| {
+            .filter_map(|(x, y, z)| {
                 let y = y.checked_add(1)?;
                 let x = x.checked_add(y)?;
                 let z = z.checked_add(y.arithmetic_checked_shl(1)?)?;
@@ -9165,7 +9165,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_51<T: PrimitiveUnsigned>(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(x, y, z)| {
+            .filter_map(|(x, y, z)| {
                 let y = y.checked_add(5)?;
                 let x = x.checked_add(y)?;
                 let z = z.checked_add(y.arithmetic_checked_shl(1)?)?;
@@ -9195,7 +9195,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_52<T: PrimitiveUnsigned>(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(x, y, z)| {
+            .filter_map(|(x, y, z)| {
                 let q = x.checked_add(3)?;
                 let n = y.checked_add(9)?;
                 let d = z.checked_add(6)?;
@@ -9286,7 +9286,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_57<T: PrimitiveUnsigned>(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(r_len, n_len, d_len)| {
+            .filter_map(|(r_len, n_len, d_len)| {
                 let d_len = d_len.checked_add(2)?;
                 let r_len = r_len.checked_add(d_len)?;
                 let n_len = n_len.checked_add(d_len)?;
@@ -9319,7 +9319,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_59<T: PrimitiveUnsigned>(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(xs_len, ys_len, zs_len)| {
+            .filter_map(|(xs_len, ys_len, zs_len)| {
                 let ys_len = ys_len.checked_add(2)?;
                 let zs_len = zs_len.checked_add(2)?;
                 let xs_len = xs_len.checked_add(ys_len + zs_len - 1)?;
@@ -9494,7 +9494,7 @@ pub fn special_random_large_type_gen_var_9<T: PrimitiveUnsigned>(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(x, y)| {
+            .filter_map(|(x, y)| {
                 let x = x.checked_add(y)?;
                 Some((x, y))
             }),

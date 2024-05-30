@@ -38,14 +38,12 @@ pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ord
                 return Some(s_cmp);
             }
             let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
-            if ord_cmp != Equal {
-                if *s_x {
-                    ord_cmp
-                } else {
-                    ord_cmp.reverse()
-                }
-            } else {
+            if ord_cmp == Equal {
                 Rational::try_from(x).unwrap().cmp(other)
+            } else if *s_x {
+                ord_cmp
+            } else {
+                ord_cmp.reverse()
             }
         }),
     }
@@ -104,13 +102,7 @@ impl PartialOrd<Rational> for Float {
                     return Some(s_cmp);
                 }
                 let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
-                if ord_cmp != Equal {
-                    if *s_x {
-                        ord_cmp
-                    } else {
-                        ord_cmp.reverse()
-                    }
-                } else {
+                if ord_cmp == Equal {
                     let shift = e_x - i64::exact_from(significand_bits(significand_x));
                     let abs_shift = shift.unsigned_abs();
                     let prod_cmp = match shift.sign() {
@@ -135,6 +127,10 @@ impl PartialOrd<Rational> for Float {
                     } else {
                         prod_cmp.reverse()
                     }
+                } else if *s_x {
+                    ord_cmp
+                } else {
+                    ord_cmp.reverse()
                 }
             }),
         }

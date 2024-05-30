@@ -406,7 +406,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_neg_2_pow[n_high] = limbs_shl_to_out(v_neg_2_pow, coefficients[degree], degree_u64 * shift);
     limbs_slice_add_greater_in_place_left(
         if degree.even() { v_2_pow } else { scratch },
-        &v_neg_2_pow[..n_high + 1],
+        &v_neg_2_pow[..=n_high],
     );
     let v_neg_2_pow_neg = limbs_cmp_same_length(v_2_pow, scratch) == Less;
     if v_neg_2_pow_neg {

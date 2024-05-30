@@ -306,10 +306,10 @@ impl GcdAssign<Natural> for Natural {
             (&mut Natural::ZERO, y) => *self = y,
             (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(y),
             (Natural(Large(ref xs)), Natural(Small(y))) => {
-                *self = Natural::from(limbs_gcd_limb(xs, y))
+                *self = Natural::from(limbs_gcd_limb(xs, y));
             }
             (Natural(Small(x)), Natural(Large(ref ys))) => {
-                *self = Natural::from(limbs_gcd_limb(ys, *x))
+                *self = Natural::from(limbs_gcd_limb(ys, *x));
             }
             (Natural(Large(ref mut xs)), Natural(Large(mut ys))) => {
                 let mut xs: &mut [Limb] = &mut *xs;
@@ -363,10 +363,10 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
             (&mut Natural::ZERO, y) => self.clone_from(y),
             (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(*y),
             (Natural(Large(ref xs)), Natural(Small(y))) => {
-                *self = Natural::from(limbs_gcd_limb(xs, *y))
+                *self = Natural::from(limbs_gcd_limb(xs, *y));
             }
             (Natural(Small(x)), Natural(Large(ref ys))) => {
-                *self = Natural::from(limbs_gcd_limb(ys, *x))
+                *self = Natural::from(limbs_gcd_limb(ys, *x));
             }
             (Natural(Large(ref mut xs)), Natural(Large(ys))) => {
                 let c = limbs_cmp(xs, ys);

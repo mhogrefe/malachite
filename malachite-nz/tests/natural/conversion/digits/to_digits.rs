@@ -1138,12 +1138,12 @@ where
             );
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             x.to_digits_desc(&base)
         );
         assert!(digits.iter().all(|&digit| digit < base));
         assert_eq!(
-            Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap(),
+            Natural::from_digits_asc(&base, digits.iter().copied()).unwrap(),
             x
         );
 
@@ -1259,12 +1259,12 @@ where
             );
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             x.to_digits_asc(&base)
         );
         assert!(digits.iter().all(|&digit| digit < base));
         assert_eq!(
-            Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap(),
+            Natural::from_digits_desc(&base, digits.iter().copied()).unwrap(),
             x
         );
 

@@ -300,7 +300,7 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
     // - w2 = w2 - w0
     //
     // w2 = (w1 - w2) >> 2
-    let (w5, w3) = out[..4 * n + 1].split_at_mut(n << 1);
+    let (w5, w3) = out[..=n << 2].split_at_mut(n << 1);
     if w2_neg {
         limbs_slice_add_same_length_in_place_left(w2, w1);
     } else {
@@ -794,10 +794,10 @@ pub(crate) fn limbs_mul_toom_interpolate_8_points(
         r5_lo_3[0].wrapping_add_assign(1);
     }
     // Hr7+Lr5
-    let carry_1 = limbs_slice_add_same_length_in_place_left(&mut r5_lo[..n + 1], r7_hi);
+    let carry_1 = limbs_slice_add_same_length_in_place_left(&mut r5_lo[..=n], r7_hi);
     // Hr7-Hr5+Lr5-Lr3
     let (r5_lo_lo, r5_lo_hi) = r5_lo.split_at_mut(n << 1);
-    let carry_2 = limbs_sub_same_length_in_place_left(&mut r5_lo_lo[..n + 1], r5_lo_hi);
+    let carry_2 = limbs_sub_same_length_in_place_left(&mut r5_lo_lo[..=n], r5_lo_hi);
     if carry_1 && !carry_2 {
         assert!(!limbs_slice_add_limb_in_place(&mut r5_lo[n + 1..], 1));
     } else if !carry_1 && carry_2 {
@@ -1079,7 +1079,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
         carry.wrapping_add_assign(1);
     }
     assert!(!limbs_slice_add_limb_in_place(
-        &mut out_4[..2 * n + 1],
+        &mut out_4[..=n<<1],
         carry,
     ));
     split_into_chunks_mut!(out_4, n, [_unused, out_5, out_6, out_7], out_8);
@@ -1097,7 +1097,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
         carry.wrapping_add_assign(1);
     }
     assert!(!limbs_slice_add_limb_in_place(
-        &mut out_8[..2 * n + 1],
+        &mut out_8[..=n<<1],
         carry,
     ));
     split_into_chunks_mut!(out_8, n, [_unused, out_9], out_10);

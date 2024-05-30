@@ -114,7 +114,7 @@ impl Iterator for DenominatorsInClosedRationalInterval {
                             .into_denominator();
                     if let Some(previous_min) = min_interior_denominator.as_ref() {
                         if interior_denominator < *previous_min {
-                            min_interior_denominator = Some(interior_denominator)
+                            min_interior_denominator = Some(interior_denominator);
                         }
                     } else {
                         min_interior_denominator = Some(interior_denominator);

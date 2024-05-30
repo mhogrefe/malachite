@@ -42,7 +42,7 @@ impl PartialOrdAbs<Natural> for Float {
     fn partial_cmp_abs(&self, other: &Natural) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) => None,
-            (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Greater),
+            (Float(Infinity { .. }), _) => Some(Greater),
             (float_either_zero!(), y) => Some(if *y == 0 { Equal } else { Less }),
             (
                 Float(Finite {

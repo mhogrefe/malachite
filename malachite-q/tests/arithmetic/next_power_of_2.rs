@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, NextPowerOf2, NextPowerOf2Assign};
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, IsPowerOf2, NextPowerOf2, NextPowerOf2Assign, PowerOf2,
+};
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::test_util::generators::natural_gen_var_2;
 use malachite_q::test_util::generators::rational_gen_var_2;
@@ -89,10 +91,10 @@ fn next_power_of_2_properties() {
         assert!(result.is_power_of_2());
         assert!(result >= x);
         assert!(&result >> 1 < x);
-        // TODO assert_eq!(Rational::power_of_2(n.ceiling_log_base_2()), result);
+        assert_eq!(Rational::power_of_2(x.ceiling_log_base_2()), result);
     });
 
     natural_gen_var_2().test_properties(|x| {
-        assert_eq!((&x).next_power_of_2(), Rational::from(x).next_power_of_2())
+        assert_eq!((&x).next_power_of_2(), Rational::from(x).next_power_of_2());
     });
 }

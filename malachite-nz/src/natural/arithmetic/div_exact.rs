@@ -356,7 +356,7 @@ pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
-        limbs_div_exact_3_to_out(out, ns)
+        limbs_div_exact_3_to_out(out, ns);
     } else {
         limbs_div_exact_limb_to_out_no_special_3(out, ns, d);
     }
@@ -406,9 +406,9 @@ pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 // src`.
 pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
-        limbs_div_exact_3_in_place(ns)
+        limbs_div_exact_3_in_place(ns);
     } else {
-        limbs_div_exact_limb_in_place_no_special_3(ns, d)
+        limbs_div_exact_limb_in_place_no_special_3(ns, d);
     }
 }}
 

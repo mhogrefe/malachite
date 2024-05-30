@@ -23,7 +23,7 @@ impl Hash for ComparableFloat {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     #[inline]
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.as_ref().hash(state)
+        self.as_ref().hash(state);
     }
 }
 
@@ -44,16 +44,16 @@ impl<'a> Hash for ComparableFloatRef<'a> {
             float_nan!() => "NaN".hash(state),
             Float(Infinity { sign }) => {
                 if *sign {
-                    "Infinity".hash(state)
+                    "Infinity".hash(state);
                 } else {
-                    "-Infinity".hash(state)
+                    "-Infinity".hash(state);
                 }
             }
             Float(Zero { sign }) => {
                 if *sign {
-                    "0.0".hash(state)
+                    "0.0".hash(state);
                 } else {
-                    "-0.0".hash(state)
+                    "-0.0".hash(state);
                 }
             }
             Float(Finite {

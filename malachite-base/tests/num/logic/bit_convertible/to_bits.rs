@@ -103,10 +103,10 @@ fn to_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!(to_bits_asc_alt(&u), bits);
         assert_eq!(u.bits().collect::<Vec<bool>>(), bits);
         assert_eq!(
-            bits.iter().cloned().rev().collect::<Vec<bool>>(),
+            bits.iter().copied().rev().collect::<Vec<bool>>(),
             u.to_bits_desc()
         );
-        assert_eq!(T::from_bits_asc(bits.iter().cloned()), u);
+        assert_eq!(T::from_bits_asc(bits.iter().copied()), u);
         if u != T::ZERO {
             assert_eq!(*bits.last().unwrap(), true);
         }
@@ -121,10 +121,10 @@ fn to_bits_asc_properties_helper_signed<T: PrimitiveSigned>() {
         assert_eq!(to_bits_asc_alt(&i), bits);
         assert_eq!(i.bits().collect::<Vec<bool>>(), bits);
         assert_eq!(
-            bits.iter().cloned().rev().collect::<Vec<bool>>(),
+            bits.iter().copied().rev().collect::<Vec<bool>>(),
             i.to_bits_desc()
         );
-        assert_eq!(T::from_bits_asc(bits.iter().cloned()), i);
+        assert_eq!(T::from_bits_asc(bits.iter().copied()), i);
         if i != T::ZERO {
             assert_eq!(*bits.last().unwrap(), i < T::ZERO);
         }
@@ -149,10 +149,10 @@ fn to_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!(to_bits_desc_alt(&u), bits);
         assert_eq!(u.bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(
-            bits.iter().cloned().rev().collect::<Vec<bool>>(),
+            bits.iter().copied().rev().collect::<Vec<bool>>(),
             u.to_bits_asc()
         );
-        assert_eq!(T::from_bits_desc(bits.iter().cloned()), u);
+        assert_eq!(T::from_bits_desc(bits.iter().copied()), u);
         if u != T::ZERO {
             assert_eq!(bits[0], true);
         }
@@ -167,10 +167,10 @@ fn to_bits_desc_properties_helper_signed<T: PrimitiveSigned>() {
         assert_eq!(to_bits_desc_alt(&i), bits);
         assert_eq!(i.bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(
-            bits.iter().cloned().rev().collect::<Vec<bool>>(),
+            bits.iter().copied().rev().collect::<Vec<bool>>(),
             i.to_bits_asc()
         );
-        assert_eq!(T::from_bits_desc(bits.iter().cloned()), i);
+        assert_eq!(T::from_bits_desc(bits.iter().copied()), i);
         if i != T::ZERO {
             assert_eq!(bits[0], i < T::ZERO);
         }

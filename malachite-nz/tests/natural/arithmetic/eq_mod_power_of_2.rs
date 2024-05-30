@@ -194,6 +194,6 @@ fn eq_mod_power_of_2_properties() {
         assert_eq!(
             x.eq_mod_power_of_2(y, pow),
             Natural::from(x).eq_mod_power_of_2(&Natural::from(y), pow)
-        )
+        );
     });
 }

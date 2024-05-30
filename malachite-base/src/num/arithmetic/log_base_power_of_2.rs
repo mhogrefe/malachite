@@ -34,17 +34,13 @@ pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -
 }
 
 fn floor_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
-    if x == T::ZERO {
-        panic!("Cannot take the base-2 logarithm of 0.");
-    }
+    assert!(x != T::ZERO, "Cannot take the base-2 logarithm of 0.");
     assert_ne!(pow, 0);
     (x.significant_bits() - 1) / pow
 }
 
 fn ceiling_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
-    if x == T::ZERO {
-        panic!("Cannot take the base-2 logarithm of 0.");
-    }
+    assert!(x != T::ZERO, "Cannot take the base-2 logarithm of 0.");
     assert_ne!(pow, 0);
     let (floor_log, rem) = (x.significant_bits() - 1).div_mod(pow);
     if rem == 0 && T::is_power_of_2(&x) {
@@ -55,9 +51,7 @@ fn ceiling_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
 }
 
 fn checked_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> Option<u64> {
-    if x == T::ZERO {
-        panic!("Cannot take the base-2 logarithm of 0.");
-    }
+    assert!(x != T::ZERO, "Cannot take the base-2 logarithm of 0.");
     assert_ne!(pow, 0);
     let (floor_log, rem) = (x.significant_bits() - 1).div_mod(pow);
     if rem == 0 && T::is_power_of_2(&x) {

@@ -49,9 +49,7 @@ fn from_hex_string(s: &str) -> Float {
 
 impl FromStringBase for Float {
     fn from_string_base(base: u8, s: &str) -> Option<Self> {
-        if base != 16 {
-            panic!();
-        }
+        assert_eq!(base, 16);
         Some(from_hex_string(s))
     }
 }

@@ -297,9 +297,8 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
         if other == 0u32 {
             if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
                 return (Rational::ZERO, if *self >= 0u32 { Less } else { Greater });
-            } else {
-                panic!("Cannot round {self} to zero using RoundingMode {rm}");
             }
+            panic!("Cannot round {self} to zero using RoundingMode {rm}");
         }
         if !other.sign {
             rm.neg_assign();
@@ -400,9 +399,8 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
         if *other == 0u32 {
             if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
                 return (Rational::ZERO, if *self >= 0 { Less } else { Greater });
-            } else {
-                panic!("Cannot round {self} to zero using RoundingMode {rm}");
             }
+            panic!("Cannot round {self} to zero using RoundingMode {rm}");
         }
         if !other.sign {
             rm.neg_assign();
@@ -482,9 +480,8 @@ impl RoundToMultipleAssign<Rational> for Rational {
                 let o = if *self >= 0 { Less } else { Greater };
                 *self = Rational::ZERO;
                 return o;
-            } else {
-                panic!("Cannot round {self} to zero using RoundingMode {rm}");
             }
+            panic!("Cannot round {self} to zero using RoundingMode {rm}");
         }
         if !other.sign {
             rm.neg_assign();
@@ -565,9 +562,8 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
                 let o = if *self >= 0u32 { Less } else { Greater };
                 *self = Rational::ZERO;
                 return o;
-            } else {
-                panic!("Cannot round {self} to zero using RoundingMode {rm}");
             }
+            panic!("Cannot round {self} to zero using RoundingMode {rm}");
         }
         if !other.sign {
             rm.neg_assign();

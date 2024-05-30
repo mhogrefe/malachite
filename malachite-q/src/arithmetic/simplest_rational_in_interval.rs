@@ -206,45 +206,7 @@ impl SimplestRationalInInterval for Rational {
         let (floor_y, mut cf_y) = y.continued_fraction();
         let floor_y = floor_y.unsigned_abs();
         let mut best = None;
-        if floor_x != floor_y {
-            let candidate = if floor_y - Natural::ONE != floor_x || !cf_y.is_done() {
-                Rational::from(floor_x + Natural::ONE)
-            } else {
-                let floor = floor_x;
-                // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f;
-                // x_1, x_2, x_3...] and [f; 1]. If x_1 does not exist, the result is [f; 2].
-                let (n, d) = if cf_x.is_done() {
-                    ((floor << 1) | Natural::ONE, Natural::TWO)
-                } else {
-                    let x_1 = cf_x.next().unwrap();
-                    if x_1 > Natural::ONE {
-                        if x_1 == 2u32 && cf_x.is_done() {
-                            // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
-                            (
-                                floor * Natural::from(3u32) + Natural::TWO,
-                                Natural::from(3u32),
-                            )
-                        } else {
-                            // If x_1 > 1, we have [f; 2] as a candidate.
-                            ((floor << 1) | Natural::ONE, Natural::TWO)
-                        }
-                    } else {
-                        // x_2 exists since x_1 was 1
-                        let x_2 = cf_x.next().unwrap();
-                        // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate. [f; 1, x_2 -
-                        // 1, 1] and [f; 1], but [f; 1, x_2] is not in the interval
-                        let k = &x_2 + Natural::ONE;
-                        (&floor * &k + floor + k, x_2 + Natural::TWO)
-                    }
-                };
-                Rational {
-                    sign: true,
-                    numerator: n,
-                    denominator: d,
-                }
-            };
-            update_best(&mut best, x, y, candidate);
-        } else {
+        if floor_x == floor_y {
             let floor = floor_x;
             let mut previous_numerator = Natural::ONE;
             let mut previous_denominator = Natural::ZERO;
@@ -337,6 +299,44 @@ impl SimplestRationalInInterval for Rational {
                     update_best(&mut best, x, y, candidate);
                 }
             }
+        } else {
+            let candidate = if floor_y - Natural::ONE != floor_x || !cf_y.is_done() {
+                Rational::from(floor_x + Natural::ONE)
+            } else {
+                let floor = floor_x;
+                // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f;
+                // x_1, x_2, x_3...] and [f; 1]. If x_1 does not exist, the result is [f; 2].
+                let (n, d) = if cf_x.is_done() {
+                    ((floor << 1) | Natural::ONE, Natural::TWO)
+                } else {
+                    let x_1 = cf_x.next().unwrap();
+                    if x_1 > Natural::ONE {
+                        if x_1 == 2u32 && cf_x.is_done() {
+                            // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
+                            (
+                                floor * Natural::from(3u32) + Natural::TWO,
+                                Natural::from(3u32),
+                            )
+                        } else {
+                            // If x_1 > 1, we have [f; 2] as a candidate.
+                            ((floor << 1) | Natural::ONE, Natural::TWO)
+                        }
+                    } else {
+                        // x_2 exists since x_1 was 1
+                        let x_2 = cf_x.next().unwrap();
+                        // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate. [f; 1, x_2 -
+                        // 1, 1] and [f; 1], but [f; 1, x_2] is not in the interval
+                        let k = &x_2 + Natural::ONE;
+                        (&floor * &k + floor + k, x_2 + Natural::TWO)
+                    }
+                };
+                Rational {
+                    sign: true,
+                    numerator: n,
+                    denominator: d,
+                }
+            };
+            update_best(&mut best, x, y, candidate);
         }
         let best = best.unwrap();
         if neg {

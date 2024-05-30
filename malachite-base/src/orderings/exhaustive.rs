@@ -8,10 +8,10 @@
 
 use crate::orderings::ORDERINGS;
 use core::cmp::Ordering::{self, *};
-use core::iter::Cloned;
+use core::iter::Copied;
 use core::slice::Iter;
 
-pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
+pub type ExhaustiveOrderings = Copied<Iter<'static, Ordering>>;
 
 /// Generates all [`Ordering`]s, in increasing order.
 ///
@@ -33,7 +33,7 @@ pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 /// ```
 #[inline]
 pub fn orderings_increasing() -> ExhaustiveOrderings {
-    [Less, Equal, Greater].iter().cloned()
+    [Less, Equal, Greater].iter().copied()
 }
 
 /// Generates all [`Ordering`]s, with `Equal` coming first.
@@ -55,6 +55,6 @@ pub fn orderings_increasing() -> ExhaustiveOrderings {
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_orderings() -> Cloned<Iter<'static, Ordering>> {
-    ORDERINGS.iter().cloned()
+pub fn exhaustive_orderings() -> Copied<Iter<'static, Ordering>> {
+    ORDERINGS.iter().copied()
 }

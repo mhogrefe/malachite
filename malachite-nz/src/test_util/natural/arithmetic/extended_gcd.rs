@@ -28,12 +28,11 @@ pub fn extended_gcd_euclidean_natural(
         } else if a == b || a == 0u32 {
             (gcd, x, y) = (b, Integer::ZERO, Integer::ONE);
             break;
-        } else {
-            let (q, r) = (&b).div_mod(&a);
-            stack.push(q);
-            swap(&mut a, &mut b);
-            a = r;
         }
+        let (q, r) = (&b).div_mod(&a);
+        stack.push(q);
+        swap(&mut a, &mut b);
+        a = r;
     }
     for q in stack.into_iter().rev() {
         swap(&mut x, &mut y);

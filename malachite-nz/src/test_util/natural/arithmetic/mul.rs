@@ -50,7 +50,7 @@ pub fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], 
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     if ys_len > 1 && ys_len < MUL_TOOM22_THRESHOLD && xs.len() > MUL_BASECASE_MAX_UN {
-        limbs_mul_greater_to_out_basecase_mem_opt_helper(out, xs, ys)
+        limbs_mul_greater_to_out_basecase_mem_opt_helper(out, xs, ys);
     } else {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
     }

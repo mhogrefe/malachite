@@ -132,7 +132,7 @@ where
                     digit_vec.insert(i, digits.next().unwrap());
                     i += 1;
                 } else {
-                    digit_vec.insert(i, digits.next_back().unwrap())
+                    digit_vec.insert(i, digits.next_back().unwrap());
                 }
             }
             assert!(digits.next().is_none());

@@ -16,7 +16,7 @@ where
     i64: TryFrom<T>,
 {
     if let Float(Finite { exponent, .. }) = x {
-        *exponent = exponent.checked_add(i64::exact_from(bits)).unwrap()
+        *exponent = exponent.checked_add(i64::exact_from(bits)).unwrap();
     }
 }
 

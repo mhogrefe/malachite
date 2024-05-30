@@ -94,9 +94,9 @@ fn div_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
             qs[0] = 0;
         }
     } else if ds.len() == 1 {
-        limbs_div_limb_to_out(qs, ns, ds[0])
+        limbs_div_limb_to_out(qs, ns, ds[0]);
     } else {
-        limbs_div_to_out(qs, ns, ds)
+        limbs_div_to_out(qs, ns, ds);
     }
 }
 
@@ -271,10 +271,10 @@ fn limbs_root_to_out_internal(
     // - qs will contain quotient and remainder of R / (exp * S ^ (exp - 1)).
     // - ws will contain S ^ (k-1) and exp *S^(k-1).
     let (qs, ws) = remainder.split_at_mut(xs_len + extra);
-    let rs = if !out_rem_is_some {
-        scratch
-    } else {
+    let rs = if out_rem_is_some {
         out_rem.unwrap()
+    } else {
+        scratch
     };
     let ss = out_root;
     // Initial approximation has one limb

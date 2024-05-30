@@ -50,11 +50,11 @@ fn mod_power_of_2_pow_fail() {
 fn mod_power_of_2_pow_assign_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
         let mut x = T::ONE;
-        x.mod_power_of_2_pow_assign(10, 0)
+        x.mod_power_of_2_pow_assign(10, 0);
     });
     assert_panic!({
         let mut x = T::from(200u8);
-        x.mod_power_of_2_pow_assign(10, 7)
+        x.mod_power_of_2_pow_assign(10, 7);
     });
 }
 

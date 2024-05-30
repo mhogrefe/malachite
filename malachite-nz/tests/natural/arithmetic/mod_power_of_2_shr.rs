@@ -68,7 +68,7 @@ where
     assert_panic!((&Natural::ONE).mod_power_of_2_shr(T::exact_from(3u8), 0));
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_shr_assign(T::exact_from(3u8), 0)
+        x.mod_power_of_2_shr_assign(T::exact_from(3u8), 0);
     });
 }
 

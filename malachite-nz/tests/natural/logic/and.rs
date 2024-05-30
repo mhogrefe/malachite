@@ -286,7 +286,7 @@ fn limbs_and_properties() {
         assert_eq!(
             Natural::from_owned_limbs_asc(limbs_and(&xs, &ys)),
             Natural::from_owned_limbs_asc(xs) & Natural::from_owned_limbs_asc(ys)
-        )
+        );
     });
 }
 

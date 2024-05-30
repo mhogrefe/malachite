@@ -17,8 +17,8 @@ fn float_partial_cmp_abs_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) ->
     match (x, y) {
         (float_nan!(), _) => None,
         (_, y) if y.is_nan() => None,
-        (float_infinity!(), y) | (float_negative_infinity!(), y) if !y.is_finite() => Some(Equal),
-        (float_infinity!(), _) | (float_negative_infinity!(), _) => Some(Greater),
+        (Float(Infinity { .. }), y) if !y.is_finite() => Some(Equal),
+        (Float(Infinity { .. }), _) => Some(Greater),
         (_, y) if !y.is_finite() => Some(Less),
         (float_either_zero!(), y) => Some(if *y == T::ZERO { Equal } else { Less }),
         (_, y) if *y == T::ZERO => Some(Greater),

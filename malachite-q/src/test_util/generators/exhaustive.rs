@@ -231,7 +231,8 @@ pub fn exhaustive_rational_signed_pair_gen_var_4<T: PrimitiveSigned>() -> It<(Ra
         .filter(|(q, i)| *i > T::ZERO || *q != 0u32)
         .interleave(exhaustive_pairs_big_tiny(
             exhaustive_negative_rationals(),
-            exhaustive_signeds::<T>().flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
+            exhaustive_signeds::<T>()
+                .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
         )),
     )
 }
@@ -335,7 +336,7 @@ pub fn exhaustive_rational_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It
         .interleave(exhaustive_pairs_big_tiny(
             exhaustive_negative_rationals(),
             exhaustive_unsigneds::<T>()
-                .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
+                .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
         )),
     )
 }

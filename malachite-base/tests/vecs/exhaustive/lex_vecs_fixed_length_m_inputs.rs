@@ -80,7 +80,7 @@ fn test_lex_vecs_fixed_length_2_inputs() {
     );
     lex_vecs_fixed_length_2_inputs_helper(
         &exhaustive_ascii_chars(),
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         &[0, 1],
         Some(384),
         &[
@@ -108,7 +108,7 @@ fn test_lex_vecs_fixed_length_2_inputs() {
     );
     lex_vecs_fixed_length_2_inputs_helper(
         &exhaustive_ascii_chars(),
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         &[0, 1, 1],
         Some(1152),
         &[
@@ -136,7 +136,7 @@ fn test_lex_vecs_fixed_length_2_inputs() {
     );
     lex_vecs_fixed_length_2_inputs_helper(
         &exhaustive_ascii_chars(),
-        &['x', 'y', 'z'].iter().cloned(),
+        &['x', 'y', 'z'].iter().copied(),
         &[0, 1, 0],
         Some(49152),
         &[

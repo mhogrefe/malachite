@@ -40,15 +40,11 @@ use malachite_base::num::random::geometric::{
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
 };
 use malachite_base::num::random::striped::{striped_random_signeds, striped_random_unsigneds};
-use malachite_base::num::random::{
-    random_primitive_floats, random_unsigned_inclusive_range, random_unsigned_range,
-};
+use malachite_base::num::random::{random_primitive_floats, random_unsigned_inclusive_range};
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::common::{
-    reshape_2_1_1_to_4, reshape_2_1_to_3, GenConfig, It,
-};
+use malachite_base::test_util::generators::common::{reshape_2_1_to_3, GenConfig, It};
 use malachite_base::tuples::random::{random_pairs, random_pairs_from_single};
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::integer::Integer;
@@ -600,66 +596,6 @@ pub fn special_random_float_float_unsigned_triple_gen_var_1<T: PrimitiveUnsigned
     ))
 }
 
-pub fn special_random_float_float_unsigned_triple_gen_var_2(
-    config: &GenConfig,
-) -> It<(Float, Float, u64)> {
-    reshape_2_1_to_3(Box::new(random_pairs(
-        EXAMPLE_SEED,
-        &|seed| {
-            striped_random_float_pairs_with_precision_inclusive_range(seed, config, 1, Limb::WIDTH)
-        },
-        &|seed| random_unsigned_range(seed, 1, Limb::WIDTH),
-    )))
-}
-
-pub fn special_random_float_float_unsigned_triple_gen_var_3(
-    config: &GenConfig,
-) -> It<(Float, Float, u64)> {
-    Box::new(
-        striped_random_float_pairs_with_precision_inclusive_range(
-            EXAMPLE_SEED,
-            config,
-            1,
-            Limb::WIDTH,
-        )
-        .map(|(x, y)| (x, y, Limb::WIDTH)),
-    )
-}
-
-pub fn special_random_float_float_unsigned_triple_gen_var_4(
-    config: &GenConfig,
-) -> It<(Float, Float, u64)> {
-    reshape_2_1_to_3(Box::new(random_pairs(
-        EXAMPLE_SEED,
-        &|seed| {
-            striped_random_float_pairs_with_precision_inclusive_range(
-                seed,
-                config,
-                Limb::WIDTH + 1,
-                Limb::WIDTH << 1,
-            )
-        },
-        &|seed| random_unsigned_range(seed, Limb::WIDTH + 1, Limb::WIDTH << 1),
-    )))
-}
-
-pub fn special_random_float_float_unsigned_triple_gen_var_5(
-    config: &GenConfig,
-) -> It<(Float, Float, u64)> {
-    reshape_2_1_to_3(Box::new(random_pairs(
-        EXAMPLE_SEED,
-        &|seed| {
-            striped_random_float_pairs_with_precision_inclusive_range(
-                seed,
-                config,
-                (Limb::WIDTH << 1) + 1,
-                Limb::WIDTH * 3,
-            )
-        },
-        &|seed| random_unsigned_range(seed, (Limb::WIDTH << 1) + 1, Limb::WIDTH * 3),
-    )))
-}
-
 // -- (Float, Float, PrimitiveUnsigned, Rational) --
 
 pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_1(
@@ -756,95 +692,6 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_3(
         )
         .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
     )
-}
-
-pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_4(
-    config: &GenConfig,
-) -> It<(Float, Float, u64, RoundingMode)> {
-    reshape_2_1_1_to_4(Box::new(
-        random_triples(
-            EXAMPLE_SEED,
-            &|seed| {
-                striped_random_float_pairs_with_precision_inclusive_range(
-                    seed,
-                    config,
-                    1,
-                    Limb::WIDTH,
-                )
-            },
-            &|seed| random_unsigned_range(seed, 1, Limb::WIDTH),
-            &random_rounding_modes,
-        )
-        .filter(|((x, y), prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
-    ))
-}
-
-pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_5(
-    config: &GenConfig,
-) -> It<(Float, Float, u64, RoundingMode)> {
-    Box::new(
-        random_pairs(
-            EXAMPLE_SEED,
-            &|seed| {
-                striped_random_float_pairs_with_precision_inclusive_range(
-                    seed,
-                    config,
-                    1,
-                    Limb::WIDTH,
-                )
-            },
-            &random_rounding_modes,
-        )
-        .filter_map(|((x, y), rm)| {
-            if mul_prec_round_valid(&x, &y, Limb::WIDTH, rm) {
-                Some((x, y, Limb::WIDTH, rm))
-            } else {
-                None
-            }
-        }),
-    )
-}
-
-pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_6(
-    config: &GenConfig,
-) -> It<(Float, Float, u64, RoundingMode)> {
-    reshape_2_1_1_to_4(Box::new(
-        random_triples(
-            EXAMPLE_SEED,
-            &|seed| {
-                striped_random_float_pairs_with_precision_inclusive_range(
-                    seed,
-                    config,
-                    Limb::WIDTH + 1,
-                    Limb::WIDTH << 1,
-                )
-            },
-            &|seed| random_unsigned_range(seed, Limb::WIDTH + 1, Limb::WIDTH << 1),
-            &random_rounding_modes,
-        )
-        .filter(|((x, y), prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
-    ))
-}
-
-pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_7(
-    config: &GenConfig,
-) -> It<(Float, Float, u64, RoundingMode)> {
-    reshape_2_1_1_to_4(Box::new(
-        random_triples(
-            EXAMPLE_SEED,
-            &|seed| {
-                striped_random_float_pairs_with_precision_inclusive_range(
-                    seed,
-                    config,
-                    (Limb::WIDTH << 1) + 1,
-                    Limb::WIDTH * 3,
-                )
-            },
-            &|seed| random_unsigned_range(seed, (Limb::WIDTH << 1) + 1, Limb::WIDTH * 3),
-            &random_rounding_modes,
-        )
-        .filter(|((x, y), prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
-    ))
 }
 
 // -- (Float, Float, Rational) --
@@ -1222,6 +1069,129 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_16(
         )
         .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
     )
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_17(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_float_pairs_with_precision_inclusive_range(
+                    seed,
+                    config,
+                    1,
+                    Limb::WIDTH - 1,
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+    ))
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_18(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_positive_floats_with_precision(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    Limb::WIDTH,
+                ))
+            },
+            &random_rounding_modes,
+        )
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+    ))
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_19(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_float_pairs_with_precision_inclusive_range(
+                    seed,
+                    config,
+                    Limb::WIDTH + 1,
+                    (Limb::WIDTH << 1) - 1,
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+    ))
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_20(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_positive_floats_with_precision(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    Limb::WIDTH << 1,
+                ))
+            },
+            &random_rounding_modes,
+        )
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+    ))
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_21(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_float_pairs_with_precision_inclusive_range(
+                    seed,
+                    config,
+                    (Limb::WIDTH << 1) + 1,
+                    Limb::WIDTH * 3 - 1,
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+    ))
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_22(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_float_pairs_with_precision_inclusive_range_to_infinity(
+                    seed,
+                    config,
+                    Limb::WIDTH * 3,
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+    ))
 }
 
 // -- (Float, Integer) --

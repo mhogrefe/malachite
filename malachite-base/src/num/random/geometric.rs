@@ -31,13 +31,12 @@ impl<T: PrimitiveInt> Iterator for GeometricRandomNaturalValues<T> {
         loop {
             if self.xs.next().unwrap() {
                 return Some(failures);
+            }
+            // Wrapping to min is equivalent to restarting this function.
+            if failures == self.max {
+                failures = self.min;
             } else {
-                // Wrapping to min is equivalent to restarting this function.
-                if failures == self.max {
-                    failures = self.min;
-                } else {
-                    failures += T::ONE;
-                }
+                failures += T::ONE;
             }
         }
     }
@@ -120,13 +119,12 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNegativeSigneds<T> {
         loop {
             if self.xs.next().unwrap() {
                 return Some(result);
+            }
+            // Wrapping to min is equivalent to restarting this function.
+            if result == self.abs_max {
+                result = self.abs_min;
             } else {
-                // Wrapping to min is equivalent to restarting this function.
-                if result == self.abs_max {
-                    result = self.abs_min;
-                } else {
-                    result -= T::ONE;
-                }
+                result -= T::ONE;
             }
         }
     }
@@ -174,9 +172,8 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNonzeroSigneds<T> {
                         return Some(result);
                     } else if result == self.max {
                         break;
-                    } else {
-                        result += T::ONE;
                     }
+                    result += T::ONE;
                 }
             } else {
                 let mut result = T::NEGATIVE_ONE;
@@ -185,9 +182,8 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNonzeroSigneds<T> {
                         return Some(result);
                     } else if result == self.min {
                         break;
-                    } else {
-                        result -= T::ONE;
                     }
+                    result -= T::ONE;
                 }
             }
         }
@@ -231,28 +227,24 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSigneds<T> {
                     if self.xs.next().unwrap() {
                         if result == T::ZERO && self.bs.next().unwrap() {
                             break;
-                        } else {
-                            return Some(result);
                         }
+                        return Some(result);
                     } else if result == self.max {
                         break;
-                    } else {
-                        result += T::ONE;
                     }
+                    result += T::ONE;
                 }
             } else {
                 loop {
                     if self.xs.next().unwrap() {
                         if result == T::ZERO && self.bs.next().unwrap() {
                             break;
-                        } else {
-                            return Some(result);
                         }
+                        return Some(result);
                     } else if result == self.min {
                         break;
-                    } else {
-                        result -= T::ONE;
                     }
+                    result -= T::ONE;
                 }
             }
         }
@@ -968,9 +960,7 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
     um_numerator: u64,
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
-    if a >= b {
-        panic!("a must be less than b. a: {a}, b: {b}");
-    }
+    assert!(a < b, "a must be less than b. a: {a}, b: {b}");
     geometric_random_natural_values_range(seed, a, b - T::ONE, um_numerator, um_denominator)
 }
 
@@ -1049,9 +1039,7 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     um_numerator: u64,
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     geometric_random_natural_values_range(seed, a, b, um_numerator, um_denominator)
 }
 
@@ -1148,9 +1136,7 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
     abs_um_numerator: u64,
     abs_um_denominator: u64,
 ) -> GeometricRandomSignedRange<T> {
-    if a >= b {
-        panic!("a must be less than b. a: {a}, b: {b}");
-    }
+    assert!(a < b, "a must be less than b. a: {a}, b: {b}");
     if a >= T::ZERO {
         GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
             seed,
@@ -1271,9 +1257,7 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
     abs_um_numerator: u64,
     abs_um_denominator: u64,
 ) -> GeometricRandomSignedRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     if a >= T::ZERO {
         GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
             seed,

@@ -100,9 +100,10 @@ pub fn read_command_line_arguments(name: &str) -> CommandLineArguments {
     let demo_key = matches.value_of("demo").map(ToString::to_string);
     let bench_key = matches.value_of("bench").map(ToString::to_string);
     let codegen_key = matches.value_of("codegen").map(ToString::to_string);
-    if demo_key.is_none() && bench_key.is_none() && codegen_key.is_none() {
-        panic!("Must specify demo, bench, or codegen");
-    }
+    assert!(
+        demo_key.is_some() || bench_key.is_some() || codegen_key.is_some(),
+        "Must specify demo, bench, or codegen"
+    );
     CommandLineArguments {
         codegen_key,
         demo_key,

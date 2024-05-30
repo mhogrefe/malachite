@@ -101,9 +101,7 @@ pub fn add_rational_prec_round_naive(
 ) -> (Float, Ordering) {
     assert_ne!(prec, 0);
     match (x, y) {
-        (x @ float_nan!() | x @ float_infinity!() | x @ float_negative_infinity!(), _) => {
-            (x, Equal)
-        }
+        (x @ Float(NaN | Infinity { .. }), _) => (x, Equal),
         (float_negative_zero!(), y) => {
             if y == 0u32 {
                 (float_negative_zero!(), Equal)

@@ -237,7 +237,7 @@ impl Natural {
             (_, 0, _) => {}
             (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)).mod_power_of_2_neg(pow),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
-                small.mod_power_of_2_sub_assign(other, pow)
+                small.mod_power_of_2_sub_assign(other, pow);
             }
             (&mut Natural(Small(ref mut small)), other, _) => {
                 let (diff, overflow) = small.overflowing_sub(other);
@@ -269,9 +269,9 @@ impl Natural {
                 if overflow {
                     let mut out = limbs_low_mask(pow);
                     out[0] = diff;
-                    *self = Natural(Large(out))
+                    *self = Natural(Large(out));
                 } else {
-                    *small = diff
+                    *small = diff;
                 }
             }
             (&mut Natural(Large(ref mut limbs)), other, _) => {
@@ -513,7 +513,7 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
             }
             (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
                 if limbs_mod_power_of_2_sub_in_place_either(xs, ys, pow) {
-                    swap(xs, ys)
+                    swap(xs, ys);
                 }
                 self.trim();
             }

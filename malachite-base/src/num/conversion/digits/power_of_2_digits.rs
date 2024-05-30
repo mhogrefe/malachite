@@ -15,13 +15,12 @@ fn to_power_of_2_digits_asc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
     log_base: u64,
 ) -> Vec<U> {
     assert_ne!(log_base, 0);
-    if log_base > U::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            U::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= U::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        U::NAME,
+        log_base
+    );
     let mut digits = Vec::new();
     if *x == T::ZERO {
     } else if x.significant_bits() <= log_base {
@@ -55,13 +54,12 @@ fn from_power_of_2_digits_asc<
     digits: I,
 ) -> Option<T> {
     assert_ne!(log_base, 0);
-    if log_base > U::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            U::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= U::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        U::NAME,
+        log_base
+    );
     let mut n = T::ZERO;
     let mut shift = 0;
     for digit in digits {
@@ -85,13 +83,12 @@ fn from_power_of_2_digits_desc<
     digits: I,
 ) -> Option<T> {
     assert_ne!(log_base, 0);
-    if log_base > U::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            U::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= U::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        U::NAME,
+        log_base
+    );
     let mut n = T::ZERO;
     for digit in digits {
         if digit.significant_bits() > log_base {

@@ -1449,7 +1449,7 @@ impl FloorRoot<u64> for u8 {
     fn floor_root(self, exp: u64) -> u8 {
         match (self, exp) {
             (_, 0) => panic!(),
-            (0, _) | (1, _) | (_, 1) => self,
+            (0 | 1, _) | (_, 1) => self,
             (_, 8..=u64::MAX) => 1,
             (x, 2) => x.floor_sqrt(),
             (x, 3) => u8::wrapping_from(match U8_CUBES.binary_search(&x) {
@@ -1460,10 +1460,10 @@ impl FloorRoot<u64> for u8 {
             (x, 4) if x < 81 => 2,
             (x, 5) if x < 32 => 1,
             (x, 5) if x < 243 => 2,
-            (_, 4) | (_, 5) => 3,
+            (_, 4 | 5) => 3,
             (x, 6) if x < 64 => 1,
             (x, 7) if x < 128 => 1,
-            (_, 6) | (_, 7) => 2,
+            (_, 6 | 7) => 2,
         }
     }
 }
@@ -1489,7 +1489,7 @@ impl CeilingRoot<u64> for u8 {
     fn ceiling_root(self, exp: u64) -> u8 {
         match (self, exp) {
             (_, 0) => panic!(),
-            (0, _) | (1, _) | (_, 1) => self,
+            (0 | 1, _) | (_, 1) => self,
             (_, 8..=u64::MAX) => 2,
             (x, 2) => x.ceiling_sqrt(),
             (x, 3) => u8::wrapping_from(match U8_CUBES.binary_search(&x) {
@@ -1499,10 +1499,10 @@ impl CeilingRoot<u64> for u8 {
             (x, 4) if x <= 81 => 3,
             (x, 5) if x <= 32 => 2,
             (x, 5) if x <= 243 => 3,
-            (_, 4) | (_, 5) => 4,
+            (_, 4 | 5) => 4,
             (x, 6) if x <= 64 => 2,
             (x, 7) if x <= 128 => 2,
-            (_, 6) | (_, 7) => 3,
+            (_, 6 | 7) => 3,
         }
     }
 }
@@ -1534,7 +1534,7 @@ impl CheckedRoot<u64> for u8 {
     fn checked_root(self, exp: u64) -> Option<u8> {
         match (self, exp) {
             (_, 0) => panic!(),
-            (0, _) | (1, _) | (_, 1) => Some(self),
+            (0 | 1, _) | (_, 1) => Some(self),
             (x, 2) => x.checked_sqrt(),
             (x, 3) => U8_CUBES.binary_search(&x).ok().map(u8::wrapping_from),
             (16, 4) | (32, 5) | (64, 6) | (128, 7) => Some(2),
@@ -1567,7 +1567,7 @@ impl RootRem<u64> for u8 {
     fn root_rem(self, exp: u64) -> (u8, u8) {
         match (self, exp) {
             (_, 0) => panic!(),
-            (0, _) | (1, _) | (_, 1) => (self, 0),
+            (0 | 1, _) | (_, 1) => (self, 0),
             (x, 8..=u64::MAX) => (1, x - 1),
             (x, 2) => x.sqrt_rem(),
             (x, 3) => match U8_CUBES.binary_search(&x) {

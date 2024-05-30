@@ -311,20 +311,20 @@ fn mod_power_of_2_add_fail() {
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_power_of_2_add_assign(Natural::ONE, 0)
+        x.mod_power_of_2_add_assign(Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_add_assign(Natural::ZERO, 0)
+        x.mod_power_of_2_add_assign(Natural::ZERO, 0);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_power_of_2_add_assign(&Natural::ONE, 0)
+        x.mod_power_of_2_add_assign(&Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_add_assign(&Natural::ZERO, 0)
+        x.mod_power_of_2_add_assign(&Natural::ZERO, 0);
     });
 }
 

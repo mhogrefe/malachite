@@ -101,14 +101,14 @@ fn to_power_of_2_digits_asc_helper<
     unsigned_pair_gen_var_4::<T, U>().test_properties(|(u, log_base)| {
         let digits = PowerOf2Digits::<U>::to_power_of_2_digits_asc(&u, log_base);
         assert_eq!(
-            T::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+            T::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap(),
             u
         );
         if u != T::ZERO {
             assert_ne!(*digits.last().unwrap(), U::ZERO);
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             u.to_power_of_2_digits_desc(log_base)
         );
         if u != T::ZERO {
@@ -149,7 +149,7 @@ fn to_power_of_2_digits_desc_helper<
     unsigned_pair_gen_var_4::<T, U>().test_properties(|(u, log_base)| {
         let digits = PowerOf2Digits::<U>::to_power_of_2_digits_desc(&u, log_base);
         assert_eq!(
-            T::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+            T::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap(),
             u
         );
         if u != T::ZERO {

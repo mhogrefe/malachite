@@ -205,7 +205,7 @@ impl Natural {
             (&mut Natural(Small(small)), other, pow) => {
                 *self = Natural::from(
                     (DoubleLimb::from(small) * DoubleLimb::from(other)).mod_power_of_2(pow),
-                )
+                );
             }
             (x, other, pow) => {
                 *x *= Natural::from(other);

@@ -10,9 +10,9 @@ use crate::orderings::ORDERINGS;
 use crate::random::Seed;
 use crate::slices::{random_values_from_slice, RandomValuesFromSlice};
 use std::cmp::Ordering;
-use std::iter::Cloned;
+use std::iter::Copied;
 
-pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
+pub type RandomOrderings = Copied<RandomValuesFromSlice<'static, Ordering>>;
 
 /// Generates a random [`Ordering`] that has an equal probability of being `Less`, `Greater`, or
 /// `Equal`.
@@ -38,5 +38,5 @@ pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
 /// ```
 #[inline]
 pub fn random_orderings(seed: Seed) -> RandomOrderings {
-    random_values_from_slice(seed, &ORDERINGS).cloned()
+    random_values_from_slice(seed, &ORDERINGS).copied()
 }

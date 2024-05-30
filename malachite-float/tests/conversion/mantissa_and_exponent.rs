@@ -2232,7 +2232,7 @@ where
         let (mantissa, exponent) = x.sci_mantissa_and_exponent();
         let (mantissa_alt, exponent_alt): (T, i64) = (&Float::from(x)).sci_mantissa_and_exponent();
         assert_eq!(mantissa_alt, mantissa);
-        assert_eq!(exponent_alt, exponent)
+        assert_eq!(exponent_alt, exponent);
     });
 }
 

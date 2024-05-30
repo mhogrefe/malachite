@@ -638,7 +638,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32(
     // sum first.
     let mut hi = out_2[0];
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
-    let scratch_hi = &mut scratch_hi[..n + 1];
+    let scratch_hi = &mut scratch_hi[..=n];
     let (scratch_hi_last, scratch_hi_init) = scratch_hi.split_last().unwrap();
     let mut x = *scratch_hi_last;
     if limbs_add_same_length_to_out(out_2, scratch_lo, scratch_hi_init) {
@@ -967,7 +967,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
     if SMALLER_RECURSION_TOOM_33_AND_53 {
         // size: n
         limbs_mul_same_length_to_out_toom_33_recursive(v_neg_1, asm1_init, bsm1_init, mul_scratch);
-        let (v_neg_1_last, v_neg_1_init) = v_neg_1[n..2 * n + 1].split_last_mut().unwrap();
+        let (v_neg_1_last, v_neg_1_init) = v_neg_1[n..=n<<1].split_last_mut().unwrap();
         let mut carry = 0;
         if *asm1_last != 0 {
             carry = *bsm1_last;
@@ -1151,7 +1151,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     let (bsm1, bs2) = remainder.split_at_mut(n);
     // Compute as1 and asm1.
     let mut v_neg_1_neg =
-        limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(as1, asm1, xs, n, &mut out[..n + 1]);
+        limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(as1, asm1, xs, n, &mut out[..=n]);
     // Compute as2.
     let (as2_last, as2_init) = as2.split_last_mut().unwrap();
     let mut carry = limbs_shl_to_out(as2_init, xs_3, 1);
@@ -2024,7 +2024,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
         [as1, asm1, as2, asm2, ash, bs1, bsm1, bs2, bsm2, bsh],
         _unused
     );
-    let out_lo = &mut out[..n + 1];
+    let out_lo = &mut out[..=n];
     // Compute as1 and asm1.
     let mut v_neg_1_neg = limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, out_lo);
     // Compute as2 and asm2.
@@ -2128,7 +2128,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
             1 => {
                 let mut carry = *bsm1_last;
                 if limbs_slice_add_same_length_in_place_left(v_neg_1_init, bsm1_init) {
-                    carry.wrapping_add_assign(1)
+                    carry.wrapping_add_assign(1);
                 }
                 carry
             }
@@ -2353,7 +2353,7 @@ pub fn limbs_mul_greater_to_out_toom_54(
     // - X(+4) * Y(+4)
     // - size: m
     limbs_mul_same_length_to_out(r3, v2, v3, mul_scratch);
-    limbs_toom_couple_handling(r3, &mut out_lo[..2 * n + 1], neg_2_pow_sign, n, 2, 4);
+    limbs_toom_couple_handling(r3, &mut out_lo[..=n << 1], neg_2_pow_sign, n, 2, 4);
     // 1, -1
     let out_lo_lo = &mut out_lo[..m];
     let neg_1_sign = limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 4, xs, n, out_lo_lo)
@@ -2364,7 +2364,7 @@ pub fn limbs_mul_greater_to_out_toom_54(
     // - X(1) * Y(1)
     // - size: m
     limbs_mul_same_length_to_out(r7, v2, v3, mul_scratch);
-    limbs_toom_couple_handling(r7, &mut out_lo[..2 * n + 1], neg_1_sign, n, 0, 0);
+    limbs_toom_couple_handling(r7, &mut out_lo[..=n << 1], neg_1_sign, n, 0, 0);
     // 2, -2
     let out_lo_lo = &mut out_lo[..m];
     let neg_2_sign = limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 4, xs, n, out_lo_lo)
@@ -2378,7 +2378,7 @@ pub fn limbs_mul_greater_to_out_toom_54(
     // - size: m
     limbs_mul_same_length_to_out(r5, v2, v3, mul_scratch);
     let (out_lo, r5) = out.split_at_mut(3 * n);
-    limbs_toom_couple_handling(r5, &mut out_lo[..2 * n + 1], neg_2_sign, n, 1, 2);
+    limbs_toom_couple_handling(r5, &mut out_lo[..=n << 1], neg_2_sign, n, 1, 2);
     // - X(0) * Y(0)
     // - size: n
     limbs_mul_same_length_to_out(out, &xs[..n], &ys[..n], mul_scratch);
@@ -2683,13 +2683,13 @@ fn limbs_abs_sub_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool
         let y = ys[i];
         if x != y {
             let n = i + 1;
-            if x > y {
+            return if x > y {
                 limbs_sub_same_length_to_out(out, &xs[..n], &ys[..n]);
-                return false;
+                false
             } else {
                 limbs_sub_same_length_to_out(out, &ys[..n], &xs[..n]);
-                return true;
-            }
+                true
+            };
         }
         out[i] = 0;
     }
@@ -2860,7 +2860,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     // - A(+4) * B(+4)
     // - size: m
     limbs_mul_same_length_to_out(r3, v2, v3, mul_scratch);
-    limbs_toom_couple_handling(r3, &mut r8[..2 * n + 1], v_neg_2_neg, n, 2, 4);
+    limbs_toom_couple_handling(r3, &mut r8[..=n<<1], v_neg_2_neg, n, 2, 4);
     // $pm1$
     v_neg_2_neg = limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 5, xs, n, &mut r8[..m]);
     // Compute bs1 and bsm1. Code taken from toom33
@@ -2889,7 +2889,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     // - A(1) * B(1)
     // - size: m
     limbs_mul_same_length_to_out(r7, v2, v3, mul_scratch);
-    limbs_toom_couple_handling(r7, &mut r8[..2 * n + 1], v_neg_2_neg, n, 0, 0);
+    limbs_toom_couple_handling(r7, &mut r8[..=n<<1], v_neg_2_neg, n, 0, 0);
     // 2, -2
     let r8_lo = &mut r8[..m];
     v_neg_2_neg = limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 5, xs, n, r8_lo);
@@ -2918,7 +2918,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     // - A(2) * B(2)
     // - size: m
     limbs_mul_same_length_to_out(r5_lo, v2, v3, mul_scratch);
-    limbs_toom_couple_handling(r5, &mut r8[..2 * n + 1], v_neg_2_neg, n, 1, 2);
+    limbs_toom_couple_handling(r5, &mut r8[..=n<<1], v_neg_2_neg, n, 1, 2);
     // - A(0) * B(0)
     // - size: n
     limbs_mul_same_length_to_out(r8, &xs[..n], &ys[..n], mul_scratch);

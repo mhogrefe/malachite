@@ -15,7 +15,7 @@ fn next_bit_chunk_helper<T: PrimitiveUnsigned>(chunk_size: u64, expected_values:
     let mut range_generator = variable_range_generator(EXAMPLE_SEED);
     let mut xs = Vec::with_capacity(20);
     for _ in 0..20 {
-        xs.push(range_generator.next_bit_chunk::<T>(chunk_size))
+        xs.push(range_generator.next_bit_chunk::<T>(chunk_size));
     }
     assert_eq!(xs, expected_values);
 }

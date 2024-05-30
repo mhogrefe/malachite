@@ -213,23 +213,20 @@ fn primitive_float_try_from_float<T: PrimitiveFloat>(f: Float) -> Result<T, Floa
                     return Err(FloatFromFloatError::Underflow);
                 } else if exponent > T::MAX_EXPONENT {
                     return Err(FloatFromFloatError::Overflow);
-                } else {
-                    let target_prec = T::max_precision_for_sci_exponent(exponent);
-                    let bits = significand_bits(&significand);
-                    if bits > target_prec
-                        && !significand.divisible_by_power_of_2(bits - target_prec)
-                    {
-                        return Err(FloatFromFloatError::Inexact);
-                    }
-                    let mantissa = u64::wrapping_from(
-                        &(significand >> (i64::exact_from(bits) - i64::exact_from(target_prec))),
-                    );
-                    T::from_integer_mantissa_and_exponent(
-                        mantissa,
-                        exponent - i64::exact_from(target_prec) + 1,
-                    )
-                    .unwrap()
                 }
+                let target_prec = T::max_precision_for_sci_exponent(exponent);
+                let bits = significand_bits(&significand);
+                if bits > target_prec && !significand.divisible_by_power_of_2(bits - target_prec) {
+                    return Err(FloatFromFloatError::Inexact);
+                }
+                let mantissa = u64::wrapping_from(
+                    &(significand >> (i64::exact_from(bits) - i64::exact_from(target_prec))),
+                );
+                T::from_integer_mantissa_and_exponent(
+                    mantissa,
+                    exponent - i64::exact_from(target_prec) + 1,
+                )
+                .unwrap()
             };
             Ok(if sign { x } else { -x })
         }
@@ -259,23 +256,20 @@ fn primitive_float_try_from_float_ref<T: PrimitiveFloat>(
                     return Err(FloatFromFloatError::Underflow);
                 } else if exponent > T::MAX_EXPONENT {
                     return Err(FloatFromFloatError::Overflow);
-                } else {
-                    let target_prec = T::max_precision_for_sci_exponent(exponent);
-                    let bits = significand_bits(significand);
-                    if bits > target_prec
-                        && !significand.divisible_by_power_of_2(bits - target_prec)
-                    {
-                        return Err(FloatFromFloatError::Inexact);
-                    }
-                    let mantissa = u64::wrapping_from(
-                        &(significand >> (i64::exact_from(bits) - i64::exact_from(target_prec))),
-                    );
-                    T::from_integer_mantissa_and_exponent(
-                        mantissa,
-                        exponent - i64::exact_from(target_prec) + 1,
-                    )
-                    .unwrap()
                 }
+                let target_prec = T::max_precision_for_sci_exponent(exponent);
+                let bits = significand_bits(significand);
+                if bits > target_prec && !significand.divisible_by_power_of_2(bits - target_prec) {
+                    return Err(FloatFromFloatError::Inexact);
+                }
+                let mantissa = u64::wrapping_from(
+                    &(significand >> (i64::exact_from(bits) - i64::exact_from(target_prec))),
+                );
+                T::from_integer_mantissa_and_exponent(
+                    mantissa,
+                    exponent - i64::exact_from(target_prec) + 1,
+                )
+                .unwrap()
             };
             Ok(if *sign { x } else { -x })
         }
@@ -306,8 +300,8 @@ macro_rules! impl_primitive_float_from {
             /// Converts a [`Float`] to a primitive float, using a specified [`RoundingMode`] and
             /// taking the [`Float`] by value. An [`Ordering`] is also returned, indicating whether
             /// the returned value is less than, equal to, or greater than the original value.
-            /// (Although a NaN is not comparable to anything, converting a NaN to a NaN will also
-            /// return `Equal`, indicating an exact conversion.)
+            /// (Although a NaN is not comparable to any [`Float`], converting a NaN to a NaN will
+            /// also return `Equal`, indicating an exact conversion.)
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -328,8 +322,8 @@ macro_rules! impl_primitive_float_from {
             /// Converts a [`Float`] to a primitive float, using a specified [`RoundingMode`] and
             /// taking the [`Float`] by reference. An [`Ordering`] is also returned, indicating
             /// whether the returned value is less than, equal to, or greater than the original
-            /// value. (Although a NaN is not comparable to anything, converting a NaN to a NaN will
-            /// also return `Equal`, indicating an exact conversion.)
+            /// value. (Although a NaN is not comparable to any [`Float`], converting a NaN to a NaN
+            /// will also return `Equal`, indicating an exact conversion.)
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

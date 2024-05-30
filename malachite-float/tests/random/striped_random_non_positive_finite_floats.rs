@@ -48,7 +48,7 @@ fn striped_random_non_positive_finite_floats_helper(
         expected_median,
         expected_median_hex,
         expected_moment_stats,
-    )
+    );
 }
 
 #[test]

@@ -2713,7 +2713,7 @@ fn add_float_significands_general(
                 };
                 if round_bit == Uninitialized {
                     round_bit = RoundBit::from(y >> (Limb::WIDTH - 1) != 0);
-                    y &= !HIGH_BIT
+                    y &= !HIGH_BIT;
                 }
                 while y == 0 {
                     if yi == 0 {

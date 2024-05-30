@@ -98,19 +98,18 @@ pub_test! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
         }
         let mut skip_loop = false;
         if x_1 == T::ZERO {
-            if y_1 != T::ZERO {
+            if y_1 == T::ZERO {
+                assert!(y_0.odd());
+                assert!(y_0 > T::ONE);
+                let j = x_0.jacobi_symbol(y_0);
+                return if bit { -j } else { j };
+            }
                 if (x_0 & y_0).get_bit(1) {
                     bit.not_assign();
                 }
                 swap(&mut x_0, &mut y_0);
                 x_1 = y_1;
                 skip_loop = true;
-            } else {
-                assert!(y_0.odd());
-                assert!(y_0 > T::ONE);
-                let j = x_0.jacobi_symbol(y_0);
-                return if bit { -j } else { j };
-            }
         }
         if !skip_loop {
             'outer: while y_1 != T::ZERO {
@@ -129,14 +128,13 @@ pub_test! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
                             bit.not_assign();
                         }
                         break 'outer;
-                    } else {
+                    }
                         let c = x_0.trailing_zeros();
                         if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
                             bit.not_assign();
                         }
                         x_0 = (x_1 << (T::WIDTH - c)) | (x_0 >> c);
                         x_1 >>= c;
-                    }
                 }
                 if x_1 != y_1 {
                     if x_1 == T::ZERO {
@@ -166,7 +164,7 @@ pub_test! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
                         }
                         let c = y_0.trailing_zeros();
                         if c.odd() & (x_0 ^ (x_0 >> 1)).get_bit(1) {
-                            bit.not_assign()
+                            bit.not_assign();
                         }
                         y_0 = (y_1 << (T::WIDTH - c)) | (y_0 >> c);
                         y_1 >>= c;

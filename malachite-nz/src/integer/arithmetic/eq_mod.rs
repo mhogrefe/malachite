@@ -232,13 +232,13 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
     assert_ne!(*ys.last().unwrap(), 0);
     assert_ne!(*ms.last().unwrap(), 0);
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
-    if !xs[0]
+    if xs[0]
         .wrapping_neg()
         .eq_mod_power_of_2(ys[0], TrailingZeros::trailing_zeros(ms[0]))
     {
-        Some(false)
-    } else {
         None
+    } else {
+        Some(false)
     }
 }
 

@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`AbsDiff`](malachite_base::num::arithmetic::traits::AbsDiff) and
+/// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
+/// the absolute value of the difference between two numbers.
+pub mod abs_diff;
 /// Addition of [`Natural`](super::Natural)s.
 pub mod add;
 /// Implementations of [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and

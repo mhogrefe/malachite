@@ -14,6 +14,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
+#[allow(clippy::unnecessary_wraps)]
 fn partial_cmp_unsigned<T: Copy + One + Ord + Sign + SignificantBits>(
     x: &Rational,
     other: &T,
@@ -40,11 +41,10 @@ where
     let d_cmp = x.denominator.cmp(&Natural::ONE);
     if n_cmp == Equal && d_cmp == Equal {
         return Some(Equal);
-    } else {
-        let nd_cmp = n_cmp.cmp(&d_cmp);
-        if nd_cmp != Equal {
-            return Some(nd_cmp);
-        }
+    }
+    let nd_cmp = n_cmp.cmp(&d_cmp);
+    if nd_cmp != Equal {
+        return Some(nd_cmp);
     }
     // Then compare floor ∘ log_2 ∘ abs
     let log_cmp = x
@@ -98,6 +98,7 @@ macro_rules! impl_unsigned {
 }
 apply_to_unsigneds!(impl_unsigned);
 
+#[allow(clippy::unnecessary_wraps)]
 fn partial_cmp_signed<
     U: Copy + One + Ord + SignificantBits,
     S: Copy + Sign + SignificantBits + UnsignedAbs<Output = U>,
@@ -128,11 +129,10 @@ where
     let d_cmp = x.denominator.cmp(&Natural::ONE);
     if n_cmp == Equal && d_cmp == Equal {
         return Some(Equal);
-    } else {
-        let nd_cmp = n_cmp.cmp(&d_cmp);
-        if nd_cmp != Equal {
-            return Some(if x.sign { nd_cmp } else { nd_cmp.reverse() });
-        }
+    }
+    let nd_cmp = n_cmp.cmp(&d_cmp);
+    if nd_cmp != Equal {
+        return Some(if x.sign { nd_cmp } else { nd_cmp.reverse() });
     }
     // Then compare floor ∘ log_2 ∘ abs
     let log_cmp = x

@@ -129,7 +129,7 @@ fn limbs_properties() {
                 limb_vec.insert(i, limbs.next().unwrap());
                 i += 1;
             } else {
-                limb_vec.insert(i, limbs.next_back().unwrap())
+                limb_vec.insert(i, limbs.next_back().unwrap());
             }
         }
         assert!(limbs.next().is_none());

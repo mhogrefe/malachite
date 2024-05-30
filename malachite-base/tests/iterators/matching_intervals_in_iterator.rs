@@ -10,7 +10,7 @@ use malachite_base::iterators::matching_intervals_in_iterator;
 
 fn matching_intervals_in_iterator_helper<F: Fn(&u8) -> bool>(xs: &[u8], f: F, result: &[(u8, u8)]) {
     assert_eq!(
-        matching_intervals_in_iterator(xs.iter().cloned(), f).as_slice(),
+        matching_intervals_in_iterator(xs.iter().copied(), f).as_slice(),
         result
     );
 }

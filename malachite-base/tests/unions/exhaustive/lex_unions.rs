@@ -109,7 +109,7 @@ fn test_lex_union2s() {
         ],
     );
     lex_union2s_helper(
-        ['a', 'b', 'c'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
         exhaustive_orderings(),
         6,
         &[
@@ -222,8 +222,8 @@ fn test_lex_union3s() {
         ],
     );
     lex_union3s_helper(
-        ['a', 'b', 'c'].iter().cloned(),
-        ["xx", "yy", "zz"].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
+        ["xx", "yy", "zz"].iter().copied(),
         0..3,
         9,
         &[

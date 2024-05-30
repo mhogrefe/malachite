@@ -150,7 +150,7 @@ fn test_exhaustive_triples_xxy() {
         ],
     );
     exhaustive_triples_xxy_helper(
-        ['a', 'b', 'c'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
         exhaustive_orderings(),
         27,
         &[
@@ -178,7 +178,7 @@ fn test_exhaustive_triples_xxy() {
     );
     exhaustive_triples_xxy_helper(
         exhaustive_pairs(exhaustive_orderings(), exhaustive_bools()),
-        exhaustive_triples_from_single([Less, Greater].iter().cloned()),
+        exhaustive_triples_from_single([Less, Greater].iter().copied()),
         288,
         &[
             ((Equal, false), (Equal, false), (Less, Less, Less)),
@@ -334,7 +334,7 @@ fn test_exhaustive_triples_xyx() {
         ],
     );
     exhaustive_triples_xyx_helper(
-        ['a', 'b', 'c'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
         exhaustive_orderings(),
         27,
         &[
@@ -362,7 +362,7 @@ fn test_exhaustive_triples_xyx() {
     );
     exhaustive_triples_xyx_helper(
         exhaustive_pairs(exhaustive_orderings(), exhaustive_bools()),
-        exhaustive_triples_from_single([Less, Greater].iter().cloned()),
+        exhaustive_triples_from_single([Less, Greater].iter().copied()),
         288,
         &[
             ((Equal, false), (Less, Less, Less), (Equal, false)),

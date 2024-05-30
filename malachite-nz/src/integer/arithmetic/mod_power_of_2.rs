@@ -138,10 +138,10 @@ impl ModPowerOf2Assign for Integer {
     /// ```
     fn mod_power_of_2_assign(&mut self, pow: u64) {
         if self.sign {
-            self.abs.mod_power_of_2_assign(pow)
+            self.abs.mod_power_of_2_assign(pow);
         } else {
             self.sign = true;
-            self.abs.neg_mod_power_of_2_assign(pow)
+            self.abs.neg_mod_power_of_2_assign(pow);
         }
     }
 }
@@ -399,9 +399,9 @@ impl CeilingModPowerOf2Assign for Integer {
     /// ```
     fn ceiling_mod_power_of_2_assign(&mut self, pow: u64) {
         if self.sign {
-            self.abs.neg_mod_power_of_2_assign(pow)
+            self.abs.neg_mod_power_of_2_assign(pow);
         } else {
-            self.abs.mod_power_of_2_assign(pow)
+            self.abs.mod_power_of_2_assign(pow);
         };
         self.sign = self.abs == 0;
     }

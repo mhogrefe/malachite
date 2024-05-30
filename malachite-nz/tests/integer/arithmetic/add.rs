@@ -139,7 +139,7 @@ fn add_properties() {
         assert_eq!(x + Integer::ZERO, *x);
         assert_eq!(Integer::ZERO + x, *x);
         assert_eq!(x + x, x << 1);
-        assert_eq!(x + (-x), 0)
+        assert_eq!(x + (-x), 0);
     });
 
     integer_triple_gen().test_properties(|(x, y, z)| {

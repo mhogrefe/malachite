@@ -13,9 +13,7 @@ use crate::num::conversion::traits::SciMantissaAndExponent;
 use crate::num::logic::traits::{LeadingZeros, TrailingZeros};
 
 fn floor_log_base_2<T: PrimitiveUnsigned>(x: T) -> u64 {
-    if x == T::ZERO {
-        panic!("Cannot take the base-2 logarithm of 0.");
-    }
+    assert!(x != T::ZERO, "Cannot take the base-2 logarithm of 0.");
     x.significant_bits() - 1
 }
 
@@ -29,9 +27,7 @@ fn ceiling_log_base_2<T: PrimitiveUnsigned>(x: T) -> u64 {
 }
 
 fn checked_log_base_2<T: PrimitiveInt>(x: T) -> Option<u64> {
-    if x == T::ZERO {
-        panic!("Cannot take the base-2 logarithm of 0.");
-    }
+    assert!(x != T::ZERO, "Cannot take the base-2 logarithm of 0.");
     let leading_zeros = LeadingZeros::leading_zeros(x);
     let trailing_zeros = TrailingZeros::trailing_zeros(x);
     if leading_zeros + trailing_zeros == T::WIDTH - 1 {

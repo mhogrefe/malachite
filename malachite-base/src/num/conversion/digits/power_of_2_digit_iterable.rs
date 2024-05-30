@@ -118,13 +118,12 @@ fn power_of_2_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     log_base: u64,
 ) -> PrimitivePowerOf2DigitIterator<T, U> {
     assert_ne!(log_base, 0);
-    if log_base > U::WIDTH {
-        panic!(
-            "type {:?} is too small for a digit of width {}",
-            U::NAME,
-            log_base
-        );
-    }
+    assert!(
+        log_base <= U::WIDTH,
+        "type {:?} is too small for a digit of width {}",
+        U::NAME,
+        log_base
+    );
     let significant_digits = x.significant_bits().div_round(log_base, Ceiling).0;
     PrimitivePowerOf2DigitIterator {
         value: x,

@@ -389,10 +389,10 @@ fn from_natural_prec_round_properties() {
         assert_eq!(float_n.partial_cmp(&n), Some(o));
         match rm {
             Floor | Down => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             Ceiling | Up => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             Exact => assert_eq!(o, Equal),
             _ => {}

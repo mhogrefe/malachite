@@ -65,7 +65,7 @@ fn mutate_fail_1() {
 #[test]
 #[should_panic]
 fn mutate_fail_2() {
-    RationalSequence::from_vec(vec![1, 2, 3]).mutate(3, |_| {})
+    RationalSequence::from_vec(vec![1, 2, 3]).mutate(3, |_| {});
 }
 
 #[test]

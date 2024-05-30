@@ -107,7 +107,7 @@ fn assign_bits_fail_helper_signed<
     assert_panic!(S::exact_from(-100).assign_bits(S::WIDTH + 1, S::WIDTH + 2, &U::ZERO));
     assert_panic!({
         let half_width = S::WIDTH >> 1;
-        S::exact_from(-100).assign_bits(half_width, 3 * half_width - 4, &U::ZERO)
+        S::exact_from(-100).assign_bits(half_width, 3 * half_width - 4, &U::ZERO);
     });
 }
 

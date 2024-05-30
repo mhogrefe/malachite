@@ -54,7 +54,7 @@ fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert!(significant_bits <= T::WIDTH);
         assert_eq!(significant_bits == 0, u == T::ZERO);
         if u != T::ZERO {
-            assert_eq!(significant_bits, u.floor_log_base_2() + 1)
+            assert_eq!(significant_bits, u.floor_log_base_2() + 1);
         }
     });
 }

@@ -292,9 +292,7 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 /// ```
 #[inline]
 pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlice<T> {
-    if xs.is_empty() {
-        panic!("empty slice");
-    }
+    assert!(!xs.is_empty(), "empty slice");
     RandomValuesFromSlice {
         xs,
         indices: random_unsigneds_less_than(seed, u64::exact_from(xs.len())),

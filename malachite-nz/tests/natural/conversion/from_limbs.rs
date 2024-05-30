@@ -74,14 +74,14 @@ fn from_limbs_asc_properties() {
         assert_eq!(Natural::from_owned_limbs_asc(xs.clone()), x);
         let mut trimmed_limbs = xs
             .iter()
-            .cloned()
+            .copied()
             .rev()
             .skip_while(|&limb| limb == 0)
             .collect_vec();
         trimmed_limbs.reverse();
         assert_eq!(x.to_limbs_asc(), trimmed_limbs);
         assert_eq!(
-            Natural::from_limbs_desc(&xs.iter().cloned().rev().collect_vec()),
+            Natural::from_limbs_desc(&xs.iter().copied().rev().collect_vec()),
             x
         );
         if !xs.is_empty() && *xs.last().unwrap() != 0 {
@@ -103,12 +103,12 @@ fn from_limbs_desc_properties() {
         assert_eq!(
             x.to_limbs_desc(),
             xs.iter()
-                .cloned()
+                .copied()
                 .skip_while(|&limb| limb == 0)
                 .collect_vec()
         );
         assert_eq!(
-            Natural::from_limbs_asc(&xs.iter().cloned().rev().collect_vec()),
+            Natural::from_limbs_asc(&xs.iter().copied().rev().collect_vec()),
             x
         );
         if !xs.is_empty() && xs[0] != 0 {

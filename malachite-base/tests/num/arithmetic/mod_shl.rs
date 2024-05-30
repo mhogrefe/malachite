@@ -58,11 +58,11 @@ fn mod_shl_fail() {
 fn mod_shl_assign_fail_helper<T: PrimitiveUnsigned + ModShlAssign<U, T>, U: PrimitiveInt>() {
     assert_panic!({
         let mut x = T::ZERO;
-        x.mod_shl_assign(U::TWO, T::ZERO)
+        x.mod_shl_assign(U::TWO, T::ZERO);
     });
     assert_panic!({
         let mut x = T::from(123u8);
-        x.mod_shl_assign(U::TWO, T::from(123u8))
+        x.mod_shl_assign(U::TWO, T::from(123u8));
     });
 }
 

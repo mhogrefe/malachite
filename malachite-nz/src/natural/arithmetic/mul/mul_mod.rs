@@ -143,7 +143,7 @@ pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], 
         carry += 1;
     }
     out_1[0] = 0;
-    assert!(!limbs_slice_add_limb_in_place(&mut out[..n + 1], carry));
+    assert!(!limbs_slice_add_limb_in_place(&mut out[..=n], carry));
 }
 
 // Interpreting the first n + 1 limbs of two slices of `Limb`s as the limbs (in ascending order) of

@@ -15,7 +15,7 @@ fn next_in_inclusive_range_helper<T: PrimitiveUnsigned>(a: T, b: T, expected_val
     let mut range_generator = variable_range_generator(EXAMPLE_SEED);
     let mut xs = Vec::with_capacity(20);
     for _ in 0..20 {
-        xs.push(range_generator.next_in_inclusive_range(a, b))
+        xs.push(range_generator.next_in_inclusive_range(a, b));
     }
     assert_eq!(xs, expected_values);
 }

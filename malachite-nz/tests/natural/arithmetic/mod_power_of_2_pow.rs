@@ -206,11 +206,11 @@ fn mod_power_of_2_pow_fail() {
     assert_panic!((&Natural::ONE).mod_power_of_2_pow(&Natural::ONE, 0));
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_pow_assign(Natural::ONE, 0)
+        x.mod_power_of_2_pow_assign(Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_pow_assign(&Natural::ONE, 0)
+        x.mod_power_of_2_pow_assign(&Natural::ONE, 0);
     });
 }
 

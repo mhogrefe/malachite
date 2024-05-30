@@ -995,7 +995,7 @@ fn limbs_round_to_multiple_of_power_of_2_in_place_properties() {
                     }
                     assert_eq!(o_alt, o);
                 },
-            )
+            );
         },
     );
 }

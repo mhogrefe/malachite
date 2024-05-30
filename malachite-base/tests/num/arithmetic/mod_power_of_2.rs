@@ -215,11 +215,11 @@ fn test_mod_power_of_2_assign_signed() {
 fn mod_power_of_2_assign_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!({
         let mut x = T::NEGATIVE_ONE;
-        x.mod_power_of_2_assign(200)
+        x.mod_power_of_2_assign(200);
     });
     assert_panic!({
         let mut x = T::MIN;
-        x.mod_power_of_2_assign(T::WIDTH)
+        x.mod_power_of_2_assign(T::WIDTH);
     });
 }
 
@@ -339,11 +339,11 @@ fn neg_mod_power_of_2_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!(T::MAX.neg_mod_power_of_2(T::WIDTH + 1));
     assert_panic!({
         let mut x = T::ONE;
-        x.neg_mod_power_of_2_assign(200)
+        x.neg_mod_power_of_2_assign(200);
     });
     assert_panic!({
         let mut x = T::MAX;
-        x.neg_mod_power_of_2_assign(T::WIDTH + 1)
+        x.neg_mod_power_of_2_assign(T::WIDTH + 1);
     });
 }
 
@@ -431,11 +431,11 @@ fn ceiling_mod_power_of_2_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.ceiling_mod_power_of_2(T::WIDTH));
     assert_panic!({
         let mut x = T::ONE;
-        x.ceiling_mod_power_of_2_assign(T::WIDTH)
+        x.ceiling_mod_power_of_2_assign(T::WIDTH);
     });
     assert_panic!({
         let mut x = T::MIN;
-        x.ceiling_mod_power_of_2_assign(T::WIDTH)
+        x.ceiling_mod_power_of_2_assign(T::WIDTH);
     });
 }
 

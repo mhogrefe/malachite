@@ -28,7 +28,7 @@ fn exhaustive_vecs_from_element_iterator_helper<I: Iterator<Item = u64>, J: Clon
 fn test_exhaustive_vecs_from_element_iterator() {
     exhaustive_vecs_from_element_iterator_helper(empty(), exhaustive_bools(), &[]);
     exhaustive_vecs_from_element_iterator_helper(
-        [2, 1, 2].iter().cloned(),
+        [2, 1, 2].iter().copied(),
         exhaustive_bools(),
         &[
             &[false, false],
@@ -70,7 +70,7 @@ fn test_exhaustive_vecs_from_element_iterator() {
         ],
     );
     exhaustive_vecs_from_element_iterator_helper(
-        [2, 1, 0, 2].iter().cloned(),
+        [2, 1, 0, 2].iter().copied(),
         exhaustive_bools(),
         &[
             &[false, false],
@@ -88,7 +88,7 @@ fn test_exhaustive_vecs_from_element_iterator() {
     );
     exhaustive_vecs_from_element_iterator_helper(empty(), exhaustive_unsigneds::<u32>(), &[]);
     exhaustive_vecs_from_element_iterator_helper(
-        [2, 1, 2].iter().cloned(),
+        [2, 1, 2].iter().copied(),
         exhaustive_unsigneds::<u32>(),
         &[
             &[0, 0],
@@ -140,7 +140,7 @@ fn test_exhaustive_vecs_from_element_iterator() {
         ],
     );
     exhaustive_vecs_from_element_iterator_helper(
-        [2, 1, 0, 2].iter().cloned(),
+        [2, 1, 0, 2].iter().copied(),
         exhaustive_unsigneds::<u32>(),
         &[
             &[0, 0],
@@ -167,7 +167,7 @@ fn test_exhaustive_vecs_from_element_iterator() {
     );
     // Stops after first empty ys
     exhaustive_vecs_from_element_iterator_helper(
-        [0, 0, 1, 0].iter().cloned(),
+        [0, 0, 1, 0].iter().copied(),
         nevers(),
         &[&[], &[]],
     );

@@ -69,9 +69,10 @@ fn shr_round_unsigned_unsigned<
         }
         Exact => {
             let shifted = x >> bits;
-            if shifted << bits != x {
-                panic!("Right shift is not exact: {x} >> {bits}");
-            }
+            assert!(
+                shifted << bits == x,
+                "Right shift is not exact: {x} >> {bits}"
+            );
             (shifted, Equal)
         }
     }
@@ -159,9 +160,10 @@ fn shr_round_assign_unsigned_unsigned<
         Exact => {
             let original = *x;
             *x >>= bits;
-            if *x << bits != original {
-                panic!("Right shift is not exact: {original} >>= {bits}");
-            }
+            assert!(
+                *x << bits == original,
+                "Right shift is not exact: {original} >>= {bits}"
+            );
             Equal
         }
     }

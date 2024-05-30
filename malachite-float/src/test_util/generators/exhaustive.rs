@@ -26,13 +26,13 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::num::exhaustive::{
     exhaustive_positive_primitive_ints, exhaustive_primitive_floats, exhaustive_signeds,
-    exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
+    exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
 use malachite_base::num::iterators::ruler_sequence;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::common::{reshape_2_1_1_to_4, reshape_2_1_to_3, It};
+use malachite_base::test_util::generators::common::{reshape_2_1_to_3, It};
 use malachite_base::test_util::generators::exhaustive_pairs_big_tiny;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, ExhaustiveDependentPairsYsGenerator,
@@ -262,37 +262,6 @@ pub fn exhaustive_float_float_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     ))
 }
 
-pub fn exhaustive_float_float_unsigned_triple_gen_var_2() -> It<(Float, Float, u64)> {
-    reshape_2_1_to_3(Box::new(exhaustive_pairs(
-        exhaustive_float_pairs_with_precision_inclusive_range(1, Limb::WIDTH),
-        primitive_int_increasing_range(1, Limb::WIDTH),
-    )))
-}
-
-pub fn exhaustive_float_float_unsigned_triple_gen_var_3() -> It<(Float, Float, u64)> {
-    Box::new(
-        exhaustive_float_pairs_with_precision_inclusive_range(1, Limb::WIDTH)
-            .map(|(x, y)| (x, y, Limb::WIDTH)),
-    )
-}
-
-pub fn exhaustive_float_float_unsigned_triple_gen_var_4() -> It<(Float, Float, u64)> {
-    reshape_2_1_to_3(Box::new(exhaustive_pairs(
-        exhaustive_float_pairs_with_precision_inclusive_range(Limb::WIDTH + 1, Limb::WIDTH << 1),
-        primitive_int_increasing_range(Limb::WIDTH + 1, Limb::WIDTH << 1),
-    )))
-}
-
-pub fn exhaustive_float_float_unsigned_triple_gen_var_5() -> It<(Float, Float, u64)> {
-    reshape_2_1_to_3(Box::new(exhaustive_pairs(
-        exhaustive_float_pairs_with_precision_inclusive_range(
-            (Limb::WIDTH << 1) + 1,
-            Limb::WIDTH * 3,
-        ),
-        primitive_int_increasing_range((Limb::WIDTH << 1) + 1, Limb::WIDTH * 3),
-    )))
-}
-
 // -- (Float, Float, PrimitiveUnsigned, RoundingMode) --
 
 pub(crate) fn add_prec_round_valid(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> bool {
@@ -387,65 +356,6 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_3(
             BitDistributorOutputType::tiny(),
             BitDistributorOutputType::tiny(),
         )
-        .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
-    )
-}
-
-pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_4(
-) -> It<(Float, Float, u64, RoundingMode)> {
-    Box::new(
-        reshape_2_1_1_to_4(Box::new(exhaustive_triples(
-            exhaustive_float_pairs_with_precision_inclusive_range(1, Limb::WIDTH),
-            primitive_int_increasing_range(1, Limb::WIDTH),
-            exhaustive_rounding_modes(),
-        )))
-        .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
-    )
-}
-
-pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_5(
-) -> It<(Float, Float, u64, RoundingMode)> {
-    Box::new(
-        lex_pairs(
-            exhaustive_float_pairs_with_precision_inclusive_range(1, Limb::WIDTH),
-            exhaustive_rounding_modes(),
-        )
-        .filter_map(|((x, y), rm)| {
-            if mul_prec_round_valid(&x, &y, Limb::WIDTH, rm) {
-                Some((x, y, Limb::WIDTH, rm))
-            } else {
-                None
-            }
-        }),
-    )
-}
-
-pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_6(
-) -> It<(Float, Float, u64, RoundingMode)> {
-    Box::new(
-        reshape_2_1_1_to_4(Box::new(exhaustive_triples(
-            exhaustive_float_pairs_with_precision_inclusive_range(
-                Limb::WIDTH + 1,
-                Limb::WIDTH << 1,
-            ),
-            primitive_int_increasing_range(Limb::WIDTH + 1, Limb::WIDTH << 1),
-            exhaustive_rounding_modes(),
-        )))
-        .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
-    )
-}
-
-pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_7(
-) -> It<(Float, Float, u64, RoundingMode)> {
-    Box::new(
-        reshape_2_1_1_to_4(Box::new(exhaustive_triples(
-            exhaustive_float_pairs_with_precision_inclusive_range(
-                (Limb::WIDTH << 1) + 1,
-                Limb::WIDTH * 3,
-            ),
-            primitive_int_increasing_range((Limb::WIDTH << 1) + 1, Limb::WIDTH * 3),
-            exhaustive_rounding_modes(),
-        )))
         .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
     )
 }
@@ -661,6 +571,72 @@ pub fn exhaustive_float_float_rounding_mode_triple_gen_var_16() -> It<(Float, Fl
     Box::new(
         exhaustive_triples_xxy(exhaustive_floats(), exhaustive_rounding_modes())
             .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_17() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_2(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_18() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_3(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_19() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_4(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_20() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_5(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_21() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_6(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_22() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_7(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
     )
 }
 

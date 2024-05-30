@@ -626,9 +626,7 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
     a: T,
     b: T,
 ) -> RandomUnsignedRange<T> {
-    if a >= b {
-        panic!("a must be less than b. a: {a}, b: {b}");
-    }
+    assert!(a < b, "a must be less than b. a: {a}, b: {b}");
     RandomUnsignedRange {
         xs: random_unsigneds_less_than(seed, b - a),
         a,
@@ -673,9 +671,7 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     a: T,
     b: T,
 ) -> RandomUnsignedInclusiveRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     if a == T::ZERO && b == T::MAX {
         RandomUnsignedInclusiveRange::All(random_primitive_ints(seed))
     } else {
@@ -716,9 +712,7 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// ```
 #[inline]
 pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> RandomSignedRange<T> {
-    if a >= b {
-        panic!("a must be less than b. a: {a}, b: {b}");
-    }
+    assert!(a < b, "a must be less than b. a: {a}, b: {b}");
     RandomSignedRange {
         xs: T::new_unsigned_range(seed, a, b),
     }
@@ -763,9 +757,7 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
     a: T,
     b: T,
 ) -> RandomSignedInclusiveRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {a}, b: {b}");
-    }
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     RandomSignedInclusiveRange {
         xs: T::new_unsigned_inclusive_range(seed, a, b),
     }
@@ -970,13 +962,12 @@ pub fn random_primitive_float_range<T: PrimitiveFloat>(
 ) -> RandomPrimitiveFloatRange<T> {
     assert!(!a.is_nan());
     assert!(!b.is_nan());
-    if NiceFloat(a) >= NiceFloat(b) {
-        panic!(
-            "a must be less than b. a: {}, b: {}",
-            NiceFloat(a),
-            NiceFloat(b)
-        );
-    }
+    assert!(
+        NiceFloat(a) < NiceFloat(b),
+        "a must be less than b. a: {}, b: {}",
+        NiceFloat(a),
+        NiceFloat(b)
+    );
     RandomPrimitiveFloatRange {
         phantom: PhantomData,
         xs: random_unsigned_range(
@@ -1033,13 +1024,12 @@ pub fn random_primitive_float_inclusive_range<T: PrimitiveFloat>(
 ) -> RandomPrimitiveFloatInclusiveRange<T> {
     assert!(!a.is_nan());
     assert!(!b.is_nan());
-    if NiceFloat(a) > NiceFloat(b) {
-        panic!(
-            "a must be less than or equal to b. a: {}, b: {}",
-            NiceFloat(a),
-            NiceFloat(b)
-        );
-    }
+    assert!(
+        NiceFloat(a) <= NiceFloat(b),
+        "a must be less than or equal to b. a: {}, b: {}",
+        NiceFloat(a),
+        NiceFloat(b)
+    );
     RandomPrimitiveFloatInclusiveRange {
         phantom: PhantomData,
         xs: random_unsigned_inclusive_range(

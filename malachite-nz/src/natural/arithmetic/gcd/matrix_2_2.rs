@@ -37,12 +37,12 @@ use core::cmp::Ordering::*;
 fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
-    if limbs_cmp_same_length(xs, ys) != Less {
-        limbs_sub_same_length_to_out(out, xs, ys);
-        false
-    } else {
+    if limbs_cmp_same_length(xs, ys) == Less {
         limbs_sub_same_length_to_out(out, ys, xs);
         true
+    } else {
+        limbs_sub_same_length_to_out(out, xs, ys);
+        false
     }
 }
 
@@ -56,12 +56,12 @@ fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
-    if limbs_cmp_same_length(xs, ys) != Less {
-        limbs_sub_same_length_in_place_left(xs, ys);
-        false
-    } else {
+    if limbs_cmp_same_length(xs, ys) == Less {
         limbs_sub_same_length_in_place_right(ys, xs);
         true
+    } else {
+        limbs_sub_same_length_in_place_left(xs, ys);
+        false
     }
 }
 
@@ -76,12 +76,12 @@ fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 fn limbs_sub_abs_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
-    if limbs_cmp_same_length(xs, ys) != Less {
-        limbs_sub_same_length_in_place_right(xs, ys);
-        false
-    } else {
+    if limbs_cmp_same_length(xs, ys) == Less {
         limbs_sub_same_length_in_place_left(ys, xs);
         true
+    } else {
+        limbs_sub_same_length_in_place_right(xs, ys);
+        false
     }
 }
 
@@ -101,11 +101,11 @@ fn limbs_add_signed_same_length_to_out(
     ys: &[Limb],
     y_sign: bool,
 ) -> bool {
-    if x_sign != y_sign {
-        x_sign != limbs_sub_abs_same_length_to_out(out, xs, ys)
-    } else {
+    if x_sign == y_sign {
         assert!(!limbs_add_same_length_to_out(out, xs, ys));
         x_sign
+    } else {
+        x_sign != limbs_sub_abs_same_length_to_out(out, xs, ys)
     }
 }
 
@@ -124,11 +124,11 @@ fn limbs_add_signed_same_length_in_place_left(
     ys: &[Limb],
     y_sign: bool,
 ) -> bool {
-    if x_sign != y_sign {
-        x_sign != limbs_sub_abs_same_length_in_place_left(xs, ys)
-    } else {
+    if x_sign == y_sign {
         assert!(!limbs_slice_add_same_length_in_place_left(xs, ys));
         x_sign
+    } else {
+        x_sign != limbs_sub_abs_same_length_in_place_left(xs, ys)
     }
 }
 
@@ -186,9 +186,9 @@ pub_test! {limbs_matrix_2_2_mul_small(
             limbs_mul_greater_to_out(t0, ys10, t1_0, &mut mul_scratch);
             limbs_mul_greater_to_out(t1, ys01, scratch, &mut mul_scratch);
         }
-        let (t0_last, t0_init) = t0[..out_len + 1].split_last_mut().unwrap();
+        let (t0_last, t0_init) = t0[..=out_len].split_last_mut().unwrap();
         *t0_last = Limb::from(limbs_slice_add_same_length_in_place_left(t0_init, p0));
-        let (t1_last, t1_init) = t1[..out_len + 1].split_last_mut().unwrap();
+        let (t1_last, t1_init) = t1[..=out_len].split_last_mut().unwrap();
         *t1_last = Limb::from(limbs_slice_add_same_length_in_place_left(t1_init, p1));
         t0 = &mut *xs10;
         t1 = &mut *xs11;
@@ -267,11 +267,11 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     let (u0, u1) = remainder.split_at_mut(sum_len + 1);
     let u1 = &mut u1[..sum_len + 2];
     let xs00_lo = &xs00[..xs_len];
-    let xs01_lo = &mut xs01[..xs_len + 1];
+    let xs01_lo = &mut xs01[..=xs_len];
     let (xs01_lo_last, xs01_lo_init) = xs01_lo.split_last_mut().unwrap();
-    let xs10 = &mut xs10[..sum_len + 1];
+    let xs10 = &mut xs10[..=sum_len];
     let xs10_lo = &xs10[..xs_len];
-    let xs11 = &mut xs11[..sum_len + 1];
+    let xs11 = &mut xs11[..=sum_len];
     let xs11_lo = &mut xs11[..xs_len];
     // u5 = s5 * t6
     let mut mul_scratch = vec![
@@ -343,12 +343,12 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     }
     assert!(xs11[sum_len] < 4);
     *u0_last = 0;
-    x11_sign = if x01_sign != t0_sign {
-        limbs_sub_abs_same_length_in_place_right(u0, xs11)
-    } else {
+    x11_sign = if x01_sign == t0_sign {
         // u3 + u5
         assert!(!limbs_slice_add_same_length_in_place_left(xs11, u0));
         false
+    } else {
+        limbs_sub_abs_same_length_in_place_right(u0, xs11)
     };
     let (t0_last, t0_init) = t0.split_last_mut().unwrap();
     if t0_sign {
@@ -373,7 +373,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // u3 + u5 + u6
     assert!(xs10[sum_len] < 4);
     x11_sign =
-        limbs_add_signed_same_length_in_place_left(xs11, x11_sign, &u1[..sum_len + 1], u1_sign);
+        limbs_add_signed_same_length_in_place_left(xs11, x11_sign, &u1[..=sum_len], u1_sign);
     // -u2 + u3 + u5
     assert!(xs11[sum_len] < 3);
     // u4 = s4 * t5

@@ -521,9 +521,10 @@ impl SubMulAssign<Natural, Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: Natural, z: Natural) {
-        if self.sub_mul_assign_no_panic(y, z) {
-            panic!("Natural sub_mul_assign cannot have a negative result");
-        }
+        assert!(
+            !self.sub_mul_assign_no_panic(y, z),
+            "Natural sub_mul_assign cannot have a negative result"
+        );
     }
 }
 
@@ -560,9 +561,10 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
-        if self.sub_mul_assign_val_ref_no_panic(y, z) {
-            panic!("Natural sub_mul_assign cannot have a negative result");
-        }
+        assert!(
+            !self.sub_mul_assign_val_ref_no_panic(y, z),
+            "Natural sub_mul_assign cannot have a negative result"
+        );
     }
 }
 
@@ -599,9 +601,10 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
-        if self.sub_mul_assign_ref_val_no_panic(y, z) {
-            panic!("Natural sub_mul_assign cannot have a negative result");
-        }
+        assert!(
+            !self.sub_mul_assign_ref_val_no_panic(y, z),
+            "Natural sub_mul_assign cannot have a negative result"
+        );
     }
 }
 
@@ -638,8 +641,9 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
-        if self.sub_mul_assign_ref_ref_no_panic(y, z) {
-            panic!("Natural sub_mul_assign cannot have a negative result");
-        }
+        assert!(
+            !self.sub_mul_assign_ref_ref_no_panic(y, z),
+            "Natural sub_mul_assign cannot have a negative result"
+        );
     }
 }

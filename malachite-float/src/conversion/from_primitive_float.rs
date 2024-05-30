@@ -35,7 +35,7 @@ impl Float {
     /// Converts a primitive float to a [`Float`]. If the [`Float`] is nonzero and finite, it has
     /// the specified precision. If rounding is needed, the specified rounding mode is used. An
     /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
-    /// or greater than the original value. (Although a NaN is not comparable to anything,
+    /// or greater than the original value. (Although a NaN is not comparable to any [`Float`],
     /// converting a NaN to a NaN will also return `Equal`, indicating an exact conversion.)
     ///
     /// If you're only using `Nearest`, try using [`Float::from_primitive_float_prec`] instead.
@@ -85,8 +85,8 @@ impl Float {
     /// Converts a primitive float to a [`Float`]. If the [`Float`] is nonzero and finite, it has
     /// the specified precision. An [`Ordering`] is also returned, indicating whether the returned
     /// value is less than, equal to, or greater than the original value. (Although a NaN is not
-    /// comparable to anything, converting a NaN to a NaN will also return `Equal`, indicating an
-    /// exact conversion.)
+    /// comparable to any [`Float`], converting a NaN to a NaN will also return `Equal`, indicating
+    /// an exact conversion.)
     ///
     /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_primitive_float_prec_round`].

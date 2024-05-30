@@ -19,7 +19,7 @@ fn test_iterator_cache() {
     assert_eq!(xs.known_len(), Some(0));
     assert_eq!(xs.get(0), None);
 
-    let mut xs = IteratorCache::new([1, 2, 3].iter().cloned());
+    let mut xs = IteratorCache::new([1, 2, 3].iter().copied());
     assert_eq!(xs.known_len(), None);
     assert_eq!(xs.get(1), Some(&2));
     assert_eq!(xs.assert_get(1), &2);

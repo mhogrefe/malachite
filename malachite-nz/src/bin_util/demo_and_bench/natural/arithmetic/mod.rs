@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    abs_diff::register(runner);
     add::register(runner);
     add_mul::register(runner);
     binomial_coefficient::register(runner);
@@ -77,6 +78,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sub_mul::register(runner);
 }
 
+mod abs_diff;
 mod add;
 mod add_mul;
 mod binomial_coefficient;

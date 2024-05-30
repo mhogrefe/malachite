@@ -238,7 +238,7 @@ fn test_mod_power_of_2_sub() {
         "5708990430541473157891818604560539975629668416",
         165,
         "46762343404498631680132551366007801946215309901791",
-    )
+    );
 }
 
 #[test]
@@ -257,20 +257,20 @@ fn mod_power_of_2_sub_fail() {
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_power_of_2_sub_assign(Natural::ONE, 0)
+        x.mod_power_of_2_sub_assign(Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_sub_assign(Natural::ZERO, 0)
+        x.mod_power_of_2_sub_assign(Natural::ZERO, 0);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_power_of_2_sub_assign(&Natural::ONE, 0)
+        x.mod_power_of_2_sub_assign(&Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_sub_assign(&Natural::ZERO, 0)
+        x.mod_power_of_2_sub_assign(&Natural::ZERO, 0);
     });
 }
 

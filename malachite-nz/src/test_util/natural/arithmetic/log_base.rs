@@ -86,7 +86,7 @@ fn log_by_squaring_helper(x: &Natural, base: &Natural) -> (u64, bool) {
             }
             Less => {
                 test_power = new_test_power;
-                log.set_bit(u64::exact_from(i))
+                log.set_bit(u64::exact_from(i));
             }
             _ => {}
         }

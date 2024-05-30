@@ -255,7 +255,7 @@ impl Natural {
         match *self {
             Natural::ZERO => Vec::new(),
             Natural(Small(small)) => vec![small],
-            Natural(Large(ref limbs)) => limbs.iter().cloned().rev().collect(),
+            Natural(Large(ref limbs)) => limbs.iter().copied().rev().collect(),
         }
     }
 

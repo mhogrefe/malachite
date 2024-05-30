@@ -372,9 +372,7 @@ where
         (Natural(Small(ref mut small)), bits) => small.shr_round_assign(bits, rm),
         (Natural(Large(ref mut limbs)), bits) => {
             let (b, o) = limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm);
-            if !b {
-                panic!("Right shift is not exact.");
-            }
+            assert!(b, "Right shift is not exact.");
             x.trim();
             o
         }

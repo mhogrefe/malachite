@@ -434,7 +434,7 @@ fn from_sign_and_naturals_properties() {
         assert_eq!(
             Rational::from_sign_and_naturals_ref(true, &n, &Natural::ONE),
             n
-        )
+        );
     });
 }
 

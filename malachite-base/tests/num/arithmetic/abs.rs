@@ -64,7 +64,7 @@ fn abs_assign_properties_signed_helper<
         assert_eq!(abs, n.abs());
         assert_eq!(abs.abs(), abs);
         assert_eq!(abs == n, n >= S::ZERO);
-        assert_eq!(S::exact_from(n.unsigned_abs()), abs)
+        assert_eq!(S::exact_from(n.unsigned_abs()), abs);
     });
 }
 

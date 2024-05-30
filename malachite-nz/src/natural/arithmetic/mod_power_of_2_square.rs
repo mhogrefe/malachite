@@ -500,7 +500,7 @@ impl ModPowerOf2SquareAssign for Natural {
                     x_double.mod_power_of_2_square(pow)
                 } else {
                     x_double.square()
-                })
+                });
             }
             Natural(Large(ref mut xs)) => {
                 *xs = limbs_mod_power_of_2_square(xs, pow);

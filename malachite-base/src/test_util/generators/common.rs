@@ -134,7 +134,7 @@ impl<T> Generator<T> {
             test,
             LARGE_LIMIT,
             exhaustive_limit,
-        )
+        );
     }
 
     pub fn test_properties_with_config<F: FnMut(T)>(&self, config: &GenConfig, test: F) {

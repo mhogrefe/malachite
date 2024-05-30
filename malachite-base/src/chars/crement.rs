@@ -93,7 +93,7 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
 #[inline]
 pub fn increment_char(c: &mut char) {
     *c = contiguous_range_to_char(char_to_contiguous_range(*c) + 1)
-        .expect("Cannot increment char::MAX")
+        .expect("Cannot increment char::MAX");
 }
 
 /// Decrements this [`char`], skipping over the [surrogate code

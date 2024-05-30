@@ -103,23 +103,23 @@ fn floor_root_ref_fail() {
 fn floor_root_assign_fail() {
     assert_panic!({
         let mut x = Integer::ONE;
-        x.floor_root_assign(0)
+        x.floor_root_assign(0);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.floor_root_assign(0)
+        x.floor_root_assign(0);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.floor_root_assign(2)
+        x.floor_root_assign(2);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.floor_root_assign(4)
+        x.floor_root_assign(4);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.floor_root_assign(100)
+        x.floor_root_assign(100);
     });
 }
 
@@ -202,23 +202,23 @@ fn ceiling_root_ref_fail() {
 fn ceiling_root_assign_fail() {
     assert_panic!({
         let mut x = Integer::ONE;
-        x.ceiling_root_assign(0)
+        x.ceiling_root_assign(0);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.ceiling_root_assign(0)
+        x.ceiling_root_assign(0);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.ceiling_root_assign(2)
+        x.ceiling_root_assign(2);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.ceiling_root_assign(4)
+        x.ceiling_root_assign(4);
     });
     assert_panic!({
         let mut x = Integer::NEGATIVE_ONE;
-        x.ceiling_root_assign(100)
+        x.ceiling_root_assign(100);
     });
 }
 

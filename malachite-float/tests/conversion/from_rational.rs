@@ -830,10 +830,10 @@ fn from_rational_prec_round_properties() {
         assert_eq!(float_x.partial_cmp(&x), Some(o));
         match (x >= 0, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater)
+                assert_ne!(o, Greater);
             }
             (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less)
+                assert_ne!(o, Less);
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}

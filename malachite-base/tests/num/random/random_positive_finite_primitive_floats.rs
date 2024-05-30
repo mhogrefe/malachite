@@ -25,7 +25,7 @@ fn random_positive_finite_primitive_floats_helper<T: CheckedToF64 + PrimitiveFlo
         expected_common_values,
         expected_median,
         expected_moment_stats,
-    )
+    );
 }
 
 #[test]

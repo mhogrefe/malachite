@@ -275,7 +275,7 @@ fn first_block_primesieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
     let mut i = if limbs == 0 {
         0
     } else {
-        fill_bitpattern(&mut bit_array[1..limbs + 1], 0)
+        fill_bitpattern(&mut bit_array[1..=limbs], 0)
     };
     bit_array[0] = sieve_seed;
     if (bits + 1) & T::WIDTH_MASK != 0 {
@@ -311,7 +311,7 @@ fn first_block_primesieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
                 while lindex <= bits {
                     bit_array[usize::exact_from(lindex >> T::LOG_WIDTH)] |= lmask;
                     lmask.rotate_left_assign(maskrot);
-                    lindex += step
+                    lindex += step;
                 }
             }
             mask <<= 1;

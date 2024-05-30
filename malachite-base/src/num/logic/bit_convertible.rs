@@ -60,9 +60,11 @@ fn from_bits_desc_unsigned<T: PrimitiveUnsigned, I: Iterator<Item = bool>>(bits:
     let mut n = T::ZERO;
     let high_mask = T::power_of_2(T::WIDTH - 1);
     for bit in bits {
-        if n & high_mask != T::ZERO {
-            panic!("Bits cannot fit in integer of type {}", T::NAME);
-        }
+        assert!(
+            n & high_mask == T::ZERO,
+            "Bits cannot fit in integer of type {}",
+            T::NAME
+        );
         n <<= 1;
         if bit {
             n |= T::ONE;
@@ -277,9 +279,11 @@ fn from_bits_desc_signed<
             sign_bit = bit;
             first = false;
         } else {
-            if n & high_mask != U::ZERO {
-                panic!("Bits cannot fit in integer of type {}", S::NAME);
-            }
+            assert!(
+                n & high_mask == U::ZERO,
+                "Bits cannot fit in integer of type {}",
+                S::NAME
+            );
             n <<= 1;
             if bit != sign_bit {
                 n |= U::ONE;

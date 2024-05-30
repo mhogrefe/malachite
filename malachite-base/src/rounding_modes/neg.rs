@@ -71,7 +71,7 @@ impl NegAssign for RoundingMode {
         if *self == Floor {
             *self = Ceiling;
         } else if *self == Ceiling {
-            *self = Floor
+            *self = Floor;
         }
     }
 }

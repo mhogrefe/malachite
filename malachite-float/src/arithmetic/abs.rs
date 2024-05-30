@@ -316,11 +316,8 @@ impl AbsAssign for Float {
     /// assert_eq!(x, Float::ONE);
     /// ```
     fn abs_assign(&mut self) {
-        match self {
-            Float(Infinity { sign }) | Float(Zero { sign }) | Float(Finite { sign, .. }) => {
-                *sign = true;
-            }
-            _ => {}
+        if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
+            *sign = true;
         }
     }
 }

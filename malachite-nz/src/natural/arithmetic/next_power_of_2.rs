@@ -36,7 +36,7 @@ pub_test! {limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
         out = vec![0; xs_init.len()];
         if x == *xs_last && !slice_test_zero(xs_init) {
             if let Some(x) = x.arithmetic_checked_shl(1) {
-                out.push(x)
+                out.push(x);
             } else {
                 out.push(0);
                 out.push(1);

@@ -20,7 +20,7 @@ impl FromSciStringHelper for Integer {
             cs = &cs[1..];
             // If the string begins with a '+', the second character cannot be '+' or '-'
             match cs {
-                [] | [b'+', ..] | [b'-', ..] => return None,
+                [] | [b'+' | b'-', ..] => return None,
                 _ => {}
             }
         }

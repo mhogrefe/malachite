@@ -29,9 +29,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
     /// use malachite_float::Float;
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Float::NAN.to_significand(), None);
@@ -66,9 +70,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
     /// use malachite_float::Float;
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Float::NAN.into_significand(), None);
@@ -106,9 +114,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
     /// use malachite_float::Float;
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Float::NAN.significand_ref(), None);

@@ -145,15 +145,15 @@ fn mod_mul_fail() {
 fn mod_mul_assign_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
         let mut x = T::ZERO;
-        x.mod_mul_assign(T::ZERO, T::ZERO)
+        x.mod_mul_assign(T::ZERO, T::ZERO);
     });
     assert_panic!({
         let mut x = T::from(123u8);
-        x.mod_mul_assign(T::from(200u8), T::from(200u8))
+        x.mod_mul_assign(T::from(200u8), T::from(200u8));
     });
     assert_panic!({
         let mut x = T::from(200u8);
-        x.mod_mul_assign(T::from(123u8), T::from(200u8))
+        x.mod_mul_assign(T::from(123u8), T::from(200u8));
     });
 }
 

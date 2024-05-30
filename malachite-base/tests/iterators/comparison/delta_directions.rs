@@ -17,7 +17,7 @@ fn delta_directions_helper(xs: &[u8], result: &[Ordering]) {
         delta_directions(xs.iter().rev())
             .map(Ordering::reverse)
             .collect_vec(),
-        result.iter().cloned().rev().collect_vec()
+        result.iter().copied().rev().collect_vec()
     );
 }
 

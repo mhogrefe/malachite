@@ -173,20 +173,20 @@ fn mod_power_of_2_mul_fail() {
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_power_of_2_mul_assign(Natural::ONE, 0)
+        x.mod_power_of_2_mul_assign(Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_mul_assign(Natural::ZERO, 0)
+        x.mod_power_of_2_mul_assign(Natural::ZERO, 0);
     });
 
     assert_panic!({
         let mut x = Natural::ZERO;
-        x.mod_power_of_2_mul_assign(&Natural::ONE, 0)
+        x.mod_power_of_2_mul_assign(&Natural::ONE, 0);
     });
     assert_panic!({
         let mut x = Natural::ONE;
-        x.mod_power_of_2_mul_assign(&Natural::ZERO, 0)
+        x.mod_power_of_2_mul_assign(&Natural::ZERO, 0);
     });
 }
 
@@ -273,7 +273,7 @@ fn mod_power_of_2_mul_properties() {
             assert_eq!(x.mod_power_of_2_mul(Natural::ONE, pow), *x);
             assert_eq!(Natural::ONE.mod_power_of_2_mul(x, pow), *x);
         }
-        assert_eq!(x.mod_power_of_2_mul(x, pow), x.mod_power_of_2_square(pow))
+        assert_eq!(x.mod_power_of_2_mul(x, pow), x.mod_power_of_2_square(pow));
     });
 
     natural_natural_natural_unsigned_quadruple_gen_var_2().test_properties(

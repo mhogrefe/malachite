@@ -25,7 +25,7 @@ fn helper(d: &str, a: &str, b: &str, out: &str) {
         .collect_vec()
         .to_debug_string(),
         out
-    )
+    );
 }
 
 #[test]

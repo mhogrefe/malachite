@@ -148,9 +148,7 @@ fn assign_bits_signed<
     if *x >= T::ZERO {
         let mut abs_x = x.unsigned_abs();
         abs_x.assign_bits(start, end, bits);
-        if abs_x.get_highest_bit() {
-            panic!("{}", ERROR_MESSAGE);
-        }
+        assert!(!abs_x.get_highest_bit(), "{ERROR_MESSAGE}");
         *x = T::wrapping_from(abs_x);
     } else {
         let width = T::WIDTH - 1;
@@ -160,9 +158,7 @@ fn assign_bits_signed<
         if bits_width > width + 1 {
             panic!("{}", ERROR_MESSAGE);
         } else if start >= width {
-            if bits != max.mod_power_of_2(bits_width) {
-                panic!("{}", ERROR_MESSAGE);
-            }
+            assert!(bits == max.mod_power_of_2(bits_width), "{ERROR_MESSAGE}");
         } else {
             let lower_width = width - start;
             if end > width && bits >> lower_width != max.mod_power_of_2(end - width) {

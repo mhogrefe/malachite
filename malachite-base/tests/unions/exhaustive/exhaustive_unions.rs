@@ -109,7 +109,7 @@ fn test_exhaustive_union2s() {
         ],
     );
     exhaustive_union2s_helper(
-        ['a', 'b', 'c'].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
         exhaustive_orderings(),
         6,
         &[
@@ -222,8 +222,8 @@ fn test_exhaustive_union3s() {
         ],
     );
     exhaustive_union3s_helper(
-        ['a', 'b', 'c'].iter().cloned(),
-        ["xx", "yy", "zz"].iter().cloned(),
+        ['a', 'b', 'c'].iter().copied(),
+        ["xx", "yy", "zz"].iter().copied(),
         0..3,
         9,
         &[

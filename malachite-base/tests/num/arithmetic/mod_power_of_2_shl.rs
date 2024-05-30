@@ -63,11 +63,11 @@ fn mod_power_of_2_shl_assign_fail_helper<
 >() {
     assert_panic!({
         let mut x = T::ONE;
-        x.mod_power_of_2_shl_assign(U::TWO, 0)
+        x.mod_power_of_2_shl_assign(U::TWO, 0);
     });
     assert_panic!({
         let mut x = T::from(200u8);
-        x.mod_power_of_2_shl_assign(U::TWO, 7)
+        x.mod_power_of_2_shl_assign(U::TWO, 7);
     });
 }
 

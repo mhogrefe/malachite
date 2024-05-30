@@ -1301,7 +1301,7 @@ pub fn special_random_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
                             config.get_or("small_unsigned_mean_n", 32),
                             config.get_or("small_unsigned_mean_d", 1),
                         )
-                        .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
+                        .filter_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
                     },
                 )
             },
@@ -2473,9 +2473,9 @@ pub fn special_random_natural_triple_gen_var_3(
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .flat_map(|(x, y, z)| {
+        .map(|(x, y, z)| {
             let z = max(&x, &y) + z + Natural::ONE;
-            Some((x, y, z))
+            (x, y, z)
         }),
     )
 }
@@ -2597,7 +2597,7 @@ pub fn special_random_natural_quadruple_gen_var_1(
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .flat_map(|(x, y, z, w)| {
+        .filter_map(|(x, y, z, w)| {
             let ranking = [(&x, 0), (&y, 1), (&z, 2), (&w, 3)];
             let (hi, next_hi) = get_two_highest(&ranking);
             if hi.0 == next_hi.0 {
@@ -4968,7 +4968,7 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_27(
                 )
             },
         )
-        .flat_map(|(mut xs, mut pow)| {
+        .filter_map(|(mut xs, mut pow)| {
             let xs_last = xs.last_mut().unwrap();
             *xs_last = xs_last.checked_add(1)?;
             pow += limbs_significant_bits_helper(&xs);
@@ -5646,7 +5646,7 @@ fn special_random_square_helper<T: PrimitiveUnsigned, F: Fn(usize) -> bool>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(move |(o, x)| {
+        .filter_map(move |(o, x)| {
             let x = x.checked_add(min_x)?;
             let ux = usize::exact_from(x);
             if valid(ux) {
@@ -6148,7 +6148,7 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_20(
                     config.get_or("mean_length_n", 4),
                     config.get_or("mean_length_d", 1),
                 )
-                .flat_map(|mut xs| {
+                .filter_map(|mut xs| {
                     let last_x = xs.last_mut().unwrap();
                     *last_x = last_x.checked_add(1)?;
                     Some(xs)
@@ -6196,7 +6196,7 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_21(
                 )
             },
         )
-        .flat_map(|(mut xs, mut es, pow)| {
+        .filter_map(|(mut xs, mut es, pow)| {
             let last_e = es.last_mut().unwrap();
             *last_e = last_e.checked_add(1)?;
             if es == [1] {
@@ -6231,7 +6231,7 @@ fn special_random_mul_helper<T: PrimitiveUnsigned, F: Fn(usize, usize) -> bool>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(move |(o, x, y)| {
+        .filter_map(move |(o, x, y)| {
             let x = x.checked_add(min_x)?;
             let y = y.checked_add(min_y)?;
             if valid(usize::exact_from(x), usize::exact_from(y)) {
@@ -6404,7 +6404,7 @@ fn special_random_mul_same_length_helper<T: PrimitiveUnsigned, F: Fn(usize, usiz
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(move |(o, x)| {
+        .filter_map(move |(o, x)| {
             let x = x.checked_add(min_x)?;
             let ux = usize::exact_from(x);
             if valid(ux, ux) {
@@ -6951,7 +6951,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_60<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .flat_map(move |(o, mut x, mut y)| {
+        .filter_map(move |(o, mut x, mut y)| {
             let sum = x + y;
             if sum <= limit {
                 if o.odd() {
@@ -7325,7 +7325,7 @@ pub fn special_random_large_type_gen_var_6(
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
             ))
-            .flat_map(|(x, y, z)| {
+            .filter_map(|(x, y, z)| {
                 let xs_len = x;
                 let ys_len = x.checked_add(1)?.checked_add(y)?;
                 let out_len = x.checked_add(1)?.checked_add(z)?;

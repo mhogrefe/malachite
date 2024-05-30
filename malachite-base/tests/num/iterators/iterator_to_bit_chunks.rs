@@ -19,7 +19,7 @@ fn iterator_to_bit_chunks_helper<T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wr
     out: &[U],
 ) {
     assert_eq!(
-        iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), in_chunk_size, out_chunk_size)
+        iterator_to_bit_chunks::<_, T, U>(xs.iter().copied(), in_chunk_size, out_chunk_size)
             .map(Option::unwrap)
             .collect_vec()
             .as_slice(),
@@ -119,16 +119,16 @@ fn test_iterator_to_bit_chunks_fail_helper<
 >() {
     let xs = [T::exact_from(12), T::exact_from(34)];
     assert_panic!({
-        iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), 0, 4);
+        iterator_to_bit_chunks::<_, T, U>(xs.iter().copied(), 0, 4);
     });
     assert_panic!({
-        iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), 4, 0);
+        iterator_to_bit_chunks::<_, T, U>(xs.iter().copied(), 4, 0);
     });
     assert_panic!({
-        iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), T::WIDTH + 1, 4);
+        iterator_to_bit_chunks::<_, T, U>(xs.iter().copied(), T::WIDTH + 1, 4);
     });
     assert_panic!({
-        iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), 4, U::WIDTH + 1);
+        iterator_to_bit_chunks::<_, T, U>(xs.iter().copied(), 4, U::WIDTH + 1);
     });
 }
 

@@ -212,7 +212,7 @@ pub_test! {limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn square_using_basecase_mul(out: &mut [Limb], xs: &[Limb]) {
-    limbs_mul_greater_to_out_basecase(out, xs, xs)
+    limbs_mul_greater_to_out_basecase(out, xs, xs);
 }
 
 // # Worst-case complexity
@@ -222,7 +222,7 @@ fn square_using_basecase_mul(out: &mut [Limb], xs: &[Limb]) {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
 fn limbs_redc_limb_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]) {
-    limbs_redc_limb(out, xs, ms, is[0])
+    limbs_redc_limb(out, xs, ms, is[0]);
 }
 
 // # Worst-case complexity
@@ -232,7 +232,7 @@ fn limbs_redc_limb_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
 fn limbs_redc_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]) {
-    limbs_redc(out, xs, ms, is)
+    limbs_redc(out, xs, ms, is);
 }
 
 // # Worst-case complexity
@@ -275,11 +275,11 @@ fn select_fns(
                 &|out, xs, ys| {
                     let mut mul_scratch =
                         vec![0; limbs_mul_same_length_to_out_scratch_len(xs.len())];
-                    limbs_mul_same_length_to_out(out, xs, ys, &mut mul_scratch)
+                    limbs_mul_same_length_to_out(out, xs, ys, &mut mul_scratch);
                 },
                 &|out, xs| {
                     let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
-                    limbs_square_to_out(out, xs, &mut square_scratch)
+                    limbs_square_to_out(out, xs, &mut square_scratch);
                 },
                 &limbs_redc_helper,
             )
@@ -300,11 +300,11 @@ fn select_fns(
         (
             &|out, xs, ys| {
                 let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(xs.len())];
-                limbs_mul_same_length_to_out(out, xs, ys, &mut mul_scratch)
+                limbs_mul_same_length_to_out(out, xs, ys, &mut mul_scratch);
             },
             &|out, xs| {
                 let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
-                limbs_square_to_out(out, xs, &mut square_scratch)
+                limbs_square_to_out(out, xs, &mut square_scratch);
             },
             if ms_len < REDC_1_TO_REDC_N_THRESHOLD {
                 &limbs_redc_limb_helper
@@ -971,11 +971,11 @@ impl ModPowAssign<Natural, Natural> for Natural {
         match (&mut *self, &exp, &m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
+            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
-                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+                x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
                 let ms = m.promote_in_place();
@@ -1029,11 +1029,11 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
         match (&mut *self, &exp, m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
+            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
-                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+                x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
                 let ms = m.to_limbs_asc();
@@ -1087,11 +1087,11 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
         match (&mut *self, exp, &m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
+            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
-                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+                x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
                 let ms = m.promote_in_place();
@@ -1140,11 +1140,11 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
         match (&mut *self, exp, m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
+            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
-                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+                x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
                 let ms = m.to_limbs_asc();

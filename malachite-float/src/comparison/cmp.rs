@@ -134,18 +134,16 @@ impl<'a> Ord for ComparableFloatRef<'a> {
             (Float(Zero { sign: s_x }), Float(Zero { sign: s_y })) => s_x.cmp(s_y),
             (float_infinity!(), _) | (_, float_negative_infinity!()) => Greater,
             (float_negative_infinity!(), _) | (_, float_infinity!()) => Less,
-            (float_nan!(), Float(Finite { sign, .. }))
-            | (float_nan!(), Float(Zero { sign }))
-            | (float_either_zero!(), Float(Finite { sign, .. })) => {
+            (Float(NaN | Zero { .. }), Float(Finite { sign, .. }))
+            | (Float(NaN), Float(Zero { sign })) => {
                 if *sign {
                     Less
                 } else {
                     Greater
                 }
             }
-            (Float(Finite { sign, .. }), float_nan!())
-            | (Float(Zero { sign }), float_nan!())
-            | (Float(Finite { sign, .. }), float_either_zero!()) => {
+            (Float(Finite { sign, .. } | Zero { sign }), Float(NaN))
+            | (Float(Finite { sign, .. }), Float(Zero { .. })) => {
                 if *sign {
                     Greater
                 } else {

@@ -263,14 +263,14 @@ where
             digits
         );
         assert_eq!(
-            Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+            Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap(),
             *n
         );
         if *n != 0 {
             assert_ne!(*digits.last().unwrap(), T::ZERO);
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             n.to_power_of_2_digits_desc(log_base)
         );
         if *n != Natural::ZERO {
@@ -285,7 +285,7 @@ where
 
         assert_eq!(
             PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(n, log_base),
-            digits.iter().cloned().map(Natural::from).collect_vec()
+            digits.iter().copied().map(Natural::from).collect_vec()
         );
     });
 
@@ -334,14 +334,14 @@ where
     natural_unsigned_pair_gen_var_6::<T>().test_properties(|(ref n, log_base)| {
         let digits = n.to_power_of_2_digits_desc(log_base);
         assert_eq!(
-            Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+            Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap(),
             *n
         );
         if *n != 0 {
             assert_ne!(digits[0], T::ZERO);
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             n.to_power_of_2_digits_asc(log_base)
         );
         if *n != Natural::ZERO {
@@ -356,7 +356,7 @@ where
 
         assert_eq!(
             PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(n, log_base),
-            digits.iter().cloned().map(Natural::from).collect_vec()
+            digits.iter().copied().map(Natural::from).collect_vec()
         );
     });
 

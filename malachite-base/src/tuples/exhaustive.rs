@@ -192,9 +192,8 @@ macro_rules! lex_tuples {
                         return false;
                     } else if i == 0 {
                         return true;
-                    } else {
-                        *counter = 0;
                     }
+                    *counter = 0;
                 }
                 false
             }
@@ -280,9 +279,8 @@ macro_rules! lex_tuples {
                         return false;
                     } else if i == 0 {
                         return true;
-                    } else {
-                        *counter = 0;
                     }
+                    *counter = 0;
                 }
                 false
             }
@@ -453,9 +451,8 @@ macro_rules! lex_custom_tuples {
                         return false;
                     } else if i == 0 {
                         return true;
-                    } else {
-                        *counter = 0;
                     }
+                    *counter = 0;
                 }
                 false
             }
@@ -1524,9 +1521,8 @@ impl<
                 if self.advance_xs() {
                     self.done = true;
                     return None;
-                } else {
-                    new_ys = true;
                 }
+                new_ys = true;
             }
             loop {
                 if let Some(y) = self.ys.as_mut().unwrap().next() {
@@ -1534,9 +1530,8 @@ impl<
                 } else if self.stop_after_empty_ys && new_ys || self.advance_xs() {
                     self.done = true;
                     return None;
-                } else {
-                    new_ys = true;
                 }
+                new_ys = true;
             }
         }
     }
@@ -1794,12 +1789,11 @@ impl<
                 } else if self.stop_after_empty_ys && t.2 {
                     self.done = true;
                     return None;
-                } else {
-                    self.xs_yss.remove(i);
-                    if self.xs_done && self.xs_yss.is_empty() {
-                        self.done = true;
-                        return None;
-                    }
+                }
+                self.xs_yss.remove(i);
+                if self.xs_done && self.xs_yss.is_empty() {
+                    self.done = true;
+                    return None;
                 }
             }
         }

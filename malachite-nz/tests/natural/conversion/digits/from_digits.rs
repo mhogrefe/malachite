@@ -1098,7 +1098,7 @@ where
         |(xs, base)| {
             let t_base = T::exact_from(base);
             assert_eq!(
-                from_digits_asc_limb(xs.iter().cloned(), base).is_some(),
+                from_digits_asc_limb(xs.iter().copied(), base).is_some(),
                 xs.iter().all(|&x| x < t_base)
             );
         },
@@ -1107,7 +1107,7 @@ where
     unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
-            let n = from_digits_asc_limb(xs.iter().cloned(), base);
+            let n = from_digits_asc_limb(xs.iter().copied(), base);
             assert_eq!(
                 from_digits_desc_naive_primitive(
                     &xs.into_iter().rev().collect_vec(),
@@ -1216,7 +1216,7 @@ where
         |(xs, base)| {
             let t_base = T::exact_from(base);
             assert_eq!(
-                from_digits_desc_limb(xs.iter().cloned(), base).is_some(),
+                from_digits_desc_limb(xs.iter().copied(), base).is_some(),
                 xs.iter().all(|&x| x < t_base)
             );
         },
@@ -1225,7 +1225,7 @@ where
     unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
-            let n = from_digits_desc_limb(xs.iter().cloned(), base);
+            let n = from_digits_desc_limb(xs.iter().copied(), base);
             assert_eq!(
                 from_digits_desc_naive_primitive(&xs, T::exact_from(base)),
                 n
@@ -1536,7 +1536,7 @@ where
         |(xs, base)| {
             let t_base = T::exact_from(base);
             assert_eq!(
-                Natural::from_digits_asc(&base, xs.iter().cloned()).is_some(),
+                Natural::from_digits_asc(&base, xs.iter().copied()).is_some(),
                 xs.iter().all(|&x| x < t_base)
             );
         },
@@ -1545,9 +1545,9 @@ where
     unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties_with_config(
         &config,
         |(digits, base)| {
-            let n = Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap();
+            let n = Natural::from_digits_asc(&base, digits.iter().copied()).unwrap();
             assert_eq!(
-                Natural::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
+                Natural::from_digits_desc(&base, digits.iter().rev().copied()).unwrap(),
                 n
             );
             let trailing_zeros = slice_trailing_zeros(&digits);
@@ -1650,7 +1650,7 @@ where
         |(xs, base)| {
             let t_base = T::exact_from(base);
             assert_eq!(
-                Natural::from_digits_desc(&base, xs.iter().cloned()).is_some(),
+                Natural::from_digits_desc(&base, xs.iter().copied()).is_some(),
                 xs.iter().all(|&x| x < t_base)
             );
         },
@@ -1659,9 +1659,9 @@ where
     unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties_with_config(
         &config,
         |(digits, base)| {
-            let n = Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap();
+            let n = Natural::from_digits_desc(&base, digits.iter().copied()).unwrap();
             assert_eq!(
-                Natural::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),
+                Natural::from_digits_asc(&base, digits.iter().rev().copied()).unwrap(),
                 n
             );
             let leading_zeros = slice_leading_zeros(&digits);

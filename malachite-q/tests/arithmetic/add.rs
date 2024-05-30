@@ -156,7 +156,7 @@ fn add_properties() {
         assert_eq!(x + Rational::ZERO, *x);
         assert_eq!(Rational::ZERO + x, *x);
         assert_eq!(x + x, x << 1);
-        assert_eq!(x + (-x), 0)
+        assert_eq!(x + (-x), 0);
     });
 
     rational_triple_gen().test_properties(|(x, y, z)| {

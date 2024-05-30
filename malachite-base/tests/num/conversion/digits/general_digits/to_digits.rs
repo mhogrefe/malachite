@@ -96,7 +96,7 @@ fn to_digits_asc_helper<
             assert_ne!(*digits.last().unwrap(), U::ZERO);
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             u.to_digits_desc(&base)
         );
         if u != T::ZERO {
@@ -142,7 +142,7 @@ fn to_digits_desc_helper<
             assert_ne!(digits[0], U::ZERO);
         }
         assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
+            digits.iter().copied().rev().collect_vec(),
             u.to_digits_asc(&base)
         );
         if u != T::ZERO {
