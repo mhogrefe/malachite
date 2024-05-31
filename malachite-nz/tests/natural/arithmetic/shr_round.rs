@@ -112,7 +112,7 @@ fn test_limbs_shr_exact_and_limbs_vec_shr_exact_in_place() {
         if limbs_vec_shr_exact_in_place(&mut limbs, bits) {
             assert_eq!(Some(limbs), out);
         } else {
-            assert_eq!(None, out)
+            assert_eq!(None, out);
         }
     };
     test(&[1], 0, Some(vec![1]));
@@ -146,7 +146,7 @@ fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
         if b {
             assert_eq!(Some(limbs.as_slice()), out);
         } else {
-            assert!(out.is_none())
+            assert!(out.is_none());
         }
         assert_eq!(o_alt, o);
     };

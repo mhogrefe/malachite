@@ -164,7 +164,7 @@ fn test_limbs_round_to_multiple_of_power_of_2() {
                 assert_eq!(xs, out.0);
                 assert_eq!(o_alt, out.1);
             },
-        )
+        );
     };
     test(&[1], 0, Nearest, Some((&[1], Equal)));
     test(&[1], 1, Up, Some((&[2], Greater)));

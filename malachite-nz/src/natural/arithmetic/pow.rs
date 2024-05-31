@@ -268,7 +268,7 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
     }
     assert_eq!(
         out as *const [Limb],
-        std::ptr::addr_of!(out_original[leading_zeros_out..]),
+        &out_original[leading_zeros_out..] as *const [Limb]
     );
     out_len + leading_zeros_out
 }

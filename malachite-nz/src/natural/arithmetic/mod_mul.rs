@@ -129,14 +129,14 @@ pub_test! {limbs_mod_mul_two_limbs(
     // at most two subtractions of n, use q as temp space
     let (q_2, q_1, q_0) = Limb::xxx_sub_yyy_to_zzz(w_2, w_1, w_0, 0, m_1, m_0);
     if q_2.get_highest_bit() {
+        (w_1, w_0)
+    } else {
         let (w_2, w_1, w_0) = Limb::xxx_sub_yyy_to_zzz(q_2, q_1, q_0, 0, m_1, m_0);
         if w_2.get_highest_bit() {
             (q_1, q_0)
         } else {
             (w_1, w_0)
         }
-    } else {
-        (w_1, w_0)
     }
 }}
 

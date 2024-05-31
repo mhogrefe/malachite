@@ -34,7 +34,6 @@
     clippy::range_plus_one,
     clippy::redundant_else,
     clippy::semicolon_if_nothing_returned,
-    clippy::borrow_as_ptr,
     clippy::cloned_instead_of_copied,
     clippy::flat_map_option,
     clippy::unnecessary_wraps,

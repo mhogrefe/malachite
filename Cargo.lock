@@ -284,9 +284,9 @@ dependencies = [
 
 [[package]]
 name = "gmp-mpfr-sys"
-version = "1.6.2"
+version = "1.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "362a6cc3cbe9f41aebe49c03b91aee8fa8fc69d32fb90533f6ed965a882e08e3"
+checksum = "74bde44a62a17a9b6a0c197eedb469e4553019c456ed4e61a602f5e3dc5e5941"
 dependencies = [
  "libc",
  "windows-sys",
@@ -415,19 +415,19 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
 name = "malachite"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "embed-doc-image",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-float 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-q 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base",
+ "malachite-float",
+ "malachite-nz",
+ "malachite-q",
  "serde",
 ]
 
 [[package]]
 name = "malachite-base"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "clap",
  "getrandom",
@@ -435,7 +435,7 @@ dependencies = [
  "hashbrown",
  "itertools 0.11.0",
  "libm",
- "malachite-base 0.4.9",
+ "malachite-base",
  "maplit",
  "rand",
  "rand_chacha",
@@ -446,44 +446,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "malachite-base"
-version = "0.4.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c1189508294c7720b50c652670cd0fab596873482f57d31dc2737a02a7bbc34"
-dependencies = [
- "clap",
- "getrandom",
- "gnuplot",
- "hashbrown",
- "itertools 0.11.0",
- "libm",
- "rand",
- "rand_chacha",
- "ryu",
- "sha3",
- "time",
-]
-
-[[package]]
 name = "malachite-criterion-bench"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "criterion",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base",
+ "malachite-nz",
  "num",
  "rug",
 ]
 
 [[package]]
 name = "malachite-float"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base 0.4.9",
- "malachite-float 0.4.9",
- "malachite-nz 0.4.9",
- "malachite-q 0.4.9",
+ "malachite-base",
+ "malachite-float",
+ "malachite-nz",
+ "malachite-q",
  "num",
  "rug",
  "serde",
@@ -491,46 +472,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "malachite-float"
-version = "0.4.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29710862a9df89b7d0c0a9e669579375afffa3ebec33b3fac4f7179a4aaa40db"
-dependencies = [
- "itertools 0.11.0",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-q 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde",
-]
-
-[[package]]
 name = "malachite-nz"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "embed-doc-image",
  "indoc",
  "itertools 0.11.0",
  "libm",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.9",
- "num",
- "pyo3",
- "pyo3-build-config",
- "rug",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "malachite-nz"
-version = "0.4.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95a3eed175b73b3ee4a4e19f4e7ffcc9d6d5c8c485a067d220670da7ba33c365"
-dependencies = [
- "indoc",
- "itertools 0.11.0",
- "libm",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base",
+ "malachite-nz",
  "num",
  "pyo3",
  "pyo3-build-config",
@@ -541,27 +491,12 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-q 0.4.9",
- "num",
- "rug",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "malachite-q"
-version = "0.4.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e0a3652adf704b95a1a8fae715ecf9b001e9e32f015448cec73fe0d84c56943"
-dependencies = [
- "itertools 0.11.0",
- "malachite-base 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base",
+ "malachite-nz",
+ "malachite-q",
  "num",
  "rug",
  "serde",
@@ -685,9 +620,9 @@ checksum = "0ab1bc2a289d34bd04a330323ac98a1b4bc82c9d9fcb1e66b63caa84da26b575"
 
 [[package]]
 name = "parking_lot"
-version = "0.12.2"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e4af0ca4f6caed20e900d564c242b8e5d4903fdacf31d3daf527b66fe6f42fb"
+checksum = "f1bf18183cf54e8d6059647fc3063646a1801cf30896933ec2311622cc4b9a27"
 dependencies = [
  "lock_api",
  "parking_lot_core",
@@ -754,18 +689,18 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.83"
+version = "1.0.84"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b33eb56c327dec362a9e55b3ad14f9d2f0904fb5a5b03b513ab5465399e9f43"
+checksum = "ec96c6a92621310b51366f1e28d05ef11489516e93be030060e5fc12024a49d6"
 dependencies = [
  "unicode-ident",
 ]
 
 [[package]]
 name = "pyo3"
-version = "0.20.3"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53bdbb96d49157e65d45cc287af5f32ffadd5f4761438b527b055fb0d4bb8233"
+checksum = "a5e00b96a521718e08e03b1a622f01c8a8deb50719335de3f60b3b3950f069d8"
 dependencies = [
  "cfg-if",
  "indoc",
@@ -781,9 +716,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-build-config"
-version = "0.20.3"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "deaa5745de3f5231ce10517a1f5dd97d53e5a2fd77aa6b5842292085831d48d7"
+checksum = "7883df5835fafdad87c0d888b266c8ec0f4c9ca48a5bed6bbb592e8dedee1b50"
 dependencies = [
  "once_cell",
  "target-lexicon",
@@ -791,9 +726,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-ffi"
-version = "0.20.3"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62b42531d03e08d4ef1f6e85a2ed422eb678b8cd62b762e53891c05faf0d4afa"
+checksum = "01be5843dc60b916ab4dad1dca6d20b9b4e6ddc8e15f50c47fe6d85f1fb97403"
 dependencies = [
  "libc",
  "pyo3-build-config",
@@ -801,27 +736,27 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros"
-version = "0.20.3"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7305c720fa01b8055ec95e484a6eca7a83c841267f0dd5280f0c8b8551d2c158"
+checksum = "77b34069fc0682e11b31dbd10321cbf94808394c56fd996796ce45217dfac53c"
 dependencies = [
  "proc-macro2",
  "pyo3-macros-backend",
  "quote",
- "syn 2.0.65",
+ "syn 2.0.66",
 ]
 
 [[package]]
 name = "pyo3-macros-backend"
-version = "0.20.3"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c7e9b68bb9c3149c5b0cade5d07f953d6d125eb4337723c4ccdb665f1f96185"
+checksum = "08260721f32db5e1a5beae69a55553f56b99bd0e1c3e6e0a5e8851a9d0f5a85c"
 dependencies = [
  "heck",
  "proc-macro2",
  "pyo3-build-config",
  "quote",
- "syn 2.0.65",
+ "syn 2.0.66",
 ]
 
 [[package]]
@@ -952,9 +887,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "serde"
-version = "1.0.202"
+version = "1.0.203"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "226b61a0d411b2ba5ff6d7f73a476ac4f8bb900373459cd00fab8512828ba395"
+checksum = "7253ab4de971e72fb7be983802300c30b5a7f0c2e56fab8abfc6a214307c0094"
 dependencies = [
  "serde_derive",
 ]
@@ -971,13 +906,13 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.202"
+version = "1.0.203"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6048858004bcff69094cd972ed40a32500f153bd3be9f716b2eed2e8217c4838"
+checksum = "500cbc0ebeb6f46627f50f3f5811ccf6bf00643be300b4c3eabc0ef55dc5b5ba"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.65",
+ "syn 2.0.66",
 ]
 
 [[package]]
@@ -1026,9 +961,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.65"
+version = "2.0.66"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2863d96a84c6439701d7a38f9de935ec562c8832cc55d1dde0f513b52fad106"
+checksum = "c42f3f41a2de00b01c0aaad383c5a45241efc8b2d1eda5661812fda5f3cdcff5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1152,7 +1087,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.65",
+ "syn 2.0.66",
  "wasm-bindgen-shared",
 ]
 
@@ -1174,7 +1109,7 @@ checksum = "e94f17b526d0a461a191c78ea52bbce64071ed5c04c9ffe424dcb38f74171bb7"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.65",
+ "syn 2.0.66",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -1316,5 +1251,5 @@ checksum = "15e934569e47891f7d9411f1a451d947a60e000ab3bd24fbb970f000387d1b3b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.65",
+ "syn 2.0.66",
 ]
