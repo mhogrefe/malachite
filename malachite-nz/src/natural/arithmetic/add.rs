@@ -227,11 +227,16 @@ pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    let mut carry = false;
-    for i in 0..len {
-        out[i] = add_and_carry(xs[i], ys[i], &mut carry);
+    let mut carry = 0;
+
+    for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
+        let result_no_carry = x.wrapping_add(y);
+        let result = result_no_carry.wrapping_add(carry);
+        carry = Limb::from((result_no_carry < x) || (result < result_no_carry));
+        *out = result
     }
-    carry
+
+    carry > 0
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
@@ -353,11 +358,16 @@ pub_crate_test! {
 pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
-    let mut carry = false;
-    for i in 0..xs_len {
-        xs[i] = add_and_carry(xs[i], ys[i], &mut carry);
+    let mut carry = 0;
+
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let result_no_carry = (*x).wrapping_add(y);
+        let result = result_no_carry.wrapping_add(carry);
+        carry = Limb::from((result_no_carry < *x) || (result < result_no_carry));
+        *x = result
     }
-    carry
+
+    carry > 0
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
