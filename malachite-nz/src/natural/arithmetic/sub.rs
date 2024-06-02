@@ -168,14 +168,16 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
-    let len = xs.len();
-    assert_eq!(len, ys.len());
-    assert!(out.len() >= len);
-    let mut borrow = false;
+    let mut carry = 0;
+
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
-        *out = sub_and_borrow(x, y, &mut borrow);
+        let result_no_carry = x.wrapping_sub(y);
+        let result = result_no_carry.wrapping_sub(carry);
+        carry = Limb::from((result_no_carry > x) || (result > result_no_carry));
+        *out = result
     }
-    borrow
+
+    carry > 0
 }}
 
 // Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
@@ -229,12 +231,16 @@ pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input.
 pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
-    assert_eq!(xs.len(), ys.len());
-    let mut borrow = false;
+    let mut carry = 0;
+
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        *x = sub_and_borrow(*x, y, &mut borrow);
+        let result_no_carry = (*x).wrapping_sub(y);
+        let result = result_no_carry.wrapping_sub(carry);
+        carry = Limb::from((result_no_carry > *x) || (result > result_no_carry));
+        *x = result
     }
-    borrow
+
+    carry > 0
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
@@ -286,12 +292,16 @@ pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // second input.
 pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
-    assert_eq!(xs.len(), ys.len());
-    let mut borrow = false;
+    let mut carry = 0;
+
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
-        *y = sub_and_borrow(x, *y, &mut borrow);
+        let result_no_carry = x.wrapping_sub(*y);
+        let result = result_no_carry.wrapping_sub(carry);
+        carry = Limb::from((result_no_carry > x) || (result > result_no_carry));
+        *y = result
     }
-    borrow
+
+    carry > 0
 }}
 
 // Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s whose
