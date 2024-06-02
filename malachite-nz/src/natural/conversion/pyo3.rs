@@ -54,8 +54,8 @@ use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
 #[allow(unused_imports)]
 use pyo3::{
-    exceptions::PyValueError, ffi, intern, types::*, FromPyObject, IntoPy, Py, PyErr, PyObject,
-    PyResult, Python, ToPyObject,
+    Bound, exceptions::PyValueError, ffi, intern, types::*, FromPyObject, IntoPy, Py, PyErr,
+    PyObject, PyResult, Python, ToPyObject,
 };
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
@@ -70,7 +70,7 @@ impl<'source> FromPyObject<'source> for Natural {
             long
         } else {
             num_owned = unsafe { Py::from_owned_ptr_or_err(py, ffi::PyNumber_Index(ob.as_ptr()))? };
-            num_owned.as_ref(py)
+            num_owned.bind(py).as_gil_ref()
         };
 
         // check if number is negative, and if so, raise TypeError
@@ -150,9 +150,9 @@ impl ToPyObject for Natural {
 
         #[cfg(Py_LIMITED_API)]
         {
-            let bytes_obj = PyBytes::new(py, &bytes);
+            let bytes_obj = PyBytes::new_bound(py, &bytes);
             let kwargs = None;
-            py.get_type::<PyLong>()
+            py.get_type_bound::<PyLong>()
                 .call_method("from_bytes", (bytes_obj, "little"), kwargs)
                 .expect("int.from_bytes() failed during to_object()")
                 .into()
@@ -242,7 +242,7 @@ fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<
         if error_code == -1 {
             return Err(PyErr::fetch(long.py()));
         }
-        buffer.set_len(n_bytes) // set buffer length to the number of bytes
+        buffer.set_len(n_bytes); // set buffer length to the number of bytes
     };
     buffer
         .iter_mut()
@@ -262,9 +262,9 @@ fn int_to_py_bytes(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<&
 
     // setup kwargs for to_bytes (only if signed)
     let kwargs = if is_signed {
-        let kwargs = PyDict::new(py);
+        let kwargs = PyDict::new_bound(py);
         kwargs.set_item(intern!(py, "signed"), true)?;
-        Some(kwargs)
+        Some(kwargs.into_gil_ref())
     } else {
         None
     };
@@ -334,7 +334,7 @@ mod tests {
         let mut f0 = 1.to_object(py);
         let mut f1 = 1.to_object(py);
         std::iter::from_fn(move || {
-            let f2 = f0.call_method1(py, "__add__", (f1.as_ref(py),)).unwrap();
+            let f2 = f0.call_method1(py, "__add__", (f1.bind(py),)).unwrap();
             Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)))
         })
     }
@@ -350,7 +350,7 @@ mod tests {
                         return self.x
                 "#
         );
-        PyModule::from_code(py, index_code, "index.py", "index").unwrap()
+        PyModule::from_code_bound(py, index_code, "index.py", "index").unwrap().into_gil_ref()
     }
 
     /// - Test conversion to and from Natural
@@ -364,7 +364,7 @@ mod tests {
                 // Python -> Rust
                 assert_eq!(py_result.extract::<Natural>(py).unwrap(), rs_result);
                 // Rust -> Python
-                assert!(py_result.as_ref(py).eq(rs_result).unwrap());
+                assert!(py_result.bind(py).eq(rs_result).unwrap());
             }
         });
     }
@@ -375,9 +375,9 @@ mod tests {
         prepare_python();
         Python::with_gil(|py| {
             let index = python_index_class(py);
-            let locals = PyDict::new(py);
+            let locals = PyDict::new_bound(py);
             locals.set_item("index", index).unwrap();
-            let ob = py.eval("index.C(10)", None, Some(locals)).unwrap();
+            let ob = py.eval_bound("index.C(10)", None, Some(&locals)).unwrap().into_gil_ref();
             let natural: Natural = FromPyObject::extract(ob).unwrap();
 
             assert_eq!(natural, Natural::from(10_u8));
@@ -395,7 +395,7 @@ mod tests {
 
             // Rust -> Python
             let zero_natural = zero_natural.to_object(py);
-            assert!(zero_natural.as_ref(py).eq(Natural::from(0_u8)).unwrap());
+            assert!(zero_natural.bind(py).eq(Natural::from(0_u8)).unwrap());
         })
     }
 
@@ -443,8 +443,8 @@ mod tests {
             assert!(minus_one
                 .extract::<Natural>(py)
                 .unwrap_err()
-                .get_type(py)
-                .is(PyType::new::<PyValueError>(py)));
+                .get_type_bound(py)
+                .is(&PyType::new_bound::<PyValueError>(py)));
         });
     }
 }
