@@ -1105,9 +1105,9 @@ pub fn random_integer_range(
 /// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
-/// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
-/// ratio is less than or equal to the bit length of the smallest integer in the range, or if they
-/// are too large and manipulating them leads to arithmetic overflow.
+/// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio
+/// is less than or equal to the bit length of the smallest integer in the range, or if they are too
+/// large and manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
@@ -1212,7 +1212,7 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
-/// mean_stripe_denominator`, or if $a > b$.
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```

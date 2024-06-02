@@ -54,7 +54,7 @@ use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
 #[allow(unused_imports)]
 use pyo3::{
-    Bound, exceptions::PyValueError, ffi, intern, types::*, FromPyObject, IntoPy, Py, PyErr,
+    exceptions::PyValueError, ffi, intern, types::*, Bound, FromPyObject, IntoPy, Py, PyErr,
     PyObject, PyResult, Python, ToPyObject,
 };
 
@@ -350,7 +350,9 @@ mod tests {
                         return self.x
                 "#
         );
-        PyModule::from_code_bound(py, index_code, "index.py", "index").unwrap().into_gil_ref()
+        PyModule::from_code_bound(py, index_code, "index.py", "index")
+            .unwrap()
+            .into_gil_ref()
     }
 
     /// - Test conversion to and from Natural
@@ -377,7 +379,10 @@ mod tests {
             let index = python_index_class(py);
             let locals = PyDict::new_bound(py);
             locals.set_item("index", index).unwrap();
-            let ob = py.eval_bound("index.C(10)", None, Some(&locals)).unwrap().into_gil_ref();
+            let ob = py
+                .eval_bound("index.C(10)", None, Some(&locals))
+                .unwrap()
+                .into_gil_ref();
             let natural: Natural = FromPyObject::extract(ob).unwrap();
 
             assert_eq!(natural, Natural::from(10_u8));

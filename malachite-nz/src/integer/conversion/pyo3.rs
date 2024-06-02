@@ -345,7 +345,9 @@ mod tests {
                         return self.x
                 "#
         );
-        PyModule::from_code_bound(py, index_code, "index.py", "index").unwrap().into_gil_ref()
+        PyModule::from_code_bound(py, index_code, "index.py", "index")
+            .unwrap()
+            .into_gil_ref()
     }
 
     /// - Test conversion to and from Integer
@@ -381,12 +383,18 @@ mod tests {
             let index = python_index_class(py);
             let locals = PyDict::new_bound(py);
             locals.set_item("index", index).unwrap();
-            let ob = py.eval_bound("index.C(10)", None, Some(&locals)).unwrap().into_gil_ref();
+            let ob = py
+                .eval_bound("index.C(10)", None, Some(&locals))
+                .unwrap()
+                .into_gil_ref();
             let integer: Integer = FromPyObject::extract(ob).unwrap();
 
             assert_eq!(integer, Integer::from(10));
 
-            let ob2 = py.eval_bound("index.C(-10)", None, Some(&locals)).unwrap().into_gil_ref();
+            let ob2 = py
+                .eval_bound("index.C(-10)", None, Some(&locals))
+                .unwrap()
+                .into_gil_ref();
             let integer2: Integer = FromPyObject::extract(ob2).unwrap();
 
             assert_eq!(integer2, Integer::from(-10));

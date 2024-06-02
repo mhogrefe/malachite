@@ -514,7 +514,7 @@ pub fn exhaustive_rationals_with_denominator_range(
 /// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Panics
-/// Panics if `d` is zero or if $a < b$.
+/// Panics if `d` is zero or if $a > b$.
 ///
 /// # Examples
 /// ```

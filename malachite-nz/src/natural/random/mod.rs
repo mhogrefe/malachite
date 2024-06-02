@@ -1072,7 +1072,7 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
-/// mean_stripe_denominator`, or if $a > b$.
+/// mean_stripe_denominator`, or if $a\geq b$.
 ///
 /// # Examples
 /// ```
