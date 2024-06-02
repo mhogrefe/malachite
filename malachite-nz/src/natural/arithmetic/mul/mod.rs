@@ -14,7 +14,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::add_mul::{
+    limbs_slice_add_mul_limb_same_length_in_place_left,
+    limbs_slice_add_mul_two_limbs_same_length_in_place_left,
+};
 use crate::natural::arithmetic::mul::fft::{
     limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
 };
@@ -478,8 +481,17 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
     out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
     // Now accumulate the product of xs and the next higher limb from ys.
     let window_size = xs_len + 1;
-    for i in 1..ys_len {
-        let (out_last, out_init) = out[i..i + window_size].split_last_mut().unwrap();
+    let mut i = 1;
+
+    while i < ys_len - 1 {
+        let (out_last, out_init) = unsafe { out.get_unchecked_mut(i..i + window_size + 1).split_last_mut().unwrap_unchecked() };
+        *out_last = limbs_slice_add_mul_two_limbs_same_length_in_place_left(out_init, xs, [ys[i], ys[i + 1]]);
+        i += 2;
+    }
+
+    if ys_len & 1 == 0 {
+        let i = ys_len - 1;
+        let (out_last, out_init) = unsafe { out.get_unchecked_mut(i..i + window_size).split_last_mut().unwrap_unchecked() };
         *out_last = limbs_slice_add_mul_limb_same_length_in_place_left(out_init, xs, ys[i]);
     }
 }}

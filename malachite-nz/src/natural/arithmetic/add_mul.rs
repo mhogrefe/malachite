@@ -71,17 +71,111 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     ys: &[Limb],
     z: Limb,
 ) -> Limb {
-    let len = xs.len();
-    assert_eq!(ys.len(), len);
-    let mut carry = 0;
-    let dz = DoubleLimb::from(z);
-    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let out = DoubleLimb::from(*x) + DoubleLimb::from(y) * dz + carry;
-        *x = out.lower_half();
-        carry = out >> Limb::WIDTH;
+    unsafe {
+        let len = xs.len();
+        let mut carry = 0;
+        let mut ys = ys.as_ptr();
+        let mut xs = xs.as_mut_ptr();
+        let mut product_hi = 0;
+
+        for _ in 0..len {
+            let y = ys.read();
+            ys = ys.wrapping_add(1);
+            let mut product_lo = y.extending_mul(z, &mut product_hi);
+            let mut x = xs.read();
+
+            product_lo = x.wrapping_add(product_lo);
+            let mut add_carry = Limb::from(x > product_lo);
+
+            x = product_lo.wrapping_add(carry);
+            add_carry += Limb::from(product_lo > x);
+
+            carry = product_hi.wrapping_add(add_carry);
+
+            xs.write(x);
+            xs = xs.wrapping_add(1);
+        }
+
+        carry
     }
-    Limb::wrapping_from(carry)
 }}
+
+pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    zs: [Limb; 2],
+) -> Limb {
+    unsafe {
+        let len = ys.len();
+        let mut carry_hi: Limb = 0;
+        let mut carry_lo: Limb = 0;
+        let mut yp = ys.as_ptr();
+        let mut xp = xs.as_mut_ptr();
+        let mut product_hi = 0;
+
+        for _ in 0..len {
+            let y = yp.read();
+            yp = yp.wrapping_add(1);
+            let mut product_lo = y.extending_mul(zs[0], &mut product_hi);
+            let mut x = xp.read();
+
+            product_lo = x.wrapping_add(product_lo);
+            let mut add_carry = Limb::from(x > product_lo);
+
+            x = product_lo.wrapping_add(carry_lo);
+            add_carry += Limb::from(product_lo > x);
+            xp.write(x);
+            xp = xp.wrapping_add(1);
+
+            carry_lo = product_hi.wrapping_add(add_carry);
+            carry_lo = carry_hi.wrapping_add(carry_lo);
+            add_carry = Limb::from(carry_hi > carry_lo);
+
+            product_lo = y.extending_mul(zs[1], &mut product_hi);
+            carry_lo = product_lo.wrapping_add(carry_lo);
+            add_carry += Limb::from(product_lo > carry_lo);
+            carry_hi = product_hi.wrapping_add(add_carry);
+        }
+
+        xp.write(carry_lo);
+
+        carry_hi
+    }
+}
+
+trait ExtendingMul {
+    fn extending_mul(self, rhs: Self, out_hi: &mut Self) -> Self;
+}
+
+impl ExtendingMul for u32 {
+    #[inline]
+    fn extending_mul(self, rhs: Self, out_hi: &mut Self) -> Self {
+        #[cfg(target_feature = "bmi2")]
+        unsafe { core::arch::x86_64::_mulx_u32(self, rhs, out_hi) }
+
+        #[cfg(not(target_feature = "bmi2"))]
+        {
+            let product = u64::from(self) * u64::from(rhs);
+            *out_hi = (product >> 32) as u32;
+            product as u32
+        }
+    }
+}
+
+impl ExtendingMul for u64 {
+    #[inline]
+    fn extending_mul(self, rhs: Self, out_hi: &mut Self) -> Self {
+        #[cfg(target_feature = "bmi2")]
+        unsafe { core::arch::x86_64::_mulx_u64(self, rhs, out_hi) }
+
+        #[cfg(not(target_feature = "bmi2"))]
+        {
+            let product = u128::from(self) * u128::from(rhs);
+            *out_hi = (product >> 64) as u64;
+            product as u64
+        }
+    }
+}
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
 // of the result are written to `ys` and the highest limb is returned. `xs` must have the same
@@ -578,7 +672,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs);
+                limbs_add_mul_in_place_left(xs, ys, zs)
             }
         }
     }
@@ -617,7 +711,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs);
+                limbs_add_mul_in_place_left(xs, ys, zs)
             }
         }
     }
@@ -656,7 +750,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs);
+                limbs_add_mul_in_place_left(xs, ys, zs)
             }
         }
     }
@@ -695,7 +789,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                limbs_add_mul_in_place_left(xs, ys, zs);
+                limbs_add_mul_in_place_left(xs, ys, zs)
             }
         }
     }
