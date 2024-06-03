@@ -71,33 +71,24 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     ys: &[Limb],
     z: Limb,
 ) -> Limb {
-    unsafe {
-        let len = xs.len();
-        let mut carry = 0;
-        let mut ys = ys.as_ptr();
-        let mut xs = xs.as_mut_ptr();
-        let mut product_hi = 0;
+    let len = xs.len();
+    assert_eq!(ys.len(), len);
+    let mut carry = 0;
 
-        for _ in 0..len {
-            let y = ys.read();
-            ys = ys.wrapping_add(1);
-            let mut product_lo = y.extending_mul(z, &mut product_hi);
-            let mut x = xs.read();
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let (product_hi, mut product_lo) =
+            (DoubleLimb::from(y) * DoubleLimb::from(z)).split_in_half();
 
-            product_lo = x.wrapping_add(product_lo);
-            let mut add_carry = Limb::from(x > product_lo);
+        product_lo = (*x).wrapping_add(product_lo);
+        let mut add_carry = Limb::from(*x > product_lo);
 
-            x = product_lo.wrapping_add(carry);
-            add_carry += Limb::from(product_lo > x);
+        *x = product_lo.wrapping_add(carry);
+        add_carry += Limb::from(product_lo > *x);
 
-            carry = product_hi.wrapping_add(add_carry);
-
-            xs.write(x);
-            xs = xs.wrapping_add(1);
-        }
-
-        carry
+        carry = product_hi.wrapping_add(add_carry);
     }
+
+    carry
 }}
 
 pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
@@ -105,76 +96,34 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
     ys: &[Limb],
     zs: [Limb; 2],
 ) -> Limb {
-    unsafe {
-        let len = ys.len();
-        let mut carry_hi: Limb = 0;
-        let mut carry_lo: Limb = 0;
-        let mut yp = ys.as_ptr();
-        let mut xp = xs.as_mut_ptr();
-        let mut product_hi = 0;
+    let len = ys.len();
+    assert_eq!(xs.len(), len + 1);
+    let mut carry_hi: Limb = 0;
+    let mut carry_lo: Limb = 0;
 
-        for _ in 0..len {
-            let y = yp.read();
-            yp = yp.wrapping_add(1);
-            let mut product_lo = y.extending_mul(zs[0], &mut product_hi);
-            let mut x = xp.read();
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let (mut product_hi, mut product_lo) =
+            (DoubleLimb::from(y) * DoubleLimb::from(zs[0])).split_in_half();
 
-            product_lo = x.wrapping_add(product_lo);
-            let mut add_carry = Limb::from(x > product_lo);
+        product_lo = (*x).wrapping_add(product_lo);
+        let mut add_carry = Limb::from(*x > product_lo);
 
-            x = product_lo.wrapping_add(carry_lo);
-            add_carry += Limb::from(product_lo > x);
-            xp.write(x);
-            xp = xp.wrapping_add(1);
+        *x = product_lo.wrapping_add(carry_lo);
+        add_carry += Limb::from(product_lo > *x);
 
-            carry_lo = product_hi.wrapping_add(add_carry);
-            carry_lo = carry_hi.wrapping_add(carry_lo);
-            add_carry = Limb::from(carry_hi > carry_lo);
+        carry_lo = product_hi.wrapping_add(add_carry);
+        carry_lo = carry_hi.wrapping_add(carry_lo);
+        add_carry = Limb::from(carry_hi > carry_lo);
 
-            product_lo = y.extending_mul(zs[1], &mut product_hi);
-            carry_lo = product_lo.wrapping_add(carry_lo);
-            add_carry += Limb::from(product_lo > carry_lo);
-            carry_hi = product_hi.wrapping_add(add_carry);
-        }
-
-        xp.write(carry_lo);
-
-        carry_hi
+        (product_hi, product_lo) = (DoubleLimb::from(y) * DoubleLimb::from(zs[1])).split_in_half();
+        carry_lo = product_lo.wrapping_add(carry_lo);
+        add_carry += Limb::from(product_lo > carry_lo);
+        carry_hi = product_hi.wrapping_add(add_carry);
     }
-}
 
-trait ExtendingMul {
-    fn extending_mul(self, rhs: Self, out_hi: &mut Self) -> Self;
-}
+    xs[len] = carry_lo;
 
-impl ExtendingMul for u32 {
-    #[inline]
-    fn extending_mul(self, rhs: Self, out_hi: &mut Self) -> Self {
-        #[cfg(target_feature = "bmi2")]
-        unsafe { core::arch::x86_64::_mulx_u32(self, rhs, out_hi) }
-
-        #[cfg(not(target_feature = "bmi2"))]
-        {
-            let product = u64::from(self) * u64::from(rhs);
-            *out_hi = (product >> 32) as u32;
-            product as u32
-        }
-    }
-}
-
-impl ExtendingMul for u64 {
-    #[inline]
-    fn extending_mul(self, rhs: Self, out_hi: &mut Self) -> Self {
-        #[cfg(target_feature = "bmi2")]
-        unsafe { core::arch::x86_64::_mulx_u64(self, rhs, out_hi) }
-
-        #[cfg(not(target_feature = "bmi2"))]
-        {
-            let product = u128::from(self) * u128::from(rhs);
-            *out_hi = (product >> 64) as u64;
-            product as u64
-        }
-    }
+    carry_hi
 }
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs

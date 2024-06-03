@@ -477,21 +477,23 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
     assert_ne!(ys_len, 0);
     assert!(xs_len >= ys_len);
     assert!(out.len() >= xs_len + ys_len);
+    let out = &mut out[..(xs_len + ys_len)];
     // We first multiply by the low order limb. This result can be stored, not added, to out.
     out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
     // Now accumulate the product of xs and the next higher limb from ys.
-    let window_size = xs_len + 1;
-    let mut i = 1;
+    let mut bottom = 1;
+    let mut top = bottom + xs_len + 1;
 
-    while i < ys_len - 1 {
-        let (out_last, out_init) = unsafe { out.get_unchecked_mut(i..i + window_size + 1).split_last_mut().unwrap_unchecked() };
-        *out_last = limbs_slice_add_mul_two_limbs_same_length_in_place_left(out_init, xs, [ys[i], ys[i + 1]]);
-        i += 2;
+    while top < out.len() {
+        let (out_last, out_init) = out[bottom..=top].split_last_mut().unwrap();
+        *out_last = limbs_slice_add_mul_two_limbs_same_length_in_place_left(out_init, xs, [ys[bottom], ys[bottom + 1]]);
+        bottom += 2;
+        top += 2;
     }
 
-    if ys_len & 1 == 0 {
+    if top <= out.len() {
         let i = ys_len - 1;
-        let (out_last, out_init) = unsafe { out.get_unchecked_mut(i..i + window_size).split_last_mut().unwrap_unchecked() };
+        let (out_last, out_init) = out[bottom..top].split_last_mut().unwrap();
         *out_last = limbs_slice_add_mul_limb_same_length_in_place_left(out_init, xs, ys[i]);
     }
 }}
