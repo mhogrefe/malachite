@@ -176,6 +176,9 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+    let len = xs.len();
+    assert_eq!(len, ys.len());
+    assert!(out.len() >= len);
     let mut carry = 0;
 
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
@@ -236,6 +239,7 @@ pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input.
 pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+    assert_eq!(xs.len(), ys.len());
     let mut carry = 0;
 
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
@@ -294,6 +298,7 @@ pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // second input.
 pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
+    assert_eq!(xs.len(), ys.len());
     let mut carry = 0;
 
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
