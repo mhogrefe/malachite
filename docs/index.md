@@ -53,14 +53,14 @@ Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` featu
 To use Malachite, add the following to your project's `Cargo.toml` file:
 ```yaml
 [dependencies.malachite]
-version = "0.4.11"
+version = "0.4.12"
 ```
 
 By default, all of Malachite's features are included, but you can opt out of some of them. For
 example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
 ```yaml
 [dependencies.malachite]
-version = "0.4.11"
+version = "0.4.12"
 default-features = false
 features = [ "naturals_and_integers" ]
 ```
@@ -127,6 +127,8 @@ The `malachite` crate re-exports three sub-crates.
 Malachite is under active development, with many more types and features planned for the future.
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that
 its API is not stable yet, and that it is licensed under LGPL 3.0.
+
+Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, and shekohex for additional contributions.
 
 # FAQ
 **How is "Malachite" pronounced, and what does it mean?**

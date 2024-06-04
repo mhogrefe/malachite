@@ -17,4 +17,6 @@ This crate defines
 
 TODO
 
+Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, and shekohex for additional contributions.
+
 Copyright © 2024 Mikhail Hogrefe

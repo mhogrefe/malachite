@@ -1,5 +1,7 @@
 // Copyright © 2024 Mikhail Hogrefe
 //
+// Some optimizations contributed by florian1345.
+//
 // Uses code adopted from the GNU MP Library.
 //
 //      Copyright © 1991-2018, 2020 Free Software Foundation, Inc.
@@ -104,18 +106,6 @@ pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
     y != 0
 }}
 
-// # Worst-case complexity
-// Constant time and additional memory.
-pub(crate) fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
-    let b = *borrow;
-    let mut diff;
-    (diff, *borrow) = x.overflowing_sub(y);
-    if b {
-        *borrow |= diff.overflowing_sub_assign(1);
-    }
-    diff
-}
-
 #[inline]
 pub(crate) fn sub_with_carry(x: Limb, y: Limb, carry: Limb) -> (Limb, Limb) {
     let result_no_carry = x.wrapping_sub(y);
@@ -145,10 +135,13 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     let mut out = Vec::with_capacity(xs_len);
-    let mut borrow = false;
+    let mut carry = 0;
     for (&x, &y) in xs.iter().zip(ys.iter()) {
-        out.push(sub_and_borrow(x, y, &mut borrow));
+        let o;
+        (o, carry) = sub_with_carry(x, y, carry);
+        out.push(o);
     }
+    let mut borrow = carry != 0;
     if xs_len != ys_len {
         out.extend_from_slice(&xs[ys_len..]);
         if borrow {
@@ -399,11 +392,11 @@ pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
     right_start: usize
 ) -> bool {
     let len = xs.len() - right_start;
-    let mut borrow = false;
+    let mut carry = 0;
     for i in 0..len {
-        xs[i] = sub_and_borrow(xs[i], xs[i + right_start], &mut borrow);
+        (xs[i], carry) = sub_with_carry(xs[i], xs[i + right_start], carry);
     }
-    borrow
+    carry != 0
 }}
 
 // Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
@@ -430,11 +423,11 @@ pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: 
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     let right_start = xs_len - ys_len;
-    let mut borrow = false;
+    let mut carry = 0;
     for i in 0..ys_len {
-        xs[i] = sub_and_borrow(xs[i + right_start], ys[i], &mut borrow);
+        (xs[i], carry) = sub_with_carry(xs[i + right_start], ys[i], carry);
     }
-    borrow
+    carry != 0
 }}
 
 // Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two

@@ -11,6 +11,8 @@ implemented are thoroughly tested and documented, with the exception of string c
 functions. The current string conversions are incomplete and will be changed in the future to
 match MPFR's behavior.
 
+Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, and shekohex for additional contributions.
+
 <https://www.malachite.rs/>
 
 Copyright © 2024 Mikhail Hogrefe

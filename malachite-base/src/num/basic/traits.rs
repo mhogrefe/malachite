@@ -1,5 +1,7 @@
 // Copyright © 2024 Mikhail Hogrefe
 //
+// Implementations of traits for NonZero* types by b4D8.
+//
 // This file is part of Malachite.
 //
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU

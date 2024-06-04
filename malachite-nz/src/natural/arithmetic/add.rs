@@ -1,5 +1,7 @@
 // Copyright © 2024 Mikhail Hogrefe
 //
+// Some optimizations contributed by florian1345.
+//
 // Uses code adopted from the GNU MP Library.
 //
 //      Copyright © 1991-2018, 2020 Free Software Foundation, Inc.
@@ -17,7 +19,6 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::iter::Sum;
 use core::ops::{Add, AddAssign};
-use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
@@ -134,25 +135,11 @@ pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     }
 }}
 
-// # Worst-case complexity
-// Constant time and additional memory.
-#[inline]
-fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
-    let c = *carry;
-    let mut sum;
-    (sum, *carry) = x.overflowing_add(y);
-    if c {
-        *carry |= sum.overflowing_add_assign(1);
-    }
-    sum
-}
-
 #[inline]
 fn add_with_carry_limb(x: Limb, y: Limb, carry: Limb) -> (Limb, Limb) {
     let result_no_carry = x.wrapping_add(y);
     let result = result_no_carry.wrapping_add(carry);
     let carry = Limb::from((result_no_carry < x) || (result < result_no_carry));
-
     (result, carry)
 }
 
@@ -180,17 +167,19 @@ pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     let mut out = Vec::with_capacity(xs_len);
-    let mut carry = false;
+    let mut carry = 0;
     for (&x, &y) in xs.iter().zip(ys.iter()) {
-        out.push(add_and_carry(x, y, &mut carry));
+        let o;
+        (o, carry) = add_with_carry_limb(x, y, carry);
+        out.push(o);
     }
     if xs_len == ys_len {
-        if carry {
+        if carry != 0 {
             out.push(1);
         }
     } else {
         out.extend_from_slice(&xs[ys_len..]);
-        if carry && limbs_slice_add_limb_in_place(&mut out[ys_len..], 1) {
+        if carry != 0 && limbs_slice_add_limb_in_place(&mut out[ys_len..], 1) {
             out.push(1);
         }
     }
@@ -237,12 +226,10 @@ pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
     let mut carry = 0;
-
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
         (*out, carry) = add_with_carry_limb(x, y, carry);
     }
-
-    carry > 0
+    carry != 0
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
@@ -338,11 +325,11 @@ pub_crate_test! {
     limbs_add_to_out_aliased_2(xs: &mut [Limb], xs_offset: usize, ys: &[Limb]) -> bool {
     let len = ys.len();
     assert_eq!(xs.len(), len + xs_offset);
-    let mut carry = false;
+    let mut carry = 0;
     for i in 0..len {
-        xs[i] = add_and_carry(xs[i + xs_offset], ys[i], &mut carry);
+        (xs[i], carry) = add_with_carry_limb(xs[i + xs_offset], ys[i], carry);
     }
-    carry
+    carry != 0
 }}
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -365,12 +352,10 @@ pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: 
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
     let mut carry = 0;
-
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         (*x, carry) = add_with_carry_limb(*x, y, carry);
     }
-
-    carry > 0
+    carry != 0
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the

@@ -1,5 +1,7 @@
 // Copyright © 2024 Mikhail Hogrefe
 //
+// CheckedDiv implementation by Park Joon-Kyu.
+//
 // Uses code adopted from the GNU MP Library.
 //
 //      Copyright © 1991, 1994-1996, 2000, 2001, 2015, 2018 Free Software Foundation, Inc.

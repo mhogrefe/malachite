@@ -19,7 +19,7 @@ use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, sub_and_borrow,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, sub_with_carry,
 };
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
@@ -1917,12 +1917,12 @@ fn limbs_sub_shl1_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    let mut borrow = false;
+    let mut carry = 0;
     let mut remaining_xs_bits = 0;
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
         let shifted_x = (x << 1) | remaining_xs_bits;
         remaining_xs_bits = x >> WIDTH_M1;
-        *out = sub_and_borrow(shifted_x, y, &mut borrow);
+        (*out, carry) = sub_with_carry(shifted_x, y, carry);
     }
 }
 
@@ -1939,14 +1939,14 @@ fn limbs_sub_shr_same_length_to_out_and_ys0(
     assert_eq!(len, ys.len());
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= len);
-    let mut borrow = false;
+    let mut carry = 0;
     let comp_bits = Limb::WIDTH - bits;
     for i in 0..len {
         let mut shifted_y = (ys[i] >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits);
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        out[i] = sub_and_borrow(xs[i], shifted_y, &mut borrow);
+        (out[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -1967,7 +1967,7 @@ fn limbs_sub_shr_greater_to_out_and_ys0(
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= xs_len);
     let comp_bits = Limb::WIDTH - bits;
-    let mut borrow = false;
+    let mut carry = 0;
     for i in 0..xs_len {
         let mut shifted_y = if let Some(y) = ys.get(i) {
             (y >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits)
@@ -1977,7 +1977,7 @@ fn limbs_sub_shr_greater_to_out_and_ys0(
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        out[i] = sub_and_borrow(xs[i], shifted_y, &mut borrow);
+        (out[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -1989,17 +1989,17 @@ fn limbs_sub_greater_to_out_different_ys0(out: &mut [Limb], xs: &[Limb], ys: &[L
     assert_ne!(ys_len, 0);
     assert!(xs_len >= ys_len);
     assert!(out.len() >= xs_len);
-    let mut borrow = false;
+    let mut carry = 0;
     let mut first = true;
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
-        *out = if first {
+        (*out, carry) = if first {
             first = false;
-            sub_and_borrow(x, ys0, &mut borrow)
+            sub_with_carry(x, ys0, carry)
         } else {
-            sub_and_borrow(x, y, &mut borrow)
+            sub_with_carry(x, y, carry)
         };
     }
-    if borrow {
+    if carry != 0 {
         limbs_sub_limb_to_out(&mut out[ys_len..], &xs[ys_len..], 1);
     } else {
         out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
@@ -2420,12 +2420,12 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
 fn limbs_sub_shl1_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    let mut borrow = false;
+    let mut carry = 0;
     let mut remaining_xs_bits = 0;
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted_x = (*x << 1) | remaining_xs_bits;
         remaining_xs_bits = *x >> WIDTH_M1;
-        *x = sub_and_borrow(shifted_x, y, &mut borrow);
+        (*x, carry) = sub_with_carry(shifted_x, y, carry);
     }
 }
 
@@ -2440,14 +2440,14 @@ fn limbs_sub_shr_same_length_in_place_left_and_ys0(
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(bits < Limb::WIDTH);
-    let mut borrow = false;
+    let mut carry = 0;
     let comp_bits = Limb::WIDTH - bits;
     for i in 0..len {
         let mut shifted_y = (ys[i] >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits);
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        xs[i] = sub_and_borrow(xs[i], shifted_y, &mut borrow);
+        (xs[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -2466,7 +2466,7 @@ fn limbs_sub_shr_greater_in_place_left_and_ys0(
     assert!(xs_len >= ys_len);
     assert!(bits < Limb::WIDTH);
     let comp_bits = Limb::WIDTH - bits;
-    let mut borrow = false;
+    let mut carry = 0;
     for (i, x) in xs.iter_mut().enumerate() {
         let mut shifted_y = if let Some(y) = ys.get(i) {
             (y >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits)
@@ -2476,7 +2476,7 @@ fn limbs_sub_shr_greater_in_place_left_and_ys0(
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        *x = sub_and_borrow(*x, shifted_y, &mut borrow);
+        (*x, carry) = sub_with_carry(*x, shifted_y, carry);
     }
 }
 
@@ -2488,17 +2488,17 @@ fn limbs_sub_greater_in_place_left_different_ys0(xs: &mut [Limb], ys: &[Limb], y
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
     assert!(xs_len >= ys_len);
-    let mut borrow = false;
+    let mut carry = 0;
     let mut first = true;
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        *x = if first {
+        (*x, carry) = if first {
             first = false;
-            sub_and_borrow(*x, ys0, &mut borrow)
+            sub_with_carry(*x, ys0, carry)
         } else {
-            sub_and_borrow(*x, y, &mut borrow)
+            sub_with_carry(*x, y, carry)
         };
     }
-    if borrow {
+    if carry != 0 {
         limbs_sub_limb_in_place(&mut xs[ys_len..], 1);
     }
 }
@@ -2922,12 +2922,12 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
 fn limbs_sub_shl1_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    let mut borrow = false;
+    let mut carry = 0;
     let mut remaining_xs_bits = 0;
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
         let shifted_x = (x << 1) | remaining_xs_bits;
         remaining_xs_bits = x >> WIDTH_M1;
-        *y = sub_and_borrow(shifted_x, *y, &mut borrow);
+        (*y, carry) = sub_with_carry(shifted_x, *y, carry);
     }
 }
 
@@ -2942,14 +2942,14 @@ fn limbs_sub_shr_same_length_in_place_right_and_ys0(
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(bits < Limb::WIDTH);
-    let mut borrow = false;
+    let mut carry = 0;
     let comp_bits = Limb::WIDTH - bits;
     for i in 0..len {
         let mut shifted_y = (ys[i] >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits);
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        ys[i] = sub_and_borrow(xs[i], shifted_y, &mut borrow);
+        (ys[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -2964,7 +2964,7 @@ fn limbs_sub_shr_greater_in_place_right_and_ys0(
     assert_ne!(n, 0);
     assert!(bits < Limb::WIDTH);
     let comp_bits = Limb::WIDTH - bits;
-    let mut borrow = false;
+    let mut carry = 0;
     for i in 0..n {
         let mut shifted_y = if let Some(y) = ys.get(i + m) {
             (y >> bits) | (ys.get(i + m + 1).unwrap_or(&0) << comp_bits)
@@ -2974,7 +2974,7 @@ fn limbs_sub_shr_greater_in_place_right_and_ys0(
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        ys[i] = sub_and_borrow(xs[i], shifted_y, &mut borrow);
+        (ys[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -2984,16 +2984,16 @@ fn limbs_sub_greater_in_place_right_different_ys0(
     ys0: Limb,
     m: usize,
 ) {
-    let mut borrow = false;
+    let mut carry = 0;
     for i in 0..xs.len() {
-        ys[i] = sub_and_borrow(
+        (ys[i], carry) = sub_with_carry(
             xs[i],
             if i == 0 {
                 ys0
             } else {
                 ys.get(i + m).copied().unwrap_or(0)
             },
-            &mut borrow,
+            carry,
         );
     }
 }
