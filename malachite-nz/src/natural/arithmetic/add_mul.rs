@@ -76,8 +76,7 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     let mut carry = 0;
 
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let (product_hi, mut product_lo) =
-            (DoubleLimb::from(y) * DoubleLimb::from(z)).split_in_half();
+        let (product_hi, mut product_lo) = expanding_mul(y, z);
 
         product_lo = (*x).wrapping_add(product_lo);
         let mut add_carry = Limb::from(*x > product_lo);
@@ -102,8 +101,7 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
     let mut carry_lo: Limb = 0;
 
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let (mut product_hi, mut product_lo) =
-            (DoubleLimb::from(y) * DoubleLimb::from(zs[0])).split_in_half();
+        let (mut product_hi, mut product_lo) = expanding_mul(y, zs[0]);
 
         product_lo = (*x).wrapping_add(product_lo);
         let mut add_carry = Limb::from(*x > product_lo);
@@ -115,7 +113,7 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
         carry_lo = carry_hi.wrapping_add(carry_lo);
         add_carry = Limb::from(carry_hi > carry_lo);
 
-        (product_hi, product_lo) = (DoubleLimb::from(y) * DoubleLimb::from(zs[1])).split_in_half();
+        (product_hi, product_lo) = expanding_mul(y, zs[1]);
         carry_lo = product_lo.wrapping_add(carry_lo);
         add_carry += Limb::from(product_lo > carry_lo);
         carry_hi = product_hi.wrapping_add(add_carry);
@@ -124,6 +122,10 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
     xs[len] = carry_lo;
 
     carry_hi
+}
+
+fn expanding_mul(x: Limb, y: Limb) -> (Limb, Limb) {
+    (DoubleLimb::from(x) * DoubleLimb::from(y)).split_in_half()
 }
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
