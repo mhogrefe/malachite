@@ -21,7 +21,7 @@ use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, XMulYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
@@ -76,7 +76,7 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     let mut carry = 0;
 
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let (product_hi, mut product_lo) = expanding_mul(y, z);
+        let (product_hi, mut product_lo) = XMulYToZZ::x_mul_y_to_zz(y, z);
 
         product_lo = (*x).wrapping_add(product_lo);
         let mut add_carry = Limb::from(*x > product_lo);
@@ -101,7 +101,7 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
     let mut carry_lo: Limb = 0;
 
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let (mut product_hi, mut product_lo) = expanding_mul(y, zs[0]);
+        let (mut product_hi, mut product_lo) = XMulYToZZ::x_mul_y_to_zz(y, zs[0]);
 
         product_lo = (*x).wrapping_add(product_lo);
         let mut add_carry = Limb::from(*x > product_lo);
@@ -113,7 +113,7 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
         carry_lo = carry_hi.wrapping_add(carry_lo);
         add_carry = Limb::from(carry_hi > carry_lo);
 
-        (product_hi, product_lo) = expanding_mul(y, zs[1]);
+        (product_hi, product_lo) = XMulYToZZ::x_mul_y_to_zz(y, zs[1]);
         carry_lo = product_lo.wrapping_add(carry_lo);
         add_carry += Limb::from(product_lo > carry_lo);
         carry_hi = product_hi.wrapping_add(add_carry);
@@ -122,10 +122,6 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
     xs[len] = carry_lo;
 
     carry_hi
-}
-
-fn expanding_mul(x: Limb, y: Limb) -> (Limb, Limb) {
-    (DoubleLimb::from(x) * DoubleLimb::from(y)).split_in_half()
 }
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
