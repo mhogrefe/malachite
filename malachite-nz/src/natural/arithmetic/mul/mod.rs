@@ -16,7 +16,7 @@
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::add_mul::{
     limbs_slice_add_mul_limb_same_length_in_place_left,
-    limbs_slice_add_mul_two_limbs_same_length_in_place_left,
+    limbs_slice_add_mul_two_limbs_matching_length_in_place_left,
 };
 use crate::natural::arithmetic::mul::fft::{
     limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
@@ -486,7 +486,7 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
 
     while top < out.len() {
         let (out_last, out_init) = out[bottom..=top].split_last_mut().unwrap();
-        *out_last = limbs_slice_add_mul_two_limbs_same_length_in_place_left(out_init, xs, [ys[bottom], ys[bottom + 1]]);
+        *out_last = limbs_slice_add_mul_two_limbs_matching_length_in_place_left(out_init, xs, [ys[bottom], ys[bottom + 1]]);
         bottom += 2;
         top += 2;
     }

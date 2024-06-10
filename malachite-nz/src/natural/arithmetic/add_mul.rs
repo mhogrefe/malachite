@@ -90,7 +90,7 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     carry
 }}
 
-pub(crate) fn limbs_slice_add_mul_two_limbs_same_length_in_place_left(
+pub(crate) fn limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     zs: [Limb; 2],
