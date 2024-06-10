@@ -481,19 +481,18 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
     // We first multiply by the low order limb. This result can be stored, not added, to out.
     out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
     // Now accumulate the product of xs and the next higher limb from ys.
-    let mut bottom = 1;
-    let mut top = bottom + xs_len + 1;
+    let window_size = xs_len + 1;
+    let mut i = 1;
+    let max = ys_len - 1;
 
-    while top < out.len() {
-        let (out_last, out_init) = out[bottom..=top].split_last_mut().unwrap();
-        *out_last = limbs_slice_add_mul_two_limbs_matching_length_in_place_left(out_init, xs, [ys[bottom], ys[bottom + 1]]);
-        bottom += 2;
-        top += 2;
+    while i < max {
+        let (out_last, out_init) = out[i..=i + window_size].split_last_mut().unwrap();
+        *out_last = limbs_slice_add_mul_two_limbs_matching_length_in_place_left(out_init, xs, [ys[i], ys[i + 1]]);
+        i += 2;
     }
 
-    if top <= out.len() {
-        let i = ys_len - 1;
-        let (out_last, out_init) = out[bottom..top].split_last_mut().unwrap();
+    if i <= max {
+        let (out_last, out_init) = out[i..i + window_size].split_last_mut().unwrap();
         *out_last = limbs_slice_add_mul_limb_same_length_in_place_left(out_init, xs, ys[i]);
     }
 }}
