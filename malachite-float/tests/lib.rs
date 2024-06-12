@@ -50,11 +50,11 @@
     clippy::range_plus_one,
     clippy::redundant_else,
     clippy::semicolon_if_nothing_returned,
+    clippy::borrow_as_ptr,
     clippy::cloned_instead_of_copied,
     clippy::flat_map_option,
     clippy::unnecessary_wraps,
-    clippy::unnested_or_patterns,
-    clippy::trivially_copy_pass_by_ref
+    clippy::unnested_or_patterns
 )]
 
 #[macro_use]
@@ -64,11 +64,13 @@ pub mod arithmetic {
     pub mod abs;
     pub mod add;
     pub mod is_power_of_2;
+    pub mod mul;
     pub mod neg;
     pub mod power_of_2;
     pub mod shl;
     pub mod shr;
     pub mod sign;
+    pub mod square;
     pub mod sub;
 }
 

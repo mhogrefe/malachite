@@ -79,6 +79,8 @@ pub mod float_add;
 #[cfg(feature = "float_helpers")]
 pub mod float_extras;
 #[cfg(feature = "float_helpers")]
+pub mod float_mul;
+#[cfg(feature = "float_helpers")]
 pub mod float_sub;
 /// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD

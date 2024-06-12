@@ -13,10 +13,10 @@ keywords = ["mathematics", "math", "numerics", "bignum"]
 categories = ["mathematics"]
 
 [dependencies]
-malachite-base = { version = "0.4.12", default_features = false }
-malachite-nz = { version = "0.4.12", default_features = false, optional = true }
-malachite-q = { version = "0.4.12", default_features = false, optional = true }
-malachite-float = { version = "0.4.12", default_features = false, optional = true }
+malachite-base = { version = "0.4.12", default_features = false, path = "../malachite-base" }
+malachite-nz = { version = "0.4.12", default_features = false, optional = true, path = "../malachite-nz" }
+malachite-q = { version = "0.4.12", default_features = false, optional = true, path = "../malachite-q" }
+malachite-float = { version = "0.4.12", default_features = false, optional = true, path = "../malachite-float" }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 embed-doc-image = { version = "0.1.4", optional = true }
 

@@ -6,8 +6,8 @@ autobenches = false
 edition = "2021"
 
 [dependencies]
-malachite-base = { version = "0.4.12" }
-malachite-nz = { version = "0.4.12", default_features = false }
+malachite-base = { version = "0.4.12", path = "../malachite-base" }
+malachite-nz = { version = "0.4.12", default_features = false, path = "../malachite-nz" }
 num = "0.4.1"
 rug = { version = "1.21.0", default-features = false, features = ["integer", "serde"] }
 

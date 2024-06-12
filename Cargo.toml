@@ -9,5 +9,5 @@ malachite-q = { version = "0.4.12", path = 'malachite-q' }
 malachite-float = { version = "0.4.12", path = 'malachite-float' }
 
 [profile.release]
-lto = true
+lto = "fat"
 strip = true

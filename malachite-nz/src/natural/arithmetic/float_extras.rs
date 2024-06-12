@@ -94,14 +94,67 @@ const HIGH_BIT: Limb = 1 << WIDTH_M1;
 const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
 pub(crate) const MPFR_EVEN_INEX: i8 = 2;
 
-// This is MPFR_RNDRAW_GEN from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool` signifying
-// whether the returned exponent should be incremented.
-pub(crate) fn round_helper(
+// This is MPFR_RNDRAW_EVEN from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool`
+// signifying whether the returned exponent should be incremented.
+pub(crate) fn round_helper_even(
     out: &mut [Limb],
     out_prec: u64,
     xs: &[Limb],
     x_prec: u64,
     rm: RoundingMode,
+) -> (i8, bool) {
+    round_helper(out, out_prec, xs, x_prec, rm, |out, xs_hi, ulp| {
+        let ulp_mask = !(ulp - 1);
+        if xs_hi[0] & ulp == 0 {
+            out.copy_from_slice(xs_hi);
+            out[0] &= ulp_mask;
+            (-MPFR_EVEN_INEX, false)
+        } else {
+            let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
+            if increment {
+                *out.last_mut().unwrap() = HIGH_BIT;
+            }
+            out[0] &= ulp_mask;
+            (MPFR_EVEN_INEX, increment)
+        }
+    })
+}
+
+// This is MPFR_RNDRAW from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool` signifying
+// whether the returned exponent should be incremented.
+pub(crate) fn round_helper_raw(
+    out: &mut [Limb],
+    out_prec: u64,
+    xs: &[Limb],
+    x_prec: u64,
+    rm: RoundingMode,
+) -> (i8, bool) {
+    round_helper(out, out_prec, xs, x_prec, rm, |out, xs_hi, ulp| {
+        let ulp_mask = !(ulp - 1);
+        if xs_hi[0] & ulp == 0 {
+            out.copy_from_slice(xs_hi);
+            out[0] &= ulp_mask;
+            (-1, false)
+        } else {
+            let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
+            if increment {
+                *out.last_mut().unwrap() = HIGH_BIT;
+            }
+            out[0] &= ulp_mask;
+            (1, increment)
+        }
+    })
+}
+
+// This is MPFR_RNDRAW_GEN from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool` signifying
+// whether the returned exponent should be incremented.
+fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
+    out: &mut [Limb],
+    out_prec: u64,
+    xs: &[Limb],
+    x_prec: u64,
+    rm: RoundingMode,
+    middle_handler: F,
 ) -> (i8, bool) {
     let xs_len = xs.len();
     let out_len = out.len();
@@ -112,19 +165,19 @@ pub(crate) fn round_helper(
     } else {
         // - Nontrivial case: rounding needed
         // - Compute position and shift
-        let sh = out_prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
+        let shift = out_prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
         let i = xs_len.checked_sub(out_len).unwrap();
         let mut sticky_bit;
         let round_bit;
         // General case when prec % Limb::WIDTH != 0
-        let ulp = if sh != 0 {
+        let ulp = if shift != 0 {
             // Compute rounding bit and sticky bit
             //
             // Note: in directed rounding modes, if the rounding bit is 1, the behavior does not
             // depend on the sticky bit; thus we will not try to compute it in this case (this can
             // be much faster and avoids reading uninitialized data in the current mpfr_mul
             // implementation). We just make sure that sticky_bit is initialized.
-            let mask = Limb::power_of_2(sh - 1);
+            let mask = Limb::power_of_2(shift - 1);
             let x = xs[i];
             round_bit = x & mask;
             sticky_bit = x & (mask - 1);
@@ -183,19 +236,7 @@ pub(crate) fn round_helper(
                     out[0] &= ulp_mask;
                     (if (sticky_bit | round_bit) != 0 { -1 } else { 0 }, false)
                 } else if sticky_bit == 0 {
-                    // Middle of two consecutive representable numbers
-                    if xs_hi[0] & ulp == 0 {
-                        out.copy_from_slice(xs_hi);
-                        out[0] &= ulp_mask;
-                        (-MPFR_EVEN_INEX, false)
-                    } else {
-                        let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
-                        if increment {
-                            out[out_len - 1] = HIGH_BIT;
-                        }
-                        out[0] &= ulp_mask;
-                        (MPFR_EVEN_INEX, increment)
-                    }
+                    middle_handler(out, xs_hi, ulp)
                 } else {
                     let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
                     if increment {

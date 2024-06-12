@@ -13,7 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use crate::natural::arithmetic::float_extras::{round_helper, MPFR_EVEN_INEX};
+use crate::natural::arithmetic::float_extras::{round_helper_even, MPFR_EVEN_INEX};
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
@@ -3699,9 +3699,10 @@ fn sub_float_significands_general<'a>(
         //  -                     C.CCCCCCCCCCCCC
         // A = S*ABS(B) +/- ulp(a)
         // ```
+        assert_ne!(rm, Exact, "Inexact float subtraction");
         let mut exp_a = x_exp;
         let increment_exp;
-        (inexact, increment_exp) = round_helper(out, out_prec, xs, x_prec, rm);
+        (inexact, increment_exp) = round_helper_even(out, out_prec, xs, x_prec, rm);
         if increment_exp {
             exp_a += 1;
         }
