@@ -21,7 +21,7 @@ use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, XMulYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
@@ -74,14 +74,55 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     let len = xs.len();
     assert_eq!(ys.len(), len);
     let mut carry = 0;
-    let dz = DoubleLimb::from(z);
+
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let out = DoubleLimb::from(*x) + DoubleLimb::from(y) * dz + carry;
-        *x = out.lower_half();
-        carry = out >> Limb::WIDTH;
+        let (product_hi, mut product_lo) = XMulYToZZ::x_mul_y_to_zz(y, z);
+
+        product_lo = (*x).wrapping_add(product_lo);
+        let mut add_carry = Limb::from(*x > product_lo);
+
+        *x = product_lo.wrapping_add(carry);
+        add_carry += Limb::from(product_lo > *x);
+
+        carry = product_hi.wrapping_add(add_carry);
     }
-    Limb::wrapping_from(carry)
+
+    carry
 }}
+
+pub(crate) fn limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    zs: [Limb; 2],
+) -> Limb {
+    let len = ys.len();
+    assert_eq!(xs.len(), len + 1);
+    let mut carry_hi: Limb = 0;
+    let mut carry_lo: Limb = 0;
+
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let (mut product_hi, mut product_lo) = XMulYToZZ::x_mul_y_to_zz(y, zs[0]);
+
+        product_lo = (*x).wrapping_add(product_lo);
+        let mut add_carry = Limb::from(*x > product_lo);
+
+        *x = product_lo.wrapping_add(carry_lo);
+        add_carry += Limb::from(product_lo > *x);
+
+        carry_lo = product_hi.wrapping_add(add_carry);
+        carry_lo = carry_hi.wrapping_add(carry_lo);
+        add_carry = Limb::from(carry_hi > carry_lo);
+
+        (product_hi, product_lo) = XMulYToZZ::x_mul_y_to_zz(y, zs[1]);
+        carry_lo = product_lo.wrapping_add(carry_lo);
+        add_carry += Limb::from(product_lo > carry_lo);
+        carry_hi = product_hi.wrapping_add(add_carry);
+    }
+
+    xs[len] = carry_lo;
+
+    carry_hi
+}
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
 // of the result are written to `ys` and the highest limb is returned. `xs` must have the same
