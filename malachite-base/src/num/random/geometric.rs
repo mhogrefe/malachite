@@ -1001,7 +1001,7 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
-/// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
+/// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
 /// than or equal to $a$, or if they are too large and manipulating them leads to arithmetic
 /// overflow.
 ///

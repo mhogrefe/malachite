@@ -556,7 +556,7 @@ pub trait PrimitiveFloat:
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `self` is less than [`MIN_EXPONENT`](PrimitiveFloat::MIN_EXPONENT) or greater than
+    /// Panics if `exponent` is less than [`MIN_EXPONENT`](PrimitiveFloat::MIN_EXPONENT) or greater than
     /// [`MAX_EXPONENT`](PrimitiveFloat::MAX_EXPONENT).
     ///
     /// # Examples

@@ -1748,7 +1748,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
-/// mean_stripe_denominator`, or if $a > b$.
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
@@ -1808,7 +1808,7 @@ pub fn striped_random_signed_range<
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
-/// mean_stripe_denominator`, or if $a \geq b$.
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
