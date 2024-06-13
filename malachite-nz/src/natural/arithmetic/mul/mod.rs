@@ -484,13 +484,15 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
     let window_size = xs_len + 1;
     let mut i = 1;
     let max = ys_len - 1;
-
     while i < max {
         let (out_last, out_init) = out[i..=i + window_size].split_last_mut().unwrap();
-        *out_last = limbs_slice_add_mul_two_limbs_matching_length_in_place_left(out_init, xs, [ys[i], ys[i + 1]]);
+        *out_last = limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
+            out_init,
+            xs,
+            [ys[i], ys[i + 1]],
+        );
         i += 2;
     }
-
     if i <= max {
         let (out_last, out_init) = out[i..i + window_size].split_last_mut().unwrap();
         *out_last = limbs_slice_add_mul_limb_same_length_in_place_left(out_init, xs, ys[i]);

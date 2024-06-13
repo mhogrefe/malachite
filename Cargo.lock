@@ -284,9 +284,9 @@ dependencies = [
 
 [[package]]
 name = "gmp-mpfr-sys"
-version = "1.6.3"
+version = "1.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74bde44a62a17a9b6a0c197eedb469e4553019c456ed4e61a602f5e3dc5e5941"
+checksum = "b0205cd82059bc63b63cf516d714352a30c44f2c74da9961dfda2617ae6b5918"
 dependencies = [
  "libc",
  "windows-sys",
@@ -415,7 +415,7 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
 name = "malachite"
-version = "0.4.12"
+version = "0.4.13"
 dependencies = [
  "embed-doc-image",
  "malachite-base",
@@ -427,7 +427,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.4.12"
+version = "0.4.13"
 dependencies = [
  "clap",
  "getrandom",
@@ -447,7 +447,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-criterion-bench"
-version = "0.4.12"
+version = "0.4.13"
 dependencies = [
  "criterion",
  "malachite-base",
@@ -458,7 +458,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.4.12"
+version = "0.4.13"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -473,7 +473,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.4.12"
+version = "0.4.13"
 dependencies = [
  "embed-doc-image",
  "indoc",
@@ -491,7 +491,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.4.12"
+version = "0.4.13"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -824,9 +824,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.10.4"
+version = "1.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c117dbdfde9c8308975b6a18d71f3f385c89461f7b3fb054288ecf2a2058ba4c"
+checksum = "b91213439dad192326a0d7c6ee3955910425f441d7038e0d6933b0aec5c4517f"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -836,9 +836,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.6"
+version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86b83b8b9847f9bf95ef68afb0b8e6cdb80f498442f5179a29fad448fcc1eaea"
+checksum = "38caf58cc5ef2fed281f89292ef23f6365465ed9a41b7a7754eb4e26496c92df"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -847,9 +847,9 @@ dependencies = [
 
 [[package]]
 name = "regex-syntax"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adad44e29e4c806119491a7f06f03de4d1af22c3a680dd47f1e6e179439d1f56"
+checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
 
 [[package]]
 name = "rug"
