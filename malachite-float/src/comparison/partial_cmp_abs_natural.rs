@@ -56,7 +56,7 @@ impl PartialOrdAbs<Natural> for Float {
             } else if *e_x <= 0 {
                 Less
             } else {
-                e_x.unsigned_abs()
+                u64::from(e_x.unsigned_abs())
                     .cmp(&other.significant_bits())
                     .then_with(|| x.cmp_normalized(y))
             }),

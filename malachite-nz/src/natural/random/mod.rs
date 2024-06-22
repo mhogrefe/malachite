@@ -532,6 +532,56 @@ pub fn random_naturals_less_than(seed: Seed, limit: Natural) -> RandomNaturalsLe
     }
 }
 
+/// Generates a random [`Natural`] less than a given limit.
+///
+/// The [`Natural`] is chosen uniformly from $[0, \ell)$, where $\ell$ is the provided limit.
+///
+/// $$
+/// P(n) = \\begin{cases}
+///     1/\ell & \text{if} 0\leq n<\ell, \\\\
+///     0 & \\text{otherwise},
+/// \\end{cases}
+/// $$
+/// where $\ell$ is `limit`.
+///
+/// # Expected complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is `limit.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::arithmetic::traits::Pow;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::random::get_random_natural_less_than;
+/// use malachite_nz::natural::Natural;
+///
+/// assert_eq!(
+///     get_random_natural_less_than(
+///         &mut random_primitive_ints(EXAMPLE_SEED),
+///         &Natural::from(10u32).pow(20)
+///     )
+///     .to_string(),
+///     "27702062732568241671"
+/// );
+/// ```
+pub fn get_random_natural_less_than(
+    limbs: &mut RandomPrimitiveInts<u64>,
+    limit: &Natural,
+) -> Natural {
+    assert_ne!(*limit, 0);
+    let bits = limit.ceiling_log_base_2();
+    loop {
+        let x = get_random_natural_with_up_to_bits(limbs, bits);
+        if x < *limit {
+            return x;
+        }
+    }
+}
+
 /// Uniformly generates random [`Natural`]s in an interval.
 #[derive(Clone, Debug)]
 pub struct UniformRandomNaturalRange {

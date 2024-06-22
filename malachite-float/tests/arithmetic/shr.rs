@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
@@ -363,6 +363,11 @@ where
             assert!((&n >> u).le_abs(&n));
         }
         assert_eq!(ComparableFloat(-&n >> u), ComparableFloat(-(&n >> u)));
+
+        assert_eq!(
+            ComparableFloat(&n >> u),
+            ComparableFloat(n * Float::power_of_2(i64::exact_from(u).checked_neg().unwrap()))
+        );
     });
 
     float_gen().test_properties(|n| {
@@ -427,6 +432,11 @@ where
         if let Some(neg_i) = i.checked_neg() {
             assert_eq!(ComparableFloat(&n >> neg_i), ComparableFloat(&n << i));
         }
+
+        assert_eq!(
+            ComparableFloat(&n >> i),
+            ComparableFloat(n * Float::power_of_2(i64::exact_from(i).checked_neg().unwrap()))
+        );
     });
 
     float_gen().test_properties(|n| {

@@ -497,6 +497,7 @@ fn floor_root_properties_helper_signed<T: PrimitiveSigned>() {
 
 macro_rules! floor_root_approx_and_refine_helper {
     ($t:ty) => {
+        #[allow(clippy::cast_lossless)]
         unsigned_pair_gen_var_32::<$t, u64>().test_properties(|(n, exp)| {
             assert_eq!(
                 floor_root_approx_and_refine(|x| x as f64, |f| f as $t, n, exp),
@@ -504,6 +505,7 @@ macro_rules! floor_root_approx_and_refine_helper {
             );
         });
 
+        #[allow(clippy::cast_lossless)]
         unsigned_gen::<$t>().test_properties(|n| {
             assert_eq!(
                 floor_root_approx_and_refine(|x| x as f64, |f| f as $t, n, 3),

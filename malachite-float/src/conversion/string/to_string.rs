@@ -77,7 +77,7 @@ impl LowerHex for Float {
                 }
                 let mut options = ToSciOptions::default();
                 options.set_base(16);
-                let m = exponent.mod_power_of_2(2);
+                let m = u64::from(exponent.mod_power_of_2(2));
                 let mut p = precision.saturating_sub(m).shr_round(2, Ceiling).0;
                 if m != 0 {
                     p += 1;

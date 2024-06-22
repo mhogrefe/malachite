@@ -57,6 +57,7 @@ impl PartialOrdAbs<Rational> for Float {
             ) => Some(if *y == 0u32 {
                 Greater
             } else {
+                let e_x = i64::from(*e_x);
                 let ord_cmp = (e_x - 1).cmp(&y.floor_log_base_2_abs());
                 if ord_cmp == Equal {
                     let shift = e_x - i64::exact_from(significand_bits(significand_x));

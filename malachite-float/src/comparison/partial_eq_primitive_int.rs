@@ -29,7 +29,7 @@ where
             *y != T::ZERO
                 && *sign
                 && *exponent >= 0
-                && y.significant_bits() == exponent.unsigned_abs()
+                && y.significant_bits() == u64::from(exponent.unsigned_abs())
                 && significand.cmp_normalized(&Natural::from(*y)) == Equal
         }
         _ => false,
@@ -98,7 +98,7 @@ where
             *y != T::ZERO
                 && *sign == (*y >= T::ZERO)
                 && *exponent >= 0
-                && y.significant_bits() == exponent.unsigned_abs()
+                && y.significant_bits() == u64::from(exponent.unsigned_abs())
                 && significand.cmp_normalized(&Natural::from(y.unsigned_abs())) == Equal
         }
         _ => false,

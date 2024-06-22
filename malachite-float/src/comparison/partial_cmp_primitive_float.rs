@@ -42,7 +42,7 @@ fn float_partial_cmp_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> Opt
         ) => {
             let s_y = y.is_sign_positive();
             Some(s_x.cmp(&s_y).then_with(|| {
-                let abs_cmp = (e_x - 1)
+                let abs_cmp = (i64::from(*e_x) - 1)
                     .cmp(&y.sci_exponent())
                     .then_with(|| m_x.cmp_normalized(&Natural::from(y.integer_mantissa())));
                 if *s_x {

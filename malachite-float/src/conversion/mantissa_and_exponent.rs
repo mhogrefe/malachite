@@ -53,7 +53,7 @@ impl Float {
     /// use malachite_nz::natural::Natural;
     /// use std::cmp::Ordering::{self, *};
     ///
-    /// let test = |x: Float, rm: RoundingMode, out: Option<(f32, i64, Ordering)>| {
+    /// let test = |x: Float, rm: RoundingMode, out: Option<(f32, i32, Ordering)>| {
     ///     assert_eq!(
     ///         x.sci_mantissa_and_exponent_round(rm)
     ///             .map(|(m, e, o)| (NiceFloat(m), e, o)),
@@ -91,7 +91,7 @@ impl Float {
     pub fn sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         &self,
         rm: RoundingMode,
-    ) -> Option<(T, i64, Ordering)> {
+    ) -> Option<(T, i32, Ordering)> {
         match self {
             Float(Finite {
                 exponent,
@@ -115,7 +115,7 @@ impl Float {
     }
 }
 
-impl RawMantissaAndExponent<Natural, i64> for Float {
+impl RawMantissaAndExponent<Natural, i32> for Float {
     /// Returns the raw mantissa and exponent of a [`Float`], taking the [`Float`] by value.
     ///
     /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
@@ -163,7 +163,7 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     ///     assert_eq!(e, -79);
     /// }
     /// ```
-    fn raw_mantissa_and_exponent(self) -> (Natural, i64) {
+    fn raw_mantissa_and_exponent(self) -> (Natural, i32) {
         if let Float(Finite {
             exponent,
             significand,
@@ -209,7 +209,7 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     ///     -79
     /// );
     /// ```
-    fn raw_exponent(self) -> i64 {
+    fn raw_exponent(self) -> i32 {
         if let Float(Finite { exponent, .. }) = self {
             exponent
         } else {
@@ -263,7 +263,7 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     ///     );
     /// }
     /// ```
-    fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i64) -> Float {
+    fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i32) -> Float {
         let bits = raw_mantissa.significant_bits();
         assert_ne!(bits, 0);
         assert!(bits.divisible_by_power_of_2(Limb::LOG_WIDTH));
@@ -277,7 +277,7 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     }
 }
 
-impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
+impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// Returns the raw mantissa and exponent of a [`Float`], taking the [`Float`] by reference.
     ///
     /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
@@ -328,7 +328,7 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///     assert_eq!(e, -79);
     /// }
     /// ```
-    fn raw_mantissa_and_exponent(self) -> (Natural, i64) {
+    fn raw_mantissa_and_exponent(self) -> (Natural, i32) {
         if let Float(Finite {
             exponent,
             significand,
@@ -372,7 +372,7 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///     -79
     /// );
     /// ```
-    fn raw_exponent(self) -> i64 {
+    fn raw_exponent(self) -> i32 {
         if let Float(Finite { exponent, .. }) = self {
             *exponent
         } else {
@@ -433,12 +433,12 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// }
     /// ```
     #[inline]
-    fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i64) -> Float {
+    fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i32) -> Float {
         Float::from_raw_mantissa_and_exponent(raw_mantissa, raw_exponent)
     }
 }
 
-impl IntegerMantissaAndExponent<Natural, i64> for Float {
+impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// Returns a [`Float`]'s integer mantissa and exponent, taking the [`Float`] by value.
     ///
     /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
@@ -493,7 +493,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ///     )
     /// );
     /// ```
-    fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
+    fn integer_mantissa_and_exponent(self) -> (Natural, i32) {
         if let Float(Finite {
             exponent,
             significand,
@@ -503,7 +503,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
             let zeros = significand.trailing_zeros().unwrap();
             let shifted = significand >> zeros;
             let bits = shifted.significant_bits();
-            (shifted, exponent - i64::exact_from(bits))
+            (shifted, exponent - i32::exact_from(bits))
         } else {
             panic!()
         }
@@ -546,7 +546,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ///     -179
     /// );
     /// ```
-    fn integer_exponent(self) -> i64 {
+    fn integer_exponent(self) -> i32 {
         if let Float(Finite {
             exponent,
             significand,
@@ -554,7 +554,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
         }) = self
         {
             exponent
-                - i64::exact_from(
+                - i32::exact_from(
                     significand.significant_bits() - significand.trailing_zeros().unwrap(),
                 )
         } else {
@@ -621,13 +621,13 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// ```
     fn from_integer_mantissa_and_exponent(
         integer_mantissa: Natural,
-        integer_exponent: i64,
+        integer_exponent: i32,
     ) -> Option<Float> {
         Some(Float::from(integer_mantissa) << integer_exponent)
     }
 }
 
-impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
+impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// Returns a [`Float`]'s integer mantissa and exponent, taking the [`Float`] by reference.
     ///
     /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
@@ -681,7 +681,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///     )
     /// );
     /// ```
-    fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
+    fn integer_mantissa_and_exponent(self) -> (Natural, i32) {
         if let Float(Finite {
             exponent,
             significand,
@@ -691,7 +691,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
             let zeros = significand.trailing_zeros().unwrap();
             let shifted = significand >> zeros;
             let bits = shifted.significant_bits();
-            (shifted, exponent - i64::exact_from(bits))
+            (shifted, exponent - i32::exact_from(bits))
         } else {
             panic!()
         }
@@ -733,7 +733,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     ///     -179
     /// );
     /// ```
-    fn integer_exponent(self) -> i64 {
+    fn integer_exponent(self) -> i32 {
         if let Float(Finite {
             exponent,
             significand,
@@ -741,7 +741,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
         }) = self
         {
             exponent
-                - i64::exact_from(
+                - i32::exact_from(
                     significand.significant_bits() - significand.trailing_zeros().unwrap(),
                 )
         } else {
@@ -815,13 +815,13 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// ```
     fn from_integer_mantissa_and_exponent(
         integer_mantissa: Natural,
-        integer_exponent: i64,
+        integer_exponent: i32,
     ) -> Option<Float> {
         Some(Float::from(integer_mantissa) << integer_exponent)
     }
 }
 
-impl SciMantissaAndExponent<Float, i64> for Float {
+impl SciMantissaAndExponent<Float, i32> for Float {
     /// Returns a [`Float`]'s scientific mantissa and exponent, taking the [`Float`] by value.
     ///
     /// When $x$ is finite and nonzero, we can write $|x| = 2^{e_s}m_s$, where $e_s$ is an integer
@@ -863,7 +863,7 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// assert_eq!(e, -80);
     /// ```
     #[inline]
-    fn sci_mantissa_and_exponent(mut self) -> (Float, i64) {
+    fn sci_mantissa_and_exponent(mut self) -> (Float, i32) {
         if let Float(Finite { sign, exponent, .. }) = &mut self {
             let old_exponent = *exponent;
             *exponent = 1;
@@ -911,7 +911,7 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// );
     /// ```
     #[inline]
-    fn sci_exponent(self) -> i64 {
+    fn sci_exponent(self) -> i32 {
         self.raw_exponent() - 1
     }
 
@@ -968,7 +968,7 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
-    fn from_sci_mantissa_and_exponent(mut sci_mantissa: Float, sci_exponent: i64) -> Option<Float> {
+    fn from_sci_mantissa_and_exponent(mut sci_mantissa: Float, sci_exponent: i32) -> Option<Float> {
         assert!(sci_mantissa.is_finite());
         assert!(!sci_mantissa.is_zero());
         if sci_mantissa.is_sign_negative() || (&sci_mantissa).raw_exponent() != 1 {
@@ -983,7 +983,7 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     }
 }
 
-impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
+impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     /// Returns a [`Float`]'s scientific mantissa and exponent, taking the [`Float`] by reference.
     ///
     /// When $x$ is finite and nonzero, we can write $|x| = 2^{e_s}m_s$, where $e_s$ is an integer
@@ -1014,23 +1014,23 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     ///
     /// assert_eq!((&Float::ONE).sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
-    /// let (m, e): (Float, i64) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
+    /// let (m, e): (Float, i32) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.5707963267948966");
     /// assert_eq!(e, 1);
     ///
-    /// let (m, e): (Float, i64) =
+    /// let (m, e): (Float, i32) =
     ///     (&Float::from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.187662594419065093441695");
     /// assert_eq!(e, 79);
     ///
-    /// let (m, e): (Float, i64) =
+    /// let (m, e): (Float, i32) =
     ///     (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0)
     ///         .sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.683979953059212693885095551367");
     /// assert_eq!(e, -80);
     /// ```
     #[inline]
-    fn sci_mantissa_and_exponent(self) -> (Float, i64) {
+    fn sci_mantissa_and_exponent(self) -> (Float, i32) {
         if let Float(Finite {
             exponent,
             precision,
@@ -1099,7 +1099,7 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     /// );
     /// ```
     #[inline]
-    fn sci_exponent(self) -> i64 {
+    fn sci_exponent(self) -> i32 {
         self.raw_exponent() - 1
     }
 
@@ -1157,14 +1157,14 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     /// );
     /// ```
     #[inline]
-    fn from_sci_mantissa_and_exponent(sci_mantissa: Float, sci_exponent: i64) -> Option<Float> {
+    fn from_sci_mantissa_and_exponent(sci_mantissa: Float, sci_exponent: i32) -> Option<Float> {
         Float::from_sci_mantissa_and_exponent(sci_mantissa, sci_exponent)
     }
 }
 
 macro_rules! impl_mantissa_and_exponent {
     ($t:ident) => {
-        impl<'a> SciMantissaAndExponent<$t, i64, Float> for &'a Float {
+        impl<'a> SciMantissaAndExponent<$t, i32, Float> for &'a Float {
             /// Returns a [`Float`]'s scientific mantissa and exponent, taking the [`Float`] by
             /// value.
             ///
@@ -1192,7 +1192,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// # Examples
             /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
-            fn sci_mantissa_and_exponent(self) -> ($t, i64) {
+            fn sci_mantissa_and_exponent(self) -> ($t, i32) {
                 let (m, e, _) = self.sci_mantissa_and_exponent_round(Nearest).unwrap();
                 (m, e)
             }
@@ -1218,7 +1218,7 @@ macro_rules! impl_mantissa_and_exponent {
             #[inline]
             fn from_sci_mantissa_and_exponent(
                 sci_mantissa: $t,
-                sci_exponent: i64,
+                sci_exponent: i32,
             ) -> Option<Float> {
                 assert!(sci_mantissa.is_finite());
                 assert_ne!(sci_mantissa, 0.0);
@@ -1228,7 +1228,7 @@ macro_rules! impl_mantissa_and_exponent {
                     let m = sci_mantissa.integer_mantissa();
                     Some(
                         Float::from(m)
-                            << (sci_exponent - i64::exact_from(m.significant_bits()) + 1),
+                            << (sci_exponent - i32::exact_from(m.significant_bits()) + 1),
                     )
                 }
             }

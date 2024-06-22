@@ -9113,6 +9113,8 @@ fn add_prec_round_properties() {
                 );
                 assert_eq!(oo, Equal);
             }
+        } else {
+            assert_panic!(x.add_prec_round_ref_ref(&y, prec, Exact));
         }
     });
 
@@ -9438,6 +9440,8 @@ fn add_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
             );
             assert_eq!(oo, Equal);
         }
+    } else {
+        assert_panic!(x.add_round_ref_ref(&y, Exact));
     }
 }
 
@@ -9782,6 +9786,8 @@ fn add_rational_prec_round_properties() {
                     );
                     assert_eq!(oo, Equal);
                 }
+            } else {
+                assert_panic!(x.add_rational_prec_round_ref_ref(&y, prec, Exact));
             }
         },
     );
@@ -10055,6 +10061,8 @@ fn add_rational_round_properties() {
                 );
                 assert_eq!(oo, Equal);
             }
+        } else {
+            assert_panic!(x.add_rational_round_ref_ref(&y, Exact));
         }
     });
 

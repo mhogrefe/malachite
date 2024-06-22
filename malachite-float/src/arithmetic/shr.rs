@@ -13,16 +13,16 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 fn shr_primitive_int_assign<T>(x: &mut Float, bits: T)
 where
-    i64: TryFrom<T>,
+    i32: TryFrom<T>,
 {
     if let Float(Finite { exponent, .. }) = x {
-        *exponent = exponent.checked_sub(i64::exact_from(bits)).unwrap();
+        *exponent = exponent.checked_sub(i32::exact_from(bits)).unwrap();
     }
 }
 
 fn shr_primitive_int_ref<T>(x: &Float, bits: T) -> Float
 where
-    i64: TryFrom<T>,
+    i32: TryFrom<T>,
 {
     match x {
         Float(Finite {
@@ -32,7 +32,7 @@ where
             significand,
         }) => Float(Finite {
             sign: *sign,
-            exponent: exponent.checked_sub(i64::exact_from(bits)).unwrap(),
+            exponent: exponent.checked_sub(i32::exact_from(bits)).unwrap(),
             precision: *precision,
             significand: significand.clone(),
         }),

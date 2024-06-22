@@ -12,20 +12,24 @@ pub(crate) fn register(runner: &mut Runner) {
     abs::register(runner);
     add::register(runner);
     is_power_of_2::register(runner);
+    mul::register(runner);
     neg::register(runner);
     power_of_2::register(runner);
     shl::register(runner);
     shr::register(runner);
     sign::register(runner);
+    square::register(runner);
     sub::register(runner);
 }
 
 mod abs;
 mod add;
 mod is_power_of_2;
+mod mul;
 mod neg;
 mod power_of_2;
 mod shl;
 mod shr;
 mod sign;
+mod square;
 mod sub;

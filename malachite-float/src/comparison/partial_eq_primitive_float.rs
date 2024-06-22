@@ -27,7 +27,7 @@ fn float_partial_eq_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> bool
             y.is_finite()
                 && *y != T::ZERO
                 && *sign == (*y > T::ZERO)
-                && *exponent - 1 == y.sci_exponent()
+                && i64::from(*exponent - 1) == y.sci_exponent()
                 && significand.cmp_normalized(&Natural::from(y.integer_mantissa())) == Equal
         }
     }

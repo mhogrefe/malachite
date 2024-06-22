@@ -237,20 +237,20 @@ pub mod is_integer;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::Rational;
 ///
-/// let (m, e): (f64, i64) = (&Float::ONE).sci_mantissa_and_exponent();
+/// let (m, e): (f64, i32) = (&Float::ONE).sci_mantissa_and_exponent();
 /// assert_eq!(NiceFloat(m), NiceFloat(1.0));
 /// assert_eq!(e, 0);
 ///
-/// let (m, e): (f64, i64) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
+/// let (m, e): (f64, i32) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
 /// assert_eq!(NiceFloat(m), NiceFloat(std::f64::consts::FRAC_PI_2));
 /// assert_eq!(e, 1);
 ///
-/// let (m, e): (f64, i64) =
+/// let (m, e): (f64, i32) =
 ///     (&Float::from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
 /// assert_eq!(NiceFloat(m), NiceFloat(1.187662594419065));
 /// assert_eq!(e, 79);
 ///
-/// let (m, e): (f64, i64) = (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0)
+/// let (m, e): (f64, i32) = (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0)
 ///     .sci_mantissa_and_exponent();
 /// assert_eq!(NiceFloat(m), NiceFloat(1.6839799530592128));
 /// assert_eq!(e, -80);

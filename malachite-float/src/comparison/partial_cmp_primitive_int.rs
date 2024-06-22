@@ -38,7 +38,7 @@ where
         } else if *e_x <= 0 {
             Less
         } else {
-            e_x.unsigned_abs()
+            u64::from(e_x.unsigned_abs())
                 .cmp(&y.significant_bits())
                 .then_with(|| sig_x.cmp_normalized(&Natural::from(*y)))
         }),
@@ -122,7 +122,7 @@ where
             } else if *e_x <= 0 {
                 Less
             } else {
-                e_x.unsigned_abs()
+                u64::from(e_x.unsigned_abs())
                     .cmp(&y.significant_bits())
                     .then_with(|| sig_x.cmp_normalized(&Natural::from(y.unsigned_abs())))
             };

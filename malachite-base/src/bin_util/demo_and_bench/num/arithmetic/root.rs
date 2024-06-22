@@ -342,6 +342,7 @@ fn demo_root_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, l
 macro_rules! benchmark_floor_cbrt_algorithms_unsigned {
     ($t:ident, $f:ident) => {
         fn $f(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+            #[allow(clippy::cast_lossless)]
             run_benchmark(
                 &format!("{}.floor_root(3)", $t::NAME),
                 BenchmarkType::Algorithms,
@@ -583,6 +584,7 @@ fn benchmark_cbrt_assign_rem<T: PrimitiveUnsigned>(
 macro_rules! benchmark_floor_root_algorithms_unsigned {
     ($t:ident, $f:ident) => {
         fn $f(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+            #[allow(clippy::cast_lossless)]
             run_benchmark(
                 &format!("{}.floor_root(u64)", $t::NAME),
                 BenchmarkType::Algorithms,

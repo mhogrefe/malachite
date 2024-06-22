@@ -52,7 +52,8 @@ impl PartialEq<Rational> for Float {
                     && *sign == (*other > 0)
                     && if let Some(log_d) = other.denominator_ref().checked_log_base_2() {
                         let n = other.numerator_ref();
-                        *exponent == i64::exact_from(n.significant_bits()) - i64::exact_from(log_d)
+                        i64::from(*exponent)
+                            == i64::exact_from(n.significant_bits()) - i64::exact_from(log_d)
                             && significand.cmp_normalized(n) == Equal
                     } else {
                         false

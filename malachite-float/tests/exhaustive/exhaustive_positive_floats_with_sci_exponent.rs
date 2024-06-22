@@ -10,7 +10,7 @@ use malachite_float::exhaustive::exhaustive_positive_floats_with_sci_exponent;
 use malachite_float::test_util::exhaustive::exhaustive_floats_helper_helper_with_limit;
 
 fn exhaustive_positive_floats_with_sci_exponent_helper(
-    sci_exponent: i64,
+    sci_exponent: i32,
     out: &[&str],
     out_hex: &[&str],
 ) {

@@ -69,7 +69,7 @@ impl Float {
         let bits = x.significant_bits();
         let mut f = Float(Finite {
             sign: true,
-            exponent: i64::exact_from(bits),
+            exponent: i32::exact_from(bits),
             precision: bits,
             significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
         });
@@ -175,7 +175,7 @@ impl Float {
         let bits = x.significant_bits();
         let mut f = Float(Finite {
             sign: true,
-            exponent: i64::exact_from(bits),
+            exponent: i32::exact_from(bits),
             precision: bits,
             significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
         });
@@ -231,7 +231,7 @@ impl Float {
         let bits = x.significant_bits();
         let mut f = Float(Finite {
             sign: true,
-            exponent: i64::exact_from(bits),
+            exponent: i32::exact_from(bits),
             precision: bits,
             significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
         });
@@ -272,7 +272,7 @@ impl From<Natural> for Float {
         let bits = n.significant_bits();
         Float(Finite {
             sign: true,
-            exponent: i64::exact_from(bits),
+            exponent: i32::exact_from(bits),
             precision: bits,
             significand: n << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
         })
@@ -313,7 +313,7 @@ impl<'a> From<&'a Natural> for Float {
         let bits = n.significant_bits();
         Float(Finite {
             sign: true,
-            exponent: i64::exact_from(bits),
+            exponent: i32::exact_from(bits),
             precision: bits,
             significand: n << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
         })

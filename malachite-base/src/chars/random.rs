@@ -241,7 +241,7 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 ///         .take(20)
 ///         .collect::<String>()
 ///         .as_str(),
-///     "𘋍𰜂礢깻ꅏ枂쭦𬝶╱𣑿⢍𰺟瀐\u{8d835}𲆽ՠ𦧹\u{37de9}\u{d71d4}𪂋"
+///     "𘋈𰒏礝깶ꅊ杽쭡𬝱╱𣑺⢍𰰬瀋\u{8daa8}𱽊ՠ𦧴\u{3805c}\u{d7447}𪂆"
 /// )
 /// ```
 #[inline]

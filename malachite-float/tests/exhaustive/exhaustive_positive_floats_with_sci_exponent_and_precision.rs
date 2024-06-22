@@ -11,7 +11,7 @@ use malachite_float::test_util::exhaustive::exhaustive_floats_helper_helper_with
 use std::panic::catch_unwind;
 
 fn exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
-    sci_exponent: i64,
+    sci_exponent: i32,
     prec: u64,
     out: &[&str],
     out_hex: &[&str],

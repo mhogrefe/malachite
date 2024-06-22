@@ -11,12 +11,12 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
 use malachite_nz::natural::Natural;
-use malachite_q::random::random_rationals_with_denominator_range_to_infinity;
+use malachite_q::random::random_rational_with_denominator_range_to_infinity;
 use malachite_q::test_util::random::random_rationals_helper_helper;
 use malachite_q::Rational;
 use std::str::FromStr;
 
-fn random_rationals_with_denominator_range_to_infinity_helper(
+fn random_rational_with_denominator_range_to_infinity_helper(
     d: &str,
     a: &str,
     mean_bits_numerator: u64,
@@ -27,7 +27,7 @@ fn random_rationals_with_denominator_range_to_infinity_helper(
     expected_sample_moment_stats: MomentStats,
 ) {
     random_rationals_helper_helper(
-        random_rationals_with_denominator_range_to_infinity(
+        random_rational_with_denominator_range_to_infinity(
             EXAMPLE_SEED,
             Natural::from_str(d).unwrap(),
             Rational::from_str(a).unwrap(),
@@ -42,7 +42,7 @@ fn random_rationals_with_denominator_range_to_infinity_helper(
 }
 
 #[test]
-fn test_random_rationals_with_denominator_range_to_infinity() {
+fn test_random_rational_with_denominator_range_to_infinity() {
     let values = &[
         "2",
         "4",
@@ -84,7 +84,7 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
         skewness: NiceFloat(961.5590415384418),
         excess_kurtosis: NiceFloat(943383.4745426066),
     };
-    random_rationals_with_denominator_range_to_infinity_helper(
+    random_rational_with_denominator_range_to_infinity_helper(
         "1",
         "0",
         10,
@@ -136,7 +136,7 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
         skewness: NiceFloat(999.9978064950928),
         excess_kurtosis: NiceFloat(999994.0749119784),
     };
-    random_rationals_with_denominator_range_to_infinity_helper(
+    random_rational_with_denominator_range_to_infinity_helper(
         "2",
         "0",
         10,
@@ -188,7 +188,7 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
         skewness: NiceFloat(999.9972159387221),
         excess_kurtosis: NiceFloat(999993.287033733),
     };
-    random_rationals_with_denominator_range_to_infinity_helper(
+    random_rational_with_denominator_range_to_infinity_helper(
         "6",
         "0",
         10,
@@ -240,7 +240,7 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
         skewness: NiceFloat(618.505376716015),
         excess_kurtosis: NiceFloat(438771.8555941413),
     };
-    random_rationals_with_denominator_range_to_infinity_helper(
+    random_rational_with_denominator_range_to_infinity_helper(
         "100",
         "245850922/78256779",
         10,
@@ -292,7 +292,7 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
         skewness: NiceFloat(994.171891194563),
         excess_kurtosis: NiceFloat(991907.5494321428),
     };
-    random_rationals_with_denominator_range_to_infinity_helper(
+    random_rational_with_denominator_range_to_infinity_helper(
         "100",
         "-245850922/78256779",
         10,
@@ -306,8 +306,8 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
 
 #[test]
 #[should_panic]
-fn random_rationals_with_denominator_range_to_infinity_fail_1() {
-    random_rationals_with_denominator_range_to_infinity(
+fn random_rational_with_denominator_range_to_infinity_fail_1() {
+    random_rational_with_denominator_range_to_infinity(
         EXAMPLE_SEED,
         Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
@@ -318,8 +318,8 @@ fn random_rationals_with_denominator_range_to_infinity_fail_1() {
 
 #[test]
 #[should_panic]
-fn random_rationals_with_denominator_range_to_infinity_fail_2() {
-    random_rationals_with_denominator_range_to_infinity(
+fn random_rational_with_denominator_range_to_infinity_fail_2() {
+    random_rational_with_denominator_range_to_infinity(
         EXAMPLE_SEED,
         Natural::ONE,
         Rational::from_unsigneds(1u32, 3),

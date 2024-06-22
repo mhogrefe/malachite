@@ -178,7 +178,7 @@ impl Float {
     /// assert_eq!(Float::power_of_2(-100i64).get_exponent(), Some(-99));
     /// ```
     #[inline]
-    pub const fn get_exponent(&self) -> Option<i64> {
+    pub const fn get_exponent(&self) -> Option<i32> {
         match self {
             Float(Finite { exponent, .. }) => Some(*exponent),
             _ => None,

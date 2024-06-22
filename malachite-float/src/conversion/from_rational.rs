@@ -80,9 +80,9 @@ impl Float {
         if x == 0 {
             (Float::ZERO, Equal)
         } else {
-            let mut exponent = i64::exact_from(x.floor_log_base_2_abs());
+            let mut exponent = i32::exact_from(x.floor_log_base_2_abs());
             let (significand, o) =
-                Integer::rounding_from(x << (i64::exact_from(prec) - exponent - 1), rm);
+                Integer::rounding_from(x << (i32::exact_from(prec) - exponent - 1), rm);
             let sign = significand >= 0;
             let mut significand = significand.unsigned_abs();
             let away_from_0 = if sign { Greater } else { Less };
@@ -230,9 +230,9 @@ impl Float {
         if *x == 0 {
             (Float::ZERO, Equal)
         } else {
-            let mut exponent = i64::exact_from(x.floor_log_base_2_abs());
+            let mut exponent = i32::exact_from(x.floor_log_base_2_abs());
             let (significand, o) =
-                Integer::rounding_from(x << (i64::exact_from(prec) - exponent - 1), rm);
+                Integer::rounding_from(x << (i32::exact_from(prec) - exponent - 1), rm);
             let sign = significand >= 0;
             let mut significand = significand.unsigned_abs();
             let away_from_0 = if sign { Greater } else { Less };

@@ -187,6 +187,10 @@ pub mod integer {
         pub mod xor;
     }
     pub mod random {
+        pub mod get_random_integer_from_range_to_infinity;
+        pub mod get_random_integer_from_range_to_negative_infinity;
+        pub mod get_uniform_random_integer_in_inclusive_range;
+        pub mod get_uniform_random_integer_in_range;
         pub mod random_integer_inclusive_range;
         pub mod random_integer_range;
         pub mod random_integer_range_to_infinity;
@@ -363,6 +367,7 @@ pub mod natural {
         pub mod xor;
     }
     pub mod random {
+        pub mod get_random_natural_less_than;
         pub mod get_random_natural_with_bits;
         pub mod get_random_natural_with_up_to_bits;
         pub mod get_striped_random_natural_with_bits;

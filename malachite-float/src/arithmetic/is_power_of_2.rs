@@ -79,7 +79,7 @@ pub(crate) fn float_is_signed_min<T: PrimitiveSigned>(f: &Float) -> bool {
             significand,
             ..
         }) => {
-            if *exponent != T::WIDTH as i64 {
+            if *exponent != T::WIDTH as i32 {
                 return false;
             }
             let mut first = true;

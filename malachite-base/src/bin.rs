@@ -62,7 +62,7 @@ use bin_util::generate::tuning_manager::{build_reference_data, test};
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
 #[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::Runner;
-#[cfg(feature = "bin_build")]
+
 // Examples:
 //
 // ```

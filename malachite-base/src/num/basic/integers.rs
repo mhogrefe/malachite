@@ -1049,7 +1049,7 @@ macro_rules! impl_basic_traits_primitive_int {
         /// # Examples
         /// See [here](self).
         impl Min for $t {
-            const MIN: $t = core::$t::MIN;
+            const MIN: $t = $t::MIN;
         }
 
         /// The highest value representable by this type.
@@ -1059,7 +1059,7 @@ macro_rules! impl_basic_traits_primitive_int {
         /// # Examples
         /// See [here](self).
         impl Max for $t {
-            const MAX: $t = core::$t::MAX;
+            const MAX: $t = $t::MAX;
         }
     };
 }

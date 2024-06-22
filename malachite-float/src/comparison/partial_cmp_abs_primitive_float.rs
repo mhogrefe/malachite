@@ -30,7 +30,7 @@ fn float_partial_cmp_abs_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) ->
             }),
             y,
         ) => Some(
-            (e_x - 1)
+            (i64::from(*e_x) - 1)
                 .cmp(&y.sci_exponent())
                 .then_with(|| m_x.cmp_normalized(&Natural::from(y.integer_mantissa()))),
         ),

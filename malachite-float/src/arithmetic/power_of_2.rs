@@ -59,7 +59,7 @@ impl Float {
         assert_ne!(prec, 0);
         Float(Finite {
             sign: true,
-            exponent: pow + 1,
+            exponent: i32::exact_from(pow.checked_add(1).unwrap()),
             precision: prec,
             significand: Natural::power_of_2(
                 prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
@@ -93,7 +93,7 @@ impl PowerOf2<u64> for Float {
     fn power_of_2(pow: u64) -> Float {
         Float(Finite {
             sign: true,
-            exponent: i64::exact_from(pow + 1),
+            exponent: i32::exact_from(pow.checked_add(1).unwrap()),
             precision: 1,
             significand: Natural::HIGH_BIT,
         })
@@ -125,7 +125,7 @@ impl PowerOf2<i64> for Float {
     fn power_of_2(pow: i64) -> Float {
         Float(Finite {
             sign: true,
-            exponent: pow + 1,
+            exponent: i32::exact_from(pow.checked_add(1).unwrap()),
             precision: 1,
             significand: Natural::HIGH_BIT,
         })

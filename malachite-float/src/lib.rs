@@ -170,7 +170,7 @@ pub(crate) enum InnerFloat {
     },
     Finite {
         sign: bool,
-        exponent: i64,
+        exponent: i32,
         precision: u64,
         significand: Natural,
     },

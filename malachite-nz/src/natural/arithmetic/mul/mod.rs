@@ -1,5 +1,7 @@
 // Copyright © 2024 Mikhail Hogrefe
 //
+// Some optimizations contributed by florian1345.
+//
 // Uses code adopted from the GNU MP Library.
 //
 //      `mpn_mul` and `TOOM44_OK` contributed to the GNU project by Torbjörn Granlund.

@@ -37,7 +37,7 @@ pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ord
             if s_cmp != Equal {
                 return Some(s_cmp);
             }
-            let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
+            let ord_cmp = (i64::from(*e_x) - 1).cmp(&other.floor_log_base_2_abs());
             if ord_cmp == Equal {
                 Rational::try_from(x).unwrap().cmp(other)
             } else if *s_x {
@@ -101,6 +101,7 @@ impl PartialOrd<Rational> for Float {
                 if s_cmp != Equal {
                     return Some(s_cmp);
                 }
+                let e_x = i64::from(*e_x);
                 let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
                 if ord_cmp == Equal {
                     let shift = e_x - i64::exact_from(significand_bits(significand_x));

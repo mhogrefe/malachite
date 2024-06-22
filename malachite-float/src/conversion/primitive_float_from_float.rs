@@ -35,7 +35,7 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
         }) => {
             let abs_rm = if sign { rm } else { -rm };
             let (x, o) = {
-                let exponent = exponent - 1;
+                let exponent = i64::from(exponent) - 1;
                 if exponent < T::MIN_EXPONENT {
                     match abs_rm {
                         Floor | Down => (T::ZERO, Less),
@@ -120,7 +120,7 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
         }) => {
             let abs_rm = if *sign { rm } else { -rm };
             let (x, o) = {
-                let exponent = exponent - 1;
+                let exponent = i64::from(*exponent) - 1;
                 if exponent < T::MIN_EXPONENT {
                     match abs_rm {
                         Floor | Down => (T::ZERO, Less),
@@ -208,7 +208,7 @@ fn primitive_float_try_from_float<T: PrimitiveFloat>(f: Float) -> Result<T, Floa
             ..
         }) => {
             let x = {
-                let exponent = exponent - 1;
+                let exponent = i64::from(exponent) - 1;
                 if exponent < T::MIN_EXPONENT {
                     return Err(FloatFromFloatError::Underflow);
                 } else if exponent > T::MAX_EXPONENT {
@@ -251,7 +251,7 @@ fn primitive_float_try_from_float_ref<T: PrimitiveFloat>(
             let x = if *significand == 0u32 {
                 T::ZERO
             } else {
-                let exponent = exponent - 1;
+                let exponent = i64::from(*exponent) - 1;
                 if exponent < T::MIN_EXPONENT {
                     return Err(FloatFromFloatError::Underflow);
                 } else if exponent > T::MAX_EXPONENT {
@@ -283,7 +283,7 @@ fn primitive_float_convertible_from_float<T: PrimitiveFloat>(f: &Float) -> bool 
             significand,
             ..
         }) => {
-            let exponent = exponent - 1;
+            let exponent = i64::from(*exponent) - 1;
             exponent >= T::MIN_EXPONENT && exponent <= T::MAX_EXPONENT && {
                 let target_prec = T::max_precision_for_sci_exponent(exponent);
                 let bits = significand_bits(significand);

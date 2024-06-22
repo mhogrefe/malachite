@@ -460,7 +460,7 @@ fn test_sci_mantissa_and_exponent_round() {
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
-        let meo: Option<(T, i64, Ordering)> = x.sci_mantissa_and_exponent_round(rm);
+        let meo: Option<(T, i32, Ordering)> = x.sci_mantissa_and_exponent_round(rm);
         if let Some((m, e, o)) = meo {
             assert_eq!(format!("Some({}, {}, {:?})", NiceFloat(m), e, o), out);
         } else {
@@ -1326,7 +1326,7 @@ fn test_sci_mantissa_and_exponent_float() {
         assert_eq!(to_hex_string(&m), m_out_hex);
         assert_eq!(e, e_out);
 
-        let (m_alt, e_alt): (Float, i64) = (&x).sci_mantissa_and_exponent();
+        let (m_alt, e_alt): (Float, i32) = (&x).sci_mantissa_and_exponent();
         assert!(m_alt.is_valid());
         assert_eq!(ComparableFloatRef(&m_alt), ComparableFloatRef(&m));
         assert_eq!(e_alt, e);
@@ -1590,14 +1590,14 @@ fn from_sci_mantissa_and_exponent_float_fail() {
 
 #[test]
 fn test_sci_mantissa_and_exponent_primitive_float() {
-    fn test<T: PrimitiveFloat>(s: &str, s_hex: &str, m_out: &str, e_out: i64)
+    fn test<T: PrimitiveFloat>(s: &str, s_hex: &str, m_out: &str, e_out: i32)
     where
-        for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+        for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
     {
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
-        let (m, e): (T, i64) = (&x).sci_mantissa_and_exponent();
+        let (m, e): (T, i32) = (&x).sci_mantissa_and_exponent();
         assert_eq!(NiceFloat(m).to_string(), m_out);
         assert_eq!(e, e_out);
 
@@ -1744,7 +1744,7 @@ fn test_sci_mantissa_and_exponent_primitive_float() {
 
 fn sci_mantissa_and_exponent_primitive_float_fail_helper<T: PrimitiveFloat>()
 where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     assert_panic!(
         <&Float as SciMantissaAndExponent<T, _, _>>::sci_mantissa_and_exponent(&Float::NAN)
@@ -1806,9 +1806,9 @@ fn sci_mantissa_and_exponent_primitive_float_fail() {
 
 #[test]
 fn test_from_sci_mantissa_and_exponent_primitive_float() {
-    fn test<T: PrimitiveFloat>(m: T, e: i64, out: Option<&str>, out_hex: Option<&str>)
+    fn test<T: PrimitiveFloat>(m: T, e: i32, out: Option<&str>, out_hex: Option<&str>)
     where
-        for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+        for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
     {
         let ox = <&Float as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(m, e);
         assert!(ox.as_ref().map_or(true, Float::is_valid));
@@ -1885,7 +1885,7 @@ fn test_from_sci_mantissa_and_exponent_primitive_float() {
 
 fn from_sci_mantissa_and_exponent_primitive_float_fail_helper<T: PrimitiveFloat>()
 where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     assert_panic!(
         <&Float as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(T::NAN, 0)
@@ -1954,7 +1954,7 @@ fn raw_mantissa_and_exponent_properties() {
 
 #[test]
 fn from_raw_mantissa_and_exponent_properties() {
-    natural_signed_pair_gen_var_4::<i64>().test_properties(|(mantissa, exponent)| {
+    natural_signed_pair_gen_var_4::<i32>().test_properties(|(mantissa, exponent)| {
         let x = Float::from_raw_mantissa_and_exponent(mantissa.clone(), exponent);
         assert!(x.is_valid());
         assert!(x.is_finite());
@@ -1978,7 +1978,7 @@ where
         let (mantissa, exponent) = x.integer_mantissa_and_exponent();
         let (mantissa_alt, exponent_alt) = Float::from(x).integer_mantissa_and_exponent();
         assert_eq!(mantissa_alt, mantissa);
-        assert_eq!(exponent_alt, exponent);
+        assert_eq!(i64::from(exponent_alt), exponent);
     });
 }
 
@@ -2018,7 +2018,7 @@ fn integer_mantissa_and_exponent_properties() {
 
 #[test]
 fn from_integer_mantissa_and_exponent_properties() {
-    natural_signed_pair_gen_var_2::<i64>().test_properties(|(mantissa, exponent)| {
+    natural_signed_pair_gen_var_2::<i32>().test_properties(|(mantissa, exponent)| {
         let ox = Float::from_integer_mantissa_and_exponent(mantissa.clone(), exponent);
         if let Some(x) = ox.as_ref() {
             assert!(x.is_valid());
@@ -2065,7 +2065,7 @@ where
             let r_x: Rational = ExactFrom::exact_from(x);
             assert_eq!(
                 r_x.sci_mantissa_and_exponent_round(rm).unwrap(),
-                (mantissa, exponent, o)
+                (mantissa, i64::from(exponent), o)
             );
         } else {
             assert!(!x.is_finite() || x == 0u32 || rm == Exact);
@@ -2127,13 +2127,13 @@ fn sci_mantissa_and_exponent_round_properties() {
 #[test]
 fn sci_mantissa_and_exponent_float_properties() {
     float_gen_var_3().test_properties(|x| {
-        let (mantissa, exponent): (Float, i64) = x.clone().sci_mantissa_and_exponent();
+        let (mantissa, exponent): (Float, i32) = x.clone().sci_mantissa_and_exponent();
         assert!(mantissa.is_valid());
-        let (mantissa_alt, exponent_alt): (Float, i64) = (&x).sci_mantissa_and_exponent();
+        let (mantissa_alt, exponent_alt): (Float, i32) = (&x).sci_mantissa_and_exponent();
         assert!(mantissa_alt.is_valid());
         assert_eq!(mantissa_alt, mantissa);
         assert_eq!(exponent_alt, exponent);
-        let (mantissa_alt, exponent_alt): (Float, i64) = (-&x).sci_mantissa_and_exponent();
+        let (mantissa_alt, exponent_alt): (Float, i32) = (-&x).sci_mantissa_and_exponent();
         assert_eq!(mantissa_alt, mantissa);
         assert_eq!(exponent_alt, exponent);
 
@@ -2171,7 +2171,7 @@ fn sci_mantissa_and_exponent_float_properties() {
 
 #[test]
 fn from_sci_mantissa_and_exponent_float_properties() {
-    float_signed_pair_gen_var_1::<i64>().test_properties(|(mantissa, exponent)| {
+    float_signed_pair_gen_var_1::<i32>().test_properties(|(mantissa, exponent)| {
         let ox = Float::from_sci_mantissa_and_exponent(mantissa.clone(), exponent);
         if let Some(x) = ox.as_ref() {
             assert!(x.is_valid());
@@ -2197,11 +2197,11 @@ fn from_sci_mantissa_and_exponent_float_properties() {
 
 fn sci_mantissa_and_exponent_primitive_float_properties_helper<T: PrimitiveFloat>()
 where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
     Float: From<T>,
 {
     float_gen_var_3().test_properties(|x| {
-        let (mantissa, exponent): (T, i64) = (&x).sci_mantissa_and_exponent();
+        let (mantissa, exponent): (T, i32) = (&x).sci_mantissa_and_exponent();
 
         assert_eq!(
             <&Float as SciMantissaAndExponent<T, _, _>>::sci_mantissa(&x),
@@ -2211,7 +2211,7 @@ where
             <&Float as SciMantissaAndExponent<T, _, _>>::sci_exponent(&x),
             exponent
         );
-        let (mantissa_alt, exponent_alt): (T, i64) = (&-&x).sci_mantissa_and_exponent();
+        let (mantissa_alt, exponent_alt): (T, i32) = (&-&x).sci_mantissa_and_exponent();
         assert_eq!(mantissa_alt, mantissa);
         assert_eq!(exponent_alt, exponent);
 
@@ -2230,9 +2230,9 @@ where
 
     primitive_float_gen_var_12::<T>().test_properties(|x| {
         let (mantissa, exponent) = x.sci_mantissa_and_exponent();
-        let (mantissa_alt, exponent_alt): (T, i64) = (&Float::from(x)).sci_mantissa_and_exponent();
+        let (mantissa_alt, exponent_alt): (T, i32) = (&Float::from(x)).sci_mantissa_and_exponent();
         assert_eq!(mantissa_alt, mantissa);
-        assert_eq!(exponent_alt, exponent);
+        assert_eq!(i64::from(exponent_alt), exponent);
     });
 }
 
@@ -2243,12 +2243,13 @@ fn sci_mantissa_and_exponent_primitive_float_properties() {
 
 fn from_sci_mantissa_and_exponent_primitive_float_properties_helper<T: PrimitiveFloat>()
 where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
     Float: From<T>,
 {
     primitive_float_signed_pair_gen_var_3::<T>().test_properties(|(mantissa, exponent)| {
         let ox = <&Float as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(
-            mantissa, exponent,
+            mantissa,
+            i32::exact_from(exponent),
         );
         if let Some(x) = ox.as_ref() {
             assert!(x.is_valid());
@@ -2259,12 +2260,13 @@ where
                 mantissa
             );
             assert_eq!(
-                <&Float as SciMantissaAndExponent<T, _, _>>::sci_exponent(x),
+                i64::from(<&Float as SciMantissaAndExponent<T, _, _>>::sci_exponent(x)),
                 exponent
             );
         }
 
-        let ox_alt = Float::from_sci_mantissa_and_exponent(Float::from(mantissa), exponent);
+        let ox_alt =
+            Float::from_sci_mantissa_and_exponent(Float::from(mantissa), i32::exact_from(exponent));
         assert!(ox_alt.as_ref().map_or(true, Float::is_valid));
         assert_eq!(ox_alt, ox);
     });

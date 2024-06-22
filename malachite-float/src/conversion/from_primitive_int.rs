@@ -63,7 +63,7 @@ impl Float {
         let bits = const_limb_significant_bits(x);
         Float(Finite {
             sign: true,
-            exponent: bits as i64,
+            exponent: bits as i32,
             precision: bits,
             significand: Natural::const_from(
                 // TODO simplify?

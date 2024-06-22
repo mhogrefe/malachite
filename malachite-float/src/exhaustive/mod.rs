@@ -37,7 +37,7 @@ use malachite_nz::platform::Limb;
 /// its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustivePositiveFloatsWithSciExponentAndPrecision {
-    exponent: i64,
+    exponent: i32,
     precision: u64,
     shift: u64,
     significands: ExhaustiveNaturalRange,
@@ -105,7 +105,7 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponentAndPrecision {
 /// );
 /// ```
 pub fn exhaustive_positive_floats_with_sci_exponent_and_precision(
-    sci_exponent: i64,
+    sci_exponent: i32,
     prec: u64,
 ) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
     assert_ne!(prec, 0);
@@ -122,7 +122,7 @@ pub fn exhaustive_positive_floats_with_sci_exponent_and_precision(
 
 #[derive(Clone, Debug)]
 struct FloatsWithSciExponentAndPrecisionGenerator {
-    sci_exponent: i64,
+    sci_exponent: i32,
 }
 
 impl
@@ -140,7 +140,7 @@ impl
 
 #[inline]
 fn exhaustive_positive_floats_with_sci_exponent_helper(
-    sci_exponent: i64,
+    sci_exponent: i32,
 ) -> LexDependentPairs<
     u64,
     Float,
@@ -234,7 +234,7 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponent {
 /// ```
 #[inline]
 pub fn exhaustive_positive_floats_with_sci_exponent(
-    sci_exponent: i64,
+    sci_exponent: i32,
 ) -> ExhaustivePositiveFloatsWithSciExponent {
     ExhaustivePositiveFloatsWithSciExponent(exhaustive_positive_floats_with_sci_exponent_helper(
         sci_exponent,
@@ -248,13 +248,13 @@ struct FloatsWithPrecisionAndSciExponentGenerator {
 
 impl
     ExhaustiveDependentPairsYsGenerator<
-        i64,
+        i32,
         Float,
         ExhaustivePositiveFloatsWithSciExponentAndPrecision,
     > for FloatsWithPrecisionAndSciExponentGenerator
 {
     #[inline]
-    fn get_ys(&self, &exp: &i64) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+    fn get_ys(&self, &exp: &i32) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
         exhaustive_positive_floats_with_sci_exponent_and_precision(exp, self.precision)
     }
 }
@@ -263,11 +263,11 @@ impl
 fn exhaustive_floats_with_precision_helper(
     prec: u64,
 ) -> ExhaustiveDependentPairs<
-    i64,
+    i32,
     Float,
     RulerSequence<usize>,
     FloatsWithPrecisionAndSciExponentGenerator,
-    ExhaustiveSigneds<i64>,
+    ExhaustiveSigneds<i32>,
     ExhaustivePositiveFloatsWithSciExponentAndPrecision,
 > {
     exhaustive_dependent_pairs(
@@ -284,11 +284,11 @@ fn exhaustive_floats_with_precision_helper(
 #[derive(Clone, Debug)]
 pub struct ExhaustivePositiveFloatsWithPrecision(
     ExhaustiveDependentPairs<
-        i64,
+        i32,
         Float,
         RulerSequence<usize>,
         FloatsWithPrecisionAndSciExponentGenerator,
-        ExhaustiveSigneds<i64>,
+        ExhaustiveSigneds<i32>,
         ExhaustivePositiveFloatsWithSciExponentAndPrecision,
     >,
 );
@@ -462,22 +462,22 @@ pub fn exhaustive_floats_with_precision(prec: u64) -> ExhaustiveFloatsWithPrecis
 #[derive(Clone, Debug)]
 struct ExhaustivePositiveFiniteFloatsGenerator;
 
-impl ExhaustiveDependentPairsYsGenerator<i64, Float, ExhaustivePositiveFloatsWithSciExponent>
+impl ExhaustiveDependentPairsYsGenerator<i32, Float, ExhaustivePositiveFloatsWithSciExponent>
     for ExhaustivePositiveFiniteFloatsGenerator
 {
     #[inline]
-    fn get_ys(&self, &sci_exponent: &i64) -> ExhaustivePositiveFloatsWithSciExponent {
+    fn get_ys(&self, &sci_exponent: &i32) -> ExhaustivePositiveFloatsWithSciExponent {
         exhaustive_positive_floats_with_sci_exponent(sci_exponent)
     }
 }
 
 #[inline]
 fn exhaustive_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
-    i64,
+    i32,
     Float,
     RulerSequence<usize>,
     ExhaustivePositiveFiniteFloatsGenerator,
-    Chain<Once<i64>, PrimitiveIntUpDown<i64>>,
+    Chain<Once<i32>, PrimitiveIntUpDown<i32>>,
     ExhaustivePositiveFloatsWithSciExponent,
 > {
     exhaustive_dependent_pairs(
@@ -494,11 +494,11 @@ fn exhaustive_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
 #[derive(Clone, Debug)]
 pub struct ExhaustivePositiveFiniteFloats(
     ExhaustiveDependentPairs<
-        i64,
+        i32,
         Float,
         RulerSequence<usize>,
         ExhaustivePositiveFiniteFloatsGenerator,
-        Chain<Once<i64>, PrimitiveIntUpDown<i64>>,
+        Chain<Once<i32>, PrimitiveIntUpDown<i32>>,
         ExhaustivePositiveFloatsWithSciExponent,
     >,
 );

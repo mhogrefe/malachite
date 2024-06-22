@@ -105,12 +105,12 @@ fn test_other_float_constants() {
         NiceFloat(1.1754944e-38)
     );
     assert_eq!(NiceFloat(f32::MAX_FINITE), NiceFloat(3.4028235e38));
-    assert_eq!(NiceFloat(Infinity::INFINITY), NiceFloat(std::f32::INFINITY));
+    assert_eq!(NiceFloat(Infinity::INFINITY), NiceFloat(f32::INFINITY));
     assert_eq!(
         NiceFloat(f32::NEGATIVE_INFINITY),
-        NiceFloat(std::f32::NEG_INFINITY)
+        NiceFloat(f32::NEG_INFINITY)
     );
-    assert_eq!(NiceFloat(NaN::NAN), NiceFloat(std::f32::NAN));
+    assert_eq!(NiceFloat(NaN::NAN), NiceFloat(f32::NAN));
     assert_eq!(f32::SMALLEST_UNREPRESENTABLE_UINT, 0x1000001);
     assert_eq!(f32::LARGEST_ORDERED_REPRESENTATION, 0xff000001);
 
@@ -133,12 +133,12 @@ fn test_other_float_constants() {
         NiceFloat(f64::MAX_FINITE),
         NiceFloat(1.7976931348623157e308)
     );
-    assert_eq!(NiceFloat(Infinity::INFINITY), NiceFloat(std::f64::INFINITY));
+    assert_eq!(NiceFloat(Infinity::INFINITY), NiceFloat(f64::INFINITY));
     assert_eq!(
         NiceFloat(f64::NEGATIVE_INFINITY),
-        NiceFloat(std::f64::NEG_INFINITY)
+        NiceFloat(f64::NEG_INFINITY)
     );
-    assert_eq!(NiceFloat(NaN::NAN), NiceFloat(std::f64::NAN));
+    assert_eq!(NiceFloat(NaN::NAN), NiceFloat(f64::NAN));
     assert_eq!(f32::SMALLEST_UNREPRESENTABLE_UINT, 0x1000001);
     assert_eq!(f64::LARGEST_ORDERED_REPRESENTATION, 0xffe0000000000001);
 }

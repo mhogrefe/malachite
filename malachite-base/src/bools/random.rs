@@ -8,7 +8,9 @@
 
 use crate::num::arithmetic::traits::Parity;
 use crate::num::random::geometric::SimpleRational;
-use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use crate::num::random::{
+    random_unsigneds_less_than, RandomUnsignedsLessThan, VariableRangeGenerator,
+};
 use crate::random::Seed;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
@@ -104,7 +106,11 @@ impl Iterator for WeightedRandomBools {
 /// Panics if `p_denominator` is 0 or `p_numerator > p_denominator`.
 ///
 /// # Expected complexity per iteration
-/// Constant time and additional memory.
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ = `p_denominator.significant_bits()`.
 ///
 /// # Examples
 /// ```
@@ -128,4 +134,49 @@ pub fn weighted_random_bools(
         numerator: p.n,
         xs: random_unsigneds_less_than(seed, p.d),
     }
+}
+
+/// Generates a random [`bool`] with a particular probability of being `true`.
+///
+/// Let $n_p$ be `p_numerator`, $d_p$ be `p_denominator`, and let $p=n_p/d_p$. Then
+///
+/// $P(\text{true}) = p$,
+///
+/// $P(\text{false}) = 1-p$.
+///
+/// # Panics
+/// Panics if `p_denominator` is 0 or `p_numerator > p_denominator`.
+///
+/// # Expected complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ = `p_denominator.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::random::get_weighted_random_bool;
+/// use malachite_base::num::random::variable_range_generator;
+/// use malachite_base::random::EXAMPLE_SEED;
+///
+/// assert_eq!(
+///     get_weighted_random_bool(&mut variable_range_generator(EXAMPLE_SEED), 1, 10),
+///     false
+/// );
+/// ```
+pub fn get_weighted_random_bool(
+    range_generator: &mut VariableRangeGenerator,
+    p_numerator: u64,
+    p_denominator: u64,
+) -> bool {
+    assert_ne!(p_denominator, 0);
+    assert!(p_numerator <= p_denominator);
+    if p_numerator == 0 {
+        return false;
+    } else if p_numerator == p_denominator {
+        return true;
+    }
+    let p = SimpleRational::new(p_numerator, p_denominator);
+    range_generator.next_less_than(p.d) < p.n
 }

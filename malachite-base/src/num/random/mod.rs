@@ -2480,6 +2480,34 @@ pub struct VariableRangeGenerator {
 }
 
 impl VariableRangeGenerator {
+    /// Uniformly generates a `bool`.
+    ///
+    /// $$
+    /// $P(\text{false}) = P(\text{true}) = \frac{1}{2}$.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::random::EXAMPLE_SEED;
+    ///
+    /// let mut xs = Vec::with_capacity(10);
+    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// for _ in 0..10 {
+    ///     xs.push(generator.next_bool());
+    /// }
+    /// assert_eq!(
+    ///     xs,
+    ///     &[true, false, true, false, true, true, true, true, true, false]
+    /// );
+    /// ```
+    pub fn next_bool(&mut self) -> bool {
+        self.xs.next().unwrap().odd()
+    }
+
     /// Uniformly generates an unsigned integer with up to some number of bits.
     ///
     /// $$
@@ -2489,8 +2517,6 @@ impl VariableRangeGenerator {
     /// \\end{cases}
     /// $$
     /// where $c$ is `chunk_size`.
-    ///
-    /// The output length is infinite.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

@@ -291,9 +291,9 @@ fn first_block_primesieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
         for i in i + 1.. {
             if bit_array[index] & mask == T::ZERO {
                 let mut step = id_to_n(i);
-                // lindex = n_to_bit(id_to_n(i)*id_to_n(i));
+                // lindex = n_to_bit(id_to_n(i) * id_to_n(i));
                 let mut lindex = i * (step + 1) - 1 + ((i & 1).wrapping_neg() & (i + 1));
-                // lindex = i*(step+1+(i&1))-1+(i&1);
+                // lindex = i * (step + 1 + (i & 1)) - 1 + (i & 1);
                 if lindex > bits {
                     break;
                 }
@@ -305,7 +305,7 @@ fn first_block_primesieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
                     lmask.rotate_left_assign(maskrot);
                     lindex += step;
                 }
-                // lindex = n_to_bit(id_to_n(i)*bit_to_n(i));
+                // lindex = n_to_bit(id_to_n(i) * bit_to_n(i));
                 lindex = i * (i * 3 + 6) + (i & 1);
                 lmask = T::power_of_2(lindex & T::WIDTH_MASK);
                 while lindex <= bits {

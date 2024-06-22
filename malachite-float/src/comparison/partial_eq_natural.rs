@@ -47,7 +47,7 @@ impl PartialEq<Natural> for Float {
                 *sign
                     && *other != 0u32
                     && *exponent >= 0
-                    && other.significant_bits() == exponent.unsigned_abs()
+                    && other.significant_bits() == u64::from(exponent.unsigned_abs())
                     && significand.cmp_normalized(other) == Equal
             }
             _ => false,

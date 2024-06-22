@@ -78,7 +78,11 @@ impl Float {
                 exponent,
                 precision,
                 ..
-            }) => Some(Float::power_of_2(exponent - i64::exact_from(*precision))),
+            }) => Some(Float::power_of_2(
+                i64::from(*exponent)
+                    .checked_sub(i64::exact_from(*precision))
+                    .unwrap(),
+            )),
             _ => None,
         }
     }

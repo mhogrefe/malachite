@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::bucketers::pair_1_primitive_float_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
@@ -235,12 +235,12 @@ fn demo_float_sci_exponent_float_ref_debug(gm: GenMode, config: &GenConfig, limi
 }
 
 fn demo_float_from_sci_mantissa_and_exponent_float(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i64>()
+    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i32>()
         .get(gm, config)
         .take(limit)
     {
         let n =
-            <Float as SciMantissaAndExponent<Float, i64, Float>>::from_sci_mantissa_and_exponent(
+            <Float as SciMantissaAndExponent<Float, i32, Float>>::from_sci_mantissa_and_exponent(
                 mantissa.clone(),
                 exponent,
             );
@@ -258,12 +258,12 @@ fn demo_float_from_sci_mantissa_and_exponent_float_debug(
     config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i64>()
+    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i32>()
         .get(gm, config)
         .take(limit)
     {
         let n =
-            <Float as SciMantissaAndExponent<Float, i64, Float>>::from_sci_mantissa_and_exponent(
+            <Float as SciMantissaAndExponent<Float, i32, Float>>::from_sci_mantissa_and_exponent(
                 mantissa.clone(),
                 exponent,
             );
@@ -281,12 +281,12 @@ fn demo_float_from_sci_mantissa_and_exponent_float_ref(
     config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i64>()
+    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i32>()
         .get(gm, config)
         .take(limit)
     {
         let n =
-            <&Float as SciMantissaAndExponent<Float, i64, Float>>::from_sci_mantissa_and_exponent(
+            <&Float as SciMantissaAndExponent<Float, i32, Float>>::from_sci_mantissa_and_exponent(
                 mantissa.clone(),
                 exponent,
             );
@@ -304,12 +304,12 @@ fn demo_float_from_sci_mantissa_and_exponent_float_ref_debug(
     config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i64>()
+    for (mantissa, exponent) in float_signed_pair_gen_var_1::<i32>()
         .get(gm, config)
         .take(limit)
     {
         let n =
-            <&Float as SciMantissaAndExponent<Float, i64, Float>>::from_sci_mantissa_and_exponent(
+            <&Float as SciMantissaAndExponent<Float, i32, Float>>::from_sci_mantissa_and_exponent(
                 mantissa.clone(),
                 exponent,
             );
@@ -327,7 +327,7 @@ fn demo_float_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         let (m, e) = SciMantissaAndExponent::<T, _, _>::sci_mantissa_and_exponent(&n);
@@ -344,7 +344,7 @@ fn demo_float_sci_mantissa_and_exponent_primitive_float_debug<T: PrimitiveFloat>
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         let (m, e) = SciMantissaAndExponent::<T, _, _>::sci_mantissa_and_exponent(&n);
@@ -361,7 +361,7 @@ fn demo_float_sci_mantissa_primitive_float<T: PrimitiveFloat>(
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!(
@@ -377,7 +377,7 @@ fn demo_float_sci_mantissa_primitive_float_debug<T: PrimitiveFloat>(
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!(
@@ -393,7 +393,7 @@ fn demo_float_sci_exponent_primitive_float<T: PrimitiveFloat>(
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!(
@@ -409,7 +409,7 @@ fn demo_float_sci_exponent_primitive_float_debug<T: PrimitiveFloat>(
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!(
@@ -425,13 +425,14 @@ fn demo_float_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for (mantissa, exponent) in primitive_float_signed_pair_gen_var_3()
         .get(gm, config)
         .take(limit)
     {
-        let n = <&Float as SciMantissaAndExponent<T, i64, Float>>::from_sci_mantissa_and_exponent(
+        let exponent = i32::exact_from(exponent);
+        let n = <&Float as SciMantissaAndExponent<T, i32, Float>>::from_sci_mantissa_and_exponent(
             mantissa, exponent,
         );
         println!(
@@ -448,13 +449,14 @@ fn demo_float_from_sci_mantissa_and_exponent_primitive_float_debug<T: PrimitiveF
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for (mantissa, exponent) in primitive_float_signed_pair_gen_var_3()
         .get(gm, config)
         .take(limit)
     {
-        let n = <&Float as SciMantissaAndExponent<T, i64, Float>>::from_sci_mantissa_and_exponent(
+        let exponent = i32::exact_from(exponent);
+        let n = <&Float as SciMantissaAndExponent<T, i32, Float>>::from_sci_mantissa_and_exponent(
             mantissa, exponent,
         );
         println!(
@@ -570,20 +572,20 @@ fn benchmark_float_from_sci_mantissa_and_exponent_float_evaluation_strategy(
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::from_sci_mantissa_and_exponent(Float, i64)",
+        "Float::from_sci_mantissa_and_exponent(Float, i32)",
         BenchmarkType::EvaluationStrategy,
-        float_signed_pair_gen_var_1::<i64>().get(gm, config),
+        float_signed_pair_gen_var_1::<i32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_float_complexity_bucketer("x"),
         &mut [
             (
-                "Float::from_sci_mantissa_and_exponent(Float, i64)",
+                "Float::from_sci_mantissa_and_exponent(Float, i32)",
                 &mut |(mantissa, exponent)| {
                     no_out!(<Float as SciMantissaAndExponent::<
                         Float,
-                        i64,
+                        i32,
                         Float,
                     >>::from_sci_mantissa_and_exponent(
                         mantissa, exponent
@@ -591,11 +593,11 @@ fn benchmark_float_from_sci_mantissa_and_exponent_float_evaluation_strategy(
                 },
             ),
             (
-                "(&Float)::from_sci_mantissa_and_exponent(Float, i64)",
+                "(&Float)::from_sci_mantissa_and_exponent(Float, i32)",
                 &mut |(mantissa, exponent)| {
                     no_out!(<&Float as SciMantissaAndExponent::<
                         Float,
-                        i64,
+                        i32,
                         Float,
                     >>::from_sci_mantissa_and_exponent(
                         mantissa, exponent
@@ -612,7 +614,7 @@ fn benchmark_float_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     limit: usize,
     file_name: &str,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     run_benchmark(
         "Float.sci_mantissa_and_exponent()",
@@ -634,7 +636,7 @@ fn benchmark_float_sci_mantissa_primitive_float<T: PrimitiveFloat>(
     limit: usize,
     file_name: &str,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     run_benchmark(
         "Float.sci_mantissa()",
@@ -656,7 +658,7 @@ fn benchmark_float_sci_exponent_primitive_float<T: PrimitiveFloat>(
     limit: usize,
     file_name: &str,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     run_benchmark(
         "Float.sci_exponent()",
@@ -678,10 +680,10 @@ fn benchmark_float_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFl
     limit: usize,
     file_name: &str,
 ) where
-    for<'a> &'a Float: SciMantissaAndExponent<T, i64, Float>,
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     run_benchmark(
-        "Float::from_sci_mantissa_and_exponent(Float, i64)",
+        "Float::from_sci_mantissa_and_exponent(Float, i32)",
         BenchmarkType::Single,
         primitive_float_signed_pair_gen_var_3().get(gm, config),
         gm.name(),
@@ -689,11 +691,12 @@ fn benchmark_float_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFl
         file_name,
         &pair_1_primitive_float_bucketer("mantissa"),
         &mut [(
-            &format!("Float::from_sci_mantissa_and_exponent({}, i64)", T::NAME),
+            &format!("Float::from_sci_mantissa_and_exponent({}, i32)", T::NAME),
             &mut |(mantissa, exponent)| {
+                let exponent = i32::exact_from(exponent);
                 no_out!(<&Float as SciMantissaAndExponent::<
                         T,
-                        i64,
+                        i32,
                         Float,
                     >>::from_sci_mantissa_and_exponent(
                         mantissa, exponent

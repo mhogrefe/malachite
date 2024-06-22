@@ -149,7 +149,7 @@ fn test_get_exponent() {
 
         let exponent = x.get_exponent();
         assert_eq!(exponent, out);
-        assert_eq!(rug::Float::exact_from(&x).get_exp().map(i64::from), out);
+        assert_eq!(rug::Float::exact_from(&x).get_exp(), out);
     };
     test("NaN", "NaN", None);
     test("Infinity", "Infinity", None);
@@ -200,10 +200,7 @@ fn test_get_exponent() {
 fn get_exponent_properties() {
     float_gen().test_properties(|x| {
         let exponent = x.get_exponent();
-        assert_eq!(
-            rug::Float::exact_from(&x).get_exp().map(i64::from),
-            exponent
-        );
+        assert_eq!(rug::Float::exact_from(&x).get_exp(), exponent);
         if let Some(exponent) = exponent {
             assert_eq!(x.sci_exponent() + 1, exponent);
         } else {

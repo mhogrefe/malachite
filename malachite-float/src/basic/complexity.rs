@@ -53,7 +53,10 @@ impl Float {
                 exponent,
                 precision,
                 ..
-            }) => max(exponent.checked_sub(1).unwrap().unsigned_abs(), *precision),
+            }) => max(
+                u64::from(exponent.checked_sub(1).unwrap().unsigned_abs()),
+                *precision,
+            ),
             _ => 1,
         }
     }

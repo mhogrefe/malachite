@@ -38,10 +38,10 @@ const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 pub fn add_float_significands_in_place(
     mut x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     x_prec: u64,
     mut y: &mut Natural,
-    y_exp: i64,
+    y_exp: i32,
     y_prec: u64,
     out_prec: u64,
     rm: RoundingMode,
@@ -291,10 +291,10 @@ pub fn add_float_significands_in_place(
 
 pub fn add_float_significands_in_place_ref(
     mut x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     x_prec: u64,
     y: &Natural,
-    y_exp: i64,
+    y_exp: i32,
     y_prec: u64,
     out_prec: u64,
     rm: RoundingMode,
@@ -544,14 +544,14 @@ pub fn add_float_significands_in_place_ref(
 
 pub fn add_float_significands_ref_ref<'a>(
     mut x: &'a Natural,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut x_prec: u64,
     mut y: &'a Natural,
-    mut y_exp: i64,
+    mut y_exp: i32,
     mut y_prec: u64,
     out_prec: u64,
     rm: RoundingMode,
-) -> (Natural, i64, Ordering) {
+) -> (Natural, i32, Ordering) {
     if x_prec == y_prec && out_prec == x_prec {
         add_float_significands_same_prec_ref_ref(x, x_exp, y, y_exp, out_prec, rm)
     } else {
@@ -668,9 +668,9 @@ pub fn add_float_significands_ref_ref<'a>(
 // This is mpfr_add1sp from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_in_place_same_prec(
     x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     y: &mut Natural,
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
 ) -> (Ordering, bool) {
@@ -725,9 +725,9 @@ fn add_float_significands_in_place_same_prec(
 // This is mpfr_add1sp from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_in_place_same_prec_ref(
     x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     y: &Natural,
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
 ) -> Ordering {
@@ -790,12 +790,12 @@ fn add_float_significands_in_place_same_prec_ref(
 // This is mpfr_add1sp from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_same_prec_ref_ref(
     x: &Natural,
-    x_exp: i64,
+    x_exp: i32,
     y: &Natural,
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (Natural, i64, Ordering) {
+) -> (Natural, i32, Ordering) {
     match (x, y) {
         (Natural(Small(x)), Natural(Small(y))) => {
             let (sum, sum_exp, o) = if prec == Limb::WIDTH {
@@ -841,12 +841,12 @@ const HIGH_BIT: Limb = 1 << WIDTH_M1;
 // This is mpfr_add1sp1 from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_same_prec_lt_w(
     mut x: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (Limb, i64, Ordering) {
+) -> (Limb, i32, Ordering) {
     assert!(prec < Limb::WIDTH);
     let shift = Limb::WIDTH - prec;
     let shift_bit = Limb::power_of_2(shift);
@@ -934,11 +934,11 @@ fn add_float_significands_same_prec_lt_w(
 // This is mpfr_add1sp1n from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_same_prec_w(
     mut x: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     rm: RoundingMode,
-) -> (Limb, i64, Ordering) {
+) -> (Limb, i32, Ordering) {
     let (mut sum, sticky_bit, round_bit) = if x_exp == y_exp {
         let sum = x.wrapping_add(y);
         x_exp = x_exp.checked_add(1).unwrap();
@@ -999,13 +999,13 @@ fn add_float_significands_same_prec_w(
 fn add_float_significands_same_prec_gt_w_lt_2w(
     mut x_0: Limb,
     mut x_1: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y_0: Limb,
     mut y_1: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (Limb, Limb, i64, Ordering) {
+) -> (Limb, Limb, i32, Ordering) {
     let shift = TWICE_WIDTH - prec;
     let shift_bit = Limb::power_of_2(shift);
     let shift_m1_bit = shift_bit >> 1;
@@ -1127,12 +1127,12 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
 fn add_float_significands_same_prec_2w(
     mut x_0: Limb,
     mut x_1: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y_0: Limb,
     mut y_1: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     rm: RoundingMode,
-) -> (Limb, Limb, i64, Ordering) {
+) -> (Limb, Limb, i32, Ordering) {
     let (mut sum_0, mut sum_1, round_bit, sticky_bit) = if x_exp == y_exp {
         // Since x_1, y_1 >= HIGH_BIT, a carry always occurs.
         let (a0, overflow) = x_0.overflowing_add(y_0);
@@ -1239,14 +1239,14 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
     mut x_0: Limb,
     mut x_1: Limb,
     mut x_2: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y_0: Limb,
     mut y_1: Limb,
     mut y_2: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (Limb, Limb, Limb, i64, Ordering) {
+) -> (Limb, Limb, Limb, i32, Ordering) {
     let shift = THRICE_WIDTH - prec;
     let shift_bit = Limb::power_of_2(shift);
     let shift_m1_bit = shift_bit >> 1;
@@ -1738,12 +1738,12 @@ fn add_significands_rsh_ref_mut(xs: &[Limb], ys: &mut [Limb], exp_diff: u64) -> 
 fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
     out: &mut [Limb],
     mut xs: &'a [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut ys: &'a [Limb],
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     if x_exp < y_exp {
         swap(&mut xs, &mut ys);
         swap(&mut x_exp, &mut y_exp);
@@ -1913,12 +1913,12 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
 
 fn add_float_significands_same_prec_ge_3w_val_val<'a>(
     xs: &'a mut [Limb],
-    x_exp: i64,
+    x_exp: i32,
     ys: &'a mut [Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering, bool) {
+) -> (i32, Ordering, bool) {
     if x_exp >= y_exp {
         let (exp, o) =
             add_float_significands_same_prec_ge_3w_val_ref(xs, x_exp, ys, y_exp, prec, rm);
@@ -1932,12 +1932,12 @@ fn add_float_significands_same_prec_ge_3w_val_val<'a>(
 
 fn add_float_significands_same_prec_ge_3w_val_ref(
     xs: &mut [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     ys: &[Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     let n = xs.len();
     assert_eq!(ys.len(), n);
     let shift = prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
@@ -2092,12 +2092,12 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
 
 fn add_float_significands_same_prec_ge_3w_ref_val(
     xs: &[Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     ys: &mut [Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     let n = xs.len();
     assert_eq!(ys.len(), n);
     let shift = prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
@@ -2291,12 +2291,12 @@ impl From<bool> for RoundBit {
 
 fn add_float_significands_general_round(
     out: &mut [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     shift_bit: Limb,
     round_bit: RoundBit,
     following_bits: RoundBit,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     if following_bits == False && round_bit == False {
         return (x_exp, Equal);
     }
@@ -2337,12 +2337,12 @@ fn add_float_significands_general_round(
 fn add_float_significands_general(
     out: &mut [Limb],
     xs: &[Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     ys: &[Limb],
-    y_exp: i64,
+    y_exp: i32,
     out_prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     assert!(x_exp >= y_exp);
     let out_len = out.len();
     let out_bits = u64::exact_from(out_len << Limb::LOG_WIDTH);

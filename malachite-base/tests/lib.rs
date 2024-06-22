@@ -119,6 +119,7 @@ pub mod bools {
     pub mod exhaustive;
     pub mod not_assign;
     pub mod random {
+        pub mod get_weighted_random_bool;
         pub mod random_bools;
         pub mod weighted_random_bools;
     }
@@ -459,6 +460,7 @@ pub mod num {
             pub mod geometric_random_unsigned_inclusive_range;
             pub mod geometric_random_unsigned_range;
             pub mod geometric_random_unsigneds;
+            pub mod get_geometric_random_signed_from_inclusive_range;
             pub mod mean;
         }
         pub mod random_finite_primitive_floats;
@@ -526,6 +528,7 @@ pub mod num {
         }
         pub mod variable_range_generator {
             pub mod next_bit_chunk;
+            pub mod next_bool;
             pub mod next_in_inclusive_range;
             pub mod next_in_range;
             pub mod next_less_than;

@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
+use crate::bools::random::{
+    get_weighted_random_bool, random_bools, weighted_random_bools, RandomBools, WeightedRandomBools,
+};
 use crate::num::arithmetic::traits::Gcd;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
@@ -15,32 +17,7 @@ use crate::num::conversion::traits::ExactInto;
 use crate::random::Seed;
 use std::fmt::Debug;
 
-/// Generates random unsigned integers from a truncated geometric distribution.
-#[derive(Clone, Debug)]
-pub struct GeometricRandomNaturalValues<T: PrimitiveInt> {
-    xs: WeightedRandomBools,
-    min: T,
-    max: T,
-}
-
-impl<T: PrimitiveInt> Iterator for GeometricRandomNaturalValues<T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<T> {
-        let mut failures = self.min;
-        loop {
-            if self.xs.next().unwrap() {
-                return Some(failures);
-            }
-            // Wrapping to min is equivalent to restarting this function.
-            if failures == self.max {
-                failures = self.min;
-            } else {
-                failures += T::ONE;
-            }
-        }
-    }
-}
+use super::VariableRangeGenerator;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) struct SimpleRational {
@@ -86,7 +63,34 @@ pub(crate) fn mean_to_p_with_min<T: PrimitiveInt>(
     (p.n, p.d)
 }
 
-fn geometric_random_natural_values_range<T: PrimitiveInt>(
+/// Generates random unsigned integers from a truncated geometric distribution.
+#[derive(Clone, Debug)]
+pub struct GeometricRandomNaturalValues<T: PrimitiveInt> {
+    xs: WeightedRandomBools,
+    min: T,
+    max: T,
+}
+
+impl<T: PrimitiveInt> Iterator for GeometricRandomNaturalValues<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        let mut failures = self.min;
+        loop {
+            if self.xs.next().unwrap() {
+                return Some(failures);
+            }
+            // Wrapping to min is equivalent to restarting this function.
+            if failures == self.max {
+                failures = self.min;
+            } else {
+                failures += T::ONE;
+            }
+        }
+    }
+}
+
+fn geometric_random_natural_values_inclusive_range<T: PrimitiveInt>(
     seed: Seed,
     min: T,
     max: T,
@@ -97,9 +101,34 @@ fn geometric_random_natural_values_range<T: PrimitiveInt>(
     assert_ne!(um_denominator, 0);
     let (numerator, denominator) = mean_to_p_with_min(min, um_numerator, um_denominator);
     GeometricRandomNaturalValues {
-        xs: weighted_random_bools(seed, numerator, numerator + denominator),
+        xs: weighted_random_bools(seed, numerator, numerator.checked_add(denominator).unwrap()),
         min,
         max,
+    }
+}
+
+fn get_geometric_random_natural_value_from_inclusive_range<T: PrimitiveInt>(
+    range_generator: &mut VariableRangeGenerator,
+    min: T,
+    max: T,
+    um_numerator: u64,
+    um_denominator: u64,
+) -> T {
+    assert!(min <= max);
+    assert_ne!(um_denominator, 0);
+    let (n, denominator) = mean_to_p_with_min(min, um_numerator, um_denominator);
+    let d = n.checked_add(denominator).unwrap();
+    let mut failures = min;
+    loop {
+        if get_weighted_random_bool(range_generator, n, d) {
+            return failures;
+        }
+        // Wrapping to min is equivalent to restarting this function.
+        if failures == max {
+            failures = min;
+        } else {
+            failures += T::ONE;
+        }
     }
 }
 
@@ -130,7 +159,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNegativeSigneds<T> {
     }
 }
 
-fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
+fn geometric_random_negative_signeds_inclusive_range<T: PrimitiveSigned>(
     seed: Seed,
     abs_min: T,
     abs_max: T,
@@ -145,9 +174,38 @@ fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
         abs_um_denominator,
     );
     GeometricRandomNegativeSigneds {
-        xs: weighted_random_bools(seed, numerator, numerator + denominator),
+        xs: weighted_random_bools(seed, numerator, numerator.checked_add(denominator).unwrap()),
         abs_min,
         abs_max,
+    }
+}
+
+fn get_geometric_random_negative_signed_from_inclusive_range<T: PrimitiveSigned>(
+    range_generator: &mut VariableRangeGenerator,
+    abs_min: T,
+    abs_max: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
+) -> T {
+    assert!(abs_min >= abs_max);
+    assert_ne!(abs_um_denominator, 0);
+    let (n, denominator) = mean_to_p_with_min(
+        abs_min.checked_neg().unwrap(),
+        abs_um_numerator,
+        abs_um_denominator,
+    );
+    let d = n.checked_add(denominator).unwrap();
+    let mut result = abs_min;
+    loop {
+        if get_weighted_random_bool(range_generator, n, d) {
+            return result;
+        }
+        // Wrapping to min is equivalent to restarting this function.
+        if result == abs_max {
+            result = abs_min;
+        } else {
+            result -= T::ONE;
+        }
     }
 }
 
@@ -190,18 +248,23 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNonzeroSigneds<T> {
     }
 }
 
-fn geometric_random_nonzero_signeds_range<T: PrimitiveSigned>(
+fn geometric_random_nonzero_signeds_inclusive_range<T: PrimitiveSigned>(
     seed: Seed,
     min: T,
     max: T,
     abs_um_numerator: u64,
     abs_um_denominator: u64,
 ) -> GeometricRandomNonzeroSigneds<T> {
+    assert!(min <= max);
     assert_ne!(abs_um_denominator, 0);
     let (numerator, denominator) = mean_to_p_with_min(T::ONE, abs_um_numerator, abs_um_denominator);
     GeometricRandomNonzeroSigneds {
         bs: random_bools(seed.fork("bs")),
-        xs: weighted_random_bools(seed.fork("xs"), numerator, numerator + denominator),
+        xs: weighted_random_bools(
+            seed.fork("xs"),
+            numerator,
+            numerator.checked_add(denominator).unwrap(),
+        ),
         min,
         max,
     }
@@ -251,21 +314,67 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSigneds<T> {
     }
 }
 
-fn geometric_random_signeds_range<T: PrimitiveSigned>(
+fn geometric_random_signed_inclusive_range_helper<T: PrimitiveSigned>(
     seed: Seed,
     min: T,
     max: T,
     abs_um_numerator: u64,
     abs_um_denominator: u64,
 ) -> GeometricRandomSigneds<T> {
+    assert!(min <= max);
     assert_ne!(abs_um_denominator, 0);
     let (numerator, denominator) =
         mean_to_p_with_min(T::ZERO, abs_um_numerator, abs_um_denominator);
     GeometricRandomSigneds {
         bs: random_bools(seed.fork("bs")),
-        xs: weighted_random_bools(seed.fork("xs"), numerator, numerator + denominator),
+        xs: weighted_random_bools(
+            seed.fork("xs"),
+            numerator,
+            numerator.checked_add(denominator).unwrap(),
+        ),
         min,
         max,
+    }
+}
+
+fn get_geometric_random_signed_from_inclusive_range_helper<T: PrimitiveSigned>(
+    range_generator: &mut VariableRangeGenerator,
+    min: T,
+    max: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
+) -> T {
+    assert!(min <= max);
+    assert_ne!(abs_um_denominator, 0);
+    let (n, denominator) = mean_to_p_with_min(T::ZERO, abs_um_numerator, abs_um_denominator);
+    let d = n.checked_add(denominator).unwrap();
+    loop {
+        let mut result = T::ZERO;
+        if range_generator.next_bool() {
+            loop {
+                if get_weighted_random_bool(range_generator, n, d) {
+                    if result == T::ZERO && range_generator.next_bool() {
+                        break;
+                    }
+                    return result;
+                } else if result == max {
+                    break;
+                }
+                result += T::ONE;
+            }
+        } else {
+            loop {
+                if get_weighted_random_bool(range_generator, n, d) {
+                    if result == T::ZERO && range_generator.next_bool() {
+                        break;
+                    }
+                    return result;
+                } else if result == min {
+                    break;
+                }
+                result -= T::ONE;
+            }
+        }
     }
 }
 
@@ -363,7 +472,13 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert_ne!(um_numerator, 0);
-    geometric_random_natural_values_range(seed, T::ZERO, T::MAX, um_numerator, um_denominator)
+    geometric_random_natural_values_inclusive_range(
+        seed,
+        T::ZERO,
+        T::MAX,
+        um_numerator,
+        um_denominator,
+    )
 }
 
 /// Generates random positive unsigned integers from a truncated geometric distribution.
@@ -441,7 +556,13 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert!(um_numerator > um_denominator);
-    geometric_random_natural_values_range(seed, T::ONE, T::MAX, um_numerator, um_denominator)
+    geometric_random_natural_values_inclusive_range(
+        seed,
+        T::ONE,
+        T::MAX,
+        um_numerator,
+        um_denominator,
+    )
 }
 
 /// Generates random signed integers from a modified geometric distribution.
@@ -527,7 +648,13 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
     abs_um_denominator: u64,
 ) -> GeometricRandomSigneds<T> {
     assert_ne!(abs_um_numerator, 0);
-    geometric_random_signeds_range(seed, T::MIN, T::MAX, abs_um_numerator, abs_um_denominator)
+    geometric_random_signed_inclusive_range_helper(
+        seed,
+        T::MIN,
+        T::MAX,
+        abs_um_numerator,
+        abs_um_denominator,
+    )
 }
 
 /// Generates random natural (non-negative) signed integers from a truncated geometric distribution.
@@ -609,7 +736,13 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert_ne!(um_numerator, 0);
-    geometric_random_natural_values_range(seed, T::ZERO, T::MAX, um_numerator, um_denominator)
+    geometric_random_natural_values_inclusive_range(
+        seed,
+        T::ZERO,
+        T::MAX,
+        um_numerator,
+        um_denominator,
+    )
 }
 
 /// Generates random positive signed integers from a truncated geometric distribution.
@@ -690,7 +823,13 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
     um_numerator: u64,
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
-    geometric_random_natural_values_range(seed, T::ONE, T::MAX, um_numerator, um_denominator)
+    geometric_random_natural_values_inclusive_range(
+        seed,
+        T::ONE,
+        T::MAX,
+        um_numerator,
+        um_denominator,
+    )
 }
 
 /// Generates random negative signed integers from a modified geometric distribution.
@@ -775,7 +914,7 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
     abs_um_denominator: u64,
 ) -> GeometricRandomNegativeSigneds<T> {
     assert!(abs_um_numerator > abs_um_denominator);
-    geometric_random_negative_signeds_range(
+    geometric_random_negative_signeds_inclusive_range(
         seed,
         T::NEGATIVE_ONE,
         T::MIN,
@@ -876,7 +1015,7 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
     abs_um_denominator: u64,
 ) -> GeometricRandomNonzeroSigneds<T> {
     assert!(abs_um_numerator > abs_um_denominator);
-    geometric_random_nonzero_signeds_range(
+    geometric_random_nonzero_signeds_inclusive_range(
         seed,
         T::MIN,
         T::MAX,
@@ -961,7 +1100,13 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert!(a < b, "a must be less than b. a: {a}, b: {b}");
-    geometric_random_natural_values_range(seed, a, b - T::ONE, um_numerator, um_denominator)
+    geometric_random_natural_values_inclusive_range(
+        seed,
+        a,
+        b - T::ONE,
+        um_numerator,
+        um_denominator,
+    )
 }
 
 /// Generates random unsigned integers from a truncated geometric distribution over the closed
@@ -1039,7 +1184,7 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
-    geometric_random_natural_values_range(seed, a, b, um_numerator, um_denominator)
+    geometric_random_natural_values_inclusive_range(seed, a, b, um_numerator, um_denominator)
 }
 
 /// Generates random signed integers from a modified geometric distribution over the half-open
@@ -1137,7 +1282,7 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 ) -> GeometricRandomSignedRange<T> {
     assert!(a < b, "a must be less than b. a: {a}, b: {b}");
     if a >= T::ZERO {
-        GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
+        GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_inclusive_range(
             seed,
             a,
             b - T::ONE,
@@ -1145,7 +1290,7 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
             abs_um_denominator,
         ))
     } else if b <= T::ONE {
-        GeometricRandomSignedRange::NonPositive(geometric_random_negative_signeds_range(
+        GeometricRandomSignedRange::NonPositive(geometric_random_negative_signeds_inclusive_range(
             seed,
             b - T::ONE,
             a,
@@ -1153,7 +1298,7 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
             abs_um_denominator,
         ))
     } else {
-        GeometricRandomSignedRange::BothSigns(geometric_random_signeds_range(
+        GeometricRandomSignedRange::BothSigns(geometric_random_signed_inclusive_range_helper(
             seed,
             a,
             b - T::ONE,
@@ -1224,12 +1369,12 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::random::geometric::geometric_random_signed_range;
+/// use malachite_base::num::random::geometric::geometric_random_signed_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 99, 30, 1),
+///         geometric_random_signed_inclusive_range::<i8>(EXAMPLE_SEED, -100, 99, 30, 1),
 ///         10
 ///     ),
 ///     "[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46, ...]"
@@ -1258,7 +1403,7 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
 ) -> GeometricRandomSignedRange<T> {
     assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
     if a >= T::ZERO {
-        GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
+        GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_inclusive_range(
             seed,
             a,
             b,
@@ -1266,7 +1411,7 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
             abs_um_denominator,
         ))
     } else if b <= T::ZERO {
-        GeometricRandomSignedRange::NonPositive(geometric_random_negative_signeds_range(
+        GeometricRandomSignedRange::NonPositive(geometric_random_negative_signeds_inclusive_range(
             seed,
             b,
             a,
@@ -1274,12 +1419,82 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
             abs_um_denominator,
         ))
     } else {
-        GeometricRandomSignedRange::BothSigns(geometric_random_signeds_range(
+        GeometricRandomSignedRange::BothSigns(geometric_random_signed_inclusive_range_helper(
             seed,
             a,
             b,
             abs_um_numerator,
             abs_um_denominator,
         ))
+    }
+}
+
+/// Generates a random signed integers from a modified geometric distribution over the closed
+/// interval $[a, b]$.
+///
+/// See [`geometric_random_signed_inclusive_range`] for a detailed description of the distribution.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+///
+/// # Panics
+/// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less than
+/// or equal to $a$, or if they are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::geometric::get_geometric_random_signed_from_inclusive_range;
+/// use malachite_base::num::random::variable_range_generator;
+/// use malachite_base::random::EXAMPLE_SEED;
+///
+/// assert_eq!(
+///     get_geometric_random_signed_from_inclusive_range::<i8>(
+///         &mut variable_range_generator(EXAMPLE_SEED),
+///         -100,
+///         99,
+///         30,
+///         1
+///     ),
+///     8
+/// )
+/// ```
+pub fn get_geometric_random_signed_from_inclusive_range<T: PrimitiveSigned>(
+    range_generator: &mut VariableRangeGenerator,
+    a: T,
+    b: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
+) -> T {
+    assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
+    if a >= T::ZERO {
+        get_geometric_random_natural_value_from_inclusive_range(
+            range_generator,
+            a,
+            b,
+            abs_um_numerator,
+            abs_um_denominator,
+        )
+    } else if b <= T::ZERO {
+        get_geometric_random_negative_signed_from_inclusive_range(
+            range_generator,
+            b,
+            a,
+            abs_um_numerator,
+            abs_um_denominator,
+        )
+    } else {
+        get_geometric_random_signed_from_inclusive_range_helper(
+            range_generator,
+            a,
+            b,
+            abs_um_numerator,
+            abs_um_denominator,
+        )
     }
 }

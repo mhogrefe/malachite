@@ -90,7 +90,7 @@ impl RoundingFrom<Float> for Integer {
                     }
                 } else {
                     let sb = significand_bits(&significand);
-                    let eb = exponent.unsigned_abs();
+                    let eb = u64::from(exponent.unsigned_abs());
                     if sb >= eb {
                         significand.shr_round(sb - eb, abs_rm)
                     } else {
@@ -184,7 +184,7 @@ impl<'a> RoundingFrom<&'a Float> for Integer {
                         }
                     } else {
                         let sb = significand_bits(significand);
-                        let eb = exponent.unsigned_abs();
+                        let eb = u64::from(exponent.unsigned_abs());
                         if sb >= eb {
                             significand.shr_round(sb - eb, abs_rm)
                         } else {
@@ -247,7 +247,7 @@ impl TryFrom<Float> for Integer {
                     Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
                 } else {
                     let sb = significand_bits(&significand);
-                    let eb = exponent.unsigned_abs();
+                    let eb = u64::from(exponent.unsigned_abs());
                     if sb >= eb {
                         let bits = sb - eb;
                         if significand.divisible_by_power_of_2(bits) {
@@ -309,7 +309,7 @@ impl<'a> TryFrom<&'a Float> for Integer {
                     Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
                 } else {
                     let sb = significand_bits(significand);
-                    let eb = exponent.unsigned_abs();
+                    let eb = u64::from(exponent.unsigned_abs());
                     if sb >= eb {
                         let bits = sb - eb;
                         if significand.divisible_by_power_of_2(bits) {
@@ -364,7 +364,7 @@ impl<'a> ConvertibleFrom<&'a Float> for Integer {
                 *significand == 0u32
                     || *exponent > 0 && {
                         let sb = significand_bits(significand);
-                        let eb = exponent.unsigned_abs();
+                        let eb = u64::from(exponent.unsigned_abs());
                         sb < eb || significand.divisible_by_power_of_2(sb - eb)
                     }
             }

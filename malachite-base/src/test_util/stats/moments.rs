@@ -30,6 +30,7 @@ pub trait CheckedToF64 {
 macro_rules! impl_checked_to_f64_for_primitive_ints {
     ($t: ident) => {
         impl CheckedToF64 for $t {
+            #[allow(clippy::cast_lossless)]
             #[inline]
             fn checked_to_f64(&self) -> f64 {
                 // No primitive integer type, not even u128 and i128, exceeds the finite range of

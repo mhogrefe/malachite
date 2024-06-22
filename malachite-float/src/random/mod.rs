@@ -33,7 +33,7 @@ use malachite_nz::platform::Limb;
 /// This `struct` is created by [`random_positive_finite_floats`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomPositiveFiniteFloats<I: Iterator<Item = Natural>> {
-    exponents: GeometricRandomSigneds<i64>,
+    exponents: GeometricRandomSigneds<i32>,
     xs: I,
 }
 

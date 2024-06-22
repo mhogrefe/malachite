@@ -11,12 +11,12 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
 use malachite_nz::natural::Natural;
-use malachite_q::random::random_rationals_with_denominator_range;
+use malachite_q::random::random_rational_with_denominator_inclusive_range;
 use malachite_q::test_util::random::random_rationals_helper_helper;
 use malachite_q::Rational;
 use std::str::FromStr;
 
-fn random_rationals_with_denominator_range_helper(
+fn random_rational_with_denominator_inclusive_range_helper(
     d: &str,
     a: &str,
     b: &str,
@@ -28,7 +28,7 @@ fn random_rationals_with_denominator_range_helper(
     expected_sample_moment_stats: MomentStats,
 ) {
     random_rationals_helper_helper(
-        random_rationals_with_denominator_range(
+        random_rational_with_denominator_inclusive_range(
             EXAMPLE_SEED,
             Natural::from_str(d).unwrap(),
             Rational::from_str(a).unwrap(),
@@ -44,22 +44,46 @@ fn random_rationals_with_denominator_range_helper(
 }
 
 #[test]
-fn test_random_rationals_with_denominator_range() {
+fn test_random_rational_with_denominator_inclusive_range() {
     let values = &[
-        "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
-        "0", "0",
+        "0", "1", "0", "1", "1", "0", "0", "0", "1", "1", "0", "0", "1", "1", "0", "1", "0", "1",
+        "1", "0",
     ];
-    let common_values = &[("0", 1000000)];
+    let common_values = &[("0", 523140), ("1", 476860)];
     let sample_median = ("0", None);
     let sample_moment_stats = MomentStats {
-        mean: NiceFloat(0.0),
+        mean: NiceFloat(0.47685999999999046),
+        standard_deviation: NiceFloat(0.49946450310787194),
+        skewness: NiceFloat(0.0926592837970364),
+        excess_kurtosis: NiceFloat(-1.9914142571262847),
+    };
+    random_rational_with_denominator_inclusive_range_helper(
+        "1",
+        "0",
+        "1",
+        10,
+        1,
+        values,
+        common_values,
+        sample_median,
+        sample_moment_stats,
+    );
+
+    let values = &[
+        "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
+        "1", "1",
+    ];
+    let common_values = &[("1", 1000000)];
+    let sample_median = ("1", None);
+    let sample_moment_stats = MomentStats {
+        mean: NiceFloat(1.0),
         standard_deviation: NiceFloat(0.0),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "1",
-        "0",
+        "1",
         "1",
         10,
         1,
@@ -81,7 +105,7 @@ fn test_random_rationals_with_denominator_range() {
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "2",
         "0",
         "1",
@@ -105,7 +129,7 @@ fn test_random_rationals_with_denominator_range() {
         skewness: NiceFloat(1.3775012070185304),
         excess_kurtosis: NiceFloat(-0.10249042466258196),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "6",
         "0",
         "1",
@@ -137,7 +161,7 @@ fn test_random_rationals_with_denominator_range() {
         skewness: NiceFloat(0.2167262624312793),
         excess_kurtosis: NiceFloat(-1.345880916970383),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "100",
         "1/3",
         "1/2",
@@ -161,7 +185,7 @@ fn test_random_rationals_with_denominator_range() {
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "1",
         "268876667/98914198",
         "245850922/78256779",
@@ -185,7 +209,7 @@ fn test_random_rationals_with_denominator_range() {
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "6",
         "268876667/98914198",
         "245850922/78256779",
@@ -221,7 +245,7 @@ fn test_random_rationals_with_denominator_range() {
         skewness: NiceFloat(-0.025551558114942263),
         excess_kurtosis: NiceFloat(-1.2130746374242132),
     };
-    random_rationals_with_denominator_range_helper(
+    random_rational_with_denominator_inclusive_range_helper(
         "100",
         "268876667/98914198",
         "245850922/78256779",
@@ -236,8 +260,8 @@ fn test_random_rationals_with_denominator_range() {
 
 #[test]
 #[should_panic]
-fn random_rationals_with_denominator_range_fail_1() {
-    random_rationals_with_denominator_range(
+fn random_rational_with_denominator_inclusive_range_fail_1() {
+    random_rational_with_denominator_inclusive_range(
         EXAMPLE_SEED,
         Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
@@ -249,8 +273,8 @@ fn random_rationals_with_denominator_range_fail_1() {
 
 #[test]
 #[should_panic]
-fn random_rationals_with_denominator_range_fail_2() {
-    random_rationals_with_denominator_range(
+fn random_rational_with_denominator_inclusive_range_fail_2() {
+    random_rational_with_denominator_inclusive_range(
         EXAMPLE_SEED,
         Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
@@ -262,21 +286,8 @@ fn random_rationals_with_denominator_range_fail_2() {
 
 #[test]
 #[should_panic]
-fn random_rationals_with_denominator_range_fail_3() {
-    random_rationals_with_denominator_range(
-        EXAMPLE_SEED,
-        Natural::ONE,
-        Rational::from_unsigneds(1u32, 3),
-        Rational::from_unsigneds(1u32, 3),
-        2,
-        3,
-    );
-}
-
-#[test]
-#[should_panic]
-fn random_rationals_with_denominator_range_fail_4() {
-    random_rationals_with_denominator_range(
+fn random_rational_with_denominator_inclusive_range_fail_3() {
+    random_rational_with_denominator_inclusive_range(
         EXAMPLE_SEED,
         Natural::ONE,
         Rational::from_unsigneds(1u32, 2),

@@ -47,7 +47,7 @@ const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
 const WIDTH_M2_MASK: Limb = Limb::MAX >> 2;
 const HIGH_BIT: Limb = 1 << WIDTH_M1;
 const HALF_HIGH_BIT: Limb = HIGH_BIT >> 1;
-const IWIDTH: i64 = Limb::WIDTH as i64;
+const IWIDTH: i32 = Limb::WIDTH as i32;
 const NEG_ONE: Limb = Limb::MAX;
 const NEG_TWO: Limb = Limb::MAX - 1;
 const WIDTH_P1: u64 = Limb::WIDTH + 1;
@@ -57,10 +57,10 @@ const TWICE_WIDTH_P1: u64 = Limb::WIDTH * 2 + 1;
 
 pub fn sub_float_significands_in_place(
     mut x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     x_prec: u64,
     mut y: &mut Natural,
-    y_exp: i64,
+    y_exp: i32,
     y_prec: u64,
     out_prec: u64,
     rm: RoundingMode,
@@ -243,10 +243,10 @@ pub fn sub_float_significands_in_place(
 
 pub fn sub_float_significands_in_place_ref(
     mut x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     x_prec: u64,
     y: &Natural,
-    y_exp: i64,
+    y_exp: i32,
     y_prec: u64,
     out_prec: u64,
     rm: RoundingMode,
@@ -429,14 +429,14 @@ pub fn sub_float_significands_in_place_ref(
 
 pub fn sub_float_significands_ref_ref<'a>(
     x: &'a Natural,
-    x_exp: i64,
+    x_exp: i32,
     x_prec: u64,
     y: &'a Natural,
-    y_exp: i64,
+    y_exp: i32,
     y_prec: u64,
     out_prec: u64,
     rm: RoundingMode,
-) -> (Natural, i64, Ordering, bool) {
+) -> (Natural, i32, Ordering, bool) {
     if x_prec == y_prec && out_prec == x_prec {
         sub_float_significands_same_prec_ref_ref(x, x_exp, y, y_exp, out_prec, rm)
     } else {
@@ -604,9 +604,9 @@ pub fn sub_float_significands_ref_ref<'a>(
 // This is mpfr_sub1sp from sub1sp.c, MPFR 4.2.0.
 fn sub_float_significands_in_place_same_prec(
     x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     y: &mut Natural,
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
 ) -> (Ordering, bool, bool) {
@@ -672,9 +672,9 @@ fn sub_float_significands_in_place_same_prec(
 // This is mpfr_sub1sp from sub1sp.c, MPFR 4.2.0.
 fn sub_float_significands_in_place_same_prec_ref(
     x: &mut Natural,
-    x_exp: &mut i64,
+    x_exp: &mut i32,
     y: &Natural,
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
 ) -> (Ordering, bool) {
@@ -740,12 +740,12 @@ fn sub_float_significands_in_place_same_prec_ref(
 // This is mpfr_sub1sp from sub1sp.c, MPFR 4.2.0.
 fn sub_float_significands_same_prec_ref_ref(
     x: &Natural,
-    x_exp: i64,
+    x_exp: i32,
     y: &Natural,
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (Natural, i64, Ordering, bool) {
+) -> (Natural, i32, Ordering, bool) {
     match (x, y) {
         (Natural(Small(x)), Natural(Small(y))) => {
             let (diff, diff_exp, o, neg) = if prec == Limb::WIDTH {
@@ -815,12 +815,12 @@ fn sub_float_significands_same_prec_ref_ref(
 // This is mpfr_sub1sp1 from sub1sp.c, MPFR 4.2.0.
 fn sub_float_significands_same_prec_lt_w(
     mut x: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     mut rm: RoundingMode,
-) -> (Limb, i64, Ordering, bool) {
+) -> (Limb, i32, Ordering, bool) {
     {
         let (mut diff, sticky_bit, round_bit, shift_bit, neg) = if x_exp == y_exp {
             let (a0, neg) = match x.cmp(&y) {
@@ -830,7 +830,7 @@ fn sub_float_significands_same_prec_lt_w(
             };
             let leading_zeros = a0.leading_zeros();
             x_exp = x_exp
-                .checked_sub(i64::wrapping_from(leading_zeros))
+                .checked_sub(i32::wrapping_from(leading_zeros))
                 .unwrap();
             (a0 << leading_zeros, 0, 0, 0, neg)
         } else {
@@ -860,7 +860,7 @@ fn sub_float_significands_same_prec_lt_w(
                 }
                 sticky_bit <<= leading_zeros;
                 x_exp = x_exp
-                    .checked_sub(i64::wrapping_from(leading_zeros))
+                    .checked_sub(i32::wrapping_from(leading_zeros))
                     .unwrap();
                 // shift > 0 since prec < Limb::WIDTH
                 assert_ne!(shift, 0);
@@ -932,11 +932,11 @@ fn sub_float_significands_same_prec_lt_w(
 // This is mpfr_sub1sp1n from sub1sp.c, MPFR 4.2.0.
 fn sub_float_significands_same_prec_w(
     mut x: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     mut rm: RoundingMode,
-) -> (Limb, i64, Ordering, bool) {
+) -> (Limb, i32, Ordering, bool) {
     let (mut diff, sticky_bit, round_bit, neg) = if x_exp == y_exp {
         let (a0, neg) = match x.cmp(&y) {
             Equal => return (0, 0, Equal, false),
@@ -945,7 +945,7 @@ fn sub_float_significands_same_prec_w(
         };
         let leading_zeros = LeadingZeros::leading_zeros(a0);
         x_exp = x_exp
-            .checked_sub(i64::wrapping_from(leading_zeros))
+            .checked_sub(i32::wrapping_from(leading_zeros))
             .unwrap();
         (a0 << leading_zeros, 0, 0, neg)
     } else {
@@ -974,7 +974,7 @@ fn sub_float_significands_same_prec_w(
                 }
                 sticky_bit <<= leading_zeros;
                 x_exp = x_exp
-                    .checked_sub(i64::wrapping_from(leading_zeros))
+                    .checked_sub(i32::wrapping_from(leading_zeros))
                     .unwrap();
                 let round_bit = sticky_bit & HIGH_BIT;
                 (a0, sticky_bit & !HIGH_BIT, round_bit, neg)
@@ -1064,13 +1064,13 @@ fn sub_float_significands_same_prec_w(
 fn sub_float_significands_same_prec_gt_w_lt_2w(
     mut x_0: Limb,
     mut x_1: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y_0: Limb,
     mut y_1: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     mut rm: RoundingMode,
-) -> (Limb, Limb, i64, Ordering, bool) {
+) -> (Limb, Limb, i32, Ordering, bool) {
     let (mut diff_0, mut diff_1, sticky_bit, round_bit, shift_bit, neg) = if x_exp == y_exp {
         // subtraction is exact in this case
         //
@@ -1103,7 +1103,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
         let leading_zeros = LeadingZeros::leading_zeros(a1);
         if leading_zeros != 0 {
             x_exp = x_exp
-                .checked_sub(i64::wrapping_from(leading_zeros))
+                .checked_sub(i32::wrapping_from(leading_zeros))
                 .unwrap();
             (
                 a0 << leading_zeros,
@@ -1156,7 +1156,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                 a0 = (a0 << leading_zeros) | (sticky_bit >> comp_zeros);
                 sticky_bit <<= leading_zeros;
                 x_exp = x_exp
-                    .checked_sub(i64::wrapping_from(leading_zeros))
+                    .checked_sub(i32::wrapping_from(leading_zeros))
                     .unwrap();
                 diff_1
             } else {
@@ -1302,12 +1302,12 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
 fn sub_float_significands_same_prec_2w(
     mut x_0: Limb,
     mut x_1: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y_0: Limb,
     mut y_1: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     mut rm: RoundingMode,
-) -> (Limb, Limb, i64, Ordering, bool) {
+) -> (Limb, Limb, i32, Ordering, bool) {
     let (mut diff_0, mut diff_1, sticky_bit, round_bit, neg) = if x_exp == y_exp {
         let (mut a0, overflow) = x_0.overflowing_sub(y_0);
         let mut a1 = x_1.wrapping_sub(y_1);
@@ -1340,7 +1340,7 @@ fn sub_float_significands_same_prec_2w(
         if leading_zeros != 0 {
             // shift [a1, a0] left by leading_zeros bits and store in result
             x_exp = x_exp
-                .checked_sub(i64::wrapping_from(leading_zeros))
+                .checked_sub(i32::wrapping_from(leading_zeros))
                 .unwrap();
             (
                 a0 << leading_zeros,
@@ -1400,7 +1400,7 @@ fn sub_float_significands_same_prec_2w(
                     a0 = (a0 << leading_zeros) | (sticky_bit >> comp_zeros);
                     sticky_bit <<= leading_zeros;
                     x_exp = x_exp
-                        .checked_sub(i64::wrapping_from(leading_zeros))
+                        .checked_sub(i32::wrapping_from(leading_zeros))
                         .unwrap();
                 }
                 (a0, a1, sticky_bit & !HIGH_BIT, sticky_bit & HIGH_BIT, neg)
@@ -1553,14 +1553,14 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
     mut x_0: Limb,
     mut x_1: Limb,
     mut x_2: Limb,
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut y_0: Limb,
     mut y_1: Limb,
     mut y_2: Limb,
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     mut rm: RoundingMode,
-) -> (Limb, Limb, Limb, i64, Ordering, bool) {
+) -> (Limb, Limb, Limb, i32, Ordering, bool) {
     let (mut diff_0, mut diff_1, mut diff_2, sticky_bit, round_bit, shift_bit, neg) = if x_exp
         == y_exp
     {
@@ -1606,7 +1606,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
         let leading_zeros = LeadingZeros::leading_zeros(a2);
         if leading_zeros != 0 {
             x_exp = x_exp
-                .checked_sub(i64::wrapping_from(leading_zeros))
+                .checked_sub(i32::wrapping_from(leading_zeros))
                 .unwrap();
             let comp_zeros = Limb::WIDTH - leading_zeros;
             (
@@ -1688,7 +1688,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 a0 = (a0 << leading_zeros) | (sticky_bit >> comp_zeros);
                 sticky_bit <<= leading_zeros;
                 x_exp = x_exp
-                    .checked_sub(i64::wrapping_from(leading_zeros))
+                    .checked_sub(i32::wrapping_from(leading_zeros))
                     .unwrap();
                 (diff_1, (a2 << leading_zeros) | (a1 >> comp_zeros))
             } else {
@@ -2008,9 +2008,9 @@ fn limbs_sub_greater_to_out_different_ys0(out: &mut [Limb], xs: &[Limb], ys: &[L
 
 fn cmp_size_helper(
     xs: &[Limb],
-    x_exp: i64,
+    x_exp: i32,
     ys: &[Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
 ) -> (usize, usize, bool) {
     let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
@@ -2042,12 +2042,12 @@ fn cmp_size_helper(
 fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
     out: &mut [Limb],
     mut xs: &'a [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut ys: &'a [Limb],
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     mut rm: RoundingMode,
-) -> (i64, Ordering, bool) {
+) -> (i32, Ordering, bool) {
     let (n, mut k, neg) = cmp_size_helper(xs, x_exp, ys, y_exp, prec);
     if n == 0 {
         // x == y. Return exact number 0. Setting the most-significant limb to 0 is a sufficient
@@ -2095,7 +2095,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 if leading_zeros != 0 {
                     limbs_slice_shl_in_place(out, leading_zeros);
                     x_exp = x_exp
-                        .checked_sub(i64::wrapping_from(leading_zeros))
+                        .checked_sub(i32::wrapping_from(leading_zeros))
                         .unwrap();
                 }
                 // Last limb should be OK
@@ -2121,7 +2121,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 out.copy_within(0..k, len);
                 slice_set_zero(&mut out[..len]);
                 x_exp = x_exp
-                    .checked_sub(i64::exact_from(
+                    .checked_sub(i32::exact_from(
                         leading_zeros
                             .checked_add(u64::exact_from(len << Limb::LOG_WIDTH))
                             .unwrap(),
@@ -2505,12 +2505,12 @@ fn limbs_sub_greater_in_place_left_different_ys0(xs: &mut [Limb], ys: &[Limb], y
 
 fn sub_float_significands_same_prec_ge_3w_val_val<'a>(
     mut xs: &'a mut [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut ys: &'a mut [Limb],
-    mut y_exp: i64,
+    mut y_exp: i32,
     prec: u64,
     mut rm: RoundingMode,
-) -> (i64, Ordering, bool) {
+) -> (i32, Ordering, bool) {
     let (n, _, neg) = cmp_size_helper(xs, x_exp, ys, y_exp, prec);
     if n == 0 {
         // x == y. Return exact number 0. Setting the most-significant limb to 0 is a sufficient
@@ -2532,12 +2532,12 @@ fn sub_float_significands_same_prec_ge_3w_val_val<'a>(
 
 fn sub_float_significands_same_prec_ge_3w_val_ref(
     xs: &mut [Limb],
-    x_exp: i64,
+    x_exp: i32,
     ys: &[Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering, bool) {
+) -> (i32, Ordering, bool) {
     let (n, _, neg) = cmp_size_helper(xs, x_exp, ys, y_exp, prec);
     if n == 0 {
         // x == y. Return exact number 0. Setting the most-significant limb to 0 is a sufficient
@@ -2560,12 +2560,12 @@ fn sub_float_significands_same_prec_ge_3w_val_ref(
 
 fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
     xs: &mut [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     ys: &[Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     let nm1 = n - 1;
     let mut k = nm1;
@@ -2602,7 +2602,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 if leading_zeros != 0 {
                     limbs_slice_shl_in_place(xs, leading_zeros);
                     x_exp = x_exp
-                        .checked_sub(i64::wrapping_from(leading_zeros))
+                        .checked_sub(i32::wrapping_from(leading_zeros))
                         .unwrap();
                 }
                 // Last limb should be OK
@@ -2628,7 +2628,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 xs.copy_within(0..k, len);
                 slice_set_zero(&mut xs[..len]);
                 x_exp = x_exp
-                    .checked_sub(i64::exact_from(
+                    .checked_sub(i32::exact_from(
                         leading_zeros
                             .checked_add(u64::exact_from(len << Limb::LOG_WIDTH))
                             .unwrap(),
@@ -3000,12 +3000,12 @@ fn limbs_sub_greater_in_place_right_different_ys0(
 
 fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
     xs: &[Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     ys: &mut [Limb],
-    y_exp: i64,
+    y_exp: i32,
     prec: u64,
     rm: RoundingMode,
-) -> (i64, Ordering) {
+) -> (i32, Ordering) {
     let n = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
     let nm1 = n - 1;
     let mut k = nm1;
@@ -3042,7 +3042,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 if leading_zeros != 0 {
                     limbs_slice_shl_in_place(ys, leading_zeros);
                     x_exp = x_exp
-                        .checked_sub(i64::wrapping_from(leading_zeros))
+                        .checked_sub(i32::wrapping_from(leading_zeros))
                         .unwrap();
                 }
                 // Last limb should be OK
@@ -3068,7 +3068,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 ys.copy_within(0..k, len);
                 slice_set_zero(&mut ys[..len]);
                 x_exp = x_exp
-                    .checked_sub(i64::exact_from(
+                    .checked_sub(i32::exact_from(
                         leading_zeros
                             .checked_add(u64::exact_from(len << Limb::LOG_WIDTH))
                             .unwrap(),
@@ -3363,10 +3363,10 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
 // This is mpfr_cmp2 from cmp2.c, MPFR 4.2.0, returning `cancel` along with `sign`.
 fn exponent_shift_compare<'a>(
     mut xs: &'a [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut x_prec: u64,
     mut ys: &'a [Limb],
-    mut y_exp: i64,
+    mut y_exp: i32,
     mut y_prec: u64,
 ) -> (Ordering, u64) {
     // x == y should not happen, since cmp2 is called only from agm (with different variables) and
@@ -3642,14 +3642,14 @@ fn exponent_shift_compare<'a>(
 fn sub_float_significands_general<'a>(
     out: &mut [Limb],
     mut xs: &'a [Limb],
-    mut x_exp: i64,
+    mut x_exp: i32,
     mut x_prec: u64,
     mut ys: &'a [Limb],
-    mut y_exp: i64,
+    mut y_exp: i32,
     mut y_prec: u64,
     out_prec: u64,
     mut rm: RoundingMode,
-) -> (i64, Ordering, bool) {
+) -> (i32, Ordering, bool) {
     let mut xs_len = xs.len();
     let mut ys_len = ys.len();
     let out_len = out.len();
@@ -3952,7 +3952,7 @@ fn sub_float_significands_general<'a>(
         //   -low(y) < 1 / 2 ^ shift <= 0.5 ulp we always truncate and inexact can be any of -1, 0,
         //   1
         // - Note: here ys_len might exceed ys_len0, in which case we consider a zero limb
-        let mut k: i64 = 0;
+        let mut k: i32 = 0;
         while xs_len != 0 || ys_len != 0 {
             // - If cmp_low < 0, we know low(x) - low(y) < 0
             // - If cmp_low > 0, we know low(x) - low(y) > 0 (more precisely if cmp_low = 2, low(x)
@@ -4212,7 +4212,7 @@ fn sub_float_significands_general<'a>(
     let exp_a = if cancel != 0 {
         // OK: add_exp is an int equal to 0 or 1
         x_exp
-            .checked_sub(i64::exact_from(cancel).checked_sub(add_exp).unwrap())
+            .checked_sub(i32::exact_from(cancel).checked_sub(add_exp).unwrap())
             .unwrap()
     } else {
         // cancel = 0: MPFR_EXP(out) <- MPFR_EXP(x) + diff_exp

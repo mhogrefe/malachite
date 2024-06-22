@@ -64,7 +64,7 @@ impl TryFrom<Float> for Rational {
                 let bits = significand_bits(&significand);
                 Ok(
                     Rational::from(Integer::from_sign_and_abs(sign, significand))
-                        << (exponent - i64::exact_from(bits)),
+                        << (i64::from(exponent) - i64::exact_from(bits)),
                 )
             }
             _ => Err(RationalFromFloatError),
@@ -120,7 +120,7 @@ impl<'a> TryFrom<&'a Float> for Rational {
                 let bits = significand_bits(significand);
                 Ok(
                     Rational::from(Integer::from_sign_and_abs_ref(*sign, significand))
-                        << (exponent - i64::exact_from(bits)),
+                        << (i64::from(*exponent) - i64::exact_from(bits)),
                 )
             }
             _ => Err(RationalFromFloatError),

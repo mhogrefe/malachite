@@ -6,15 +6,29 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::arithmetic::denominators_in_closed_interval::DenominatorsInClosedRationalInterval;
+use crate::arithmetic::traits::DenominatorsInClosedInterval;
 use crate::exhaustive::RationalsWithDenominator;
 use crate::Rational;
+use core::cmp::min;
 use malachite_base::bools::random::{random_bools, RandomBools};
+use malachite_base::iterators::iterator_cache::IteratorCache;
+use malachite_base::num::arithmetic::traits::{
+    CoprimeWith, Reciprocal, RoundToMultiple, UnsignedAbs,
+};
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::random::geometric::{
+    geometric_random_unsigneds, GeometricRandomNaturalValues,
+};
+use malachite_base::num::random::{
+    random_primitive_ints, variable_range_generator, RandomPrimitiveInts, VariableRangeGenerator,
+};
 use malachite_base::random::Seed;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::random::{
+    get_random_integer_from_range_to_infinity, get_random_integer_from_range_to_negative_infinity,
     random_integer_range, random_integer_range_to_infinity,
     random_integer_range_to_negative_infinity, RandomIntegerRange, RandomIntegerRangeToInfinity,
 };
@@ -24,6 +38,7 @@ use malachite_nz::natural::random::{
     striped_random_positive_naturals, RandomNaturals, StripedRandomNaturals,
 };
 use malachite_nz::natural::Natural;
+use std::collections::HashMap;
 
 /// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`] numerators
 /// and denominators.
@@ -695,12 +710,12 @@ pub fn striped_random_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::random::random_rationals_with_denominator_range_to_infinity;
+/// use malachite_q::random::random_rational_with_denominator_range_to_infinity;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         random_rationals_with_denominator_range_to_infinity(
+///         random_rational_with_denominator_range_to_infinity(
 ///             EXAMPLE_SEED,
 ///             Natural::from(3u32),
 ///             Rational::from_signeds(-3i32, 2),
@@ -712,7 +727,7 @@ pub fn striped_random_rationals(
 ///     "[1/3, 4/3, -2/3, 94/3, 4/3, -2/3, 1/3, 145/3, 7/3, 1/3, ...]"
 /// )
 /// ```
-pub fn random_rationals_with_denominator_range_to_infinity(
+pub fn random_rational_with_denominator_range_to_infinity(
     seed: Seed,
     d: Natural,
     a: Rational,
@@ -757,12 +772,12 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::random::random_rationals_with_denominator_range_to_negative_infinity;
+/// use malachite_q::random::random_rational_with_denominator_range_to_negative_infinity;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         random_rationals_with_denominator_range_to_negative_infinity(
+///         random_rational_with_denominator_range_to_negative_infinity(
 ///             EXAMPLE_SEED,
 ///             Natural::from(3u32),
 ///             Rational::from_unsigneds(3u32, 2),
@@ -774,7 +789,7 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 ///     "[1/3, 4/3, -56/3, -2/3, 2/3, -1/3, -7/3, -11/3, -17/3, 4/3, ...]"
 /// )
 /// ```
-pub fn random_rationals_with_denominator_range_to_negative_infinity(
+pub fn random_rational_with_denominator_range_to_negative_infinity(
     seed: Seed,
     d: Natural,
     a: Rational,
@@ -819,22 +834,22 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 /// mean_numerator_bits_denominator`.
 ///
 /// # Panics
-/// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
-/// ratio is less than or equal to the bit length of the [`Rational`] with smallest absolute
-/// numerator in the range, or if they are too large and manipulating them leads to arithmetic
-/// overflow.
+/// Panics if $a \geq b$, if `mean_numerator_bits_numerator` or `mean_numerator_bits_denominator`
+/// are zero, if their ratio is less than or equal to the bit length of the [`Rational`] with
+/// smallest absolute numerator in the range, or if they are too large and manipulating them leads
+/// to arithmetic overflow.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::random::random_rationals_with_denominator_range;
+/// use malachite_q::random::random_rational_with_denominator_range;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         random_rationals_with_denominator_range(
+///         random_rational_with_denominator_range(
 ///             EXAMPLE_SEED,
 ///             Natural::from(100u32),
 ///             Rational::from_unsigneds(1u32, 3),
@@ -847,13 +862,13 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 ///     "[41/100, 43/100, 41/100, 41/100, 39/100, 41/100, 49/100, 41/100, 41/100, 39/100, ...]"
 /// )
 /// ```
-pub fn random_rationals_with_denominator_range(
+pub fn random_rational_with_denominator_range(
     seed: Seed,
     d: Natural,
     a: Rational,
     b: Rational,
-    mean_numerator_bits_numerator: u64,
-    mean_numerator_bits_denominator: u64,
+    mut mean_numerator_bits_numerator: u64,
+    mut mean_numerator_bits_denominator: u64,
 ) -> RationalsWithDenominator<RandomIntegerRange> {
     assert_ne!(d, 0u32);
     assert!(a < b);
@@ -863,6 +878,15 @@ pub fn random_rationals_with_denominator_range(
     let mut b_i = Integer::rounding_from(b * q_d, Floor).0;
     if !upper_included {
         b_i += Integer::ONE;
+    }
+    if (a_i >= 0) == (b_i >= 0) {
+        let (n, d) = (Rational::from_unsigneds(
+            mean_numerator_bits_numerator,
+            mean_numerator_bits_denominator,
+        ) + Rational::from(min(a_i.significant_bits(), b_i.significant_bits())))
+        .into_numerator_and_denominator();
+        mean_numerator_bits_numerator = u64::exact_from(&n);
+        mean_numerator_bits_denominator = u64::exact_from(&d);
     }
     RationalsWithDenominator {
         numerators: random_integer_range(
@@ -901,21 +925,22 @@ pub fn random_rationals_with_denominator_range(
 /// mean_numerator_bits_denominator`.
 ///
 /// # Panics
-/// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio
-/// is less than or equal to the bit length of the [`Rational`] with smallest absolute numerator in
-/// the range, or if they are too large and manipulating them leads to arithmetic overflow.
+/// Panics if $a > b$, if `mean_numerator_bits_numerator` or `mean_numerator_bits_denominator` are
+/// zero, if their ratio is less than or equal to the bit length of the [`Rational`] with smallest
+/// absolute numerator in the range, or if they are too large and manipulating them leads to
+/// arithmetic overflow.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::random::random_rationals_with_denominator_inclusive_range;
+/// use malachite_q::random::random_rational_with_denominator_inclusive_range;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         random_rationals_with_denominator_inclusive_range(
+///         random_rational_with_denominator_inclusive_range(
 ///             EXAMPLE_SEED,
 ///             Natural::from(100u32),
 ///             Rational::from_unsigneds(1u32, 3),
@@ -928,19 +953,28 @@ pub fn random_rationals_with_denominator_range(
 ///     "[41/100, 43/100, 41/100, 41/100, 39/100, 41/100, 49/100, 41/100, 41/100, 39/100, ...]"
 /// )
 /// ```
-pub fn random_rationals_with_denominator_inclusive_range(
+pub fn random_rational_with_denominator_inclusive_range(
     seed: Seed,
     d: Natural,
     a: Rational,
     b: Rational,
-    mean_numerator_bits_numerator: u64,
-    mean_numerator_bits_denominator: u64,
+    mut mean_numerator_bits_numerator: u64,
+    mut mean_numerator_bits_denominator: u64,
 ) -> RationalsWithDenominator<RandomIntegerRange> {
     assert_ne!(d, 0u32);
     assert!(a <= b);
     let q_d = Rational::from(&d);
     let a_i = Integer::rounding_from(a * &q_d, Ceiling).0;
     let b_i = Integer::rounding_from(b * q_d, Floor).0 + Integer::ONE;
+    if (a_i >= 0) == (b_i >= 0) {
+        let (n, d) = (Rational::from_unsigneds(
+            mean_numerator_bits_numerator,
+            mean_numerator_bits_denominator,
+        ) + Rational::from(min(a_i.significant_bits(), b_i.significant_bits())))
+        .into_numerator_and_denominator();
+        mean_numerator_bits_numerator = u64::exact_from(&n);
+        mean_numerator_bits_denominator = u64::exact_from(&d);
+    }
     RationalsWithDenominator {
         numerators: random_integer_range(
             seed,
@@ -951,4 +985,477 @@ pub fn random_rationals_with_denominator_inclusive_range(
         ),
         denominator: d,
     }
+}
+
+/// Generates random [`Rational`]s greater than or equal to a lower bound. See
+/// [`random_rational_range_to_infinity`] for more details.
+#[derive(Clone, Debug)]
+pub struct RandomRationalRangeToInfinity {
+    a: Rational,
+    limbs: RandomPrimitiveInts<u64>,
+    range_generator: VariableRangeGenerator,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    denominators: RandomNaturals<GeometricRandomNaturalValues<u64>>,
+}
+
+impl Iterator for RandomRationalRangeToInfinity {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        let d = self.denominators.next().unwrap();
+        let numerator_bound = Integer::rounding_from(&self.a * Rational::from(&d), Ceiling).0;
+        let (numerator, denominator) = (Rational::from(d.significant_bits())
+            + Rational::from_unsigneds(self.mean_bits_numerator, self.mean_bits_denominator))
+        .into_numerator_and_denominator();
+        let numerator = u64::exact_from(&numerator);
+        let denominator = u64::exact_from(&denominator);
+        loop {
+            let n = get_random_integer_from_range_to_infinity(
+                &mut self.limbs,
+                &mut self.range_generator,
+                numerator_bound.clone(),
+                numerator,
+                denominator,
+            );
+            if n.unsigned_abs_ref().coprime_with(&d) {
+                return Some(Rational {
+                    sign: n >= 0,
+                    numerator: n.unsigned_abs(),
+                    denominator: d,
+                });
+            }
+        }
+    }
+}
+
+/// Generates random [`Rational`]s greater than or equal to a lower bound $a$.
+///
+/// The mean bit length $m$ of the absolute values of the numerators of the generated values is
+/// specified. $m$ is equal to `mean_numerator_bits_numerator / mean_numerator_bits_denominator`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
+/// is less than or equal to the bit length of $a$, or if they are too large and manipulating them
+/// leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::random::random_rational_range_to_infinity;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_range_to_infinity(EXAMPLE_SEED, Rational::from_signeds(-3i32, 2), 3, 1),
+///         10
+///     ),
+///     "[2/3, 56, 1/2, -1/34, -15/23, -4/5, 1/2, 5, 195, -1, ...]"
+/// )
+/// ```
+pub fn random_rational_range_to_infinity(
+    seed: Seed,
+    a: Rational,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomRationalRangeToInfinity {
+    RandomRationalRangeToInfinity {
+        a,
+        limbs: random_primitive_ints(seed.fork("limbs")),
+        range_generator: variable_range_generator(seed.fork("range generator")),
+        mean_bits_numerator,
+        mean_bits_denominator,
+        denominators: random_positive_naturals(
+            seed.fork("denominators"),
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    }
+}
+
+/// Generates random [`Rational`]s less than or equal to a lower bound. See
+/// [`random_rational_range_to_negative_infinity`] for more details.
+#[derive(Clone, Debug)]
+pub struct RandomRationalRangeToNegativeInfinity {
+    a: Rational,
+    limbs: RandomPrimitiveInts<u64>,
+    range_generator: VariableRangeGenerator,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    denominators: RandomNaturals<GeometricRandomNaturalValues<u64>>,
+}
+
+impl Iterator for RandomRationalRangeToNegativeInfinity {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        let d = self.denominators.next().unwrap();
+        let numerator_bound = Integer::rounding_from(&self.a * Rational::from(&d), Floor).0;
+        let (numerator, denominator) = (Rational::from(d.significant_bits())
+            + Rational::from_unsigneds(self.mean_bits_numerator, self.mean_bits_denominator))
+        .into_numerator_and_denominator();
+        let numerator = u64::exact_from(&numerator);
+        let denominator = u64::exact_from(&denominator);
+        loop {
+            let n = get_random_integer_from_range_to_negative_infinity(
+                &mut self.limbs,
+                &mut self.range_generator,
+                numerator_bound.clone(),
+                numerator,
+                denominator,
+            );
+            if n.unsigned_abs_ref().coprime_with(&d) {
+                return Some(Rational {
+                    sign: n >= 0,
+                    numerator: n.unsigned_abs(),
+                    denominator: d,
+                });
+            }
+        }
+    }
+}
+
+/// Generates random [`Rational`]s less than or equal to a lower bound $a$.
+///
+/// The mean bit length $m$ of the absolute values of the numerators of the generated values is
+/// specified. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
+/// is less than or equal to the bit length of $a$, or if they are too large and manipulating them
+/// leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::random::random_rational_range_to_negative_infinity;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_range_to_negative_infinity(
+///             EXAMPLE_SEED,
+///             Rational::from_signeds(-3i32, 2),
+///             3,
+///             1
+///         ),
+///         10
+///     ),
+///     "[-8/3, -114, -31/2, -1187/34, -61/23, -81/5, -3/2, -19, -82, -312, ...]"
+/// )
+/// ```
+pub fn random_rational_range_to_negative_infinity(
+    seed: Seed,
+    a: Rational,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomRationalRangeToNegativeInfinity {
+    RandomRationalRangeToNegativeInfinity {
+        a,
+        limbs: random_primitive_ints(seed.fork("limbs")),
+        range_generator: variable_range_generator(seed.fork("range generator")),
+        mean_bits_numerator,
+        mean_bits_denominator,
+        denominators: random_positive_naturals(
+            seed.fork("denominators"),
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    }
+}
+
+/// Generates random [`Rational`]s in a half-open interval $[a,b)$. See [`random_rational_range`]
+/// for more details.
+#[derive(Clone, Debug)]
+pub struct RandomRationalRange {
+    seed: Seed,
+    mean_numerator_bits_numerator: u64,
+    mean_numerator_bits_denominator: u64,
+    a: Rational,
+    b: Rational,
+    denominators: IteratorCache<DenominatorsInClosedRationalInterval>,
+    denominator_map: HashMap<Natural, RationalsWithDenominator<RandomIntegerRange>>,
+    indices: GeometricRandomNaturalValues<usize>,
+}
+
+impl Iterator for RandomRationalRange {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        loop {
+            let d = self.denominators.get(self.indices.next().unwrap()).unwrap();
+            if (&self.a)
+                .round_to_multiple(Rational::from(d).reciprocal(), Ceiling)
+                .0
+                >= self.b
+            {
+                // This can happen when d is the denominator of b
+                continue;
+            }
+            return self
+                .denominator_map
+                .entry(d.clone())
+                .or_insert_with(|| {
+                    random_rational_with_denominator_range(
+                        self.seed.fork(&d.to_string()),
+                        d.clone(),
+                        self.a.clone(),
+                        self.b.clone(),
+                        self.mean_numerator_bits_numerator,
+                        self.mean_numerator_bits_denominator,
+                    )
+                })
+                .next();
+        }
+    }
+}
+
+/// Generates random [`Rational`]s in the half-open interval $[a, b)$.
+///
+/// In general, the [`Rational`]s are not generated uniformly. Instead, [`Rational`]s whose
+/// numerators have smaller bit lengths are generated more frequently.
+///
+/// The distribution of generated values is parametrized by a number $m$, given by
+/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator`. It is not actually the mean
+/// bit length of the numerators, though it approaches the mean bit length of the numerators minus
+/// $\lceil ad \right$ as $\log (b/a)$ approaches infinity. $m$ cannot be 0, and must be greater
+/// than the bit length of the numerator of the generated [`Rational`] with the smallest absolute
+/// value, but it may be arbitrarily large. The smaller it is, the more quickly the probabilities
+/// decrease as bit length increases. The larger it is, the more closely the distribution approaches
+/// a uniform distribution over the bit lengths.
+///
+/// The distribution of denominators is parametrized by `mean_denominator_index_numerator /
+/// mean_denominator_index_denominator.` The larger this value is, the larger the average
+/// denominator produced.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `mean_numerator_bits_numerator`, `mean_numerator_bits_denominator`,
+/// `mean_denominator_index_numerator`, or `mean_denominator_index_denominator` are zero, if
+/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator` is less than or equal to the
+/// bit length of the [`Rational`] with smallest absolute numerator in the range, or if any of these
+/// values are too are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::random::random_rational_range;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_range(
+///             EXAMPLE_SEED,
+///             Rational::from_unsigneds(1u32, 3),
+///             Rational::from_unsigneds(1u32, 2),
+///             3,
+///             1,
+///             10,
+///             1
+///         ),
+///         10
+///     ),
+///     "[1/3, 4/9, 7/19, 5/13, 13/28, 4/9, 5/14, 7/19, 14/33, 8/17, ...]"
+/// )
+/// ```
+pub fn random_rational_range(
+    seed: Seed,
+    a: Rational,
+    b: Rational,
+    mean_numerator_bits_numerator: u64,
+    mean_numerator_bits_denominator: u64,
+    mean_denominator_index_numerator: u64,
+    mean_denominator_index_denominator: u64,
+) -> RandomRationalRange {
+    assert!(a < b);
+    assert_ne!(mean_numerator_bits_denominator, 0);
+    assert_ne!(mean_denominator_index_denominator, 0);
+    RandomRationalRange {
+        seed: seed.fork("numerators"),
+        mean_numerator_bits_numerator,
+        mean_numerator_bits_denominator,
+        a: a.clone(),
+        b: b.clone(),
+        denominators: IteratorCache::new(Rational::denominators_in_closed_interval(a, b)),
+        denominator_map: HashMap::new(),
+        indices: geometric_random_unsigneds(
+            seed.fork("indices"),
+            mean_denominator_index_numerator,
+            mean_denominator_index_denominator,
+        ),
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct RandomRationalInclusiveRangeInner {
+    seed: Seed,
+    mean_numerator_bits_numerator: u64,
+    mean_numerator_bits_denominator: u64,
+    a: Rational,
+    b: Rational,
+    denominators: IteratorCache<DenominatorsInClosedRationalInterval>,
+    denominator_map: HashMap<Natural, RationalsWithDenominator<RandomIntegerRange>>,
+    indices: GeometricRandomNaturalValues<usize>,
+}
+
+impl Iterator for RandomRationalInclusiveRangeInner {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        let d = self.denominators.get(self.indices.next().unwrap()).unwrap();
+        self.denominator_map
+            .entry(d.clone())
+            .or_insert_with(|| {
+                random_rational_with_denominator_inclusive_range(
+                    self.seed.fork(&d.to_string()),
+                    d.clone(),
+                    self.a.clone(),
+                    self.b.clone(),
+                    self.mean_numerator_bits_numerator,
+                    self.mean_numerator_bits_denominator,
+                )
+            })
+            .next()
+    }
+}
+
+/// Generates random [`Rational`]s in a closed interval $\[a,b\]$. See
+/// [`random_rational_inclusive_range`] for more details.
+#[derive(Clone, Debug)]
+pub enum RandomRationalInclusiveRange {
+    Single(Rational),
+    Multiple(RandomRationalInclusiveRangeInner),
+}
+
+impl Iterator for RandomRationalInclusiveRange {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        match self {
+            RandomRationalInclusiveRange::Single(x) => Some(x.clone()),
+            RandomRationalInclusiveRange::Multiple(xs) => xs.next(),
+        }
+    }
+}
+
+/// Generates random [`Rational`]s in the closed interval $[a, b]$.
+///
+/// In general, the [`Rational`]s are not generated uniformly. Instead, [`Rational`]s whose
+/// numerators have smaller bit lengths are generated more frequently.
+///
+/// The distribution of generated values is parametrized by a number $m$, given by
+/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator`. It is not actually the mean
+/// bit length of the numerators, though it approaches the mean bit length of the numerators minus
+/// $\lceil ad \right$ as $\log (b/a)$ approaches infinity. $m$ cannot be 0, and must be greater
+/// than the bit length of the numerator of the generated [`Rational`] with the smallest absolute
+/// value, but it may be arbitrarily large. The smaller it is, the more quickly the probabilities
+/// decrease as bit length increases. The larger it is, the more closely the distribution approaches
+/// a uniform distribution over the bit lengths.
+///
+/// The distribution of denominators is parametrized by `mean_denominator_index_numerator /
+/// mean_denominator_index_denominator.` The larger this value is, the larger the average
+/// denominator produced.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a>b$, if `mean_numerator_bits_numerator`, `mean_numerator_bits_denominator`,
+/// `mean_denominator_index_numerator`, or `mean_denominator_index_denominator` are zero, if
+/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator` is less than or equal to the
+/// bit length of the [`Rational`] with smallest absolute numerator in the range, or if any of these
+/// values are too are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::random::random_rational_inclusive_range;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_inclusive_range(
+///             EXAMPLE_SEED,
+///             Rational::from_unsigneds(1u32, 3),
+///             Rational::from_unsigneds(1u32, 2),
+///             3,
+///             1,
+///             10,
+///             1
+///         ),
+///         10
+///     ),
+///     "[1/3, 4/9, 1/2, 7/19, 5/13, 13/28, 1/2, 4/9, 1/2, 5/14, ...]"
+/// )
+/// ```
+pub fn random_rational_inclusive_range(
+    seed: Seed,
+    a: Rational,
+    b: Rational,
+    mean_numerator_bits_numerator: u64,
+    mean_numerator_bits_denominator: u64,
+    mean_denominator_index_numerator: u64,
+    mean_denominator_index_denominator: u64,
+) -> RandomRationalInclusiveRange {
+    assert!(a <= b);
+    if a == b {
+        return RandomRationalInclusiveRange::Single(a);
+    }
+    assert_ne!(mean_numerator_bits_denominator, 0);
+    assert_ne!(mean_denominator_index_denominator, 0);
+    RandomRationalInclusiveRange::Multiple(RandomRationalInclusiveRangeInner {
+        seed: seed.fork("numerators"),
+        mean_numerator_bits_numerator,
+        mean_numerator_bits_denominator,
+        a: a.clone(),
+        b: b.clone(),
+        denominators: IteratorCache::new(Rational::denominators_in_closed_interval(a, b)),
+        denominator_map: HashMap::new(),
+        indices: geometric_random_unsigneds(
+            seed.fork("indices"),
+            mean_denominator_index_numerator,
+            mean_denominator_index_denominator,
+        ),
+    })
 }

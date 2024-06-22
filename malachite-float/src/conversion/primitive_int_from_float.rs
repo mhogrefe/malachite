@@ -41,6 +41,7 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(exponent);
             if !sign {
                 match rm {
                     Ceiling | Down | Nearest => (T::ZERO, Greater),
@@ -106,12 +107,13 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(*exponent);
             if !sign {
                 match rm {
                     Ceiling | Down | Nearest => (T::ZERO, Greater),
                     _ => panic!("Cannot convert negative Float to {} using {}", T::NAME, rm),
                 }
-            } else if *exponent < 0 {
+            } else if exponent < 0 {
                 match rm {
                     Floor | Down | Nearest => (T::ZERO, Less),
                     Ceiling | Up => (T::ONE, Greater),
@@ -119,7 +121,7 @@ where
                         panic!("Cannot convert Float to {} using {}", T::NAME, rm)
                     }
                 }
-            } else if *exponent > i64::wrapping_from(T::WIDTH) {
+            } else if exponent > i64::wrapping_from(T::WIDTH) {
                 match rm {
                     Floor | Down | Nearest => (T::MAX, Less),
                     _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
@@ -159,6 +161,7 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(exponent);
             if !sign {
                 Err(UnsignedFromFloatError::FloatNegative)
             } else if exponent <= 0 || exponent > i64::wrapping_from(T::WIDTH) {
@@ -196,9 +199,10 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(*exponent);
             if !sign {
                 Err(UnsignedFromFloatError::FloatNegative)
-            } else if *exponent <= 0 || *exponent > i64::wrapping_from(T::WIDTH) {
+            } else if exponent <= 0 || exponent > i64::wrapping_from(T::WIDTH) {
                 Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
             } else {
                 let sb = significand_bits(significand);
@@ -229,7 +233,8 @@ fn unsigned_convertible_from_float<T: PrimitiveUnsigned>(f: &Float) -> bool {
             significand,
             ..
         }) => {
-            *sign && *exponent > 0 && *exponent <= i64::wrapping_from(T::WIDTH) && {
+            let exponent = i64::from(*exponent);
+            *sign && exponent > 0 && exponent <= i64::wrapping_from(T::WIDTH) && {
                 let sb = significand_bits(significand);
                 let eb = exponent.unsigned_abs();
                 sb < eb || significand.divisible_by_power_of_2(sb - eb)
@@ -393,6 +398,7 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(exponent);
             if sign {
                 if exponent < 0 {
                     match rm {
@@ -494,8 +500,9 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(*exponent);
             if *sign {
-                if *exponent < 0 {
+                if exponent < 0 {
                     match rm {
                         Floor | Down | Nearest => (T::ZERO, Less),
                         Ceiling | Up => (T::ONE, Greater),
@@ -503,7 +510,7 @@ where
                             panic!("Cannot convert Float to Integer using {rm}")
                         }
                     }
-                } else if *exponent >= i64::wrapping_from(T::WIDTH) {
+                } else if exponent >= i64::wrapping_from(T::WIDTH) {
                     match rm {
                         Floor | Down | Nearest => (T::MAX, Less),
                         _ => {
@@ -530,7 +537,7 @@ where
                     };
                     (n, o)
                 }
-            } else if *exponent < 0 {
+            } else if exponent < 0 {
                 match rm {
                     Ceiling | Down | Nearest => (T::ZERO, Greater),
                     Floor | Up => (T::NEGATIVE_ONE, Less),
@@ -538,7 +545,7 @@ where
                         panic!("Cannot convert Float to Integer using {rm}")
                     }
                 }
-            } else if *exponent > i64::wrapping_from(T::WIDTH) {
+            } else if exponent > i64::wrapping_from(T::WIDTH) {
                 // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok because the
                 // next else block handles it.
                 match rm {
@@ -586,6 +593,7 @@ where
             significand,
             ..
         }) => {
+            let exponent = i64::from(exponent);
             if exponent <= 0
                 || (sign && exponent >= i64::wrapping_from(T::WIDTH)
                     || !sign && exponent > i64::wrapping_from(T::WIDTH))
@@ -627,9 +635,10 @@ where
             significand,
             ..
         }) => {
-            if *exponent <= 0
-                || (*sign && *exponent >= i64::wrapping_from(T::WIDTH)
-                    || !*sign && *exponent > i64::wrapping_from(T::WIDTH))
+            let exponent = i64::from(*exponent);
+            if exponent <= 0
+                || (*sign && exponent >= i64::wrapping_from(T::WIDTH)
+                    || !*sign && exponent > i64::wrapping_from(T::WIDTH))
             {
                 Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
             } else {
@@ -663,10 +672,11 @@ fn signed_convertible_from_float<T: PrimitiveSigned>(f: &Float) -> bool {
             significand,
             ..
         }) => {
-            if *exponent <= 0 {
+            let exponent = i64::from(*exponent);
+            if exponent <= 0 {
                 return false;
             }
-            if *exponent >= i64::wrapping_from(T::WIDTH) {
+            if exponent >= i64::wrapping_from(T::WIDTH) {
                 float_is_signed_min::<T>(f)
             } else {
                 let sb = significand_bits(significand);

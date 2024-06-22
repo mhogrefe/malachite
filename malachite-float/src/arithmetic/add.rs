@@ -383,571 +383,6 @@ impl Float {
         }
     }
 
-    // This is mpfr_add_q from gmp_op.c, MPFR 4.2.0.
-    pub(crate) fn add_rational_prec_round_assign_helper(
-        &mut self,
-        other: Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> Ordering {
-        assert_ne!(prec, 0);
-        match (&mut *self, other) {
-            (Float(NaN | Infinity { .. }), _) => Equal,
-            (float_negative_zero!(), y) => {
-                if y == 0u32 {
-                    Equal
-                } else {
-                    let o;
-                    (*self, o) = Float::from_rational_prec_round(y, prec, rm);
-                    o
-                }
-            }
-            (float_zero!(), y) => {
-                let o;
-                (*self, o) = Float::from_rational_prec_round(y, prec, rm);
-                o
-            }
-            (_, y) if y == 0 => self.set_prec_round(prec, rm),
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        return self.add_prec_round_assign(q, prec, rm);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let t = x.add_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            *self = t;
-                            return self.set_prec_round(prec, rm);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    pub(crate) fn add_rational_prec_round_assign_ref_helper(
-        &mut self,
-        other: &Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> Ordering {
-        assert_ne!(prec, 0);
-        match (&mut *self, other) {
-            (Float(NaN | Infinity { .. }), _) => Equal,
-            (float_negative_zero!(), y) => {
-                if *y == 0u32 {
-                    Equal
-                } else {
-                    let o;
-                    (*self, o) = Float::from_rational_prec_round_ref(y, prec, rm);
-                    o
-                }
-            }
-            (float_zero!(), y) => {
-                let o;
-                (*self, o) = Float::from_rational_prec_round_ref(y, prec, rm);
-                o
-            }
-            (_, y) if *y == 0 => self.set_prec_round(prec, rm),
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        return self.add_prec_round_assign(q, prec, rm);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let t = x.add_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            *self = t;
-                            return self.set_prec_round(prec, rm);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    pub(crate) fn add_rational_prec_round_ref_val_helper(
-        &self,
-        other: Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Equal),
-            (float_infinity!(), _) => (float_infinity!(), Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
-            (float_negative_zero!(), y) => {
-                if y == 0u32 {
-                    (float_negative_zero!(), Equal)
-                } else {
-                    Float::from_rational_prec_round(y, prec, rm)
-                }
-            }
-            (float_zero!(), y) => Float::from_rational_prec_round(y, prec, rm),
-            (_, y) if y == 0 => {
-                let mut x = self.clone();
-                let o = x.set_prec_round(prec, rm);
-                (x, o)
-            }
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        let mut x = self.clone();
-                        let o = x.add_prec_round_assign(q, prec, rm);
-                        return (x, o);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let mut t = x.add_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            let o = t.set_prec_round(prec, rm);
-                            return (t, o);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    pub(crate) fn add_rational_prec_round_ref_ref_helper(
-        &self,
-        other: &Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Equal),
-            (float_infinity!(), _) => (float_infinity!(), Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
-            (float_negative_zero!(), y) => {
-                if *y == 0u32 {
-                    (float_negative_zero!(), Equal)
-                } else {
-                    Float::from_rational_prec_round_ref(y, prec, rm)
-                }
-            }
-            (float_zero!(), y) => Float::from_rational_prec_round_ref(y, prec, rm),
-            (_, y) if *y == 0 => {
-                let mut x = self.clone();
-                let o = x.set_prec_round(prec, rm);
-                (x, o)
-            }
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        let mut x = self.clone();
-                        let o = x.add_prec_round_assign(q, prec, rm);
-                        return (x, o);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let mut t = x.add_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            let o = t.set_prec_round(prec, rm);
-                            return (t, o);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    // This is mpfr_sub_q from gmp_op.c, MPFR 4.2.0.
-    pub(crate) fn sub_rational_prec_round_assign_helper(
-        &mut self,
-        other: Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> Ordering {
-        assert_ne!(prec, 0);
-        match (&mut *self, other) {
-            (Float(NaN | Infinity { .. }), _) => Equal,
-            (float_negative_zero!(), y) => {
-                let o;
-                (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
-                self.neg_assign();
-                o.reverse()
-            }
-            (float_zero!(), y) => {
-                if y == 0u32 {
-                    Equal
-                } else {
-                    let o;
-                    (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
-                    self.neg_assign();
-                    o.reverse()
-                }
-            }
-            (_, y) if y == 0 => self.set_prec_round(prec, rm),
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        return self.sub_prec_round_assign(q, prec, rm);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let t = x.sub_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            *self = t;
-                            return self.set_prec_round(prec, rm);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    pub(crate) fn sub_rational_prec_round_assign_ref_helper(
-        &mut self,
-        other: &Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> Ordering {
-        assert_ne!(prec, 0);
-        match (&mut *self, other) {
-            (Float(NaN | Infinity { .. }), _) => Equal,
-            (float_negative_zero!(), y) => {
-                let o;
-                (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
-                self.neg_assign();
-                o.reverse()
-            }
-            (float_zero!(), y) => {
-                if *y == 0u32 {
-                    Equal
-                } else {
-                    let o;
-                    (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
-                    self.neg_assign();
-                    o.reverse()
-                }
-            }
-            (_, y) if *y == 0 => self.set_prec_round(prec, rm),
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        return self.sub_prec_round_assign(q, prec, rm);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let t = x.sub_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            *self = t;
-                            return self.set_prec_round(prec, rm);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    pub(crate) fn sub_rational_prec_round_ref_val_helper(
-        &self,
-        other: Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Equal),
-            (float_infinity!(), _) => (float_infinity!(), Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
-            (float_negative_zero!(), y) => {
-                let (diff, o) = Float::from_rational_prec_round(y, prec, -rm);
-                (-diff, o.reverse())
-            }
-            (float_zero!(), y) => {
-                if y == 0u32 {
-                    (float_zero!(), Equal)
-                } else {
-                    let (diff, o) = Float::from_rational_prec_round(y, prec, -rm);
-                    (-diff, o.reverse())
-                }
-            }
-            (_, y) if y == 0 => {
-                let mut x = self.clone();
-                let o = x.set_prec_round(prec, rm);
-                (x, o)
-            }
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        let mut x = self.clone();
-                        let o = x.sub_prec_round_assign(q, prec, rm);
-                        return (x, o);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let mut t = x.sub_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            let o = t.set_prec_round(prec, rm);
-                            return (t, o);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
-    pub(crate) fn sub_rational_prec_round_ref_ref_helper(
-        &self,
-        other: &Rational,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        match (self, other) {
-            (float_nan!(), _) => (float_nan!(), Equal),
-            (float_infinity!(), _) => (float_infinity!(), Equal),
-            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
-            (float_negative_zero!(), y) => {
-                let (diff, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
-                (-diff, o.reverse())
-            }
-            (float_zero!(), y) => {
-                if *y == 0u32 {
-                    (float_zero!(), Equal)
-                } else {
-                    let (diff, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
-                    (-diff, o.reverse())
-                }
-            }
-            (_, y) if *y == 0 => {
-                let mut x = self.clone();
-                let o = x.set_prec_round(prec, rm);
-                (x, o)
-            }
-            (x, y) => {
-                let mut working_prec = prec + 10;
-                let mut increment = Limb::WIDTH;
-                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
-                loop {
-                    // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
-                    if o == Equal {
-                        // Result is exact so we can add it directly!
-                        let mut x = self.clone();
-                        let o = x.sub_prec_round_assign(q, prec, rm);
-                        return (x, o);
-                    }
-                    let q_exp = q.get_exponent().unwrap();
-                    let mut t = x.sub_prec_ref_val(q, working_prec).0;
-                    // Error on t is <= 1/2 ulp(t).
-                    // ```
-                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
-                    //                     <= 2^(EXP(q)-EXP(t))
-                    // If EXP(q)-EXP(t)<0, <= 2^0
-                    // ```
-                    // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
-                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
-                            .checked_add(1)
-                            .unwrap();
-                        if working_prec >= m
-                            && float_can_round(
-                                t.significand_ref().unwrap(),
-                                working_prec - m,
-                                prec,
-                                rm,
-                            )
-                        {
-                            let o = t.set_prec_round(prec, rm);
-                            return (t, o);
-                        }
-                    }
-                    working_prec += increment;
-                    increment = working_prec >> 1;
-                }
-            }
-        }
-    }
-
     /// Adds two [`Float`]s, rounding the result to the specified precision and with the specified
     /// rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
@@ -2524,7 +1959,68 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
-        self.add_rational_prec_round_ref_val_helper(other, prec, rm)
+        assert_ne!(prec, 0);
+        match (self, other) {
+            (float_nan!(), _) => (float_nan!(), Equal),
+            (float_infinity!(), _) => (float_infinity!(), Equal),
+            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
+            (float_negative_zero!(), y) => {
+                if y == 0u32 {
+                    (float_negative_zero!(), Equal)
+                } else {
+                    Float::from_rational_prec_round(y, prec, rm)
+                }
+            }
+            (float_zero!(), y) => Float::from_rational_prec_round(y, prec, rm),
+            (_, y) if y == 0 => {
+                let mut x = self.clone();
+                let o = x.set_prec_round(prec, rm);
+                (x, o)
+            }
+            (x, y) => {
+                let mut working_prec = prec + 10;
+                let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
+                loop {
+                    // Error <= 1/2 ulp(q)
+                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    if o == Equal {
+                        // Result is exact so we can add it directly!
+                        let mut x = self.clone();
+                        let o = x.add_prec_round_assign(q, prec, rm);
+                        return (x, o);
+                    }
+                    let q_exp = q.get_exponent().unwrap();
+                    let mut t = x.add_prec_ref_val(q, working_prec).0;
+                    // Error on t is <= 1/2 ulp(t).
+                    // ```
+                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
+                    //                     <= 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)<0, <= 2^0
+                    // ```
+                    // We can get 0, but we can't round since q is inexact
+                    if t != 0 {
+                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
+                            .checked_add(1)
+                            .unwrap();
+                        if working_prec >= m
+                            && float_can_round(
+                                t.significand_ref().unwrap(),
+                                working_prec - m,
+                                prec,
+                                rm,
+                            )
+                        {
+                            let o = t.set_prec_round(prec, rm);
+                            return (t, o);
+                        }
+                    }
+                    working_prec += increment;
+                    increment = working_prec >> 1;
+                }
+            }
+        }
     }
 
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the specified precision and with
@@ -2634,7 +2130,68 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
-        self.add_rational_prec_round_ref_ref_helper(other, prec, rm)
+        assert_ne!(prec, 0);
+        match (self, other) {
+            (float_nan!(), _) => (float_nan!(), Equal),
+            (float_infinity!(), _) => (float_infinity!(), Equal),
+            (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
+            (float_negative_zero!(), y) => {
+                if *y == 0u32 {
+                    (float_negative_zero!(), Equal)
+                } else {
+                    Float::from_rational_prec_round_ref(y, prec, rm)
+                }
+            }
+            (float_zero!(), y) => Float::from_rational_prec_round_ref(y, prec, rm),
+            (_, y) if *y == 0 => {
+                let mut x = self.clone();
+                let o = x.set_prec_round(prec, rm);
+                (x, o)
+            }
+            (x, y) => {
+                let mut working_prec = prec + 10;
+                let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
+                loop {
+                    // Error <= 1/2 ulp(q)
+                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    if o == Equal {
+                        // Result is exact so we can add it directly!
+                        let mut x = self.clone();
+                        let o = x.add_prec_round_assign(q, prec, rm);
+                        return (x, o);
+                    }
+                    let q_exp = q.get_exponent().unwrap();
+                    let mut t = x.add_prec_ref_val(q, working_prec).0;
+                    // Error on t is <= 1/2 ulp(t).
+                    // ```
+                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
+                    //                     <= 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)<0, <= 2^0
+                    // ```
+                    // We can get 0, but we can't round since q is inexact
+                    if t != 0 {
+                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
+                            .checked_add(1)
+                            .unwrap();
+                        if working_prec >= m
+                            && float_can_round(
+                                t.significand_ref().unwrap(),
+                                working_prec - m,
+                                prec,
+                                rm,
+                            )
+                        {
+                            let o = t.set_prec_round(prec, rm);
+                            return (t, o);
+                        }
+                    }
+                    working_prec += increment;
+                    increment = working_prec >> 1;
+                }
+            }
+        }
     }
 
     /// Adds a [`Float`] and a [`Rational`], rounding the result to the nearest value of the
@@ -3271,6 +2828,8 @@ impl Float {
     /// );
     /// assert_eq!(x.to_string(), "3.474926");
     /// ```
+    ///
+    /// This is mpfr_add_q from gmp_op.c, MPFR 4.2.0.
     #[inline]
     pub fn add_rational_prec_round_assign(
         &mut self,
@@ -3278,7 +2837,65 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
-        self.add_rational_prec_round_assign_helper(other, prec, rm)
+        assert_ne!(prec, 0);
+        match (&mut *self, other) {
+            (Float(NaN | Infinity { .. }), _) => Equal,
+            (float_negative_zero!(), y) => {
+                if y == 0u32 {
+                    Equal
+                } else {
+                    let o;
+                    (*self, o) = Float::from_rational_prec_round(y, prec, rm);
+                    o
+                }
+            }
+            (float_zero!(), y) => {
+                let o;
+                (*self, o) = Float::from_rational_prec_round(y, prec, rm);
+                o
+            }
+            (_, y) if y == 0 => self.set_prec_round(prec, rm),
+            (x, y) => {
+                let mut working_prec = prec + 10;
+                let mut increment = Limb::WIDTH;
+                loop {
+                    // Error <= 1/2 ulp(q)
+                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    if o == Equal {
+                        // Result is exact so we can add it directly!
+                        return self.add_prec_round_assign(q, prec, rm);
+                    }
+                    let q_exp = q.get_exponent().unwrap();
+                    let t = x.add_prec_ref_val(q, working_prec).0;
+                    // Error on t is <= 1/2 ulp(t).
+                    // ```
+                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
+                    //                     <= 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)<0, <= 2^0
+                    // ```
+                    // We can get 0, but we can't round since q is inexact
+                    if t != 0 {
+                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
+                            .checked_add(1)
+                            .unwrap();
+                        if working_prec >= m
+                            && float_can_round(
+                                t.significand_ref().unwrap(),
+                                working_prec - m,
+                                prec,
+                                rm,
+                            )
+                        {
+                            *self = t;
+                            return self.set_prec_round(prec, rm);
+                        }
+                    }
+                    working_prec += increment;
+                    increment = working_prec >> 1;
+                }
+            }
+        }
     }
 
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the specified precision
@@ -3376,7 +2993,66 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
-        self.add_rational_prec_round_assign_ref_helper(other, prec, rm)
+        assert_ne!(prec, 0);
+        match (&mut *self, other) {
+            (Float(NaN | Infinity { .. }), _) => Equal,
+            (float_negative_zero!(), y) => {
+                if *y == 0u32 {
+                    Equal
+                } else {
+                    let o;
+                    (*self, o) = Float::from_rational_prec_round_ref(y, prec, rm);
+                    o
+                }
+            }
+            (float_zero!(), y) => {
+                let o;
+                (*self, o) = Float::from_rational_prec_round_ref(y, prec, rm);
+                o
+            }
+            (_, y) if *y == 0 => self.set_prec_round(prec, rm),
+            (x, y) => {
+                let mut working_prec = prec + 10;
+                let mut increment = Limb::WIDTH;
+                // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
+                loop {
+                    // Error <= 1/2 ulp(q)
+                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    if o == Equal {
+                        // Result is exact so we can add it directly!
+                        return self.add_prec_round_assign(q, prec, rm);
+                    }
+                    let q_exp = q.get_exponent().unwrap();
+                    let t = x.add_prec_ref_val(q, working_prec).0;
+                    // Error on t is <= 1/2 ulp(t).
+                    // ```
+                    // Error / ulp(t)      <= 1/2 + 1/2 * 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)>0, <= 2^(EXP(q)-EXP(t)-1)*(1+2^-(EXP(q)-EXP(t)))
+                    //                     <= 2^(EXP(q)-EXP(t))
+                    // If EXP(q)-EXP(t)<0, <= 2^0
+                    // ```
+                    // We can get 0, but we can't round since q is inexact
+                    if t != 0 {
+                        let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
+                            .checked_add(1)
+                            .unwrap();
+                        if working_prec >= m
+                            && float_can_round(
+                                t.significand_ref().unwrap(),
+                                working_prec - m,
+                                prec,
+                                rm,
+                            )
+                        {
+                            *self = t;
+                            return self.set_prec_round(prec, rm);
+                        }
+                    }
+                    working_prec += increment;
+                    increment = working_prec >> 1;
+                }
+            }
+        }
     }
 
     /// Adds a [`Rational`] to a [`Float`] in place, rounding the result to the nearest value of the

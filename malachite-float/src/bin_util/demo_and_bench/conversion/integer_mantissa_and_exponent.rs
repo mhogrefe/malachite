@@ -167,11 +167,11 @@ fn demo_float_integer_exponent_ref_debug(gm: GenMode, config: &GenConfig, limit:
 }
 
 fn demo_float_from_integer_mantissa_and_exponent(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i64>()
+    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i32>()
         .get(gm, config)
         .take(limit)
     {
-        let n = <Float as IntegerMantissaAndExponent::<Natural, i64, Float>>
+        let n = <Float as IntegerMantissaAndExponent::<Natural, i32, Float>>
             ::from_integer_mantissa_and_exponent(mantissa.clone(), exponent);
         println!(
             "Float::from_integer_mantissa_and_exponent({}, {}) = {}",
@@ -187,11 +187,11 @@ fn demo_float_from_integer_mantissa_and_exponent_debug(
     config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i64>()
+    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i32>()
         .get(gm, config)
         .take(limit)
     {
-        let n = <Float as IntegerMantissaAndExponent::<Natural, i64, Float>>
+        let n = <Float as IntegerMantissaAndExponent::<Natural, i32, Float>>
             ::from_integer_mantissa_and_exponent(mantissa.clone(), exponent);
         println!(
             "Float::from_integer_mantissa_and_exponent({:#x}, {}) = {:#x}",
@@ -207,11 +207,11 @@ fn demo_float_from_integer_mantissa_and_exponent_ref(
     config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i64>()
+    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i32>()
         .get(gm, config)
         .take(limit)
     {
-        let n = <&Float as IntegerMantissaAndExponent::<Natural, i64, Float>>
+        let n = <&Float as IntegerMantissaAndExponent::<Natural, i32, Float>>
             ::from_integer_mantissa_and_exponent(mantissa.clone(), exponent);
         println!(
             "Float::from_integer_mantissa_and_exponent({}, {}) = {}",
@@ -227,11 +227,11 @@ fn demo_float_from_integer_mantissa_and_exponent_ref_debug(
     config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i64>()
+    for (mantissa, exponent) in natural_signed_pair_gen_var_2::<i32>()
         .get(gm, config)
         .take(limit)
     {
-        let n = <&Float as IntegerMantissaAndExponent::<Natural, i64, Float>>
+        let n = <&Float as IntegerMantissaAndExponent::<Natural, i32, Float>>
             ::from_integer_mantissa_and_exponent(mantissa.clone(), exponent);
         println!(
             "Float::from_integer_mantissa_and_exponent({:#x}, {}) = {:#x}",
@@ -324,20 +324,20 @@ fn benchmark_float_from_integer_mantissa_and_exponent_evaluation_strategy(
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::from_integer_mantissa_and_exponent(Float, i64)",
+        "Float::from_integer_mantissa_and_exponent(Float, i32)",
         BenchmarkType::EvaluationStrategy,
-        natural_signed_pair_gen_var_2::<i64>().get(gm, config),
+        natural_signed_pair_gen_var_2::<i32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             (
-                "Float::from_integer_mantissa_and_exponent(Float, i64)",
+                "Float::from_integer_mantissa_and_exponent(Float, i32)",
                 &mut |(mantissa, exponent)| {
                     no_out!(<Float as IntegerMantissaAndExponent::<
                         Natural,
-                        i64,
+                        i32,
                         Float,
                     >>::from_integer_mantissa_and_exponent(
                         mantissa, exponent
@@ -345,11 +345,11 @@ fn benchmark_float_from_integer_mantissa_and_exponent_evaluation_strategy(
                 },
             ),
             (
-                "(&Float)::from_integer_mantissa_and_exponent(Float, i64)",
+                "(&Float)::from_integer_mantissa_and_exponent(Float, i32)",
                 &mut |(mantissa, exponent)| {
                     no_out!(<&Float as IntegerMantissaAndExponent::<
                         Natural,
-                        i64,
+                        i32,
                         Float,
                     >>::from_integer_mantissa_and_exponent(
                         mantissa, exponent

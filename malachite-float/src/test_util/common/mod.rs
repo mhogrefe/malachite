@@ -77,7 +77,7 @@ impl From<&rug::Float> for Float {
             }
             let result = Float(Finite {
                 sign: x.is_sign_positive(),
-                exponent: i64::from(x.get_exp().unwrap()),
+                exponent: x.get_exp().unwrap(),
                 precision,
                 significand,
             });
@@ -126,8 +126,10 @@ impl TryFrom<&Float> for rug::Float {
                     Round::Zero,
                 )
                 .0;
-                f >>= i32::try_from(i64::exact_from(significand_bits(significand)) - exponent)
-                    .map_err(|_| ())?;
+                f >>= i32::try_from(
+                    i64::exact_from(significand_bits(significand)) - i64::from(*exponent),
+                )
+                .map_err(|_| ())?;
                 if !sign {
                     f = -f;
                 }
@@ -158,7 +160,7 @@ where
     if !result.is_normal() {
         return T::exact_from(&result);
     }
-    let e = <&Float as SciMantissaAndExponent<Float, i64, _>>::sci_exponent(&result);
+    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
             return T::rounding_from(&result, Nearest).0;
@@ -190,7 +192,7 @@ where
     if !result.is_normal() {
         return T::exact_from(&result);
     }
-    let e = <&Float as SciMantissaAndExponent<Float, i64, _>>::sci_exponent(&result);
+    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
             return T::rounding_from(&result, Nearest).0;
