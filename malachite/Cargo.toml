@@ -2,8 +2,8 @@
 name = "malachite"
 version = "0.4.14"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
-rust-version = "1.61.0"
-edition = "2021"
+rust-version.workspace = true
+edition.workspace = true
 description = "Arbitrary-precision arithmetic, with efficient algorithms partially derived from GMP and FLINT"
 readme = "../README.md"
 homepage = "https://malachite.rs/"

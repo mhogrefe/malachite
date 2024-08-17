@@ -3,7 +3,8 @@ name = "malachite-criterion-bench"
 version = "0.4.14"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 autobenches = false
-edition = "2021"
+rust-version.workspace = true
+edition.workspace = true
 
 [dependencies]
 malachite-base = { version = "0.4.14" }
