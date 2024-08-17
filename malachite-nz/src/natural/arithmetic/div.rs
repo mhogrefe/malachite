@@ -190,7 +190,7 @@ pub_test! {limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 // # Panics
 // Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
 //
-// This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`.
+// This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`
 // and `un > 1`, but not computing the remainder.
 pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);

@@ -13,6 +13,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_signed_rounding_mode_triple_gen_var_3,
@@ -484,6 +485,14 @@ fn shr_round_properties_helper_unsigned_unsigned<
         if let Some(m) = shifted.arithmetic_checked_shl(u) {
             assert_eq!(m.cmp(&n), o);
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.shr_round(u, rm), (shifted, Equal));
+            }
+        } else {
+            assert_panic!(n.shr_round(u, Exact));
+        }
     });
 
     unsigned_pair_gen_var_2::<T, U>().test_properties(|(n, u)| {
@@ -563,6 +572,14 @@ fn shr_round_properties_helper_unsigned_signed<
                 assert_eq!(m.cmp(&n), o);
             }
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.shr_round(i, rm), (shifted, Equal));
+            }
+        } else {
+            assert_panic!(n.shr_round(i, Exact));
+        }
     });
 
     unsigned_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
@@ -600,6 +617,14 @@ fn shr_round_properties_helper_signed_unsigned<
         assert_eq!(n.divisible_by_power_of_2(u.exact_into()), o == Equal);
         if let Some(m) = shifted.arithmetic_checked_shl(u) {
             assert_eq!(m.cmp(&n), o);
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.shr_round(u, rm), (shifted, Equal));
+            }
+        } else {
+            assert_panic!(n.shr_round(u, Exact));
         }
     });
 
@@ -696,6 +721,14 @@ fn shr_round_properties_helper_signed_signed<
             if let Some(m) = shifted.arithmetic_checked_shl(i) {
                 assert_eq!(m.cmp(&n), o);
             }
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.shr_round(i, rm), (shifted, Equal));
+            }
+        } else {
+            assert_panic!(n.shr_round(i, Exact));
         }
     });
 

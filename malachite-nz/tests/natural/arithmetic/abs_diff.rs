@@ -6,9 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{AbsDiff, AbsDiffAssign};
+use malachite_base::num::arithmetic::traits::{Abs, AbsDiff, AbsDiffAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
@@ -95,6 +96,7 @@ fn abs_diff_properties() {
         assert_eq!(diff_alt, diff);
         assert!(diff_alt.is_valid());
 
+        assert_eq!((Integer::from(&x) - Integer::from(&y)).abs(), diff);
         assert_eq!((&y).abs_diff(&x), diff);
         assert_eq!(diff == 0, x == y);
     });

@@ -24,7 +24,7 @@ macro_rules! impl_unsigned {
             /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &$t) -> bool {
-                self.sign && self.denominator == 1 && self.numerator == *other
+                self.sign && self.denominator == 1u32 && self.numerator == *other
             }
         }
 

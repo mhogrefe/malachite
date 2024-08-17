@@ -12,11 +12,12 @@ use crate::num::arithmetic::traits::{
     Abs, AbsAssign, AddMul, AddMulAssign, Ceiling, CeilingAssign, CeilingLogBase2,
     CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor, FloorAssign,
     FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, Ln, NegAssign, NextPowerOf2,
-    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign,
-    SubMul, SubMulAssign,
+    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt,
+    SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, PrimeConstant,
+    ThueMorseConstant, Two, Zero,
 };
 use crate::num::comparison::traits::PartialOrdAbs;
 use crate::num::conversion::traits::{
@@ -32,6 +33,7 @@ use core::num::FpCategory;
 use core::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
+use core::panic::RefUnwindSafe;
 use core::str::FromStr;
 
 /// This trait defines functions on primitive float types: [`f32`] and [`f64`].
@@ -161,8 +163,12 @@ pub trait PrimitiveFloat:
     + PowAssign<i64>
     + PowAssign<Self>
     + PowerOf2<i64>
+    + PrimeConstant
     + Product
     + RawMantissaAndExponent<u64, u64>
+    + Reciprocal<Output = Self>
+    + ReciprocalAssign
+    + RefUnwindSafe
     + Rem<Output = Self>
     + RemAssign<Self>
     + RoundingFrom<u8>
@@ -201,6 +207,7 @@ pub trait PrimitiveFloat:
     + SubMul<Output = Self>
     + SubMulAssign<Self, Self>
     + Sum<Self>
+    + ThueMorseConstant
     + Two
     + UpperExp
     + Zero
@@ -587,7 +594,9 @@ macro_rules! impl_basic_traits_primitive_float {
         $width: expr,
         $min_positive_subnormal: expr,
         $max_subnormal: expr,
-        $min_positive_normal: expr
+        $min_positive_normal: expr,
+        $thue_morse_constant: expr,
+        $prime_constant: expr
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
@@ -705,13 +714,33 @@ macro_rules! impl_basic_traits_primitive_float {
         impl Max for $t {
             const MAX: $t = $t::INFINITY;
         }
+
+        /// The Thue-Morse constant.
+        impl ThueMorseConstant for $t {
+            const THUE_MORSE_CONSTANT: $t = $thue_morse_constant;
+        }
+
+        /// The prime constant.
+        impl PrimeConstant for $t {
+            const PRIME_CONSTANT: $t = $prime_constant;
+        }
     };
 }
-impl_basic_traits_primitive_float!(f32, 32, 1.0e-45, 1.1754942e-38, 1.1754944e-38);
+impl_basic_traits_primitive_float!(
+    f32,
+    32,
+    1.0e-45,
+    1.1754942e-38,
+    1.1754944e-38,
+    0.41245404,
+    0.4146825
+);
 impl_basic_traits_primitive_float!(
     f64,
     64,
     5.0e-324,
     2.225073858507201e-308,
-    2.2250738585072014e-308
+    2.2250738585072014e-308,
+    0.4124540336401076,
+    0.41468250985111166
 );

@@ -14,6 +14,7 @@ use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::float::NiceFloat;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_13, primitive_float_gen_var_14, primitive_float_gen_var_15,
@@ -213,7 +214,7 @@ where
     NiceFloat<U>: TryFrom<T>,
 {
     primitive_float_rounding_mode_pair_gen_var_3::<U, T>().test_properties(|(f, rm)| {
-        let o = T::rounding_from(f, rm).1;
+        let (rounded, o) = T::rounding_from(f, rm);
         match (f >= U::ZERO, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
@@ -223,6 +224,14 @@ where
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(T::rounding_from(f, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(T::rounding_from(f, Exact));
         }
     });
 
@@ -267,7 +276,7 @@ where
     NiceFloat<U>: TryFrom<T>,
 {
     primitive_float_rounding_mode_pair_gen_var_3::<U, T>().test_properties(|(f, rm)| {
-        let o = T::rounding_from(f, rm).1;
+        let (rounded, o) = T::rounding_from(f, rm);
         match (f >= U::ZERO, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
@@ -277,6 +286,14 @@ where
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(T::rounding_from(f, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(T::rounding_from(f, Exact));
         }
     });
 
@@ -323,12 +340,20 @@ fn rounding_from_helper_primitive_float_unsigned<
     U: TryFrom<NiceFloat<T>> + PrimitiveUnsigned + RoundingFrom<T>,
 >() {
     unsigned_rounding_mode_pair_gen_var_2::<U, T>().test_properties(|(u, rm)| {
-        let o = T::rounding_from(u, rm).1;
+        let (rounded, o) = T::rounding_from(u, rm);
         match rm {
             Floor | Down => assert_ne!(o, Greater),
             Ceiling | Up => assert_ne!(o, Less),
             Exact => assert_eq!(o, Equal),
             _ => {}
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(T::rounding_from(u, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(T::rounding_from(u, Exact));
         }
     });
 
@@ -396,7 +421,7 @@ fn rounding_from_helper_primitive_float_signed<
     S: TryFrom<NiceFloat<T>> + PrimitiveSigned + RoundingFrom<T> + WrappingFrom<U>,
 >() {
     signed_rounding_mode_pair_gen_var_4::<S, T>().test_properties(|(i, rm)| {
-        let o = T::rounding_from(i, rm).1;
+        let (rounded, o) = T::rounding_from(i, rm);
         match (i >= S::ZERO, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
@@ -406,6 +431,14 @@ fn rounding_from_helper_primitive_float_signed<
             }
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(T::rounding_from(i, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(T::rounding_from(i, Exact));
         }
     });
 

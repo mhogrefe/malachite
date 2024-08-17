@@ -53,6 +53,7 @@ use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
     Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
 };
+use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::str::FromStr;
 
 // When the `random` feature is enabled, the HasRandomPrimitiveInts bound is included.
@@ -264,6 +265,7 @@ pub trait PrimitiveInt:
     + PowAssign<u64>
     + PowerOf2<u64>
     + Product
+    + RefUnwindSafe
     + Rem<Self, Output = Self>
     + RemAssign<Self>
     + RemPowerOf2<Output = Self>
@@ -440,6 +442,7 @@ pub trait PrimitiveInt:
     + TryInto<u8>
     + TryInto<usize>
     + Two
+    + UnwindSafe
     + UpperHex
     + WrappingAdd<Self, Output = Self>
     + WrappingAddAssign<Self>
@@ -738,6 +741,7 @@ pub trait PrimitiveInt:
     + PowAssign<u64>
     + PowerOf2<u64>
     + Product
+    + RefUnwindSafe
     + Rem<Self, Output = Self>
     + RemAssign<Self>
     + RemPowerOf2<Output = Self>

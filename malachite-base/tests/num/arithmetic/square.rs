@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::float::NiceFloat;
@@ -19,27 +20,62 @@ use malachite_base::test_util::generators::{
 
 #[test]
 fn test_square() {
-    fn test<T: PrimitiveInt>(x: T, out: T) {
+    fn test_i<T: PrimitiveInt>(x: T, out: T) {
         assert_eq!(x.square(), out);
 
         let mut x = x;
         x.square_assign();
         assert_eq!(x, out);
     }
-    test::<u8>(0, 0);
-    test::<i16>(1, 1);
-    test::<u32>(2, 4);
-    test::<i64>(3, 9);
-    test::<u128>(10, 100);
-    test::<isize>(123, 15129);
-    test::<u32>(1000, 1000000);
+    test_i::<u8>(0, 0);
+    test_i::<i16>(1, 1);
+    test_i::<u32>(2, 4);
+    test_i::<i64>(3, 9);
+    test_i::<u128>(10, 100);
+    test_i::<isize>(123, 15129);
+    test_i::<u32>(1000, 1000000);
 
-    test::<i16>(-1, 1);
-    test::<i32>(-2, 4);
-    test::<i64>(-3, 9);
-    test::<i128>(-10, 100);
-    test::<isize>(-123, 15129);
-    test::<i32>(-1000, 1000000);
+    test_i::<i16>(-1, 1);
+    test_i::<i32>(-2, 4);
+    test_i::<i64>(-3, 9);
+    test_i::<i128>(-10, 100);
+    test_i::<isize>(-123, 15129);
+    test_i::<i32>(-1000, 1000000);
+
+    fn test_f<T: PrimitiveFloat>(x: T, out: T) {
+        assert_eq!(NiceFloat(x.square()), NiceFloat(out));
+
+        let mut x = x;
+        x.square_assign();
+        assert_eq!(NiceFloat(x), NiceFloat(out));
+    }
+    test_f::<f32>(f32::NAN, f32::NAN);
+    test_f::<f32>(f32::INFINITY, f32::INFINITY);
+    test_f::<f32>(f32::NEGATIVE_INFINITY, f32::INFINITY);
+    test_f::<f32>(0.0, 0.0);
+    test_f::<f32>(-0.0, 0.0);
+    test_f::<f32>(1.0, 1.0);
+    test_f::<f32>(-1.0, 1.0);
+    test_f::<f32>(0.5, 0.25);
+    test_f::<f32>(-0.5, 0.25);
+    test_f::<f32>(core::f32::consts::SQRT_2, 1.9999999);
+    test_f::<f32>(-core::f32::consts::SQRT_2, 1.9999999);
+    test_f::<f32>(core::f32::consts::PI, 9.869605);
+    test_f::<f32>(-core::f32::consts::PI, 9.869605);
+
+    test_f::<f64>(f64::NAN, f64::NAN);
+    test_f::<f64>(f64::INFINITY, f64::INFINITY);
+    test_f::<f64>(f64::NEGATIVE_INFINITY, f64::INFINITY);
+    test_f::<f64>(0.0, 0.0);
+    test_f::<f64>(-0.0, 0.0);
+    test_f::<f64>(1.0, 1.0);
+    test_f::<f64>(-1.0, 1.0);
+    test_f::<f64>(0.5, 0.25);
+    test_f::<f64>(-0.5, 0.25);
+    test_f::<f64>(core::f64::consts::SQRT_2, 2.0000000000000004);
+    test_f::<f64>(-core::f64::consts::SQRT_2, 2.0000000000000004);
+    test_f::<f64>(core::f64::consts::PI, 9.869604401089358);
+    test_f::<f64>(-core::f64::consts::PI, 9.869604401089358);
 }
 
 fn square_properties_helper_unsigned<T: PrimitiveUnsigned>() {

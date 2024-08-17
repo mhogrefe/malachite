@@ -67,6 +67,7 @@ extern crate rug;
 pub mod integer {
     pub mod arithmetic {
         pub mod abs;
+        pub mod abs_diff;
         pub mod add;
         pub mod add_mul;
         pub mod binomial_coefficient;

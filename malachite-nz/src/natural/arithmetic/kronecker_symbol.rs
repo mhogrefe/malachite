@@ -84,9 +84,7 @@ impl<'a, 'b, 'c> GcdSubdivideStepContext for HalfGcdJacobiContext<'a, 'b, 'c> {
 }
 
 const HALF_WIDTH: u64 = Limb::WIDTH >> 1;
-
 const TWO_POW_HALF_WIDTH: Limb = 1 << HALF_WIDTH;
-
 const TWICE_TWO_POW_HALF_WIDTH: Limb = TWO_POW_HALF_WIDTH << 1;
 
 // This is equivalent to `mpn_hgcd2_jacobi` from `mpn/hgcd2_jacobi.c`, GMP 6.2.1, returning `bitsp`

@@ -266,7 +266,7 @@ impl CheckedSqrt for Integer {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
@@ -327,7 +327,7 @@ impl<'a> CheckedSqrt for &'a Integer {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$

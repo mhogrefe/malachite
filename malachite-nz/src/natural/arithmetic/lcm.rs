@@ -139,8 +139,8 @@ impl<'a, 'b> Lcm<&'a Natural> for &'b Natural {
         }
         let gcd = self.gcd(other);
         // Division is slower than multiplication, so we choose the arguments to div_exact to be as
-        // small as possible. This also allows the special case of lcm(x, y) when gcd(x, y) = y to
-        // be quickly reduced to x.
+        // small as possible. This also allows the special case of lcm(x, y) when x is a multiple of
+        // y to be quickly reduced to x.
         if self >= other {
             self * other.div_exact(gcd)
         } else {

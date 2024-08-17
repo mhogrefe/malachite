@@ -4326,6 +4326,22 @@ pub fn random_unsigned_rounding_mode_pair_gen_var_2<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn random_unsigned_rounding_mode_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| random_rounding_modes(seed).filter(|&rm| rm != Exact),
+    ))
+}
+
 // -- (PrimitiveUnsigned, String) --
 
 struct DigitStringGenerator {

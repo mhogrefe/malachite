@@ -13,6 +13,7 @@ use malachite_base::num::conversion::mantissa_and_exponent::{
 };
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, primitive_float_signed_pair_gen_var_1,
@@ -352,17 +353,21 @@ fn sci_mantissa_and_exponent_properties_round_helper<T: PrimitiveUnsigned, U: Pr
         if let Some((mantissa, exponent, o)) = sci_mantissa_and_exponent_round::<T, U>(x, rm) {
             assert!(mantissa >= U::ONE);
             assert!(mantissa < U::TWO);
-            if rm == Exact {
-                assert_eq!(
-                    from_sci_mantissa_and_exponent_round(mantissa, exponent, rm),
-                    Some((x, Equal))
-                );
-            }
             match rm {
                 Floor | Down => assert_ne!(o, Greater),
                 Ceiling | Up => assert_ne!(o, Less),
                 Exact => assert_eq!(o, Equal),
                 _ => {}
+            }
+            if o == Equal {
+                for rm in exhaustive_rounding_modes() {
+                    assert_eq!(
+                        sci_mantissa_and_exponent_round(x, rm),
+                        Some((mantissa, exponent, Equal))
+                    );
+                }
+            } else {
+                assert!(sci_mantissa_and_exponent_round::<T, U>(x, Exact).is_none(),);
             }
         }
     });
@@ -465,8 +470,18 @@ fn from_sci_mantissa_and_exponent_properties_round_helper<
     primitive_float_unsigned_rounding_mode_triple_gen_var_1::<U, u64>().test_properties(
         |(m, e, rm)| {
             let on = from_sci_mantissa_and_exponent_round::<T, U>(m, e, rm);
-            if on.is_some() {
+            if let Some((x, o)) = on {
                 assert!(m >= U::ONE && m < U::TWO);
+                if o == Equal {
+                    for rm in exhaustive_rounding_modes() {
+                        assert_eq!(
+                            from_sci_mantissa_and_exponent_round::<T, U>(m, e, rm),
+                            Some((x, Equal))
+                        );
+                    }
+                } else {
+                    assert!(from_sci_mantissa_and_exponent_round::<T, U>(m, e, Exact).is_none());
+                }
             }
         },
     );

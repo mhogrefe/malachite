@@ -221,3 +221,159 @@ macro_rules! impl_primes {
     };
 }
 apply_to_unsigneds!(impl_primes);
+
+/// An iterator that generates `bool`s up to a certain limit, where the $n$th `bool` is `true` if
+/// and only if $n$ is prime. See [`prime_indicator_sequence_less_than`] for more information.
+#[derive(Clone, Debug)]
+pub struct PrimeIndicatorSequenceLessThan {
+    primes: PrimesLessThanIterator<u64>,
+    limit: u64,
+    i: u64,
+    next_prime: u64,
+}
+
+impl Iterator for PrimeIndicatorSequenceLessThan {
+    type Item = bool;
+
+    fn next(&mut self) -> Option<bool> {
+        if self.i >= self.limit {
+            None
+        } else if self.i == self.next_prime {
+            self.i += 1;
+            self.next_prime = self.primes.next().unwrap_or(0);
+            Some(true)
+        } else {
+            self.i += 1;
+            Some(false)
+        }
+    }
+}
+
+/// Returns an iterator that generates an sequence of `bool`s, where the $n$th `bool` is `true` if
+/// and only if $n$ is prime. The first `bool` generated has index 1, and the last one has index
+/// $\max(0,\ell-1)$, where $\ell$ is `limit`.
+///
+/// The output length is $max(0,\ell-1)$, where $\ell$ is `limit`.
+///
+/// # Worst-case complexity (amortized)
+/// $T(i) = O(\log \log \log i)$
+///
+/// $M(i) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration index.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::factorization::primes::prime_indicator_sequence_less_than;
+///
+/// let s: String = prime_indicator_sequence_less_than(101)
+///     .map(|b| if b { '1' } else { '0' })
+///     .collect();
+/// assert_eq!(
+///     s,
+///     "01101010001010001010001000001010000010001010001000001000001010000010001010000010001000001\
+///     00000001000"
+/// )
+/// ```
+pub fn prime_indicator_sequence_less_than(limit: u64) -> PrimeIndicatorSequenceLessThan {
+    let mut primes = u64::primes_less_than(&limit);
+    primes.next(); // skip 2
+    PrimeIndicatorSequenceLessThan {
+        primes,
+        limit,
+        i: 1,
+        next_prime: 2,
+    }
+}
+
+/// Returns an iterator that generates an sequence of `bool`s, where the $n$th `bool` is `true` if
+/// and only if $n$ is prime. The first `bool` generated has index 1, and the last one has index
+/// `limit`.
+///
+/// The output length is `limit`.
+///
+/// # Worst-case complexity (amortized)
+/// $T(i) = O(\log \log \log i)$
+///
+/// $M(i) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration index.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::factorization::primes::prime_indicator_sequence_less_than_or_equal_to;
+///
+/// let s: String = prime_indicator_sequence_less_than_or_equal_to(100)
+///     .map(|b| if b { '1' } else { '0' })
+///     .collect();
+/// assert_eq!(
+///     s,
+///     "01101010001010001010001000001010000010001010001000001000001010000010001010000010001000001\
+///     00000001000"
+/// )
+/// ```
+pub fn prime_indicator_sequence_less_than_or_equal_to(
+    limit: u64,
+) -> PrimeIndicatorSequenceLessThan {
+    prime_indicator_sequence_less_than(limit.checked_add(1).unwrap())
+}
+
+/// An iterator that generates `bool`s, where the $n$th `bool` is `true` if and only if $n$ is
+/// prime. See [`prime_indicator_sequence`] for more information.
+#[derive(Clone, Debug)]
+pub struct PrimeIndicatorSequence {
+    primes: PrimesIterator<u64>,
+    i: u64,
+    next_prime: u64,
+}
+
+impl Iterator for PrimeIndicatorSequence {
+    type Item = bool;
+
+    fn next(&mut self) -> Option<bool> {
+        Some(if self.i == self.next_prime {
+            self.i += 1;
+            self.next_prime = self.primes.next().unwrap();
+            true
+        } else {
+            self.i += 1;
+            false
+        })
+    }
+}
+
+/// Returns an iterator that generates an infinite sequence of `bool`s, where the $n$th `bool` is
+/// `true` if and only if $n$ is prime. The first `bool` generated has index 1.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity (amortized)
+/// $T(i) = O(\log \log \log i)$
+///
+/// $M(i) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration index.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::factorization::primes::prime_indicator_sequence;
+///
+/// let s: String = prime_indicator_sequence()
+///     .take(100)
+///     .map(|b| if b { '1' } else { '0' })
+///     .collect();
+/// assert_eq!(
+///     s,
+///     "01101010001010001010001000001010000010001010001000001000001010000010001010000010001000001\
+///     00000001000"
+/// )
+/// ```
+pub fn prime_indicator_sequence() -> PrimeIndicatorSequence {
+    let mut primes = u64::primes();
+    primes.next(); // skip 2
+    PrimeIndicatorSequence {
+        primes,
+        i: 1,
+        next_prime: 2,
+    }
+}

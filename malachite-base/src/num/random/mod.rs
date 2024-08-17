@@ -2254,7 +2254,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater the smallest absolute of any sci-exponent of a
 ///   float in the range, and the precision mean greater than 2, but they may be as high as you
-/// like.
+///   like.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
 /// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical

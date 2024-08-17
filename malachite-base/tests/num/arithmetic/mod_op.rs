@@ -501,6 +501,11 @@ fn mod_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.mod_op(T::ONE), T::ZERO);
+        assert_panic!(x.mod_op(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.mod_assign(T::ZERO);
+        });
     });
 
     unsigned_gen_var_1::<T>().test_properties(|x| {
@@ -536,6 +541,11 @@ fn mod_properties_helper_signed<T: PrimitiveSigned>() {
     signed_gen::<T>().test_properties(|x| {
         assert_eq!(x.mod_op(T::ONE), T::ZERO);
         assert_eq!(x.mod_op(T::NEGATIVE_ONE), T::ZERO);
+        assert_panic!(x.mod_op(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.mod_assign(T::ZERO);
+        });
     });
 
     signed_gen_var_6::<T>().test_properties(|x| {
@@ -571,6 +581,11 @@ fn neg_mod_properties_helper<T: PrimitiveUnsigned>() {
 
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.neg_mod(T::ONE), T::ZERO);
+        assert_panic!(x.neg_mod(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.neg_mod_assign(T::ZERO);
+        });
     });
 
     unsigned_gen_var_1::<T>().test_properties(|x| {

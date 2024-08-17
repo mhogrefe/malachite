@@ -606,7 +606,7 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 //
 // $$
 // s = \\begin{cases}
-//     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+//     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
 //     \operatorname{None} & \textrm{otherwise}.
 // \\end{cases}
 // $$
@@ -877,7 +877,7 @@ impl CheckedSqrt for Natural {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
@@ -931,7 +931,7 @@ impl<'a> CheckedSqrt for &'a Natural {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$

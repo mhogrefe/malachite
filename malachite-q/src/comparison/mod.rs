@@ -12,6 +12,95 @@ pub mod cmp;
 /// and [`OrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`) (traits for comparing
 /// the absolute values of numbers by order) for [`Rational`](crate::Rational)s.
 pub mod cmp_abs;
+/// Equality of the absolute values of two [`Rational`](crate::Rational)s.
+pub mod eq_abs;
+/// Equality of the absolute values of a [`Rational`](crate::Rational) and an
+/// [`Integer`](crate::integer::Integer).
+pub mod eq_abs_integer;
+/// Equality of the absolute values of a [`Rational`](crate::Rational) and a
+/// [`Natural`](crate::natural::Natural).
+pub mod eq_abs_natural;
+/// Equality of the absolute values of a [`Rational`](crate::Rational) and a primitive float.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(Rational::from(123).eq_abs(&123.0), true);
+/// assert_eq!(Rational::from(123).eq_abs(&5.0), false);
+/// assert_eq!(Rational::from(123).eq_abs(&-123.0), true);
+/// assert_eq!(Rational::from(123).eq_abs(&-5.0), false);
+/// assert_eq!(Rational::from(-123).eq_abs(&123.0), true);
+/// assert_eq!(Rational::from(-123).eq_abs(&5.0), false);
+/// assert_eq!(Rational::from(-123).eq_abs(&-123.0), true);
+/// assert_eq!(Rational::from(-123).eq_abs(&-5.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&123.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&5.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&-123.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&-5.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&123.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&5.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&-123.0), false);
+/// assert_eq!(Rational::from_signeds(22, 7).eq_abs(&-5.0), false);
+/// assert_eq!(Rational::ZERO.eq_abs(&0.0), true);
+/// assert_eq!(Rational::ZERO.eq_abs(&-0.0), true);
+/// assert_eq!(Rational::ZERO.eq_abs(&f64::NAN), false);
+/// assert_eq!(Rational::ZERO.eq_abs(&f64::INFINITY), false);
+/// assert_eq!(Rational::ZERO.eq_abs(&f64::NEGATIVE_INFINITY), false);
+///
+/// assert_eq!(123.0.eq_abs(&Rational::from(123)), true);
+/// assert_eq!(5.0.eq_abs(&Rational::from(123)), false);
+/// assert_eq!((-123.0).eq_abs(&Rational::from(123)), true);
+/// assert_eq!((-5.0).eq_abs(&Rational::from(123)), false);
+/// assert_eq!(123.0.eq_abs(&Rational::from(-123)), true);
+/// assert_eq!(5.0.eq_abs(&Rational::from(-123)), false);
+/// assert_eq!((-123.0).eq_abs(&Rational::from(-123)), true);
+/// assert_eq!((-5.0).eq_abs(&Rational::from(-123)), false);
+/// assert_eq!(123.0.eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!(5.0.eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!((-123.0).eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!((-5.0).eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!(123.0.eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!(5.0.eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!((-123.0).eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!((-5.0).eq_abs(&Rational::from_signeds(22, 7)), false);
+/// assert_eq!(0.0.eq_abs(&Rational::ZERO), true);
+/// assert_eq!((-0.0).eq_abs(&Rational::ZERO), true);
+/// assert_eq!(f64::NAN.eq_abs(&Rational::ZERO), false);
+/// assert_eq!(f64::INFINITY.eq_abs(&Rational::ZERO), false);
+/// assert_eq!(f64::NEGATIVE_INFINITY.eq_abs(&Rational::ZERO), false);
+/// ```
+pub mod eq_abs_primitive_float;
+/// Equality of the absolute values of a [`Rational`](crate::Rational) and a primitive integer.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_q::Rational;
+///
+/// assert!(Rational::from(123).eq_abs(&123u64));
+/// assert!(Rational::from(-123).eq_abs(&123u64));
+/// assert!(Rational::from_signeds(22, 7).ne_abs(&123u64));
+/// assert!(Rational::from_signeds(-22, 7).ne_abs(&123u64));
+///
+/// assert!(Rational::from(123).eq_abs(&123i64));
+/// assert!(Rational::from(123).eq_abs(&-123i64));
+/// assert!(Rational::from_signeds(22, 7).ne_abs(&-123i64));
+/// assert!(Rational::from_signeds(-22, 7).ne_abs(&-123i64));
+///
+/// assert!(123u64.eq_abs(&Rational::from(123)));
+/// assert!(123u64.eq_abs(&Rational::from(-123)));
+/// assert!(123u64.ne_abs(&Rational::from_signeds(22, 7)));
+/// assert!(123u64.ne_abs(&Rational::from_signeds(-22, 7)));
+///
+/// assert!(123i64.eq_abs(&Rational::from(123)));
+/// assert!(123i64.eq_abs(&Rational::from(-123)));
+/// assert!((-123i64).ne_abs(&Rational::from_signeds(22, 7)));
+/// assert!((-123i64).ne_abs(&Rational::from_signeds(-22, 7)));
+/// ```
+pub mod eq_abs_primitive_int;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
 /// (a trait for comparing the absolute values of numbers by order) for
 /// [`Rational`](crate::Rational)s and [`Integer`](malachite_nz::integer::Integer)s.

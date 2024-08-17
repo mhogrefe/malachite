@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_pair_gen, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
@@ -1242,6 +1243,14 @@ fn round_to_multiple_properties_helper_unsigned<T: PrimitiveUnsigned>() {
                 }
             }
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(x.round_to_multiple(y, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(x.round_to_multiple(y, Exact));
+        }
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
@@ -1339,6 +1348,14 @@ fn round_to_multiple_properties_helper_signed<
                     }
                 }
             }
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(x.round_to_multiple(y, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(x.round_to_multiple(y, Exact));
         }
     });
 

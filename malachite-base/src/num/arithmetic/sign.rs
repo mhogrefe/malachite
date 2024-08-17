@@ -36,8 +36,7 @@ macro_rules! impl_sign_primitive_float {
         impl Sign for $t {
             /// Compares a number to zero.
             ///
-            /// - Positive finite numbers, positive zero, and positive infinity have sign
-            /// `Greater`.
+            /// - Positive finite numbers, positive zero, and positive infinity have sign `Greater`.
             /// - Negative finite numbers, negative zero, and negative infinity have sign `Less`.
             /// - `NaN` has sign `Equal`.
             ///

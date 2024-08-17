@@ -385,8 +385,8 @@ pub fn random_rationals(
 ///
 /// The actual numerator and denominator bit lengths are chosen from a geometric distribution with
 /// mean $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than
-/// 1. A striped bit sequence with the given stripe parameter is generated and truncated at the bit
-/// lengths to produce the numerators and denominators. The highest bits are forced to be 1.
+/// `1`. A striped bit sequence with the given stripe parameter is generated and truncated at the
+/// bit lengths to produce the numerators and denominators. The highest bits are forced to be `1`.
 /// Finally, the [`Rational`] is reduced.
 ///
 /// The output length is infinite.

@@ -408,11 +408,12 @@ impl Sum for Rational {
     ///
     /// assert_eq!(
     ///     Rational::sum(
-    ///         vec_from_str::<Rational>("[2, -3, 5, 7]")
+    ///         vec_from_str::<Rational>("[0, 1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
     ///             .unwrap()
     ///             .into_iter()
-    ///     ),
-    ///     11
+    ///     )
+    ///     .to_string(),
+    ///     "19079/2520"
     /// );
     /// ```
     fn sum<I>(xs: I) -> Rational
@@ -420,15 +421,15 @@ impl Sum for Rational {
         I: Iterator<Item = Rational>,
     {
         let mut stack = Vec::new();
-        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+        for (i, x) in xs.enumerate() {
             let mut s = x;
-            for _ in 0..i.trailing_zeros() {
+            for _ in 0..(i + 1).trailing_zeros() {
                 s += stack.pop().unwrap();
             }
             stack.push(s);
         }
         let mut s = Rational::ZERO;
-        for x in stack {
+        for x in stack.into_iter().rev() {
             s += x;
         }
         s
@@ -471,15 +472,15 @@ impl<'a> Sum<&'a Rational> for Rational {
         I: Iterator<Item = &'a Rational>,
     {
         let mut stack = Vec::new();
-        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+        for (i, x) in xs.enumerate() {
             let mut s = x.clone();
-            for _ in 0..i.trailing_zeros() {
+            for _ in 0..(i + 1).trailing_zeros() {
                 s += stack.pop().unwrap();
             }
             stack.push(s);
         }
         let mut s = Rational::ZERO;
-        for x in stack {
+        for x in stack.into_iter().rev() {
             s += x;
         }
         s

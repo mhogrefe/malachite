@@ -675,6 +675,14 @@ pub fn exhaustive_primitive_int_rounding_mode_pair_gen_var_1<T: PrimitiveInt>(
     ))
 }
 
+pub fn exhaustive_primitive_int_rounding_mode_pair_gen_var_2<T: PrimitiveInt>(
+) -> It<(T, RoundingMode)> {
+    Box::new(lex_pairs(
+        exhaustive_positive_primitive_ints(),
+        exhaustive_rounding_modes().filter(|&rm| rm != Exact),
+    ))
+}
+
 // -- PrimitiveSigned --
 
 pub fn exhaustive_signed_gen<T: PrimitiveSigned>() -> It<T> {

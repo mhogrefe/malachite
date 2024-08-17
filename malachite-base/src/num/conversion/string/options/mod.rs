@@ -56,7 +56,7 @@ impl SciSizeOptions {
 /// - The negative exponent threshold determines when small numbers switch to scientific notation.
 ///   The default is $-6$, meaning that the numbers $1/10, 1/100, 1/1000, \ldots$. would be
 ///   displayed as `0.1, 0.01, 0.001, 0.0001, 0.00001, 1e-6, 1e-7...`. The threshold must be
-/// negative.
+///   negative.
 ///
 /// - The lowercase setting determines whether digits in bases greater than 10 are lowercase or
 ///   uppercase. The default is `true`.

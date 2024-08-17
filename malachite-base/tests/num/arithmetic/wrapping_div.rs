@@ -9,7 +9,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::test_util::generators::{signed_pair_gen_var_6, unsigned_pair_gen_var_12};
+use malachite_base::test_util::generators::{
+    signed_gen, signed_pair_gen_var_6, unsigned_gen, unsigned_pair_gen_var_12,
+};
 use std::panic::catch_unwind;
 
 #[test]
@@ -49,6 +51,14 @@ fn wrapping_div_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!(quotient, x.wrapping_div(y));
         assert_eq!(x / y, quotient);
     });
+
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_panic!(x.wrapping_div(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.wrapping_div_assign(T::ZERO);
+        });
+    });
 }
 
 fn wrapping_div_properties_helper_signed<T: PrimitiveSigned>() {
@@ -59,6 +69,14 @@ fn wrapping_div_properties_helper_signed<T: PrimitiveSigned>() {
         if x != T::MIN || y != T::NEGATIVE_ONE {
             assert_eq!(x / y, quotient);
         }
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        assert_panic!(x.wrapping_div(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.wrapping_div_assign(T::ZERO);
+        });
     });
 }
 

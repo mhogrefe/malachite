@@ -203,6 +203,7 @@ macro_rules! impl_bit_block_access_signed {
             /// where
             /// - $W$ is the type's width
             /// - for all $i$, $b_i\in \\{0, 1\\}$, and $b_i = 1$ for $i \geq W$.
+            ///
             /// Then
             /// $$
             /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.

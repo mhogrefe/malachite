@@ -10,6 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_16,
@@ -154,6 +155,14 @@ fn round_to_multiple_of_power_of_2_properties_helper_unsigned<T: PrimitiveUnsign
                 }
             }
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.round_to_multiple_of_power_of_2(pow, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(n.round_to_multiple_of_power_of_2(pow, Exact));
+        }
     });
 
     unsigned_pair_gen_var_2::<T, u64>().test_properties(|(n, pow)| {
@@ -266,6 +275,14 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<
                     }
                 }
             }
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.round_to_multiple_of_power_of_2(pow, rm), (rounded, Equal));
+            }
+        } else {
+            assert_panic!(n.round_to_multiple_of_power_of_2(pow, Exact));
         }
     });
 

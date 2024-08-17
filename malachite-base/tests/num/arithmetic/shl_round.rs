@@ -13,6 +13,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_signed_rounding_mode_triple_gen_var_4,
@@ -493,6 +494,14 @@ where
                 assert_eq!(m.cmp(&n), o);
             }
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.shl_round(i, rm), (shifted, Equal));
+            }
+        } else {
+            assert_panic!(n.shl_round(i, Exact));
+        }
     });
 
     unsigned_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
@@ -535,6 +544,14 @@ where
             if let Some(m) = shifted.arithmetic_checked_shr(i) {
                 assert_eq!(m.cmp(&n), o);
             }
+        }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(n.shl_round(i, rm), (shifted, Equal));
+            }
+        } else {
+            assert_panic!(n.shl_round(i, Exact));
         }
     });
 

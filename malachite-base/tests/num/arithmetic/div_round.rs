@@ -9,6 +9,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_pair_gen_var_3, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
@@ -1135,6 +1136,14 @@ fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         if let Some(product) = q.checked_mul(y) {
             assert_eq!(product.cmp(&x), o);
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(x.div_round(y, rm), (q, Equal));
+            }
+        } else {
+            assert_panic!(x.div_round(y, Exact));
+        }
     });
 
     unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
@@ -1165,6 +1174,11 @@ fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
     unsigned_rounding_mode_pair_gen::<T>().test_properties(|(x, rm)| {
         assert_eq!(x.div_round(T::ONE, rm), (x, Equal));
+        assert_panic!(x.div_round(T::ZERO, rm));
+        assert_panic!({
+            let mut y = x;
+            y.div_round_assign(T::ZERO, rm)
+        });
     });
 
     unsigned_rounding_mode_pair_gen_var_1::<T>().test_properties(|(x, rm)| {
@@ -1207,6 +1221,14 @@ fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
         if let Some(product) = q.checked_mul(y) {
             assert_eq!(product.cmp(&x), if y >= T::ZERO { o } else { o.reverse() });
         }
+
+        if o == Equal {
+            for rm in exhaustive_rounding_modes() {
+                assert_eq!(x.div_round(y, rm), (q, Equal));
+            }
+        } else {
+            assert_panic!(x.div_round(y, Exact));
+        }
     });
 
     signed_pair_gen_var_3::<T>().test_properties(|(x, y)| {
@@ -1237,6 +1259,11 @@ fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
 
     signed_rounding_mode_pair_gen::<T>().test_properties(|(x, rm)| {
         assert_eq!(x.div_round(T::ONE, rm), (x, Equal));
+        assert_panic!(x.div_round(T::ZERO, rm));
+        assert_panic!({
+            let mut y = x;
+            y.div_round_assign(T::ZERO, rm)
+        });
     });
 
     signed_rounding_mode_pair_gen_var_2::<T>().test_properties(|(x, rm)| {

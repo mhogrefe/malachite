@@ -182,6 +182,7 @@ pub mod iterators {
     pub mod matching_intervals_in_iterator;
     pub mod nonzero_values;
     pub mod prefix_to_string;
+    pub mod thue_morse_sequence;
     pub mod with_special_value;
     pub mod with_special_values;
 }
@@ -261,6 +262,7 @@ pub mod num {
         pub mod pow;
         pub mod power_of_2;
         pub mod primorial;
+        pub mod reciprocal;
         pub mod root;
         pub mod rotate;
         pub mod round_to_multiple;
@@ -393,6 +395,8 @@ pub mod num {
         pub mod primitive_int_increasing_range;
     }
     pub mod factorization {
+        pub mod prime_indicator_sequence;
+        pub mod prime_indicator_sequence_less_than;
         pub mod prime_sieve;
         pub mod primes;
     }

@@ -106,6 +106,11 @@ fn div_mod_and_div_rem_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.div_mod(T::ONE), (x, T::ZERO));
+        assert_panic!(x.div_mod(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.div_assign_mod(T::ZERO)
+        });
     });
 
     unsigned_gen_var_1::<T>().test_properties(|x| {
@@ -427,6 +432,11 @@ fn div_mod_properties_helper_signed<T: PrimitiveSigned>() {
             assert_eq!(q, -x);
             assert_eq!(r, T::ZERO);
         }
+        assert_panic!(x.div_mod(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.div_assign_mod(T::ZERO)
+        });
     });
 
     signed_gen_var_6::<T>().test_properties(|x| {
@@ -736,6 +746,11 @@ fn div_rem_properties_helper_signed<T: PrimitiveSigned>() {
             assert_eq!(q, -x);
             assert_eq!(r, T::ZERO);
         }
+        assert_panic!(x.div_rem(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.div_assign_rem(T::ZERO)
+        });
     });
 
     signed_gen_var_6::<T>().test_properties(|x| {
@@ -860,6 +875,11 @@ fn ceiling_div_neg_mod_properties_helper<T: PrimitiveUnsigned>() {
 
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.ceiling_div_neg_mod(T::ONE), (x, T::ZERO));
+        assert_panic!(x.ceiling_div_neg_mod(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.ceiling_div_assign_neg_mod(T::ZERO)
+        });
     });
 
     unsigned_gen_var_1::<T>().test_properties(|x| {
@@ -1175,6 +1195,11 @@ fn ceiling_div_mod_properties_helper<T: PrimitiveSigned>() {
             assert_eq!(q, -x);
             assert_eq!(r, T::ZERO);
         }
+        assert_panic!(x.ceiling_div_mod(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.ceiling_div_assign_mod(T::ZERO)
+        });
     });
 
     signed_gen_var_6::<T>().test_properties(|x| {

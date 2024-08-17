@@ -7,8 +7,8 @@ rust-version.workspace = true
 edition.workspace = true
 
 [dependencies]
-malachite-base = { version = "0.4.14" }
-malachite-nz = { version = "0.4.14", default-features = false }
+malachite-base = { version = "0.4.14", path = "../malachite-base" }
+malachite-nz = { version = "0.4.14", default-features = false, path = "../malachite-nz" }
 num = "0.4.1"
 rug = { version = "1.21.0", default-features = false, features = ["integer", "serde"] }
 

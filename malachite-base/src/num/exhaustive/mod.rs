@@ -1539,10 +1539,8 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 /// ascending order instead, use [`positive_primitive_floats_increasing`].
 ///
 /// The output length is $2^M(2^E-1)$.
-/// - For [`f32`]
-/// , this is $2^{31}-2^{23}$, or 2139095040.
-/// - For [`f64`]
-/// , this is $2^{63}-2^{52}$, or 9218868437227405312.
+/// - For [`f32`], this is $2^{31}-2^{23}$, or 2139095040.
+/// - For [`f64`], this is $2^{63}-2^{52}$, or 9218868437227405312.
 ///
 /// # Complexity per iteration
 /// Constant time and additional memory.

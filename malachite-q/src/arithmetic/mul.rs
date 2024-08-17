@@ -323,12 +323,12 @@ impl Product for Rational {
         I: Iterator<Item = Rational>,
     {
         let mut stack = Vec::new();
-        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+        for (i, x) in xs.enumerate() {
             if x == 0 {
                 return Rational::ZERO;
             }
             let mut p = x;
-            for _ in 0..i.trailing_zeros() {
+            for _ in 0..(i + 1).trailing_zeros() {
                 p *= stack.pop().unwrap();
             }
             stack.push(p);
@@ -377,12 +377,12 @@ impl<'a> Product<&'a Rational> for Rational {
         I: Iterator<Item = &'a Rational>,
     {
         let mut stack = Vec::new();
-        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+        for (i, x) in xs.enumerate() {
             if *x == 0 {
                 return Rational::ZERO;
             }
             let mut p = x.clone();
-            for _ in 0..i.trailing_zeros() {
+            for _ in 0..(i + 1).trailing_zeros() {
                 p *= stack.pop().unwrap();
             }
             stack.push(p);

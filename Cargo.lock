@@ -422,6 +422,10 @@ dependencies = [
  "malachite-float 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "malachite-q 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-float 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-q 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
 ]
 
@@ -435,6 +439,7 @@ dependencies = [
  "hashbrown",
  "itertools 0.11.0",
  "libm",
+ "malachite-base 0.4.14",
  "malachite-base 0.4.14",
  "maplit",
  "rand",
@@ -451,9 +456,7 @@ version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "44c817c713ff9f16e06cfdc23baa3fecf1b71eaaac714816a98a560f4e350aa6"
 dependencies = [
- "clap",
  "getrandom",
- "gnuplot",
  "hashbrown",
  "itertools 0.11.0",
  "libm",
@@ -461,7 +464,6 @@ dependencies = [
  "rand_chacha",
  "ryu",
  "sha3",
- "time",
 ]
 
 [[package]]
@@ -469,8 +471,8 @@ name = "malachite-criterion-bench"
 version = "0.4.14"
 dependencies = [
  "criterion",
- "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.4.14",
+ "malachite-nz 0.4.14",
  "num",
  "rug",
 ]
@@ -480,14 +482,27 @@ name = "malachite-float"
 version = "0.4.14"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.4.14",
  "malachite-float 0.4.14",
- "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-q 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.4.14",
+ "malachite-q 0.4.14",
  "num",
  "rug",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "malachite-float"
+version = "0.4.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4fc2c9c0893bae56d0690c01df3117e116edb08fe18a06b4c5337e60bf526d3"
+dependencies = [
+ "itertools 0.11.0",
+ "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-q 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
 ]
 
 [[package]]
@@ -511,7 +526,7 @@ dependencies = [
  "indoc",
  "itertools 0.11.0",
  "libm",
- "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.4.14",
  "malachite-nz 0.4.14",
  "num",
  "pyo3",
@@ -527,16 +542,12 @@ version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "603729facf62429736ac17a9fc9fe1bf7e0eb8bde3da3b18cc2b6153150464d5"
 dependencies = [
- "indoc",
  "itertools 0.11.0",
  "libm",
  "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "num",
  "pyo3",
  "pyo3-build-config",
- "rug",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -544,8 +555,8 @@ name = "malachite-q"
 version = "0.4.14"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.4.14",
+ "malachite-nz 0.4.14",
  "malachite-q 0.4.14",
  "num",
  "rug",
@@ -562,10 +573,7 @@ dependencies = [
  "itertools 0.11.0",
  "malachite-base 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "malachite-nz 0.4.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "num",
- "rug",
  "serde",
- "serde_json",
 ]
 
 [[package]]

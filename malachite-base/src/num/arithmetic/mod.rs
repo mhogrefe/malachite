@@ -2528,6 +2528,30 @@ pub mod power_of_2;
 /// assert_eq!(u32::checked_product_of_first_n_primes(100), None);
 /// ```
 pub mod primorial;
+/// [`Reciprocal`](traits::Reciprocal) and [`ReciprocalAssign`](traits::ReciprocalAssign), traits
+/// for computing the reciprocal (multiplicative inverse) of a number.
+///
+/// # reciprocal
+/// ```
+/// use malachite_base::num::arithmetic::traits::Reciprocal;
+///
+/// assert_eq!(0.0f32.reciprocal(), f32::INFINITY);
+/// assert_eq!(1.5f32.reciprocal(), 0.6666667);
+/// ```
+///
+/// # reciprocal_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ReciprocalAssign;
+///
+/// let mut x = 0.0f32;
+/// x.reciprocal_assign();
+/// assert_eq!(x, f32::INFINITY);
+///
+/// let mut x = 1.5f32;
+/// x.reciprocal_assign();
+/// assert_eq!(x, 0.6666667);
+/// ```
+pub mod reciprocal;
 /// Traits for taking the $n$th root of a number.
 ///
 /// The traits are [`FloorRoot`](traits::FloorRoot), [`FloorRootAssign`](traits::FloorRootAssign),

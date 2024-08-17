@@ -15,8 +15,6 @@ macro_rules! impl_unsigned {
             /// Determines whether the absolute values of an [`Integer`] and a primitive unsigned
             /// integer are equal.
             ///
-            /// Since both values are non-negative, this is the same as ordinary equality.
-            ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
@@ -30,8 +28,6 @@ macro_rules! impl_unsigned {
         impl EqAbs<Integer> for $t {
             /// Determines whether the absolute values of a primitive unsigned integer and an
             /// [`Integer`] are equal.
-            ///
-            /// Since both values are non-negative, this is the same as ordinary equality.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

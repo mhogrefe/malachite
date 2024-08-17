@@ -9,6 +9,10 @@
 /// Absolute value of [`Integer`](super::Integer)s, including implementations of
 /// [`UnsignedAbs`](malachite_base::num::arithmetic::traits::UnsignedAbs).
 pub mod abs;
+/// Implementations of [`AbsDiff`](malachite_base::num::arithmetic::traits::AbsDiff) and
+/// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
+/// the absolute value of the difference between two numbers.
+pub mod abs_diff;
 /// Addition of [`Integer`](super::Integer)s.
 pub mod add;
 /// Implementations of [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and

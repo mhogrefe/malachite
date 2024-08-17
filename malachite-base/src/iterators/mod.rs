@@ -8,14 +8,14 @@
 
 #[cfg(feature = "random")]
 use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
+use crate::num::arithmetic::traits::Parity;
 use crate::num::basic::traits::Zero;
 #[cfg(feature = "random")]
 use crate::random::Seed;
 #[cfg(feature = "random")]
 use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 use alloc::collections::VecDeque;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::fmt::Display;
 use core::hash::Hash;
@@ -531,6 +531,47 @@ where
     }
     s.push(']');
     s
+}
+
+/// An iterator that generates the Thue-Morse sequence. See [`thue_morse_sequence`] for more
+/// information.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
+pub struct ThueMorseSequence(u64);
+
+impl Iterator for ThueMorseSequence {
+    type Item = bool;
+
+    fn next(&mut self) -> Option<bool> {
+        let b = self.0.count_ones().odd();
+        self.0 += 1;
+        Some(b)
+    }
+}
+
+/// Returns an iterator that generates the Thue-Morse sequence.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::thue_morse_sequence;
+///
+/// let s: String = thue_morse_sequence()
+///     .take(100)
+///     .map(|b| if b { '1' } else { '0' })
+///     .collect();
+/// assert_eq!(
+///     s,
+///     "01101001100101101001011001101001100101100110100101101001100101101001011001101001011010011\
+///     00101100110"
+/// )
+/// ```
+#[inline]
+pub const fn thue_morse_sequence() -> ThueMorseSequence {
+    ThueMorseSequence(0)
 }
 
 /// Contains [`BitDistributor`](bit_distributor::BitDistributor), which helps generate tuples

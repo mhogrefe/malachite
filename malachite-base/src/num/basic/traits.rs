@@ -64,6 +64,17 @@ pub trait NaN {
     const NAN: Self;
 }
 
+/// Provides the Thue-Morse constant, whose bits are the Thue-Morse sequence.
+pub trait ThueMorseConstant {
+    const THUE_MORSE_CONSTANT: Self;
+}
+
+/// Provides the prime constant, whose $n$th bit (starting from $n=1$) is true if and only if $n$ is
+/// prime.
+pub trait PrimeConstant {
+    const PRIME_CONSTANT: Self;
+}
+
 // Implementation for `NonZero*` types:
 // - `One` and `Two` for both signed and unsigned variants
 // - `NegativeOne` for the signed variant

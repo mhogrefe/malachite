@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
+use malachite_base::num::arithmetic::traits::{Abs, CheckedSqrt, Square, SquareAssign};
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
@@ -56,8 +56,7 @@ fn square_properties() {
         if x != 0 {
             assert_eq!(square.cmp_abs(&x), x.partial_cmp_abs(&1).unwrap());
         }
-
-        // TODO assert_eq!(square.checked_sqrt(), Some(x.abs()));
+        assert_eq!(square.checked_sqrt(), Some(x.abs()));
     });
 
     rational_pair_gen().test_properties(|(x, y)| {

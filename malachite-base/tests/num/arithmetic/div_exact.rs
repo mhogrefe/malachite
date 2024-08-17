@@ -100,6 +100,11 @@ fn div_exact_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.div_exact(T::ONE), x);
+        assert_panic!(x.div_exact(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.div_exact_assign(T::ZERO);
+        });
     });
 
     unsigned_gen_var_1::<T>().test_properties(|x| {
@@ -128,6 +133,11 @@ fn div_exact_properties_helper_signed<T: PrimitiveSigned>() {
 
     signed_gen::<T>().test_properties(|x| {
         assert_eq!(x.div_exact(T::ONE), x);
+        assert_panic!(x.div_exact(T::ZERO));
+        assert_panic!({
+            let mut y = x;
+            y.div_exact_assign(T::ZERO);
+        });
     });
 
     signed_gen_var_6::<T>().test_properties(|x| {
