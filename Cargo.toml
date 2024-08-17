@@ -2,6 +2,10 @@
 members = ['malachite', 'malachite-base', 'malachite-float', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
 resolver = "2"
 
+[workspace.package]
+edition = "2021"
+rust-version = "1.74.0"
+
 [workspace.dependencies]
 malachite-base = { version = "0.4.14", path = 'malachite-base' }
 malachite-nz = { version = "0.4.14", path = 'malachite-nz', default_features = false }
