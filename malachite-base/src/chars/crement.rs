@@ -60,7 +60,7 @@ pub const fn char_to_contiguous_range(c: char) -> u32 {
 /// assert_eq!(contiguous_range_to_char(97), Some('a'));
 /// assert_eq!(contiguous_range_to_char(1112063), Some(char::MAX));
 /// ```
-pub fn contiguous_range_to_char(u: u32) -> Option<char> {
+pub const fn contiguous_range_to_char(u: u32) -> Option<char> {
     const ONE_BELOW_FIRST_SURROGATE_CODE_POINT: u32 = FIRST_SURROGATE_CODE_POINT - 1;
     const ONE_BELOW_NUMBER_OF_CHARS: u32 = NUMBER_OF_CHARS - 1;
     match u {

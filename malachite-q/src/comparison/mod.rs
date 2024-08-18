@@ -15,10 +15,10 @@ pub mod cmp_abs;
 /// Equality of the absolute values of two [`Rational`](crate::Rational)s.
 pub mod eq_abs;
 /// Equality of the absolute values of a [`Rational`](crate::Rational) and an
-/// [`Integer`](crate::integer::Integer).
+/// [`Integer`](malachite_nz::integer::Integer).
 pub mod eq_abs_integer;
 /// Equality of the absolute values of a [`Rational`](crate::Rational) and a
-/// [`Natural`](crate::natural::Natural).
+/// [`Natural`](malachite_nz::natural::Natural).
 pub mod eq_abs_natural;
 /// Equality of the absolute values of a [`Rational`](crate::Rational) and a primitive float.
 ///

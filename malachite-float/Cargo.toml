@@ -1,6 +1,6 @@
 [package]
 name = "malachite-float"
-version = "0.4.14"
+version = "0.4.15"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
@@ -22,9 +22,9 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
-malachite-base = { version = "0.4.14", default-features = false, path = "../malachite-base" }
-malachite-nz = { version = "0.4.14", default-features = false, features = ["float_helpers"], path = "../malachite-nz" }
-malachite-q = { version = "0.4.14", default-features = false, path = "../malachite-q" }
+malachite-base = { version = "0.4.15", default-features = false }
+malachite-nz = { version = "0.4.15", default-features = false, features = ["float_helpers"] }
+malachite-q = { version = "0.4.15", default-features = false }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
 serde_json = { version = "1.0.105", optional = true }

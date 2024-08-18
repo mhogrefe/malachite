@@ -918,6 +918,7 @@ pub trait PrimitiveInt:
     + TryInto<u8>
     + TryInto<usize>
     + Two
+    + UnwindSafe
     + UpperHex
     + WrappingAdd<Self, Output = Self>
     + WrappingAddAssign<Self>
