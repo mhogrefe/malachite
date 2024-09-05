@@ -467,7 +467,7 @@ pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutat
 /// Typically $\ell = n$.
 ///
 /// # Worst-case complexity
-/// $T(n) = O(n^{1+\epsilon})$ for all $\epsilon > 0$
+/// $T(n) = O(n^{1+\varepsilon})$ for all $\varepsilon > 0$
 ///
 /// $M(n) = O(n)$
 ///

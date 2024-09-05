@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::bools::random::get_weighted_random_bool;
-use malachite_base::num::random::variable_range_generator;
+use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::random::EXAMPLE_SEED;
 
 fn get_weighted_random_bool_helper(n: u64, d: u64, out: bool) {
     assert_eq!(
-        get_weighted_random_bool(&mut variable_range_generator(EXAMPLE_SEED), n, d),
+        get_weighted_random_bool(&mut VariableRangeGenerator::new(EXAMPLE_SEED), n, d),
         out
     );
 }
@@ -29,17 +29,17 @@ fn test_get_weighted_random_bool() {
 #[test]
 #[should_panic]
 fn get_weighted_random_bool_fail_1() {
-    get_weighted_random_bool(&mut variable_range_generator(EXAMPLE_SEED), 0, 0);
+    get_weighted_random_bool(&mut VariableRangeGenerator::new(EXAMPLE_SEED), 0, 0);
 }
 
 #[test]
 #[should_panic]
 fn get_weighted_random_bool_fail_2() {
-    get_weighted_random_bool(&mut variable_range_generator(EXAMPLE_SEED), 1, 0);
+    get_weighted_random_bool(&mut VariableRangeGenerator::new(EXAMPLE_SEED), 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn get_weighted_random_bool_fail_3() {
-    get_weighted_random_bool(&mut variable_range_generator(EXAMPLE_SEED), 2, 1);
+    get_weighted_random_bool(&mut VariableRangeGenerator::new(EXAMPLE_SEED), 2, 1);
 }

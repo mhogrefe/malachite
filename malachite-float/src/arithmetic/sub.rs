@@ -38,13 +38,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -128,13 +128,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -218,13 +218,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -307,13 +307,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -398,10 +398,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -459,10 +459,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -520,10 +520,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -581,10 +581,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -641,13 +641,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -716,13 +716,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -791,13 +791,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -866,13 +866,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -941,13 +941,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1017,13 +1017,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1111,10 +1111,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1161,10 +1161,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1210,13 +1210,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -1273,13 +1273,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -1335,13 +1335,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1428,13 +1428,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1539,13 +1539,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1654,11 +1654,7 @@ impl Float {
                     (-diff, o.reverse())
                 }
             }
-            (_, y) if y == 0 => {
-                let mut x = self.clone();
-                let o = x.set_prec_round(prec, rm);
-                (x, o)
-            }
+            (_, y) if y == 0 => Float::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
@@ -1667,10 +1663,8 @@ impl Float {
                     // Error <= 1/2 ulp(q)
                     let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
                     if o == Equal {
-                        // Result is exact so we can add it directly!
-                        let mut x = self.clone();
-                        let o = x.sub_prec_round_assign(q, prec, rm);
-                        return (x, o);
+                        // Result is exact so we can subtract it directly!
+                        return self.sub_prec_round_ref_val(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
                     let mut t = x.sub_prec_ref_val(q, working_prec).0;
@@ -1714,13 +1708,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = x-y+\epsilon.
+    /// f(x,y,p,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1829,11 +1823,7 @@ impl Float {
                     (-diff, o.reverse())
                 }
             }
-            (_, y) if *y == 0 => {
-                let mut x = self.clone();
-                let o = x.set_prec_round(prec, rm);
-                (x, o)
-            }
+            (_, y) if *y == 0 => Float::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
@@ -1842,10 +1832,8 @@ impl Float {
                     // Error <= 1/2 ulp(q)
                     let (q, o) = Float::from_rational_prec_ref(y, working_prec);
                     if o == Equal {
-                        // Result is exact so we can add it directly!
-                        let mut x = self.clone();
-                        let o = x.sub_prec_round_assign(q, prec, rm);
-                        return (x, o);
+                        // Result is exact so we can subtract it directly!
+                        return self.sub_prec_round_ref_val(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
                     let mut t = x.sub_prec_ref_val(q, working_prec).0;
@@ -1891,10 +1879,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1950,10 +1938,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2009,10 +1997,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2068,10 +2056,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = x-y+\epsilon.
+    /// f(x,y,p) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2126,13 +2114,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2201,13 +2189,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2281,13 +2269,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2361,13 +2349,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x-y+\epsilon.
+    /// f(x,y,m) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2440,13 +2428,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2555,7 +2543,7 @@ impl Float {
                     // Error <= 1/2 ulp(q)
                     let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
                     if o == Equal {
-                        // Result is exact so we can add it directly!
+                        // Result is exact so we can subtract it directly!
                         return self.sub_prec_round_assign(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
@@ -2600,13 +2588,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$.
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$.
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2714,7 +2702,7 @@ impl Float {
                     // Error <= 1/2 ulp(q)
                     let (q, o) = Float::from_rational_prec_ref(y, working_prec);
                     if o == Equal {
-                        // Result is exact so we can add it directly!
+                        // Result is exact so we can subtract it directly!
                         return self.sub_prec_round_assign(q, prec, rm);
                     }
                     let q_exp = q.get_exponent().unwrap();
@@ -2761,10 +2749,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2820,10 +2808,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2878,13 +2866,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
     ///
@@ -2951,13 +2939,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x-y+\epsilon.
+    /// x \gets x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x-y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $x-y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x-y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
     ///
@@ -3031,10 +3019,10 @@ impl Sub<Float> for Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
@@ -3096,10 +3084,10 @@ impl<'a> Sub<&'a Float> for Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
@@ -3167,10 +3155,10 @@ impl<'a> Sub<Float> for &'a Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
@@ -3238,10 +3226,10 @@ impl<'a, 'b> Sub<&'a Float> for &'b Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
@@ -3307,10 +3295,10 @@ impl SubAssign<Float> for Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// x\gets = x-y+\epsilon.
+    /// x\gets = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// See the `-` documentation for information on special cases.
@@ -3382,10 +3370,10 @@ impl<'a> SubAssign<&'a Float> for Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// x\gets = x-y+\epsilon.
+    /// x\gets = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// See the `-` documentation for information on special cases.
@@ -3458,10 +3446,10 @@ impl Sub<Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -3525,10 +3513,10 @@ impl<'a> Sub<&'a Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -3595,10 +3583,10 @@ impl<'a> Sub<Rational> for &'a Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -3664,10 +3652,10 @@ impl<'a, 'b> Sub<&'a Rational> for &'b Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -3731,10 +3719,10 @@ impl SubAssign<Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// x\gets = x-y+\epsilon.
+    /// x\gets = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// See the `-` documentation for information on special cases.
@@ -3803,10 +3791,10 @@ impl<'a> SubAssign<&'a Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// x\gets = x-y+\epsilon.
+    /// x\gets = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// See the `-` documentation for information on special cases.
@@ -3877,10 +3865,10 @@ impl Sub<Float> for Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -3942,10 +3930,10 @@ impl<'a> Sub<&'a Float> for Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -4007,10 +3995,10 @@ impl<'a> Sub<Float> for &'a Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
@@ -4071,10 +4059,10 @@ impl<'a, 'b> Sub<&'a Float> for &'b Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x-y+\epsilon.
+    /// f(x,y) = x-y+\varepsilon.
     /// $$
-    /// - If $x-y$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
+    /// - If $x-y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:

@@ -19,7 +19,8 @@ use malachite_float::test_util::arithmetic::add::{
     add_prec_round_naive, add_rational_prec_round_naive,
 };
 use malachite_float::test_util::arithmetic::sub::{
-    rug_sub, rug_sub_rational, rug_sub_rational_round, rug_sub_round,
+    rug_sub, rug_sub_prec, rug_sub_prec_round, rug_sub_rational, rug_sub_rational_prec,
+    rug_sub_rational_prec_round, rug_sub_rational_round, rug_sub_round,
 };
 use malachite_float::test_util::common::{
     emulate_primitive_float_fn_2, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -85,8 +86,8 @@ fn test_sub() {
 
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_sub(
-                rug::Float::exact_from(&x),
-                rug::Float::exact_from(&y)
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y)
             ))),
             ComparableFloatRef(&diff)
         );
@@ -1779,9 +1780,20 @@ fn test_sub_prec() {
         assert_eq!(ComparableFloatRef(&diff), ComparableFloatRef(&diff_alt));
         assert_eq!(o_alt, o_out);
 
-        let (diff_alt, o_alt) = add_prec_round_naive(x.clone(), -y, prec, Nearest);
+        let (diff_alt, o_alt) = add_prec_round_naive(x.clone(), -&y, prec, Nearest);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
+
+        let (rug_diff, rug_o) = rug_sub_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_diff)),
+            ComparableFloatRef(&diff),
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", "NaN", "NaN", 1, "NaN", "NaN", Equal);
     test(
@@ -2571,7 +2583,7 @@ fn test_sub_round() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_diff, rug_o) =
-                rug_sub_round(rug::Float::exact_from(&x), rug::Float::exact_from(&y), rm);
+                rug_sub_round(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y), rm);
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_diff)),
                 ComparableFloatRef(&diff),
@@ -6795,6 +6807,20 @@ fn test_sub_prec_round() {
         let (diff_alt, o_alt) = add_prec_round_naive(x.clone(), -&y, prec, rm);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_diff, rug_o) = rug_sub_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_diff)),
+                ComparableFloatRef(&diff),
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", "NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "NaN", "NaN", 1, Ceiling, "NaN", "NaN", Equal);
@@ -9327,8 +9353,8 @@ fn test_sub_rational() {
 
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_sub_rational(
-                rug::Float::exact_from(&x),
-                rug::Rational::from(&y)
+                &rug::Float::exact_from(&x),
+                &rug::Rational::from(&y)
             ))),
             ComparableFloatRef(&diff)
         );
@@ -9437,6 +9463,17 @@ fn test_sub_rational_prec() {
         let (diff_alt, o_alt) = add_rational_prec_round_naive(x.clone(), -&y, prec, Nearest);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
+
+        let (rug_diff, rug_o) = rug_sub_rational_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_diff)),
+            ComparableFloatRef(&diff)
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", "-123", 1, "NaN", "NaN", Equal);
     test(
@@ -9575,8 +9612,8 @@ fn test_sub_rational_round() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_diff, rug_o) = rug_sub_rational_round(
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
                 rm,
             );
             assert_eq!(
@@ -10149,6 +10186,20 @@ fn test_sub_rational_prec_round() {
         let (diff_alt, o_alt) = add_rational_prec_round_naive(x.clone(), -&y, prec, rm);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_diff, rug_o) = rug_sub_rational_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_diff)),
+                ComparableFloatRef(&diff)
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", "-123", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "-123", 1, Ceiling, "NaN", "NaN", Equal);
@@ -10808,6 +10859,39 @@ fn sub_prec_round_properties() {
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
 
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_diff, rug_o) = rug_sub_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_diff)),
+                ComparableFloatRef(&diff),
+            );
+            assert_eq!(rug_o, o);
+        }
+
+        if o == Equal && diff.is_finite() {
+            assert_eq!(
+                ComparableFloat(
+                    diff.add_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(x.abs_negative_zero_ref())
+            );
+            assert_eq!(
+                ComparableFloat(
+                    x.sub_prec_round_ref_ref(&diff, y.significant_bits(), Exact)
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(y.abs_negative_zero_ref())
+            );
+        }
+
         let r_diff = if diff.is_finite() {
             if diff.is_normal() {
                 assert_eq!(diff.get_prec(), Some(prec));
@@ -10991,6 +11075,36 @@ fn sub_prec_properties() {
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
 
+        let (rug_diff, rug_o) = rug_sub_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_diff)),
+            ComparableFloatRef(&diff),
+        );
+        assert_eq!(rug_o, o);
+
+        if o == Equal && diff.is_finite() {
+            assert_eq!(
+                ComparableFloat(
+                    diff.add_prec_ref_ref(&y, x.significant_bits())
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(x.abs_negative_zero_ref())
+            );
+            assert_eq!(
+                ComparableFloat(
+                    x.sub_prec_ref_ref(&diff, y.significant_bits())
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(y.abs_negative_zero_ref())
+            );
+        }
+
         let (diff_alt, o_alt) = x.sub_prec_round_ref_ref(&y, prec, Nearest);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
@@ -11150,6 +11264,11 @@ fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
+    if o == Equal && diff.is_finite() {
+        assert_eq!(diff.add_round_ref_ref(&y, Exact).0, x);
+        assert_eq!(x.sub_round_ref_ref(&diff, Exact).0, y);
+    }
+
     let r_diff = if diff.is_finite() {
         if x.is_normal() && y.is_normal() && diff.is_normal() {
             assert_eq!(
@@ -11186,7 +11305,7 @@ fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_diff, rug_o) =
-            rug_sub_round(rug::Float::exact_from(&x), rug::Float::exact_from(&y), rm);
+            rug_sub_round(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y), rm);
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_diff)),
             ComparableFloatRef(&diff),
@@ -11384,8 +11503,13 @@ fn sub_properties_helper_2(x: Float, y: Float) {
         .sub_prec_ref_ref(&y, max(x.significant_bits(), y.significant_bits()))
         .0;
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-    let diff_alt = x.sub_round_ref_ref(&y, Nearest).0;
+    let (diff_alt, o) = x.sub_round_ref_ref(&y, Nearest);
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+
+    if o == Equal && diff.is_finite() {
+        assert_eq!(&diff + &y, x);
+        assert_eq!(&x - &diff, y);
+    }
 
     if diff.is_finite() && x.is_normal() && y.is_normal() && diff.is_normal() {
         assert_eq!(
@@ -11404,7 +11528,7 @@ fn sub_properties_helper_2(x: Float, y: Float) {
         }
     }
 
-    let rug_diff = rug_sub(rug::Float::exact_from(&x), rug::Float::exact_from(&y));
+    let rug_diff = rug_sub(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y));
     assert_eq!(
         ComparableFloatRef(&Float::from(&rug_diff)),
         ComparableFloatRef(&diff),
@@ -11530,6 +11654,32 @@ fn sub_rational_prec_round_properties() {
             let (diff_alt, o_alt) = add_rational_prec_round_naive(x.clone(), -&y, prec, rm);
             assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
             assert_eq!(o_alt, o);
+
+            if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_diff, rug_o) = rug_sub_rational_prec_round(
+                    &rug::Float::exact_from(&x),
+                    &rug::Rational::exact_from(&y),
+                    prec,
+                    rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_diff)),
+                    ComparableFloatRef(&diff)
+                );
+                assert_eq!(rug_o, o);
+            }
+
+            if o == Equal && diff.is_finite() {
+                assert_eq!(
+                    ComparableFloat(
+                        diff.add_rational_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                            .0
+                            .abs_negative_zero()
+                    ),
+                    ComparableFloat(x.abs_negative_zero_ref())
+                );
+                // TODO additional test
+            }
 
             let r_diff = if diff.is_finite() {
                 if diff.is_normal() {
@@ -11677,6 +11827,29 @@ fn sub_rational_prec_properties() {
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
 
+        let (rug_diff, rug_o) = rug_sub_rational_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_diff)),
+            ComparableFloatRef(&diff)
+        );
+        assert_eq!(rug_o, o);
+
+        if o == Equal && diff.is_finite() {
+            assert_eq!(
+                ComparableFloat(
+                    diff.add_rational_prec_ref_ref(&y, x.significant_bits())
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(x.abs_negative_zero_ref())
+            );
+            // TODO additional test
+        }
+
         let (diff_alt, o_alt) = x.sub_rational_prec_round_ref_ref(&y, prec, Nearest);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
@@ -11800,6 +11973,11 @@ fn sub_rational_round_properties() {
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
 
+        if o == Equal && diff.is_finite() && diff != 0 {
+            assert_eq!(diff.add_rational_round_ref_ref(&y, Exact).0, x);
+            // TODO additional test
+        }
+
         let r_diff = if diff.is_finite() {
             if x.is_normal() && diff.is_normal() {
                 assert_eq!(diff.get_prec(), Some(x.get_prec().unwrap()));
@@ -11834,8 +12012,8 @@ fn sub_rational_round_properties() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_diff, rug_o) = rug_sub_rational_round(
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
                 rm,
             );
             assert_eq!(
@@ -11968,8 +12146,13 @@ fn sub_rational_properties() {
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         let diff_alt = x.sub_rational_prec_ref_ref(&y, x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        let diff_alt = x.sub_rational_round_ref_ref(&y, Nearest).0;
+        let (diff_alt, o) = x.sub_rational_round_ref_ref(&y, Nearest);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+
+        if o == Equal && diff.is_finite() && diff != 0 {
+            assert_eq!(&diff + &y, x);
+            // TODO additional test
+        }
 
         if diff.is_finite() && x.is_normal() && diff.is_normal() {
             assert_eq!(diff.get_prec(), Some(x.get_prec().unwrap()));
@@ -11985,7 +12168,7 @@ fn sub_rational_properties() {
             }
         }
 
-        let rug_diff = rug_sub_rational(rug::Float::exact_from(&x), rug::Rational::from(&y));
+        let rug_diff = rug_sub_rational(&rug::Float::exact_from(&x), &rug::Rational::from(&y));
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_diff)),
             ComparableFloatRef(&diff),

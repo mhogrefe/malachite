@@ -8,7 +8,7 @@
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
-    unsigned_gen_var_1, unsigned_gen_var_6, unsigned_pair_gen_var_16,
+    unsigned_gen, unsigned_gen_var_1, unsigned_gen_var_6, unsigned_pair_gen_var_16,
 };
 use std::panic::catch_unwind;
 
@@ -81,6 +81,10 @@ fn mod_neg_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_gen_var_6::<T>().test_properties(|m| {
         assert_eq!(T::ONE.mod_neg(m), m - T::ONE);
         assert_eq!((m - T::ONE).mod_neg(m), T::ONE);
+    });
+
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_panic!(x.mod_neg(T::ZERO));
     });
 }
 

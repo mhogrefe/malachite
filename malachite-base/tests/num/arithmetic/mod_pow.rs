@@ -11,8 +11,9 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
-    unsigned_pair_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_6,
-    unsigned_quadruple_gen_var_7, unsigned_triple_gen_var_14, unsigned_triple_gen_var_15,
+    unsigned_pair_gen, unsigned_pair_gen_var_12, unsigned_pair_gen_var_16,
+    unsigned_quadruple_gen_var_6, unsigned_quadruple_gen_var_7, unsigned_triple_gen_var_14,
+    unsigned_triple_gen_var_15,
 };
 use malachite_base::test_util::num::arithmetic::mod_pow::naive_mod_pow;
 use std::panic::catch_unwind;
@@ -141,6 +142,14 @@ fn mod_pow_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(x.mod_pow(0, m), T::from(m != T::ONE));
         assert_eq!(x.mod_pow(1, m), x);
         assert_eq!(x.mod_pow(2, m), x.mod_mul(x, m));
+    });
+
+    unsigned_pair_gen::<T, u64>().test_properties(|(x, y)| {
+        assert_panic!(x.mod_pow(y, T::ZERO));
+        assert_panic!({
+            let mut x = x;
+            x.mod_pow_assign(y, T::ZERO);
+        });
     });
 
     unsigned_quadruple_gen_var_6::<T, u64>().test_properties(|(x, y, exp, m)| {

@@ -55,7 +55,7 @@ use crate::num::random::{
     random_finite_primitive_floats, random_nonzero_finite_primitive_floats,
     random_positive_finite_primitive_floats, random_primitive_float_inclusive_range,
     random_primitive_float_range, random_primitive_floats, random_unsigneds_less_than,
-    variable_range_generator, RandomPrimitiveFloatInclusiveRange, VariableRangeGenerator,
+    RandomPrimitiveFloatInclusiveRange, VariableRangeGenerator,
 };
 use crate::random::{Seed, EXAMPLE_SEED};
 use crate::rational_sequences::random::random_rational_sequences;
@@ -6425,7 +6425,7 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
             config.get_or("mean_stripe_n", T::WIDTH >> 1),
             config.get_or("mean_stripe_d", 1),
         ),
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         phantom_t: PhantomData,
         phantom_u: PhantomData,
     })

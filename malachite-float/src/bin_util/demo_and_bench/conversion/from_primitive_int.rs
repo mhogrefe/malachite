@@ -10,13 +10,14 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::{
-    pair_primitive_int_bit_u64_max_bucketer, signed_bit_bucketer,
+    pair_1_bit_bucketer, pair_primitive_int_bit_u64_max_bucketer, signed_bit_bucketer,
     triple_1_2_primitive_int_bit_u64_max_bucketer, unsigned_bit_bucketer,
 };
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
-    signed_gen, signed_unsigned_pair_gen_var_20, unsigned_gen, unsigned_pair_gen_var_32,
+    signed_gen, signed_pair_gen_var_2, signed_unsigned_pair_gen_var_20, unsigned_gen,
+    unsigned_pair_gen_var_32, unsigned_signed_pair_gen_var_1,
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
@@ -40,6 +41,13 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_from_unsigned_prec_debug);
     register_unsigned_demos!(runner, demo_float_from_unsigned_prec_round);
     register_unsigned_demos!(runner, demo_float_from_unsigned_prec_round_debug);
+    register_demo!(runner, demo_float_const_from_unsigned);
+    register_demo!(runner, demo_float_const_from_unsigned_debug);
+    register_demo!(runner, demo_float_const_from_unsigned_times_power_of_2);
+    register_demo!(
+        runner,
+        demo_float_const_from_unsigned_times_power_of_2_debug
+    );
 
     register_signed_demos!(runner, demo_float_from_signed);
     register_signed_demos!(runner, demo_float_from_signed_debug);
@@ -47,6 +55,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_demos!(runner, demo_float_from_signed_prec_debug);
     register_signed_demos!(runner, demo_float_from_signed_prec_round);
     register_signed_demos!(runner, demo_float_from_signed_prec_round_debug);
+    register_demo!(runner, demo_float_const_from_signed);
+    register_demo!(runner, demo_float_const_from_signed_debug);
+    register_demo!(runner, demo_float_const_from_signed_times_power_of_2);
+    register_demo!(runner, demo_float_const_from_signed_times_power_of_2_debug);
 
     register_unsigned_benches!(runner, benchmark_float_from_unsigned_library_comparison);
     register_unsigned_benches!(
@@ -57,6 +69,8 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_from_unsigned_prec_round_library_comparison
     );
+    register_bench!(runner, benchmark_float_const_from_unsigned);
+    register_bench!(runner, benchmark_float_const_from_unsigned_times_power_of_2);
 
     register_signed_benches!(runner, benchmark_float_from_signed_library_comparison);
     register_signed_benches!(runner, benchmark_float_from_signed_prec_library_comparison);
@@ -64,6 +78,8 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_from_signed_prec_round_library_comparison
     );
+    register_bench!(runner, benchmark_float_const_from_signed);
+    register_bench!(runner, benchmark_float_const_from_signed_times_power_of_2);
 }
 
 fn demo_float_from_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
@@ -176,6 +192,52 @@ fn demo_float_from_unsigned_prec_round_debug<T: PrimitiveUnsigned>(
     }
 }
 
+fn demo_float_const_from_unsigned(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_unsigned({}) = {}",
+            n,
+            Float::const_from_unsigned(n)
+        );
+    }
+}
+
+fn demo_float_const_from_unsigned_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_unsigned({:#x}) = {:#x}",
+            n,
+            ComparableFloat(Float::const_from_unsigned(n))
+        );
+    }
+}
+
+fn demo_float_const_from_unsigned_times_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow) in unsigned_signed_pair_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_unsigned_times_power_of_2({}, {}) = {}",
+            n,
+            pow,
+            Float::const_from_unsigned_times_power_of_2(n, pow)
+        );
+    }
+}
+
+fn demo_float_const_from_unsigned_times_power_of_2_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow) in unsigned_signed_pair_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_unsigned_times_power_of_2({:#x}, {}) = {:#x}",
+            n,
+            pow,
+            Float::const_from_unsigned_times_power_of_2(n, pow)
+        );
+    }
+}
+
 fn demo_float_from_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Float: From<T>,
@@ -280,6 +342,52 @@ fn demo_float_from_signed_prec_round_debug<T: PrimitiveSigned>(
     }
 }
 
+fn demo_float_const_from_signed(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_signed({}) = {}",
+            n,
+            Float::const_from_signed(n)
+        );
+    }
+}
+
+fn demo_float_const_from_signed_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_signed({:#x}) = {:#x}",
+            n,
+            ComparableFloat(Float::const_from_signed(n))
+        );
+    }
+}
+
+fn demo_float_const_from_signed_times_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow) in signed_pair_gen_var_2().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_signed_times_power_of_2({}, {}) = {}",
+            n,
+            pow,
+            Float::const_from_signed_times_power_of_2(n, pow)
+        );
+    }
+}
+
+fn demo_float_const_from_signed_times_power_of_2_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow) in signed_pair_gen_var_2().get(gm, config).take(limit) {
+        println!(
+            "Float::const_from_signed_times_power_of_2({:#x}, {}) = {:#x}",
+            n,
+            pow,
+            Float::const_from_signed_times_power_of_2(n, pow)
+        );
+    }
+}
+
 #[allow(unused_must_use)]
 fn benchmark_float_from_unsigned_library_comparison<T: PrimitiveUnsigned>(
     gm: GenMode,
@@ -375,6 +483,44 @@ fn benchmark_float_from_unsigned_prec_round_library_comparison<T: PrimitiveUnsig
     );
 }
 
+fn benchmark_float_const_from_unsigned(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::const_from_unsigned(Limb)",
+        BenchmarkType::Single,
+        unsigned_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [("Malachite", &mut |n| no_out!(Float::const_from_unsigned(n)))],
+    );
+}
+
+fn benchmark_float_const_from_unsigned_times_power_of_2(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::const_from_unsigned_times_power_of_2(Limb)",
+        BenchmarkType::Single,
+        unsigned_signed_pair_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_bit_bucketer("n"),
+        &mut [("Malachite", &mut |(n, pow)| {
+            no_out!(Float::const_from_unsigned_times_power_of_2(n, pow))
+        })],
+    );
+}
+
 #[allow(unused_must_use)]
 fn benchmark_float_from_signed_library_comparison<T: PrimitiveSigned>(
     gm: GenMode,
@@ -467,5 +613,43 @@ fn benchmark_float_from_signed_prec_round_library_comparison<T: PrimitiveSigned>
                 ))
             }),
         ],
+    );
+}
+
+fn benchmark_float_const_from_signed(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::const_from_signed(Limb)",
+        BenchmarkType::Single,
+        signed_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &signed_bit_bucketer(),
+        &mut [("Malachite", &mut |n| no_out!(Float::const_from_signed(n)))],
+    );
+}
+
+fn benchmark_float_const_from_signed_times_power_of_2(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::const_from_signed_times_power_of_2(Limb)",
+        BenchmarkType::Single,
+        signed_pair_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_bit_bucketer("n"),
+        &mut [("Malachite", &mut |(n, pow)| {
+            no_out!(Float::const_from_signed_times_power_of_2(n, pow))
+        })],
     );
 }

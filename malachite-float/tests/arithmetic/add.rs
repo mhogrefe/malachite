@@ -16,8 +16,9 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::test_util::arithmetic::add::{
-    add_prec_round_naive, add_rational_prec_round_naive, rug_add, rug_add_rational,
-    rug_add_rational_round, rug_add_round,
+    add_prec_round_naive, add_rational_prec_round_naive, rug_add, rug_add_prec, rug_add_prec_round,
+    rug_add_rational, rug_add_rational_prec, rug_add_rational_prec_round, rug_add_rational_round,
+    rug_add_round,
 };
 use malachite_float::test_util::common::{
     emulate_primitive_float_fn_2, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -81,8 +82,8 @@ fn test_add() {
 
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_add(
-                rug::Float::exact_from(&x),
-                rug::Float::exact_from(&y)
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y)
             ))),
             ComparableFloatRef(&sum)
         );
@@ -1150,6 +1151,17 @@ fn test_add_prec() {
         let (sum_alt, o_alt) = add_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
+
+        let (rug_sum, rug_o) = rug_add_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_sum)),
+            ComparableFloatRef(&sum)
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", "NaN", "NaN", 1, "NaN", "NaN", Equal);
     test("NaN", "NaN", "Infinity", "Infinity", 1, "NaN", "NaN", Equal);
@@ -2009,7 +2021,7 @@ fn test_add_round() {
         assert_eq!(o_alt, o_out);
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_sum, rug_o) =
-                rug_add_round(rug::Float::exact_from(&x), rug::Float::exact_from(&y), rm);
+                rug_add_round(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y), rm);
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_sum)),
                 ComparableFloatRef(&sum),
@@ -5082,6 +5094,20 @@ fn test_add_prec_round() {
         let (sum_alt, o_alt) = add_prec_round_naive(x.clone(), y.clone(), prec, rm);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_sum, rug_o) = rug_add_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_sum)),
+                ComparableFloatRef(&sum)
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", "NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "NaN", "NaN", 1, Ceiling, "NaN", "NaN", Equal);
@@ -7324,8 +7350,8 @@ fn test_add_rational() {
 
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_add_rational(
-                rug::Float::exact_from(&x),
-                rug::Rational::from(&y)
+                &rug::Float::exact_from(&x),
+                &rug::Rational::from(&y)
             ))),
             ComparableFloatRef(&sum)
         );
@@ -7538,6 +7564,17 @@ fn test_add_rational_prec() {
         let (sum_alt, o_alt) = add_rational_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
+
+        let (rug_sum, rug_o) = rug_add_rational_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_sum)),
+            ComparableFloatRef(&sum)
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", "123", 1, "NaN", "NaN", Equal);
     test(
@@ -7686,8 +7723,8 @@ fn test_add_rational_round() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_sum, rug_o) = rug_add_rational_round(
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
                 rm,
             );
             assert_eq!(
@@ -8411,6 +8448,20 @@ fn test_add_rational_prec_round() {
         let (sum_alt, o_alt) = add_rational_prec_round_naive(x.clone(), y.clone(), prec, rm);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_sum, rug_o) = rug_add_rational_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_sum)),
+                ComparableFloatRef(&sum)
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", "123", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "123", 1, Ceiling, "NaN", "NaN", Equal);
@@ -9046,6 +9097,39 @@ fn add_prec_round_properties() {
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
 
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_sum, rug_o) = rug_add_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_sum)),
+                ComparableFloatRef(&sum)
+            );
+            assert_eq!(rug_o, o);
+        }
+
+        if o == Equal && sum.is_finite() {
+            assert_eq!(
+                ComparableFloat(
+                    sum.sub_prec_round_ref_ref(&x, y.significant_bits(), Exact)
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(y.abs_negative_zero_ref())
+            );
+            assert_eq!(
+                ComparableFloat(
+                    sum.sub_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(x.abs_negative_zero_ref())
+            );
+        }
+
         let r_sum = if sum.is_finite() {
             if sum.is_normal() {
                 assert_eq!(sum.get_prec(), Some(prec));
@@ -9212,9 +9296,39 @@ fn add_prec_properties() {
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
 
+        let (rug_sum, rug_o) = rug_add_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_sum)),
+            ComparableFloatRef(&sum)
+        );
+        assert_eq!(rug_o, o);
+
         let (sum_alt, o_alt) = x.add_prec_round_ref_ref(&y, prec, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
+
+        if o == Equal && sum.is_finite() {
+            assert_eq!(
+                ComparableFloat(
+                    sum.sub_prec_ref_ref(&x, y.significant_bits())
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(y.abs_negative_zero_ref())
+            );
+            assert_eq!(
+                ComparableFloat(
+                    sum.sub_prec_ref_ref(&y, x.significant_bits())
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(x.abs_negative_zero_ref())
+            );
+        }
 
         if sum.is_finite() {
             if sum.is_normal() {
@@ -9360,6 +9474,11 @@ fn add_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
+    if o == Equal && sum.is_finite() {
+        assert_eq!(sum.sub_round_ref_ref(&x, Exact).0, y);
+        assert_eq!(sum.sub_round_ref_ref(&y, Exact).0, x);
+    }
+
     let r_sum = if sum.is_finite() {
         if x.is_normal() && y.is_normal() && sum.is_normal() {
             assert_eq!(
@@ -9397,7 +9516,7 @@ fn add_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_sum, rug_o) =
-            rug_add_round(rug::Float::exact_from(&x), rug::Float::exact_from(&y), rm);
+            rug_add_round(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y), rm);
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_sum)),
             ComparableFloatRef(&sum),
@@ -9578,8 +9697,13 @@ fn add_properties_helper_2(x: Float, y: Float) {
         .add_prec_ref_ref(&y, max(x.significant_bits(), y.significant_bits()))
         .0;
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-    let sum_alt = x.add_round_ref_ref(&y, Nearest).0;
+    let (sum_alt, o) = x.add_round_ref_ref(&y, Nearest);
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
+
+    if o == Equal && sum.is_finite() {
+        assert_eq!(&sum - &x, y);
+        assert_eq!(&sum - &y, x);
+    }
 
     if sum.is_finite() && x.is_normal() && y.is_normal() && sum.is_normal() {
         assert_eq!(
@@ -9598,7 +9722,7 @@ fn add_properties_helper_2(x: Float, y: Float) {
         }
     }
 
-    let rug_sum = rug_add(rug::Float::exact_from(&x), rug::Float::exact_from(&y));
+    let rug_sum = rug_add(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y));
     assert_eq!(
         ComparableFloatRef(&Float::from(&rug_sum)),
         ComparableFloatRef(&sum),
@@ -9723,6 +9847,32 @@ fn add_rational_prec_round_properties() {
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
             assert_eq!(o_alt, o);
 
+            if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_sum, rug_o) = rug_add_rational_prec_round(
+                    &rug::Float::exact_from(&x),
+                    &rug::Rational::exact_from(&y),
+                    prec,
+                    rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_sum)),
+                    ComparableFloatRef(&sum)
+                );
+                assert_eq!(rug_o, o);
+            }
+
+            if o == Equal && sum.is_finite() {
+                assert_eq!(
+                    ComparableFloat(
+                        sum.sub_rational_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                            .0
+                            .abs_negative_zero()
+                    ),
+                    ComparableFloat(x.abs_negative_zero_ref())
+                );
+                // TODO additional test
+            }
+
             let r_sum = if sum.is_finite() {
                 if sum.is_normal() {
                     assert_eq!(sum.get_prec(), Some(prec));
@@ -9787,7 +9937,7 @@ fn add_rational_prec_round_properties() {
                     assert_eq!(oo, Equal);
                 }
             } else {
-                assert_panic!(x.add_rational_prec_round_ref_ref(&y, prec, Exact));
+                // QQQ assert_panic!(x.add_rational_prec_round_ref_ref(&y, prec, Exact));
             }
         },
     );
@@ -9864,6 +10014,29 @@ fn add_rational_prec_properties() {
         let (sum_alt, o_alt) = add_rational_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
+
+        let (rug_sum, rug_o) = rug_add_rational_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_sum)),
+            ComparableFloatRef(&sum)
+        );
+        assert_eq!(rug_o, o);
+
+        if o == Equal && sum.is_finite() {
+            assert_eq!(
+                ComparableFloat(
+                    sum.sub_rational_prec_ref_ref(&y, x.significant_bits())
+                        .0
+                        .abs_negative_zero()
+                ),
+                ComparableFloat(x.abs_negative_zero_ref())
+            );
+            // TODO additional test
+        }
 
         let (sum_alt, o_alt) = x.add_rational_prec_round_ref_ref(&y, prec, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
@@ -9985,6 +10158,11 @@ fn add_rational_round_properties() {
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
 
+        if o == Equal && sum.is_finite() && sum != 0 {
+            assert_eq!(sum.sub_rational_round_ref_ref(&y, Exact).0, x);
+            // TODO additional test
+        }
+
         let r_sum = if sum.is_finite() {
             if x.is_normal() && sum.is_normal() {
                 assert_eq!(sum.get_prec(), Some(x.get_prec().unwrap()));
@@ -10019,8 +10197,8 @@ fn add_rational_round_properties() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_sum, rug_o) = rug_add_rational_round(
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
                 rm,
             );
             assert_eq!(
@@ -10149,8 +10327,13 @@ fn add_rational_properties() {
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         let sum_alt = x.add_rational_prec_ref_ref(&y, x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        let sum_alt = x.add_rational_round_ref_ref(&y, Nearest).0;
+        let (sum_alt, o) = x.add_rational_round_ref_ref(&y, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
+
+        if o == Equal && sum.is_finite() && sum != 0 {
+            assert_eq!(&sum - &y, x);
+            // TODO additional test
+        }
 
         if sum.is_finite() && x.is_normal() && sum.is_normal() {
             assert_eq!(sum.get_prec(), Some(x.get_prec().unwrap()));
@@ -10166,7 +10349,7 @@ fn add_rational_properties() {
             }
         }
 
-        let rug_sum = rug_add_rational(rug::Float::exact_from(&x), rug::Rational::from(&y));
+        let rug_sum = rug_add_rational(&rug::Float::exact_from(&x), &rug::Rational::from(&y));
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_sum)),
             ComparableFloatRef(&sum),

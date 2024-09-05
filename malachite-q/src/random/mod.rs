@@ -22,15 +22,18 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
     geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
+use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::num::random::{
-    random_primitive_ints, variable_range_generator, RandomPrimitiveInts, VariableRangeGenerator,
+    random_primitive_ints, RandomPrimitiveInts, VariableRangeGenerator,
 };
 use malachite_base::random::Seed;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::random::{
     get_random_integer_from_range_to_infinity, get_random_integer_from_range_to_negative_infinity,
-    random_integer_range, random_integer_range_to_infinity,
-    random_integer_range_to_negative_infinity, RandomIntegerRange, RandomIntegerRangeToInfinity,
+    get_striped_random_integer_from_range_to_infinity,
+    get_striped_random_integer_from_range_to_negative_infinity, random_integer_range,
+    random_integer_range_to_infinity, random_integer_range_to_negative_infinity,
+    RandomIntegerRange, RandomIntegerRangeToInfinity,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::random::{
@@ -391,8 +394,7 @@ pub fn random_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
-/// about generating striped random numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -447,8 +449,7 @@ pub fn striped_random_positive_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
-/// about generating striped random numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -512,8 +513,7 @@ pub fn striped_random_non_negative_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
-/// about generating striped random numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -570,8 +570,7 @@ pub fn striped_random_negative_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
-/// about generating striped random numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -626,8 +625,7 @@ pub fn striped_random_nonzero_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
-/// about generating striped random numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -1073,7 +1071,7 @@ pub fn random_rational_range_to_infinity(
     RandomRationalRangeToInfinity {
         a,
         limbs: random_primitive_ints(seed.fork("limbs")),
-        range_generator: variable_range_generator(seed.fork("range generator")),
+        range_generator: VariableRangeGenerator::new(seed.fork("range generator")),
         mean_bits_numerator,
         mean_bits_denominator,
         denominators: random_positive_naturals(
@@ -1175,7 +1173,7 @@ pub fn random_rational_range_to_negative_infinity(
     RandomRationalRangeToNegativeInfinity {
         a,
         limbs: random_primitive_ints(seed.fork("limbs")),
-        range_generator: variable_range_generator(seed.fork("range generator")),
+        range_generator: VariableRangeGenerator::new(seed.fork("range generator")),
         mean_bits_numerator,
         mean_bits_denominator,
         denominators: random_positive_naturals(
@@ -1458,4 +1456,240 @@ pub fn random_rational_inclusive_range(
             mean_denominator_index_denominator,
         ),
     })
+}
+
+/// Generates striped random [`Rational`]s greater than or equal to a lower bound. See
+/// [`striped_random_rational_range_to_infinity`] for more details.
+#[derive(Clone, Debug)]
+pub struct StripedRandomRationalRangeToInfinity {
+    a: Rational,
+    xs: StripedBitSource,
+    range_generator: VariableRangeGenerator,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    denominators: StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
+}
+
+impl Iterator for StripedRandomRationalRangeToInfinity {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        let d = self.denominators.next().unwrap();
+        let numerator_bound = Integer::rounding_from(&self.a * Rational::from(&d), Ceiling).0;
+        let (numerator, denominator) = (Rational::from(d.significant_bits())
+            + Rational::from_unsigneds(self.mean_bits_numerator, self.mean_bits_denominator))
+        .into_numerator_and_denominator();
+        let numerator = u64::exact_from(&numerator);
+        let denominator = u64::exact_from(&denominator);
+        loop {
+            let n = get_striped_random_integer_from_range_to_infinity(
+                &mut self.xs,
+                &mut self.range_generator,
+                numerator_bound.clone(),
+                numerator,
+                denominator,
+            );
+            if n.unsigned_abs_ref().coprime_with(&d) {
+                return Some(Rational {
+                    sign: n >= 0,
+                    numerator: n.unsigned_abs(),
+                    denominator: d,
+                });
+            }
+        }
+    }
+}
+
+/// Generates striped random [`Rational`]s greater than or equal to a lower bound $a$.
+///
+/// The actual numerator and denominator bit lengths are chosen from a geometric distribution with
+/// mean $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than
+/// `1`. A striped bit sequence with the given stripe parameter is generated and truncated at the
+/// bit lengths to produce the numerators and denominators. The highest bits are forced to be `1`.
+/// Finally, the [`Rational`] is reduced.
+///
+/// The output length is infinite.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a >
+/// 0$ and their ratio is less than or equal to the bit length of $a$, or if they are too large and
+/// manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::random::striped_random_rational_range_to_infinity;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_rational_range_to_infinity(
+///             EXAMPLE_SEED,
+///             Rational::from_signeds(-3i32, 2),
+///             10,
+///             1,
+///             3,
+///             1
+///         ),
+///         10
+///     ),
+///     "[3/2, 39, 239/2, -32/63, 127/16, 16383/4, -1/2, 1, 583664, 1, ...]"
+/// )
+/// ```
+pub fn striped_random_rational_range_to_infinity(
+    seed: Seed,
+    a: Rational,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomRationalRangeToInfinity {
+    StripedRandomRationalRangeToInfinity {
+        a,
+        xs: StripedBitSource::new(
+            seed.fork("xs"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+        range_generator: VariableRangeGenerator::new(seed.fork("range generator")),
+        mean_bits_numerator,
+        mean_bits_denominator,
+        denominators: striped_random_positive_naturals(
+            seed.fork("denominators"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    }
+}
+
+/// Generates random striped [`Rational`]s less than or equal to a lower bound. See
+/// [`striped_random_rational_range_to_negative_infinity`] for more details.
+#[derive(Clone, Debug)]
+pub struct StripedRandomRationalRangeToNegativeInfinity {
+    a: Rational,
+    xs: StripedBitSource,
+    range_generator: VariableRangeGenerator,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    denominators: StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
+}
+
+impl Iterator for StripedRandomRationalRangeToNegativeInfinity {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        let d = self.denominators.next().unwrap();
+        let numerator_bound = Integer::rounding_from(&self.a * Rational::from(&d), Floor).0;
+        let (numerator, denominator) = (Rational::from(d.significant_bits())
+            + Rational::from_unsigneds(self.mean_bits_numerator, self.mean_bits_denominator))
+        .into_numerator_and_denominator();
+        let numerator = u64::exact_from(&numerator);
+        let denominator = u64::exact_from(&denominator);
+        loop {
+            let n = get_striped_random_integer_from_range_to_negative_infinity(
+                &mut self.xs,
+                &mut self.range_generator,
+                numerator_bound.clone(),
+                numerator,
+                denominator,
+            );
+            if n.unsigned_abs_ref().coprime_with(&d) {
+                return Some(Rational {
+                    sign: n >= 0,
+                    numerator: n.unsigned_abs(),
+                    denominator: d,
+                });
+            }
+        }
+    }
+}
+
+/// Generates striped random [`Rational`]s less than or equal to a lower bound $a$.
+///
+/// The actual numerator and denominator bit lengths are chosen from a geometric distribution with
+/// mean $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than
+/// `1`. A striped bit sequence with the given stripe parameter is generated and truncated at the
+/// bit lengths to produce the numerators and denominators. The highest bits are forced to be `1`.
+/// Finally, the [`Rational`] is reduced.
+///
+/// The output length is infinite.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a <
+/// 0$ and their ratio is less than or equal to the bit length of $a$, or if they are too large and
+/// manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::random::striped_random_rational_range_to_negative_infinity;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_rational_range_to_negative_infinity(
+///             EXAMPLE_SEED,
+///             Rational::from_signeds(-3i32, 2),
+///             10,
+///             1,
+///             3,
+///             1
+///         ),
+///         10
+///     ),
+///     "[-79/2, -7, -1051/2, -95/63, -255/16, -159/4, -3/2, -16, -2, -22, ...]"
+/// )
+/// ```
+pub fn striped_random_rational_range_to_negative_infinity(
+    seed: Seed,
+    a: Rational,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomRationalRangeToNegativeInfinity {
+    StripedRandomRationalRangeToNegativeInfinity {
+        a,
+        xs: StripedBitSource::new(
+            seed.fork("xs"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+        range_generator: VariableRangeGenerator::new(seed.fork("range generator")),
+        mean_bits_numerator,
+        mean_bits_denominator,
+        denominators: striped_random_positive_naturals(
+            seed.fork("denominators"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    }
 }

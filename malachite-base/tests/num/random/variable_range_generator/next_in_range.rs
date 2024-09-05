@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::random::variable_range_generator;
+use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::random::EXAMPLE_SEED;
 use std::panic::catch_unwind;
 
 fn next_in_range_helper<T: PrimitiveUnsigned>(a: T, b: T, expected_values: &[T]) {
-    let mut range_generator = variable_range_generator(EXAMPLE_SEED);
+    let mut range_generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     let mut xs = Vec::with_capacity(20);
     for _ in 0..20 {
         xs.push(range_generator.next_in_range(a, b));
@@ -45,7 +45,7 @@ fn test_next_in_range() {
 
 fn next_in_range_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
-        let mut range_generator = variable_range_generator(EXAMPLE_SEED);
+        let mut range_generator = VariableRangeGenerator::new(EXAMPLE_SEED);
         range_generator.next_in_range(T::TWO, T::TWO);
     });
 }

@@ -88,6 +88,13 @@ fn test_from_natural_prec() {
     test("1000000000000", 1, "1.0e12", "0x1.0E+10#1", Greater);
     test("1000000000000", 10, "9.997e11", "0xe.8cE+9#10", Less);
     test("1000000000000", 20, "9.999997e11", "0xe.8d4aE+9#20", Less);
+    test(
+        "289905948138435080392",
+        64,
+        "2.8990594813843508038e20",
+        "0xf.b740d3d8283d70cE+16#64",
+        Less,
+    );
 }
 
 #[test]
@@ -270,6 +277,67 @@ fn test_from_natural_prec_round() {
         "0xe.8d4aE+9#20",
         Less,
     );
+
+    test(
+        "20928269765806917927943182622889",
+        64,
+        Nearest,
+        "2.0928269765806917929e31",
+        "0x1.0826e3012a87296eE+26#64",
+        Greater,
+    );
+
+    // - in from_natural_prec_round
+    // - x == 0 in from_natural_prec_round
+    test("0", 1, Down, "0.0", "0x0.0", Equal);
+    // - x != 0 in from_natural_prec_round
+    // - bits <= prec in from_natural_prec_round
+    test("1", 1, Down, "1.0", "0x1.0#1", Equal);
+    // - bits > prec in from_natural_prec_round
+    // - needed_bits == 0 in from_natural_prec_round
+    // - mask_width < Limb::WIDTH in from_natural_prec_round
+    // - rm == Floor || rm == Down in from_natural_prec_round
+    // - (rm == Floor || rm == Down) && !inexact in from_natural_prec_round
+    test("2", 1, Down, "2.0", "0x2.0#1", Equal);
+    // - rm == Ceiling || rm == Up in from_natural_prec_round
+    // - (rm == Ceiling || rm == Up) && !inexact in from_natural_prec_round
+    test("2", 1, Up, "2.0", "0x2.0#1", Equal);
+    // - rm == Nearest in from_natural_prec_round
+    // - rm == Nearest && (!half_bit || !inexact_after_half && !x.get_bit(bits - prec) && !inexact
+    //   in from_natural_prec_round
+    test("2", 1, Nearest, "2.0", "0x2.0#1", Equal);
+    // - rm == Exact in from_natural_prec_round
+    test("2", 1, Exact, "2.0", "0x2.0#1", Equal);
+    // - (rm == Floor || rm == Down) && inexact in from_natural_prec_round
+    test("3", 1, Down, "2.0", "0x2.0#1", Less);
+    // - (rm == Ceiling || rm == Up) && inexact in from_natural_prec_round
+    // - (rm == Ceiling || rm == Up) && significand.limb_count() > original_limb_count in
+    //   from_natural_prec_round
+    test("3", 1, Up, "4.0", "0x4.0#1", Greater);
+    // - rm == Nearest && half_bit && (inexact_after_half || x.get_bit(bits - prec)) in
+    //   from_natural_prec_round
+    // - rm == Nearest && half_bit && (inexact_after_half || x.get_bit(bits - prec)) &&
+    //   significand.limb_count() > original_limb_count in from_natural_prec_round
+    test("3", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    // - rm == Nearest && (!half_bit || !inexact_after_half && !x.get_bit(bits - prec) && inexact in
+    //   from_natural_prec_round
+    test("5", 1, Nearest, "4.0", "0x4.0#1", Less);
+    // - (rm == Ceiling || rm == Up) && significand.limb_count() <= original_limb_count in
+    //   from_natural_prec_round
+    test("5", 2, Up, "6.0", "0x6.0#2", Greater);
+    // - rm == Nearest && half_bit && (inexact_after_half || x.get_bit(bits - prec)) &&
+    //   significand.limb_count() <= original_limb_count in from_natural_prec_round
+    test("11", 2, Nearest, "1.0e1", "0xc.0#2", Greater);
+    // - needed_bits != 0 in from_natural_prec_round
+    // - mask_width >= Limb::WIDTH in from_natural_prec_round
+    test(
+        "10524811972430560515843",
+        15,
+        Floor,
+        "1.05244e22",
+        "0x2.3a88E+18#15",
+        Less,
+    );
 }
 
 #[test]
@@ -292,6 +360,27 @@ fn from_natural_prec_round_ref_fail() {
         1,
         Exact
     ));
+}
+
+#[test]
+fn test_from_natural_min_prec() {
+    let test = |s, out, out_hex| {
+        let u = Natural::from_str(s).unwrap();
+
+        let x = Float::from_natural_min_prec(u.clone());
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+
+        let x = Float::from_natural_min_prec_ref(&u);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+    };
+    test("0", "0.0", "0x0.0");
+    test("1", "1.0", "0x1.0#1");
+    test("123", "123.0", "0x7b.0#7");
+    test("1000000000000", "1.0e12", "0xe.8d4a51E+9#28");
 }
 
 #[test]
@@ -456,5 +545,32 @@ fn from_natural_prec_round_properties() {
             assert!((r_nearest - Rational::from(&n))
                 .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
         }
+    });
+}
+
+#[test]
+fn from_natural_min_prec_properties() {
+    natural_gen().test_properties(|n| {
+        let float_n = Float::from_natural_min_prec(n.clone());
+        assert!(float_n.is_valid());
+
+        let float_n_alt = Float::from_natural_min_prec_ref(&n);
+        assert!(float_n_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_n_alt),
+            ComparableFloatRef(&float_n)
+        );
+        assert_eq!(float_n, n);
+
+        assert_eq!(float_n.get_min_prec(), float_n.get_prec());
+
+        assert_eq!(
+            ComparableFloatRef(&Float::from_integer_min_prec(Integer::from(&n))),
+            ComparableFloatRef(&float_n)
+        );
+        let prec = Float::from(&n).get_min_prec().unwrap_or(1);
+        let (f, o) = Float::from_natural_prec(n, prec);
+        assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
+        assert_eq!(o, Equal);
     });
 }

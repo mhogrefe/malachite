@@ -37,6 +37,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_from_natural_prec_round_debug);
     register_demo!(runner, demo_float_from_natural_prec_round_ref);
     register_demo!(runner, demo_float_from_natural_prec_round_ref_debug);
+    register_demo!(runner, demo_float_from_natural_min_prec);
+    register_demo!(runner, demo_float_from_natural_min_prec_debug);
+    register_demo!(runner, demo_float_from_natural_min_prec_ref);
+    register_demo!(runner, demo_float_from_natural_min_prec_ref_debug);
 
     register_bench!(runner, benchmark_float_from_natural_evaluation_strategy);
     register_bench!(runner, benchmark_float_from_natural_library_comparison);
@@ -52,6 +56,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_float_from_natural_prec_round_library_comparison
+    );
+    register_bench!(
+        runner,
+        benchmark_float_from_natural_min_prec_evaluation_strategy
     );
 }
 
@@ -204,6 +212,46 @@ fn demo_float_from_natural_prec_round_ref_debug(gm: GenMode, config: &GenConfig,
             p,
             rm,
             (ComparableFloat(f), o)
+        );
+    }
+}
+
+fn demo_float_from_natural_min_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::from_natural_min_prec({}) = {}",
+            n.clone(),
+            Float::from_natural_min_prec(n)
+        );
+    }
+}
+
+fn demo_float_from_natural_min_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::from_natural_min_prec({:#x}) = {:#x}",
+            n.clone(),
+            ComparableFloat(Float::from_natural_min_prec(n))
+        );
+    }
+}
+
+fn demo_float_from_natural_min_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::from_natural_min_prec_ref(&{}) = {}",
+            n,
+            Float::from_natural_min_prec_ref(&n)
+        );
+    }
+}
+
+fn demo_float_from_natural_min_prec_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!(
+            "Float::from_natural_min_prec_ref(&{:#x}) = {:#x}",
+            n,
+            ComparableFloat(Float::from_natural_min_prec_ref(&n))
         );
     }
 }
@@ -363,6 +411,31 @@ fn benchmark_float_from_natural_prec_round_library_comparison(
                     rug::Integer::from(&n),
                     rug_round_try_from_rounding_mode(rm).unwrap()
                 ))
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_from_natural_min_prec_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::from_natural_min_prec(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        natural_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &natural_bit_bucketer("n"),
+        &mut [
+            ("Float::from(Natural)", &mut |n| {
+                no_out!(Float::from_natural_min_prec(n))
+            }),
+            ("Float::from(&Natural)", &mut |n| {
+                no_out!(Float::from_natural_min_prec_ref(&n))
             }),
         ],
     );

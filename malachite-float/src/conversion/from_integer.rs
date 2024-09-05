@@ -21,11 +21,12 @@ impl Float {
     /// If you're only using [`Nearest`], try using [`Float::from_integer_prec`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(m,n) = O(\max(m,n))$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $m$ is `n.significant_bits()`, and $n$ is
+    /// `prec`.
     ///
     /// # Examples
     /// ```
@@ -92,11 +93,12 @@ impl Float {
     /// as well as a precision, try [`Float::from_integer_prec_round`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(m,n) = O(\max(m,n))$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $m$ is `n.significant_bits()`, and $n$ is
+    /// `prec`.
     ///
     /// # Examples
     /// ```
@@ -142,11 +144,12 @@ impl Float {
     /// If you're only using [`Nearest`], try using [`Float::from_integer_prec_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(m,n) = O(\max(m,n))$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $m$ is `n.significant_bits()`, and $n$ is
+    /// `prec`.
     ///
     /// # Examples
     /// ```
@@ -221,11 +224,12 @@ impl Float {
     /// as well as a precision, try [`Float::from_integer_prec_round_ref`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(m,n) = O(\max(m,n))$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $m$ is `n.significant_bits()`, and $n$ is
+    /// `prec`.
     ///
     /// # Examples
     /// ```
@@ -268,15 +272,122 @@ impl Float {
             (-f, o.reverse())
         }
     }
+
+    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value.
+    ///
+    /// If the [`Integer`] is nonzero, the precision of the [`Float`] is the minimum possible
+    /// precision to represent the [`Integer`] exactly. If you instead want to use the precision
+    /// equal to the [`Integer`]'s number of significant bits, try `from`. If you want to specify
+    /// some other precision, try [`Float::from_integer_prec`]. This may require rounding, which
+    /// uses [`Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_integer_prec_round`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec(Integer::ZERO).to_string(),
+    ///     "0.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec(Integer::from(100)).to_string(),
+    ///     "100.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec(Integer::from(100)).get_prec(),
+    ///     Some(5)
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec(Integer::from(-100)).to_string(),
+    ///     "-100.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec(Integer::from(-100)).get_prec(),
+    ///     Some(5)
+    /// );
+    /// ```
+    pub fn from_integer_min_prec(x: Integer) -> Float {
+        let sign = x >= 0;
+        let abs = Float::from_natural_min_prec(x.unsigned_abs());
+        if sign {
+            abs
+        } else {
+            -abs
+        }
+    }
+
+    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference.
+    ///
+    /// If the [`Integer`] is nonzero, the precision of the [`Float`] is the minimum possible
+    /// precision to represent the [`Integer`] exactly. If you instead want to use the precision
+    /// equal to the [`Integer`]'s number of significant bits, try `from`. If you want to specify
+    /// some other precision, try [`Float::from_integer_prec_ref`]. This may require rounding, which
+    /// uses [`Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_integer_prec_round_ref`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec_ref(&Integer::ZERO).to_string(),
+    ///     "0.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec_ref(&Integer::from(100)).to_string(),
+    ///     "100.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec_ref(&Integer::from(100)).get_prec(),
+    ///     Some(5)
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec_ref(&Integer::from(-100)).to_string(),
+    ///     "-100.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::from_integer_min_prec_ref(&Integer::from(-100)).get_prec(),
+    ///     Some(5)
+    /// );
+    /// ```
+    pub fn from_integer_min_prec_ref(x: &Integer) -> Float {
+        let abs = Float::from_natural_min_prec_ref(x.unsigned_abs_ref());
+        if *x >= 0 {
+            abs
+        } else {
+            -abs
+        }
+    }
 }
 
 impl From<Integer> for Float {
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value.
     ///
     /// If the [`Integer`] is nonzero, the precision of the [`Float`] is equal to the [`Integer`]'s
-    /// number of significant bits. If you want to specify a different precision, try
-    /// [`Float::from_integer_prec`]. This may require rounding, which uses [`Nearest`] by default.
-    /// To specify a rounding mode as well as a precision, try [`Float::from_integer_prec_round`].
+    /// number of significant bits. If you instead want to use the minimum possible precision to
+    /// represent the [`Integer`] exactly, try [`Float::from_integer_min_prec`]. If you want to
+    /// specify some other precision, try [`Float::from_integer_prec`]. This may require rounding,
+    /// which uses [`Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_integer_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -312,10 +423,11 @@ impl<'a> From<&'a Integer> for Float {
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference.
     ///
     /// If the [`Integer`] is nonzero, the precision of the [`Float`] is equal to the [`Integer`]'s
-    /// number of significant bits. If you want to specify a different precision, try
-    /// [`Float::from_integer_prec_ref`]. This may require rounding, which uses [`Nearest`] by
-    /// default. To specify a rounding mode as well as a precision, try
-    /// [`Float::from_integer_prec_round_ref`].
+    /// number of significant bits. If you instead want to use the minimum possible precision to
+    /// represent the [`Integer`] exactly, try [`Float::from_integer_min_prec_ref`]. If you want to
+    /// specify some other precision, try [`Float::from_integer_prec_ref`]. This may require
+    /// rounding, which uses [`Nearest`] by default. To specify a rounding mode as well as a
+    /// precision, try [`Float::from_integer_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

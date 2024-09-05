@@ -12,10 +12,12 @@ use core::cmp::{
     max,
     Ordering::{self, *},
 };
+use core::mem::swap;
 use core::ops::{Mul, MulAssign};
-use malachite_base::num::arithmetic::traits::{NegAssign, Sign};
+use malachite_base::num::arithmetic::traits::{CheckedLogBase2, NegAssign, Sign};
+use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_mul::{
     mul_float_significands_in_place, mul_float_significands_in_place_ref,
@@ -23,9 +25,110 @@ use malachite_nz::natural::arithmetic::float_mul::{
 };
 use malachite_q::Rational;
 
-// The non-naive algorithm requires general float division, which we don't have yet.
-pub fn mul_rational_prec_round_naive(
-    x: Float,
+const MUL_RATIONAL_THRESHOLD: u64 = 50;
+
+fn mul_rational_prec_round_assign_naive(
+    x: &mut Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Ordering {
+    assert_ne!(prec, 0);
+    match (&mut *x, y) {
+        (float_nan!(), _) => Equal,
+        (Float(Infinity { sign }), y) => {
+            match y.sign() {
+                Equal => *x = float_nan!(),
+                Greater => {}
+                Less => {
+                    sign.not_assign();
+                }
+            };
+            Equal
+        }
+        (Float(Zero { sign }), y) => {
+            if y < 0 {
+                sign.not_assign();
+            };
+            Equal
+        }
+        (x, y) => {
+            let not_sign = *x < 0;
+            let mut z = Float::ZERO;
+            swap(x, &mut z);
+            let (mut product, o) =
+                Float::from_rational_prec_round(Rational::exact_from(z) * y, prec, rm);
+            if product == 0u32 && not_sign {
+                product.neg_assign();
+            }
+            *x = product;
+            o
+        }
+    }
+}
+
+fn mul_rational_prec_round_assign_naive_ref(
+    x: &mut Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Ordering {
+    assert_ne!(prec, 0);
+    match (&mut *x, y) {
+        (float_nan!(), _) => Equal,
+        (Float(Infinity { sign }), y) => {
+            match y.sign() {
+                Equal => *x = float_nan!(),
+                Greater => {}
+                Less => {
+                    sign.not_assign();
+                }
+            };
+            Equal
+        }
+        (Float(Zero { sign }), y) => {
+            if *y < 0 {
+                sign.not_assign();
+            };
+            Equal
+        }
+        (x, y) => {
+            let not_sign = *x < 0;
+            let mut z = Float::ZERO;
+            swap(x, &mut z);
+            let (mut product, o) =
+                Float::from_rational_prec_round(Rational::exact_from(z) * y, prec, rm);
+            if product == 0u32 && not_sign {
+                product.neg_assign();
+            }
+            *x = product;
+            o
+        }
+    }
+}
+
+pub_test! {mul_rational_prec_round_naive(
+    mut x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let o = mul_rational_prec_round_assign_naive(&mut x, y, prec, rm);
+    (x, o)
+}}
+
+pub_test! {mul_rational_prec_round_naive_val_ref(
+    mut x: Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let o = mul_rational_prec_round_assign_naive_ref(&mut x, y, prec, rm);
+    (x, o)
+}}
+
+pub_test! {mul_rational_prec_round_naive_ref_val(
+    x: &Float,
     y: Rational,
     prec: u64,
     rm: RoundingMode,
@@ -36,29 +139,279 @@ pub fn mul_rational_prec_round_naive(
         (Float(Infinity { sign }), y) => (
             match y.sign() {
                 Equal => float_nan!(),
-                Greater => Float(Infinity { sign }),
-                Less => Float(Infinity { sign: !sign }),
+                Greater => Float(Infinity { sign: *sign }),
+                Less => Float(Infinity { sign: !*sign }),
             },
             Equal,
         ),
         (Float(Zero { sign }), y) => (
             if y >= 0u32 {
-                Float(Zero { sign })
+                Float(Zero { sign: *sign })
             } else {
-                Float(Zero { sign: !sign })
+                Float(Zero { sign: !*sign })
             },
             Equal,
         ),
         (x, y) => {
             let (mut product, o) =
-                Float::from_rational_prec_round(Rational::exact_from(&x) * y, prec, rm);
-            if product == 0u32 && x < 0 {
+                Float::from_rational_prec_round(Rational::exact_from(x) * y, prec, rm);
+            if product == 0u32 && *x < 0 {
                 product.neg_assign();
             }
             (product, o)
         }
     }
+}}
+
+pub_test! {mul_rational_prec_round_naive_ref_ref(
+    x: &Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    match (x, y) {
+        (float_nan!(), _) => (float_nan!(), Equal),
+        (Float(Infinity { sign }), y) => (
+            match y.sign() {
+                Equal => float_nan!(),
+                Greater => Float(Infinity { sign: *sign }),
+                Less => Float(Infinity { sign: !*sign }),
+            },
+            Equal,
+        ),
+        (Float(Zero { sign }), y) => (
+            if *y >= 0u32 {
+                Float(Zero { sign: *sign })
+            } else {
+                Float(Zero { sign: !*sign })
+            },
+            Equal,
+        ),
+        (x, y) => {
+            let (mut product, o) =
+                Float::from_rational_prec_round(Rational::exact_from(x) * y, prec, rm);
+            if product == 0u32 && *x < 0 {
+                product.neg_assign();
+            }
+            (product, o)
+        }
+    }
+}}
+
+fn mul_rational_prec_round_assign_direct(
+    x: &mut Float,
+    y: Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> Ordering {
+    assert_ne!(prec, 0);
+    let sign = y >= 0;
+    let (n, d) = y.into_numerator_and_denominator();
+    if !sign {
+        rm.neg_assign();
+    }
+    let o = match (
+        if n == 0 { None } else { n.checked_log_base_2() },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => {
+            let o = x.set_prec_round(prec, rm);
+            *x <<= log_n;
+            *x >>= log_d;
+            o
+        }
+        (None, Some(log_d)) => {
+            let o = x.mul_prec_round_assign(Float::from_natural_min_prec(n), prec, rm);
+            *x >>= log_d;
+            o
+        }
+        (Some(log_n), None) => {
+            let o = x.div_prec_round_assign(Float::from_natural_min_prec(d), prec, rm);
+            *x <<= log_n;
+            o
+        }
+        (None, None) => {
+            let n = Float::from_natural_min_prec(n);
+            let d = Float::from_natural_min_prec(d);
+            let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
+            x.mul_prec_round_assign(n, mul_prec, Floor);
+            x.div_prec_round_assign(d, prec, rm)
+        }
+    };
+    if sign {
+        o
+    } else {
+        x.neg_assign();
+        o.reverse()
+    }
 }
+
+fn mul_rational_prec_round_assign_direct_ref(
+    x: &mut Float,
+    y: &Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> Ordering {
+    assert_ne!(prec, 0);
+    let sign = *y >= 0;
+    let (n, d) = y.numerator_and_denominator_ref();
+    if !sign {
+        rm.neg_assign();
+    }
+    let o = match (
+        if *n == 0 {
+            None
+        } else {
+            n.checked_log_base_2()
+        },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => {
+            let o = x.set_prec_round(prec, rm);
+            *x <<= log_n;
+            *x >>= log_d;
+            o
+        }
+        (None, Some(log_d)) => {
+            let o = x.mul_prec_round_assign(Float::from_natural_min_prec_ref(n), prec, rm);
+            *x >>= log_d;
+            o
+        }
+        (Some(log_n), None) => {
+            let o = x.div_prec_round_assign(Float::from_natural_min_prec_ref(d), prec, rm);
+            *x <<= log_n;
+            o
+        }
+        (None, None) => {
+            let n = Float::from_natural_min_prec_ref(n);
+            let d = Float::from_natural_min_prec_ref(d);
+            let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
+            x.mul_prec_round_assign(n, mul_prec, Floor);
+            x.div_prec_round_assign(d, prec, rm)
+        }
+    };
+    if sign {
+        o
+    } else {
+        x.neg_assign();
+        o.reverse()
+    }
+}
+
+pub_test! {mul_rational_prec_round_direct(
+    mut x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let o = mul_rational_prec_round_assign_direct(&mut x, y, prec, rm);
+    (x, o)
+}}
+
+pub_test! {mul_rational_prec_round_direct_val_ref(
+    mut x: Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let o = mul_rational_prec_round_assign_direct_ref(&mut x, y, prec, rm);
+    (x, o)
+}}
+
+pub_test! {mul_rational_prec_round_direct_ref_val(
+    x: &Float,
+    y: Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    let sign = y >= 0;
+    let (n, d) = y.into_numerator_and_denominator();
+    if !sign {
+        rm.neg_assign();
+    }
+    let (product, o) = match (
+        if n == 0 { None } else { n.checked_log_base_2() },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => {
+            let (product, o) = Float::from_float_prec_round_ref(x, prec, rm);
+            (product << log_n >> log_d, o)
+        }
+        (None, Some(log_d)) => {
+            let (product, o) = x.mul_prec_round_ref_val(Float::from_natural_min_prec(n), prec, rm);
+            (product >> log_d, o)
+        }
+        (Some(log_n), None) => {
+            let (product, o) = x.div_prec_round_ref_val(Float::from_natural_min_prec(d), prec, rm);
+            (product << log_n, o)
+        }
+        (None, None) => {
+            let n = Float::from_natural_min_prec(n);
+            let d = Float::from_natural_min_prec(d);
+            let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
+            x.mul_prec_round_ref_val(n, mul_prec, Floor)
+                .0
+                .div_prec_round(d, prec, rm)
+        }
+    };
+    if sign {
+        (product, o)
+    } else {
+        (-product, o.reverse())
+    }
+}}
+
+pub_test! {mul_rational_prec_round_direct_ref_ref(
+    x: &Float,
+    y: &Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    let sign = *y >= 0;
+    let (n, d) = y.numerator_and_denominator_ref();
+    if !sign {
+        rm.neg_assign();
+    }
+    let (product, o) = match (
+        if *n == 0 {
+            None
+        } else {
+            n.checked_log_base_2()
+        },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => {
+            let (product, o) = Float::from_float_prec_round_ref(x, prec, rm);
+            (product << log_n >> log_d, o)
+        }
+        (None, Some(log_d)) => {
+            let (product, o) =
+                x.mul_prec_round_ref_val(Float::from_natural_min_prec_ref(n), prec, rm);
+            (product >> log_d, o)
+        }
+        (Some(log_n), None) => {
+            let (product, o) =
+                x.div_prec_round_ref_val(Float::from_natural_min_prec_ref(d), prec, rm);
+            (product << log_n, o)
+        }
+        (None, None) => {
+            let n = Float::from_natural_min_prec_ref(n);
+            let d = Float::from_natural_min_prec_ref(d);
+            let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
+            x.mul_prec_round_ref_val(n, mul_prec, Floor)
+                .0
+                .div_prec_round(d, prec, rm)
+        }
+    };
+    if sign {
+        (product, o)
+    } else {
+        (-product, o.reverse())
+    }
+}}
 
 impl Float {
     /// Multiplies two [`Float`]s, rounding the result to the specified precision and with the
@@ -70,13 +423,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -102,9 +455,9 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -163,13 +516,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -195,9 +548,9 @@ impl Float {
     /// consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -256,13 +609,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -288,9 +641,9 @@ impl Float {
     /// consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -349,13 +702,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -381,9 +734,9 @@ impl Float {
     /// consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -507,10 +860,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -531,9 +884,9 @@ impl Float {
     /// the precisions of the two inputs, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -568,10 +921,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -592,9 +945,9 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -629,10 +982,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -653,9 +1006,9 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -690,10 +1043,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -714,9 +1067,9 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -750,13 +1103,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -823,13 +1176,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -896,13 +1249,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -969,13 +1322,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -1041,13 +1394,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1059,9 +1412,9 @@ impl Float {
     /// consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -1198,13 +1551,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1216,9 +1569,9 @@ impl Float {
     /// true, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -1361,10 +1714,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1375,9 +1728,9 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -1412,10 +1765,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1426,9 +1779,9 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`, and $m$ is `prec`.
@@ -1462,13 +1815,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -1525,13 +1878,13 @@ impl Float {
     /// [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
@@ -1587,13 +1940,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1614,7 +1967,12 @@ impl Float {
     /// using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact multiplication.
@@ -1677,13 +2035,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1704,7 +2062,12 @@ impl Float {
     /// true, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact multiplication.
@@ -1785,13 +2148,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1812,7 +2175,12 @@ impl Float {
     /// true, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact multiplication.
@@ -1880,7 +2248,11 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
-        mul_rational_prec_round_naive(self.clone(), other, prec, rm)
+        if max(self.complexity(), other.significant_bits()) < MUL_RATIONAL_THRESHOLD {
+            mul_rational_prec_round_naive_ref_val(self, other, prec, rm)
+        } else {
+            mul_rational_prec_round_direct_ref_val(self, other, prec, rm)
+        }
     }
 
     /// Multiplies a [`Float`] by a [`Rational`], rounding the result to the specified precision and
@@ -1892,13 +2264,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,p,m) = xy+\epsilon.
+    /// f(x,y,p,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -1919,7 +2291,12 @@ impl Float {
     /// true, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact multiplication.
@@ -1987,7 +2364,11 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
-        mul_rational_prec_round_naive(self.clone(), other.clone(), prec, rm)
+        if max(self.complexity(), other.significant_bits()) < MUL_RATIONAL_THRESHOLD {
+            mul_rational_prec_round_naive_ref_ref(self, other, prec, rm)
+        } else {
+            mul_rational_prec_round_direct_ref_ref(self, other, prec, rm)
+        }
     }
 
     /// Multiplies a [`Float`] by a [`Rational`], rounding the result to the nearest value of the
@@ -2001,10 +2382,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2024,7 +2405,12 @@ impl Float {
     /// precision of the [`Float`] input, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```
@@ -2058,10 +2444,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2081,7 +2467,12 @@ impl Float {
     /// is the precision of the [`Float`] input, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```
@@ -2116,10 +2507,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2139,7 +2530,12 @@ impl Float {
     /// is the precision of the [`Float`] input, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```
@@ -2173,10 +2569,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y,p) = xy+\epsilon.
+    /// f(x,y,p) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2196,7 +2592,12 @@ impl Float {
     /// is the precision of the [`Float`] input, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```
@@ -2230,13 +2631,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2256,7 +2657,9 @@ impl Float {
     /// rounding mode, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2304,13 +2707,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2330,7 +2733,9 @@ impl Float {
     /// `Nearest` rounding mode, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2382,13 +2787,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2408,7 +2813,9 @@ impl Float {
     /// `Nearest` rounding mode, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2460,13 +2867,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = xy+\epsilon.
+    /// f(x,y,m) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
     ///
@@ -2486,7 +2893,9 @@ impl Float {
     /// `Nearest` rounding mode, consider using `*` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2537,13 +2946,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2555,10 +2964,12 @@ impl Float {
     /// true, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(other.significant_bits(),
-    /// prec)`.
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact multiplication.
@@ -2620,9 +3031,11 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
-        let (p, o) = mul_rational_prec_round_naive(self.clone(), other, prec, rm);
-        *self = p;
-        o
+        if max(self.complexity(), other.significant_bits()) < MUL_RATIONAL_THRESHOLD {
+            mul_rational_prec_round_assign_naive(self, other, prec, rm)
+        } else {
+            mul_rational_prec_round_assign_direct(self, other, prec, rm)
+        }
     }
 
     /// Multiplies a [`Float`] by a [`Rational`] in place, rounding the result to the specified
@@ -2634,13 +3047,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$.
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2653,10 +3066,12 @@ impl Float {
     /// using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(other.significant_bits(),
-    /// prec)`.
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact multiplication.
@@ -2718,9 +3133,11 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
-        let (p, o) = mul_rational_prec_round_naive(self.clone(), other.clone(), prec, rm);
-        *self = p;
-        o
+        if max(self.complexity(), other.significant_bits()) < MUL_RATIONAL_THRESHOLD {
+            mul_rational_prec_round_assign_naive_ref(self, other, prec, rm)
+        } else {
+            mul_rational_prec_round_assign_direct_ref(self, other, prec, rm)
+        }
     }
 
     /// Multiplies a [`Float`] by a [`Rational`] in place, rounding the result to the nearest value
@@ -2734,10 +3151,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2748,7 +3165,12 @@ impl Float {
     /// the maximum of the precisions of the two inputs, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```
@@ -2788,10 +3210,10 @@ impl Float {
     /// description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -2802,7 +3224,12 @@ impl Float {
     /// the maximum of the precisions of the two inputs, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```
@@ -2841,13 +3268,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
     ///
@@ -2858,7 +3285,12 @@ impl Float {
     /// rounding mode, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the precision of the input [`Float`] is not high enough to
@@ -2909,13 +3341,13 @@ impl Float {
     /// for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets xy+\epsilon.
+    /// x \gets xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
     ///
@@ -2926,7 +3358,12 @@ impl Float {
     /// rounding mode, consider using `*=` instead.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the precision of the input [`Float`] is not high enough to
@@ -2983,11 +3420,11 @@ impl Mul<Float> for Float {
     /// `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(x,\text{NaN})=f(\pm\infty,\pm0.0)=f(\pm0.0,\pm\infty) = \text{NaN}$
@@ -3056,11 +3493,11 @@ impl<'a> Mul<&'a Float> for Float {
     /// `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(x,\text{NaN})=f(\pm\infty,\pm0.0)=f(\pm0.0,\pm\infty) = \text{NaN}$
@@ -3130,11 +3567,11 @@ impl<'a> Mul<Float> for &'a Float {
     /// `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(x,\text{NaN})=f(\pm\infty,\pm0.0)=f(\pm0.0,\pm\infty) = \text{NaN}$
@@ -3204,11 +3641,11 @@ impl<'a, 'b> Mul<&'a Float> for &'b Float {
     /// `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(x,\text{NaN})=f(\pm\infty,\pm0.0)=f(\pm0.0,\pm\infty) = \text{NaN}$
@@ -3277,11 +3714,11 @@ impl MulAssign<Float> for Float {
     /// `Nearest` rounding mode.
     ///
     /// $$
-    /// x\gets = xy+\epsilon.
+    /// x\gets = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the maximum precision of the inputs.
     ///
     /// See the `*` documentation for information on special cases.
     ///
@@ -3360,11 +3797,11 @@ impl<'a> MulAssign<&'a Float> for Float {
     /// `Nearest` rounding mode.
     ///
     /// $$
-    /// x\gets = xy+\epsilon.
+    /// x\gets = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the maximum precision of the inputs.
     ///
     /// See the `*` documentation for information on special cases.
     ///
@@ -3444,11 +3881,11 @@ impl Mul<Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(\pm\infty,0)=\text{NaN}$
@@ -3467,7 +3904,9 @@ impl Mul<Rational> for Float {
     /// [`Float::mul_rational_prec_round`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3518,11 +3957,11 @@ impl<'a> Mul<&'a Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(\pm\infty,0)=\text{NaN}$
@@ -3541,7 +3980,9 @@ impl<'a> Mul<&'a Rational> for Float {
     /// consider using [`Float::mul_rational_prec_round_val_ref`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3595,11 +4036,11 @@ impl<'a> Mul<Rational> for &'a Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(\pm\infty,0)=\text{NaN}$
@@ -3618,7 +4059,9 @@ impl<'a> Mul<Rational> for &'a Float {
     /// consider using [`Float::mul_rational_prec_round_ref_val`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3671,11 +4114,11 @@ impl<'a, 'b> Mul<&'a Rational> for &'b Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(\text{NaN},x)=f(\pm\infty,0)=\text{NaN}$
@@ -3694,7 +4137,9 @@ impl<'a, 'b> Mul<&'a Rational> for &'b Float {
     /// consider using [`Float::mul_rational_prec_round_ref_ref`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3745,11 +4190,11 @@ impl MulAssign<Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// x\gets = xy+\epsilon.
+    /// x\gets = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// See the `*` documentation for information on special cases.
     ///
@@ -3759,7 +4204,12 @@ impl MulAssign<Rational> for Float {
     /// consider using [`Float::mul_rational_prec_round_assign`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -3808,11 +4258,11 @@ impl<'a> MulAssign<&'a Rational> for Float {
     /// rounding mode.
     ///
     /// $$
-    /// x\gets = xy+\epsilon.
+    /// x\gets = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// See the `*` documentation for information on special cases.
     ///
@@ -3822,7 +4272,12 @@ impl<'a> MulAssign<&'a Rational> for Float {
     /// these things, consider using [`Float::mul_rational_prec_round_assign_ref`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -3873,11 +4328,11 @@ impl Mul<Float> for Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(x,\text{NaN})=f(0,\pm\infty)=\text{NaN}$
@@ -3891,7 +4346,12 @@ impl Mul<Float> for Rational {
     /// - $f(x,-0.0)=0.0$ if $x<0$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -3939,11 +4399,11 @@ impl<'a> Mul<&'a Float> for Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(x,\text{NaN})=f(0,\pm\infty)=\text{NaN}$
@@ -3957,7 +4417,12 @@ impl<'a> Mul<&'a Float> for Rational {
     /// - $f(x,-0.0)=0.0$ if $x<0$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -4008,11 +4473,11 @@ impl<'a> Mul<Float> for &'a Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(x,\text{NaN})=f(0,\pm\infty)=\text{NaN}$
@@ -4026,7 +4491,12 @@ impl<'a> Mul<Float> for &'a Rational {
     /// - $f(x,-0.0)=0.0$ if $x<0$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -4076,11 +4546,11 @@ impl<'a, 'b> Mul<&'a Float> for &'b Rational {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = xy+\epsilon.
+    /// f(x,y) = xy+\varepsilon.
     /// $$
-    /// - If $xy$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $xy$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$, where
-    ///   $p$ is the precision of the input [`Float`].
+    /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
+    ///   where $p$ is the precision of the input [`Float`].
     ///
     /// Special cases:
     /// - $f(x,\text{NaN})=f(0,\pm\infty)=\text{NaN}$
@@ -4094,7 +4564,12 @@ impl<'a, 'b> Mul<&'a Float> for &'b Rational {
     /// - $f(x,-0.0)=0.0$ if $x<0$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

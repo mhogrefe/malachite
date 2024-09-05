@@ -10,6 +10,10 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::conversion::from_rational::{
+    from_rational_prec_round_direct, from_rational_prec_round_ref_direct,
+    from_rational_prec_round_ref_using_div, from_rational_prec_round_using_div,
+};
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
 use malachite_float::test_util::generators::{
     rational_unsigned_rounding_mode_triple_gen_var_1,
@@ -47,6 +51,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_float_from_rational_prec_round_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_float_from_rational_prec_round_algorithms);
+    register_bench!(
+        runner,
+        benchmark_float_from_rational_prec_round_ref_algorithms
     );
     register_bench!(
         runner,
@@ -299,6 +308,62 @@ fn benchmark_float_from_rational_prec_round_evaluation_strategy(
                 "Float::from_rational_prec_ref(&Rational, u64, RoundingMode)",
                 &mut |(n, prec, rm)| no_out!(Float::from_rational_prec_round_ref(&n, prec, rm)),
             ),
+        ],
+    );
+}
+
+fn benchmark_float_from_rational_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::from_rational_prec_round(Rational, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_unsigned_rounding_mode_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_rational_bit_u64_max_bucketer("n", "prec"),
+        &mut [
+            ("default", &mut |(n, prec, rm)| {
+                no_out!(Float::from_rational_prec_round(n, prec, rm))
+            }),
+            ("direct", &mut |(n, prec, rm)| {
+                no_out!(from_rational_prec_round_direct(n, prec, rm))
+            }),
+            ("using div", &mut |(n, prec, rm)| {
+                no_out!(from_rational_prec_round_using_div(n, prec, rm))
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_from_rational_prec_round_ref_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::from_rational_prec_round_ref(&Rational, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_unsigned_rounding_mode_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_rational_bit_u64_max_bucketer("n", "prec"),
+        &mut [
+            ("default", &mut |(n, prec, rm)| {
+                no_out!(Float::from_rational_prec_round_ref(&n, prec, rm))
+            }),
+            ("direct", &mut |(n, prec, rm)| {
+                no_out!(from_rational_prec_round_ref_direct(&n, prec, rm))
+            }),
+            ("using div", &mut |(n, prec, rm)| {
+                no_out!(from_rational_prec_round_ref_using_div(&n, prec, rm))
+            }),
         ],
     );
 }

@@ -13,7 +13,8 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::test_util::generators::{
     signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_gen_var_5,
-    unsigned_pair_gen_var_16, unsigned_pair_gen_var_25, unsigned_signed_unsigned_triple_gen_var_2,
+    unsigned_pair_gen_var_16, unsigned_pair_gen_var_2, unsigned_pair_gen_var_25,
+    unsigned_signed_pair_gen_var_1, unsigned_signed_unsigned_triple_gen_var_2,
     unsigned_triple_gen_var_18,
 };
 use std::panic::catch_unwind;
@@ -100,6 +101,14 @@ fn mod_shl_properties_unsigned_unsigned_helper<
         assert_eq!(T::ZERO.mod_shl(u, m), T::ZERO);
     });
 
+    unsigned_pair_gen_var_2::<T, U>().test_properties(|(n, u)| {
+        assert_panic!(n.mod_shl(u, T::ZERO));
+        assert_panic!({
+            let mut n = n;
+            n.mod_shl_assign(u, T::ZERO);
+        });
+    });
+
     unsigned_gen_var_5::<U>().test_properties(|u| {
         assert_eq!(T::ZERO.mod_shl(u, T::ONE), T::ZERO);
     });
@@ -138,6 +147,14 @@ fn mod_shl_properties_unsigned_signed_helper<
 
     signed_unsigned_pair_gen_var_13::<U, S, T>().test_properties(|(i, m)| {
         assert_eq!(T::ZERO.mod_shl(i, m), T::ZERO);
+    });
+
+    unsigned_signed_pair_gen_var_1::<T, S>().test_properties(|(n, i)| {
+        assert_panic!(n.mod_shl(i, T::ZERO));
+        assert_panic!({
+            let mut n = n;
+            n.mod_shl_assign(i, T::ZERO);
+        });
     });
 
     signed_gen_var_5::<S>().test_properties(|i| {

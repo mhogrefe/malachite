@@ -16,7 +16,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, SignedLimb};
 
 const fn const_limb_significant_bits(x: Limb) -> u64 {
     Limb::WIDTH - (x.leading_zeros() as u64)
@@ -54,22 +54,214 @@ const fn const_i64_convertible_from_limb(value: Limb) -> bool {
 }
 
 impl Float {
-    // TODO test
-    pub const fn const_from_unsigned(x: Limb) -> Float {
+    /// Converts an unsigned primitive integer to a [`Float`], after multiplying it by the specified
+    /// power of 2.
+    ///
+    /// The type of the integer is `u64`, unless the `32_bit_limbs` feature is set, in which case
+    /// the type is `u32`.
+    ///
+    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
+    /// of significant bits.
+    ///
+    /// If you don't need to use this function in a const context, try just using `from` instead,
+    /// followed by `>>` or `<<`.
+    ///
+    /// $$
+    /// f(x,k) = x2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(
+    ///     Float::const_from_unsigned_times_power_of_2(0, 0).to_string(),
+    ///     "0.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_unsigned_times_power_of_2(123, 0).to_string(),
+    ///     "123.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_unsigned_times_power_of_2(123, 1).to_string(),
+    ///     "246.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_unsigned_times_power_of_2(123, -1).to_string(),
+    ///     "61.5"
+    /// );
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// {
+    ///     assert_eq!(
+    ///         Float::const_from_unsigned_times_power_of_2(884279719003555, -48).to_string(),
+    ///         "3.141592653589793"
+    ///     );
+    /// }
+    /// ```
+    pub const fn const_from_unsigned_times_power_of_2(x: Limb, pow: i32) -> Float {
         if x == 0 {
             return Float::ZERO;
         }
         assert!(const_i64_convertible_from_limb(x));
         let bits = const_limb_significant_bits(x);
+        let bits_i32 = bits as i32;
+        let exponent = bits_i32.wrapping_add(pow);
+        if pow >= 0 {
+            assert!(exponent >= bits_i32);
+        } else {
+            assert!(exponent < bits_i32);
+        }
         Float(Finite {
             sign: true,
-            exponent: bits as i32,
+            exponent,
             precision: bits,
             significand: Natural::const_from(
-                // TODO simplify?
                 x << const_u64_neg_mod_power_of_2(bits, Limb::LOG_WIDTH),
             ),
         })
+    }
+
+    /// Converts an unsigned primitive integer to a [`Float`].
+    ///
+    /// The type of the integer is `u64`, unless the `32_bit_limbs` feature is set, in which case
+    /// the type is `u32`.
+    ///
+    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
+    /// of significant bits.
+    ///
+    /// If you don't need to use this function in a const context, try just using `from` instead; it
+    /// will probably be slightly faster.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::const_from_unsigned(0).to_string(), "0.0");
+    /// assert_eq!(Float::const_from_unsigned(123).to_string(), "123.0");
+    /// ```
+    #[inline]
+    pub const fn const_from_unsigned(x: Limb) -> Float {
+        Float::const_from_unsigned_times_power_of_2(x, 0)
+    }
+
+    /// Converts a signed primitive integer to a [`Float`], after multiplying it by the specified
+    /// power of 2.
+    ///
+    /// The type of the integer is `i64`, unless the `32_bit_limbs` feature is set, in which case
+    /// the type is `i32`.
+    ///
+    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
+    /// of significant bits.
+    ///
+    /// If you don't need to use this function in a const context, try just using `from` instead,
+    /// followed by `>>` or `<<`.
+    ///
+    /// $$
+    /// f(x,k) = x2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(0, 0).to_string(),
+    ///     "0.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(123, 0).to_string(),
+    ///     "123.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(123, 1).to_string(),
+    ///     "246.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(123, -1).to_string(),
+    ///     "61.5"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(-123, 0).to_string(),
+    ///     "-123.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(-123, 1).to_string(),
+    ///     "-246.0"
+    /// );
+    /// assert_eq!(
+    ///     Float::const_from_signed_times_power_of_2(-123, -1).to_string(),
+    ///     "-61.5"
+    /// );
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// {
+    ///     assert_eq!(
+    ///         Float::const_from_signed_times_power_of_2(884279719003555, -48).to_string(),
+    ///         "3.141592653589793"
+    ///     );
+    ///     assert_eq!(
+    ///         Float::const_from_signed_times_power_of_2(-884279719003555, -48).to_string(),
+    ///         "-3.141592653589793"
+    ///     );
+    /// }
+    /// ```
+    pub const fn const_from_signed_times_power_of_2(x: SignedLimb, pow: i32) -> Float {
+        if x == 0 {
+            return Float::ZERO;
+        }
+        let x_abs = x.unsigned_abs();
+        assert!(const_i64_convertible_from_limb(x_abs));
+        let bits = const_limb_significant_bits(x_abs);
+        let bits_i32 = bits as i32;
+        let exponent = bits_i32.wrapping_add(pow);
+        if pow >= 0 {
+            assert!(exponent >= bits_i32);
+        } else {
+            assert!(exponent < bits_i32);
+        }
+        Float(Finite {
+            sign: x > 0,
+            exponent,
+            precision: bits,
+            significand: Natural::const_from(
+                x_abs << const_u64_neg_mod_power_of_2(bits, Limb::LOG_WIDTH),
+            ),
+        })
+    }
+
+    /// Converts a signed primitive integer to a [`Float`].
+    ///
+    /// The type of the integer is `i64`, unless the `32_bit_limbs` feature is set, in which case
+    /// the type is `i32`.
+    ///
+    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
+    /// of significant bits.
+    ///
+    /// If you don't need to use this function in a const context, try just using `from` instead; it
+    /// will probably be slightly faster.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::const_from_signed(0).to_string(), "0.0");
+    /// assert_eq!(Float::const_from_signed(123).to_string(), "123.0");
+    /// assert_eq!(Float::const_from_signed(-123).to_string(), "-123.0");
+    /// ```
+    #[inline]
+    pub const fn const_from_signed(x: SignedLimb) -> Float {
+        Float::const_from_signed_times_power_of_2(x, 0)
     }
 
     /// Converts a primitive unsigned integer to a [`Float`]. If the [`Float`] is nonzero, it has
@@ -194,6 +386,9 @@ macro_rules! impl_from_unsigned {
             /// default. To specify a rounding mode as well as a precision, try
             /// [`Float::from_unsigned_prec_round`].
             ///
+            /// If you want to create a [`Float`] from an unsigned primitive integer in a const
+            /// context, try [`Float::const_from_unsigned`] instead.
+            ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
@@ -218,6 +413,9 @@ macro_rules! impl_from_signed {
             /// [`Float::from_signed_prec`]. This may require rounding, which uses `Nearest` by
             /// default. To specify a rounding mode as well as a precision, try
             /// [`Float::from_signed_prec_round`].
+            ///
+            /// If you want to create a [`Float`] from an signed primitive integer in a const
+            /// context, try [`Float::const_from_signed`] instead.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

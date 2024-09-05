@@ -1473,7 +1473,7 @@ pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
             mean_sci_exponent_denominator,
         ),
         range_map: HashMap::new(),
-        ranges: variable_range_generator(seed.fork("ranges")),
+        ranges: VariableRangeGenerator::new(seed.fork("ranges")),
         mean_precision_n: mean_precision_numerator,
         mean_precision_d: mean_precision_denominator,
         phantom: PhantomData,
@@ -2110,7 +2110,7 @@ fn special_random_positive_finite_float_inclusive_range<T: PrimitiveFloat>(
             mean_precision_numerator,
             mean_precision_denominator,
         ),
-        ranges: variable_range_generator(seed.fork("ranges")),
+        ranges: VariableRangeGenerator::new(seed.fork("ranges")),
     }
 }
 
@@ -2470,7 +2470,7 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
 /// Generates unsigneds sampled from ranges. A single generator can sample from different ranges of
 /// different types.
 ///
-/// This `struct` is created by [`variable_range_generator`]; see its documentation for more.
+/// This `struct` is created by [`VariableRangeGenerator::new`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct VariableRangeGenerator {
     xs: RandomPrimitiveInts<u32>,
@@ -2480,6 +2480,36 @@ pub struct VariableRangeGenerator {
 }
 
 impl VariableRangeGenerator {
+    /// Generates unsigneds sampled from ranges. A single generator can sample from different ranges
+    /// of different types.
+    ///
+    /// If you only need to generate values from a single range, it is slightly more efficient to
+    /// use [`random_unsigned_bit_chunks`], [`random_unsigneds_less_than`],
+    /// [`random_unsigned_range`], or [`random_unsigned_inclusive_range`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::random::VariableRangeGenerator;
+    /// use malachite_base::random::EXAMPLE_SEED;
+    ///
+    /// let mut generator = VariableRangeGenerator::new(EXAMPLE_SEED);
+    /// assert_eq!(generator.next_bit_chunk::<u16>(10), 881);
+    /// assert_eq!(generator.next_less_than::<u8>(100), 34);
+    /// assert_eq!(generator.next_in_range::<u32>(10, 20), 16);
+    /// assert_eq!(generator.next_in_inclusive_range::<u64>(10, 20), 14);
+    /// ```
+    pub fn new(seed: Seed) -> VariableRangeGenerator {
+        VariableRangeGenerator {
+            xs: random_primitive_ints(seed),
+            x: 0,
+            in_inner_loop: false,
+            remaining_x_bits: 0,
+        }
+    }
+
     /// Uniformly generates a `bool`.
     ///
     /// $$
@@ -2491,11 +2521,11 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::num::random::VariableRangeGenerator;
     /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
-    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// let mut generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     /// for _ in 0..10 {
     ///     xs.push(generator.next_bool());
     /// }
@@ -2526,11 +2556,11 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::num::random::VariableRangeGenerator;
     /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
-    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// let mut generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     /// for _ in 0..10 {
     ///     xs.push(generator.next_bit_chunk::<u8>(3));
     /// }
@@ -2585,11 +2615,11 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::num::random::VariableRangeGenerator;
     /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
-    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// let mut generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     /// for _ in 0..10 {
     ///     xs.push(generator.next_less_than(10u8));
     /// }
@@ -2630,11 +2660,11 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::num::random::VariableRangeGenerator;
     /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
-    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// let mut generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     /// for _ in 0..10 {
     ///     xs.push(generator.next_in_range(10u8, 20));
     /// }
@@ -2663,11 +2693,11 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::num::random::VariableRangeGenerator;
     /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
-    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// let mut generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     /// for _ in 0..10 {
     ///     xs.push(generator.next_in_inclusive_range(10u8, 19));
     /// }
@@ -2679,36 +2709,6 @@ impl VariableRangeGenerator {
         } else {
             self.next_less_than(b - a + T::ONE) + a
         }
-    }
-}
-
-/// Generates unsigneds sampled from ranges. A single generator can sample from different ranges of
-/// different types.
-///
-/// If you only need to generate values from a single range, it is slightly more efficient to use
-/// [`random_unsigned_bit_chunks`], [`random_unsigneds_less_than`], [`random_unsigned_range`], or
-/// [`random_unsigned_inclusive_range`].
-///
-/// # Worst-case complexity
-/// Constant time and additional memory.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::random::variable_range_generator;
-/// use malachite_base::random::EXAMPLE_SEED;
-///
-/// let mut generator = variable_range_generator(EXAMPLE_SEED);
-/// assert_eq!(generator.next_bit_chunk::<u16>(10), 881);
-/// assert_eq!(generator.next_less_than::<u8>(100), 34);
-/// assert_eq!(generator.next_in_range::<u32>(10, 20), 16);
-/// assert_eq!(generator.next_in_inclusive_range::<u64>(10, 20), 14);
-/// ```
-pub fn variable_range_generator(seed: Seed) -> VariableRangeGenerator {
-    VariableRangeGenerator {
-        xs: random_primitive_ints(seed),
-        x: 0,
-        in_inner_loop: false,
-        remaining_x_bits: 0,
     }
 }
 

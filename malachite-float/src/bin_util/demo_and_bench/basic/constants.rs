@@ -102,7 +102,7 @@ fn benchmark_float_one_prec_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Float.one_prec()",
+        "Float.one_prec(u64)",
         BenchmarkType::LibraryComparison,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
@@ -125,7 +125,7 @@ fn benchmark_float_two_prec_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Float.two_prec()",
+        "Float.two_prec(u64)",
         BenchmarkType::LibraryComparison,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
@@ -148,7 +148,7 @@ fn benchmark_float_negative_one_prec_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Float.negative_one_prec()",
+        "Float.negative_one_prec(u64)",
         BenchmarkType::LibraryComparison,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
@@ -171,7 +171,7 @@ fn benchmark_float_one_half_prec_library_comparison(
     file_name: &str,
 ) {
     run_benchmark(
-        "Float.one_half_prec()",
+        "Float.one_half_prec(u64)",
         BenchmarkType::LibraryComparison,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),

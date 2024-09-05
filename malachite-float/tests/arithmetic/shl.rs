@@ -365,6 +365,7 @@ where
         }
         assert_eq!(ComparableFloat(-&n << u), ComparableFloat(-(&n << u)));
 
+        assert_eq!(ComparableFloatRef(&(&n << u >> u)), ComparableFloatRef(&n));
         assert_eq!(
             ComparableFloat(&n << u),
             ComparableFloat(n * Float::power_of_2(u64::exact_from(u)))
@@ -438,6 +439,7 @@ where
             assert_eq!(ComparableFloat(&n << neg_i), ComparableFloat(&n >> i));
         }
 
+        assert_eq!(ComparableFloatRef(&(&n << i >> i)), ComparableFloatRef(&n));
         assert_eq!(
             ComparableFloat(&n << i),
             ComparableFloat(n * Float::power_of_2(i64::exact_from(i)))

@@ -107,8 +107,8 @@ use malachite_base::num::random::geometric::{
 use malachite_base::num::random::{
     random_natural_signeds, random_positive_unsigneds, random_primitive_ints,
     random_unsigned_bit_chunks, random_unsigned_inclusive_range, random_unsigneds_less_than,
-    special_random_primitive_floats, variable_range_generator, RandomPrimitiveInts,
-    RandomUnsignedBitChunks, RandomUnsignedRange, RandomUnsignedsLessThan, VariableRangeGenerator,
+    special_random_primitive_floats, RandomPrimitiveInts, RandomUnsignedBitChunks,
+    RandomUnsignedRange, RandomUnsignedsLessThan, VariableRangeGenerator,
 };
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::{Seed, EXAMPLE_SEED};
@@ -1647,7 +1647,7 @@ fn random_positive_float_naturals<T: PrimitiveFloat>(
             mean_exponent_numerator,
             mean_exponent_denominator,
         ),
-        ranges: variable_range_generator(seed.fork("mantissas")),
+        ranges: VariableRangeGenerator::new(seed.fork("mantissas")),
         phantom: PhantomData,
     }
 }

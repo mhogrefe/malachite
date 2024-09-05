@@ -15,8 +15,8 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::test_util::generators::{
-    unsigned_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_4,
-    unsigned_quadruple_gen_var_5, unsigned_triple_gen_var_12,
+    unsigned_gen_var_12, unsigned_pair_gen_var_16, unsigned_pair_gen_var_27,
+    unsigned_quadruple_gen_var_4, unsigned_quadruple_gen_var_5, unsigned_triple_gen_var_12,
 };
 use malachite_base::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use std::panic::catch_unwind;
@@ -234,6 +234,14 @@ fn mod_mul_properties_helper<T: PrimitiveUnsigned>() {
             assert_eq!(x.mod_mul(T::ONE, m), x);
             assert_eq!(T::ONE.mod_mul(x, m), x);
         }
+    });
+
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        assert_panic!(x.mod_mul(y, T::ZERO));
+        assert_panic!({
+            let mut x = x;
+            x.mod_mul_assign(y, T::ZERO);
+        });
     });
 
     unsigned_quadruple_gen_var_4::<T>().test_properties(|(x, y, z, m)| {

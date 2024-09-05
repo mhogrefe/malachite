@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::random::geometric::get_geometric_random_signed_from_inclusive_range;
-use malachite_base::num::random::variable_range_generator;
+use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::random::EXAMPLE_SEED;
 
 fn get_geometric_random_signed_from_inclusive_range_helper(
@@ -19,7 +19,7 @@ fn get_geometric_random_signed_from_inclusive_range_helper(
 ) {
     assert_eq!(
         get_geometric_random_signed_from_inclusive_range(
-            &mut variable_range_generator(EXAMPLE_SEED),
+            &mut VariableRangeGenerator::new(EXAMPLE_SEED),
             a,
             b,
             abs_um_numerator,
@@ -47,7 +47,7 @@ fn test_get_geometric_random_signed_from_inclusive_range() {
 #[should_panic]
 fn get_geometric_random_signed_from_inclusive_range_fail_1() {
     get_geometric_random_signed_from_inclusive_range(
-        &mut variable_range_generator(EXAMPLE_SEED),
+        &mut VariableRangeGenerator::new(EXAMPLE_SEED),
         1,
         0,
         1,
@@ -59,7 +59,7 @@ fn get_geometric_random_signed_from_inclusive_range_fail_1() {
 #[should_panic]
 fn get_geometric_random_signed_from_inclusive_range_fail_2() {
     get_geometric_random_signed_from_inclusive_range(
-        &mut variable_range_generator(EXAMPLE_SEED),
+        &mut VariableRangeGenerator::new(EXAMPLE_SEED),
         1,
         2,
         1,
@@ -71,7 +71,7 @@ fn get_geometric_random_signed_from_inclusive_range_fail_2() {
 #[should_panic]
 fn get_geometric_random_signed_from_inclusive_range_fail_3() {
     get_geometric_random_signed_from_inclusive_range(
-        &mut variable_range_generator(EXAMPLE_SEED),
+        &mut VariableRangeGenerator::new(EXAMPLE_SEED),
         1,
         2,
         0,
@@ -83,7 +83,7 @@ fn get_geometric_random_signed_from_inclusive_range_fail_3() {
 #[should_panic]
 fn get_geometric_random_signed_from_inclusive_range_fail_4() {
     get_geometric_random_signed_from_inclusive_range(
-        &mut variable_range_generator(EXAMPLE_SEED),
+        &mut VariableRangeGenerator::new(EXAMPLE_SEED),
         1,
         2,
         1,

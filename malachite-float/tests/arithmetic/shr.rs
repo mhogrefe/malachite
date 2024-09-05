@@ -335,9 +335,10 @@ fn test_shr_signed() {
 fn shr_properties_helper_unsigned<T: PrimitiveUnsigned>()
 where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
-    Float: Shr<T, Output = Float> + ShrAssign<T>,
+    Float: Shl<T, Output = Float> + Shr<T, Output = Float> + ShrAssign<T>,
     for<'a> &'a Float: Shr<T, Output = Float>,
     i64: TryFrom<T>,
+    u64: TryFrom<T>,
 {
     float_unsigned_pair_gen_var_2::<T>().test_properties(|(n, u)| {
         let mut mut_n = n.clone();
@@ -364,9 +365,14 @@ where
         }
         assert_eq!(ComparableFloat(-&n >> u), ComparableFloat(-(&n >> u)));
 
+        assert_eq!(ComparableFloatRef(&(&n >> u << u)), ComparableFloatRef(&n));
         assert_eq!(
             ComparableFloat(&n >> u),
-            ComparableFloat(n * Float::power_of_2(i64::exact_from(u).checked_neg().unwrap()))
+            ComparableFloat(&n * Float::power_of_2(i64::exact_from(u).checked_neg().unwrap()))
+        );
+        assert_eq!(
+            ComparableFloat(&n >> u),
+            ComparableFloat(n / Float::power_of_2(u64::exact_from(u)))
         );
     });
 
@@ -433,9 +439,14 @@ where
             assert_eq!(ComparableFloat(&n >> neg_i), ComparableFloat(&n << i));
         }
 
+        assert_eq!(ComparableFloatRef(&(&n >> i << i)), ComparableFloatRef(&n));
         assert_eq!(
             ComparableFloat(&n >> i),
-            ComparableFloat(n * Float::power_of_2(i64::exact_from(i).checked_neg().unwrap()))
+            ComparableFloat(&n * Float::power_of_2(i64::exact_from(i).checked_neg().unwrap()))
+        );
+        assert_eq!(
+            ComparableFloat(&n >> i),
+            ComparableFloat(n / Float::power_of_2(i64::exact_from(i)))
         );
     });
 

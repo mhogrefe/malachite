@@ -360,6 +360,16 @@ fn test_set_prec_round() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
 
+        let (x_alt, o_alt) = Float::from_float_prec_round(old_x.clone(), prec, rm);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
+        let (x_alt, o_alt) = Float::from_float_prec_round_ref(&old_x, prec, rm);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
         if rm != Exact {
             let mut rug_x = rug::Float::exact_from(&old_x);
             assert_eq!(
@@ -721,25 +731,38 @@ fn set_prec_round_fail() {
 
 #[test]
 fn set_prec_round_properties() {
-    float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(mut x, p, rm)| {
+    float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(mut x, prec, rm)| {
         let old_x = x.clone();
-        let o = x.set_prec_round(p, rm);
+        let o = x.set_prec_round(prec, rm);
         assert!(x.is_valid());
         let final_x = x.clone();
         if x.is_normal() {
-            assert_eq!(x.get_prec(), Some(p));
+            assert_eq!(x.get_prec(), Some(prec));
             assert_eq!(x.partial_cmp(&old_x), Some(o));
         } else {
             assert_eq!(o, Equal);
             assert_eq!(ComparableFloatRef(&old_x), ComparableFloatRef(&x));
         }
 
+        let (x_alt, o_alt) = Float::from_float_prec_round(old_x.clone(), prec, rm);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
+        let (x_alt, o_alt) = Float::from_float_prec_round_ref(&old_x, prec, rm);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
         if rm == Exact {
             assert_eq!(o, Equal);
         } else {
             let mut rug_x = rug::Float::exact_from(&old_x);
             assert_eq!(
-                rug_x.set_prec_round(u32::exact_from(p), rug_round_exact_from_rounding_mode(rm)),
+                rug_x.set_prec_round(
+                    u32::exact_from(prec),
+                    rug_round_exact_from_rounding_mode(rm)
+                ),
                 o
             );
             assert_eq!(
@@ -756,7 +779,7 @@ fn set_prec_round_properties() {
         }
 
         let mut x = -old_x;
-        x.set_prec_round(p, -rm);
+        x.set_prec_round(prec, -rm);
         assert_eq!(ComparableFloat(x), ComparableFloat(-final_x));
     });
 }
@@ -772,6 +795,16 @@ fn test_set_prec() {
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
+
+        let (x_alt, o_alt) = Float::from_float_prec(old_x.clone(), prec);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
+        let (x_alt, o_alt) = Float::from_float_prec_ref(&old_x, prec);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
 
         let mut rug_x = rug::Float::exact_from(&old_x);
         rug_x.set_prec(u32::exact_from(prec));
@@ -833,21 +866,31 @@ fn test_set_prec() {
 
 #[test]
 fn set_prec_properties() {
-    float_unsigned_pair_gen_var_1().test_properties(|(mut x, p)| {
+    float_unsigned_pair_gen_var_1().test_properties(|(mut x, prec)| {
         let old_x = x.clone();
-        let o = x.set_prec(p);
+        let o = x.set_prec(prec);
         let final_x = x.clone();
         assert!(x.is_valid());
         if x.is_normal() {
-            assert_eq!(x.get_prec(), Some(p));
+            assert_eq!(x.get_prec(), Some(prec));
             assert_eq!(x.partial_cmp(&old_x), Some(o));
         } else {
             assert_eq!(o, Equal);
             assert_eq!(ComparableFloatRef(&old_x), ComparableFloatRef(&x));
         }
 
+        let (x_alt, o_alt) = Float::from_float_prec(old_x.clone(), prec);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
+        let (x_alt, o_alt) = Float::from_float_prec_ref(&old_x, prec);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+
         let mut rug_x = rug::Float::exact_from(&old_x);
-        rug_x.set_prec(u32::exact_from(p));
+        rug_x.set_prec(u32::exact_from(prec));
         assert_eq!(
             ComparableFloatRef(&x),
             ComparableFloatRef(&Float::from(&rug_x))
@@ -861,7 +904,7 @@ fn set_prec_properties() {
         }
 
         let mut x = -old_x;
-        x.set_prec(p);
+        x.set_prec(prec);
         assert_eq!(ComparableFloat(x), ComparableFloat(-final_x));
     });
 }

@@ -77,9 +77,13 @@ pub mod factorial;
 #[cfg(feature = "float_helpers")]
 pub mod float_add;
 #[cfg(feature = "float_helpers")]
+pub mod float_div;
+#[cfg(feature = "float_helpers")]
 pub mod float_extras;
 #[cfg(feature = "float_helpers")]
 pub mod float_mul;
+#[cfg(feature = "float_helpers")]
+pub mod float_reciprocal;
 #[cfg(feature = "float_helpers")]
 pub mod float_square;
 #[cfg(feature = "float_helpers")]

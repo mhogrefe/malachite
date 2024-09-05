@@ -1273,7 +1273,6 @@ pub fn random_rational_triple_gen_var_1(config: &GenConfig) -> It<(Rational, Rat
 }
 
 pub fn random_rational_triple_gen_var_2(config: &GenConfig) -> It<(Rational, Rational, Rational)> {
-    // TODO
     Box::new(random_ordered_unique_triples(random_rationals(
         EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),

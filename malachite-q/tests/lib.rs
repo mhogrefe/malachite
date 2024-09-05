@@ -195,5 +195,7 @@ pub mod random {
     pub mod striped_random_non_negative_rationals;
     pub mod striped_random_nonzero_rationals;
     pub mod striped_random_positive_rationals;
+    pub mod striped_random_rational_range_to_infinity;
+    pub mod striped_random_rational_range_to_negative_infinity;
     pub mod striped_random_rationals;
 }

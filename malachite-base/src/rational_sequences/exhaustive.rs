@@ -47,7 +47,7 @@ where
 /// The output length is 1 if the input iterator is empty, and infinite otherwise.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(T^\prime(i) + (\log i)^{1+\epsilon})$ for all $\epsilon > 0$
+/// $T(i) = O(T^\prime(i) + (\log i)^{1+\varepsilon})$ for all $\varepsilon > 0$
 ///
 /// $M(i) = O((\log i) M^\prime(i))$
 ///

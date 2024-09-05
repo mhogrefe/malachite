@@ -290,6 +290,9 @@ pub mod arithmetic;
 pub mod basic;
 /// Traits for comparing [`Float`]s for equality or order.
 pub mod comparison;
+/// Functions that produce [`Float`] approximations of mathematical constants, using a given
+/// precision and rounding mode.
+pub mod constants;
 /// Traits for converting to and from [`Float`]s, including converting [`Float`]s to and from
 /// strings.
 pub mod conversion;

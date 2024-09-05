@@ -8,12 +8,12 @@
 
 use crate::InnerFloat::Finite;
 use crate::{significand_bits, Float};
+use core::cmp::max;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, IsPowerOf2, NegModPowerOf2, RoundToMultipleOfPowerOf2, UnsignedAbs,
+    CheckedLogBase2, IsPowerOf2, NegAssign, NegModPowerOf2, RoundToMultipleOfPowerOf2, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -21,6 +21,186 @@ use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
 use malachite_q::Rational;
+
+pub_test! {from_rational_prec_round_direct(
+    x: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    if let Some(pow) = x.denominator_ref().checked_log_base_2() {
+        let sign = x >= 0;
+        let (y, o) = Float::from_integer_prec_round(
+            Integer::from_sign_and_abs(sign, x.into_numerator()),
+            prec,
+            rm,
+        );
+        (y >> pow, o)
+    } else {
+        let mut exponent = i32::exact_from(x.floor_log_base_2_abs());
+        let (significand, o) =
+            Integer::rounding_from(x << (i32::exact_from(prec) - exponent - 1), rm);
+        let sign = significand >= 0;
+        let mut significand = significand.unsigned_abs();
+        let away_from_0 = if sign { Greater } else { Less };
+        if o == away_from_0 && significand.is_power_of_2() {
+            exponent += 1;
+        }
+        significand <<= significand
+            .significant_bits()
+            .neg_mod_power_of_2(Limb::LOG_WIDTH);
+        let target_bits = prec
+            .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+            .0;
+        let current_bits = significand_bits(&significand);
+        if current_bits > target_bits {
+            significand >>= current_bits - target_bits;
+        }
+        (
+            Float(Finite {
+                sign,
+                exponent: exponent + 1,
+                precision: prec,
+                significand,
+            }),
+            o,
+        )
+    }
+}}
+
+pub_test! {from_rational_prec_round_using_div(
+    x: Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> (Float, Ordering) {
+    let sign = x >= 0;
+    if !sign {
+        rm.neg_assign();
+    }
+    let (n, d) = x.into_numerator_and_denominator();
+    let (f, o) = match (
+        if n == 0 { None } else { n.checked_log_base_2() },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => (
+            Float::power_of_2_prec(i64::exact_from(log_n) - i64::exact_from(log_d), prec),
+            Equal,
+        ),
+        (None, Some(log_d)) => {
+            let (f, o) = Float::from_natural_prec_round(n, prec, rm);
+            (f >> log_d, o)
+        }
+        (Some(log_n), None) => {
+            let (f, o) = Float::from_natural_min_prec(d).reciprocal_prec_round(prec, rm);
+            (f << log_n, o)
+        }
+        (None, None) => Float::from_natural_min_prec(n).div_prec_round(
+            Float::from_natural_min_prec(d),
+            prec,
+            rm,
+        ),
+    };
+    if sign {
+        (f, o)
+    } else {
+        (-f, o.reverse())
+    }
+}}
+
+pub fn from_rational_prec_round_ref_direct(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    if let Some(pow) = x.denominator_ref().checked_log_base_2() {
+        let sign = *x >= 0;
+        let (y, o) = Float::from_natural_prec_round_ref(
+            x.numerator_ref(),
+            prec,
+            if sign { rm } else { -rm },
+        );
+        if sign {
+            (y >> pow, o)
+        } else {
+            (-y >> pow, o.reverse())
+        }
+    } else {
+        let mut exponent = i32::exact_from(x.floor_log_base_2_abs());
+        let (significand, o) =
+            Integer::rounding_from(x << (i32::exact_from(prec) - exponent - 1), rm);
+        let sign = significand >= 0;
+        let mut significand = significand.unsigned_abs();
+        let away_from_0 = if sign { Greater } else { Less };
+        if o == away_from_0 && significand.is_power_of_2() {
+            exponent += 1;
+        }
+        significand <<= significand
+            .significant_bits()
+            .neg_mod_power_of_2(Limb::LOG_WIDTH);
+        let target_bits = prec
+            .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+            .0;
+        let current_bits = significand_bits(&significand);
+        if current_bits > target_bits {
+            significand >>= current_bits - target_bits;
+        }
+        (
+            Float(Finite {
+                sign,
+                exponent: exponent + 1,
+                precision: prec,
+                significand,
+            }),
+            o,
+        )
+    }
+}
+
+pub fn from_rational_prec_round_ref_using_div(
+    x: &Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> (Float, Ordering) {
+    let sign = *x >= 0;
+    if !sign {
+        rm.neg_assign();
+    }
+    let (n, d) = x.numerator_and_denominator_ref();
+    let (f, o) = match (
+        if *n == 0 {
+            None
+        } else {
+            n.checked_log_base_2()
+        },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => (
+            Float::power_of_2_prec(i64::exact_from(log_n) - i64::exact_from(log_d), prec),
+            Equal,
+        ),
+        (None, Some(log_d)) => {
+            let (f, o) = Float::from_natural_prec_round_ref(n, prec, rm);
+            (f >> log_d, o)
+        }
+        (Some(log_n), None) => {
+            let (f, o) = Float::from_natural_min_prec_ref(d).reciprocal_prec_round(prec, rm);
+            (f << log_n, o)
+        }
+        (None, None) => Float::from_natural_min_prec_ref(n).div_prec_round(
+            Float::from_natural_min_prec_ref(d),
+            prec,
+            rm,
+        ),
+    };
+    if sign {
+        (f, o)
+    } else {
+        (-f, o.reverse())
+    }
+}
+
+const FROM_RATIONAL_THRESHOLD: u64 = 100;
 
 impl Float {
     /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by value. If the [`Float`]
@@ -76,38 +256,10 @@ impl Float {
     /// ```
     #[inline]
     pub fn from_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        if x == 0 {
-            (Float::ZERO, Equal)
+        if max(x.significant_bits(), prec) < FROM_RATIONAL_THRESHOLD {
+            from_rational_prec_round_direct(x, prec, rm)
         } else {
-            let mut exponent = i32::exact_from(x.floor_log_base_2_abs());
-            let (significand, o) =
-                Integer::rounding_from(x << (i32::exact_from(prec) - exponent - 1), rm);
-            let sign = significand >= 0;
-            let mut significand = significand.unsigned_abs();
-            let away_from_0 = if sign { Greater } else { Less };
-            if o == away_from_0 && significand.is_power_of_2() {
-                exponent += 1;
-            }
-            significand <<= significand
-                .significant_bits()
-                .neg_mod_power_of_2(Limb::LOG_WIDTH);
-            let target_bits = prec
-                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
-                .0;
-            let current_bits = significand_bits(&significand);
-            if current_bits > target_bits {
-                significand >>= current_bits - target_bits;
-            }
-            (
-                Float(Finite {
-                    sign,
-                    exponent: exponent + 1,
-                    precision: prec,
-                    significand,
-                }),
-                o,
-            )
+            from_rational_prec_round_using_div(x, prec, rm)
         }
     }
 
@@ -226,38 +378,10 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Float, Ordering) {
-        assert_ne!(prec, 0);
-        if *x == 0 {
-            (Float::ZERO, Equal)
+        if max(x.significant_bits(), prec) < FROM_RATIONAL_THRESHOLD {
+            from_rational_prec_round_ref_direct(x, prec, rm)
         } else {
-            let mut exponent = i32::exact_from(x.floor_log_base_2_abs());
-            let (significand, o) =
-                Integer::rounding_from(x << (i32::exact_from(prec) - exponent - 1), rm);
-            let sign = significand >= 0;
-            let mut significand = significand.unsigned_abs();
-            let away_from_0 = if sign { Greater } else { Less };
-            if o == away_from_0 && significand.is_power_of_2() {
-                exponent += 1;
-            }
-            significand <<= significand
-                .significant_bits()
-                .neg_mod_power_of_2(Limb::LOG_WIDTH);
-            let target_bits = prec
-                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
-                .0;
-            let current_bits = significand_bits(&significand);
-            if current_bits > target_bits {
-                significand >>= current_bits - target_bits;
-            }
-            (
-                Float(Finite {
-                    sign,
-                    exponent: exponent + 1,
-                    precision: prec,
-                    significand,
-                }),
-                o,
-            )
+            from_rational_prec_round_ref_using_div(x, prec, rm)
         }
     }
 

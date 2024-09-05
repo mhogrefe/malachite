@@ -22,6 +22,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::slices::slice_test_zero;
 
 // This is MPFR_CAN_ROUND from mpfr-impl.h, MPFR 4.2.0.
 pub fn float_can_round(x: &Natural, err0: u64, prec: u64, rm: RoundingMode) -> bool {
@@ -247,5 +248,61 @@ fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
                 }
             }
         }
+    }
+}
+
+// Assuming xs is an approximation of a non-singular number with error at most equal to 2 ^ (EXP(x)
+// - err0) (`err0` bits of x are known) of direction unknown, check if we can round x toward zero
+// with precision prec.
+//
+// This is mpfr_round_p from round_p.c, MPFR 4.2.0.
+pub(crate) fn round_helper_2(xs: &[Limb], err0: i32, prec: u64) -> bool {
+    let len = xs.len();
+    assert!(xs.last().unwrap().get_highest_bit());
+    let mut err = u64::exact_from(len << Limb::LOG_WIDTH);
+    if err0 <= 0 {
+        return false;
+    }
+    let err0 = u64::from(err0.unsigned_abs());
+    if err0 <= prec || prec >= err {
+        return false;
+    }
+    err = min(err, err0);
+    let k = usize::exact_from(prec >> Limb::LOG_WIDTH);
+    let n = usize::exact_from(err >> Limb::LOG_WIDTH) - k;
+    assert!(len > k);
+    // Check first limb
+    let xs = &xs[len - k - n - 1..];
+    let (xs_last, xs_init) = xs[..=n].split_last().unwrap();
+    let mut tmp = *xs_last;
+    let mask = Limb::MAX >> (prec & Limb::WIDTH_MASK);
+    tmp &= mask;
+    if n == 0 {
+        // prec and error are in the same limb
+        let s = Limb::WIDTH - (err & Limb::WIDTH_MASK);
+        assert!(s < Limb::WIDTH);
+        tmp >>= s;
+        tmp != 0 && tmp != mask >> s
+    } else if tmp == 0 {
+        let (xs_head, xs_tail) = xs_init.split_first().unwrap();
+        // Check if all (n - 1) limbs are 0
+        if !slice_test_zero(xs_tail) {
+            return true;
+        }
+        // Check if final error limb is 0
+        let s = Limb::WIDTH - (err & Limb::WIDTH_MASK);
+        s != Limb::WIDTH && *xs_head >> s != 0
+    } else if tmp == mask {
+        let (xs_head, xs_tail) = xs_init.split_first().unwrap();
+        // Check if all (n - 1) limbs are 11111111111111111
+        if xs_tail.iter().any(|&x| x != Limb::MAX) {
+            return true;
+        }
+        // Check if final error limb is 0
+        let s = Limb::WIDTH - (err & Limb::WIDTH_MASK);
+        s != Limb::WIDTH && *xs_head >> s != Limb::MAX >> s
+    } else {
+        // First limb is different from 000000 or 1111111
+        true
     }
 }

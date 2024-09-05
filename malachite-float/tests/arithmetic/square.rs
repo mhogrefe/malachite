@@ -24,7 +24,9 @@ use malachite_base::test_util::generators::{
     unsigned_rounding_mode_pair_gen_var_3,
 };
 use malachite_float::arithmetic::square::square_prec_round_naive;
-use malachite_float::test_util::arithmetic::square::{rug_square, rug_square_round};
+use malachite_float::test_util::arithmetic::square::{
+    rug_square, rug_square_prec, rug_square_prec_round, rug_square_round,
+};
 use malachite_float::test_util::common::{
     emulate_primitive_float_fn, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -62,7 +64,7 @@ fn test_square() {
         assert_eq!(ComparableFloatRef(&square), ComparableFloatRef(&square_alt));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_square(rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&Float::from(&rug_square(&rug::Float::exact_from(&x)))),
             ComparableFloatRef(&square)
         );
 
@@ -294,6 +296,13 @@ fn test_square_prec() {
         let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, Nearest);
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
         assert_eq!(o_alt, o);
+
+        let (rug_square, rug_o) = rug_square_prec(&rug::Float::exact_from(&x), prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_square)),
+            ComparableFloatRef(&square),
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", 1, "NaN", "NaN", Equal);
     test("Infinity", "Infinity", 1, "Infinity", "Infinity", Equal);
@@ -757,7 +766,7 @@ fn test_square_round() {
         assert_eq!(o_alt, o_out);
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_square, rug_o) = rug_square_round(rug::Float::exact_from(&x), rm);
+            let (rug_square, rug_o) = rug_square_round(&rug::Float::exact_from(&x), rm);
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_square)),
                 ComparableFloatRef(&square),
@@ -1438,6 +1447,15 @@ fn test_square_prec_round() {
         let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, rm);
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_square, rug_o) = rug_square_prec_round(&rug::Float::exact_from(&x), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_square)),
+                ComparableFloatRef(&square),
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", 1, Ceiling, "NaN", "NaN", Equal);
@@ -2324,6 +2342,15 @@ fn square_prec_round_properties() {
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
         assert_eq!(o_alt, o);
 
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_square, rug_o) = rug_square_prec_round(&rug::Float::exact_from(&x), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_square)),
+                ComparableFloatRef(&square),
+            );
+            assert_eq!(rug_o, o);
+        }
+
         if !x.is_nan() {
             assert!(square.is_sign_positive());
         }
@@ -2432,6 +2459,13 @@ fn square_prec_properties_helper(x: Float, prec: u64) {
     let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, Nearest);
     assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
     assert_eq!(o_alt, o);
+
+    let (rug_square, rug_o) = rug_square_prec(&rug::Float::exact_from(&x), prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_square)),
+        ComparableFloatRef(&square),
+    );
+    assert_eq!(rug_o, o);
 
     let (square_alt, o_alt) = x.square_prec_round_ref(prec, Nearest);
     assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
@@ -2567,7 +2601,7 @@ fn square_round_properties_helper(x: Float, rm: RoundingMode) {
     }
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-        let (rug_square, rug_o) = rug_square_round(rug::Float::exact_from(&x), rm);
+        let (rug_square, rug_o) = rug_square_round(&rug::Float::exact_from(&x), rm);
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_square)),
             ComparableFloatRef(&square),
@@ -2683,11 +2717,12 @@ fn square_properties_helper_1(x: Float) {
         }
     }
 
-    let rug_square = rug_square(rug::Float::exact_from(&x));
+    let rug_square = rug_square(&rug::Float::exact_from(&x));
     assert_eq!(
         ComparableFloatRef(&Float::from(&rug_square)),
         ComparableFloatRef(&square),
     );
+
     assert_eq!(ComparableFloat((-x).square()), ComparableFloat(square));
 }
 

@@ -9,7 +9,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
-    unsigned_gen_var_1, unsigned_pair_gen_var_16, unsigned_triple_gen_var_12,
+    unsigned_gen, unsigned_gen_var_1, unsigned_pair_gen_var_16, unsigned_triple_gen_var_12,
 };
 use std::panic::catch_unwind;
 
@@ -104,6 +104,10 @@ fn mod_square_properties_helper<T: PrimitiveUnsigned>() {
             x.mod_mul(y, m).mod_square(m),
             x.mod_square(m).mod_mul(y.mod_square(m), m)
         );
+    });
+
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_panic!(x.mod_square(T::ZERO));
     });
 }
 

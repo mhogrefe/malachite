@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Functions for creating a [`Float`](crate::Float) from an infinite iterator of bits.
+pub mod from_bits;
 /// Implementations of the [`From`] trait for converting an
 /// [`Integer`](malachite_nz::integer::Integer) to a [`Float`](crate::Float).
 pub mod from_integer;

@@ -125,9 +125,9 @@ impl Rational {
     /// and the literal value of the string (as parsed by
     /// [`from_sci_string`](Rational::from_sci_string)) is $q$, and the implied scale is $s$
     /// (meaning $s$ digits are provided after the point; if the string is `"123.456"`, then $s$ is
-    /// 3). Then this function computes $\epsilon = b^{-s}/2$ and finds the simplest [`Rational`] in
-    /// the closed interval $[q - \epsilon, q + \epsilon]$. The simplest [`Rational`] is the one
-    /// with minimal denominator; if there are multiple such [`Rational`]s, the one with the
+    /// 3). Then this function computes $\varepsilon = b^{-s}/2$ and finds the simplest [`Rational`]
+    /// in the closed interval $[q - \varepsilon, q + \varepsilon]$. The simplest [`Rational`] is
+    /// the one with minimal denominator; if there are multiple such [`Rational`]s, the one with the
     /// smallest absolute numerator is chosen.
     ///
     /// The following discussion assumes base 10.
@@ -214,8 +214,8 @@ impl Rational {
     /// Here's a more precise description of the function's behavior. Suppose that the literal value
     /// of the string (as parsed by [`from_sci_string`](Rational::from_sci_string)) is $q$, and the
     /// implied scale is $s$ (meaning $s$ digits are provided after the point; if the string is
-    /// `"123.456"`, then $s$ is 3). Then this function computes $\epsilon = 10^{-s}/2$ and finds
-    /// the simplest [`Rational`] in the closed interval $[q - \epsilon, q + \epsilon]$. The
+    /// `"123.456"`, then $s$ is 3). Then this function computes $\varepsilon = 10^{-s}/2$ and finds
+    /// the simplest [`Rational`] in the closed interval $[q - \varepsilon, q + \varepsilon]$. The
     /// simplest [`Rational`] is the one with minimal denominator; if there are multiple such
     /// [`Rational`]s, the one with the smallest absolute numerator is chosen.
     ///

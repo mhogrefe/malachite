@@ -1104,12 +1104,12 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 
 /// Generates random striped [`Natural`]s in the range $[a, b)$.
 ///
-/// The [`Natural`] are generated using a striped bit sequence with mean run length $m$, which is
+/// The [`Natural`]s are generated using a striped bit sequence with mean run length $m$, which is
 /// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
-/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run length
-/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
-/// length.
+/// Because the [`Natural`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
+/// run length.
 ///
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
@@ -1165,9 +1165,9 @@ pub fn striped_random_natural_range(
 /// The [`Natural`]s are generated using a striped bit sequence with mean run length $m$ =
 /// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
-/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run length
-/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
-/// length.
+/// Because the [`Natural`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
+/// run length.
 ///
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
@@ -1228,6 +1228,142 @@ pub fn striped_random_natural_inclusive_range(
     }
 }
 
+/// Generates a random striped [`Natural`] in the range $[a, b)$.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if $a\geq b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::striped::StripedBitSource;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+/// use malachite_nz::natural::random::get_striped_random_natural_from_range;
+/// use malachite_nz::natural::Natural;
+///
+/// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 10, 1);
+/// assert_eq!(
+///     get_striped_random_natural_from_range(
+///         &mut bit_source,
+///         Natural::from(10000u32),
+///         Natural::from(20000u32)
+///     )
+///     .to_binary_string(),
+///     "10011100111111"
+/// );
+/// ```
+#[inline]
+pub fn get_striped_random_natural_from_range(
+    xs: &mut StripedBitSource,
+    a: Natural,
+    b: Natural,
+) -> Natural {
+    assert!(a < b);
+    get_striped_random_natural_from_inclusive_range(xs, a, b - Natural::ONE)
+}
+
+/// Generates a random striped [`Natural`] in the range $[a, b]$.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if $a > b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::striped::StripedBitSource;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+/// use malachite_nz::natural::random::get_striped_random_natural_from_inclusive_range;
+/// use malachite_nz::natural::Natural;
+///
+/// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 10, 1);
+/// assert_eq!(
+///     get_striped_random_natural_from_inclusive_range(
+///         &mut bit_source,
+///         Natural::from(10000u32),
+///         Natural::from(19999u32)
+///     )
+///     .to_binary_string(),
+///     "10011100111111"
+/// );
+/// ```
+#[allow(clippy::needless_pass_by_value)]
+pub fn get_striped_random_natural_from_inclusive_range(
+    xs: &mut StripedBitSource,
+    a: Natural,
+    b: Natural,
+) -> Natural {
+    assert!(a <= b);
+    let diff_bits = (&a ^ &b).significant_bits();
+    let mask = Natural::low_mask(diff_bits);
+    let lo_template = (&a).round_to_multiple_of_power_of_2(diff_bits, Floor).0;
+    let hi_template = &lo_template | mask;
+    if diff_bits == 0 {
+        return lo_template;
+    }
+    let mut lo_template = lo_template.clone();
+    let mut hi_template = hi_template.clone();
+    let mut first = true;
+    let mut previous_forced = true;
+    let mut previous_bit = lo_template.get_bit(diff_bits);
+    for next_bit in (0..diff_bits).rev() {
+        let false_possible;
+        let true_possible;
+        if first {
+            false_possible = true;
+            true_possible = true;
+            lo_template.assign_bit(next_bit, true);
+            hi_template.assign_bit(next_bit, true);
+            first = false;
+        } else {
+            lo_template.assign_bit(next_bit, false);
+            hi_template.assign_bit(next_bit, false);
+            false_possible = ranges_intersect(&lo_template, &hi_template, &a, &b);
+            lo_template.assign_bit(next_bit, true);
+            hi_template.assign_bit(next_bit, true);
+            true_possible = ranges_intersect(&lo_template, &hi_template, &a, &b);
+        }
+        assert!(false_possible || true_possible);
+        let bit = if !false_possible {
+            previous_forced = true;
+            true
+        } else if !true_possible {
+            previous_forced = true;
+            false
+        } else {
+            if previous_forced {
+                xs.end_block();
+                xs.set_previous_bit(previous_bit);
+                previous_forced = false;
+            }
+            xs.next().unwrap()
+        };
+        if !bit {
+            lo_template.assign_bit(next_bit, false);
+            hi_template.assign_bit(next_bit, false);
+        }
+        previous_bit = bit;
+    }
+    lo_template
+}
+
 /// Generates striped random [`Natural`]s greater than or equal to a lower bound.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNaturalRangeToInfinity {
@@ -1265,9 +1401,9 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 /// The [`Natural`]s are generated using a striped bit sequence with mean run length $m$ =
 /// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
-/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run length
-/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
-/// length.
+/// Because the [`Natural`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
+/// run length.
 ///
 /// The output length is infinite.
 ///

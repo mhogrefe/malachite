@@ -215,10 +215,10 @@ impl Float {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `p`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `p` is zero.
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// ```
@@ -259,10 +259,10 @@ impl Float {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `p`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `p` is zero.
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// ```
@@ -303,10 +303,10 @@ impl Float {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `p`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `p` is zero.
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// ```
@@ -347,10 +347,10 @@ impl Float {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `p`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `p` is zero.
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// ```

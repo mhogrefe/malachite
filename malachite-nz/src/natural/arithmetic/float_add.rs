@@ -24,7 +24,6 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
-use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     NegModPowerOf2, OverflowingAddAssign, Parity, PowerOf2, ShrRound, WrappingAddAssign,
 };
@@ -1775,10 +1774,6 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
-                            fail_on_untested_path(
-                                "add_float_significands_same_prec_ge_3w, exp_diff == 0 && \
-                                rm == Nearest && out[0] & shift_bit != 0 && carry",
-                            );
                             x_exp = x_exp.checked_add(1).unwrap();
                             out[last_index] = HIGH_BIT;
                         }
@@ -1788,9 +1783,6 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        fail_on_untested_path(
-                            "exp_diff == 0 && (rm == Ceiling || rm == Up) && carry",
-                        );
                         x_exp = x_exp.checked_add(1).unwrap();
                         out[last_index] = HIGH_BIT;
                     }
@@ -1964,10 +1956,6 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                            fail_on_untested_path(
-                                "add_float_significands_same_prec_ge_3w, exp_diff == 0 && \
-                                rm == Nearest && xs[0] & shift_bit != 0 && carry",
-                            );
                             x_exp = x_exp.checked_add(1).unwrap();
                             xs[last_index] = HIGH_BIT;
                         }
@@ -1977,9 +1965,6 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                        fail_on_untested_path(
-                            "exp_diff == 0 && (rm == Ceiling || rm == Up) && carry",
-                        );
                         x_exp = x_exp.checked_add(1).unwrap();
                         xs[last_index] = HIGH_BIT;
                     }
@@ -2124,10 +2109,6 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                            fail_on_untested_path(
-                                "add_float_significands_same_prec_ge_3w, exp_diff == 0 && \
-                                rm == Nearest && out[0] & shift_bit != 0 && carry",
-                            );
                             x_exp = x_exp.checked_add(1).unwrap();
                             ys[last_index] = HIGH_BIT;
                         }
@@ -2137,9 +2118,6 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                        fail_on_untested_path(
-                            "exp_diff == 0 && (rm == Ceiling || rm == Up) && carry",
-                        );
                         x_exp = x_exp.checked_add(1).unwrap();
                         ys[last_index] = HIGH_BIT;
                     }

@@ -6,29 +6,30 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::named::Named;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_base::test_util::generators::{
-    signed_unsigned_pair_gen_var_20, unsigned_pair_gen_var_32,
+    signed_gen, signed_gen_var_5, signed_pair_gen_var_2, signed_unsigned_pair_gen_var_20,
+    unsigned_gen, unsigned_pair_gen_var_32, unsigned_signed_pair_gen_var_1,
 };
 use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
 use rug::Assign;
-use std::cmp::{
-    max,
-    Ordering::{self, *},
-};
+use std::cmp::max;
+use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
 #[test]
@@ -37,6 +38,8 @@ fn test_from_primitive_int() {
     where
         Float: From<T>,
         rug::Float: Assign<T>,
+        Limb: WrappingFrom<T>,
+        SignedLimb: WrappingFrom<T>,
     {
         let x = Float::from(u);
         assert!(x.is_valid());
@@ -47,11 +50,25 @@ fn test_from_primitive_int() {
         let x = Float::exact_from(&rug_x);
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
+
+        if T::NAME == Limb::NAME {
+            let x_alt = Float::const_from_unsigned(Limb::wrapping_from(u));
+            assert!(x_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        }
+
+        if T::NAME == SignedLimb::NAME {
+            let x_alt = Float::const_from_signed(SignedLimb::wrapping_from(u));
+            assert!(x_alt.is_valid());
+            assert_eq!(ComparableFloat(x_alt), ComparableFloat(x));
+        }
     }
     fn test_helper_ui<T: PrimitiveInt>()
     where
         Float: From<T>,
         rug::Float: Assign<T>,
+        Limb: WrappingFrom<T>,
+        SignedLimb: WrappingFrom<T>,
     {
         test_helper(T::ZERO, "0.0", "0x0.0");
         test_helper(T::ONE, "1.0", "0x1.0#1");
@@ -64,6 +81,8 @@ fn test_from_primitive_int() {
     where
         Float: From<T>,
         rug::Float: Assign<T>,
+        Limb: WrappingFrom<T>,
+        SignedLimb: WrappingFrom<T>,
     {
         test_helper(T::NEGATIVE_ONE, "-1.0", "-0x1.0#1");
         test_helper(T::from(-123i8), "-123.0", "-0x7b.0#7");
@@ -770,6 +789,65 @@ fn from_primitive_int_prec_round_fail() {
     apply_fn_to_signeds!(from_signed_prec_round_fail_helper);
 }
 
+#[test]
+fn test_const_from_unsigned_times_power_of_2() {
+    fn test_helper(u: Limb, pow: i32, out: &str, out_hex: &str) {
+        let x = Float::const_from_unsigned_times_power_of_2(u, pow);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+    }
+    test_helper(0, 0, "0.0", "0x0.0");
+    test_helper(0, 10, "0.0", "0x0.0");
+    test_helper(0, -10, "0.0", "0x0.0");
+    test_helper(1, 0, "1.0", "0x1.0#1");
+    test_helper(1, 10, "1.0e3", "0x4.0E+2#1");
+    test_helper(1, -10, "0.001", "0x0.004#1");
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        test_helper(
+            884279719003555,
+            -48,
+            "3.141592653589793",
+            "0x3.243f6a8885a3#50",
+        );
+    }
+}
+
+#[test]
+fn test_const_from_signed_times_power_of_2() {
+    fn test_helper(u: SignedLimb, pow: i32, out: &str, out_hex: &str) {
+        let x = Float::const_from_signed_times_power_of_2(u, pow);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+    }
+    test_helper(0, 0, "0.0", "0x0.0");
+    test_helper(0, 10, "0.0", "0x0.0");
+    test_helper(0, -10, "0.0", "0x0.0");
+    test_helper(1, 0, "1.0", "0x1.0#1");
+    test_helper(1, 10, "1.0e3", "0x4.0E+2#1");
+    test_helper(1, -10, "0.001", "0x0.004#1");
+    test_helper(-1, 0, "-1.0", "-0x1.0#1");
+    test_helper(-1, 10, "-1.0e3", "-0x4.0E+2#1");
+    test_helper(-1, -10, "-0.001", "-0x0.004#1");
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        test_helper(
+            884279719003555,
+            -48,
+            "3.141592653589793",
+            "0x3.243f6a8885a3#50",
+        );
+        test_helper(
+            -884279719003555,
+            -48,
+            "-3.141592653589793",
+            "-0x3.243f6a8885a3#50",
+        );
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds)]
 fn from_primitive_int_properties_helper_unsigned<T: PrimitiveUnsigned>()
 where
@@ -777,10 +855,21 @@ where
     rug::Float: Assign<T>,
     Natural: From<T> + PartialEq<T>,
     for<'a> T: ExactFrom<&'a Float>,
+    Limb: WrappingFrom<T>,
 {
     unsigned_gen::<T>().test_properties(|n| {
         let float_n = Float::from(n);
         assert!(float_n.is_valid());
+
+        if T::WIDTH == Limb::WIDTH {
+            let n_alt = Float::const_from_unsigned(Limb::wrapping_from(n));
+            assert!(n_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
+
+            let n_alt = Float::const_from_unsigned_times_power_of_2(Limb::wrapping_from(n), 0);
+            assert!(n_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
+        }
 
         let rug_n = rug::Float::with_val(max(1, u32::exact_from(n.significant_bits())), n);
         assert_eq!(
@@ -814,10 +903,21 @@ where
     rug::Float: Assign<T>,
     Integer: From<T> + PartialEq<T>,
     for<'a> T: ExactFrom<&'a Float>,
+    SignedLimb: WrappingFrom<T>,
 {
     signed_gen::<T>().test_properties(|n| {
         let float_n = Float::from(n);
         assert!(float_n.is_valid());
+
+        if T::WIDTH == SignedLimb::WIDTH {
+            let n_alt = Float::const_from_signed(SignedLimb::wrapping_from(n));
+            assert!(n_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
+
+            let n_alt = Float::const_from_signed_times_power_of_2(SignedLimb::wrapping_from(n), 0);
+            assert!(n_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
+        }
 
         let rug_n = rug::Float::with_val(max(1, u32::exact_from(n.significant_bits())), n);
         assert_eq!(
@@ -1094,4 +1194,44 @@ where
 fn from_primitive_int_prec_round_properties() {
     apply_fn_to_unsigneds!(from_primitive_int_prec_round_properties_helper_unsigned);
     apply_fn_to_signeds!(from_primitive_int_prec_round_properties_helper_signed);
+}
+
+#[test]
+fn const_from_unsigned_times_power_of_2_properties() {
+    unsigned_signed_pair_gen_var_1().test_properties(|(n, pow)| {
+        let float_n = Float::const_from_unsigned_times_power_of_2(n, pow);
+        assert!(float_n.is_valid());
+        assert!(float_n >= 0);
+        assert_eq!(
+            ComparableFloat(float_n),
+            ComparableFloat(Float::from(n) << pow)
+        );
+    });
+
+    signed_gen_var_5().test_properties(|pow| {
+        assert_eq!(
+            ComparableFloat(Float::const_from_unsigned_times_power_of_2(1, pow)),
+            ComparableFloat(Float::power_of_2(i64::from(pow)))
+        );
+    });
+}
+
+#[test]
+fn const_from_signed_times_power_of_2_properties() {
+    signed_pair_gen_var_2().test_properties(|(n, pow)| {
+        let float_n = Float::const_from_signed_times_power_of_2(n, pow);
+        assert!(float_n.is_valid());
+        assert_eq!(float_n >= 0, n >= 0);
+        assert_eq!(
+            ComparableFloat(float_n),
+            ComparableFloat(Float::from(n) << pow)
+        );
+    });
+
+    signed_gen_var_5().test_properties(|pow| {
+        assert_eq!(
+            ComparableFloat(Float::const_from_signed_times_power_of_2(1, pow)),
+            ComparableFloat(Float::power_of_2(i64::from(pow)))
+        );
+    });
 }

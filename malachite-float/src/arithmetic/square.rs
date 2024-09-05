@@ -32,13 +32,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,p,m) = x^2+\epsilon.
+    /// f(x,p,m) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x^2|\rfloor-p}$.
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -53,9 +53,9 @@ impl Float {
     /// [`Float::square`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
     /// `prec`.
@@ -109,13 +109,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,p,m) = x^2+\epsilon.
+    /// f(x,p,m) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x^2|\rfloor-p}$.
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -130,9 +130,9 @@ impl Float {
     /// `(&Float).square()`instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
     /// `prec`.
@@ -214,10 +214,10 @@ impl Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,p) = x^2+\epsilon.
+    /// f(x,p) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$.
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -231,9 +231,9 @@ impl Float {
     /// precision of the input, consider using [`Float::square`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
     /// `prec`.
@@ -268,10 +268,10 @@ impl Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,p) = x^2+\epsilon.
+    /// f(x,p) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$.
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -285,9 +285,9 @@ impl Float {
     /// precision of the input, consider using `(&Float).square()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
     /// `prec`.
@@ -320,13 +320,13 @@ impl Float {
     /// description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x^2+\epsilon.
+    /// f(x,y,m) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x^2|\rfloor-p}$, where $p$ is the precision of the input.
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
@@ -384,13 +384,13 @@ impl Float {
     /// description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x^2+\epsilon.
+    /// f(x,y,m) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x^2|\rfloor-p}$, where $p$ is the precision of the input.
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
@@ -448,13 +448,13 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x^2+\epsilon.
+    /// x \gets x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x^2|\rfloor-p}$.
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -466,9 +466,9 @@ impl Float {
     /// [`Float::square_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
     /// `prec`.
@@ -479,15 +479,32 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::PI;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.square_prec_assign(5), Greater);
+    /// assert_eq!(x.square_prec_round_assign(5, Floor), Less);
+    /// assert_eq!(x.to_string(), "9.5");
+    ///
+    /// let mut x = Float::from(PI);
+    /// assert_eq!(x.square_prec_round_assign(5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "10.0");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.square_prec_assign(20), Less);
+    /// assert_eq!(x.square_prec_round_assign(5, Nearest), Greater);
+    /// assert_eq!(x.to_string(), "10.0");
+    ///
+    /// let mut x = Float::from(PI);
+    /// assert_eq!(x.square_prec_round_assign(20, Floor), Less);
+    /// assert_eq!(x.to_string(), "9.8696");
+    ///
+    /// let mut x = Float::from(PI);
+    /// assert_eq!(x.square_prec_round_assign(20, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "9.86961");
+    ///
+    /// let mut x = Float::from(PI);
+    /// assert_eq!(x.square_prec_round_assign(20, Nearest), Less);
     /// assert_eq!(x.to_string(), "9.8696");
     /// ```
     #[inline]
@@ -528,10 +545,10 @@ impl Float {
     /// the `Nearest` rounding mode.
     ///
     /// $$
-    /// x \gets x^2+\epsilon.
+    /// x \gets x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$.
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -542,9 +559,9 @@ impl Float {
     /// precision of the input, consider using [`Float::square`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n + m)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n + m)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
     /// `prec`.
@@ -577,13 +594,13 @@ impl Float {
     /// description of the possible rounding modes.
     ///
     /// $$
-    /// x \gets x^2+\epsilon.
+    /// x \gets x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| < 2^{\lfloor\log_2
-    ///   |x^2|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
@@ -641,10 +658,10 @@ impl Square for Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x^2+\epsilon.
+    /// f(x,y) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
@@ -694,10 +711,10 @@ impl<'a> Square for &'a Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x^2+\epsilon.
+    /// f(x,y) = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
@@ -745,10 +762,10 @@ impl SquareAssign for Float {
     /// rounding mode.
     ///
     /// $$
-    /// x\gets = x^2+\epsilon.
+    /// x\gets = x^2+\varepsilon.
     /// $$
-    /// - If $x^2$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be 0.
-    /// - If $x^2$ is finite and nonzero, then $|\epsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
+    /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
     /// See the [`Float::square`] documentation for information on special cases.

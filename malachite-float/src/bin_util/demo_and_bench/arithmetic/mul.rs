@@ -11,15 +11,25 @@ use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::arithmetic::mul::mul_rational_prec_round_naive;
+use malachite_float::arithmetic::mul::{
+    mul_rational_prec_round_direct, mul_rational_prec_round_direct_ref_ref,
+    mul_rational_prec_round_direct_ref_val, mul_rational_prec_round_direct_val_ref,
+    mul_rational_prec_round_naive, mul_rational_prec_round_naive_ref_ref,
+    mul_rational_prec_round_naive_ref_val, mul_rational_prec_round_naive_val_ref,
+};
 use malachite_float::test_util::arithmetic::mul::{
-    mul_prec_round_naive, rug_mul, rug_mul_rational, rug_mul_rational_round, rug_mul_round,
+    mul_prec_round_naive, rug_mul, rug_mul_prec, rug_mul_prec_round, rug_mul_rational,
+    rug_mul_rational_prec, rug_mul_rational_prec_round, rug_mul_rational_round, rug_mul_round,
 };
 use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_max_complexity_bucketer, pair_2_pair_float_rational_max_complexity_bucketer,
+    pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
+    pair_2_quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer,
     pair_2_triple_1_2_float_max_complexity_bucketer,
-    pair_2_triple_1_2_float_rational_max_complexity_bucketer, pair_float_max_complexity_bucketer,
-    pair_float_rational_max_complexity_bucketer,
+    pair_2_triple_1_2_float_rational_max_complexity_bucketer,
+    pair_2_triple_float_float_primitive_int_max_complexity_bucketer,
+    pair_2_triple_float_rational_primitive_int_max_complexity_bucketer,
+    pair_float_max_complexity_bucketer, pair_float_rational_max_complexity_bucketer,
     quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
     quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer,
     triple_1_2_float_max_complexity_bucketer, triple_1_2_float_rational_max_complexity_bucketer,
@@ -28,12 +38,15 @@ use malachite_float::test_util::bench::bucketers::{
 };
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_16, float_float_rounding_mode_triple_gen_var_16_rm,
-    float_float_unsigned_rounding_mode_quadruple_gen_var_3, float_float_unsigned_triple_gen_var_1,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_3,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_3_rm,
+    float_float_unsigned_triple_gen_var_1, float_float_unsigned_triple_gen_var_1_rm,
     float_pair_gen, float_pair_gen_rm, float_rational_pair_gen, float_rational_pair_gen_rm,
     float_rational_rounding_mode_triple_gen_var_3_rm,
     float_rational_rounding_mode_triple_gen_var_4,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_3,
-    float_rational_unsigned_triple_gen_var_1,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_3_rm,
+    float_rational_unsigned_triple_gen_var_1, float_rational_unsigned_triple_gen_var_1_rm,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 use std::cmp::max;
@@ -149,6 +162,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_mul_algorithms);
     register_bench!(runner, benchmark_float_mul_assign_evaluation_strategy);
     register_bench!(runner, benchmark_float_mul_prec_evaluation_strategy);
+    register_bench!(runner, benchmark_float_mul_prec_library_comparison);
     register_bench!(runner, benchmark_float_mul_prec_algorithms);
     register_bench!(runner, benchmark_float_mul_prec_assign_evaluation_strategy);
     register_bench!(runner, benchmark_float_mul_round_evaluation_strategy);
@@ -156,6 +170,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_mul_round_algorithms);
     register_bench!(runner, benchmark_float_mul_round_assign_evaluation_strategy);
     register_bench!(runner, benchmark_float_mul_prec_round_evaluation_strategy);
+    register_bench!(runner, benchmark_float_mul_prec_round_library_comparison);
     register_bench!(runner, benchmark_float_mul_prec_round_algorithms);
     register_bench!(
         runner,
@@ -174,6 +189,7 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_mul_rational_prec_evaluation_strategy
     );
+    register_bench!(runner, benchmark_float_mul_rational_prec_library_comparison);
     register_bench!(runner, benchmark_float_mul_rational_prec_algorithms);
     register_bench!(
         runner,
@@ -196,7 +212,23 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_mul_rational_prec_round_evaluation_strategy
     );
+    register_bench!(
+        runner,
+        benchmark_float_mul_rational_prec_round_library_comparison
+    );
     register_bench!(runner, benchmark_float_mul_rational_prec_round_algorithms);
+    register_bench!(
+        runner,
+        benchmark_float_mul_rational_prec_round_val_ref_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_float_mul_rational_prec_round_ref_val_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_float_mul_rational_prec_round_ref_ref_algorithms
+    );
     register_bench!(
         runner,
         benchmark_float_mul_rational_prec_round_assign_evaluation_strategy
@@ -1762,8 +1794,8 @@ fn benchmark_float_mul_library_comparison(
         file_name,
         &pair_2_pair_float_max_complexity_bucketer("x", "y"),
         &mut [
-            ("Malachite", &mut |(_, (x, y))| no_out!(x * y)),
-            ("rug", &mut |((x, y), _)| no_out!(rug_mul(x, y))),
+            ("Malachite", &mut |(_, (x, y))| no_out!(&x * &y)),
+            ("rug", &mut |((x, y), _)| no_out!(rug_mul(&x, &y))),
         ],
     );
 }
@@ -1843,6 +1875,31 @@ fn benchmark_float_mul_prec_evaluation_strategy(
                 "(&Float).mul_prec_ref_ref(&Float, u64)",
                 &mut |(x, y, prec)| no_out!(x.mul_prec_ref_ref(&y, prec)),
             ),
+        ],
+    );
+}
+
+fn benchmark_float_mul_prec_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.mul_prec(Float, u64)",
+        BenchmarkType::LibraryComparison,
+        float_float_unsigned_triple_gen_var_1_rm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_triple_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("Malachite", &mut |(_, (x, y, prec))| {
+                no_out!(x.mul_prec_ref_ref(&y, prec))
+            }),
+            ("rug", &mut |((x, y, prec), _)| {
+                no_out!(rug_mul_prec(&x, &y, prec))
+            }),
         ],
     );
 }
@@ -1950,10 +2007,10 @@ fn benchmark_float_mul_round_library_comparison(
         &pair_2_triple_1_2_float_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y, rm))| {
-                no_out!(x.mul_round(y, rm))
+                no_out!(x.mul_round_ref_ref(&y, rm))
             }),
             ("rug", &mut |((x, y, rm), _)| {
-                no_out!(rug_mul_round(x, y, rm))
+                no_out!(rug_mul_round(&x, &y, rm))
             }),
         ],
     );
@@ -2042,6 +2099,31 @@ fn benchmark_float_mul_prec_round_evaluation_strategy(
                 "(&Float).mul_prec_round_ref_ref(&Float, u64, RoundingMode)",
                 &mut |(x, y, prec, rm)| no_out!(x.mul_prec_round_ref_ref(&y, prec, rm)),
             ),
+        ],
+    );
+}
+
+fn benchmark_float_mul_prec_round_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.mul_prec_round(Float, u64, RoundingMode)",
+        BenchmarkType::LibraryComparison,
+        float_float_unsigned_rounding_mode_quadruple_gen_var_3_rm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("Malachite", &mut |(_, (x, y, prec, rm))| {
+                no_out!(x.mul_prec_round_ref_ref(&y, prec, rm))
+            }),
+            ("rug", &mut |((x, y, prec, rm), _)| {
+                no_out!(rug_mul_prec_round(&x, &y, prec, rm))
+            }),
         ],
     );
 }
@@ -2138,8 +2220,8 @@ fn benchmark_float_mul_rational_library_comparison(
         file_name,
         &pair_2_pair_float_rational_max_complexity_bucketer("x", "y"),
         &mut [
-            ("Malachite", &mut |(_, (x, y))| no_out!(x * y)),
-            ("rug", &mut |((x, y), _)| no_out!(rug_mul_rational(x, y))),
+            ("Malachite", &mut |(_, (x, y))| no_out!(&x * &y)),
+            ("rug", &mut |((x, y), _)| no_out!(rug_mul_rational(&x, &y))),
         ],
     );
 }
@@ -2165,6 +2247,11 @@ fn benchmark_float_mul_rational_algorithms(
                 let xsb = x.significant_bits();
                 let ysb = y.significant_bits();
                 no_out!(mul_rational_prec_round_naive(x, y, max(xsb, ysb), Nearest).0)
+            }),
+            ("direct", &mut |(x, y)| {
+                let xsb = x.significant_bits();
+                let ysb = y.significant_bits();
+                no_out!(mul_rational_prec_round_direct(x, y, max(xsb, ysb), Nearest).0)
             }),
         ],
     );
@@ -2231,8 +2318,8 @@ fn benchmark_rational_mul_float_library_comparison(
         file_name,
         &pair_2_pair_float_rational_max_complexity_bucketer("y", "x"),
         &mut [
-            ("Malachite", &mut |(_, (y, x))| no_out!(x * y)),
-            ("rug", &mut |((x, y), _)| no_out!(rug_mul_rational(x, y))),
+            ("Malachite", &mut |(_, (y, x))| no_out!(&x * &y)),
+            ("rug", &mut |((x, y), _)| no_out!(rug_mul_rational(&x, &y))),
         ],
     );
 }
@@ -2272,6 +2359,31 @@ fn benchmark_float_mul_rational_prec_evaluation_strategy(
     );
 }
 
+fn benchmark_float_mul_rational_prec_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.mul_rational_prec(Rational, u64)",
+        BenchmarkType::LibraryComparison,
+        float_rational_unsigned_triple_gen_var_1_rm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_triple_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("Malachite", &mut |(_, (x, y, prec))| {
+                no_out!(x.mul_rational_prec_ref_ref(&y, prec))
+            }),
+            ("rug", &mut |((x, y, prec), _)| {
+                no_out!(rug_mul_rational_prec(&x, &y, prec))
+            }),
+        ],
+    );
+}
+
 fn benchmark_float_mul_rational_prec_algorithms(
     gm: GenMode,
     config: &GenConfig,
@@ -2292,6 +2404,9 @@ fn benchmark_float_mul_rational_prec_algorithms(
             }),
             ("naive", &mut |(x, y, prec)| {
                 no_out!(mul_rational_prec_round_naive(x, y, prec, Nearest))
+            }),
+            ("direct", &mut |(x, y, prec)| {
+                no_out!(mul_rational_prec_round_direct(x, y, prec, Nearest))
             }),
         ],
     );
@@ -2375,10 +2490,10 @@ fn benchmark_float_mul_rational_round_library_comparison(
         &pair_2_triple_1_2_float_rational_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y, rm))| {
-                no_out!(x.mul_rational_round(y, rm))
+                no_out!(x.mul_rational_round_ref_ref(&y, rm))
             }),
             ("rug", &mut |((x, y, rm), _)| {
-                no_out!(rug_mul_rational_round(x, y, rm))
+                no_out!(rug_mul_rational_round(&x, &y, rm))
             }),
         ],
     );
@@ -2405,6 +2520,10 @@ fn benchmark_float_mul_rational_round_algorithms(
             ("naive", &mut |(x, y, rm)| {
                 let ysb = y.significant_bits();
                 mul_rational_prec_round_naive(x, y, ysb, rm);
+            }),
+            ("direct", &mut |(x, y, rm)| {
+                let ysb = y.significant_bits();
+                mul_rational_prec_round_direct(x, y, ysb, rm);
             }),
         ],
     );
@@ -2472,6 +2591,33 @@ fn benchmark_float_mul_rational_prec_round_evaluation_strategy(
     );
 }
 
+fn benchmark_float_mul_rational_prec_round_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.mul_rational_prec_round(Rational, u64, RoundingMode)",
+        BenchmarkType::LibraryComparison,
+        float_rational_unsigned_rounding_mode_quadruple_gen_var_3_rm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer(
+            "x", "y", "prec",
+        ),
+        &mut [
+            ("Malachite", &mut |(_, (x, y, prec, rm))| {
+                no_out!(x.mul_rational_prec_round_ref_ref(&y, prec, rm))
+            }),
+            ("rug", &mut |((x, y, prec, rm), _)| {
+                no_out!(rug_mul_rational_prec_round(&x, &y, prec, rm))
+            }),
+        ],
+    );
+}
+
 fn benchmark_float_mul_rational_prec_round_algorithms(
     gm: GenMode,
     config: &GenConfig,
@@ -2492,6 +2638,93 @@ fn benchmark_float_mul_rational_prec_round_algorithms(
             }),
             ("naive", &mut |(x, y, prec, rm)| {
                 no_out!(mul_rational_prec_round_naive(x, y, prec, rm))
+            }),
+            ("direct", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_direct(x, y, prec, rm))
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_mul_rational_prec_round_val_ref_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.mul_rational_prec_round_val_ref(&Rational, u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        float_rational_unsigned_rounding_mode_quadruple_gen_var_3().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("default", &mut |(x, y, prec, rm)| {
+                no_out!(x.mul_rational_prec_round_val_ref(&y, prec, rm))
+            }),
+            ("naive", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_naive_val_ref(x, &y, prec, rm))
+            }),
+            ("direct", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_direct_val_ref(x, &y, prec, rm))
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_mul_rational_prec_round_ref_val_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&Float).mul_rational_prec_round_ref_val(Rational, u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        float_rational_unsigned_rounding_mode_quadruple_gen_var_3().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("default", &mut |(x, y, prec, rm)| {
+                no_out!(x.mul_rational_prec_round_ref_val(y, prec, rm))
+            }),
+            ("naive", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_naive_ref_val(&x, y, prec, rm))
+            }),
+            ("direct", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_direct_ref_val(&x, y, prec, rm))
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_mul_rational_prec_round_ref_ref_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.mul_rational_prec_round_ref_ref(&Rational, u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        float_rational_unsigned_rounding_mode_quadruple_gen_var_3().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("default", &mut |(x, y, prec, rm)| {
+                no_out!(x.mul_rational_prec_round_ref_ref(&y, prec, rm))
+            }),
+            ("naive", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_naive_ref_ref(&x, &y, prec, rm))
+            }),
+            ("direct", &mut |(x, y, prec, rm)| {
+                no_out!(mul_rational_prec_round_direct_ref_ref(&x, &y, prec, rm))
             }),
         ],
     );

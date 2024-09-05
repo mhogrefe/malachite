@@ -26,7 +26,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 impl Natural {
     /// Calculates the approximate natural logarithm of a nonzero [`Natural`].
     ///
-    /// $f(x) = (1+\epsilon)(\log x)$, where $|\epsilon| < 2^{-52}.$
+    /// $f(x) = (1+\varepsilon)(\log x)$, where $|\varepsilon| < 2^{-52}.$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

@@ -1450,12 +1450,12 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
 /// # Examples
 /// ```
 /// use malachite_base::num::random::geometric::get_geometric_random_signed_from_inclusive_range;
-/// use malachite_base::num::random::variable_range_generator;
+/// use malachite_base::num::random::VariableRangeGenerator;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     get_geometric_random_signed_from_inclusive_range::<i8>(
-///         &mut variable_range_generator(EXAMPLE_SEED),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED),
 ///         -100,
 ///         99,
 ///         30,

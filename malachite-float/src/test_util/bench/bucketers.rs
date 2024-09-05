@@ -113,6 +113,18 @@ pub fn pair_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt>(
     }
 }
 
+pub fn pair_2_pair_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (U, (Float, T))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, z))| {
+            usize::exact_from(max!(x.complexity(), z.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits)"),
+    }
+}
+
 pub fn triple_float_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt>(
     x_name: &'a str,
     y_name: &'a str,
@@ -120,6 +132,21 @@ pub fn triple_float_float_primitive_int_max_complexity_bucketer<'a, T: Primitive
 ) -> Bucketer<'a, (Float, Float, T)> {
     Bucketer {
         bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), z.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.significant_bits)"
+        ),
+    }
+}
+
+pub fn pair_2_triple_float_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (U, (Float, Float, T))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z))| {
             usize::exact_from(max!(x.complexity(), y.complexity(), z.significant_bits()))
         },
         bucketing_label: format!(
@@ -140,6 +167,18 @@ pub fn triple_1_2_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveIn
     }
 }
 
+pub fn pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt, U, V>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (V, (Float, T, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, _))| {
+            usize::exact_from(max!(x.complexity(), y.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
 pub fn quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt, U>(
     x_name: &'a str,
     y_name: &'a str,
@@ -147,6 +186,26 @@ pub fn quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer<'a, T: 
 ) -> Bucketer<'a, (Float, Float, T, U)> {
     Bucketer {
         bucketing_function: &|(x, y, z, _)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), z.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.significant_bits())"
+        ),
+    }
+}
+
+pub fn pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer<
+    'a,
+    T: PrimitiveInt,
+    U,
+    V,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (V, (Float, Float, T, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z, _))| {
             usize::exact_from(max!(x.complexity(), y.complexity(), z.significant_bits()))
         },
         bucketing_label: format!(
@@ -178,6 +237,30 @@ pub fn quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer<
     }
 }
 
+pub fn pair_2_quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer<
+    'a,
+    T: PrimitiveInt,
+    U,
+    V,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (V, (Float, Rational, T, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z, _))| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.significant_bits(), {z_name}.significant_bits())"
+        ),
+    }
+}
+
 pub fn triple_float_rational_primitive_int_max_complexity_bucketer<'a, T: PrimitiveInt>(
     x_name: &'a str,
     y_name: &'a str,
@@ -185,6 +268,29 @@ pub fn triple_float_rational_primitive_int_max_complexity_bucketer<'a, T: Primit
 ) -> Bucketer<'a, (Float, Rational, T)> {
     Bucketer {
         bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.significant_bits(), {z_name}.significant_bits)"
+        ),
+    }
+}
+
+pub fn pair_2_triple_float_rational_primitive_int_max_complexity_bucketer<
+    'a,
+    T: PrimitiveInt,
+    U,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (U, (Float, Rational, T))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z))| {
             usize::exact_from(max!(
                 x.complexity(),
                 y.significant_bits(),
@@ -321,6 +427,16 @@ pub fn pair_float_primitive_float_max_complexity_bucketer<'a, T: PrimitiveFloat>
     }
 }
 
+pub fn max_triple_1_float_complexity_triple_2_bucketer<'a, T>(
+    x_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (Float, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, p, _)| usize::exact_from(max(x.complexity(), *p)),
+        bucketing_label: format!("max({x_name}.complexity(), {p_name})"),
+    }
+}
+
 pub fn pair_2_max_triple_1_float_complexity_triple_2_bucketer<'a, T, U>(
     x_name: &'a str,
     p_name: &'a str,
@@ -328,6 +444,16 @@ pub fn pair_2_max_triple_1_float_complexity_triple_2_bucketer<'a, T, U>(
     Bucketer {
         bucketing_function: &|(_, (x, p, _))| usize::exact_from(max(x.complexity(), *p)),
         bucketing_label: format!("max({x_name}.complexity(), {p_name})"),
+    }
+}
+
+pub fn max_pair_1_complexity_pair_2_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), *y)),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name})"),
     }
 }
 

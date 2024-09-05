@@ -37,7 +37,7 @@ impl<T: Eq> RationalSequence<T> {
     /// nonrepeating part and the second is the repeating part.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n + m^{1+\epsilon})$ for all $\epsilon > 0$
+    /// $T(n, m) = O(n + m^{1+\varepsilon})$ for all $\varepsilon > 0$
     ///
     /// $M(n, m) = O(1)$
     ///
@@ -147,7 +147,7 @@ impl<T: Clone + Eq> RationalSequence<T> {
     /// part and the second is the repeating part.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n + m^{1+\epsilon})$ for all $\epsilon > 0$
+    /// $T(n, m) = O(n + m^{1+\varepsilon})$ for all $\varepsilon > 0$
     ///
     /// $M(n, m) = O(n + m)$
     ///

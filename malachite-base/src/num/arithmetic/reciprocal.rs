@@ -16,15 +16,15 @@ macro_rules! impl_reciprocal {
             /// Takes the reciprocal of a floating-point number.
             ///
             /// $$
-            /// f(x) = 1/x+\epsilon.
+            /// f(x) = 1/x+\varepsilon.
             /// $$
             /// Let $p$ be the precision of the input float (typically 24 for `f32`s and 53 for
             /// `f64`s, unless the float is subnormal).
-            /// - If $1/x$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be
-            ///   0.
-            /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+            /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+            ///   be 0.
+            /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
             ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$.
-            /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| <
+            /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
             ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$.
             ///
             /// If the output has a precision, it is `prec`.
@@ -50,13 +50,13 @@ macro_rules! impl_reciprocal {
         impl ReciprocalAssign for $t {
             /// Takes the reciprocal of a floating-point number, in place.
             ///
-            /// $x \gets 1/x+\epsilon$. Let $p$ be the precision of the input float (typically 24
+            /// $x \gets 1/x+\varepsilon$. Let $p$ be the precision of the input float (typically 24
             /// for `f32`s and 53 for `f64`s, unless the float is subnormal).
-            /// - If $1/x$ is infinite, zero, or `NaN`, $\epsilon$ may be ignored or assumed to be
-            ///   0.
-            /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\epsilon| <
+            /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+            ///   be 0.
+            /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
             ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$.
-            /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\epsilon| <
+            /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
             ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$.
             ///
             /// See the `reciprocal` documentation for information on special cases.

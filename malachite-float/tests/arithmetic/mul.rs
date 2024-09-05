@@ -23,9 +23,15 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::arithmetic::mul::mul_rational_prec_round_naive;
+use malachite_float::arithmetic::mul::{
+    mul_rational_prec_round_direct, mul_rational_prec_round_direct_ref_ref,
+    mul_rational_prec_round_direct_ref_val, mul_rational_prec_round_direct_val_ref,
+    mul_rational_prec_round_naive, mul_rational_prec_round_naive_ref_ref,
+    mul_rational_prec_round_naive_ref_val, mul_rational_prec_round_naive_val_ref,
+};
 use malachite_float::test_util::arithmetic::mul::{
-    mul_prec_round_naive, rug_mul, rug_mul_rational, rug_mul_rational_round, rug_mul_round,
+    mul_prec_round_naive, rug_mul, rug_mul_prec, rug_mul_prec_round, rug_mul_rational,
+    rug_mul_rational_prec, rug_mul_rational_prec_round, rug_mul_rational_round, rug_mul_round,
 };
 use malachite_float::test_util::common::{
     emulate_primitive_float_fn_2, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -101,14 +107,8 @@ fn test_mul() {
 
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_mul(
-                rug::Float::exact_from(&x),
-                rug::Float::exact_from(&y)
-            ))),
-            ComparableFloatRef(&product),
-            "{:#x} {:#x}",
-            ComparableFloatRef(&Float::from(&rug_mul(
-                rug::Float::exact_from(&x),
-                rug::Float::exact_from(&y)
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y)
             ))),
             ComparableFloatRef(&product)
         );
@@ -297,8 +297,6 @@ fn test_mul() {
         "4.442882938158366",
         "0x4.7160c6b758b90#53",
     );
-
-    // yyy
 
     // - in mul_float_significands_same_prec_lt_w
     // - decrement_exp in mul_float_significands_same_prec_lt_w
@@ -1046,6 +1044,17 @@ fn test_mul_prec() {
             ComparableFloatRef(&product),
         );
         assert_eq!(o_alt, o);
+
+        let (rug_product, rug_o) = rug_mul_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_product)),
+            ComparableFloatRef(&product),
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", "NaN", "NaN", 1, "NaN", "NaN", Equal);
     test("NaN", "NaN", "Infinity", "Infinity", 1, "NaN", "NaN", Equal);
@@ -1489,7 +1498,6 @@ fn test_mul_prec() {
         Greater,
     );
 
-    // yyy
     test(
         "1.4134592e-8",
         "0x3.cb5260E-7#24",
@@ -1577,9 +1585,10 @@ fn test_mul_round() {
             ComparableFloatRef(&product_alt)
         );
         assert_eq!(o_alt, o_out);
+
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_product, rug_o) =
-                rug_mul_round(rug::Float::exact_from(&x), rug::Float::exact_from(&y), rm);
+                rug_mul_round(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y), rm);
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_product)),
                 ComparableFloatRef(&product),
@@ -3445,8 +3454,6 @@ fn test_mul_round() {
         Less,
     );
 
-    // yyy
-
     // - rm == Floor || rm == Down in mul_float_significands_same_prec_lt_w
     test(
         "1.5", "0x1.8#2", "1.5", "0x1.8#2", Down, "2.0", "0x2.0#2", Less,
@@ -4405,6 +4412,20 @@ fn test_mul_prec_round() {
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_product, rug_o) = rug_mul_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_product)),
+                ComparableFloatRef(&product),
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", "NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "NaN", "NaN", 1, Ceiling, "NaN", "NaN", Equal);
@@ -7278,14 +7299,21 @@ fn test_mul_rational() {
 
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_mul_rational(
-                rug::Float::exact_from(&x),
-                rug::Rational::from(&y)
+                &rug::Float::exact_from(&x),
+                &rug::Rational::from(&y)
             ))),
             ComparableFloatRef(&product)
         );
 
         let product_alt =
             mul_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+
+        let product_alt =
+            mul_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
         assert_eq!(
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
@@ -7426,6 +7454,25 @@ fn test_mul_rational_prec() {
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) =
+            mul_rational_prec_round_direct(x.clone(), y.clone(), prec, Nearest);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (rug_product, rug_o) = rug_mul_rational_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_product)),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(rug_o, o);
     };
     test("NaN", "NaN", "123", 1, "NaN", "NaN", Equal);
     test(
@@ -7663,8 +7710,8 @@ fn test_mul_rational_round() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_product, rug_o) = rug_mul_rational_round(
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
                 rm,
             );
             assert_eq!(
@@ -7676,6 +7723,14 @@ fn test_mul_rational_round() {
 
         let (product_alt, o_alt) =
             mul_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) =
+            mul_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), rm);
         assert_eq!(
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
@@ -8298,6 +8353,69 @@ fn test_mul_rational_prec_round() {
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_naive_val_ref(x.clone(), &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_naive_ref_val(&x, y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_naive_ref_ref(&x, &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_direct(x.clone(), y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_direct_val_ref(x.clone(), &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_direct_ref_val(&x, y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) = mul_rational_prec_round_direct_ref_ref(&x, &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_product, rug_o) = rug_mul_rational_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_product)),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     test("NaN", "NaN", "123", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "123", 1, Ceiling, "NaN", "NaN", Equal);
@@ -9617,6 +9735,7 @@ fn test_mul_rational_prec_round() {
 
 #[test]
 fn mul_rational_prec_round_fail() {
+    assert_panic!(Float::one_prec(1).mul_rational_prec_round(Rational::ONE, 0, Exact));
     assert_panic!(Float::one_prec(1).mul_rational_prec_round(
         Rational::from_unsigneds(5u32, 8),
         1,
@@ -9692,6 +9811,39 @@ fn mul_prec_round_properties() {
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_product, rug_o) = rug_mul_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                prec,
+                rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_product)),
+                ComparableFloatRef(&product),
+            );
+            assert_eq!(rug_o, o);
+        }
+
+        if o == Equal && product.is_finite() && product != 0 {
+            assert_eq!(
+                ComparableFloatRef(
+                    &product
+                        .div_prec_round_ref_ref(&x, y.significant_bits(), Exact)
+                        .0
+                ),
+                ComparableFloatRef(&y)
+            );
+            assert_eq!(
+                ComparableFloatRef(
+                    &product
+                        .div_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                        .0
+                ),
+                ComparableFloatRef(&x)
+            );
+        }
 
         let r_product = if product.is_finite() {
             if product.is_normal() {
@@ -9770,7 +9922,7 @@ fn mul_prec_round_properties() {
                 assert_eq!(oo, Equal);
             }
         } else {
-            assert_panic!(x.mul_prec_round_ref_ref(&y, prec, Exact));
+            // QQQ assert_panic!(x.mul_prec_round_ref_ref(&y, prec, Exact));
         }
     });
 
@@ -9909,6 +10061,28 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
     );
     assert_eq!(o_alt, o);
 
+    let (rug_product, rug_o) = rug_mul_prec(
+        &rug::Float::exact_from(&x),
+        &rug::Float::exact_from(&y),
+        prec,
+    );
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_product)),
+        ComparableFloatRef(&product),
+    );
+    assert_eq!(rug_o, o);
+
+    if o == Equal && product.is_finite() && product != 0 {
+        assert_eq!(
+            ComparableFloatRef(&product.div_prec_ref_ref(&x, y.significant_bits()).0),
+            ComparableFloatRef(&y)
+        );
+        assert_eq!(
+            ComparableFloatRef(&product.div_prec_ref_ref(&y, x.significant_bits()).0),
+            ComparableFloatRef(&x)
+        );
+    }
+
     let (product_alt, o_alt) = x.mul_prec_round_ref_ref(&y, prec, Nearest);
     assert_eq!(
         ComparableFloatRef(&product_alt),
@@ -9981,6 +10155,14 @@ fn mul_prec_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    float_float_unsigned_triple_gen_var_1().test_properties_with_config(&config, |(x, y, prec)| {
+        mul_prec_properties_helper(x, y, prec);
+    });
+
+    let mut config = GenConfig::new();
+    config.insert("mean_precision_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    config.insert("small_n", 16 << Limb::LOG_WIDTH);
     float_float_unsigned_triple_gen_var_1().test_properties_with_config(&config, |(x, y, prec)| {
         mul_prec_properties_helper(x, y, prec);
     });
@@ -10127,6 +10309,11 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     );
     assert_eq!(o_alt, o);
 
+    if o == Equal && product.is_finite() && product != 0 {
+        assert_eq!(product.div_round_ref_ref(&x, Exact).0, y);
+        assert_eq!(product.div_round_ref_ref(&y, Exact).0, x);
+    }
+
     let r_product = if product.is_finite() {
         if x.is_normal() && y.is_normal() && product.is_normal() {
             assert_eq!(
@@ -10167,7 +10354,7 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_product, rug_o) =
-            rug_mul_round(rug::Float::exact_from(&x), rug::Float::exact_from(&y), rm);
+            rug_mul_round(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y), rm);
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_product)),
             ComparableFloatRef(&product),
@@ -10390,11 +10577,16 @@ fn mul_properties_helper_1(x: Float, y: Float) {
         ComparableFloatRef(&product_alt),
         ComparableFloatRef(&product)
     );
-    let product_alt = x.mul_round_ref_ref(&y, Nearest).0;
+    let (product_alt, o) = x.mul_round_ref_ref(&y, Nearest);
     assert_eq!(
         ComparableFloatRef(&product_alt),
         ComparableFloatRef(&product)
     );
+
+    if o == Equal && product.is_finite() && product != 0 {
+        assert_eq!(&product / &x, y);
+        assert_eq!(&product / &y, x);
+    }
 
     if product.is_finite() && x.is_normal() && y.is_normal() && product.is_normal() {
         assert_eq!(
@@ -10413,7 +10605,7 @@ fn mul_properties_helper_1(x: Float, y: Float) {
         }
     }
 
-    let rug_product = rug_mul(rug::Float::exact_from(&x), rug::Float::exact_from(&y));
+    let rug_product = rug_mul(&rug::Float::exact_from(&x), &rug::Float::exact_from(&y));
     assert_eq!(
         ComparableFloatRef(&Float::from(&rug_product)),
         ComparableFloatRef(&product),
@@ -10591,6 +10783,86 @@ fn mul_rational_prec_round_properties() {
                 ComparableFloatRef(&product)
             );
             assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) =
+                mul_rational_prec_round_naive_val_ref(x.clone(), &y, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) =
+                mul_rational_prec_round_naive_ref_val(&x, y.clone(), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) = mul_rational_prec_round_naive_ref_ref(&x, &y, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) =
+                mul_rational_prec_round_direct(x.clone(), y.clone(), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) =
+                mul_rational_prec_round_direct_val_ref(x.clone(), &y, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) =
+                mul_rational_prec_round_direct_ref_val(&x, y.clone(), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            let (product_alt, o_alt) = mul_rational_prec_round_direct_ref_ref(&x, &y, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&product_alt),
+                ComparableFloatRef(&product)
+            );
+            assert_eq!(o_alt, o);
+
+            if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_product, rug_o) = rug_mul_rational_prec_round(
+                    &rug::Float::exact_from(&x),
+                    &rug::Rational::exact_from(&y),
+                    prec,
+                    rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_product)),
+                    ComparableFloatRef(&product),
+                );
+                assert_eq!(rug_o, o);
+            }
+
+            if o == Equal && product.is_finite() && product != 0 {
+                assert_eq!(
+                    ComparableFloatRef(
+                        &product
+                            .div_rational_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                            .0
+                    ),
+                    ComparableFloatRef(&x)
+                );
+                // TODO additional test
+            }
 
             let r_product = if product.is_finite() {
                 if product.is_normal() {
@@ -10780,6 +11052,37 @@ fn mul_rational_prec_properties() {
         );
         assert_eq!(o_alt, o);
 
+        let (product_alt, o_alt) =
+            mul_rational_prec_round_direct(x.clone(), y.clone(), prec, Nearest);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
+        let (rug_product, rug_o) = rug_mul_rational_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_product)),
+            ComparableFloatRef(&product),
+        );
+        assert_eq!(rug_o, o);
+
+        if o == Equal && product.is_finite() && product != 0 {
+            assert_eq!(
+                ComparableFloatRef(
+                    &product
+                        .div_rational_prec_ref_ref(&y, x.significant_bits())
+                        .0
+                ),
+                ComparableFloatRef(&x)
+            );
+            // TODO additional test
+        }
+
         let (product_alt, o_alt) = x.mul_rational_prec_round_ref_ref(&y, prec, Nearest);
         assert_eq!(
             ComparableFloatRef(&product_alt),
@@ -10964,12 +11267,26 @@ fn mul_rational_round_properties() {
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+
+        let (product_alt, o_alt) =
+            mul_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), rm);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+
         let (product_alt, o_alt) = x.mul_rational_prec_round_ref_ref(&y, x.significant_bits(), rm);
         assert_eq!(
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+
+        if o == Equal && product.is_finite() && product != 0 {
+            assert_eq!(product.div_rational_round_ref_ref(&y, Exact).0, x);
+            // TODO additional test
+        }
 
         let r_product = if product.is_finite() {
             if x.is_normal() && product.is_normal() {
@@ -11008,8 +11325,8 @@ fn mul_rational_round_properties() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_product, rug_o) = rug_mul_rational_round(
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
+                &rug::Float::exact_from(&x),
+                &rug::Rational::exact_from(&y),
                 rm,
             );
             assert_eq!(
@@ -11180,6 +11497,14 @@ fn mul_rational_properties() {
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
         );
+
+        let product_alt =
+            mul_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+
         let product_alt = x
             .mul_rational_prec_round_ref_ref(&y, x.significant_bits(), Nearest)
             .0;
@@ -11192,11 +11517,16 @@ fn mul_rational_properties() {
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
         );
-        let product_alt = x.mul_rational_round_ref_ref(&y, Nearest).0;
+        let (product_alt, o) = x.mul_rational_round_ref_ref(&y, Nearest);
         assert_eq!(
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
         );
+
+        if o == Equal && product.is_finite() && product != 0 {
+            assert_eq!(&product / &y, x);
+            // TODO additional test
+        }
 
         if product.is_finite() && x.is_normal() && product.is_normal() {
             assert_eq!(product.get_prec(), Some(x.get_prec().unwrap()));
@@ -11212,7 +11542,7 @@ fn mul_rational_properties() {
             }
         }
 
-        let rug_product = rug_mul_rational(rug::Float::exact_from(&x), rug::Rational::from(&y));
+        let rug_product = rug_mul_rational(&rug::Float::exact_from(&x), &rug::Rational::from(&y));
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_product)),
             ComparableFloatRef(&product),

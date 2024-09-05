@@ -49,9 +49,9 @@ use crate::num::random::{
     special_random_nonzero_finite_primitive_floats,
     special_random_positive_finite_primitive_floats,
     special_random_primitive_float_inclusive_range, special_random_primitive_float_range,
-    special_random_primitive_floats, variable_range_generator, RandomPrimitiveInts,
-    RandomUnsignedBitChunks, RandomUnsignedInclusiveRange, RandomUnsignedRange,
-    SpecialRandomNonzeroFiniteFloats, VariableRangeGenerator,
+    special_random_primitive_floats, RandomPrimitiveInts, RandomUnsignedBitChunks,
+    RandomUnsignedInclusiveRange, RandomUnsignedRange, SpecialRandomNonzeroFiniteFloats,
+    VariableRangeGenerator,
 };
 use crate::random::{Seed, EXAMPLE_SEED};
 use crate::rational_sequences::random::random_rational_sequences;
@@ -224,7 +224,7 @@ fn random_positive_natural_floats<T: PrimitiveFloat>(
             mean_exponent_numerator,
             mean_exponent_denominator,
         ),
-        ranges: variable_range_generator(seed.fork("mantissas")),
+        ranges: VariableRangeGenerator::new(seed.fork("mantissas")),
         phantom: PhantomData,
     }
 }
@@ -3722,7 +3722,7 @@ pub fn random_unsigned_pair_gen_var_21<T: PrimitiveUnsigned>(_config: &GenConfig
             T::WIDTH >> 1,
             1,
         ),
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         phantom: PhantomData,
     })
 }
@@ -3848,7 +3848,7 @@ pub fn random_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>(config: &GenConfig)
             config.get_or("mean_m_n", 4),
             config.get_or("mean_m_d", 1),
         ),
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         ms_to_n_limit: HashMap::new(),
         phantom: PhantomData::<*const T>,
     })
@@ -4371,7 +4371,7 @@ impl Iterator for DigitStringGenerator {
 
 pub fn random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(u8, String)> {
     Box::new(DigitStringGenerator {
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         digit_map: HashMap::new(),
         digit_counts: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("digit_counts"),
@@ -4420,7 +4420,7 @@ impl Iterator for TargetedIntegerFromStringBaseInputs {
 pub fn random_unsigned_string_pair_gen_var_3(config: &GenConfig) -> It<(u8, String)> {
     Box::new(TargetedIntegerFromStringBaseInputs {
         uss: Box::new(DigitStringGenerator {
-            ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+            ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
             digit_map: HashMap::new(),
             digit_counts: geometric_random_unsigned_range(
                 EXAMPLE_SEED.fork("digit_counts"),
@@ -4892,7 +4892,7 @@ pub fn random_string_from_sci_string_options_pair_gen_var_1(
 ) -> It<(String, FromSciStringOptions)> {
     Box::new(SciDigitStringGenerator {
         options: random_from_sci_string_options(EXAMPLE_SEED.fork("options")),
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         digit_map: HashMap::new(),
         digit_counts: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("digit_counts"),
@@ -4927,7 +4927,7 @@ pub fn random_string_from_sci_string_options_pair_gen_var_3(
     Box::new(
         SciDigitStringGenerator {
             options: random_from_sci_string_options(EXAMPLE_SEED.fork("options")),
-            ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+            ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
             digit_map: HashMap::new(),
             digit_counts: geometric_random_unsigned_range(
                 EXAMPLE_SEED.fork("digit_counts"),
@@ -4961,7 +4961,7 @@ pub fn random_string_unsigned_pair_gen_var_1(config: &GenConfig) -> It<(String, 
 pub fn random_string_unsigned_pair_gen_var_2(config: &GenConfig) -> It<(String, u8)> {
     Box::new(
         SciDigitStringGenerator2 {
-            ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+            ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
             digit_map: HashMap::new(),
             digit_counts: geometric_random_unsigned_range(
                 EXAMPLE_SEED.fork("digit_counts"),
@@ -7455,7 +7455,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned, U: Prim
             config.get_or("mean_log_base_n", 4),
             config.get_or("mean_log_base_d", 1),
         ),
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         phantom_t: PhantomData,
         phantom_u: PhantomData,
     })
@@ -7514,7 +7514,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_3<
             config.get_or("mean_digit_count_n", 4),
             config.get_or("mean_digit_count_d", 1),
         ),
-        digits: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        digits: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         phantom: PhantomData,
     })
 }
@@ -7556,7 +7556,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_4<
     _config: &GenConfig,
 ) -> It<(Vec<T>, T)> {
     Box::new(DigitsDesc::<T, U> {
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         phantom_t: PhantomData,
         phantom_u: PhantomData,
     })
@@ -7630,7 +7630,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
             config.get_or("mean_digit_count_n", 4),
             config.get_or("mean_digit_count_d", 1),
         ),
-        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
         phantom: PhantomData,
     })
 }

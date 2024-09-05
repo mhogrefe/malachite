@@ -71,6 +71,26 @@ impl IsPowerOf2 for Float {
     }
 }
 
+pub(crate) fn abs_is_power_of_2(x: &Float) -> bool {
+    match x {
+        Float(Finite { significand, .. }) => {
+            let mut first = true;
+            for x in significand.limbs().rev() {
+                if first {
+                    if x != HIGH_BIT {
+                        return false;
+                    }
+                    first = false;
+                } else if x != 0 {
+                    return false;
+                }
+            }
+            true
+        }
+        _ => false,
+    }
+}
+
 pub(crate) fn float_is_signed_min<T: PrimitiveSigned>(f: &Float) -> bool {
     match f {
         Float(Finite {

@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::random::variable_range_generator;
+use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::random::EXAMPLE_SEED;
 use std::panic::catch_unwind;
 
 fn next_bit_chunk_helper<T: PrimitiveUnsigned>(chunk_size: u64, expected_values: &[T]) {
-    let mut range_generator = variable_range_generator(EXAMPLE_SEED);
+    let mut range_generator = VariableRangeGenerator::new(EXAMPLE_SEED);
     let mut xs = Vec::with_capacity(20);
     for _ in 0..20 {
         xs.push(range_generator.next_bit_chunk::<T>(chunk_size));
@@ -49,11 +49,11 @@ fn test_next_bit_chunk() {
 
 fn next_bit_chunk_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!({
-        let mut range_generator = variable_range_generator(EXAMPLE_SEED);
+        let mut range_generator = VariableRangeGenerator::new(EXAMPLE_SEED);
         range_generator.next_bit_chunk::<T>(0)
     });
     assert_panic!({
-        let mut range_generator = variable_range_generator(EXAMPLE_SEED);
+        let mut range_generator = VariableRangeGenerator::new(EXAMPLE_SEED);
         range_generator.next_bit_chunk::<T>(T::WIDTH + 1)
     });
 }

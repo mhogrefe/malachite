@@ -10,6 +10,10 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_float::conversion::from_rational::{
+    from_rational_prec_round_direct, from_rational_prec_round_ref_direct,
+    from_rational_prec_round_ref_using_div, from_rational_prec_round_using_div,
+};
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
 use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::generators::rational_unsigned_rounding_mode_triple_gen_var_1;
@@ -34,6 +38,30 @@ fn test_from_rational_prec() {
         assert_eq!(o, out_o);
 
         let (x, o) = Float::from_rational_prec_ref(&u, prec);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_direct(u.clone(), prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_direct(&u, prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_using_div(u.clone(), prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_using_div(&u, prec, Nearest);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
@@ -105,6 +133,30 @@ fn test_from_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (x, o) = Float::from_rational_prec_round_ref(&u, prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_direct(u.clone(), prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_using_div(u.clone(), prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_direct(&u, prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_using_div(&u, prec, rm);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
@@ -796,6 +848,38 @@ fn from_rational_prec_properties() {
         assert_eq!(o, o_alt);
         assert_eq!(float_x.partial_cmp(&x), Some(o));
 
+        let (float_x_alt, o_alt) = from_rational_prec_round_direct(x.clone(), prec, Nearest);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_using_div(x.clone(), prec, Nearest);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_ref_direct(&x, prec, Nearest);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_ref_using_div(&x, prec, Nearest);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
         let rug_x = rug::Float::with_val(u32::exact_from(prec), rug::Rational::from(&x));
         assert_eq!(
             ComparableFloatRef(&float_x),
@@ -838,6 +922,38 @@ fn from_rational_prec_round_properties() {
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_direct(x.clone(), prec, rm);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_using_div(x.clone(), prec, rm);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_ref_direct(&x, prec, rm);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
+
+        let (float_x_alt, o_alt) = from_rational_prec_round_ref_using_div(&x, prec, rm);
+        assert!(float_x_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_x_alt),
+            ComparableFloatRef(&float_x)
+        );
+        assert_eq!(o, o_alt);
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_x, rug_o) =

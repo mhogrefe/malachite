@@ -4203,7 +4203,7 @@ fn sub_float_significands_general<'a>(
     }
     let last_out = &mut out[out_len - 1];
     if !goto_end_of_sub && *last_out >> WIDTH_M1 == 0 {
-        // case 1 - epsilon
+        // case 1 - varepsilon
         *last_out = HIGH_BIT;
         add_exp = 1;
     }

@@ -11,6 +11,10 @@ pub mod abs;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;
+/// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
+/// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
+/// [`Float`](super::Float)s.
+pub mod div;
 /// An implementations of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
@@ -22,6 +26,10 @@ pub mod neg;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod power_of_2;
+/// Implementations of [`Reciprocal`](malachite_base::num::arithmetic::traits::Reciprocal) and
+/// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
+/// computing the reciprocal of a number.
+pub mod reciprocal;
 /// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
 ///
 /// # shl
@@ -109,6 +117,7 @@ pub mod shr;
 pub mod sign;
 /// Squaring of [`Float`](super::Float)s.
 pub mod square;
-/// Subtraction of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
-/// [`Rational`](malachite_q::Rational)s.
+/// Subtraction of [`Float`](super::Float)s, of [`Float`](super::Float)s by
+/// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
+/// [`Float`](super::Float)s.
 pub mod sub;

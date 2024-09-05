@@ -14,46 +14,75 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 use rug::float::Round;
-use rug::ops::AddAssignRound;
+use rug::ops::AssignRound;
+use std::cmp::max;
 use std::cmp::Ordering::{self, *};
-use std::ops::AddAssign;
 
-pub fn rug_add_round(x: rug::Float, y: rug::Float, rm: Round) -> (rug::Float, Ordering) {
-    let xsb = rug_float_significant_bits(&x);
-    let ysb = rug_float_significant_bits(&y);
-    let mut sum = x;
-    if sum == 0u32 || xsb < ysb {
-        sum.set_prec(u32::exact_from(ysb));
-    }
-    let o = sum.add_assign_round(y, rm);
+pub fn rug_add_prec_round(
+    x: &rug::Float,
+    y: &rug::Float,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = sum.assign_round(x + y, rm);
     (sum, o)
 }
 
-pub fn rug_add(x: rug::Float, y: rug::Float) -> rug::Float {
-    let xsb = rug_float_significant_bits(&x);
-    let ysb = rug_float_significant_bits(&y);
-    let mut sum = x;
-    if sum == 0u32 || xsb < ysb {
-        sum.set_prec(u32::exact_from(ysb));
-    }
-    sum.add_assign(y);
-    sum
+#[inline]
+pub fn rug_add_round(x: &rug::Float, y: &rug::Float, rm: Round) -> (rug::Float, Ordering) {
+    rug_add_prec_round(
+        x,
+        y,
+        max(rug_float_significant_bits(x), rug_float_significant_bits(y)),
+        rm,
+    )
+}
+
+#[inline]
+pub fn rug_add_prec(x: &rug::Float, y: &rug::Float, prec: u64) -> (rug::Float, Ordering) {
+    rug_add_prec_round(x, y, prec, Round::Nearest)
+}
+
+pub fn rug_add(x: &rug::Float, y: &rug::Float) -> rug::Float {
+    rug_add_prec_round(
+        x,
+        y,
+        max(rug_float_significant_bits(x), rug_float_significant_bits(y)),
+        Round::Nearest,
+    )
+    .0
+}
+
+pub fn rug_add_rational_prec_round(
+    x: &rug::Float,
+    y: &rug::Rational,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = sum.assign_round(x + y, rm);
+    (sum, o)
 }
 
 pub fn rug_add_rational_round(
-    x: rug::Float,
-    y: rug::Rational,
+    x: &rug::Float,
+    y: &rug::Rational,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = x;
-    let o = sum.add_assign_round(y, rm);
-    (sum, o)
+    rug_add_rational_prec_round(x, y, rug_float_significant_bits(x), rm)
 }
 
-pub fn rug_add_rational(x: rug::Float, y: rug::Rational) -> rug::Float {
-    let mut sum = x;
-    sum.add_assign(y);
-    sum
+pub fn rug_add_rational_prec(
+    x: &rug::Float,
+    y: &rug::Rational,
+    prec: u64,
+) -> (rug::Float, Ordering) {
+    rug_add_rational_prec_round(x, y, prec, Round::Nearest)
+}
+
+pub fn rug_add_rational(x: &rug::Float, y: &rug::Rational) -> rug::Float {
+    rug_add_rational_prec_round(x, y, rug_float_significant_bits(x), Round::Nearest).0
 }
 
 pub fn add_prec_round_naive(x: Float, y: Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {

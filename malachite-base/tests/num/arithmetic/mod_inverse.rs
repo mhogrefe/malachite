@@ -10,7 +10,9 @@ use malachite_base::num::arithmetic::mod_inverse::mod_inverse_binary;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::test_util::generators::{unsigned_gen_var_6, unsigned_pair_gen_var_38};
+use malachite_base::test_util::generators::{
+    unsigned_gen, unsigned_gen_var_6, unsigned_pair_gen_var_38,
+};
 use malachite_base::test_util::num::arithmetic::mod_inverse::mod_inverse_euclidean;
 use std::panic::catch_unwind;
 
@@ -73,6 +75,10 @@ fn mod_inverse_properties_helper<
     unsigned_gen_var_6::<U>().test_properties(|m| {
         assert_eq!(U::ONE.mod_inverse(m), Some(U::ONE));
         assert_eq!((m - U::ONE).mod_inverse(m), Some(m - U::ONE));
+    });
+
+    unsigned_gen::<U>().test_properties(|x| {
+        assert_panic!(x.mod_inverse(U::ZERO));
     });
 }
 

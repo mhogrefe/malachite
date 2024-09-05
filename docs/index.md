@@ -3,8 +3,8 @@
 </p>
 
 Malachite is an arbitrary-precision arithmetic library for [Rust](https://www.rust-lang.org/). It
-achieves high performance in part by using algorithms derived from [GMP](https://gmplib.org/) and
-[FLINT](https://www.flintlib.org/).
+achieves high performance in part by using algorithms derived from [GMP](https://gmplib.org/),
+[FLINT](https://www.flintlib.org/), and [MPFR](https://www.mpfr.org/).
 
 ```rust
 use malachite::num::arithmetic::traits::Factorial;
@@ -53,14 +53,14 @@ Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` featu
 To use Malachite, add the following to your project's `Cargo.toml` file:
 ```yaml
 [dependencies.malachite]
-version = "0.4.15"
+version = "0.4.16"
 ```
 
 By default, all of Malachite's features are included, but you can opt out of some of them. For
 example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
 ```yaml
 [dependencies.malachite]
-version = "0.4.15"
+version = "0.4.16"
 default-features = false
 features = [ "naturals_and_integers" ]
 ```

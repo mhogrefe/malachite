@@ -9,8 +9,8 @@
 use crate::integer::Integer;
 use crate::natural::random::{
     get_random_natural_less_than, get_random_natural_with_bits,
-    get_striped_random_natural_with_bits, random_naturals_less_than,
-    striped_random_natural_inclusive_range, RandomNaturalsLessThan,
+    get_striped_random_natural_from_inclusive_range, get_striped_random_natural_with_bits,
+    random_naturals_less_than, striped_random_natural_inclusive_range, RandomNaturalsLessThan,
     StripedRandomNaturalInclusiveRange,
 };
 use crate::natural::Natural;
@@ -811,11 +811,11 @@ pub fn uniform_random_integer_inclusive_range(
 /// ```
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::random::get_uniform_random_integer_in_range;
+/// use malachite_nz::integer::random::get_uniform_random_integer_from_range;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     get_uniform_random_integer_in_range(
+///     get_uniform_random_integer_from_range(
 ///         &mut random_primitive_ints(EXAMPLE_SEED),
 ///         Integer::from(500u32),
 ///         Integer::from(1000u32)
@@ -823,7 +823,7 @@ pub fn uniform_random_integer_inclusive_range(
 ///     869
 /// );
 /// ```
-pub fn get_uniform_random_integer_in_range(
+pub fn get_uniform_random_integer_from_range(
     limbs: &mut RandomPrimitiveInts<u64>,
     a: Integer,
     b: Integer,
@@ -859,11 +859,11 @@ pub fn get_uniform_random_integer_in_range(
 /// ```
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::random::get_uniform_random_integer_in_inclusive_range;
+/// use malachite_nz::integer::random::get_uniform_random_integer_from_inclusive_range;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     get_uniform_random_integer_in_inclusive_range(
+///     get_uniform_random_integer_from_inclusive_range(
 ///         &mut random_primitive_ints(EXAMPLE_SEED),
 ///         Integer::from(500u32),
 ///         Integer::from(1001u32)
@@ -871,13 +871,13 @@ pub fn get_uniform_random_integer_in_range(
 ///     869
 /// );
 /// ```
-pub fn get_uniform_random_integer_in_inclusive_range(
+pub fn get_uniform_random_integer_from_inclusive_range(
     limbs: &mut RandomPrimitiveInts<u64>,
     a: Integer,
     b: Integer,
 ) -> Integer {
     assert!(a <= b);
-    get_uniform_random_integer_in_range(limbs, a, b + Integer::ONE)
+    get_uniform_random_integer_from_range(limbs, a, b + Integer::ONE)
 }
 
 fn signed_significant_bits(a: &Integer) -> (u64, i64) {
@@ -919,15 +919,15 @@ fn signed_max_bit_range(
     }
 }
 
-fn get_random_integer_in_signed_min_bit_range(
+fn get_random_integer_from_signed_min_bit_range(
     limbs: &mut RandomPrimitiveInts<u64>,
     a: Integer,
     unsigned_min_bits: u64,
 ) -> Integer {
     if a >= 0 {
-        get_uniform_random_integer_in_range(limbs, a, Integer::power_of_2(unsigned_min_bits))
+        get_uniform_random_integer_from_range(limbs, a, Integer::power_of_2(unsigned_min_bits))
     } else {
-        get_uniform_random_integer_in_inclusive_range(
+        get_uniform_random_integer_from_inclusive_range(
             limbs,
             a,
             -Integer::power_of_2(unsigned_min_bits - 1),
@@ -935,21 +935,68 @@ fn get_random_integer_in_signed_min_bit_range(
     }
 }
 
-fn get_random_integer_in_signed_max_bit_range(
+fn get_random_integer_from_signed_max_bit_range(
     limbs: &mut RandomPrimitiveInts<u64>,
     a: Integer,
     unsigned_max_bits: u64,
 ) -> Integer {
     if a > 0 {
-        get_uniform_random_integer_in_inclusive_range(
+        get_uniform_random_integer_from_inclusive_range(
             limbs,
             Integer::power_of_2(unsigned_max_bits - 1),
             a,
         )
     } else {
         // also handles a == 0
-        get_uniform_random_integer_in_inclusive_range(
+        get_uniform_random_integer_from_inclusive_range(
             limbs,
+            -Integer::power_of_2(unsigned_max_bits) + Integer::ONE,
+            a,
+        )
+    }
+}
+
+fn get_striped_random_integer_from_signed_min_bit_range(
+    xs: &mut StripedBitSource,
+    range_generator: &mut VariableRangeGenerator,
+    a: Integer,
+    unsigned_min_bits: u64,
+) -> Integer {
+    if a >= 0 {
+        get_striped_random_integer_from_range(
+            xs,
+            range_generator,
+            a,
+            Integer::power_of_2(unsigned_min_bits),
+        )
+    } else {
+        get_striped_random_integer_from_inclusive_range(
+            xs,
+            range_generator,
+            a,
+            -Integer::power_of_2(unsigned_min_bits - 1),
+        )
+    }
+}
+
+fn get_striped_random_integer_from_signed_max_bit_range(
+    xs: &mut StripedBitSource,
+    range_generator: &mut VariableRangeGenerator,
+    a: Integer,
+    unsigned_max_bits: u64,
+) -> Integer {
+    if a > 0 {
+        get_striped_random_integer_from_inclusive_range(
+            xs,
+            range_generator,
+            Integer::power_of_2(unsigned_max_bits - 1),
+            a,
+        )
+    } else {
+        // also handles a == 0
+        get_striped_random_integer_from_inclusive_range(
+            xs,
+            range_generator,
             -Integer::power_of_2(unsigned_max_bits) + Integer::ONE,
             a,
         )
@@ -1059,7 +1106,7 @@ pub fn random_integer_range_to_infinity(
 /// # Examples
 /// ```
 /// use malachite_base::num::random::random_primitive_ints;
-/// use malachite_base::num::random::variable_range_generator;
+/// use malachite_base::num::random::VariableRangeGenerator;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::get_random_integer_from_range_to_infinity;
 /// use malachite_nz::integer::Integer;
@@ -1067,7 +1114,7 @@ pub fn random_integer_range_to_infinity(
 /// assert_eq!(
 ///     get_random_integer_from_range_to_infinity(
 ///         &mut random_primitive_ints(EXAMPLE_SEED.fork("limbs")),
-///         &mut variable_range_generator(EXAMPLE_SEED.fork("rg")),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
 ///         Integer::from(-1000),
 ///         20,
 ///         1
@@ -1091,7 +1138,7 @@ pub fn get_random_integer_from_range_to_infinity(
         mean_bits_denominator,
     );
     if bits == min_bits {
-        get_random_integer_in_signed_min_bit_range(limbs, a, unsigned_min_bits)
+        get_random_integer_from_signed_min_bit_range(limbs, a, unsigned_min_bits)
     } else {
         Integer::from_sign_and_abs(
             bits >= 0,
@@ -1177,7 +1224,7 @@ pub fn random_integer_range_to_negative_infinity(
 /// # Examples
 /// ```
 /// use malachite_base::num::random::random_primitive_ints;
-/// use malachite_base::num::random::variable_range_generator;
+/// use malachite_base::num::random::VariableRangeGenerator;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::get_random_integer_from_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;
@@ -1185,7 +1232,7 @@ pub fn random_integer_range_to_negative_infinity(
 /// assert_eq!(
 ///     get_random_integer_from_range_to_negative_infinity(
 ///         &mut random_primitive_ints(EXAMPLE_SEED.fork("limbs")),
-///         &mut variable_range_generator(EXAMPLE_SEED.fork("rg")),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
 ///         Integer::from(-1000),
 ///         20,
 ///         1
@@ -1209,7 +1256,7 @@ pub fn get_random_integer_from_range_to_negative_infinity(
         mean_bits_denominator,
     );
     if bits == max_bits {
-        get_random_integer_in_signed_max_bit_range(limbs, a, unsigned_max_bits)
+        get_random_integer_from_signed_max_bit_range(limbs, a, unsigned_max_bits)
     } else {
         Integer::from_sign_and_abs(
             bits >= 0,
@@ -1269,7 +1316,7 @@ impl Iterator for RandomIntegerRange {
 /// Generates random [`Integer`]s in the half-open interval $[a, b)$.
 ///
 /// In general, the [`Integer`]s are not generated uniformly; for that, use
-/// [`uniform_random_integer_range`]. Instead, [`Natural`]s with smaller bit lengths are generated
+/// [`uniform_random_integer_range`]. Instead, [`Integer`]s with smaller bit lengths are generated
 /// more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
@@ -1599,6 +1646,123 @@ pub fn striped_random_integer_inclusive_range(
     }
 }
 
+/// Generates a random striped [`Integer`] in the range $[a, b)$.
+///
+/// Because the [`Integer`] is constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.significant_bits(),
+/// b.significant_bits())`.
+///
+/// # Panics
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::striped::StripedBitSource;
+/// use malachite_base::num::random::VariableRangeGenerator;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::get_striped_random_integer_from_range;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     get_striped_random_integer_from_range(
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
+///         Integer::from(-4),
+///         Integer::from(7),
+///     ),
+///     -4
+/// );
+/// ```
+#[inline]
+pub fn get_striped_random_integer_from_range(
+    xs: &mut StripedBitSource,
+    range_generator: &mut VariableRangeGenerator,
+    a: Integer,
+    b: Integer,
+) -> Integer {
+    assert!(a < b);
+    get_striped_random_integer_from_inclusive_range(xs, range_generator, a, b - Integer::ONE)
+}
+
+/// Generates a random striped [`Integer`] in the range $[a, b]$.
+///
+/// Because the [`Integer`] is constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.significant_bits(),
+/// b.significant_bits())`.
+///
+/// # Panics
+/// Panics if $a > b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::striped::StripedBitSource;
+/// use malachite_base::num::random::VariableRangeGenerator;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::get_striped_random_integer_from_inclusive_range;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     get_striped_random_integer_from_inclusive_range(
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
+///         Integer::from(-4),
+///         Integer::from(7),
+///     ),
+///     -4
+/// );
+/// ```
+pub fn get_striped_random_integer_from_inclusive_range(
+    xs: &mut StripedBitSource,
+    range_generator: &mut VariableRangeGenerator,
+    a: Integer,
+    b: Integer,
+) -> Integer {
+    assert!(a <= b);
+    if a >= 0u32 {
+        Integer::from(get_striped_random_natural_from_inclusive_range(
+            xs,
+            a.unsigned_abs(),
+            b.unsigned_abs(),
+        ))
+    } else if b < 0u32 {
+        Integer::from_sign_and_abs(
+            false,
+            get_striped_random_natural_from_inclusive_range(xs, b.unsigned_abs(), a.unsigned_abs()),
+        )
+    } else if range_generator.next_bool() {
+        Integer::from(get_striped_random_natural_from_inclusive_range(
+            xs,
+            Natural::ZERO,
+            b.unsigned_abs(),
+        ))
+    } else {
+        Integer::from_sign_and_abs(
+            false,
+            get_striped_random_natural_from_inclusive_range(xs, Natural::ONE, a.unsigned_abs()),
+        )
+    }
+}
+
 fn striped_signed_min_bit_range(
     seed: Seed,
     a: Integer,
@@ -1761,6 +1925,160 @@ pub fn striped_random_integer_range_to_infinity(
             mean_stripe_numerator,
             mean_stripe_denominator,
         ),
+    }
+}
+
+/// Generates a striped random [`Integer`] greater than or equal to a lower bound $a$.
+///
+/// The mean bit length $m$ of the [`Integer`] is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$, which
+/// is not typical).
+///
+/// Because the [`Integer`] is constrained to be within a certain range, the actual mean run length
+/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
+/// length.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity
+/// $T(n, m) = O(n + m)$
+///
+/// $M(n, m) = O(n / m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
+/// is less than or equal to the bit length of $a$, or if they are too large and manipulating them
+/// leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::striped::StripedBitSource;
+/// use malachite_base::num::random::VariableRangeGenerator;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::get_striped_random_integer_from_range_to_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     get_striped_random_integer_from_range_to_infinity(
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
+///         Integer::from(-1000),
+///         20,
+///         1
+///     ),
+///     -3
+/// );
+/// ```
+pub fn get_striped_random_integer_from_range_to_infinity(
+    xs: &mut StripedBitSource,
+    range_generator: &mut VariableRangeGenerator,
+    a: Integer,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> Integer {
+    let (unsigned_min_bits, min_bits) = signed_significant_bits(&a);
+    let bits = get_geometric_random_signed_from_inclusive_range(
+        range_generator,
+        min_bits,
+        i64::MAX,
+        mean_bits_numerator,
+        mean_bits_denominator,
+    );
+    if bits == min_bits {
+        get_striped_random_integer_from_signed_min_bit_range(
+            xs,
+            range_generator,
+            a,
+            unsigned_min_bits,
+        )
+    } else {
+        Integer::from_sign_and_abs(
+            bits >= 0,
+            get_striped_random_natural_with_bits(xs, bits.unsigned_abs()),
+        )
+    }
+}
+
+/// Generates a striped random [`Integer`] less than or equal to an upper bound $a$.
+///
+/// The mean bit length $m$ of the [`Integer`] is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$, which
+/// is not typical).
+///
+/// Because the [`Integer`] is constrained to be within a certain range, the actual mean run length
+/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
+/// length.
+///
+/// See [`StripedBitSource`] for information about generating striped random numbers.
+///
+/// # Expected complexity
+/// $T(n, m) = O(n + m)$
+///
+/// $M(n, m) = O(n / m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $b < 0$ and their ratio
+/// is less than or equal to the bit length of $b$, or if they are too large and manipulating them
+/// leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::striped::StripedBitSource;
+/// use malachite_base::num::random::VariableRangeGenerator;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::get_striped_random_integer_from_range_to_negative_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     get_striped_random_integer_from_range_to_negative_infinity(
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
+///         Integer::from(-1000),
+///         20,
+///         1
+///     ),
+///     -3975
+/// );
+/// ```
+pub fn get_striped_random_integer_from_range_to_negative_infinity(
+    xs: &mut StripedBitSource,
+    range_generator: &mut VariableRangeGenerator,
+    a: Integer,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> Integer {
+    let (unsigned_max_bits, max_bits) = signed_significant_bits(&a);
+    let bits = get_geometric_random_signed_from_inclusive_range(
+        range_generator,
+        i64::MIN,
+        max_bits,
+        mean_bits_numerator,
+        mean_bits_denominator,
+    );
+    if bits == max_bits {
+        get_striped_random_integer_from_signed_max_bit_range(
+            xs,
+            range_generator,
+            a,
+            unsigned_max_bits,
+        )
+    } else {
+        Integer::from_sign_and_abs(
+            bits >= 0,
+            get_striped_random_natural_with_bits(xs, bits.unsigned_abs()),
+        )
     }
 }
 

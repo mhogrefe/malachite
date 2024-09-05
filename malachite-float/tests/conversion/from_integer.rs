@@ -473,6 +473,30 @@ fn from_integer_prec_round_ref_fail() {
 }
 
 #[test]
+fn test_from_integer_min_prec() {
+    let test = |s, out, out_hex| {
+        let u = Integer::from_str(s).unwrap();
+
+        let x = Float::from_integer_min_prec(u.clone());
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+
+        let x = Float::from_integer_min_prec_ref(&u);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+    };
+    test("0", "0.0", "0x0.0");
+    test("1", "1.0", "0x1.0#1");
+    test("123", "123.0", "0x7b.0#7");
+    test("1000000000000", "1.0e12", "0xe.8d4a51E+9#28");
+    test("-1", "-1.0", "-0x1.0#1");
+    test("-123", "-123.0", "-0x7b.0#7");
+    test("-1000000000000", "-1.0e12", "-0xe.8d4a51E+9#28");
+}
+
+#[test]
 fn from_integer_properties() {
     integer_gen().test_properties(|n| {
         let float_n = Float::from(n.clone());
@@ -620,5 +644,28 @@ fn from_integer_prec_round_properties() {
             assert!((r_nearest - Rational::from(&n))
                 .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
         }
+    });
+}
+
+#[test]
+fn from_integer_min_prec_properties() {
+    integer_gen().test_properties(|n| {
+        let float_n = Float::from_integer_min_prec(n.clone());
+        assert!(float_n.is_valid());
+
+        let float_n_alt = Float::from_integer_min_prec_ref(&n);
+        assert!(float_n_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&float_n_alt),
+            ComparableFloatRef(&float_n)
+        );
+        assert_eq!(float_n, n);
+
+        assert_eq!(float_n.get_min_prec(), float_n.get_prec());
+
+        let prec = Float::from(&n).get_min_prec().unwrap_or(1);
+        let (f, o) = Float::from_integer_prec(n, prec);
+        assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
+        assert_eq!(o, Equal);
     });
 }
