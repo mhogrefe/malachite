@@ -42,7 +42,7 @@ The output is this:
 Every digit is correct, except that the least-significant digit was rounded up from 2. The default
 rounding mode,
 [`Nearest`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html#variant.Nearest),
-uses [bankers' rounding](https://en.wikipedia.org/wiki/Rounding#Round_half_to_even), but you may
+uses [bankers' rounding](https://en.wikipedia.org/wiki/Rounding#Rounding_half_to_even), but you may
 specify different rounding behavior via the options parameter.
 
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
