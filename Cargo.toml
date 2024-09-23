@@ -12,6 +12,6 @@ rust-version = "1.74.0"
 malachite = "<=0.4.18"
 num-traits = { version = "0.2.11", default-features = false, features = ["i128"] }
 num-integer = { version = "0.1.45", default-features = false, features = ["i128"] }
-derive_more = "0.99.17"
+derive_more = { version = "1.0.0", features = ["display", "from", "into"] }
 paste = "1.0.12"
 num-bigint = { version = "0.4", default-features = false, optional = true }

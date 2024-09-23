@@ -18,6 +18,7 @@ use num_traits::{
 use paste::paste;
 use std::{
     cmp::Ordering,
+    fmt::Debug,
     iter::{Product, Sum},
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
@@ -78,7 +79,7 @@ impl Neg for Sign {
     From,
     Into,
 )]
-#[display(fmt = "{}", "self.0")]
+#[display("{}", "self.0")]
 #[into(owned, ref, ref_mut)]
 pub struct BigInt(Integer);
 
@@ -139,7 +140,7 @@ impl_sum_iter_type!(BigInt);
 
 impl std::fmt::Debug for BigInt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
+        Debug::fmt(&self.0, f)
     }
 }
 

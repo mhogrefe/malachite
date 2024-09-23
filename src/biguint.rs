@@ -18,6 +18,7 @@ use num_traits::{
 use paste::paste;
 use std::{
     cmp::Ordering::{Equal, Greater, Less},
+    fmt::Debug,
     iter::{Product, Sum},
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
@@ -53,7 +54,7 @@ impl_primitive_convert!(BigUint, f64);
     From,
     Into,
 )]
-#[display(fmt = "{}", "self.0")]
+#[display("{}", "self.0")]
 #[into(owned, ref, ref_mut)]
 pub struct BigUint(pub(crate) Natural);
 
@@ -112,7 +113,7 @@ impl_sum_iter_type!(BigUint);
 
 impl std::fmt::Debug for BigUint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
+        Debug::fmt(&self.0, f)
     }
 }
 
