@@ -1051,7 +1051,7 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 ///
 /// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where $1 \leq m_s
 /// < 2$ and $e_s$ is an integer; then $e_s$ is the sci-exponent. An integer $e_s$ occurs as the
-/// sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
+/// sci-exponent of a float if $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
 ///
 /// In the above equation, $m$ is a dyadic rational. Let $p$ be the smallest integer such that
 /// $m2^{p-1}$ is an integer. Then $p$ is the float's precision. It is also the number of
@@ -1209,7 +1209,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///
 /// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where $1 \leq m_s
 /// < 2$ and $e_s$ is an integer; then $e$ is the sci-exponent. An integer $e_s$ occurs as the
-/// sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
+/// sci-exponent of a float if $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
 ///
 /// If $e_s \geq 2-2^{E-1}$ (the float is normal), the output length is $2^M$.
 /// - For [`f32`], this is $2^{23}$, or 8388608.

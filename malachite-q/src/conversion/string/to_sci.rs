@@ -67,7 +67,7 @@ impl Rational {
     /// When expanding a [`Rational`] in a small base $b$, determines how many digits after the
     /// decimal (or other-base) point are in the base-$b$ expansion.
     ///
-    /// If the expansion is non-terminating, this method returns `None`. This happens iff the
+    /// If the expansion is non-terminating, this method returns `None`. This happens if the
     /// [`Rational`]'s denominator has prime factors not present in $b$.
     ///
     /// # Worst-case complexity

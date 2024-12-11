@@ -230,7 +230,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 // - Let x be xs before execution.
 // - Let s be out after execution.
 // - Then s = floor(sqrt(x)).
-// - The return value is true iff there is a remainder (that is, x is not a perfect square).
+// - The return value is true if there is a remainder (that is, x is not a perfect square).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$

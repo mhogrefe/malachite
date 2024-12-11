@@ -383,7 +383,7 @@ impl EqMod<Integer, Natural> for Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. All three numbers are taken by value.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -437,7 +437,7 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first two numbers are taken by value and the third by reference.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -491,7 +491,7 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first and third numbers are taken by value and the second by reference.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -545,7 +545,7 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first number is taken by value and the second and third by reference.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -599,7 +599,7 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first number is taken by reference and the second and third by value.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -653,7 +653,7 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first and third numbers are taken by reference and the third by value.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -707,7 +707,7 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first two numbers are taken by reference and the third by value.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -761,7 +761,7 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. All three numbers are taken by reference.
     ///
-    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Integer`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///

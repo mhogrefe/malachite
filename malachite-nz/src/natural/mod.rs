@@ -86,7 +86,7 @@ impl Natural {
         self.demote_if_small();
     }
 
-    // Returns true iff `self` is valid. To be valid,
+    // Returns true if `self` is valid. To be valid,
     //
     // `self` can only be `Large` when it is at least $2^W$, and cannot have leading zero limbs. All
     // `Natural`s must be valid.

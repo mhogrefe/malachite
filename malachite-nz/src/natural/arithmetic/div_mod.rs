@@ -898,7 +898,7 @@ pub_test! {limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]
 // `ds`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_bc_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
-// return value is `true` iff the return value of `mpn_bc_invertappr` would be 0.
+// return value is `true` if the return value of `mpn_bc_invertappr` would be 0.
 pub_test! {limbs_invert_basecase_approx(
     is: &mut [Limb],
     ds: &[Limb],
@@ -965,7 +965,7 @@ pub_test! {limbs_invert_basecase_approx(
 // the length of `ds`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_ni_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
-// return value is `true` iff the return value of `mpn_ni_invertappr` would be 0.
+// return value is `true` if the return value of `mpn_ni_invertappr` would be 0.
 pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
     assert!(d_len > 4);
@@ -1138,7 +1138,7 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
 // `ds`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
-// return value is `true` iff the return value of `mpn_invertappr` would be 0.
+// return value is `true` if the return value of `mpn_invertappr` would be 0.
 pub_crate_test! {limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     if ds.len() < INV_NEWTON_THRESHOLD {
         limbs_invert_basecase_approx(is, ds, scratch)

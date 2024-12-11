@@ -49,7 +49,7 @@ pub_crate_test! {limbs_kronecker_symbol_single(
     let mut negate = !x_sign && !y_sign;
     let y_twos = TrailingZeros::trailing_zeros(y);
     y >>= y_twos;
-    // (-1/b) = -1 iff b = 3 (mod 4)
+    // (-1/b) = -1 if b = 3 (mod 4)
     if !x_sign && y.get_bit(1) {
         negate.not_assign();
     }
@@ -109,7 +109,7 @@ pub_crate_test! {
             ys_len = 1;
         }
     }
-    // (-1 / y) = -1 iff y ≡ 3 mod 4
+    // (-1 / y) = -1 if y ≡ 3 mod 4
     if !x_sign && y_lo.get_bit(1) {
         negate.not_assign();
     }

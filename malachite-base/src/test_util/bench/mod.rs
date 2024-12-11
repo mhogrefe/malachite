@@ -158,7 +158,7 @@ pub fn run_benchmark<'a, I: Iterator>(
         benchmark_type == BenchmarkType::Single,
         series.len() == 1,
         "Bad benchmark: {title}. \
-             Benchmarks should have type Single iff they have only one series.",
+             Benchmarks should have type Single if they have only one series.",
     );
     if limit == 0 {
         return;
@@ -211,7 +211,7 @@ pub fn run_benchmark_old<'a, I: Iterator>(
         benchmark_type == BenchmarkType::Single,
         series.len() == 1,
         "Bad benchmark: {title}. \
-             Benchmarks should have type Single iff they have only one series.",
+             Benchmarks should have type Single if they have only one series.",
     );
     if limit == 0 {
         return;

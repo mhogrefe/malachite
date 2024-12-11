@@ -1449,7 +1449,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
 // return low so that:
 // * the most significant bit of low would be that of out[-1] if we would compute one more limb of
 //   the (infinite) addition
-// * the Limb::WIDTH - 1 least significant bits of low are zero iff all bits of out[-1], out[-2],
+// * the Limb::WIDTH - 1 least significant bits of low are zero if all bits of out[-1], out[-2],
 //   ... would be zero (except the most significant bit of out[-1]).
 //
 // Assume 0 < exp_diff < Limb::WIDTH * n.
@@ -1555,7 +1555,7 @@ fn add_significands_rsh_to_out(
 // low so that:
 // * the most significant bit of low would be that of x[-1] if we would compute one more limb of the
 //   (infinite) addition
-// * the Limb::WIDTH - 1 least significant bits of low are zero iff all bits of x[-1], x[-2], ...
+// * the Limb::WIDTH - 1 least significant bits of low are zero if all bits of x[-1], x[-2], ...
 //   would be zero (except the most significant bit of x[-1]).
 //
 // Assume 0 < exp_diff < Limb::WIDTH * n.
@@ -1641,7 +1641,7 @@ fn add_significands_rsh_mut_ref(xs: &mut [Limb], ys: &[Limb], exp_diff: u64) -> 
 // low so that:
 // * the most significant bit of low would be that of y[-1] if we would compute one more limb of the
 //   (infinite) addition
-// * the Limb::WIDTH - 1 least significant bits of low are zero iff all bits of y[-1], y[-2], ...
+// * the Limb::WIDTH - 1 least significant bits of low are zero if all bits of y[-1], y[-2], ...
 //   would be zero (except the most significant bit of y[-1]).
 //
 // Assume 0 < exp_diff < Limb::WIDTH * n.
@@ -1845,7 +1845,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
         let carry;
         (sticky_bit, carry) = add_significands_rsh_to_out(out, xs, ys, exp_diff);
         // The most significant bit of sticky_bit contains what would be the most significant bit of
-        // out[-1], and the remaining bits of stick_bit are 0 iff the remaining bits of out[-1],
+        // out[-1], and the remaining bits of stick_bit are 0 if the remaining bits of out[-1],
         // out[-2], ... are all zero
         if shift != 0 {
             // The round bit and a part of the sticky bit are in out[0].
@@ -2017,7 +2017,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
         let carry;
         (sticky_bit, carry) = add_significands_rsh_mut_ref(xs, ys, exp_diff);
         // The most significant bit of sticky_bit contains what would be the most significant bit of
-        // out[-1], and the remaining bits of stick_bit are 0 iff the remaining bits of out[-1],
+        // out[-1], and the remaining bits of stick_bit are 0 if the remaining bits of out[-1],
         // out[-2], ... are all zero
         if shift != 0 {
             // The round bit and a part of the sticky bit are in out[0].
@@ -2180,7 +2180,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
         let carry;
         (sticky_bit, carry) = add_significands_rsh_ref_mut(xs, ys, exp_diff);
         // The most significant bit of sticky_bit contains what would be the most significant bit of
-        // y[-1], and the remaining bits of stick_bit are 0 iff the remaining bits of y[-1], y[-2],
+        // y[-1], and the remaining bits of stick_bit are 0 if the remaining bits of y[-1], y[-2],
         // ... are all zero
         if shift != 0 {
             // The round bit and a part of the sticky bit are in y[0].

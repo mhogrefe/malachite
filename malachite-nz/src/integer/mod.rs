@@ -32,7 +32,7 @@ pub struct Integer {
 pub(crate) struct SerdeInteger(String);
 
 impl Integer {
-    // Returns true iff `self` is valid.
+    // Returns true if `self` is valid.
     //
     // To be valid, its absolute value must be valid, and if the absolute value is zero, the sign
     // must be `true`. All `Integer`s must be valid.

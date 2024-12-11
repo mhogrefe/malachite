@@ -231,7 +231,7 @@ impl<T: Eq> RationalSequence<T> {
 }
 
 impl<T: Clone + Eq> RationalSequence<T> {
-    // Returns true iff `self` is valid.
+    // Returns true if `self` is valid.
     //
     // To be valid, the non-repeating and repeating parts must be reduced. For example, `[1, 2]` and
     // `[3, 4]` is a reduced pair. On the other hand, `[1, 2]` and `[3, 4, 3, 4]` is a non-reduced

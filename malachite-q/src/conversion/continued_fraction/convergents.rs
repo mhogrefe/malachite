@@ -61,7 +61,7 @@ impl Convergents for Rational {
     ///
     /// The convergents of a number are the sequence of rational numbers whose continued fractions
     /// are the prefixes of the number's continued fraction. The first convergent is the floor of
-    /// the number. The sequence of convergents is finite iff the number is rational, in which case
+    /// the number. The sequence of convergents is finite if the number is rational, in which case
     /// the last convergent is the number itself. Each convergent is closer to the number than the
     /// previous convergent is. The even-indexed convergents are less than or equal to the number,
     /// and the odd-indexed ones are greater than or equal to it.
@@ -120,7 +120,7 @@ impl<'a> Convergents for &'a Rational {
     ///
     /// The convergents of a number are the sequence of rational numbers whose continued fractions
     /// are the prefixes of the number's continued fraction. The first convergent is the floor of
-    /// the number. The sequence of convergents is finite iff the number is rational, in which case
+    /// the number. The sequence of convergents is finite if the number is rational, in which case
     /// the last convergent is the number itself. Each convergent is closer to the number than the
     /// previous convergent is. The even-indexed convergents are less than or equal to the number,
     /// and the odd-indexed ones are greater than or equal to it.

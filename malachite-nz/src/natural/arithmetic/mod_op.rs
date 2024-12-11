@@ -1262,7 +1262,7 @@ pub_test! {limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
         DoubleLimb::from(base_mod_d >> shift)
     };
     let small_base_pow_2_mod_d = d.wrapping_neg().wrapping_mul(d_inv);
-    // equality iff divisor = 2 ^ (Limb::WIDTH - 1)
+    // equality if divisor = 2 ^ (Limb::WIDTH - 1)
     assert!(small_base_pow_2_mod_d <= d);
     let base_pow_2_mod_d = DoubleLimb::from(small_base_pow_2_mod_d);
     let mut r_lo = ns[len - 2];

@@ -782,7 +782,7 @@ fn div_float_significands_long_by_short_to_out(
     // 2 ^ exp = ({scratch, out_len + 1} + (c + r) / y) * B ^ (-(out_len + 1)) * 2 ^ exp where 0 <=
     // (c + r) / y < 1.
     //
-    // sticky_bit != 0 iff r != 0
+    // sticky_bit != 0 if r != 0
     //
     // If the highest limb of the result is 0 (xs[xs_len - 1] < y), remove it. Otherwise, compute
     // the left shift to be performed to normalize. In the latter case, we discard some low bits
@@ -795,10 +795,10 @@ fn div_float_significands_long_by_short_to_out(
     let out_last = *out.last().unwrap();
     let round_bit;
     let mut exp_offset = if out_last == 0 {
-        // round bit is 1 iff (c + r) / u >= 1/2
+        // round bit is 1 if (c + r) / u >= 1/2
         if shift == 0 {
             // In this case scratch[out_len] = 0 and shift = 0, the round bit is not in {scratch,
-            // out_len + 1}. It is 1 iff 2 * (c + r) - y >= 0. This means that in some cases, we
+            // out_len + 1}. It is 1 if 2 * (c + r) - y >= 0. This means that in some cases, we
             // should look at the most significant bit of r.
             if c >= y - c {
                 // i.e. 2 * c >= y: round bit is always 1
@@ -808,7 +808,7 @@ fn div_float_significands_long_by_short_to_out(
             } else {
                 // 2 * c < y
                 //
-                // The round bit is 1 iff r >= 1 / 2 and 2 * (c + 1 / 2) = y.
+                // The round bit is 1 if r >= 1 / 2 and 2 * (c + 1 / 2) = y.
                 let xdm1 = if diff == 0 {
                     0
                 } else {
@@ -937,7 +937,7 @@ fn div_float_significands_long_by_short_in_place(
     // 2 ^ exp = ({scratch, out_len + 1} + (c + r) / y) * B ^ (-(out_len + 1)) * 2 ^ exp where 0 <=
     // (c + r) / y < 1.
     //
-    // sticky_bit != 0 iff r != 0
+    // sticky_bit != 0 if r != 0
     //
     // If the highest limb of the result is 0 (xs[xs_len - 1] < y), remove it. Otherwise, compute
     // the left shift to be performed to normalize. In the latter case, we discard some low bits
@@ -950,10 +950,10 @@ fn div_float_significands_long_by_short_in_place(
     let xs_last = *xs.last().unwrap();
     let round_bit;
     let mut exp_offset = if xs_last == 0 {
-        // round bit is 1 iff (c + r) / u >= 1/2
+        // round bit is 1 if (c + r) / u >= 1/2
         if shift == 0 {
             // In this case scratch[out_len] = 0 and shift = 0, the round bit is not in {scratch,
-            // out_len + 1}. It is 1 iff 2 * (c + r) - y >= 0. This means that in some cases, we
+            // out_len + 1}. It is 1 if 2 * (c + r) - y >= 0. This means that in some cases, we
             // should look at the most significant bit of r.
             if c >= y - c {
                 // i.e. 2 * c >= y: round bit is always 1
@@ -963,7 +963,7 @@ fn div_float_significands_long_by_short_in_place(
             } else {
                 // 2 * c < y
                 //
-                // The round bit is 1 iff r >= 1 / 2 and 2 * (c + 1 / 2) = y.
+                // The round bit is 1 if r >= 1 / 2 and 2 * (c + 1 / 2) = y.
                 round_bit = Limb::from(c == y >> 1 && !out_ge_xs && xdm1.get_highest_bit());
                 // If round_bit is set, we need to recompute sticky_bit, since it might have taken
                 // into account the most-significant bit of xs[-diff - 1].
@@ -1424,7 +1424,7 @@ fn div_float_significands_general_to_out(
     }
     let mut low_x = sticky_x;
     let mut k;
-    // Now sticky_x is non-zero iff the truncated part of x is non-zero
+    // Now sticky_x is non-zero if the truncated part of x is non-zero
     let mut sticky_y = false;
     // Prepare the divisor
     k = if ds_len >= qs_2_len {
@@ -1464,7 +1464,7 @@ fn div_float_significands_general_to_out(
     k = qs_2_len;
     sticky_x = sticky_x || !slice_test_zero(&xs[..k]);
     let mut sticky_bit = Limb::from(sticky_x | sticky_y);
-    // now sticky_bit is non-zero iff one of the following holds:
+    // now sticky_bit is non-zero if one of the following holds:
     // - the truncated part of u is non-zero
     // - the truncated part of v is non-zero
     // - the remainder from division is non-zero

@@ -514,7 +514,7 @@ pub_test! {limbs_root_rem_to_out(
     limbs_root_to_out_internal(out_root, Some(out_rem), xs, exp, false)
 }}
 
-// Returns a non-zero value iff the remainder is non-zero.
+// Returns a non-zero value if the remainder is non-zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log\log n)$

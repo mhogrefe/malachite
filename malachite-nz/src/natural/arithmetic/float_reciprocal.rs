@@ -451,7 +451,7 @@ fn reciprocal_float_significand_short_to_out(
     // exp = ({scratch, out_len + 1} + (c + r) / y) * B ^ (-(out_len + 1)) * 2 ^ exp where 0 <= (c +
     // r) / y < 1.
     //
-    // sticky_bit != 0 iff r != 0
+    // sticky_bit != 0 if r != 0
     //
     // If the highest limb of the result is 0 (xs[0] < y), remove it. Otherwise, compute the left
     // shift to be performed to normalize. In the latter case, we discard some low bits computed.
@@ -460,10 +460,10 @@ fn reciprocal_float_significand_short_to_out(
     let shift_bit = Limb::power_of_2(shift);
     let shift_mask = shift_bit - 1;
     let out_head = out[0];
-    // round bit is 1 iff (c + r) / u >= 1/2
+    // round bit is 1 if (c + r) / u >= 1/2
     let (mut exp_offset, round_bit, sticky_bit) = if shift == 0 {
         // In this case scratch[out_len] = 0 and shift = 0, the round bit is not in {scratch,
-        // out_len + 1}. It is 1 iff 2 * (c + r) - y >= 0. This means that in some cases, we should
+        // out_len + 1}. It is 1 if 2 * (c + r) - y >= 0. This means that in some cases, we should
         // look at the most significant bit of r.
         if c >= y - c {
             // i.e. 2 * c >= y: round bit is always 1
@@ -473,7 +473,7 @@ fn reciprocal_float_significand_short_to_out(
         } else {
             // 2 * c < y
             //
-            // The round bit is 1 iff r >= 1 / 2 and 2 * (c + 1 / 2) = y.
+            // The round bit is 1 if r >= 1 / 2 and 2 * (c + 1 / 2) = y.
             //
             // If round_bit is set, we need to recompute sticky_bit, since it might have taken into
             // account the most-significant bit of xs[-diff - 1].
@@ -619,7 +619,7 @@ fn reciprocal_float_significand_general_to_out(
     k = qs_2_len;
     let sticky_x = !slice_test_zero(&xs[..k]);
     let mut sticky_bit = Limb::from(sticky_x | sticky_y);
-    // now sticky_bit is non-zero iff one of the following holds:
+    // now sticky_bit is non-zero if one of the following holds:
     // - the truncated part of u is non-zero
     // - the truncated part of v is non-zero
     // - the remainder from division is non-zero

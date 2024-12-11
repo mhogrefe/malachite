@@ -23,7 +23,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 // zeros. An `Ordering` is also returned, indicating whether the returned value is less than, equal
 // to, or greater than the exact value.
 //
-// This function returns a `None` iff the rounding mode is `Exact` but the remainder of the division
+// This function returns a `None` if the rounding mode is `Exact` but the remainder of the division
 // would be nonzero.
 //
 // Note that this function may only return `None`, `Some((0, Less))`, or `Some((1, Greater))`

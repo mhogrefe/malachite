@@ -19,7 +19,7 @@ macro_rules! impl_eq_mod {
             /// Returns whether a number is equivalent to another number modulo a third; that is,
             /// whether the difference between the first two is a multiple of the third.
             ///
-            /// Two numbers are equal to each other modulo 0 iff they are equal.
+            /// Two numbers are equal to each other modulo 0 if they are equal.
             ///
             /// $f(x, y, m) = (x \equiv y \mod m)$.
             ///

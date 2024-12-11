@@ -721,7 +721,7 @@ impl EqMod<Natural, Natural> for Natural {
     /// whether the difference between the first two is a multiple of the third. All three are taken
     /// by value.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -789,7 +789,7 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     /// whether the difference between the first two is a multiple of the third. The first two are
     /// taken by value and the third by reference.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -857,7 +857,7 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     /// whether the difference between the first two is a multiple of the third. The first and third
     /// are taken by value and the second by reference.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -925,7 +925,7 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     /// whether the difference between the first two is a multiple of the third. The first is taken
     /// by value and the second and third by reference.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -993,7 +993,7 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     /// whether the difference between the first two is a multiple of the third. The first is taken
     /// by reference and the second and third by value.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -1061,7 +1061,7 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     /// whether the difference between the first two is a multiple of the third. The first and third
     /// are taken by reference and the second by value.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -1129,7 +1129,7 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     /// whether the difference between the first two is a multiple of the third. The first and
     /// second are taken by reference and the third by value.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
@@ -1197,7 +1197,7 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     /// whether the difference between the first two is a multiple of the third. All three are taken
     /// by reference.
     ///
-    /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
+    /// Two [`Natural`]s are equal to each other modulo 0 if they are equal.
     ///
     /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///

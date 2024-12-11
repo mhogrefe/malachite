@@ -153,7 +153,7 @@ pub struct Rational {
 }
 
 impl Rational {
-    // Returns true iff `self` is valid.
+    // Returns true if `self` is valid.
     //
     // To be valid, its denominator must be nonzero, its numerator and denominator must be
     // relatively prime, and if its numerator is zero, then `sign` must be `true`. All `Rational`s
