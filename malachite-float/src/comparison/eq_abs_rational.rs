@@ -8,12 +8,12 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::CheckedLogBase2;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_q::Rational;
-use std::cmp::Ordering::*;
 
 impl EqAbs<Rational> for Float {
     #[inline]

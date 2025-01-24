@@ -857,7 +857,6 @@ pub mod mul_low;
 /// Code for multiplying two [`Natural`]s modulo one less than a large power of 2; used by the
 /// Schönhage-Strassen algorithm.
 pub mod mul_mod;
-pub mod new_fft;
 /// Code for evaluating polynomials at various points; used in Toom-Cook multiplication.
 pub mod poly_eval;
 /// Code for reconstructing polynomials from their values at various points; used in Toom-Cook

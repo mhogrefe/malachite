@@ -82,10 +82,13 @@ fn primorial_properties() {
             p
         );
         assert_ne!(p, 0u32);
-        if n.is_prime() {
-            assert!(Natural::primorial(n - 1) < p);
-        } else {
-            assert_eq!(Natural::primorial(n - 1), p);
+        if n != 0 {
+            let q = Natural::primorial(n - 1);
+            if n.is_prime() {
+                assert!(q < p);
+            } else {
+                assert_eq!(q, p);
+            }
         }
     });
 

@@ -7,8 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-#[cfg(not(any(feature = "test_build", feature = "random")))]
-use crate::malachite_base::num::arithmetic::traits::Abs;
 use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;

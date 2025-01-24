@@ -1,10 +1,10 @@
 [package]
 name = "malachite-q"
-version = "0.4.16"
+version = "0.4.17"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
-description = "The arbitrary-precision type Rational, with efficient algorithms partially derived from GMP and FLINT"
+description = "The arbitrary-precision type Rational, with efficient algorithms partially derived from GMP and FLINT."
 readme = "README.md"
 homepage = "https://malachite.rs/"
 repository = "https://github.com/mhogrefe/malachite"
@@ -22,8 +22,8 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
-malachite-base = { version = "0.4.16", default-features = false, path = "../malachite-base" }
-malachite-nz = { version = "0.4.16", default-features = false, path = "../malachite-nz" }
+malachite-base = { version = "0.4.17", default-features = false }
+malachite-nz = { version = "0.4.17", default-features = false }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
 serde_json = { version = "1.0.105", optional = true }

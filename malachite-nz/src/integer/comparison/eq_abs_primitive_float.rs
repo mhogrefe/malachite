@@ -7,8 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-#[cfg(not(any(feature = "test_build", feature = "random")))]
-use crate::malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::EqAbs;
 
 macro_rules! impl_eq_abs {

@@ -1236,7 +1236,8 @@ pub fn float_signed_rounding_mode_triple_gen_var_3_rm() -> Generator<(
 )> {
     Generator::new(
         &|| {
-            float_t_rounding_mode_triple_rm(exhaustive_float_signed_rounding_mode_triple_gen_var_3())
+            let ts = exhaustive_float_signed_rounding_mode_triple_gen_var_3();
+            float_t_rounding_mode_triple_rm(ts)
         },
         &|config| {
             float_t_rounding_mode_triple_rm(random_float_signed_rounding_mode_triple_gen_var_3(
@@ -1290,7 +1291,8 @@ pub fn float_signed_rounding_mode_triple_gen_var_6_rm() -> Generator<(
 )> {
     Generator::new(
         &|| {
-            float_t_rounding_mode_triple_rm(exhaustive_float_signed_rounding_mode_triple_gen_var_6())
+            let ts = exhaustive_float_signed_rounding_mode_triple_gen_var_6();
+            float_t_rounding_mode_triple_rm(ts)
         },
         &|config| {
             float_t_rounding_mode_triple_rm(random_float_signed_rounding_mode_triple_gen_var_6(

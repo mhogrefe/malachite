@@ -1,10 +1,10 @@
 [package]
 name = "malachite-base"
-version = "0.4.16"
+version = "0.4.17"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
-description = "A collection of utilities, including new arithmetic traits and iterators that generate all values of a type"
+description = "A collection of utilities, including new arithmetic traits and iterators that generate all values of a type."
 readme = "README.md"
 homepage = "https://malachite.rs/"
 repository = "https://github.com/mhogrefe/malachite"

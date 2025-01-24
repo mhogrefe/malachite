@@ -388,6 +388,8 @@ pub fn special_random_float_gen_var_14(config: &GenConfig) -> It<Float> {
     )
 }
 
+type GRNV = GeometricRandomNaturalValues<u64>;
+
 fn striped_random_mixed_extreme_positive_finite_floats(
     seed: Seed,
     mean_sci_exponent_abs_numerator: u64,
@@ -396,8 +398,7 @@ fn striped_random_mixed_extreme_positive_finite_floats(
     mean_stripe_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
-) -> RandomMixedExtremePositiveFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>>
-{
+) -> RandomMixedExtremePositiveFiniteFloats<StripedRandomNaturals<GRNV>> {
     RandomMixedExtremePositiveFiniteFloats {
         exponents: geometric_random_natural_signeds(
             seed.fork("exponents"),

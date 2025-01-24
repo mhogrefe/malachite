@@ -9,6 +9,7 @@
 use crate::alloc::string::ToString;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
+use alloc::string::String;
 use core::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};
 use malachite_base::num::arithmetic::traits::{
     Abs, ModPowerOf2, RoundToMultipleOfPowerOf2, ShrRound,

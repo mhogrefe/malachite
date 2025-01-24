@@ -1,14 +1,14 @@
 [package]
 name = "malachite-criterion-bench"
-version = "0.4.16"
+version = "0.4.17"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 autobenches = false
 rust-version.workspace = true
 edition.workspace = true
 
 [dependencies]
-malachite-base = { version = "0.4.16", path = "../malachite-base" }
-malachite-nz = { version = "0.4.16", default-features = false, path = "../malachite-nz" }
+malachite-base = { version = "0.4.17" }
+malachite-nz = { version = "0.4.17", default-features = false }
 num = "0.4.1"
 rug = { version = "1.21.0", default-features = false, features = ["integer", "serde"] }
 

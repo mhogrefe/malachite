@@ -8,8 +8,6 @@
 
 use crate::Rational;
 use core::cmp::Ordering::{self, *};
-#[cfg(not(any(feature = "test_build", feature = "random")))]
-use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::ExactFrom;

@@ -6,8 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-#[cfg(not(any(feature = "test_build", feature = "random")))]
-use crate::malachite_base::num::arithmetic::traits::Abs;
 use crate::natural::Natural;
 use malachite_base::num::comparison::traits::EqAbs;
 

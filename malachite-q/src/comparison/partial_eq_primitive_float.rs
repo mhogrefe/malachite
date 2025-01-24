@@ -7,8 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-#[cfg(not(any(feature = "test_build", feature = "random")))]
-use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 

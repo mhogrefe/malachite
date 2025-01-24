@@ -579,6 +579,9 @@ impl IsPrime for u8 {
     ///
     /// This implementation just does a few divisibility checks.
     ///
+    /// If you want to generate many small primes, try using
+    /// [`u8::primes`][crate::num::factorization::traits::Primes::primes] instead.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -607,6 +610,9 @@ impl IsPrime for u16 {
     /// This implementation does a few divisibility checks, then performs strong probable prime
     /// tests with bases 31 and 73, which is enough to prove primality for any integer less than
     /// $2^{16}$.
+    ///
+    /// If you want to generate many small primes, try using
+    /// [`u16::primes`][crate::num::factorization::traits::Primes::primes] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -661,6 +667,9 @@ impl IsPrime for u32 {
     ///
     /// This implementation does a few divisibility checks, then performs a few strong probable
     /// prime tests, which is enough to prove primality for any integer less than $2^{32}$.
+    ///
+    /// If you want to generate many small primes, try using
+    /// [`u32::primes`][crate::num::factorization::traits::Primes::primes] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -742,6 +751,9 @@ impl IsPrime for u64 {
     /// either runs a few strong probable prime tests or the Baillie–PSW test. This is enough to
     /// prove primality for any integer less than $2^{64}$.
     ///
+    /// If you want to generate many small primes, try using
+    /// [`u64::primes`][crate::num::factorization::traits::Primes::primes] instead.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
@@ -816,6 +828,30 @@ impl IsPrime for u64 {
 }
 
 impl IsPrime for usize {
+    /// Tests whether a `usize` is prime.
+    ///
+    /// This implementation first does a few divisibility checks. Then, depending on the input, it
+    /// either runs a few strong probable prime tests or the Baillie–PSW test. This is enough to
+    /// prove primality for any integer that fits in a `usize`.
+    ///
+    /// If you want to generate many small primes, try using
+    /// [`usize::primes`][crate::num::factorization::traits::Primes::primes] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::factorization::traits::IsPrime;
+    ///
+    /// assert_eq!(5usize.is_prime(), true);
+    /// assert_eq!(6usize.is_prime(), false);
+    /// assert_eq!(4294967291usize.is_prime(), true);
+    /// ```
     #[inline]
     fn is_prime(&self) -> bool {
         if USIZE_IS_U32 {
