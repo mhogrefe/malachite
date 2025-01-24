@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -84,6 +84,33 @@ macro_rules! triple_significant_bits_fn {
 
 pub const TRIPLE_SIGNIFICANT_BITS_LABEL: &str =
     "max(a.significant_bits(), b.significant_bits(), c.significant_bits())";
+
+pub fn rle_encode<I: Iterator>(xs: I) -> Vec<(I::Item, usize)>
+where
+    I::Item: Clone + Eq,
+{
+    let mut out = Vec::new();
+    let mut previous: Option<I::Item> = None;
+    let mut count = 0;
+    for x in xs {
+        if let Some(p) = previous.as_ref() {
+            if x == *p {
+                count += 1;
+            } else {
+                out.push((p.clone(), count));
+                previous = Some(x.clone());
+                count = 1;
+            }
+        } else {
+            count = 1;
+            previous = Some(x.clone());
+        }
+    }
+    if let Some(p) = previous {
+        out.push((p, count));
+    }
+    out
+}
 
 pub fn rle_decode<T: Clone>(ps: &[(T, usize)]) -> Vec<T> {
     let mut out = Vec::new();

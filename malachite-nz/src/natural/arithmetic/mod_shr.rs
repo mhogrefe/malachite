@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -155,7 +155,7 @@ macro_rules! impl_mod_shr {
             }
         }
 
-        impl<'a> ModShr<$t, Natural> for &'a Natural {
+        impl ModShr<$t, Natural> for &Natural {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
@@ -183,7 +183,7 @@ macro_rules! impl_mod_shr {
             }
         }
 
-        impl<'a, 'b> ModShr<$t, &'b Natural> for &'a Natural {
+        impl ModShr<$t, &Natural> for &Natural {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
@@ -206,7 +206,7 @@ macro_rules! impl_mod_shr {
             /// # Examples
             /// See [here](super::mod_shr#mod_shr).
             #[inline]
-            fn mod_shr(self, bits: $t, m: &'b Natural) -> Natural {
+            fn mod_shr(self, bits: $t, m: &Natural) -> Natural {
                 mod_shr_ref_ref(self, bits, m)
             }
         }

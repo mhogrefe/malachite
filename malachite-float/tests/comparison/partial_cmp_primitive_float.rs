@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,7 +15,8 @@ use malachite_float::test_util::common::{
 };
 use malachite_float::test_util::generators::{
     float_float_primitive_float_triple_gen, float_gen, float_gen_var_2,
-    float_primitive_float_pair_gen, float_primitive_float_primitive_float_triple_gen,
+    float_primitive_float_pair_gen, float_primitive_float_pair_gen_var_1,
+    float_primitive_float_primitive_float_triple_gen,
 };
 use malachite_float::Float;
 use rug;
@@ -114,6 +115,29 @@ fn test_partial_cmp_primitive_float() {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_cmp_primitive_float_properties_helper_helper<
+    T: PartialOrd<Float> + PartialOrd<rug::Float> + PrimitiveFloat,
+>(
+    n: Float,
+    u: T,
+) where
+    Float: TryFrom<T> + PartialOrd<T>,
+    rug::Float: PartialOrd<T>,
+{
+    let cmp = n.partial_cmp(&u);
+    assert_eq!(rug::Float::exact_from(&n).partial_cmp(&u), cmp);
+
+    let cmp_rev = cmp.map(Ordering::reverse);
+    assert_eq!(u.partial_cmp(&n), cmp_rev);
+    assert_eq!(u.partial_cmp(&rug::Float::exact_from(&n)), cmp_rev);
+
+    assert_eq!(
+        PartialOrd::<Float>::partial_cmp(&n, &Float::exact_from(u)),
+        cmp
+    );
+}
+
 #[allow(clippy::neg_cmp_op_on_partial_ord)]
 fn partial_cmp_primitive_float_properties_helper<
     T: PartialOrd<Float> + PartialOrd<rug::Float> + PrimitiveFloat,
@@ -123,17 +147,11 @@ where
     rug::Float: PartialOrd<T>,
 {
     float_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
-        let cmp = n.partial_cmp(&u);
-        assert_eq!(rug::Float::exact_from(&n).partial_cmp(&u), cmp);
+        partial_cmp_primitive_float_properties_helper_helper(n, u);
+    });
 
-        let cmp_rev = cmp.map(Ordering::reverse);
-        assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&rug::Float::exact_from(&n)), cmp_rev);
-
-        assert_eq!(
-            PartialOrd::<Float>::partial_cmp(&n, &Float::exact_from(u)),
-            cmp
-        );
+    float_primitive_float_pair_gen_var_1::<T>().test_properties(|(n, u)| {
+        partial_cmp_primitive_float_properties_helper_helper(n, u);
     });
 
     float_float_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -55,7 +55,7 @@ impl Add<Integer> for Integer {
     }
 }
 
-impl<'a> Add<&'a Integer> for Integer {
+impl Add<&Integer> for Integer {
     type Output = Integer;
 
     /// Adds two [`Integer`]s, taking the first by reference and the second by value.
@@ -87,13 +87,13 @@ impl<'a> Add<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn add(mut self, other: &'a Integer) -> Integer {
+    fn add(mut self, other: &Integer) -> Integer {
         self += other;
         self
     }
 }
 
-impl<'a> Add<Integer> for &'a Integer {
+impl Add<Integer> for &Integer {
     type Output = Integer;
 
     /// Adds two [`Integer`]s, taking the first by value and the second by reference.
@@ -131,7 +131,7 @@ impl<'a> Add<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> Add<&'a Integer> for &'b Integer {
+impl Add<&Integer> for &Integer {
     type Output = Integer;
 
     /// Adds two [`Integer`]s, taking both by reference.
@@ -162,7 +162,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     ///     1000000000000u64
     /// );
     /// ```
-    fn add(self, other: &'a Integer) -> Integer {
+    fn add(self, other: &Integer) -> Integer {
         match (self, other) {
             (x, y) if core::ptr::eq(x, y) => x << 1,
             (&integer_zero!(), y) => y.clone(),
@@ -270,7 +270,7 @@ impl AddAssign<Integer> for Integer {
     }
 }
 
-impl<'a> AddAssign<&'a Integer> for Integer {
+impl AddAssign<&Integer> for Integer {
     /// Adds an [`Integer`] to an [`Integer`] in place, taking the [`Integer`] on the right-hand
     /// side by reference.
     ///
@@ -299,7 +299,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
     /// x += &(Integer::from(10u32).pow(12) * Integer::from(4u32));
     /// assert_eq!(x, 2000000000000u64);
     /// ```
-    fn add_assign(&mut self, other: &'a Integer) {
+    fn add_assign(&mut self, other: &Integer) {
         match (&mut *self, other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {

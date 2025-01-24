@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,6 +13,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, signed_pair_gen_var_2, signed_unsigned_pair_gen_var_20,
@@ -28,7 +29,6 @@ use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
 use rug::Assign;
-use std::cmp::max;
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
@@ -46,7 +46,14 @@ fn test_from_primitive_int() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
 
-        let rug_x = rug::Float::with_val(max(1, u32::exact_from(u.significant_bits())), u);
+        let rug_x = rug::Float::with_val(
+            if u == T::ZERO {
+                1
+            } else {
+                u32::exact_from(u.significant_bits() - TrailingZeros::trailing_zeros(u))
+            },
+            u,
+        );
         let x = Float::exact_from(&rug_x);
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
@@ -75,7 +82,7 @@ fn test_from_primitive_int() {
         test_helper(T::exact_from(123u8), "123.0", "0x7b.0#7");
     }
     apply_fn_to_primitive_ints!(test_helper_ui);
-    test_helper(1000000000000u64, "1000000000000.0", "0xe8d4a51000.0#40");
+    test_helper(1000000000000u64, "1.0e12", "0xe.8d4a51E+9#28");
 
     fn test_helper_i<T: PrimitiveSigned>()
     where
@@ -88,7 +95,7 @@ fn test_from_primitive_int() {
         test_helper(T::from(-123i8), "-123.0", "-0x7b.0#7");
     }
     apply_fn_to_signeds!(test_helper_i);
-    test_helper(-1000000000000i64, "-1000000000000.0", "-0xe8d4a51000.0#40");
+    test_helper(-1000000000000i64, "-1.0e12", "-0xe.8d4a51E+9#28");
 }
 
 #[test]
@@ -803,6 +810,8 @@ fn test_const_from_unsigned_times_power_of_2() {
     test_helper(1, 0, "1.0", "0x1.0#1");
     test_helper(1, 10, "1.0e3", "0x4.0E+2#1");
     test_helper(1, -10, "0.001", "0x0.004#1");
+    test_helper(1, 1073741822, "too_big", "0x4.0E+268435455#1");
+    test_helper(1, -1073741824, "too_small", "0x1.0E-268435456#1");
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         test_helper(
@@ -812,6 +821,12 @@ fn test_const_from_unsigned_times_power_of_2() {
             "0x3.243f6a8885a3#50",
         );
     }
+}
+
+#[test]
+fn const_from_unsigned_times_power_of_2_fail() {
+    assert_panic!(Float::const_from_unsigned_times_power_of_2(1, 1073741823));
+    assert_panic!(Float::const_from_unsigned_times_power_of_2(1, -1073741825));
 }
 
 #[test]
@@ -831,6 +846,8 @@ fn test_const_from_signed_times_power_of_2() {
     test_helper(-1, 0, "-1.0", "-0x1.0#1");
     test_helper(-1, 10, "-1.0e3", "-0x4.0E+2#1");
     test_helper(-1, -10, "-0.001", "-0x0.004#1");
+    test_helper(1, 1073741822, "too_big", "0x4.0E+268435455#1");
+    test_helper(1, -1073741824, "too_small", "0x1.0E-268435456#1");
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         test_helper(
@@ -846,6 +863,12 @@ fn test_const_from_signed_times_power_of_2() {
             "-0x3.243f6a8885a3#50",
         );
     }
+}
+
+#[test]
+fn const_from_signed_times_power_of_2_fail() {
+    assert_panic!(Float::const_from_signed_times_power_of_2(1, 1073741823));
+    assert_panic!(Float::const_from_signed_times_power_of_2(1, -1073741825));
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -871,26 +894,23 @@ where
             assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
         }
 
-        let rug_n = rug::Float::with_val(max(1, u32::exact_from(n.significant_bits())), n);
+        let expected_prec = if n == T::ZERO {
+            None
+        } else {
+            Some(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+        };
+        let rug_n = rug::Float::with_val(expected_prec.map_or(1, u32::exact_from), n);
         assert_eq!(
             ComparableFloatRef(&float_n),
             ComparableFloatRef(&From::<&rug::Float>::from(&rug_n))
         );
 
-        let n_alt: Float = From::from(Natural::from(n));
+        let n_alt: Float = ExactFrom::exact_from(Natural::exact_from(n));
         assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
 
-        assert_eq!(
-            float_n.get_prec(),
-            if n == T::ZERO {
-                None
-            } else {
-                Some(n.significant_bits())
-            }
-        );
+        assert_eq!(float_n.get_prec(), expected_prec);
         assert_eq!(T::exact_from(&float_n), n);
-        let bits = max(1, n.significant_bits());
-        let (f, o) = Float::from_unsigned_prec(n, bits);
+        let (f, o) = Float::from_unsigned_prec(n, expected_prec.unwrap_or(1));
         assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
         assert_eq!(o, Equal);
     });
@@ -919,26 +939,23 @@ where
             assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
         }
 
-        let rug_n = rug::Float::with_val(max(1, u32::exact_from(n.significant_bits())), n);
+        let expected_prec = if n == T::ZERO {
+            None
+        } else {
+            Some(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+        };
+        let rug_n = rug::Float::with_val(expected_prec.map_or(1, u32::exact_from), n);
         assert_eq!(
             ComparableFloatRef(&float_n),
             ComparableFloatRef(&From::<&rug::Float>::from(&rug_n))
         );
 
-        let n_alt: Float = From::from(Integer::from(n));
+        let n_alt: Float = ExactFrom::exact_from(Integer::from(n));
         assert_eq!(ComparableFloatRef(&n_alt), ComparableFloatRef(&float_n));
 
-        assert_eq!(
-            float_n.get_prec(),
-            if n == T::ZERO {
-                None
-            } else {
-                Some(n.significant_bits())
-            }
-        );
+        assert_eq!(float_n.get_prec(), expected_prec);
         assert_eq!(T::exact_from(&float_n), n);
-        let bits = max(1, n.significant_bits());
-        let (f, o) = Float::from_signed_prec(n, bits);
+        let (f, o) = Float::from_signed_prec(n, expected_prec.unwrap_or(1));
         assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
         assert_eq!(o, Equal);
     });

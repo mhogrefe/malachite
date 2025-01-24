@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -12231,15 +12231,55 @@ fn test_mul() {
         9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
         3448224036804997350851153108395928780441635856",
     );
-    let large_power_of_2 = Natural::power_of_2(100_000) * Natural::power_of_2(100_000);
-    assert!(large_power_of_2.is_valid());
-    assert_eq!(large_power_of_2.checked_log_base_2(), Some(200_000));
+    let big_test = |u: Natural, v: Natural| {
+        let mut n = u.clone();
+        n *= v.clone();
+        assert!(n.is_valid());
+        let product = n;
+
+        let mut n = u.clone();
+        n *= &v;
+        assert!(n.is_valid());
+        assert_eq!(n, product);
+
+        let n = u.clone() * v.clone();
+        assert!(n.is_valid());
+        assert_eq!(n, product);
+
+        let n = &u * v.clone();
+        assert!(n.is_valid());
+        assert_eq!(n, product);
+
+        let n = u.clone() * &v;
+        assert!(n.is_valid());
+        assert_eq!(n, product);
+
+        let n = &u * &v;
+        assert!(n.is_valid());
+        assert_eq!(n, product);
+
+        let n = rug::Integer::from(&u) * rug::Integer::from(&v);
+        assert_eq!(Natural::exact_from(&n), product);
+    };
+    big_test(Natural::power_of_2(100_000), Natural::power_of_2(100_000));
+    // - limbs_fft_mulmod_2expp1_helper, out[j] != 0
+    big_test(
+        Natural::power_of_2(0x3fff_fffe),
+        Natural::power_of_2(0x4000_0000),
+    );
+    big_test(
+        Natural::from(0x3d500b05e209u64) << 0x3fffffbc,
+        Natural::power_of_2(0x4000_0028),
+    );
+    let p = Natural::power_of_2(33554432);
+    big_test(p.clone(), p);
 }
 
 #[test]
 fn test_multiplying_large_powers_of_2() {
     for i in 0..400_000 {
-        let p = Natural::power_of_2(i) * Natural::power_of_2(i);
+        let p = Natural::power_of_2(i);
+        let p = &p * &p;
         assert!(p.is_valid());
         assert_eq!(p.checked_log_base_2(), Some(i << 1));
     }

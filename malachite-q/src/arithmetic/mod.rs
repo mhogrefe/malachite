@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -8,6 +8,10 @@
 
 /// Absolute value of [`Rational`](super::Rational)s.
 pub mod abs;
+/// Implementations of [`AbsDiff`](malachite_base::num::arithmetic::traits::AbsDiff) and
+/// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
+/// the absolute value of the difference between two numbers.
+pub mod abs_diff;
 /// Addition of [`Rational`](super::Rational)s.
 pub mod add;
 /// Implementations of [`Approximate`](traits::Approximate) and

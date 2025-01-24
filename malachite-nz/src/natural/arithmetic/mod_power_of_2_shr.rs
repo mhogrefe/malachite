@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -81,7 +81,7 @@ macro_rules! impl_mod_power_of_2_shr_signed {
             }
         }
 
-        impl<'a> ModPowerOf2Shr<$t> for &'a Natural {
+        impl ModPowerOf2Shr<$t> for &Natural {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo $2^k$. The

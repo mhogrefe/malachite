@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::Rational;
 use malachite_base::num::conversion::traits::IsInteger;
 
-impl<'a> IsInteger for &'a Rational {
+impl IsInteger for &Rational {
     /// Determines whether a [`Rational`] is an integer.
     ///
     /// $f(x) = x \in \Z$.

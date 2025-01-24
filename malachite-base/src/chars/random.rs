@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,6 @@
 use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
 use crate::chars::char_is_graphic;
 use crate::chars::crement::{char_to_contiguous_range, contiguous_range_to_char, decrement_char};
-use crate::comparison::traits::Min;
 use crate::num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
 use crate::random::Seed;
 use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
@@ -241,7 +240,7 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 ///         .take(20)
 ///         .collect::<String>()
 ///         .as_str(),
-///     "𘋈𰒏礝깶ꅊ杽쭡𬝱╱𣑺⢍𰰬瀋\u{8daa8}𱽊ՠ𦧴\u{3805c}\u{d7447}𪂆"
+///     "𗇚𮃿礡깶ꅎ极쭡𫍬╷𢁽⢓𮢜瀏\u{8eea5}𰭈ՠ𥗷\u{39459}\u{d8844}𨲉"
 /// )
 /// ```
 #[inline]

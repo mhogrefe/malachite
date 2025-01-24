@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -337,7 +337,7 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     }
 }
 
-impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
+impl AddMul<&Integer, &Integer> for &Integer {
     type Output = Integer;
 
     /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking all three by
@@ -368,7 +368,7 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     ///     -65537000000000000i64
     /// );
     /// ```
-    fn add_mul(self, y: &'a Integer, z: &'b Integer) -> Integer {
+    fn add_mul(self, y: &Integer, z: &Integer) -> Integer {
         if self.sign == (y.sign == z.sign) {
             Integer {
                 sign: self.sign,

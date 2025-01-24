@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -232,43 +232,43 @@ pub mod natural_from_rational;
 /// ```
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::basic::traits::OneHalf;
-/// use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
+/// use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     f32::try_from(Rational::from_signeds(1i8, 3)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// assert_eq!(f32::try_from(Rational::ONE_HALF), Ok(0.5));
 /// assert_eq!(
 ///     f32::try_from(Rational::power_of_2(200u64)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// assert_eq!(
 ///     f32::try_from(Rational::power_of_2(-200i64)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// assert_eq!(
 ///     f32::try_from(-Rational::power_of_2(-200i64)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 ///
 /// assert_eq!(
 ///     f32::try_from(&Rational::from_signeds(1i8, 3)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// assert_eq!(f32::try_from(&Rational::ONE_HALF), Ok(0.5));
 /// assert_eq!(
 ///     f32::try_from(&Rational::power_of_2(200u64)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// assert_eq!(
 ///     f32::try_from(&Rational::power_of_2(-200i64)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// assert_eq!(
 ///     f32::try_from(&-Rational::power_of_2(-200i64)),
-///     Err(FloatFromRationalError)
+///     Err(FloatConversionError::Inexact)
 /// );
 /// ```
 ///

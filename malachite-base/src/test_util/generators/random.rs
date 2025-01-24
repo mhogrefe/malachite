@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,7 +11,6 @@ use crate::chars::constants::NUMBER_OF_CHARS;
 use crate::chars::random::{
     random_ascii_chars, random_char_inclusive_range, random_char_range, random_chars,
 };
-use crate::comparison::traits::Min;
 use crate::iterators::with_special_value;
 use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::arithmetic::traits::{
@@ -2871,6 +2870,22 @@ pub fn random_signed_rounding_mode_pair_gen_var_3<T: PrimitiveSigned>(
     ))
 }
 
+pub fn random_signed_rounding_mode_pair_gen_var_4<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
 // --(PrimitiveSigned, Vec<bool>) --
 
 struct SignedBoolVecPairGeneratorVar1<T: PrimitiveSigned> {
@@ -3113,17 +3128,15 @@ pub fn random_unsigned_primitive_int_pair_gen_var_1<T: PrimitiveUnsigned, U: Pri
 
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveInt, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator<
-    T: PrimitiveUnsigned,
-    U: PrimitiveInt,
-> {
+struct ModPowerOf2QuadrupleWithTwoExtraPrimitiveIntsGenerator<T: PrimitiveUnsigned, U: PrimitiveInt>
+{
     ms: GeometricRandomNaturalValues<u64>,
     us: RandomPrimitiveInts<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator
-    for ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator<T, U>
+    for ModPowerOf2QuadrupleWithTwoExtraPrimitiveIntsGenerator<T, U>
 {
     type Item = (T, U, U, u64);
 
@@ -3151,7 +3164,7 @@ pub fn random_unsigned_primitive_int_primitive_int_unsigned_quadruple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, U, U, u64)> {
-    Box::new(ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator {
+    Box::new(ModPowerOf2QuadrupleWithTwoExtraPrimitiveIntsGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -3166,14 +3179,14 @@ pub fn random_unsigned_primitive_int_primitive_int_unsigned_quadruple_gen_var_1<
 
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoTripleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
+struct ModPowerOf2TripleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
     ms: GeometricRandomNaturalValues<u64>,
     us: RandomPrimitiveInts<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator
-    for ModPowerOfTwoTripleWithExtraPrimitiveIntGenerator<T, U>
+    for ModPowerOf2TripleWithExtraPrimitiveIntGenerator<T, U>
 {
     type Item = (T, U, u64);
 
@@ -3201,7 +3214,7 @@ pub fn random_unsigned_primitive_int_unsigned_triple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, U, u64)> {
-    Box::new(ModPowerOfTwoTripleWithExtraPrimitiveIntGenerator {
+    Box::new(ModPowerOf2TripleWithExtraPrimitiveIntGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -3269,14 +3282,14 @@ pub fn random_unsigned_signed_pair_gen_var_1<T: PrimitiveFloat>(
 
 // -- (PrimitiveUnsigned, PrimitiveSigned, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoTripleWithExtraSmallSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
+struct ModPowerOf2TripleWithExtraSmallSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
     ms: GeometricRandomNaturalValues<u64>,
     us: GeometricRandomSigneds<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveSigned> Iterator
-    for ModPowerOfTwoTripleWithExtraSmallSignedGenerator<T, U>
+    for ModPowerOf2TripleWithExtraSmallSignedGenerator<T, U>
 {
     type Item = (T, U, u64);
 
@@ -3304,7 +3317,7 @@ pub fn random_unsigned_signed_unsigned_triple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, U, u64)> {
-    Box::new(ModPowerOfTwoTripleWithExtraSmallSignedGenerator {
+    Box::new(ModPowerOf2TripleWithExtraSmallSignedGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -3444,12 +3457,12 @@ pub fn random_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(_config: &GenConfig)
     )
 }
 
-struct ModPowerOfTwoSingleGenerator<T: PrimitiveUnsigned> {
+struct ModPowerOf2SingleGenerator<T: PrimitiveUnsigned> {
     ms: GeometricRandomNaturalValues<u64>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
-impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator<T> {
+impl<T: PrimitiveUnsigned> Iterator for ModPowerOf2SingleGenerator<T> {
     type Item = (T, u64);
 
     fn next(&mut self) -> Option<(T, u64)> {
@@ -3470,12 +3483,12 @@ impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator<T> {
     }
 }
 
-struct ModPowerOfTwoSingleGenerator2<T: PrimitiveUnsigned> {
+struct ModPowerOf2SingleGenerator2<T: PrimitiveUnsigned> {
     ms: GeometricRandomNaturalValues<u64>,
     xss: Vec<Option<Box<dyn Iterator<Item = T>>>>,
 }
 
-impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator2<T> {
+impl<T: PrimitiveUnsigned> Iterator for ModPowerOf2SingleGenerator2<T> {
     type Item = (T, u64);
 
     fn next(&mut self) -> Option<(T, u64)> {
@@ -3494,7 +3507,7 @@ impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator2<T> {
 }
 
 pub fn random_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
-    Box::new(ModPowerOfTwoSingleGenerator {
+    Box::new(ModPowerOf2SingleGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -3775,7 +3788,7 @@ pub fn random_unsigned_pair_gen_var_26<T: PrimitiveUnsigned>(_config: &GenConfig
 }
 
 pub fn random_unsigned_pair_gen_var_27<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
-    Box::new(ModPowerOfTwoSingleGenerator2 {
+    Box::new(ModPowerOf2SingleGenerator2 {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             1,
@@ -3865,18 +3878,26 @@ pub fn random_unsigned_pair_gen_var_32<T: PrimitiveUnsigned>(config: &GenConfig)
     )
 }
 
-// var 33 is in malachite-nz
+// vars 33 through 37 are in malachite-nz
+
+pub fn random_unsigned_pair_gen_var_38<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(random_pairs_from_single(random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        T::TWO,
+        T::MAX,
+    )))
+}
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
+struct ModPowerOf2QuadrupleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
     ms: GeometricRandomNaturalValues<u64>,
     us: RandomPrimitiveInts<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator
-    for ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T, U>
+    for ModPowerOf2QuadrupleWithExtraPrimitiveIntGenerator<T, U>
 {
     type Item = (T, T, U, u64);
 
@@ -3905,7 +3926,7 @@ pub fn random_unsigned_unsigned_primitive_int_unsigned_quadruple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, T, U, u64)> {
-    Box::new(ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator {
+    Box::new(ModPowerOf2QuadrupleWithExtraPrimitiveIntGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -4022,12 +4043,12 @@ pub fn random_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
     )
 }
 
-struct ModPowerOfTwoPairGenerator<T: PrimitiveUnsigned> {
+struct ModPowerOf2PairGenerator<T: PrimitiveUnsigned> {
     ms: GeometricRandomNaturalValues<u64>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
-impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoPairGenerator<T> {
+impl<T: PrimitiveUnsigned> Iterator for ModPowerOf2PairGenerator<T> {
     type Item = (T, T, u64);
 
     fn next(&mut self) -> Option<(T, T, u64)> {
@@ -4052,7 +4073,7 @@ impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoPairGenerator<T> {
 pub fn random_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, T, u64)> {
-    Box::new(ModPowerOfTwoPairGenerator {
+    Box::new(ModPowerOf2PairGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -4064,17 +4085,15 @@ pub fn random_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
     })
 }
 
-struct ModPowerOfTwoTripleWithExtraSmallUnsignedGenerator<
-    T: PrimitiveUnsigned,
-    U: PrimitiveUnsigned,
-> {
+struct ModPowerOf2TripleWithExtraSmallUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
+{
     ms: GeometricRandomNaturalValues<u64>,
     us: GeometricRandomNaturalValues<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
-    for ModPowerOfTwoTripleWithExtraSmallUnsignedGenerator<T, U>
+    for ModPowerOf2TripleWithExtraSmallUnsignedGenerator<T, U>
 {
     type Item = (T, U, u64);
 
@@ -4099,7 +4118,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
 pub fn random_unsigned_triple_gen_var_6<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, U, u64)> {
-    Box::new(ModPowerOfTwoTripleWithExtraSmallUnsignedGenerator {
+    Box::new(ModPowerOf2TripleWithExtraSmallUnsignedGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -4172,12 +4191,12 @@ pub fn random_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>(
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoTripleGenerator<T: PrimitiveUnsigned> {
+struct ModPowerOf2TripleGenerator<T: PrimitiveUnsigned> {
     ms: GeometricRandomNaturalValues<u64>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
-impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoTripleGenerator<T> {
+impl<T: PrimitiveUnsigned> Iterator for ModPowerOf2TripleGenerator<T> {
     type Item = (T, T, T, u64);
 
     fn next(&mut self) -> Option<(T, T, T, u64)> {
@@ -4202,7 +4221,7 @@ impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoTripleGenerator<T> {
 pub fn random_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, T, T, u64)> {
-    Box::new(ModPowerOfTwoTripleGenerator {
+    Box::new(ModPowerOf2TripleGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -4339,6 +4358,22 @@ pub fn random_unsigned_rounding_mode_pair_gen_var_3<T: PrimitiveUnsigned>(
             )
         },
         &|seed| random_rounding_modes(seed).filter(|&rm| rm != Exact),
+    ))
+}
+
+pub fn random_unsigned_rounding_mode_pair_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &random_rounding_modes,
     ))
 }
 
@@ -7593,14 +7628,14 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>(
     ))
 }
 
-struct PowerOfTwoDigitsGenerator<T: PrimitiveUnsigned> {
+struct PowerOf2DigitsGenerator<T: PrimitiveUnsigned> {
     log_bases: GeometricRandomNaturalValues<u64>,
     digit_counts: GeometricRandomNaturalValues<usize>,
     ranges: VariableRangeGenerator,
     phantom: PhantomData<*const T>,
 }
 
-impl<T: PrimitiveUnsigned> Iterator for PowerOfTwoDigitsGenerator<T> {
+impl<T: PrimitiveUnsigned> Iterator for PowerOf2DigitsGenerator<T> {
     type Item = (Vec<T>, u64);
 
     fn next(&mut self) -> Option<(Vec<T>, u64)> {
@@ -7617,7 +7652,7 @@ impl<T: PrimitiveUnsigned> Iterator for PowerOfTwoDigitsGenerator<T> {
 pub fn random_unsigned_vec_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(Vec<T>, u64)> {
-    Box::new(PowerOfTwoDigitsGenerator::<T> {
+    Box::new(PowerOf2DigitsGenerator::<T> {
         log_bases: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("log_bases"),
             1,

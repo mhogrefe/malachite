@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -293,7 +293,7 @@ impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
     }
 }
 
-impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
+impl ModPowerOf2Mul<Natural> for &Natural {
     type Output = Natural;
 
     /// Multiplies two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
@@ -332,7 +332,7 @@ impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
+impl ModPowerOf2Mul<&Natural> for &Natural {
     type Output = Natural;
 
     /// Multiplies two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
@@ -364,7 +364,7 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
     ///     12
     /// );
     /// ```
-    fn mod_power_of_2_mul(self, other: &'b Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_mul(self, other: &Natural, pow: u64) -> Natural {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"

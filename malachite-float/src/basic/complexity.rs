@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -43,7 +43,7 @@ impl Float {
     /// assert_eq!(Float::NAN.complexity(), 1);
     /// assert_eq!(Float::ONE.complexity(), 1);
     /// assert_eq!(Float::one_prec(100).complexity(), 100);
-    /// assert_eq!(Float::from(std::f64::consts::PI).complexity(), 53);
+    /// assert_eq!(Float::from(std::f64::consts::PI).complexity(), 50);
     /// assert_eq!(Float::power_of_2(100u64).complexity(), 100);
     /// assert_eq!(Float::power_of_2(-100i64).complexity(), 100);
     /// ```
@@ -53,16 +53,13 @@ impl Float {
                 exponent,
                 precision,
                 ..
-            }) => max(
-                u64::from(exponent.checked_sub(1).unwrap().unsigned_abs()),
-                *precision,
-            ),
+            }) => max(u64::from((exponent - 1).unsigned_abs()), *precision),
             _ => 1,
         }
     }
 }
 
-impl<'a> SignificantBits for &'a Float {
+impl SignificantBits for &Float {
     /// Returns the number of significant bits of a [`Float`]. This is defined as follows:
     ///
     /// $$
@@ -92,7 +89,7 @@ impl<'a> SignificantBits for &'a Float {
     /// assert_eq!(Float::NAN.significant_bits(), 1);
     /// assert_eq!(Float::ONE.significant_bits(), 1);
     /// assert_eq!(Float::one_prec(100).significant_bits(), 100);
-    /// assert_eq!(Float::from(std::f64::consts::PI).significant_bits(), 53);
+    /// assert_eq!(Float::from(std::f64::consts::PI).significant_bits(), 50);
     /// assert_eq!(Float::power_of_2(100u64).significant_bits(), 1);
     /// assert_eq!(Float::power_of_2(-100i64).significant_bits(), 1);
     /// ```

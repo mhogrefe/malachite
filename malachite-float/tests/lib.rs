@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -70,7 +70,9 @@ pub mod arithmetic {
     pub mod power_of_2;
     pub mod reciprocal;
     pub mod shl;
+    pub mod shl_round;
     pub mod shr;
+    pub mod shr_round;
     pub mod sign;
     pub mod square;
     pub mod sub;
@@ -117,6 +119,7 @@ pub mod conversion {
     pub mod from_primitive_int;
     pub mod from_rational;
     pub mod integer_from_float;
+    pub mod is_integer;
     pub mod mantissa_and_exponent;
     pub mod natural_from_float;
     pub mod primitive_float_from_float;

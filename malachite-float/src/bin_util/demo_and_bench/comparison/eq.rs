@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -12,14 +12,20 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_max_complexity_bucketer, pair_float_max_complexity_bucketer,
 };
-use malachite_float::test_util::generators::{float_pair_gen, float_pair_gen_rm};
+use malachite_float::test_util::generators::{
+    float_pair_gen, float_pair_gen_rm, float_pair_gen_var_10,
+};
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_eq);
     register_demo!(runner, demo_float_eq_debug);
+    register_demo!(runner, demo_float_eq_extreme);
+    register_demo!(runner, demo_float_eq_extreme_debug);
     register_demo!(runner, demo_comparable_float_eq);
     register_demo!(runner, demo_comparable_float_eq_debug);
+    register_demo!(runner, demo_comparable_float_eq_extreme);
+    register_demo!(runner, demo_comparable_float_eq_extreme_debug);
     register_demo!(runner, demo_comparable_float_ref_eq);
     register_demo!(runner, demo_comparable_float_ref_eq_debug);
 
@@ -50,6 +56,28 @@ fn demo_float_eq_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_eq_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_pair_gen_var_10().get(gm, config).take(limit) {
+        if x == y {
+            println!("{x} = {y}");
+        } else {
+            println!("{x} ≠ {y}");
+        }
+    }
+}
+
+fn demo_float_eq_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_pair_gen_var_10().get(gm, config).take(limit) {
+        let cx = ComparableFloatRef(&x);
+        let cy = ComparableFloatRef(&y);
+        if x == y {
+            println!("{cx:#x} = {cy:#x}");
+        } else {
+            println!("{cx:#x} ≠ {cy:#x}");
+        }
+    }
+}
+
 fn demo_comparable_float_eq(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in float_pair_gen().get(gm, config).take(limit) {
         let cx = ComparableFloat(x.clone());
@@ -64,6 +92,30 @@ fn demo_comparable_float_eq(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_comparable_float_eq_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in float_pair_gen().get(gm, config).take(limit) {
+        let cx = ComparableFloat(x.clone());
+        let cy = ComparableFloat(y.clone());
+        if cx == cy {
+            println!("{cx:#x} = {cy:#x}");
+        } else {
+            println!("{cx:#x} ≠ {cy:#x}");
+        }
+    }
+}
+
+fn demo_comparable_float_eq_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_pair_gen_var_10().get(gm, config).take(limit) {
+        let cx = ComparableFloat(x.clone());
+        let cy = ComparableFloat(y.clone());
+        if cx == cy {
+            println!("{x} = {y}");
+        } else {
+            println!("{x} ≠ {y}");
+        }
+    }
+}
+
+fn demo_comparable_float_eq_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_pair_gen_var_10().get(gm, config).take(limit) {
         let cx = ComparableFloat(x.clone());
         let cy = ComparableFloat(y.clone());
         if cx == cy {

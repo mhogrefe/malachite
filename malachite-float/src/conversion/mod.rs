@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -233,7 +233,7 @@ pub mod is_integer;
 /// ```
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::Float;
 /// use malachite_nz::natural::Natural;
@@ -248,7 +248,7 @@ pub mod is_integer;
 /// assert_eq!(e, 1);
 ///
 /// let (m, e): (f64, i32) =
-///     (&Float::from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
+///     (&Float::exact_from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
 /// assert_eq!(NiceFloat(m), NiceFloat(1.187662594419065));
 /// assert_eq!(e, 79);
 ///

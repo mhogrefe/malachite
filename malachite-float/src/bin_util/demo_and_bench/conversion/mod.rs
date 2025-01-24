@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     from_rational::register(runner);
     integer_from_float::register(runner);
     integer_mantissa_and_exponent::register(runner);
+    is_integer::register(runner);
     natural_from_float::register(runner);
     primitive_float_from_float::register(runner);
     primitive_int_from_float::register(runner);
@@ -34,6 +35,7 @@ mod from_primitive_int;
 mod from_rational;
 mod integer_from_float;
 mod integer_mantissa_and_exponent;
+mod is_integer;
 mod natural_from_float;
 mod primitive_float_from_float;
 mod primitive_int_from_float;

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // CheckedDiv implementation by Park Joon-Kyu.
 //
@@ -70,7 +70,7 @@ impl Div<Rational> for Rational {
     }
 }
 
-impl<'a> Div<&'a Rational> for Rational {
+impl Div<&Rational> for Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking the first by value and the second by
@@ -103,7 +103,7 @@ impl<'a> Div<&'a Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn div(self, other: &'a Rational) -> Rational {
+    fn div(self, other: &Rational) -> Rational {
         if *other == 0u32 {
             panic!("division by zero");
         } else if self == 0u32 {
@@ -114,7 +114,7 @@ impl<'a> Div<&'a Rational> for Rational {
     }
 }
 
-impl<'a> Div<Rational> for &'a Rational {
+impl Div<Rational> for &Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking the first by reference and the second
@@ -166,7 +166,7 @@ impl<'a> Div<Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Div<&'a Rational> for &'b Rational {
+impl Div<&Rational> for &Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking both by reference.
@@ -197,7 +197,7 @@ impl<'a, 'b> Div<&'a Rational> for &'b Rational {
     ///     "200/63"
     /// );
     /// ```
-    fn div(self, other: &'a Rational) -> Rational {
+    fn div(self, other: &Rational) -> Rational {
         if *other == 0u32 {
             panic!("division by zero");
         } else if *self == 0u32 {
@@ -273,7 +273,7 @@ impl CheckedDiv<Rational> for Rational {
     }
 }
 
-impl<'a> CheckedDiv<&'a Rational> for Rational {
+impl CheckedDiv<&Rational> for Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking the first by value and the second by
@@ -310,7 +310,7 @@ impl<'a> CheckedDiv<&'a Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn checked_div(self, other: &'a Rational) -> Option<Rational> {
+    fn checked_div(self, other: &Rational) -> Option<Rational> {
         if other == &0u32 {
             None
         } else if self == 0u32 {
@@ -321,7 +321,7 @@ impl<'a> CheckedDiv<&'a Rational> for Rational {
     }
 }
 
-impl<'a> CheckedDiv<Rational> for &'a Rational {
+impl CheckedDiv<Rational> for &Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking the first by reference and the second
@@ -378,7 +378,7 @@ impl<'a> CheckedDiv<Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> CheckedDiv<&'a Rational> for &'b Rational {
+impl CheckedDiv<&Rational> for &Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking both by reference. Returns `None`
@@ -415,7 +415,7 @@ impl<'a, 'b> CheckedDiv<&'a Rational> for &'b Rational {
     ///     "200/63"
     /// );
     /// ```
-    fn checked_div(self, other: &'a Rational) -> Option<Rational> {
+    fn checked_div(self, other: &Rational) -> Option<Rational> {
         if *other == 0u32 {
             return None;
         } else if *self == 0u32 {
@@ -486,7 +486,7 @@ impl DivAssign<Rational> for Rational {
     }
 }
 
-impl<'a> DivAssign<&'a Rational> for Rational {
+impl DivAssign<&Rational> for Rational {
     /// Divides a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the right-hand
     /// side by reference.
     ///
@@ -518,7 +518,7 @@ impl<'a> DivAssign<&'a Rational> for Rational {
     /// x /= &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "200/63");
     /// ```
-    fn div_assign(&mut self, other: &'a Rational) {
+    fn div_assign(&mut self, other: &Rational) {
         if *other == 0u32 {
             panic!("division by zero");
         } else if *self == 0u32 || *other == 1u32 {

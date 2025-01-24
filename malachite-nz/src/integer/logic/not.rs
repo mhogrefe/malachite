@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -44,7 +44,7 @@ impl Not for Integer {
     }
 }
 
-impl<'a> Not for &'a Integer {
+impl Not for &Integer {
     type Output = Integer;
 
     /// Returns the bitwise negation of an [`Integer`], taking it by reference.

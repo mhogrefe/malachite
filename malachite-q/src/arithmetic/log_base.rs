@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -153,7 +153,7 @@ pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
     }
 }
 
-impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
+impl FloorLogBase<&Rational> for &Rational {
     type Output = i64;
 
     /// Returns the floor of the base-$b$ logarithm of a positive [`Rational`].
@@ -212,7 +212,7 @@ impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
+impl CeilingLogBase<&Rational> for &Rational {
     type Output = i64;
 
     /// Returns the ceiling of the base-$b$ logarithm of a positive [`Rational`].
@@ -276,7 +276,7 @@ impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> CheckedLogBase<&'b Rational> for &'a Rational {
+impl CheckedLogBase<&Rational> for &Rational {
     type Output = i64;
 
     /// Returns the base-$b$ logarithm of a positive [`Rational`]. If the [`Rational`] is not a

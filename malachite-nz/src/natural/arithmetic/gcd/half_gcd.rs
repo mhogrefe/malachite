@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -62,7 +62,7 @@ pub(crate) trait GcdSubdivideStepContext {
 /// This is equivalent to `gcd_ctx` from `mpn/gcd.c`, GMP 6.2.1.
 struct GcdContext<'a>(&'a mut [Limb]);
 
-impl<'a> GcdSubdivideStepContext for GcdContext<'a> {
+impl GcdSubdivideStepContext for GcdContext<'_> {
     /// This is equivalent to `gcd_hook` from `mpn/gcd.c`, GMP 6.2.1.
     fn gcd_subdiv_step_hook(
         &mut self,
@@ -95,7 +95,7 @@ pub(crate) struct HalfGcdMatrix<'a> {
     pub(crate) n: usize,
 }
 
-impl<'a> HalfGcdMatrix<'a> {
+impl HalfGcdMatrix<'_> {
     // # Worst-case complexity
     // Constant time and additional memory.
     pub_crate_test! {get(&self, row: u8, column: u8) -> &[Limb] {
@@ -863,7 +863,7 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     xs_len
 }
 
-impl<'a> GcdSubdivideStepContext for HalfGcdMatrix<'a> {
+impl GcdSubdivideStepContext for HalfGcdMatrix<'_> {
     // # Worst-case complexity
     // $T(n) = O(n)$
     //

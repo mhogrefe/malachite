@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -122,7 +122,7 @@ impl RoundToMultiple<Natural> for Natural {
     }
 }
 
-impl<'a> RoundToMultiple<&'a Natural> for Natural {
+impl RoundToMultiple<&Natural> for Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
@@ -227,13 +227,13 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &'a Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn round_to_multiple(mut self, other: &Natural, rm: RoundingMode) -> (Natural, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
 }
 
-impl<'a> RoundToMultiple<Natural> for &'a Natural {
+impl RoundToMultiple<Natural> for &Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
@@ -382,7 +382,7 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
+impl RoundToMultiple<&Natural> for &Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
@@ -485,7 +485,7 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     ///     "(16, Greater)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: &'b Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn round_to_multiple(self, other: &Natural, rm: RoundingMode) -> (Natural, Ordering) {
         match (self, other) {
             (x, y) if x == y => (x.clone(), Equal),
             (x, &Natural::ZERO) => match rm {
@@ -665,7 +665,7 @@ impl RoundToMultipleAssign<Natural> for Natural {
     }
 }
 
-impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
+impl RoundToMultipleAssign<&Natural> for Natural {
     /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a specified
     /// rounding mode. The [`Natural`] on the right-hand side is taken by reference. An [`Ordering`]
     /// is also returned, indicating whether the returned value is less than, equal to, or greater
@@ -748,7 +748,7 @@ impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// );
     /// assert_eq!(x, 16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &'a Natural, rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: &Natural, rm: RoundingMode) -> Ordering {
         match (&mut *self, other) {
             (x, y) if *x == *y => Equal,
             (x, &Natural::ZERO) => match rm {

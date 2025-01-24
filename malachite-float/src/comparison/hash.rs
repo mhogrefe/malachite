@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -27,7 +27,7 @@ impl Hash for ComparableFloat {
     }
 }
 
-impl<'a> Hash for ComparableFloatRef<'a> {
+impl Hash for ComparableFloatRef<'_> {
     /// Computes a hash of a `ComparableFloatRef`.
     ///
     /// The hash is compatible with `ComparableFloatRef` equality: all `NaN`s hash to the same

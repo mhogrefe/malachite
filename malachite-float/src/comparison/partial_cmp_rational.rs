@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,48 +13,12 @@ use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::Rational;
 
-pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ordering> {
-    match (x, other) {
-        (float_nan!(), _) => None,
-        (float_infinity!(), _) => Some(Greater),
-        (float_negative_infinity!(), _) => Some(Less),
-        (float_either_zero!(), y) => 0u32.partial_cmp(y),
-        (
-            Float(Finite {
-                sign: s_x,
-                exponent: e_x,
-                ..
-            }),
-            y,
-        ) => Some(if *y == 0u32 {
-            if *s_x {
-                Greater
-            } else {
-                Less
-            }
-        } else {
-            let s_cmp = s_x.cmp(&(*y > 0));
-            if s_cmp != Equal {
-                return Some(s_cmp);
-            }
-            let ord_cmp = (i64::from(*e_x) - 1).cmp(&other.floor_log_base_2_abs());
-            if ord_cmp == Equal {
-                Rational::try_from(x).unwrap().cmp(other)
-            } else if *s_x {
-                ord_cmp
-            } else {
-                ord_cmp.reverse()
-            }
-        }),
-    }
-}
-
 impl PartialOrd<Rational> for Float {
     /// Compares a [`Float`] to a [`Rational`].
     ///
-    /// NaN is not comparable to any [`Rational`]. Infinity is greater than any [`Rational`], and
-    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are equal
-    /// to the [`Rational`] zero.
+    /// NaN is not comparable to any [`Rational`]. $\infty$ is greater than any [`Rational`], and
+    /// $-\infty$ is less. Both the [`Float`] zero and the [`Float`] negative zero are equal to the
+    /// [`Rational`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -102,36 +66,31 @@ impl PartialOrd<Rational> for Float {
                     return Some(s_cmp);
                 }
                 let e_x = i64::from(*e_x);
-                let ord_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
-                if ord_cmp == Equal {
-                    let shift = e_x - i64::exact_from(significand_bits(significand_x));
-                    let abs_shift = shift.unsigned_abs();
-                    let prod_cmp = match shift.sign() {
-                        Equal => {
-                            (significand_x * other.denominator_ref()).cmp(other.numerator_ref())
+                let exp_cmp = (e_x - 1).cmp(&other.floor_log_base_2_abs());
+                if exp_cmp != Equal {
+                    return Some(if *s_x { exp_cmp } else { exp_cmp.reverse() });
+                }
+                let shift = e_x - i64::exact_from(significand_bits(significand_x));
+                let abs_shift = shift.unsigned_abs();
+                let prod_cmp = match shift.sign() {
+                    Equal => (significand_x * other.denominator_ref()).cmp(other.numerator_ref()),
+                    Greater => ((significand_x * other.denominator_ref()) << abs_shift)
+                        .cmp(other.numerator_ref()),
+                    Less => {
+                        let n_trailing_zeros = significand_x.trailing_zeros().unwrap();
+                        if abs_shift <= n_trailing_zeros {
+                            ((significand_x >> abs_shift) * other.denominator_ref())
+                                .cmp(other.numerator_ref())
+                        } else {
+                            ((significand_x >> n_trailing_zeros) * other.denominator_ref())
+                                .cmp(&(other.numerator_ref() << (abs_shift - n_trailing_zeros)))
                         }
-                        Greater => ((significand_x * other.denominator_ref()) << abs_shift)
-                            .cmp(other.numerator_ref()),
-                        Less => {
-                            let n_trailing_zeros = significand_x.trailing_zeros().unwrap();
-                            if abs_shift <= n_trailing_zeros {
-                                ((significand_x >> abs_shift) * other.denominator_ref())
-                                    .cmp(other.numerator_ref())
-                            } else {
-                                ((significand_x >> n_trailing_zeros) * other.denominator_ref())
-                                    .cmp(&(other.numerator_ref() << (abs_shift - n_trailing_zeros)))
-                            }
-                        }
-                    };
-                    if *s_x {
-                        prod_cmp
-                    } else {
-                        prod_cmp.reverse()
                     }
-                } else if *s_x {
-                    ord_cmp
+                };
+                if *s_x {
+                    prod_cmp
                 } else {
-                    ord_cmp.reverse()
+                    prod_cmp.reverse()
                 }
             }),
         }
@@ -141,9 +100,9 @@ impl PartialOrd<Rational> for Float {
 impl PartialOrd<Float> for Rational {
     /// Compares an [`Rational`] to a [`Float`].
     ///
-    /// No [`Rational`] is comparable to NaN. Every [`Rational`] is smaller than infinity and
-    /// greater than negative infinity. The [`Rational`] zero is equal to both the [`Float`] zero
-    /// and the [`Float`] negative zero.
+    /// No [`Rational`] is comparable to NaN. Every [`Rational`] is smaller than $\infty$ and
+    /// greater than $-\infty$. The [`Rational`] zero is equal to both the [`Float`] zero and the
+    /// [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

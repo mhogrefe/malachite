@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -92,7 +92,7 @@ impl Natural {
     }
 }
 
-impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
+impl HammingDistance<&Natural> for &Natural {
     /// Determines the Hamming distance between two [`Natural]`s.
     ///
     /// Both [`Natural`]s have infinitely many implicit leading zeros.
@@ -123,7 +123,7 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     /// let n = Natural::ONE << 100u32;
     /// assert_eq!(n.hamming_distance(&(&n - Natural::ONE)), 101);
     /// ```
-    fn hamming_distance(self, other: &'a Natural) -> u64 {
+    fn hamming_distance(self, other: &Natural) -> u64 {
         match (self, other) {
             (&Natural(Small(x)), _) => other.hamming_distance_limb(x),
             (_, &Natural(Small(y))) => self.hamming_distance_limb(y),

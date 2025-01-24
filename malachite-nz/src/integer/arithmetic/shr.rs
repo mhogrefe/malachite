@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -94,7 +94,7 @@ macro_rules! impl_shr_unsigned {
             }
         }
 
-        impl<'a> Shr<$t> for &'a Integer {
+        impl<'a> Shr<$t> for &Integer {
             type Output = Integer;
 
             /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor), taking
@@ -201,7 +201,7 @@ macro_rules! impl_shr_signed {
             }
         }
 
-        impl<'a> Shr<$t> for &'a Integer {
+        impl<'a> Shr<$t> for &Integer {
             type Output = Integer;
 
             /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor or

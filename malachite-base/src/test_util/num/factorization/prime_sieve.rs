@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,29 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{CheckedSquare, DivisibleBy, FloorSqrt, Parity};
+use crate::num::arithmetic::traits::{CheckedSquare, DivisibleBy, Parity};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::factorization::prime_sieve::{id_to_n, limbs_count_ones, n_to_bit};
+use crate::num::factorization::traits::IsPrime;
 use crate::num::logic::traits::{NotAssign, TrailingZeros};
 use crate::slices::slice_leading_zeros;
-
-// Replace with good primality test once we have one
-fn is_prime_simple(n: u64) -> bool {
-    match n {
-        0 | 1 => false,
-        2 => true,
-        n if n.even() => false,
-        n => {
-            for f in 3..=n.floor_sqrt() {
-                if n.divisible_by(f) {
-                    return false;
-                }
-            }
-            true
-        }
-    }
-}
 
 pub fn limbs_prime_sieve_naive_1<T: PrimitiveUnsigned>(bit_array: &mut [T], n: u64) -> u64 {
     assert!(n > 4);
@@ -37,7 +21,7 @@ pub fn limbs_prime_sieve_naive_1<T: PrimitiveUnsigned>(bit_array: &mut [T], n: u
     'outer: for x in &mut *bit_array {
         *x = T::MAX;
         for i in 0..T::WIDTH {
-            if is_prime_simple(f) {
+            if f.is_prime() {
                 x.clear_bit(i);
             }
             f += if b { 4 } else { 2 };

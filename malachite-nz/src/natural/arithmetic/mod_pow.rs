@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -703,7 +703,7 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a> ModPow<Natural, Natural> for &'a Natural {
+impl ModPow<Natural, Natural> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`]$m$. The base must be
@@ -761,7 +761,7 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
+impl ModPow<Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
@@ -796,7 +796,7 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow(self, mut exp: Natural, m: &'b Natural) -> Natural {
+    fn mod_pow(self, mut exp: Natural, m: &Natural) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, &exp, m) {
             (_, _, &Natural::ONE) => Natural::ZERO,
@@ -819,7 +819,7 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
+impl ModPow<&Natural, Natural> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
@@ -854,7 +854,7 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow(self, exp: &'b Natural, mut m: Natural) -> Natural {
+    fn mod_pow(self, exp: &Natural, mut m: Natural) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, exp, &m) {
             (_, _, &Natural::ONE) => Natural::ZERO,
@@ -877,7 +877,7 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
+impl ModPow<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
@@ -911,7 +911,7 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow(self, exp: &'b Natural, m: &'c Natural) -> Natural {
+    fn mod_pow(self, exp: &Natural, m: &Natural) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, exp, m) {
             (_, _, &Natural::ONE) => Natural::ZERO,

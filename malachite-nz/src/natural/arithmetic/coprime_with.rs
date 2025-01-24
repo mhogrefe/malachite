@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -125,7 +125,7 @@ impl<'a> CoprimeWith<&'a Natural> for Natural {
     }
 }
 
-impl<'a> CoprimeWith<Natural> for &'a Natural {
+impl CoprimeWith<Natural> for &Natural {
     /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
     /// other than 1. The first [`Natural`] is taken by reference and the second by value.
     ///
@@ -163,7 +163,7 @@ impl<'a> CoprimeWith<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> CoprimeWith<&'b Natural> for &'a Natural {
+impl CoprimeWith<&Natural> for &Natural {
     /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
     /// other than 1. Both [`Natural`]s are taken by reference.
     ///
@@ -195,7 +195,7 @@ impl<'a, 'b> CoprimeWith<&'b Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn coprime_with(self, other: &'b Natural) -> bool {
+    fn coprime_with(self, other: &Natural) -> bool {
         coprime_with_check_2_ref_ref(self, other)
     }
 }

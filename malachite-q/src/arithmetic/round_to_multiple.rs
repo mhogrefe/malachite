@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -110,7 +110,7 @@ impl RoundToMultiple<Rational> for Rational {
     }
 }
 
-impl<'a> RoundToMultiple<&'a Rational> for Rational {
+impl RoundToMultiple<&Rational> for Rational {
     type Output = Rational;
 
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
@@ -200,13 +200,13 @@ impl<'a> RoundToMultiple<&'a Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &'a Rational, rm: RoundingMode) -> (Rational, Ordering) {
+    fn round_to_multiple(mut self, other: &Rational, rm: RoundingMode) -> (Rational, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
 }
 
-impl<'a> RoundToMultiple<Rational> for &'a Rational {
+impl RoundToMultiple<Rational> for &Rational {
     type Output = Rational;
 
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
@@ -311,7 +311,7 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
+impl RoundToMultiple<&Rational> for &Rational {
     type Output = Rational;
 
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
@@ -392,7 +392,7 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
     ///     "(157/50, Less)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: &'b Rational, mut rm: RoundingMode) -> (Rational, Ordering) {
+    fn round_to_multiple(self, other: &Rational, mut rm: RoundingMode) -> (Rational, Ordering) {
         if self == other {
             return (self.clone(), Equal);
         }
@@ -498,7 +498,7 @@ impl RoundToMultipleAssign<Rational> for Rational {
     }
 }
 
-impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
+impl RoundToMultipleAssign<&Rational> for Rational {
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`] in place, according to
     /// a specified rounding mode. The [`Rational`] on the right-hand side is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
@@ -553,7 +553,7 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     /// assert_eq!(x.round_to_multiple_assign(&hundredth, Nearest), Less);
     /// assert_eq!(x.to_string(), "157/50");
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &'a Rational, mut rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: &Rational, mut rm: RoundingMode) -> Ordering {
         if self == other {
             return Equal;
         }

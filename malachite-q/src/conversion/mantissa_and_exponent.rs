@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -355,7 +355,7 @@ macro_rules! impl_mantissa_and_exponent {
             }
         }
 
-        impl<'a> SciMantissaAndExponent<$t, i64, Rational> for &'a Rational {
+        impl SciMantissaAndExponent<$t, i64, Rational> for &Rational {
             /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`]
             /// by reference.
             ///

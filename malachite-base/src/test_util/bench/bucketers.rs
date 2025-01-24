@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -184,6 +184,22 @@ where
 {
     Bucketer {
         bucketing_function: &|&(x, y)| {
+            max(usize::exact_from(x.unsigned_abs()), usize::exact_from(y))
+        },
+        bucketing_label: format!("max({x_name}, {y_name})"),
+    }
+}
+
+pub fn abs_triple_1_2_usize_convertible_max_bucketer<'a, T: Copy + UnsignedAbs, U: Copy, V>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, V)>
+where
+    usize: ExactFrom<<T as UnsignedAbs>::Output> + ExactFrom<U>,
+    <T as UnsignedAbs>::Output: Ord,
+{
+    Bucketer {
+        bucketing_function: &|&(x, y, _)| {
             max(usize::exact_from(x.unsigned_abs()), usize::exact_from(y))
         },
         bucketing_label: format!("max({x_name}, {y_name})"),

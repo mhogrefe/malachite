@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,9 +15,9 @@ use malachite_nz::integer::Integer;
 impl PartialOrd<Integer> for Float {
     /// Compares a [`Float`] to an [`Integer`].
     ///
-    /// NaN is not comparable to any [`Integer`]. Infinity is greater than any [`Integer`], and
-    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are equal
-    /// to the [`Integer`] zero.
+    /// NaN is not comparable to any [`Integer`]. $\infty$ is greater than any [`Integer`], and
+    /// $-\infty$ is less. Both the [`Float`] zero and the [`Float`] negative zero are equal to the
+    /// [`Integer`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -76,9 +76,9 @@ impl PartialOrd<Integer> for Float {
 impl PartialOrd<Float> for Integer {
     /// Compares an [`Integer`] to a [`Float`].
     ///
-    /// No [`Integer`] is comparable to NaN. Every [`Integer`] is smaller than infinity and greater
-    /// than negative infinity. The [`Integer`] zero is equal to both the [`Float`] zero and the
-    /// [`Float`] negative zero.
+    /// No [`Integer`] is comparable to NaN. Every [`Integer`] is smaller than $\infty$ and greater
+    /// than $-\infty$. The [`Integer`] zero is equal to both the [`Float`] zero and the [`Float`]
+    /// negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

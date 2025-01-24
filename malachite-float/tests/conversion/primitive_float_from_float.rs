@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,7 +17,8 @@ use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::conversion::primitive_float_from_float::FloatFromFloatError;
 use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_var_4, float_rounding_mode_pair_gen_var_6,
+    float_gen, float_gen_var_12, float_gen_var_4, float_rounding_mode_pair_gen_var_20,
+    float_rounding_mode_pair_gen_var_6,
 };
 use malachite_float::Float;
 use malachite_nz::integer::Integer;
@@ -71,6 +72,8 @@ fn test_try_from_float() {
         );
         test_helper::<T>("2.0e2408", "0x1.0E+2000#1", "Err(Overflow)");
         test_helper::<T>("6.0e-2409", "0x1.0E-2000#1", "Err(Underflow)");
+        test_helper::<T>("too_big", "0x4.0E+268435455#1", "Err(Overflow)");
+        test_helper::<T>("too_small", "0x1.0E-268435456#1", "Err(Underflow)");
 
         test_helper::<T>("-1.0", "-0x1.0#1", "Ok(-1.0)");
         test_helper::<T>("-2.0", "-0x2.0#1", "Ok(-2.0)");
@@ -83,6 +86,8 @@ fn test_try_from_float() {
         );
         test_helper::<T>("-2.0e2408", "-0x1.0E+2000#1", "Err(Overflow)");
         test_helper::<T>("-6.0e-2409", "-0x1.0E-2000#1", "Err(Underflow)");
+        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", "Err(Overflow)");
+        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", "Err(Underflow)");
     }
     apply_fn_to_primitive_floats!(test_helper_2);
     test_helper::<f32>("0.33333334", "0x0.5555558#24", "Ok(0.33333334)");
@@ -151,6 +156,8 @@ fn test_convertible_from_float() {
         test_helper::<T>("0.333333333333333332", "0x0.555555555555554#57", false);
         test_helper::<T>("2.0e2408", "0x1.0E+2000#1", false);
         test_helper::<T>("6.0e-2409", "0x1.0E-2000#1", false);
+        test_helper::<T>("too_big", "0x4.0E+268435455#1", false);
+        test_helper::<T>("too_small", "0x1.0E-268435456#1", false);
 
         test_helper::<T>("-1.0", "-0x1.0#1", true);
         test_helper::<T>("-2.0", "-0x2.0#1", true);
@@ -160,6 +167,8 @@ fn test_convertible_from_float() {
         test_helper::<T>("-0.333333333333333332", "-0x0.555555555555554#57", false);
         test_helper::<T>("-2.0e2408", "-0x1.0E+2000#1", false);
         test_helper::<T>("-6.0e-2409", "-0x1.0E-2000#1", false);
+        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", false);
+        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", false);
     }
     apply_fn_to_primitive_floats!(test_helper_2);
     test_helper::<f32>("0.33333333333333331", "0x0.55555555555554#53", false);
@@ -535,7 +544,6 @@ fn test_rounding_from_float() {
         "1.7976931348623157e308",
         Less,
     );
-
     test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Floor, "0.0", Less);
     test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Ceiling, "1.0e-45", Greater);
     test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Down, "0.0", Less);
@@ -596,6 +604,78 @@ fn test_rounding_from_float() {
     test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Down, "0.0", Less);
     test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Up, "5.0e-324", Greater);
     test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Nearest, "0.0", Less);
+
+    test_helper::<f32>("too_big", "0x4.0E+268435455#1", Floor, "3.4028235e38", Less);
+    test_helper::<f32>(
+        "too_big",
+        "0x4.0E+268435455#1",
+        Ceiling,
+        "Infinity",
+        Greater,
+    );
+    test_helper::<f32>("too_big", "0x4.0E+268435455#1", Down, "3.4028235e38", Less);
+    test_helper::<f32>("too_big", "0x4.0E+268435455#1", Up, "Infinity", Greater);
+    test_helper::<f32>(
+        "too_big",
+        "0x4.0E+268435455#1",
+        Nearest,
+        "3.4028235e38",
+        Less,
+    );
+
+    test_helper::<f64>(
+        "too_big",
+        "0x4.0E+268435455#1",
+        Floor,
+        "1.7976931348623157e308",
+        Less,
+    );
+    test_helper::<f64>(
+        "too_big",
+        "0x4.0E+268435455#1",
+        Ceiling,
+        "Infinity",
+        Greater,
+    );
+    test_helper::<f64>(
+        "too_big",
+        "0x4.0E+268435455#1",
+        Down,
+        "1.7976931348623157e308",
+        Less,
+    );
+    test_helper::<f64>("too_big", "0x4.0E+268435455#1", Up, "Infinity", Greater);
+    test_helper::<f64>(
+        "too_big",
+        "0x4.0E+268435455#1",
+        Nearest,
+        "1.7976931348623157e308",
+        Less,
+    );
+
+    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Floor, "0.0", Less);
+    test_helper::<f32>(
+        "too_small",
+        "0x1.0E-268435456#1",
+        Ceiling,
+        "1.0e-45",
+        Greater,
+    );
+    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Down, "0.0", Less);
+    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Up, "1.0e-45", Greater);
+    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Nearest, "0.0", Less);
+
+    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Floor, "0.0", Less);
+    test_helper::<f64>(
+        "too_small",
+        "0x1.0E-268435456#1",
+        Ceiling,
+        "5.0e-324",
+        Greater,
+    );
+    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Down, "0.0", Less);
+    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Up, "5.0e-324", Greater);
+    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Nearest, "0.0", Less);
 
     test_helper::<f32>(
         "-0.33333334",
@@ -991,6 +1071,96 @@ fn test_rounding_from_float() {
     test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Down, "-0.0", Greater);
     test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Up, "-5.0e-324", Less);
     test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Nearest, "-0.0", Greater);
+
+    test_helper::<f32>("-too_big", "-0x4.0E+268435455#1", Floor, "-Infinity", Less);
+    test_helper::<f32>(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Ceiling,
+        "-3.4028235e38",
+        Greater,
+    );
+    test_helper::<f32>(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Down,
+        "-3.4028235e38",
+        Greater,
+    );
+    test_helper::<f32>("-too_big", "-0x4.0E+268435455#1", Up, "-Infinity", Less);
+    test_helper::<f32>(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Nearest,
+        "-3.4028235e38",
+        Greater,
+    );
+
+    test_helper::<f64>("-too_big", "-0x4.0E+268435455#1", Floor, "-Infinity", Less);
+    test_helper::<f64>(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Ceiling,
+        "-1.7976931348623157e308",
+        Greater,
+    );
+    test_helper::<f64>(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Down,
+        "-1.7976931348623157e308",
+        Greater,
+    );
+    test_helper::<f64>("-too_big", "-0x4.0E+268435455#1", Up, "-Infinity", Less);
+    test_helper::<f64>(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Nearest,
+        "-1.7976931348623157e308",
+        Greater,
+    );
+
+    test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Floor, "-1.0e-45", Less);
+    test_helper::<f32>(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Ceiling,
+        "-0.0",
+        Greater,
+    );
+    test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Down, "-0.0", Greater);
+    test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Up, "-1.0e-45", Less);
+    test_helper::<f32>(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Nearest,
+        "-0.0",
+        Greater,
+    );
+
+    test_helper::<f64>(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Floor,
+        "-5.0e-324",
+        Less,
+    );
+    test_helper::<f64>(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Ceiling,
+        "-0.0",
+        Greater,
+    );
+    test_helper::<f64>("-too_small", "-0x1.0E-268435456#1", Down, "-0.0", Greater);
+    test_helper::<f64>("-too_small", "-0x1.0E-268435456#1", Up, "-5.0e-324", Less);
+    test_helper::<f64>(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Nearest,
+        "-0.0",
+        Greater,
+    );
 }
 
 fn rounding_from_float_fail_helper<T: PrimitiveFloat + RoundingFrom<Float>>() {
@@ -1025,6 +1195,33 @@ fn rounding_from_float_fail() {
     apply_fn_to_primitive_floats!(rounding_from_float_fail_helper);
 }
 
+#[allow(
+    clippy::type_repetition_in_bounds,
+    clippy::op_ref,
+    clippy::needless_pass_by_value
+)]
+fn try_from_float_properties_helper_helper<
+    T: PrimitiveFloat + PartialEq<Float> + TryFrom<Float, Error = FloatFromFloatError>,
+>(
+    x: Float,
+) where
+    for<'a> T: ConvertibleFrom<&'a Float> + TryFrom<&'a Float, Error = FloatFromFloatError>,
+    Float: From<T> + PartialEq<T>,
+{
+    let t_x = T::try_from(x.clone());
+
+    let t_x_alt = T::try_from(&x);
+    assert_eq!(t_x.map(NiceFloat), t_x_alt.map(NiceFloat));
+
+    assert_eq!(t_x.is_ok(), T::convertible_from(&x));
+    if let Ok(n) = t_x {
+        assert_eq!(NiceFloat(T::exact_from(&x)), NiceFloat(n));
+        assert!(n.is_nan() && x.is_nan() || n == x);
+        let n_alt = Float::from(n);
+        assert!(n_alt.is_nan() && x.is_nan() || &n_alt == &x);
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds, clippy::op_ref)]
 fn try_from_float_properties_helper<
     T: PrimitiveFloat + PartialEq<Float> + TryFrom<Float, Error = FloatFromFloatError>,
@@ -1034,18 +1231,11 @@ where
     Float: From<T> + PartialEq<T>,
 {
     float_gen().test_properties(|x| {
-        let t_x = T::try_from(x.clone());
+        try_from_float_properties_helper_helper(x);
+    });
 
-        let t_x_alt = T::try_from(&x);
-        assert_eq!(t_x.map(NiceFloat), t_x_alt.map(NiceFloat));
-
-        assert_eq!(t_x.is_ok(), T::convertible_from(&x));
-        if let Ok(n) = t_x {
-            assert_eq!(NiceFloat(T::exact_from(&x)), NiceFloat(n));
-            assert!(n.is_nan() && x.is_nan() || n == x);
-            let n_alt = Float::from(n);
-            assert!(n_alt.is_nan() && x.is_nan() || &n_alt == &x);
-        }
+    float_gen_var_12().test_properties(|x| {
+        try_from_float_properties_helper_helper(x);
     });
 }
 
@@ -1054,12 +1244,24 @@ fn try_from_float_properties() {
     apply_fn_to_primitive_floats!(try_from_float_properties_helper);
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn convertible_from_float_properties_helper_helper<T>(x: Float)
+where
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    T::convertible_from(&x);
+}
+
 fn convertible_from_float_properties_helper<T>()
 where
     for<'a> T: ConvertibleFrom<&'a Float>,
 {
     float_gen().test_properties(|x| {
-        T::convertible_from(&x);
+        convertible_from_float_properties_helper_helper::<T>(x);
+    });
+
+    float_gen_var_12().test_properties(|x| {
+        convertible_from_float_properties_helper_helper::<T>(x);
     });
 }
 
@@ -1072,6 +1274,41 @@ const fn wrap_nice_float<T: PrimitiveFloat>(p: (T, Ordering)) -> (NiceFloat<T>, 
     (NiceFloat(p.0), p.1)
 }
 
+#[allow(clippy::type_repetition_in_bounds, clippy::needless_pass_by_value)]
+fn rounding_from_float_properties_helper_helper<
+    T: PrimitiveFloat + RoundingFrom<Float> + PartialOrd<Integer>,
+>(
+    x: Float,
+    rm: RoundingMode,
+    extreme: bool,
+) where
+    for<'a> T: ConvertibleFrom<&'a Float> + PartialOrd<Float> + RoundingFrom<&'a Float>,
+    Float: From<T> + PartialOrd<T>,
+    Rational: TryFrom<T>,
+{
+    let no = T::rounding_from(&x, rm);
+    let no_alt = T::rounding_from(x.clone(), rm);
+    assert_eq!(NiceFloat(no_alt.0), NiceFloat(no.0));
+    assert_eq!(no_alt.1, no.1);
+    let (n, o) = no;
+    if !extreme && n > -T::MAX_FINITE && n < T::MAX_FINITE && n != T::ZERO {
+        let r_x: Rational = ExactFrom::<&Float>::exact_from(&x);
+        assert!((Rational::exact_from(n) - r_x).lt_abs(&Float::from(n).ulp().unwrap()));
+    }
+
+    assert_eq!(n.partial_cmp(&x), if x.is_nan() { None } else { Some(o) });
+    match (x >= T::ZERO, rm) {
+        (_, Floor) | (true, Down) | (false, Up) => {
+            assert_ne!(o, Greater);
+        }
+        (_, Ceiling) | (true, Up) | (false, Down) => {
+            assert_ne!(o, Less);
+        }
+        (_, Exact) => assert_eq!(o, Equal),
+        _ => {}
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds)]
 fn rounding_from_float_properties_helper<
     T: PrimitiveFloat + RoundingFrom<Float> + PartialOrd<Integer>,
@@ -1082,27 +1319,11 @@ where
     Rational: TryFrom<T>,
 {
     float_rounding_mode_pair_gen_var_6::<T>().test_properties(|(x, rm)| {
-        let no = T::rounding_from(&x, rm);
-        let no_alt = T::rounding_from(x.clone(), rm);
-        assert_eq!(NiceFloat(no_alt.0), NiceFloat(no.0));
-        assert_eq!(no_alt.1, no.1);
-        let (n, o) = no;
-        if n > -T::MAX_FINITE && n < T::MAX_FINITE && n != T::ZERO {
-            let r_x: Rational = ExactFrom::<&Float>::exact_from(&x);
-            assert!((Rational::exact_from(n) - r_x).lt_abs(&Float::from(n).ulp().unwrap()));
-        }
+        rounding_from_float_properties_helper_helper(x, rm, false);
+    });
 
-        assert_eq!(n.partial_cmp(&x), if x.is_nan() { None } else { Some(o) });
-        match (x >= T::ZERO, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
-        }
+    float_rounding_mode_pair_gen_var_20::<T>().test_properties(|(x, rm)| {
+        rounding_from_float_properties_helper_helper(x, rm, true);
     });
 
     float_gen_var_4().test_properties(|x| {

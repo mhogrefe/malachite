@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Some optimizations contributed by florian1345.
 //
@@ -582,7 +582,7 @@ impl Sub<Natural> for Natural {
     }
 }
 
-impl<'a> Sub<&'a Natural> for Natural {
+impl Sub<&Natural> for Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
@@ -612,13 +612,13 @@ impl<'a> Sub<&'a Natural> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn sub(self, other: &'a Natural) -> Natural {
+    fn sub(self, other: &Natural) -> Natural {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
 }
 
-impl<'a> Sub<Natural> for &'a Natural {
+impl Sub<Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -654,7 +654,7 @@ impl<'a> Sub<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
+impl Sub<&Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference.
@@ -683,7 +683,7 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn sub(self, other: &'a Natural) -> Natural {
+    fn sub(self, other: &Natural) -> Natural {
         self.checked_sub(other).unwrap_or_else(|| {
             sub_panic(self, other);
         })
@@ -728,7 +728,7 @@ impl SubAssign<Natural> for Natural {
     }
 }
 
-impl<'a> SubAssign<&'a Natural> for Natural {
+impl SubAssign<&Natural> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
     ///
@@ -758,7 +758,7 @@ impl<'a> SubAssign<&'a Natural> for Natural {
     /// x -= &(Natural::from(10u32).pow(12) * Natural::from(4u32));
     /// assert_eq!(x, 0);
     /// ```
-    fn sub_assign(&mut self, other: &'a Natural) {
+    fn sub_assign(&mut self, other: &Natural) {
         assert!(
             !self.sub_assign_ref_no_panic(other),
             "Cannot subtract a Natural from a smaller Natural"

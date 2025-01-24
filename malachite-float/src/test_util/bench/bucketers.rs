@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -36,6 +36,22 @@ pub fn pair_2_pair_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer
 pub fn pair_2_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<(T, Float)> {
     Bucketer {
         bucketing_function: &|(_, x)| usize::exact_from(x.complexity()),
+        bucketing_label: format!("{var_name}.complexity()"),
+    }
+}
+
+pub fn triple_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer<(Float, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, _, _)| usize::exact_from(x.complexity()),
+        bucketing_label: format!("{var_name}.complexity()"),
+    }
+}
+
+pub fn pair_2_triple_1_float_complexity_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<(V, (Float, T, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, _, _))| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),
     }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 
-impl<'a> DivisibleByPowerOf2 for &'a Integer {
+impl DivisibleByPowerOf2 for &Integer {
     /// Returns whether an [`Integer`] is divisible by $2^k$.
     ///
     /// $f(x, k) = (2^k|x)$.

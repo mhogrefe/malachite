@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -41,7 +41,7 @@ impl ModSquare<Natural> for Natural {
     }
 }
 
-impl<'a> ModSquare<&'a Natural> for Natural {
+impl ModSquare<&Natural> for Natural {
     type Output = Natural;
 
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
@@ -67,12 +67,12 @@ impl<'a> ModSquare<&'a Natural> for Natural {
     /// assert_eq!(Natural::from(2u32).mod_square(&Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(&Natural::from(497u32)), 60);
     /// ```
-    fn mod_square(self, m: &'a Natural) -> Natural {
+    fn mod_square(self, m: &Natural) -> Natural {
         (&self).mod_pow(&Natural::TWO, m)
     }
 }
 
-impl<'a> ModSquare<Natural> for &'a Natural {
+impl ModSquare<Natural> for &Natural {
     type Output = Natural;
 
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
@@ -106,7 +106,7 @@ impl<'a> ModSquare<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
+impl ModSquare<&Natural> for &Natural {
     type Output = Natural;
 
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
@@ -135,7 +135,7 @@ impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
     ///     60
     /// );
     /// ```
-    fn mod_square(self, m: &'b Natural) -> Natural {
+    fn mod_square(self, m: &Natural) -> Natural {
         self.mod_pow(&Natural::TWO, m)
     }
 }
@@ -175,7 +175,7 @@ impl ModSquareAssign<Natural> for Natural {
     }
 }
 
-impl<'a> ModSquareAssign<&'a Natural> for Natural {
+impl ModSquareAssign<&Natural> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
     /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///
@@ -205,7 +205,7 @@ impl<'a> ModSquareAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 60);
     /// ```
     #[inline]
-    fn mod_square_assign(&mut self, m: &'a Natural) {
+    fn mod_square_assign(&mut self, m: &Natural) {
         self.mod_pow_assign(&Natural::TWO, m);
     }
 }

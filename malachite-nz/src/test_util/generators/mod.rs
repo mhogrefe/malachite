@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -940,7 +940,17 @@ where
     )
 }
 
-// var 3 is in malachite-float
+// vars 3 and 4 are in malachite-float
+
+// All `(Integer, T, RoundingMode)` where the `T` is small and unsigned.
+pub fn integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_rounding_mode_triple_gen_var_5,
+        &random_integer_unsigned_rounding_mode_triple_gen_var_5,
+        &special_random_integer_unsigned_rounding_mode_triple_gen_var_5,
+    )
+}
 
 // -- (Integer, RoundingMode) --
 
@@ -2443,6 +2453,8 @@ pub fn unsigned_pair_gen_var_49() -> Generator<(Limb, Limb)> {
         &random_unsigned_pair_gen_var_37,
     )
 }
+
+// var 50 is in malachite-base
 
 // -- (PrimitiveUnsigned * 6) --
 

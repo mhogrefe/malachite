@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Some optimizations contributed by florian1345.
 //
@@ -660,7 +660,7 @@ impl<'a> Add<&'a Natural> for Natural {
     }
 }
 
-impl<'a> Add<Natural> for &'a Natural {
+impl Add<Natural> for &Natural {
     type Output = Natural;
 
     /// Adds two [`Natural`]s, taking the first by value and the second by reference.
@@ -698,7 +698,7 @@ impl<'a> Add<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> Add<&'a Natural> for &'b Natural {
+impl Add<&Natural> for &Natural {
     type Output = Natural;
 
     /// Adds two [`Natural`]s, taking both by reference.
@@ -729,7 +729,7 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     ///     3000000000000u64
     /// );
     /// ```
-    fn add(self, other: &'a Natural) -> Natural {
+    fn add(self, other: &Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.add_limb_ref(y),
             (&Natural(Small(x)), y) => y.add_limb_ref(x),

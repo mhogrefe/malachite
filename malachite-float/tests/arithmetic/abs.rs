@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,7 +11,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
-use malachite_float::test_util::generators::{float_gen, float_gen_var_4};
+use malachite_float::test_util::generators::{float_gen, float_gen_var_12, float_gen_var_4};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
 
@@ -87,30 +87,39 @@ fn test_abs_negative_zero() {
     );
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn abs_negative_zero_properties_helper(x: Float) {
+    let abs = x.clone().abs_negative_zero();
+    assert!(abs.is_valid());
+
+    let abs_alt = x.abs_negative_zero_ref();
+    assert!(abs_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
+
+    let mut abs_alt = x.clone();
+    abs_alt.abs_negative_zero_assign();
+    assert!(abs_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
+
+    if x.is_negative_zero() {
+        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&Float::ZERO));
+    } else {
+        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&x));
+    }
+    assert_eq!(
+        ComparableFloat(abs.abs_negative_zero_ref()),
+        ComparableFloat(abs)
+    );
+}
+
 #[test]
 fn abs_negative_zero_properties() {
     float_gen().test_properties(|x| {
-        let abs = x.clone().abs_negative_zero();
-        assert!(abs.is_valid());
+        abs_negative_zero_properties_helper(x);
+    });
 
-        let abs_alt = x.abs_negative_zero_ref();
-        assert!(abs_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
-
-        let mut abs_alt = x.clone();
-        abs_alt.abs_negative_zero_assign();
-        assert!(abs_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
-
-        if x.is_negative_zero() {
-            assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&Float::ZERO));
-        } else {
-            assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&x));
-        }
-        assert_eq!(
-            ComparableFloat(abs.abs_negative_zero_ref()),
-            ComparableFloat(abs)
-        );
+    float_gen_var_12().test_properties(|x| {
+        abs_negative_zero_properties_helper(x);
     });
 }
 
@@ -191,33 +200,41 @@ fn test_abs() {
     );
 }
 
+fn abs_properties_helper(x: Float) {
+    let abs = x.clone().abs();
+    assert!(abs.is_valid());
+
+    let abs_alt = (&x).abs();
+    assert!(abs_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
+
+    let mut abs_alt = x.clone();
+    abs_alt.abs_assign();
+    assert!(abs_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
+
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug::Float::exact_from(&x).abs())),
+        ComparableFloatRef(&abs)
+    );
+
+    if x.is_sign_negative() {
+        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&-&x));
+    } else {
+        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&x));
+    }
+    assert_eq!(ComparableFloatRef(&(&abs).abs()), ComparableFloatRef(&abs));
+    assert_eq!(ComparableFloat((-x).abs()), ComparableFloat(abs));
+}
+
 #[test]
 fn abs_properties() {
     float_gen().test_properties(|x| {
-        let abs = x.clone().abs();
-        assert!(abs.is_valid());
+        abs_properties_helper(x);
+    });
 
-        let abs_alt = (&x).abs();
-        assert!(abs_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
-
-        let mut abs_alt = x.clone();
-        abs_alt.abs_assign();
-        assert!(abs_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&abs_alt));
-
-        assert_eq!(
-            ComparableFloatRef(&Float::from(&rug::Float::exact_from(&x).abs())),
-            ComparableFloatRef(&abs)
-        );
-
-        if x.is_sign_negative() {
-            assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&-&x));
-        } else {
-            assert_eq!(ComparableFloatRef(&abs), ComparableFloatRef(&x));
-        }
-        assert_eq!(ComparableFloatRef(&(&abs).abs()), ComparableFloatRef(&abs));
-        assert_eq!(ComparableFloat((-x).abs()), ComparableFloat(abs));
+    float_gen_var_12().test_properties(|x| {
+        abs_properties_helper(x);
     });
 
     float_gen_var_4().test_properties(|x| {

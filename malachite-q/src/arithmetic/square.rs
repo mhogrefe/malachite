@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -45,7 +45,7 @@ impl Square for Rational {
     }
 }
 
-impl<'a> Square for &'a Rational {
+impl Square for &Rational {
     type Output = Rational;
 
     /// Squares a [`Rational`], taking it by reference.

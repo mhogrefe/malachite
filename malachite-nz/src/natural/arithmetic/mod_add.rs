@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -185,7 +185,7 @@ impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a> ModAdd<Natural, Natural> for &'a Natural {
+impl ModAdd<Natural, Natural> for &Natural {
     type Output = Natural;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
@@ -232,7 +232,7 @@ impl<'a> ModAdd<Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModAdd<Natural, &'b Natural> for &'a Natural {
+impl ModAdd<Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
@@ -269,13 +269,13 @@ impl<'a, 'b> ModAdd<Natural, &'b Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by reference and `c` is taken by value.
     #[inline]
-    fn mod_add(self, mut other: Natural, m: &'b Natural) -> Natural {
+    fn mod_add(self, mut other: Natural, m: &Natural) -> Natural {
         other.mod_add_assign(self, m);
         other
     }
 }
 
-impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
+impl ModAdd<&Natural, Natural> for &Natural {
     type Output = Natural;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
@@ -311,7 +311,7 @@ impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by reference and `m` is taken by value.
-    fn mod_add(self, other: &'b Natural, m: Natural) -> Natural {
+    fn mod_add(self, other: &Natural, m: Natural) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
             *other < m,
@@ -326,7 +326,7 @@ impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b, 'c> ModAdd<&'b Natural, &'c Natural> for &'a Natural {
+impl ModAdd<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
@@ -362,7 +362,7 @@ impl<'a, 'b, 'c> ModAdd<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by reference.
-    fn mod_add(self, other: &'b Natural, m: &'c Natural) -> Natural {
+    fn mod_add(self, other: &Natural, m: &Natural) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         let sum = self + other;

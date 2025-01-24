@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -63,7 +63,7 @@ impl Mul<Rational> for Rational {
     }
 }
 
-impl<'a> Mul<&'a Rational> for Rational {
+impl Mul<&Rational> for Rational {
     type Output = Rational;
 
     /// Multiplies two [`Rational`]s, taking the first by value and the second by reference.
@@ -92,12 +92,12 @@ impl<'a> Mul<&'a Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn mul(self, other: &'a Rational) -> Rational {
+    fn mul(self, other: &Rational) -> Rational {
         other * self
     }
 }
 
-impl<'a> Mul<Rational> for &'a Rational {
+impl Mul<Rational> for &Rational {
     type Output = Rational;
 
     /// Multiplies two [`Rational`]s, taking the first by reference and the second by value.
@@ -143,7 +143,7 @@ impl<'a> Mul<Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Mul<&'a Rational> for &'b Rational {
+impl Mul<&Rational> for &Rational {
     type Output = Rational;
 
     /// Multiplies two [`Rational`]s, taking both by reference.
@@ -171,7 +171,7 @@ impl<'a, 'b> Mul<&'a Rational> for &'b Rational {
     ///     "1089/350"
     /// );
     /// ```
-    fn mul(self, other: &'a Rational) -> Rational {
+    fn mul(self, other: &Rational) -> Rational {
         if *self == 0u32 || *other == 0u32 {
             return Rational::ZERO;
         } else if *self == 1u32 {
@@ -238,7 +238,7 @@ impl MulAssign<Rational> for Rational {
     }
 }
 
-impl<'a> MulAssign<&'a Rational> for Rational {
+impl MulAssign<&Rational> for Rational {
     /// Multiplies a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the
     /// right-hand side by reference.
     ///
@@ -267,7 +267,7 @@ impl<'a> MulAssign<&'a Rational> for Rational {
     /// x *= &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "1089/350");
     /// ```
-    fn mul_assign(&mut self, other: &'a Rational) {
+    fn mul_assign(&mut self, other: &Rational) {
         if *self == 0u32 || *other == 1u32 {
             return;
         } else if *other == 0u32 {

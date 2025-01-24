@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -55,6 +55,13 @@ use core::ops::{
 };
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::str::FromStr;
+
+pub const USIZE_IS_U32: bool = usize::WIDTH == u32::WIDTH;
+pub const USIZE_IS_U64: bool = usize::WIDTH == u64::WIDTH;
+
+// Checks that usize is equivalent to u32 or u64, at compile time. The rest of Malachite can assume
+// that this condition is true.
+const _USIZE_ASSERTION: () = assert!(USIZE_IS_U32 || USIZE_IS_U64);
 
 // When the `random` feature is enabled, the HasRandomPrimitiveInts bound is included.
 

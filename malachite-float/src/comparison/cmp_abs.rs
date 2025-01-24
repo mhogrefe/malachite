@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -83,7 +83,7 @@ impl<'a> OrdAbs for ComparableFloatRef<'a> {
     ///   - NaN
     ///   - Positive and negative zero
     ///   - Nonzero finite floats
-    ///   - Positive and negative infinity
+    ///   - $\infty$ and $-\infty$
     ///
     /// For different comparison behavior that follows the IEEE 754 standard, consider just using
     /// [`Float`].
@@ -155,7 +155,7 @@ impl<'a> OrdAbs for ComparableFloatRef<'a> {
     }
 }
 
-impl<'a> PartialOrdAbs for ComparableFloatRef<'a> {
+impl PartialOrdAbs for ComparableFloatRef<'_> {
     /// Compares the absolute values of two [`ComparableFloatRef`]s.
     ///
     /// See the documentation for the [`Ord`] implementation.
@@ -173,7 +173,7 @@ impl OrdAbs for ComparableFloat {
     ///   - NaN
     ///   - Positive and negative zero
     ///   - Nonzero finite floats
-    ///   - Positive and negative infinity
+    ///   - $\infty$ and $-\infty$
     ///
     /// For different comparison behavior that follows the IEEE 754 standard, consider just using
     /// [`Float`].

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -18,22 +18,35 @@ use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen_var_3, float_rounding_mode_pair_gen, float_signed_pair_gen_var_1,
+    float_gen_var_13, float_gen_var_3, float_rounding_mode_pair_gen,
+    float_rounding_mode_pair_gen_var_21, float_signed_pair_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_round);
+    register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_round_debug);
+    register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_round_extreme);
+    register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_round_extreme_debug);
     register_demo!(runner, demo_float_sci_mantissa_and_exponent_float);
     register_demo!(runner, demo_float_sci_mantissa_and_exponent_float_debug);
+    register_demo!(runner, demo_float_sci_mantissa_and_exponent_float_extreme);
+    register_demo!(
+        runner,
+        demo_float_sci_mantissa_and_exponent_float_extreme_debug
+    );
     register_demo!(runner, demo_float_sci_mantissa_and_exponent_float_ref);
     register_demo!(runner, demo_float_sci_mantissa_and_exponent_float_ref_debug);
     register_demo!(runner, demo_float_sci_mantissa_float);
     register_demo!(runner, demo_float_sci_mantissa_float_debug);
+    register_demo!(runner, demo_float_sci_mantissa_float_extreme);
+    register_demo!(runner, demo_float_sci_mantissa_float_extreme_debug);
     register_demo!(runner, demo_float_sci_mantissa_float_ref);
     register_demo!(runner, demo_float_sci_mantissa_float_ref_debug);
     register_demo!(runner, demo_float_sci_exponent_float);
     register_demo!(runner, demo_float_sci_exponent_float_debug);
+    register_demo!(runner, demo_float_sci_exponent_float_extreme);
+    register_demo!(runner, demo_float_sci_exponent_float_extreme_debug);
     register_demo!(runner, demo_float_sci_exponent_float_ref);
     register_demo!(runner, demo_float_sci_exponent_float_ref_debug);
     register_demo!(runner, demo_float_from_sci_mantissa_and_exponent_float);
@@ -52,10 +65,28 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_float_sci_mantissa_and_exponent_primitive_float_debug
     );
+    register_primitive_float_demos!(
+        runner,
+        demo_float_sci_mantissa_and_exponent_primitive_float_extreme
+    );
+    register_primitive_float_demos!(
+        runner,
+        demo_float_sci_mantissa_and_exponent_primitive_float_extreme_debug
+    );
     register_primitive_float_demos!(runner, demo_float_sci_mantissa_primitive_float);
     register_primitive_float_demos!(runner, demo_float_sci_mantissa_primitive_float_debug);
+    register_primitive_float_demos!(runner, demo_float_sci_mantissa_primitive_float_extreme);
+    register_primitive_float_demos!(
+        runner,
+        demo_float_sci_mantissa_primitive_float_extreme_debug
+    );
     register_primitive_float_demos!(runner, demo_float_sci_exponent_primitive_float);
     register_primitive_float_demos!(runner, demo_float_sci_exponent_primitive_float_debug);
+    register_primitive_float_demos!(runner, demo_float_sci_exponent_primitive_float_extreme);
+    register_primitive_float_demos!(
+        runner,
+        demo_float_sci_exponent_primitive_float_extreme_debug
+    );
     register_primitive_float_demos!(
         runner,
         demo_float_from_sci_mantissa_and_exponent_primitive_float
@@ -110,6 +141,57 @@ fn demo_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
     }
 }
 
+fn demo_sci_mantissa_and_exponent_round_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, rm) in float_rounding_mode_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.sci_mantissa_and_exponent_round({}) = {:?}",
+            ComparableFloat(n.clone()),
+            rm,
+            n.sci_mantissa_and_exponent_round::<T>(rm)
+        );
+    }
+}
+
+fn demo_sci_mantissa_and_exponent_round_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, rm) in float_rounding_mode_pair_gen_var_21()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "{}.sci_mantissa_and_exponent_round({}) = {:?}",
+            n.clone(),
+            rm,
+            n.sci_mantissa_and_exponent_round::<T>(rm)
+        );
+    }
+}
+
+fn demo_sci_mantissa_and_exponent_round_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, rm) in float_rounding_mode_pair_gen_var_21()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "{:#x}.sci_mantissa_and_exponent_round({}) = {:?}",
+            ComparableFloat(n.clone()),
+            rm,
+            n.sci_mantissa_and_exponent_round::<T>(rm)
+        );
+    }
+}
+
 fn demo_float_sci_mantissa_and_exponent_float(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!(
@@ -122,6 +204,34 @@ fn demo_float_sci_mantissa_and_exponent_float(gm: GenMode, config: &GenConfig, l
 
 fn demo_float_sci_mantissa_and_exponent_float_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.sci_mantissa_and_exponent() = {:?}",
+            ComparableFloat(n.clone()),
+            SciMantissaAndExponent::<Float, _, _>::sci_mantissa_and_exponent(n)
+        );
+    }
+}
+
+fn demo_float_sci_mantissa_and_exponent_float_extreme(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{}.sci_mantissa_and_exponent() = {:?}",
+            n.clone(),
+            SciMantissaAndExponent::<Float, _, _>::sci_mantissa_and_exponent(n)
+        );
+    }
+}
+
+fn demo_float_sci_mantissa_and_exponent_float_extreme_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
         println!(
             "{:#x}.sci_mantissa_and_exponent() = {:?}",
             ComparableFloat(n.clone()),
@@ -174,6 +284,26 @@ fn demo_float_sci_mantissa_float_debug(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
+fn demo_float_sci_mantissa_float_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{}.sci_mantissa() = {}",
+            n.clone(),
+            SciMantissaAndExponent::<Float, _, _>::sci_mantissa(n)
+        );
+    }
+}
+
+fn demo_float_sci_mantissa_float_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.sci_mantissa() = {:#x}",
+            ComparableFloat(n.clone()),
+            ComparableFloat(SciMantissaAndExponent::<Float, _, _>::sci_mantissa(n))
+        );
+    }
+}
+
 fn demo_float_sci_mantissa_float_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!(
@@ -206,6 +336,26 @@ fn demo_float_sci_exponent_float(gm: GenMode, config: &GenConfig, limit: usize) 
 
 fn demo_float_sci_exponent_float_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.sci_exponent() = {}",
+            ComparableFloat(n.clone()),
+            SciMantissaAndExponent::<Float, _, _>::sci_exponent(n)
+        );
+    }
+}
+
+fn demo_float_sci_exponent_float_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{}.sci_exponent() = {}",
+            n.clone(),
+            SciMantissaAndExponent::<Float, _, _>::sci_exponent(n)
+        );
+    }
+}
+
+fn demo_float_sci_exponent_float_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
         println!(
             "{:#x}.sci_exponent() = {}",
             ComparableFloat(n.clone()),
@@ -356,6 +506,40 @@ fn demo_float_sci_mantissa_and_exponent_primitive_float_debug<T: PrimitiveFloat>
     }
 }
 
+fn demo_float_sci_mantissa_and_exponent_primitive_float_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
+{
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        let (m, e) = SciMantissaAndExponent::<T, _, _>::sci_mantissa_and_exponent(&n);
+        println!(
+            "{}.sci_mantissa_and_exponent() = {:?}",
+            n,
+            (NiceFloat(m), e)
+        );
+    }
+}
+
+fn demo_float_sci_mantissa_and_exponent_primitive_float_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
+{
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        let (m, e) = SciMantissaAndExponent::<T, _, _>::sci_mantissa_and_exponent(&n);
+        println!(
+            "{:#x}.sci_mantissa_and_exponent() = {:?}",
+            ComparableFloatRef(&n),
+            (NiceFloat(m), e)
+        );
+    }
+}
+
 fn demo_float_sci_mantissa_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -388,6 +572,38 @@ fn demo_float_sci_mantissa_primitive_float_debug<T: PrimitiveFloat>(
     }
 }
 
+fn demo_float_sci_mantissa_primitive_float_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
+{
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{}.sci_mantissa() = {}",
+            n,
+            NiceFloat(SciMantissaAndExponent::<T, _, _>::sci_mantissa(&n))
+        );
+    }
+}
+
+fn demo_float_sci_mantissa_primitive_float_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
+{
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.sci_mantissa() = {}",
+            ComparableFloatRef(&n),
+            NiceFloat(SciMantissaAndExponent::<T, _, _>::sci_mantissa(&n))
+        );
+    }
+}
+
 fn demo_float_sci_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -412,6 +628,38 @@ fn demo_float_sci_exponent_primitive_float_debug<T: PrimitiveFloat>(
     for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
 {
     for n in float_gen_var_3().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.sci_exponent() = {:?}",
+            ComparableFloatRef(&n),
+            SciMantissaAndExponent::<T, _, _>::sci_exponent(&n)
+        );
+    }
+}
+
+fn demo_float_sci_exponent_primitive_float_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
+{
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{}.sci_exponent() = {:?}",
+            n,
+            SciMantissaAndExponent::<T, _, _>::sci_exponent(&n)
+        );
+    }
+}
+
+fn demo_float_sci_exponent_primitive_float_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
+{
+    for n in float_gen_var_13().get(gm, config).take(limit) {
         println!(
             "{:#x}.sci_exponent() = {:?}",
             ComparableFloatRef(&n),

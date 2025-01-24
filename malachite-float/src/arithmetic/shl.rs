@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,39 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use crate::Float;
-use crate::InnerFloat::Finite;
 use core::ops::{Shl, ShlAssign};
-use malachite_base::num::conversion::traits::ExactFrom;
-
-fn shl_primitive_int_assign<T>(x: &mut Float, bits: T)
-where
-    i32: TryFrom<T>,
-{
-    if let Float(Finite { exponent, .. }) = x {
-        *exponent = exponent.checked_add(i32::exact_from(bits)).unwrap();
-    }
-}
-
-fn shl_primitive_int_ref<T>(x: &Float, bits: T) -> Float
-where
-    i32: TryFrom<T>,
-{
-    match x {
-        Float(Finite {
-            sign,
-            exponent,
-            precision,
-            significand,
-        }) => Float(Finite {
-            sign: *sign,
-            exponent: exponent.checked_add(i32::exact_from(bits)).unwrap(),
-            precision: *precision,
-            significand: significand.clone(),
-        }),
-        f => f.clone(),
-    }
-}
+use malachite_base::rounding_modes::RoundingMode::*;
 
 macro_rules! impl_shl {
     ($t:ident) => {
@@ -47,58 +18,62 @@ macro_rules! impl_shl {
 
             /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking it by value.
             ///
-            /// `NaN`, infinities, and zeros are unchanged.
+            /// `NaN`, infinities, and zeros are unchanged. If the [`Float`] has a precision, the
+            /// output has the same precision.
             ///
             /// $$
             /// f(x, k) = x2^k.
             /// $$
             ///
-            /// # Worst-case complexity
-            /// $T(n, m) = O(n + m)$
+            /// - If $f(x,k)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+            /// - If $f(x,k)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+            /// - If $0<f(x,k)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+            /// - If $2^{-2^{30}-1}<f(x,k)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+            /// - If $-2^{-2^{30}-1}\leq f(x,k)<0$, $-0.0$ is returned instead.
+            /// - If $-2^{-2^{30}}<f(x,k)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
             ///
-            /// $M(n, m) = O(n + m)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
-            /// $m$ is `bits`.
-            ///
-            /// # Examples
-            /// See [here](super::shl#shl).
-            #[inline]
-            fn shl(mut self, bits: $t) -> Float {
-                self <<= bits;
-                self
-            }
-        }
-
-        impl<'a> Shl<$t> for &'a Float {
-            type Output = Float;
-
-            /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking it by value.
-            ///
-            /// `NaN`, infinities, and zeros are unchanged.
-            ///
-            /// $$
-            /// f(x, k) = x2^k.
-            /// $$
-            ///
-            /// # Worst-case complexity
-            /// $T(n, m) = O(n + m)$
-            ///
-            /// $M(n, m) = O(n + m)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
-            /// $m$ is `bits`.
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// See [here](super::shl#shl).
             #[inline]
             fn shl(self, bits: $t) -> Float {
-                shl_primitive_int_ref(self, bits)
+                self.shl_round(bits, Nearest).0
+            }
+        }
+
+        impl Shl<$t> for &Float {
+            type Output = Float;
+
+            /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking it by value.
+            ///
+            /// `NaN`, infinities, and zeros are unchanged. If the [`Float`] has a precision, the
+            /// output has the same precision.
+            ///
+            /// $$
+            /// f(x, k) = x2^k.
+            /// $$
+            ///
+            /// - If $f(x,k)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+            /// - If $f(x,k)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+            /// - If $0<f(x,k)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+            /// - If $2^{-2^{30}-1}<f(x,k)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+            /// - If $-2^{-2^{30}-1}\leq f(x,k)<0$, $-0.0$ is returned instead.
+            /// - If $-2^{-2^{30}}<f(x,k)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+            ///
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::shl#shl).
+            #[inline]
+            fn shl(self, bits: $t) -> Float {
+                self.shl_round(bits, Nearest).0
             }
         }
 
         impl ShlAssign<$t> for Float {
-            /// Left-shifts a [`Float`] (multiplies it by a power of 2), in place.
+            /// Left-shifts a [`Float`] (multiplies it by a power of 2), in place. If the [`Float`]
+            /// has a precision, the precision is unchanged.
             ///
             /// `NaN`, infinities, and zeros are unchanged.
             ///
@@ -106,19 +81,20 @@ macro_rules! impl_shl {
             /// x \gets x2^k.
             /// $$
             ///
-            /// # Worst-case complexity
-            /// $T(n, m) = O(n + m)$
+            /// - If $f(x,k)\geq 2^{2^{30}-1}$, $\infty$ is assigned instead.
+            /// - If $f(x,k)\leq -2^{2^{30}-1}$, $-\infty$ is assigned instead.
+            /// - If $0<f(x,k)\leq2^{-2^{30}-1}$, $0.0$ is assigned instead.
+            /// - If $2^{-2^{30}-1}<f(x,k)<2^{-2^{30}}$, $2^{-2^{30}}$ is assigned instead.
+            /// - If $-2^{-2^{30}-1}\leq f(x,k)<0$, $-0.0$ is assigned instead.
+            /// - If $-2^{-2^{30}}<f(x,k)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is assigned instead.
             ///
-            /// $M(n, m) = O(n + m)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
-            /// $m$ is `bits`.
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// See [here](super::shl#shl_assign).
             #[inline]
             fn shl_assign(&mut self, bits: $t) {
-                shl_primitive_int_assign(self, bits);
+                self.shl_round_assign(bits, Nearest);
             }
         }
     };

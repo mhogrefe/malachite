@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -107,7 +107,7 @@ struct NLIterator<'a> {
     first_nonzero_index: Option<usize>,
 }
 
-impl<'a> NLIterator<'a> {
+impl NLIterator<'_> {
     fn get(&self, index: u64) -> Limb {
         let index = usize::exact_from(index);
         if index >= self.limbs.len() {
@@ -124,7 +124,7 @@ impl<'a> NLIterator<'a> {
     }
 }
 
-impl<'a> Iterator for NLIterator<'a> {
+impl Iterator for NLIterator<'_> {
     type Item = Limb;
 
     // A function to iterate through the two's complement limbs of the negative of a `Natural` in
@@ -162,7 +162,7 @@ impl<'a> Iterator for NLIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NLIterator<'a> {
+impl DoubleEndedIterator for NLIterator<'_> {
     // A function to iterate through the two's complement limbs of the negative of a `Natural` in
     // descending order (most-significant first). This is worst-case linear since the first
     // `next_back` call needs to determine the index of the least-significant nonzero limb.
@@ -227,7 +227,7 @@ trait SignExtendedLimbIterator: DoubleEndedIterator<Item = Limb> {
     }
 }
 
-impl<'a> SignExtendedLimbIterator for LimbIterator<'a> {
+impl SignExtendedLimbIterator for LimbIterator<'_> {
     const EXTENSION: Limb = 0;
 
     fn needs_sign_extension(&self) -> bool {
@@ -235,7 +235,7 @@ impl<'a> SignExtendedLimbIterator for LimbIterator<'a> {
     }
 }
 
-impl<'a> SignExtendedLimbIterator for NLIterator<'a> {
+impl SignExtendedLimbIterator for NLIterator<'_> {
     const EXTENSION: Limb = Limb::MAX;
 
     fn needs_sign_extension(&self) -> bool {
@@ -270,7 +270,7 @@ pub enum TwosComplementLimbIterator<'a> {
     Negative(NegativeLimbIterator<'a>, bool),
 }
 
-impl<'a> TwosComplementLimbIterator<'a> {
+impl TwosComplementLimbIterator<'_> {
     /// A function to retrieve twos-complement [limbs](crate#limbs) by index. Indexing at or above
     /// the limb count returns zero or `Limb::MAX` limbs, depending on the sign of the `[Integer`].
     ///
@@ -310,7 +310,7 @@ impl<'a> TwosComplementLimbIterator<'a> {
     }
 }
 
-impl<'a> Iterator for TwosComplementLimbIterator<'a> {
+impl Iterator for TwosComplementLimbIterator<'_> {
     type Item = Limb;
 
     /// A function to iterate through the twos-complement [limbs](crate#limbs) of an [`Integer`] in
@@ -351,7 +351,7 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
+impl DoubleEndedIterator for TwosComplementLimbIterator<'_> {
     /// A function to iterate through the twos-complement [limbs](crate#limbs) of an [`Integer`] in
     /// descending order (most-significant first). The first limb may be a sign-extension limb.
     ///

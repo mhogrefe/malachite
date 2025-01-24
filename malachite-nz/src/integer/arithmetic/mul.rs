@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -48,7 +48,7 @@ impl Mul<Integer> for Integer {
     }
 }
 
-impl<'a> Mul<&'a Integer> for Integer {
+impl Mul<&Integer> for Integer {
     type Output = Integer;
 
     /// Multiplies two [`Integer`]s, taking the first by value and the second by reference.
@@ -78,13 +78,13 @@ impl<'a> Mul<&'a Integer> for Integer {
     ///     "121932631112635269000000"
     /// );
     /// ```
-    fn mul(mut self, other: &'a Integer) -> Integer {
+    fn mul(mut self, other: &Integer) -> Integer {
         self *= other;
         self
     }
 }
 
-impl<'a> Mul<Integer> for &'a Integer {
+impl Mul<Integer> for &Integer {
     type Output = Integer;
 
     /// Multiplies two [`Integer`]s, taking the first by reference and the second by value.
@@ -120,7 +120,7 @@ impl<'a> Mul<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
+impl Mul<&Integer> for &Integer {
     type Output = Integer;
 
     /// Multiplies two [`Integer`]s, taking both by reference.
@@ -150,7 +150,7 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     ///     "121932631112635269000000"
     /// );
     /// ```
-    fn mul(self, other: &'a Integer) -> Integer {
+    fn mul(self, other: &Integer) -> Integer {
         let product_abs = &self.abs * &other.abs;
         Integer {
             sign: self.sign == other.sign || product_abs == 0,
@@ -193,7 +193,7 @@ impl MulAssign<Integer> for Integer {
     }
 }
 
-impl<'a> MulAssign<&'a Integer> for Integer {
+impl MulAssign<&Integer> for Integer {
     /// Multiplies an [`Integer`] by an [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -221,7 +221,7 @@ impl<'a> MulAssign<&'a Integer> for Integer {
     /// x *= &Integer::from(4000);
     /// assert_eq!(x, -24000000000000i64);
     /// ```
-    fn mul_assign(&mut self, other: &'a Integer) {
+    fn mul_assign(&mut self, other: &Integer) {
         self.abs *= &other.abs;
         self.sign = self.sign == other.sign || self.abs == 0;
     }

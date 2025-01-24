@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -340,6 +340,7 @@ fn demo_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
     }
 }
 
+#[allow(unused_must_use)]
 fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -372,6 +373,7 @@ fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -405,6 +407,7 @@ fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_to_string_base_upper_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -432,6 +435,7 @@ fn benchmark_to_string_base_upper_algorithms_unsigned<T: PrimitiveUnsigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -460,6 +464,7 @@ fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -489,6 +494,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -518,6 +524,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -547,6 +554,7 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,

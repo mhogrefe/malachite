@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -12,9 +12,12 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::float::NiceFloat;
+use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::primitive_float_unsigned_pair_gen_var_4;
-use malachite_float::conversion::from_primitive_float::alt_precision;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, primitive_float_unsigned_pair_gen_var_4,
+};
 use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::primitive_float_unsigned_rounding_mode_triple_gen_var_3;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -40,7 +43,13 @@ fn test_from_primitive_float() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
 
-        let rug_x = rug::Float::with_val(max(1, u32::exact_from(alt_precision(u))), u);
+        let prec = if !u.is_finite() || u == T::ZERO {
+            1
+        } else {
+            let n = u.integer_mantissa();
+            u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+        };
+        let rug_x = rug::Float::with_val(prec, u);
         let x = Float::exact_from(&rug_x);
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
@@ -51,34 +60,26 @@ fn test_from_primitive_float() {
     test_helper(f32::ZERO, "0.0", "0x0.0");
     test_helper(f32::NEGATIVE_ZERO, "-0.0", "-0x0.0");
 
-    test_helper(f32::ONE, "1.0", "0x1.000000#24");
-    test_helper(f32::TWO, "2.0", "0x2.000000#24");
-    test_helper(f32::ONE_HALF, "0.5", "0x0.800000#24");
+    test_helper(f32::ONE, "1.0", "0x1.0#1");
+    test_helper(f32::TWO, "2.0", "0x2.0#1");
+    test_helper(f32::ONE_HALF, "0.5", "0x0.8#1");
     test_helper(1.0f32 / 3.0, "0.33333334", "0x0.5555558#24");
     test_helper(std::f32::consts::SQRT_2, "1.4142135", "0x1.6a09e6#24");
     test_helper(std::f32::consts::PI, "3.1415927", "0x3.243f6c#24");
     test_helper(f32::MIN_POSITIVE_SUBNORMAL, "1.0e-45", "0x8.0E-38#1");
     test_helper(f32::MAX_SUBNORMAL, "1.1754942e-38", "0x3.fffff8E-32#23");
-    test_helper(
-        f32::MIN_POSITIVE_NORMAL,
-        "1.1754944e-38",
-        "0x4.000000E-32#24",
-    );
+    test_helper(f32::MIN_POSITIVE_NORMAL, "1.0e-38", "0x4.0E-32#1");
     test_helper(f32::MAX_FINITE, "3.4028235e38", "0xf.fffffE+31#24");
 
-    test_helper(f32::NEGATIVE_ONE, "-1.0", "-0x1.000000#24");
-    test_helper(-2.0f32, "-2.0", "-0x2.000000#24");
-    test_helper(-f32::ONE_HALF, "-0.5", "-0x0.800000#24");
+    test_helper(f32::NEGATIVE_ONE, "-1.0", "-0x1.0#1");
+    test_helper(-f32::TWO, "-2.0", "-0x2.0#1");
+    test_helper(-f32::ONE_HALF, "-0.5", "-0x0.8#1");
     test_helper(-1.0f32 / 3.0, "-0.33333334", "-0x0.5555558#24");
     test_helper(-std::f32::consts::SQRT_2, "-1.4142135", "-0x1.6a09e6#24");
     test_helper(-std::f32::consts::PI, "-3.1415927", "-0x3.243f6c#24");
     test_helper(-f32::MIN_POSITIVE_SUBNORMAL, "-1.0e-45", "-0x8.0E-38#1");
     test_helper(-f32::MAX_SUBNORMAL, "-1.1754942e-38", "-0x3.fffff8E-32#23");
-    test_helper(
-        -f32::MIN_POSITIVE_NORMAL,
-        "-1.1754944e-38",
-        "-0x4.000000E-32#24",
-    );
+    test_helper(-f32::MIN_POSITIVE_NORMAL, "-1.0e-38", "-0x4.0E-32#1");
     test_helper(-f32::MAX_FINITE, "-3.4028235e38", "-0xf.fffffE+31#24");
 
     test_helper(f64::NAN, "NaN", "NaN");
@@ -87,9 +88,9 @@ fn test_from_primitive_float() {
     test_helper(f64::ZERO, "0.0", "0x0.0");
     test_helper(f64::NEGATIVE_ZERO, "-0.0", "-0x0.0");
 
-    test_helper(f64::ONE, "1.0", "0x1.0000000000000#53");
-    test_helper(f64::TWO, "2.0", "0x2.0000000000000#53");
-    test_helper(f64::ONE_HALF, "0.5", "0x0.80000000000000#53");
+    test_helper(f64::ONE, "1.0", "0x1.0#1");
+    test_helper(f64::TWO, "2.0", "0x2.0#1");
+    test_helper(f64::ONE_HALF, "0.5", "0x0.8#1");
     test_helper(1.0f64 / 3.0, "0.33333333333333331", "0x0.55555555555554#53");
     test_helper(
         std::f64::consts::SQRT_2,
@@ -98,8 +99,8 @@ fn test_from_primitive_float() {
     );
     test_helper(
         std::f64::consts::PI,
-        "3.1415926535897931",
-        "0x3.243f6a8885a30#53",
+        "3.141592653589793",
+        "0x3.243f6a8885a3#50",
     );
     test_helper(f64::MIN_POSITIVE_SUBNORMAL, "5.0e-324", "0x4.0E-269#1");
     test_helper(
@@ -107,20 +108,16 @@ fn test_from_primitive_float() {
         "2.2250738585072009e-308",
         "0x3.ffffffffffffcE-256#52",
     );
-    test_helper(
-        f64::MIN_POSITIVE_NORMAL,
-        "2.2250738585072014e-308",
-        "0x4.0000000000000E-256#53",
-    );
+    test_helper(f64::MIN_POSITIVE_NORMAL, "2.0e-308", "0x4.0E-256#1");
     test_helper(
         f64::MAX_FINITE,
         "1.7976931348623157e308",
         "0xf.ffffffffffff8E+255#53",
     );
 
-    test_helper(f64::NEGATIVE_ONE, "-1.0", "-0x1.0000000000000#53");
-    test_helper(-f64::TWO, "-2.0", "-0x2.0000000000000#53");
-    test_helper(-f64::ONE_HALF, "-0.5", "-0x0.80000000000000#53");
+    test_helper(f64::NEGATIVE_ONE, "-1.0", "-0x1.0#1");
+    test_helper(-f64::TWO, "-2.0", "-0x2.0#1");
+    test_helper(-f64::ONE_HALF, "-0.5", "-0x0.8#1");
     test_helper(
         -1.0f64 / 3.0,
         "-0.33333333333333331",
@@ -133,8 +130,8 @@ fn test_from_primitive_float() {
     );
     test_helper(
         -std::f64::consts::PI,
-        "-3.1415926535897931",
-        "-0x3.243f6a8885a30#53",
+        "-3.141592653589793",
+        "-0x3.243f6a8885a3#50",
     );
     test_helper(-f64::MIN_POSITIVE_SUBNORMAL, "-5.0e-324", "-0x4.0E-269#1");
     test_helper(
@@ -142,11 +139,7 @@ fn test_from_primitive_float() {
         "-2.2250738585072009e-308",
         "-0x3.ffffffffffffcE-256#52",
     );
-    test_helper(
-        -f64::MIN_POSITIVE_NORMAL,
-        "-2.2250738585072014e-308",
-        "-0x4.0000000000000E-256#53",
-    );
+    test_helper(-f64::MIN_POSITIVE_NORMAL, "-2.0e-308", "-0x4.0E-256#1");
     test_helper(
         -f64::MAX_FINITE,
         "-1.7976931348623157e308",
@@ -1493,4 +1486,40 @@ where
 #[test]
 fn from_primitive_float_prec_round_properties() {
     apply_fn_to_primitive_floats!(from_primitive_float_prec_round_properties_helper);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn from_primitive_float_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T>,
+    rug::Float: Assign<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        let float_x = Float::from(x);
+        assert!(float_x.is_valid());
+
+        let expected_prec = if !x.is_finite() || x == T::ZERO {
+            None
+        } else {
+            let n = x.integer_mantissa();
+            Some(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+        };
+        let rug_x = rug::Float::with_val(expected_prec.map_or(1, u32::exact_from), x);
+        assert_eq!(
+            ComparableFloatRef(&float_x),
+            ComparableFloatRef(&From::<&rug::Float>::from(&rug_x))
+        );
+
+        assert_eq!(float_x.get_prec(), expected_prec);
+        assert_eq!(NiceFloat(T::exact_from(&float_x)), NiceFloat(x));
+        let (f, o) = Float::from_primitive_float_prec(x, expected_prec.unwrap_or(1));
+        assert_eq!(ComparableFloat(f), ComparableFloat(float_x));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[test]
+fn from_primitive_float_properties() {
+    apply_fn_to_primitive_floats!(from_primitive_float_properties_helper);
 }

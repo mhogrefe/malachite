@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -41,7 +41,7 @@ impl Neg for Rational {
     }
 }
 
-impl<'a> Neg for &'a Rational {
+impl Neg for &Rational {
     type Output = Rational;
 
     /// Negates a [`Rational`], taking it by reference.

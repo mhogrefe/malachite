@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -12,7 +12,10 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_base::{apply_fn_to_signeds, apply_fn_to_unsigneds};
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::{float_signed_pair_gen, float_unsigned_pair_gen};
+use malachite_float::test_util::generators::{
+    float_signed_pair_gen, float_signed_pair_gen_var_4, float_unsigned_pair_gen,
+    float_unsigned_pair_gen_var_5,
+};
 use malachite_float::Float;
 use rug;
 
@@ -434,6 +437,25 @@ fn test_partial_eq_i64() {
     test("-4.0e-121", "-0x1.0E-100#1", -100, false);
 }
 
+#[allow(clippy::needless_pass_by_value, clippy::cmp_owned, clippy::op_ref)]
+fn partial_eq_primitive_int_properties_helper_unsigned_helper<
+    T: PartialEq<Float> + PartialEq<rug::Float> + PrimitiveUnsigned,
+>(
+    n: Float,
+    u: T,
+) where
+    Float: From<T> + PartialEq<T>,
+    rug::Float: PartialEq<T>,
+{
+    let eq = n == u;
+    assert_eq!(rug::Float::exact_from(&n) == u, eq);
+    assert_eq!(&n == &Float::from(u), eq);
+
+    assert_eq!(u == n, eq);
+    assert_eq!(u == rug::Float::exact_from(&n), eq);
+    assert_eq!(&Float::from(u) == &n, eq);
+}
+
 #[allow(clippy::cmp_owned, clippy::op_ref)]
 fn partial_eq_primitive_int_properties_helper_unsigned<
     T: PartialEq<Float> + PartialEq<rug::Float> + PrimitiveUnsigned,
@@ -443,19 +465,36 @@ where
     rug::Float: PartialEq<T>,
 {
     float_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
-        let eq = n == u;
-        assert_eq!(rug::Float::exact_from(&n) == u, eq);
-        assert_eq!(&n == &Float::from(u), eq);
+        partial_eq_primitive_int_properties_helper_unsigned_helper(n, u);
+    });
 
-        assert_eq!(u == n, eq);
-        assert_eq!(u == rug::Float::exact_from(&n), eq);
-        assert_eq!(&Float::from(u) == &n, eq);
+    float_unsigned_pair_gen_var_5::<T>().test_properties(|(n, u)| {
+        partial_eq_primitive_int_properties_helper_unsigned_helper(n, u);
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         assert_eq!(Float::from(x) == y, x == y);
         assert_eq!(x == Float::from(y), x == y);
     });
+}
+
+#[allow(clippy::needless_pass_by_value, clippy::op_ref)]
+fn partial_eq_primitive_int_properties_helper_signed_helper<
+    T: PartialEq<Float> + PartialEq<rug::Float> + PrimitiveSigned,
+>(
+    n: Float,
+    i: T,
+) where
+    Float: From<T> + PartialEq<T>,
+    rug::Float: PartialEq<T>,
+{
+    let eq = n == i;
+    assert_eq!(rug::Float::exact_from(&n) == i, eq);
+    assert_eq!(&n == &Float::from(i), eq);
+
+    assert_eq!(i == n, eq);
+    assert_eq!(i == rug::Float::exact_from(&n), eq);
+    assert_eq!(&Float::from(i) == &n, eq);
 }
 
 // Extra refs necessary for type inference
@@ -468,13 +507,11 @@ where
     rug::Float: PartialEq<T>,
 {
     float_signed_pair_gen::<T>().test_properties(|(n, i)| {
-        let eq = n == i;
-        assert_eq!(rug::Float::exact_from(&n) == i, eq);
-        assert_eq!(&n == &Float::from(i), eq);
+        partial_eq_primitive_int_properties_helper_signed_helper(n, i);
+    });
 
-        assert_eq!(i == n, eq);
-        assert_eq!(i == rug::Float::exact_from(&n), eq);
-        assert_eq!(&Float::from(i) == &n, eq);
+    float_signed_pair_gen_var_4::<T>().test_properties(|(n, i)| {
+        partial_eq_primitive_int_properties_helper_signed_helper(n, i);
     });
 
     signed_pair_gen::<T>().test_properties(|(x, y)| {

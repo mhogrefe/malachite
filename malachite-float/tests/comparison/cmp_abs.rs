@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,7 +14,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::test_util::common::{parse_hex_string, ORDERED_FLOAT_HEX_STRINGS};
 use malachite_float::test_util::generators::{
-    float_gen, float_pair_gen, float_pair_gen_var_1, float_triple_gen,
+    float_gen, float_pair_gen, float_pair_gen_var_1, float_pair_gen_var_10, float_triple_gen,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -69,29 +69,37 @@ fn test_partial_cmp_abs() {
     }
 }
 
+fn partial_cmp_abs_properties_helper(x: Float, y: Float) {
+    let ord = x.partial_cmp_abs(&y);
+    assert_eq!(y.partial_cmp_abs(&x).map(Ordering::reverse), ord);
+    assert_eq!(
+        (&x).abs() == (&y).abs(),
+        x.partial_cmp_abs(&y) == Some(Equal)
+    );
+    assert_eq!((-&x).partial_cmp_abs(&y), ord);
+    assert_eq!(x.partial_cmp_abs(&-&y), ord);
+    assert_eq!((-&x).partial_cmp_abs(&-&y), ord);
+    assert_eq!(
+        rug::Float::exact_from(&x).cmp_abs(&rug::Float::exact_from(&y)),
+        ord
+    );
+    if !x.is_zero() || !y.is_zero() {
+        if let Some(ord) = ord {
+            if ord != Equal {
+                assert_eq!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)), ord);
+            }
+        }
+    }
+}
+
 #[test]
 fn partial_cmp_abs_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        let ord = x.partial_cmp_abs(&y);
-        assert_eq!(y.partial_cmp_abs(&x).map(Ordering::reverse), ord);
-        assert_eq!(
-            (&x).abs() == (&y).abs(),
-            x.partial_cmp_abs(&y) == Some(Equal)
-        );
-        assert_eq!((-&x).partial_cmp_abs(&y), ord);
-        assert_eq!(x.partial_cmp_abs(&-&y), ord);
-        assert_eq!((-&x).partial_cmp_abs(&-&y), ord);
-        assert_eq!(
-            rug::Float::exact_from(&x).cmp_abs(&rug::Float::exact_from(&y)),
-            ord
-        );
-        if !x.is_zero() || !y.is_zero() {
-            if let Some(ord) = ord {
-                if ord != Equal {
-                    assert_eq!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)), ord);
-                }
-            }
-        }
+        partial_cmp_abs_properties_helper(x, y);
+    });
+
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        partial_cmp_abs_properties_helper(x, y);
     });
 
     float_gen().test_properties(|x| {
@@ -176,30 +184,38 @@ fn test_comparable_float_cmp_abs() {
     }
 }
 
+fn comparable_float_cmp_abs_properties_helper(x: Float, y: Float) {
+    let cx = ComparableFloatRef(&x);
+    let cy = ComparableFloatRef(&y);
+    let ord = cx.cmp_abs(&cy);
+    assert_eq!(cy.cmp_abs(&cx).reverse(), ord);
+    assert_eq!(
+        ComparableFloat((&x).abs()) == ComparableFloat((&y).abs()),
+        cx.cmp_abs(&cy) == Equal
+    );
+    assert_eq!(
+        ComparableFloat(x.clone()).cmp_abs(&ComparableFloat(y.clone())),
+        ord
+    );
+    assert_eq!(
+        (ComparableFloatRef(&x)).cmp_abs(&ComparableFloatRef(&-&y)),
+        ord
+    );
+    assert_eq!(
+        (ComparableFloatRef(&-&x)).cmp_abs(&ComparableFloatRef(&y)),
+        ord
+    );
+    assert_eq!((ComparableFloat(-x)).cmp_abs(&ComparableFloat(-y)), ord);
+}
+
 #[test]
 fn comparable_float_cmp_abs_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        let cx = ComparableFloatRef(&x);
-        let cy = ComparableFloatRef(&y);
-        let ord = cx.cmp_abs(&cy);
-        assert_eq!(cy.cmp_abs(&cx).reverse(), ord);
-        assert_eq!(
-            ComparableFloat((&x).abs()) == ComparableFloat((&y).abs()),
-            cx.cmp_abs(&cy) == Equal
-        );
-        assert_eq!(
-            ComparableFloat(x.clone()).cmp_abs(&ComparableFloat(y.clone())),
-            ord
-        );
-        assert_eq!(
-            (ComparableFloatRef(&x)).cmp_abs(&ComparableFloatRef(&-&y)),
-            ord
-        );
-        assert_eq!(
-            (ComparableFloatRef(&-&x)).cmp_abs(&ComparableFloatRef(&y)),
-            ord
-        );
-        assert_eq!((ComparableFloat(-x)).cmp_abs(&ComparableFloat(-y)), ord);
+        comparable_float_cmp_abs_properties_helper(x, y);
+    });
+
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        comparable_float_cmp_abs_properties_helper(x, y);
     });
 
     float_gen().test_properties(|x| {

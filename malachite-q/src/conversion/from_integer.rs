@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -35,7 +35,7 @@ impl From<Integer> for Rational {
     }
 }
 
-impl<'a> From<&'a Integer> for Rational {
+impl From<&Integer> for Rational {
     /// Converts an [`Integer`] to a [`Rational`], taking the [`Integer`] by reference.
     ///
     /// # Worst-case complexity
@@ -53,7 +53,7 @@ impl<'a> From<&'a Integer> for Rational {
     /// assert_eq!(Rational::from(&Integer::from(123)), 123);
     /// assert_eq!(Rational::from(&Integer::from(-123)), -123);
     /// ```
-    fn from(value: &'a Integer) -> Rational {
+    fn from(value: &Integer) -> Rational {
         Rational {
             sign: *value >= 0,
             numerator: value.unsigned_abs(),

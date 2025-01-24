@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -16,7 +16,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::XXXXAddYYYYToZZZZ;
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 
@@ -134,7 +134,7 @@ impl XXXXAddYYYYToZZZZ for usize {
         y_1: usize,
         y_0: usize,
     ) -> (usize, usize, usize, usize) {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             let (z_3, z_2, z_1, z_0) = u32::xxxx_add_yyyy_to_zzzz(
                 u32::wrapping_from(x_3),
                 u32::wrapping_from(x_2),

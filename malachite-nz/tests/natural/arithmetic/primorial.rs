@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Primorial;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::factorization::traits::Primes;
+use malachite_base::num::factorization::traits::{IsPrime, Primes};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_27, unsigned_gen_var_28, unsigned_gen_var_5,
 };
@@ -82,7 +82,11 @@ fn primorial_properties() {
             p
         );
         assert_ne!(p, 0u32);
-        // TODO compare with primorial(n - 1) depending on whether n is prime
+        if n.is_prime() {
+            assert!(Natural::primorial(n - 1) < p);
+        } else {
+            assert_eq!(Natural::primorial(n - 1), p);
+        }
     });
 
     unsigned_gen_var_27::<Limb>().test_properties(|n| {

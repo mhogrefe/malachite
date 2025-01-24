@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,28 +11,42 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::test_util::arithmetic::shl::shl_naive;
 use malachite_float::test_util::bench::bucketers::{
     pair_1_float_complexity_bucketer, pair_2_pair_1_float_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_signed_pair_gen_var_2, float_signed_pair_gen_var_2_rm, float_unsigned_pair_gen_var_2,
-    float_unsigned_pair_gen_var_2_rm,
+    float_signed_pair_gen_var_2, float_signed_pair_gen_var_2_rm, float_signed_pair_gen_var_3,
+    float_unsigned_pair_gen_var_2, float_unsigned_pair_gen_var_2_rm, float_unsigned_pair_gen_var_3,
 };
-use malachite_float::Float;
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
 use std::ops::{Shl, ShlAssign};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_shl_assign_unsigned);
+    register_unsigned_demos!(runner, demo_float_shl_assign_unsigned_debug);
     register_signed_demos!(runner, demo_float_shl_assign_signed);
+    register_signed_demos!(runner, demo_float_shl_assign_signed_debug);
     register_unsigned_demos!(runner, demo_float_shl_unsigned);
+    register_unsigned_demos!(runner, demo_float_shl_unsigned_debug);
+    register_unsigned_demos!(runner, demo_float_shl_unsigned_extreme);
+    register_unsigned_demos!(runner, demo_float_shl_unsigned_extreme_debug);
     register_signed_demos!(runner, demo_float_shl_signed);
+    register_signed_demos!(runner, demo_float_shl_signed_debug);
+    register_signed_demos!(runner, demo_float_shl_signed_extreme);
+    register_signed_demos!(runner, demo_float_shl_signed_extreme_debug);
     register_unsigned_demos!(runner, demo_float_shl_unsigned_ref);
+    register_unsigned_demos!(runner, demo_float_shl_unsigned_ref_debug);
     register_signed_demos!(runner, demo_float_shl_signed_ref);
+    register_signed_demos!(runner, demo_float_shl_signed_ref_debug);
 
     register_unsigned_benches!(runner, benchmark_float_shl_assign_unsigned);
     register_signed_benches!(runner, benchmark_float_shl_assign_signed);
     register_unsigned_benches!(runner, benchmark_float_shl_unsigned_evaluation_strategy);
     register_signed_benches!(runner, benchmark_float_shl_signed_evaluation_strategy);
+    register_unsigned_benches!(runner, benchmark_float_shl_unsigned_algorithms);
+    register_signed_benches!(runner, benchmark_float_shl_signed_algorithms);
 
     register_bench!(runner, benchmark_float_shl_assign_u32_library_comparison);
     register_bench!(runner, benchmark_float_shl_u32_library_comparison);
@@ -57,6 +71,27 @@ fn demo_float_shl_assign_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+fn demo_float_shl_assign_unsigned_debug<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: ShlAssign<T>,
+{
+    for (mut n, u) in float_unsigned_pair_gen_var_2::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        n <<= u;
+        println!(
+            "x := {:#x}; x <<= {u}; x = {:#x}",
+            ComparableFloat(n_old),
+            ComparableFloat(n)
+        );
+    }
+}
+
 fn demo_float_shl_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Float: ShlAssign<T>,
@@ -68,6 +103,27 @@ where
         let n_old = n.clone();
         n <<= i;
         println!("x := {n_old}; x <<= {i}; x = {n}");
+    }
+}
+
+fn demo_float_shl_assign_signed_debug<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: ShlAssign<T>,
+{
+    for (mut n, i) in float_signed_pair_gen_var_2::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        n <<= i;
+        println!(
+            "x := {:#x}; x <<= {i}; x = {:#x}",
+            ComparableFloat(n_old),
+            ComparableFloat(n)
+        );
     }
 }
 
@@ -84,6 +140,64 @@ where
     }
 }
 
+fn demo_float_shl_unsigned_debug<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: Shl<T, Output = Float>,
+{
+    for (n, u) in float_unsigned_pair_gen_var_2::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        println!(
+            "{:#x} << {} = {:#x}",
+            ComparableFloat(n_old),
+            u,
+            ComparableFloat(n << u)
+        );
+    }
+}
+
+fn demo_float_shl_unsigned_extreme<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: Shl<T, Output = Float>,
+{
+    for (n, u) in float_unsigned_pair_gen_var_3::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        println!("{} << {} = {}", n_old, u, n << u);
+    }
+}
+
+fn demo_float_shl_unsigned_extreme_debug<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: Shl<T, Output = Float>,
+{
+    for (n, u) in float_unsigned_pair_gen_var_3::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        println!(
+            "{:#x} << {} = {:#x}",
+            ComparableFloat(n_old),
+            u,
+            ComparableFloat(n << u)
+        );
+    }
+}
+
 fn demo_float_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Float: Shl<T, Output = Float>,
@@ -94,6 +208,58 @@ where
     {
         let n_old = n.clone();
         println!("{} << {} = {}", n_old, i, n << i);
+    }
+}
+
+fn demo_float_shl_signed_debug<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: Shl<T, Output = Float>,
+{
+    for (n, i) in float_signed_pair_gen_var_2::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        println!(
+            "{:#x} << {} = {:#x}",
+            ComparableFloat(n_old),
+            i,
+            ComparableFloat(n << i)
+        );
+    }
+}
+
+fn demo_float_shl_signed_extreme<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: Shl<T, Output = Float>,
+{
+    for (n, i) in float_signed_pair_gen_var_3::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        println!("{} << {} = {}", n_old, i, n << i);
+    }
+}
+
+fn demo_float_shl_signed_extreme_debug<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: Shl<T, Output = Float>,
+{
+    for (n, i) in float_signed_pair_gen_var_3::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let n_old = n.clone();
+        println!(
+            "{:#x} << {} = {:#x}",
+            ComparableFloat(n_old),
+            i,
+            ComparableFloat(n << i)
+        );
     }
 }
 
@@ -109,6 +275,26 @@ where
     }
 }
 
+fn demo_float_shl_unsigned_ref_debug<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: Shl<T, Output = Float>,
+{
+    for (n, u) in float_unsigned_pair_gen_var_2::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "&{:#x} << {} = {:#x}",
+            ComparableFloatRef(&n),
+            u,
+            ComparableFloatRef(&(&n << u))
+        );
+    }
+}
+
 fn demo_float_shl_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Float: Shl<T, Output = Float>,
@@ -118,6 +304,26 @@ where
         .take(limit)
     {
         println!("&{} << {} = {}", n, i, &n << i);
+    }
+}
+
+fn demo_float_shl_signed_ref_debug<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a Float: Shl<T, Output = Float>,
+{
+    for (n, i) in float_signed_pair_gen_var_2::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "&{:#x} << {} = {:#x}",
+            ComparableFloatRef(&n),
+            i,
+            ComparableFloatRef(&(&n << i))
+        );
     }
 }
 
@@ -215,6 +421,58 @@ fn benchmark_float_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
             (&format!("&Float << {}", T::NAME), &mut |(x, y)| {
                 no_out!(&x << y)
             }),
+        ],
+    );
+}
+
+#[allow(clippy::no_effect, unused_must_use)]
+fn benchmark_float_shl_unsigned_algorithms<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: Shl<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
+    for<'a> &'a Float: Shl<T, Output = Float>,
+{
+    run_benchmark(
+        &format!("Float << {}", T::NAME),
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_pair_gen_var_2::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_float_complexity_bucketer("n"),
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x << y)),
+            ("naive", &mut |(x, y)| no_out!(shl_naive(x, y))),
+        ],
+    );
+}
+
+#[allow(clippy::no_effect, unused_must_use)]
+fn benchmark_float_shl_signed_algorithms<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: Shl<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
+    for<'a> &'a Float: Shl<T, Output = Float>,
+{
+    run_benchmark(
+        &format!("Float << {}", T::NAME),
+        BenchmarkType::EvaluationStrategy,
+        float_signed_pair_gen_var_2::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_float_complexity_bucketer("n"),
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x << y)),
+            ("naive", &mut |(x, y)| no_out!(shl_naive(x, y))),
         ],
     );
 }

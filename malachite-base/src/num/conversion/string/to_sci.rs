@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -27,7 +27,7 @@ pub struct SciWrapper<'a, T: ToSci> {
     pub(crate) options: ToSciOptions,
 }
 
-impl<'a, T: ToSci> Display for SciWrapper<'a, T> {
+impl<T: ToSci> Display for SciWrapper<'_, T> {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> core::fmt::Result {
         self.x.fmt_sci(f, self.options)

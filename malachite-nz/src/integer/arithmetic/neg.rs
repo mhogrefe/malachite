@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -41,7 +41,7 @@ impl Neg for Integer {
     }
 }
 
-impl<'a> Neg for &'a Integer {
+impl Neg for &Integer {
     type Output = Integer;
 
     /// Negates an [`Integer`], taking it by reference.

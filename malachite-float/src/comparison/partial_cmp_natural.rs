@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,9 +15,9 @@ use malachite_nz::natural::Natural;
 impl PartialOrd<Natural> for Float {
     /// Compares a [`Float`] to a [`Natural`].
     ///
-    /// NaN is not comparable to any [`Natural`]. Infinity is greater than any [`Natural`], and
-    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are equal
-    /// to the [`Natural`] zero.
+    /// NaN is not comparable to any [`Natural`]. $\infty$ is greater than any [`Natural`], and
+    /// $-\infty$ is less. Both the [`Float`] zero and the [`Float`] negative zero are equal to the
+    /// [`Natural`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -69,9 +69,9 @@ impl PartialOrd<Natural> for Float {
 impl PartialOrd<Float> for Natural {
     /// Compares a [`Natural`] to a [`Float`].
     ///
-    /// No [`Natural`] is comparable to NaN. Every [`Natural`] is smaller than infinity and greater
-    /// than negative infinity. The [`Natural`] zero is equal to both the [`Float`] zero and the
-    /// [`Float`] negative zero.
+    /// No [`Natural`] is comparable to NaN. Every [`Natural`] is smaller than $\infty$ and greater
+    /// than $-\infty$. The [`Natural`] zero is equal to both the [`Float`] zero and the [`Float`]
+    /// negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

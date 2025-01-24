@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,7 @@ use crate::Float;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, IsInteger};
 use malachite_nz::integer::Integer;
 
-impl<'a> IsInteger for &'a Float {
+impl IsInteger for &Float {
     /// Determines whether a [`Float`] is an integer.
     ///
     /// $f(x) = x \in \Z$.

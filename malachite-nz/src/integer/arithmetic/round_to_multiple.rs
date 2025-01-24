@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -171,7 +171,7 @@ impl RoundToMultiple<Integer> for Integer {
     }
 }
 
-impl<'a> RoundToMultiple<&'a Integer> for Integer {
+impl RoundToMultiple<&Integer> for Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
@@ -325,13 +325,13 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &'a Integer, rm: RoundingMode) -> (Integer, Ordering) {
+    fn round_to_multiple(mut self, other: &Integer, rm: RoundingMode) -> (Integer, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
 }
 
-impl<'a> RoundToMultiple<Integer> for &'a Integer {
+impl RoundToMultiple<Integer> for &Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
@@ -493,7 +493,7 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
+impl RoundToMultiple<&Integer> for &Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
@@ -646,7 +646,7 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     ///     "(-16, Less)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: &'b Integer, rm: RoundingMode) -> (Integer, Ordering) {
+    fn round_to_multiple(self, other: &Integer, rm: RoundingMode) -> (Integer, Ordering) {
         let (n, o) = (&self.abs).round_to_multiple(&other.abs, if self.sign { rm } else { -rm });
         (
             Integer::from_sign_and_abs(self.sign, n),
@@ -771,7 +771,7 @@ impl RoundToMultipleAssign<Integer> for Integer {
     }
 }
 
-impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
+impl RoundToMultipleAssign<&Integer> for Integer {
     /// Rounds an [`Integer`] to a multiple of another [`Integer`] in place, according to a
     /// specified rounding mode. The [`Integer`] on the right-hand side is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
@@ -885,7 +885,7 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// );
     /// assert_eq!(x, -16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &'a Integer, rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: &Integer, rm: RoundingMode) -> Ordering {
         if self.sign {
             self.abs.round_to_multiple_assign(&other.abs, rm)
         } else {

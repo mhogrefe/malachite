@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
@@ -19,7 +20,7 @@ use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::generators::rational_unsigned_rounding_mode_triple_gen_var_1;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use malachite_q::Rational;
 use std::cmp::Ordering::*;
@@ -104,6 +105,415 @@ fn test_from_rational_prec() {
         "3.142857142857142857142857142858",
         "0x3.2492492492492492492492494#100",
         Greater,
+    );
+
+    let test_big = |u: Rational, prec, out, out_hex, out_o| {
+        let (x, o) = Float::from_rational_prec(u.clone(), prec);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = Float::from_rational_prec_ref(&u, prec);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_direct(u.clone(), prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_direct(&u, prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_using_div(u.clone(), prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_using_div(&u, prec, Nearest);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let rug_x = rug::Float::with_val(u32::exact_from(prec), rug::Rational::from(&u));
+        let x = Float::exact_from(&rug_x);
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+    };
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        1,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
     );
 }
 
@@ -655,6 +1065,2273 @@ fn test_from_rational_prec_round() {
         "-0x3.2492492492492492492492494#100",
         Less,
     );
+
+    let test_big = |u: Rational, prec, rm, out, out_hex, out_o| {
+        let (x, o) = Float::from_rational_prec_round(u.clone(), prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = Float::from_rational_prec_round_ref(&u, prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_direct(u.clone(), prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_using_div(u.clone(), prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_direct(&u, prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = from_rational_prec_round_ref_using_div(&u, prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_x, o) =
+                rug::Float::with_val_round(u32::exact_from(prec), rug::Rational::from(&u), rm);
+            let x = Float::exact_from(&rug_x);
+            assert_eq!(x.to_string(), out);
+            assert_eq!(to_hex_string(&x), out_hex);
+            assert_eq!(o, out_o);
+        }
+    };
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        Floor,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        Ceiling,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        Down,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        Up,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        Nearest,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(1000i64),
+        10,
+        Exact,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Floor,
+        "too_big",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Down,
+        "too_big",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Floor,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Ceiling,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Down,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Up,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Nearest,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Exact,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Nearest,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        Floor,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        Ceiling,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        Down,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        Up,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        10,
+        Exact,
+        "9.33e-302",
+        "0x1.000E-250#10",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Floor,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Ceiling,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Down,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Up,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Nearest,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Exact,
+        "too_small",
+        "0x2.00E-268435456#10",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Floor,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Down,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Nearest,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Exact,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Nearest,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Nearest,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Nearest,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Nearest,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Ceiling,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Nearest,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        Floor,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        Ceiling,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        Down,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        Up,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        Nearest,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(-1000i64),
+        1,
+        Exact,
+        "9.0e-302",
+        "0x1.0E-250#1",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Floor,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Ceiling,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Down,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Up,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Nearest,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Exact,
+        "too_small",
+        "0x2.0E-268435456#1",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Floor,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Down,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Exact,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Equal,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        Floor,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        Ceiling,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        Down,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        Up,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        Nearest,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(1000i64),
+        10,
+        Exact,
+        "-1.072e301",
+        "-0x1.000E+250#10",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Ceiling,
+        "-too_big",
+        "-0x7.feE+268435455#10",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Down,
+        "-too_big",
+        "-0x7.feE+268435455#10",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        10,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Floor,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Ceiling,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Down,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Up,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Nearest,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        10,
+        Exact,
+        "-too_big",
+        "-0x4.00E+268435455#10",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        1,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        1,
+        Ceiling,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        1,
+        Down,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        1,
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        1,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Ceiling,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Down,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        1,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Ceiling,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Down,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        1,
+        Nearest,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        Floor,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        Ceiling,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        Down,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        Up,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        10,
+        Exact,
+        "-9.33e-302",
+        "-0x1.000E-250#10",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Floor,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Ceiling,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Down,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Up,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        10,
+        Exact,
+        "-too_small",
+        "-0x2.00E-268435456#10",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Ceiling,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Down,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        Exact,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        10,
+        Nearest,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Floor,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Up,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        10,
+        Nearest,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        Floor,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        Ceiling,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        Down,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        Up,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        Nearest,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        1,
+        Exact,
+        "-9.0e-302",
+        "-0x1.0E-250#1",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Floor,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Ceiling,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Down,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Up,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        1,
+        Exact,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Ceiling,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Down,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Exact,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Equal,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Nearest,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
 }
 
 #[test]
@@ -787,23 +3464,252 @@ fn test_try_from_rational() {
 
     test(
         "1/3",
-        Err(&&FloatFromRationalError),
-        Err(&&FloatFromRationalError),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
     );
     test(
         "22/7",
-        Err(&&FloatFromRationalError),
-        Err(&&FloatFromRationalError),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
     );
     test(
         "-1/3",
-        Err(&&FloatFromRationalError),
-        Err(&&FloatFromRationalError),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
     );
     test(
         "-22/7",
-        Err(&&FloatFromRationalError),
-        Err(&&FloatFromRationalError),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+
+    let test_big = |x: Rational, out, out_hex| {
+        let of = Float::try_from(x.clone());
+        assert!(of.as_ref().map_or(true, Float::is_valid));
+        let ofs = of.as_ref().map(ToString::to_string);
+        assert_eq!(ofs.as_ref().map(String::as_str), out);
+        let ofs = of.map(|f| to_hex_string(&f));
+        assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
+
+        let of = Float::try_from(&x);
+        assert!(of.as_ref().map_or(true, Float::is_valid));
+        let ofs = of.as_ref().map(ToString::to_string);
+        assert_eq!(ofs.as_ref().map(String::as_str), out);
+        let ofs = of.map(|f| to_hex_string(&f));
+        assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
+    };
+    test_big(
+        Rational::power_of_2(1000i64),
+        Ok("1.0e301"),
+        Ok("0x1.0E+250#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        Err(&&FloatConversionError::Overflow),
+        Err(&&FloatConversionError::Overflow),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        Ok("too_big"),
+        Ok("0x4.0E+268435455#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        Ok("too_big"),
+        Ok("0x6.0E+268435455#2"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3073u16, 2048),
+        Ok("too_big"),
+        Ok("0x6.008E+268435455#12"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3071u16, 2048),
+        Ok("too_big"),
+        Ok("0x5.ff8E+268435455#12"),
+    );
+
+    test_big(
+        Rational::power_of_2(-1000i64),
+        Ok("9.0e-302"),
+        Ok("0x1.0E-250#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        Ok("too_small"),
+        Ok("0x2.0E-268435456#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        Ok("too_small"),
+        Ok("0x1.0E-268435456#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        Err(&&FloatConversionError::Underflow),
+        Err(&&FloatConversionError::Underflow),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        Err(&&FloatConversionError::Underflow),
+        Err(&&FloatConversionError::Underflow),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        Err(&&FloatConversionError::Underflow),
+        Err(&&FloatConversionError::Underflow),
+    );
+
+    test_big(
+        Rational::power_of_2(1000i64),
+        Ok("1.0e301"),
+        Ok("0x1.0E+250#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        Err(&&FloatConversionError::Overflow),
+        Err(&&FloatConversionError::Overflow),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        Ok("too_big"),
+        Ok("0x4.0E+268435455#1"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        Ok("too_big"),
+        Ok("0x6.0E+268435455#2"),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+
+    test_big(
+        -Rational::power_of_2(-1000i64),
+        Ok("-9.0e-302"),
+        Ok("-0x1.0E-250#1"),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
+        Ok("-too_small"),
+        Ok("-0x2.0E-268435456#1"),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        Ok("-too_small"),
+        Ok("-0x1.0E-268435456#1"),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        Err(&&FloatConversionError::Underflow),
+        Err(&&FloatConversionError::Underflow),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        Err(&&FloatConversionError::Underflow),
+        Err(&&FloatConversionError::Underflow),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        Err(&&FloatConversionError::Underflow),
+        Err(&&FloatConversionError::Underflow),
+    );
+
+    test_big(
+        -Rational::power_of_2(1000i64),
+        Ok("-1.0e301"),
+        Ok("-0x1.0E+250#1"),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
+        Err(&&FloatConversionError::Overflow),
+        Err(&&FloatConversionError::Overflow),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        Ok("-too_big"),
+        Ok("-0x4.0E+268435455#1"),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        Ok("-too_big"),
+        Ok("-0x6.0E+268435455#2"),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        Err(&&FloatConversionError::Inexact),
+        Err(&&FloatConversionError::Inexact),
     );
 }
 
@@ -831,6 +3737,124 @@ fn test_convertible_from_rational() {
     test("22/7", false);
     test("-1/3", false);
     test("-22/7", false);
+
+    let test_big = |x: Rational, out| {
+        assert_eq!(Float::convertible_from(&x), out);
+    };
+    test_big(Rational::power_of_2(1000i64), true);
+    test_big(Rational::power_of_2(i64::from(Float::MAX_EXPONENT)), false);
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        true,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
+        true,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        false,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        false,
+    );
+
+    test_big(Rational::power_of_2(-1000i64), true);
+    test_big(Rational::power_of_2(i64::from(Float::MIN_EXPONENT)), true);
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        true,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        false,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        false,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        false,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        false,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        false,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        false,
+    );
+
+    test_big(-Rational::power_of_2(1000i64), true);
+    test_big(-Rational::power_of_2(i64::from(Float::MAX_EXPONENT)), false);
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
+        true,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(3u8, 2),
+        true,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(300u16, 199),
+        false,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
+            * Rational::from_unsigneds(299u16, 200),
+        false,
+    );
+
+    test_big(-Rational::power_of_2(-1000i64), true);
+    test_big(-Rational::power_of_2(i64::from(Float::MIN_EXPONENT)), true);
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        true,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
+        false,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        false,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        false,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1024u16, 1023),
+        false,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1001u16, 1000),
+        false,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
+            * Rational::from_unsigneds(1025u16, 1024),
+        false,
+    );
 }
 
 #[test]

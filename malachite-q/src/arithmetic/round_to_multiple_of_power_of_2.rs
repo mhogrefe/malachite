@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -111,7 +111,7 @@ impl RoundToMultipleOfPowerOf2<i64> for Rational {
     }
 }
 
-impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
+impl RoundToMultipleOfPowerOf2<i64> for &Rational {
     type Output = Rational;
 
     /// Rounds a [`Rational`] to an integer multiple of $2^k$ according to a specified rounding

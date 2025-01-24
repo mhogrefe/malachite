@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -151,7 +151,7 @@ impl Natural {
     }
 }
 
-impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
+impl CheckedHammingDistance<&Integer> for &Integer {
     /// Determines the Hamming distance between two [`Integer`]s.
     ///
     /// The two [`Integer`]s have infinitely many leading zeros or infinitely many leading ones,

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -418,6 +418,7 @@ fn benchmark_natural_to_string_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_string_with_width(
     gm: GenMode,
     config: &GenConfig,
@@ -484,6 +485,7 @@ fn benchmark_natural_to_binary_string_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_binary_string_with_width(
     gm: GenMode,
     config: &GenConfig,
@@ -550,6 +552,7 @@ fn benchmark_natural_to_octal_string_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_octal_string_with_width(
     gm: GenMode,
     config: &GenConfig,
@@ -620,6 +623,7 @@ fn benchmark_natural_to_lower_hex_string_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_lower_hex_string_with_width(
     gm: GenMode,
     config: &GenConfig,
@@ -664,6 +668,7 @@ fn benchmark_natural_to_upper_hex_string_library_comparison(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_upper_hex_string_with_width(
     gm: GenMode,
     config: &GenConfig,
@@ -712,6 +717,7 @@ fn benchmark_natural_to_string_base_library_comparison(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_string_base_algorithms(
     gm: GenMode,
     config: &GenConfig,
@@ -738,6 +744,7 @@ fn benchmark_natural_to_string_base_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_to_string_base_upper_algorithms(
     gm: GenMode,
     config: &GenConfig,
@@ -763,6 +770,7 @@ fn benchmark_natural_to_string_base_upper_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_base_fmt_wrapper_fmt_with_width(
     gm: GenMode,
     config: &GenConfig,
@@ -787,6 +795,7 @@ fn benchmark_natural_base_fmt_wrapper_fmt_with_width(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_base_fmt_wrapper_fmt_upper_with_width(
     gm: GenMode,
     config: &GenConfig,

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -38,10 +38,10 @@ macro_rules! impl_partial_eq_primitive_float {
         impl PartialEq<$t> for Float {
             /// Determines whether a [`Float`] is equal to a primitive float.
             ///
-            /// The [`Float`] infinity is equal to the primitive float infinity, and the [`Float`]
-            /// negative infinity is equal to the primitive float negative infinity. The [`Float`]
-            /// NaN is not equal to anything, not even the primitive float NaN. Every [`Float`] zero
-            /// is equal to every primitive float zero, regardless of sign.
+            /// The [`Float`] $\infty$ is equal to the primitive float $\infty$, and the [`Float`]
+            /// $-\infty$ is equal to the primitive float $-\infty$. The [`Float`] NaN is not equal
+            /// to anything, not even the primitive float NaN. Every [`Float`] zero is equal to
+            /// every primitive float zero, regardless of sign.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -62,10 +62,10 @@ macro_rules! impl_partial_eq_primitive_float {
         impl PartialEq<Float> for $t {
             /// Determines whether a primitive float is equal to a [`Float`].
             ///
-            /// The primitive float infinity is equal to the [`Float`] infinity, and the primitive
-            /// float negative infinity is equal to the [`Float`] negative infinity. The primitive
-            /// float NaN is not equal to anything, not even the [`Float`] NaN. Every primitive
-            /// float zero is equal to every [`Float`] zero, regardless of sign.
+            /// The primitive float $\infty$ is equal to the [`Float`] $\infty$, and the primitive
+            /// float $-\infty$ is equal to the [`Float`] $-\infty$. The primitive float NaN is not
+            /// equal to anything, not even the [`Float`] NaN. Every primitive float zero is equal
+            /// to every [`Float`] zero, regardless of sign.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

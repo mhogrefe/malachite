@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -12,7 +12,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::test_util::common::{parse_hex_string, ORDERED_FLOAT_HEX_STRINGS};
 use malachite_float::test_util::generators::{
-    float_gen, float_pair_gen, float_pair_gen_var_1, float_triple_gen,
+    float_gen, float_pair_gen, float_pair_gen_var_1, float_pair_gen_var_10, float_triple_gen,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -67,24 +67,32 @@ fn test_partial_cmp() {
     }
 }
 
+fn partial_cmp_properties_helper(x: Float, y: Float) {
+    let ord = x.partial_cmp(&y);
+    assert_eq!(y.partial_cmp(&x).map(Ordering::reverse), ord);
+    assert_eq!(x == y, x.partial_cmp(&y) == Some(Equal));
+    assert_eq!((-&y).partial_cmp(&-&x), ord);
+    assert_eq!(
+        rug::Float::exact_from(&x).partial_cmp(&rug::Float::exact_from(&y)),
+        ord
+    );
+    if !x.is_zero() || !y.is_zero() {
+        if let Some(ord) = ord {
+            if ord != Equal {
+                assert_eq!(ComparableFloat(x).cmp(&ComparableFloat(y)), ord);
+            }
+        }
+    }
+}
+
 #[test]
 fn partial_cmp_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        let ord = x.partial_cmp(&y);
-        assert_eq!(y.partial_cmp(&x).map(Ordering::reverse), ord);
-        assert_eq!(x == y, x.partial_cmp(&y) == Some(Equal));
-        assert_eq!((-&y).partial_cmp(&-&x), ord);
-        assert_eq!(
-            rug::Float::exact_from(&x).partial_cmp(&rug::Float::exact_from(&y)),
-            ord
-        );
-        if !x.is_zero() || !y.is_zero() {
-            if let Some(ord) = ord {
-                if ord != Equal {
-                    assert_eq!(ComparableFloat(x).cmp(&ComparableFloat(y)), ord);
-                }
-            }
-        }
+        partial_cmp_properties_helper(x, y);
+    });
+
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        partial_cmp_properties_helper(x, y);
     });
 
     float_gen().test_properties(|x| {

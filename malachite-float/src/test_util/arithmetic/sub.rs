@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -7,10 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::test_util::common::rug_float_significant_bits;
+use crate::Float;
+use crate::InnerFloat::{Infinity, NaN, Zero};
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
-use std::cmp::{max, Ordering};
+use std::cmp::max;
+use std::cmp::Ordering::{self, *};
 
 pub fn rug_sub_prec_round(
     x: &rug::Float,
@@ -77,4 +83,32 @@ pub fn rug_sub_rational_prec(
 
 pub fn rug_sub_rational(x: &rug::Float, y: &rug::Rational) -> rug::Float {
     rug_sub_rational_prec_round(x, y, rug_float_significant_bits(x), Round::Nearest).0
+}
+
+pub fn sub_rational_prec_round_naive(
+    x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    match (x, y) {
+        (x @ Float(NaN | Infinity { .. }), _) => (x, Equal),
+        (float_negative_zero!(), y) => {
+            if y == 0u32 {
+                (float_negative_zero!(), Equal)
+            } else {
+                Float::from_rational_prec_round(-y, prec, rm)
+            }
+        }
+        (float_zero!(), y) => Float::from_rational_prec_round(-y, prec, rm),
+        (x, y) => {
+            let (mut sum, o) =
+                Float::from_rational_prec_round(Rational::exact_from(x) - y, prec, rm);
+            if rm == Floor && sum == 0u32 {
+                sum.neg_assign();
+            }
+            (sum, o)
+        }
+    }
 }

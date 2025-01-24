@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -7,14 +7,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{float_either_infinity, float_either_zero, float_nan, Float};
+use crate::{
+    float_either_infinity, float_either_zero, float_infinity, float_nan, float_negative_infinity,
+    float_negative_zero, float_zero, Float,
+};
 use core::cmp::{
     max,
     Ordering::{self, *},
 };
 use core::mem::swap;
 use core::ops::{Mul, MulAssign};
-use malachite_base::num::arithmetic::traits::{CheckedLogBase2, NegAssign, Sign};
+use malachite_base::num::arithmetic::traits::{CheckedLogBase2, IsPowerOf2, NegAssign, Sign};
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
@@ -222,18 +225,18 @@ fn mul_rational_prec_round_assign_direct(
             o
         }
         (None, Some(log_d)) => {
-            let o = x.mul_prec_round_assign(Float::from_natural_min_prec(n), prec, rm);
+            let o = x.mul_prec_round_assign(Float::exact_from(n), prec, rm);
             *x >>= log_d;
             o
         }
         (Some(log_n), None) => {
-            let o = x.div_prec_round_assign(Float::from_natural_min_prec(d), prec, rm);
+            let o = x.div_prec_round_assign(Float::exact_from(d), prec, rm);
             *x <<= log_n;
             o
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec(n);
-            let d = Float::from_natural_min_prec(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
             x.mul_prec_round_assign(n, mul_prec, Floor);
             x.div_prec_round_assign(d, prec, rm)
@@ -274,18 +277,18 @@ fn mul_rational_prec_round_assign_direct_ref(
             o
         }
         (None, Some(log_d)) => {
-            let o = x.mul_prec_round_assign(Float::from_natural_min_prec_ref(n), prec, rm);
+            let o = x.mul_prec_round_assign(Float::exact_from(n), prec, rm);
             *x >>= log_d;
             o
         }
         (Some(log_n), None) => {
-            let o = x.div_prec_round_assign(Float::from_natural_min_prec_ref(d), prec, rm);
+            let o = x.div_prec_round_assign(Float::exact_from(d), prec, rm);
             *x <<= log_n;
             o
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec_ref(n);
-            let d = Float::from_natural_min_prec_ref(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
             x.mul_prec_round_assign(n, mul_prec, Floor);
             x.div_prec_round_assign(d, prec, rm)
@@ -340,16 +343,16 @@ pub_test! {mul_rational_prec_round_direct_ref_val(
             (product << log_n >> log_d, o)
         }
         (None, Some(log_d)) => {
-            let (product, o) = x.mul_prec_round_ref_val(Float::from_natural_min_prec(n), prec, rm);
+            let (product, o) = x.mul_prec_round_ref_val(Float::exact_from(n), prec, rm);
             (product >> log_d, o)
         }
         (Some(log_n), None) => {
-            let (product, o) = x.div_prec_round_ref_val(Float::from_natural_min_prec(d), prec, rm);
+            let (product, o) = x.div_prec_round_ref_val(Float::exact_from(d), prec, rm);
             (product << log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec(n);
-            let d = Float::from_natural_min_prec(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
             x.mul_prec_round_ref_val(n, mul_prec, Floor)
                 .0
@@ -389,17 +392,17 @@ pub_test! {mul_rational_prec_round_direct_ref_ref(
         }
         (None, Some(log_d)) => {
             let (product, o) =
-                x.mul_prec_round_ref_val(Float::from_natural_min_prec_ref(n), prec, rm);
+                x.mul_prec_round_ref_val(Float::exact_from(n), prec, rm);
             (product >> log_d, o)
         }
         (Some(log_n), None) => {
             let (product, o) =
-                x.div_prec_round_ref_val(Float::from_natural_min_prec_ref(d), prec, rm);
+                x.div_prec_round_ref_val(Float::exact_from(d), prec, rm);
             (product << log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec_ref(n);
-            let d = Float::from_natural_min_prec_ref(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
             x.mul_prec_round_ref_val(n, mul_prec, Floor)
                 .0
@@ -448,6 +451,29 @@ impl Float {
     ///   $x>0.0$
     /// - $f(-0.0,x,p,m)=f(x,-0.0,p,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or
     ///   $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::mul_prec`] instead. If you
     /// know that your target precision is the maximum of the precisions of the two inputs, consider
@@ -542,6 +568,29 @@ impl Float {
     /// - $f(-0.0,x,p,m)=f(x,-0.0,p,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or
     ///   $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::mul_prec_val_ref`] instead.
     /// If you know that your target precision is the maximum of the precisions of the two inputs,
     /// consider using [`Float::mul_round_val_ref`] instead. If both of these things are true,
@@ -635,6 +684,29 @@ impl Float {
     /// - $f(-0.0,x,p,m)=f(x,-0.0,p,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or
     ///   $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::mul_prec_ref_val`] instead.
     /// If you know that your target precision is the maximum of the precisions of the two inputs,
     /// consider using [`Float::mul_round_ref_val`] instead. If both of these things are true,
@@ -727,6 +799,29 @@ impl Float {
     ///   $x>0.0$
     /// - $f(-0.0,x,p,m)=f(x,-0.0,p,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or
     ///   $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::mul_prec_ref_ref`] instead.
     /// If you know that your target precision is the maximum of the precisions of the two inputs,
@@ -823,6 +918,24 @@ impl Float {
                 }),
             ) => {
                 let sign = x_sign == y_sign;
+                let exp_sum = x_exp + y_exp;
+                if exp_sum - 1 > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
+                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
+                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                    };
+                } else if exp_sum < Float::MIN_EXPONENT - 1 {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Floor | Down | Nearest) => (float_zero!(), Less),
+                        (true, _) => (Float::min_positive_value_prec(prec), Greater),
+                        (false, Ceiling | Down | Nearest) => (float_negative_zero!(), Greater),
+                        (false, _) => (-Float::min_positive_value_prec(prec), Less),
+                    };
+                }
                 let (product, exp_offset, o) = mul_float_significands_ref_ref(
                     x,
                     *x_prec,
@@ -836,6 +949,34 @@ impl Float {
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
+                if exp > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
+                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
+                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                    };
+                } else if exp < Float::MIN_EXPONENT {
+                    return if rm == Nearest
+                        && exp == Float::MIN_EXPONENT - 1
+                        && (o == Less || !product.is_power_of_2())
+                    {
+                        if sign {
+                            (Float::min_positive_value_prec(prec), Greater)
+                        } else {
+                            (-Float::min_positive_value_prec(prec), Less)
+                        }
+                    } else {
+                        match (sign, rm) {
+                            (_, Exact) => panic!("Inexact float multiplication"),
+                            (true, Ceiling | Up) => (Float::min_positive_value_prec(prec), Greater),
+                            (true, _) => (float_zero!(), Less),
+                            (false, Floor | Up) => (-Float::min_positive_value_prec(prec), Less),
+                            (false, _) => (float_negative_zero!(), Greater),
+                        }
+                    };
+                }
                 (
                     Float(Finite {
                         sign,
@@ -878,6 +1019,14 @@ impl Float {
     /// - $f(0.0,x,p)=f(x,0.0,p)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_round`] instead. If you know that your target precision is the maximum of
@@ -940,6 +1089,14 @@ impl Float {
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_round_val_ref`] instead. If you know that your target precision is the
     /// maximum of the precisions of the two inputs, consider using `*` instead.
@@ -1001,6 +1158,14 @@ impl Float {
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_round_ref_val`] instead. If you know that your target precision is the
     /// maximum of the precisions of the two inputs, consider using `*` instead.
@@ -1061,6 +1226,14 @@ impl Float {
     /// - $f(0.0,x,p)=f(x,0.0,p)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,p)=f(x,-0.0,p)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_round_ref_ref`] instead. If you know that your target precision is the
@@ -1124,6 +1297,28 @@ impl Float {
     /// - $f(0.0,x,m)=f(x,0.0,m)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you want to specify an output precision, consider using [`Float::mul_prec_round`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `*`
@@ -1198,6 +1393,28 @@ impl Float {
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using [`Float::mul_prec_round_val_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `*`
     /// instead.
@@ -1270,6 +1487,28 @@ impl Float {
     /// - $f(0.0,x,m)=f(x,0.0,m)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you want to specify an output precision, consider using [`Float::mul_prec_round_ref_val`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `*`
@@ -1344,6 +1583,28 @@ impl Float {
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x,m)=f(x,-0.0,m)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using [`Float::mul_prec_round_ref_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `*`
     /// instead.
@@ -1404,7 +1665,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::mul_prec_round`] documentation for information on special cases.
+    /// See the [`Float::mul_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::mul_prec_assign`] instead. If
     /// you know that your target precision is the maximum of the precisions of the two inputs,
@@ -1517,6 +1779,48 @@ impl Float {
                 }),
             ) => {
                 let sign = *x_sign == y_sign;
+                let exp_sum = *x_exp + y_exp;
+                if exp_sum - 1 > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Float::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                } else if exp_sum < Float::MIN_EXPONENT - 1 {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Floor | Down | Nearest) => {
+                            *self = float_zero!();
+                            Less
+                        }
+                        (true, _) => {
+                            *self = Float::min_positive_value_prec(prec);
+                            Greater
+                        }
+                        (false, Ceiling | Down | Nearest) => {
+                            *self = float_negative_zero!();
+                            Greater
+                        }
+                        (false, _) => {
+                            *self = -Float::min_positive_value_prec(prec);
+                            Less
+                        }
+                    };
+                }
                 let (exp_offset, o) = mul_float_significands_in_place(
                     x,
                     *x_prec,
@@ -1525,12 +1829,70 @@ impl Float {
                     prec,
                     if sign { rm } else { -rm },
                 );
-                *x_sign = sign;
                 *x_exp = x_exp
                     .checked_add(y_exp)
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
+                if *x_exp > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Float::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                } else if *x_exp < Float::MIN_EXPONENT {
+                    return if rm == Nearest
+                        && *x_exp == Float::MIN_EXPONENT - 1
+                        && (o == Less || !x.is_power_of_2())
+                    {
+                        if sign {
+                            {
+                                *self = Float::min_positive_value_prec(prec);
+                                Greater
+                            }
+                        } else {
+                            {
+                                *self = -Float::min_positive_value_prec(prec);
+                                Less
+                            }
+                        }
+                    } else {
+                        match (sign, rm) {
+                            (_, Exact) => panic!("Inexact float multiplication"),
+                            (true, Ceiling | Up) => {
+                                *self = Float::min_positive_value_prec(prec);
+                                Greater
+                            }
+                            (true, _) => {
+                                *self = float_zero!();
+                                Less
+                            }
+                            (false, Floor | Up) => {
+                                *self = -Float::min_positive_value_prec(prec);
+                                Less
+                            }
+                            (false, _) => {
+                                *self = float_negative_zero!();
+                                Greater
+                            }
+                        }
+                    };
+                }
+                *x_sign = sign;
                 *x_prec = prec;
                 if sign {
                     o
@@ -1561,7 +1923,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::mul_prec_round`] documentation for information on special cases.
+    /// See the [`Float::mul_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::mul_prec_assign_ref`]
     /// instead. If you know that your target precision is the maximum of the precisions of the two
@@ -1678,7 +2041,49 @@ impl Float {
                     significand: y,
                 }),
             ) => {
-                let sign = *x_sign == *y_sign;
+                let sign = x_sign == y_sign;
+                let exp_sum = *x_exp + y_exp;
+                if exp_sum - 1 > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Float::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                } else if exp_sum < Float::MIN_EXPONENT - 1 {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Floor | Down | Nearest) => {
+                            *self = float_zero!();
+                            Less
+                        }
+                        (true, _) => {
+                            *self = Float::min_positive_value_prec(prec);
+                            Greater
+                        }
+                        (false, Ceiling | Down | Nearest) => {
+                            *self = float_negative_zero!();
+                            Greater
+                        }
+                        (false, _) => {
+                            *self = -Float::min_positive_value_prec(prec);
+                            Less
+                        }
+                    };
+                }
                 let (exp_offset, o) = mul_float_significands_in_place_ref(
                     x,
                     *x_prec,
@@ -1687,12 +2092,70 @@ impl Float {
                     prec,
                     if sign { rm } else { -rm },
                 );
-                *x_sign = sign;
                 *x_exp = x_exp
                     .checked_add(*y_exp)
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
+                if *x_exp > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float multiplication");
+                    return match (sign, rm) {
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Float::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                } else if *x_exp < Float::MIN_EXPONENT {
+                    return if rm == Nearest
+                        && *x_exp == Float::MIN_EXPONENT - 1
+                        && (o == Less || !x.is_power_of_2())
+                    {
+                        if sign {
+                            {
+                                *self = Float::min_positive_value_prec(prec);
+                                Greater
+                            }
+                        } else {
+                            {
+                                *self = -Float::min_positive_value_prec(prec);
+                                Less
+                            }
+                        }
+                    } else {
+                        match (sign, rm) {
+                            (_, Exact) => panic!("Inexact float multiplication"),
+                            (true, Ceiling | Up) => {
+                                *self = Float::min_positive_value_prec(prec);
+                                Greater
+                            }
+                            (true, _) => {
+                                *self = float_zero!();
+                                Less
+                            }
+                            (false, Floor | Up) => {
+                                *self = -Float::min_positive_value_prec(prec);
+                                Less
+                            }
+                            (false, _) => {
+                                *self = float_negative_zero!();
+                                Greater
+                            }
+                        }
+                    };
+                }
+                *x_sign = sign;
                 *x_prec = prec;
                 if sign {
                     o
@@ -1721,7 +2184,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::mul_prec`] documentation for information on special cases.
+    /// See the [`Float::mul_prec`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_round_assign`] instead. If you know that your target precision is the
@@ -1772,7 +2236,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::mul_prec`] documentation for information on special cases.
+    /// See the [`Float::mul_prec`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_round_assign_ref`] instead. If you know that your target precision is the
@@ -1825,7 +2290,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
-    /// See the [`Float::mul_round`] documentation for information on special cases.
+    /// See the [`Float::mul_round`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to specify an output precision, consider using [`Float::mul_prec_round_assign`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `*=`
@@ -1888,7 +2354,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
-    /// See the [`Float::mul_round`] documentation for information on special cases.
+    /// See the [`Float::mul_round`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_prec_round_assign_ref`] instead. If you know you'll be using the `Nearest`
@@ -2678,18 +3145,18 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
+    /// assert_eq!(product.to_string(), "1.047197551196597");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.0471975511965979");
+    /// assert_eq!(product.to_string(), "1.047197551196598");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn mul_rational_round(self, other: Rational, rm: RoundingMode) -> (Float, Ordering) {
@@ -2754,18 +3221,18 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
+    /// assert_eq!(product.to_string(), "1.047197551196597");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.0471975511965979");
+    /// assert_eq!(product.to_string(), "1.047197551196598");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn mul_rational_round_val_ref(
@@ -2834,18 +3301,18 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
+    /// assert_eq!(product.to_string(), "1.047197551196597");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.0471975511965979");
+    /// assert_eq!(product.to_string(), "1.047197551196598");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn mul_rational_round_ref_val(
@@ -2914,18 +3381,18 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
+    /// assert_eq!(product.to_string(), "1.047197551196597");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.0471975511965979");
+    /// assert_eq!(product.to_string(), "1.047197551196598");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.0471975511965976");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn mul_rational_round_ref_ref(
@@ -3309,21 +3776,21 @@ impl Float {
     ///     x.mul_rational_round_assign(Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.0471975511965976");
+    /// assert_eq!(x.to_string(), "1.047197551196597");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign(Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.0471975511965979");
+    /// assert_eq!(x.to_string(), "1.047197551196598");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign(Rational::from_unsigneds(1u8, 3), Nearest),
-    ///     Less
+    ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.0471975511965976");
+    /// assert_eq!(x.to_string(), "1.047197551196598");
     /// ```
     #[inline]
     pub fn mul_rational_round_assign(&mut self, other: Rational, rm: RoundingMode) -> Ordering {
@@ -3382,21 +3849,21 @@ impl Float {
     ///     x.mul_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.0471975511965976");
+    /// assert_eq!(x.to_string(), "1.047197551196597");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.0471975511965979");
+    /// assert_eq!(x.to_string(), "1.047197551196598");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Nearest),
-    ///     Less
+    ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.0471975511965976");
+    /// assert_eq!(x.to_string(), "1.047197551196598");
     /// ```
     #[inline]
     pub fn mul_rational_round_assign_ref(
@@ -3437,6 +3904,14 @@ impl Mul<Float> for Float {
     /// - $f(-0.0,x)=f(x,-0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using [`Float::mul_prec`]
     /// instead. If you want to specify the output precision, consider using [`Float::mul_round`].
     /// If you want both of these things, consider using [`Float::mul_prec_round`].
@@ -3470,10 +3945,10 @@ impl Mul<Float> for Float {
     /// );
     /// assert!((Float::INFINITY * Float::ZERO).is_nan());
     ///
-    /// assert_eq!(Float::from(1.5) * Float::from(2.5), 3.75);
-    /// assert_eq!(Float::from(1.5) * Float::from(-2.5), -3.75);
-    /// assert_eq!(Float::from(-1.5) * Float::from(2.5), -3.75);
-    /// assert_eq!(Float::from(-1.5) * Float::from(-2.5), 3.75);
+    /// assert_eq!(Float::from(1.5) * Float::from(2.5), 4.0);
+    /// assert_eq!(Float::from(1.5) * Float::from(-2.5), -4.0);
+    /// assert_eq!(Float::from(-1.5) * Float::from(2.5), -4.0);
+    /// assert_eq!(Float::from(-1.5) * Float::from(-2.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: Float) -> Float {
@@ -3482,7 +3957,7 @@ impl Mul<Float> for Float {
     }
 }
 
-impl<'a> Mul<&'a Float> for Float {
+impl Mul<&Float> for Float {
     type Output = Float;
 
     /// Multiplies two [`Float`]s, taking the first by value and the second by reference.
@@ -3509,6 +3984,14 @@ impl<'a> Mul<&'a Float> for Float {
     /// - $f(0.0,x)=f(x,0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_val_ref`] instead. If you want to specify the output precision, consider
@@ -3544,19 +4027,19 @@ impl<'a> Mul<&'a Float> for Float {
     /// );
     /// assert!((Float::INFINITY * &Float::ZERO).is_nan());
     ///
-    /// assert_eq!(Float::from(1.5) * &Float::from(2.5), 3.75);
-    /// assert_eq!(Float::from(1.5) * &Float::from(-2.5), -3.75);
-    /// assert_eq!(Float::from(-1.5) * &Float::from(2.5), -3.75);
-    /// assert_eq!(Float::from(-1.5) * &Float::from(-2.5), 3.75);
+    /// assert_eq!(Float::from(1.5) * &Float::from(2.5), 4.0);
+    /// assert_eq!(Float::from(1.5) * &Float::from(-2.5), -4.0);
+    /// assert_eq!(Float::from(-1.5) * &Float::from(2.5), -4.0);
+    /// assert_eq!(Float::from(-1.5) * &Float::from(-2.5), 4.0);
     /// ```
     #[inline]
-    fn mul(self, other: &'a Float) -> Float {
+    fn mul(self, other: &Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.mul_prec_round_val_ref(other, prec, Nearest).0
     }
 }
 
-impl<'a> Mul<Float> for &'a Float {
+impl Mul<Float> for &Float {
     type Output = Float;
 
     /// Multiplies two [`Float`]s, taking the first by reference and the second by value.
@@ -3583,6 +4066,14 @@ impl<'a> Mul<Float> for &'a Float {
     /// - $f(0.0,x)=f(x,0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_ref_val`] instead. If you want to specify the output precision, consider
@@ -3618,10 +4109,10 @@ impl<'a> Mul<Float> for &'a Float {
     /// );
     /// assert!((&Float::INFINITY * Float::ZERO).is_nan());
     ///
-    /// assert_eq!(&Float::from(1.5) * Float::from(2.5), 3.75);
-    /// assert_eq!(&Float::from(1.5) * Float::from(-2.5), -3.75);
-    /// assert_eq!(&Float::from(-1.5) * Float::from(2.5), -3.75);
-    /// assert_eq!(&Float::from(-1.5) * Float::from(-2.5), 3.75);
+    /// assert_eq!(&Float::from(1.5) * Float::from(2.5), 4.0);
+    /// assert_eq!(&Float::from(1.5) * Float::from(-2.5), -4.0);
+    /// assert_eq!(&Float::from(-1.5) * Float::from(2.5), -4.0);
+    /// assert_eq!(&Float::from(-1.5) * Float::from(-2.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: Float) -> Float {
@@ -3630,7 +4121,7 @@ impl<'a> Mul<Float> for &'a Float {
     }
 }
 
-impl<'a, 'b> Mul<&'a Float> for &'b Float {
+impl Mul<&Float> for &Float {
     type Output = Float;
 
     /// Multiplies two [`Float`]s, taking both by reference.
@@ -3657,6 +4148,14 @@ impl<'a, 'b> Mul<&'a Float> for &'b Float {
     /// - $f(0.0,x)=f(x,0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=-0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=0.0$ or $x>0.0$
     /// - $f(-0.0,x)=f(x,-0.0)=0.0$ if $x$ is not NaN or $\pm\infty$, and if $x=-0.0$ or $x<0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_ref_ref`] instead. If you want to specify the output precision, consider
@@ -3692,13 +4191,13 @@ impl<'a, 'b> Mul<&'a Float> for &'b Float {
     /// );
     /// assert!((&Float::INFINITY * &Float::ZERO).is_nan());
     ///
-    /// assert_eq!(&Float::from(1.5) * &Float::from(2.5), 3.75);
-    /// assert_eq!(&Float::from(1.5) * &Float::from(-2.5), -3.75);
-    /// assert_eq!(&Float::from(-1.5) * &Float::from(2.5), -3.75);
-    /// assert_eq!(&Float::from(-1.5) * &Float::from(-2.5), 3.75);
+    /// assert_eq!(&Float::from(1.5) * &Float::from(2.5), 4.0);
+    /// assert_eq!(&Float::from(1.5) * &Float::from(-2.5), -4.0);
+    /// assert_eq!(&Float::from(-1.5) * &Float::from(2.5), -4.0);
+    /// assert_eq!(&Float::from(-1.5) * &Float::from(-2.5), 4.0);
     /// ```
     #[inline]
-    fn mul(self, other: &'a Float) -> Float {
+    fn mul(self, other: &Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.mul_prec_round_ref_ref(other, prec, Nearest).0
     }
@@ -3720,7 +4219,7 @@ impl MulAssign<Float> for Float {
     /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// See the `*` documentation for information on special cases.
+    /// See the `*` documentation for information on special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_assign`] instead. If you want to specify the output precision, consider
@@ -3766,19 +4265,19 @@ impl MulAssign<Float> for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x *= Float::from(2.5);
-    /// assert_eq!(x, 3.75);
+    /// assert_eq!(x, 4.0);
     ///
     /// let mut x = Float::from(1.5);
     /// x *= Float::from(-2.5);
-    /// assert_eq!(x, -3.75);
+    /// assert_eq!(x, -4.0);
     ///
     /// let mut x = Float::from(-1.5);
     /// x *= Float::from(2.5);
-    /// assert_eq!(x, -3.75);
+    /// assert_eq!(x, -4.0);
     ///
     /// let mut x = Float::from(-1.5);
     /// x *= Float::from(-2.5);
-    /// assert_eq!(x, 3.75);
+    /// assert_eq!(x, 4.0);
     /// ```
     #[inline]
     fn mul_assign(&mut self, other: Float) {
@@ -3787,7 +4286,7 @@ impl MulAssign<Float> for Float {
     }
 }
 
-impl<'a> MulAssign<&'a Float> for Float {
+impl MulAssign<&Float> for Float {
     /// Multiplies a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side
     /// by reference.
     ///
@@ -3803,7 +4302,7 @@ impl<'a> MulAssign<&'a Float> for Float {
     /// - If $xy$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |xy|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// See the `*` documentation for information on special cases.
+    /// See the `*` documentation for information on special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_prec_assign`] instead. If you want to specify the output precision, consider
@@ -3849,19 +4348,19 @@ impl<'a> MulAssign<&'a Float> for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x *= &Float::from(2.5);
-    /// assert_eq!(x, 3.75);
+    /// assert_eq!(x, 4.0);
     ///
     /// let mut x = Float::from(1.5);
     /// x *= &Float::from(-2.5);
-    /// assert_eq!(x, -3.75);
+    /// assert_eq!(x, -4.0);
     ///
     /// let mut x = Float::from(-1.5);
     /// x *= &Float::from(2.5);
-    /// assert_eq!(x, -3.75);
+    /// assert_eq!(x, -4.0);
     ///
     /// let mut x = Float::from(-1.5);
     /// x *= &Float::from(-2.5);
-    /// assert_eq!(x, 3.75);
+    /// assert_eq!(x, 4.0);
     /// ```
     #[inline]
     fn mul_assign(&mut self, other: &Float) {
@@ -3933,10 +4432,10 @@ impl Mul<Rational> for Float {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(Float::from(2.5) * Rational::exact_from(1.5), 3.75);
-    /// assert_eq!(Float::from(2.5) * Rational::exact_from(-1.5), -3.75);
-    /// assert_eq!(Float::from(-2.5) * Rational::exact_from(1.5), -3.75);
-    /// assert_eq!(Float::from(-2.5) * Rational::exact_from(-1.5), 3.75);
+    /// assert_eq!(Float::from(2.5) * Rational::exact_from(1.5), 4.0);
+    /// assert_eq!(Float::from(2.5) * Rational::exact_from(-1.5), -4.0);
+    /// assert_eq!(Float::from(-2.5) * Rational::exact_from(1.5), -4.0);
+    /// assert_eq!(Float::from(-2.5) * Rational::exact_from(-1.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: Rational) -> Float {
@@ -3945,7 +4444,7 @@ impl Mul<Rational> for Float {
     }
 }
 
-impl<'a> Mul<&'a Rational> for Float {
+impl Mul<&Rational> for Float {
     type Output = Float;
 
     /// Multiplies a [`Float`] by a [`Rational`], taking the first by value and the second by
@@ -4012,10 +4511,10 @@ impl<'a> Mul<&'a Rational> for Float {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(Float::from(2.5) * &Rational::exact_from(1.5), 3.75);
-    /// assert_eq!(Float::from(2.5) * &Rational::exact_from(-1.5), -3.75);
-    /// assert_eq!(Float::from(-2.5) * &Rational::exact_from(1.5), -3.75);
-    /// assert_eq!(Float::from(-2.5) * &Rational::exact_from(-1.5), 3.75);
+    /// assert_eq!(Float::from(2.5) * &Rational::exact_from(1.5), 4.0);
+    /// assert_eq!(Float::from(2.5) * &Rational::exact_from(-1.5), -4.0);
+    /// assert_eq!(Float::from(-2.5) * &Rational::exact_from(1.5), -4.0);
+    /// assert_eq!(Float::from(-2.5) * &Rational::exact_from(-1.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: &Rational) -> Float {
@@ -4024,7 +4523,7 @@ impl<'a> Mul<&'a Rational> for Float {
     }
 }
 
-impl<'a> Mul<Rational> for &'a Float {
+impl Mul<Rational> for &Float {
     type Output = Float;
 
     /// Multiplies a [`Float`] by a [`Rational`], taking the first by reference and the second by
@@ -4091,10 +4590,10 @@ impl<'a> Mul<Rational> for &'a Float {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(&Float::from(2.5) * Rational::exact_from(1.5), 3.75);
-    /// assert_eq!(&Float::from(2.5) * Rational::exact_from(-1.5), -3.75);
-    /// assert_eq!(&Float::from(-2.5) * Rational::exact_from(1.5), -3.75);
-    /// assert_eq!(&Float::from(-2.5) * Rational::exact_from(-1.5), 3.75);
+    /// assert_eq!(&Float::from(2.5) * Rational::exact_from(1.5), 4.0);
+    /// assert_eq!(&Float::from(2.5) * Rational::exact_from(-1.5), -4.0);
+    /// assert_eq!(&Float::from(-2.5) * Rational::exact_from(1.5), -4.0);
+    /// assert_eq!(&Float::from(-2.5) * Rational::exact_from(-1.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: Rational) -> Float {
@@ -4103,7 +4602,7 @@ impl<'a> Mul<Rational> for &'a Float {
     }
 }
 
-impl<'a, 'b> Mul<&'a Rational> for &'b Float {
+impl Mul<&Rational> for &Float {
     type Output = Float;
 
     /// Multiplies a [`Float`] by a [`Rational`], taking both by reference.
@@ -4169,10 +4668,10 @@ impl<'a, 'b> Mul<&'a Rational> for &'b Float {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(&Float::from(2.5) * &Rational::exact_from(1.5), 3.75);
-    /// assert_eq!(&Float::from(2.5) * &Rational::exact_from(-1.5), -3.75);
-    /// assert_eq!(&Float::from(-2.5) * &Rational::exact_from(1.5), -3.75);
-    /// assert_eq!(&Float::from(-2.5) * &Rational::exact_from(-1.5), 3.75);
+    /// assert_eq!(&Float::from(2.5) * &Rational::exact_from(1.5), 4.0);
+    /// assert_eq!(&Float::from(2.5) * &Rational::exact_from(-1.5), -4.0);
+    /// assert_eq!(&Float::from(-2.5) * &Rational::exact_from(1.5), -4.0);
+    /// assert_eq!(&Float::from(-2.5) * &Rational::exact_from(-1.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: &Rational) -> Float {
@@ -4240,7 +4739,7 @@ impl MulAssign<Rational> for Float {
     ///
     /// let mut x = Float::from(2.5);
     /// x *= Rational::exact_from(1.5);
-    /// assert_eq!(x, 3.75);
+    /// assert_eq!(x, 4.0);
     /// ```
     #[inline]
     fn mul_assign(&mut self, other: Rational) {
@@ -4249,7 +4748,7 @@ impl MulAssign<Rational> for Float {
     }
 }
 
-impl<'a> MulAssign<&'a Rational> for Float {
+impl MulAssign<&Rational> for Float {
     /// Multiplies a [`Float`] by a [`Rational`] in place, taking the [`Rational`] by reference.
     ///
     /// If the output has a precision, it is the precision of the input [`Float`]. If the product is
@@ -4308,7 +4807,7 @@ impl<'a> MulAssign<&'a Rational> for Float {
     ///
     /// let mut x = Float::from(2.5);
     /// x *= &Rational::exact_from(1.5);
-    /// assert_eq!(x, 3.75);
+    /// assert_eq!(x, 4.0);
     /// ```
     #[inline]
     fn mul_assign(&mut self, other: &Rational) {
@@ -4375,10 +4874,10 @@ impl Mul<Float> for Rational {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(Rational::exact_from(1.5) * Float::from(2.5), 3.75);
-    /// assert_eq!(Rational::exact_from(-1.5) * Float::from(2.5), -3.75);
-    /// assert_eq!(Rational::exact_from(1.5) * Float::from(-2.5), -3.75);
-    /// assert_eq!(Rational::exact_from(-1.5) * Float::from(-2.5), 3.75);
+    /// assert_eq!(Rational::exact_from(1.5) * Float::from(2.5), 4.0);
+    /// assert_eq!(Rational::exact_from(-1.5) * Float::from(2.5), -4.0);
+    /// assert_eq!(Rational::exact_from(1.5) * Float::from(-2.5), -4.0);
+    /// assert_eq!(Rational::exact_from(-1.5) * Float::from(-2.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: Float) -> Float {
@@ -4387,7 +4886,7 @@ impl Mul<Float> for Rational {
     }
 }
 
-impl<'a> Mul<&'a Float> for Rational {
+impl Mul<&Float> for Rational {
     type Output = Float;
 
     /// Multiplies a [`Rational`] by a [`Float`], taking the [`Rational`] by value and the [`Float`]
@@ -4449,10 +4948,10 @@ impl<'a> Mul<&'a Float> for Rational {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(Rational::exact_from(1.5) * &Float::from(2.5), 3.75);
-    /// assert_eq!(Rational::exact_from(-1.5) * &Float::from(2.5), -3.75);
-    /// assert_eq!(Rational::exact_from(1.5) * &Float::from(-2.5), -3.75);
-    /// assert_eq!(Rational::exact_from(-1.5) * &Float::from(-2.5), 3.75);
+    /// assert_eq!(Rational::exact_from(1.5) * &Float::from(2.5), 4.0);
+    /// assert_eq!(Rational::exact_from(-1.5) * &Float::from(2.5), -4.0);
+    /// assert_eq!(Rational::exact_from(1.5) * &Float::from(-2.5), -4.0);
+    /// assert_eq!(Rational::exact_from(-1.5) * &Float::from(-2.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: &Float) -> Float {
@@ -4461,7 +4960,7 @@ impl<'a> Mul<&'a Float> for Rational {
     }
 }
 
-impl<'a> Mul<Float> for &'a Rational {
+impl Mul<Float> for &Rational {
     type Output = Float;
 
     /// Multiplies a [`Rational`] by a [`Float`], taking the [`Rational`] by reference and the
@@ -4523,10 +5022,10 @@ impl<'a> Mul<Float> for &'a Rational {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(&Rational::exact_from(1.5) * Float::from(2.5), 3.75);
-    /// assert_eq!(&Rational::exact_from(-1.5) * Float::from(2.5), -3.75);
-    /// assert_eq!(&Rational::exact_from(1.5) * Float::from(-2.5), -3.75);
-    /// assert_eq!(&Rational::exact_from(-1.5) * Float::from(-2.5), 3.75);
+    /// assert_eq!(&Rational::exact_from(1.5) * Float::from(2.5), 4.0);
+    /// assert_eq!(&Rational::exact_from(-1.5) * Float::from(2.5), -4.0);
+    /// assert_eq!(&Rational::exact_from(1.5) * Float::from(-2.5), -4.0);
+    /// assert_eq!(&Rational::exact_from(-1.5) * Float::from(-2.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: Float) -> Float {
@@ -4535,7 +5034,7 @@ impl<'a> Mul<Float> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Mul<&'a Float> for &'b Rational {
+impl Mul<&Float> for &Rational {
     type Output = Float;
 
     /// Multiplies a [`Rational`] by a [`Float`], taking both by reference.
@@ -4596,10 +5095,10 @@ impl<'a, 'b> Mul<&'a Float> for &'b Rational {
     ///     Float::INFINITY
     /// );
     ///
-    /// assert_eq!(&Rational::exact_from(1.5) * &Float::from(2.5), 3.75);
-    /// assert_eq!(&Rational::exact_from(-1.5) * &Float::from(2.5), -3.75);
-    /// assert_eq!(&Rational::exact_from(1.5) * &Float::from(-2.5), -3.75);
-    /// assert_eq!(&Rational::exact_from(-1.5) * &Float::from(-2.5), 3.75);
+    /// assert_eq!(&Rational::exact_from(1.5) * &Float::from(2.5), 4.0);
+    /// assert_eq!(&Rational::exact_from(-1.5) * &Float::from(2.5), -4.0);
+    /// assert_eq!(&Rational::exact_from(1.5) * &Float::from(-2.5), -4.0);
+    /// assert_eq!(&Rational::exact_from(-1.5) * &Float::from(-2.5), 4.0);
     /// ```
     #[inline]
     fn mul(self, other: &Float) -> Float {

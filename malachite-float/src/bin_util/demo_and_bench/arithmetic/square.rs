@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -12,9 +12,8 @@ use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::arithmetic::square::square_prec_round_naive;
 use malachite_float::test_util::arithmetic::square::{
-    rug_square, rug_square_prec, rug_square_prec_round, rug_square_round,
+    rug_square, rug_square_prec, rug_square_prec_round, rug_square_round, square_prec_round_naive,
 };
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer, pair_2_float_complexity_bucketer,
@@ -25,9 +24,10 @@ use malachite_float::test_util::bench::bucketers::{
     triple_1_2_float_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_rm, float_rounding_mode_pair_gen_var_7,
-    float_rounding_mode_pair_gen_var_7_rm, float_unsigned_pair_gen_var_1,
-    float_unsigned_pair_gen_var_1_rm, float_unsigned_rounding_mode_triple_gen_var_2,
+    float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_22,
+    float_rounding_mode_pair_gen_var_7, float_rounding_mode_pair_gen_var_7_rm,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
+    float_unsigned_rounding_mode_triple_gen_var_11, float_unsigned_rounding_mode_triple_gen_var_2,
     float_unsigned_rounding_mode_triple_gen_var_2_rm,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
@@ -35,24 +35,32 @@ use malachite_float::{ComparableFloat, ComparableFloatRef};
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_square);
     register_demo!(runner, demo_float_square_debug);
+    register_demo!(runner, demo_float_square_extreme);
+    register_demo!(runner, demo_float_square_extreme_debug);
     register_demo!(runner, demo_float_square_ref);
     register_demo!(runner, demo_float_square_ref_debug);
     register_demo!(runner, demo_float_square_assign);
     register_demo!(runner, demo_float_square_assign_debug);
     register_demo!(runner, demo_float_square_prec);
     register_demo!(runner, demo_float_square_prec_debug);
+    register_demo!(runner, demo_float_square_prec_extreme);
+    register_demo!(runner, demo_float_square_prec_extreme_debug);
     register_demo!(runner, demo_float_square_prec_ref);
     register_demo!(runner, demo_float_square_prec_ref_debug);
     register_demo!(runner, demo_float_square_prec_assign);
     register_demo!(runner, demo_float_square_prec_assign_debug);
     register_demo!(runner, demo_float_square_round);
     register_demo!(runner, demo_float_square_round_debug);
+    register_demo!(runner, demo_float_square_round_extreme);
+    register_demo!(runner, demo_float_square_round_extreme_debug);
     register_demo!(runner, demo_float_square_round_ref);
     register_demo!(runner, demo_float_square_round_ref_debug);
     register_demo!(runner, demo_float_square_round_assign);
     register_demo!(runner, demo_float_square_round_assign_debug);
     register_demo!(runner, demo_float_square_prec_round);
     register_demo!(runner, demo_float_square_prec_round_debug);
+    register_demo!(runner, demo_float_square_prec_round_extreme);
+    register_demo!(runner, demo_float_square_prec_round_extreme_debug);
     register_demo!(runner, demo_float_square_prec_round_ref);
     register_demo!(runner, demo_float_square_prec_round_ref_debug);
     register_demo!(runner, demo_float_square_prec_round_assign);
@@ -88,6 +96,24 @@ fn demo_float_square(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_square_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!(
+            "({:#x}) ^ 2 = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(x.square())
+        );
+    }
+}
+
+fn demo_float_square_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}) ^ 2 = {}", x_old, x.square());
+    }
+}
+
+fn demo_float_square_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!(
             "({:#x}) ^ 2 = {:#x}",
@@ -147,6 +173,32 @@ fn demo_float_square_prec(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_square_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let (sum, o) = x.square_prec(prec);
+        println!(
+            "({:#x}).square_prec({}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            prec,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_square_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_4().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!(
+            "({}).square_prec({}) = {:?}",
+            x_old,
+            prec,
+            x.square_prec(prec)
+        );
+    }
+}
+
+fn demo_float_square_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_4().get(gm, config).take(limit) {
         let x_old = x.clone();
         let (sum, o) = x.square_prec(prec);
         println!(
@@ -222,6 +274,38 @@ fn demo_float_square_round(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_square_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (sum, o) = x.square_round(rm);
+        println!(
+            "({:#x}).square_round({}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_square_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_22()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).square_round({}) = {:?}",
+            x_old,
+            rm,
+            x.square_round(rm)
+        );
+    }
+}
+
+fn demo_float_square_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_22()
         .get(gm, config)
         .take(limit)
     {
@@ -313,6 +397,40 @@ fn demo_float_square_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_square_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (sum, o) = x.square_prec_round(prec, rm);
+        println!(
+            "({:#x}).square_prec_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            prec,
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_square_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_11()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).square_prec_round({}, {}) = {:?}",
+            x_old,
+            prec,
+            rm,
+            x.square_prec_round(prec, rm)
+        );
+    }
+}
+
+fn demo_float_square_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_11()
         .get(gm, config)
         .take(limit)
     {

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -85,7 +85,7 @@ impl CheckedSqrt for Rational {
     }
 }
 
-impl<'a> CheckedSqrt for &'a Rational {
+impl CheckedSqrt for &Rational {
     type Output = Rational;
 
     /// Returns the the square root of a [`Rational`], or `None` if it is not a perfect square. The

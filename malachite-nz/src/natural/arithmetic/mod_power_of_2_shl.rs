@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -79,7 +79,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             }
         }
 
-        impl<'a> ModPowerOf2Shl<$t> for &'a Natural {
+        impl ModPowerOf2Shl<$t> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
@@ -199,7 +199,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             }
         }
 
-        impl<'a> ModPowerOf2Shl<$t> for &'a Natural {
+        impl ModPowerOf2Shl<$t> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The

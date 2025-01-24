@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -90,7 +90,7 @@ pub_test! {limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
     }
 }}
 
-impl<'a> FloorLogBase2 for &'a Natural {
+impl FloorLogBase2 for &Natural {
     type Output = u64;
 
     /// Returns the floor of the base-2 logarithm of a positive [`Natural`].
@@ -119,7 +119,7 @@ impl<'a> FloorLogBase2 for &'a Natural {
     }
 }
 
-impl<'a> CeilingLogBase2 for &'a Natural {
+impl CeilingLogBase2 for &Natural {
     type Output = u64;
 
     /// Returns the ceiling of the base-2 logarithm of a positive [`Natural`].
@@ -152,7 +152,7 @@ impl<'a> CeilingLogBase2 for &'a Natural {
     }
 }
 
-impl<'a> CheckedLogBase2 for &'a Natural {
+impl CheckedLogBase2 for &Natural {
     type Output = u64;
 
     /// Returns the base-2 logarithm of a positive [`Natural`]. If the [`Natural`] is not a power of

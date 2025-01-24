@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -184,8 +184,12 @@ impl Float {
                 significand: x,
             }) => {
                 if x.is_power_of_2() {
-                    let reciprocal = Float::power_of_2_prec(i64::from(1 - exp), prec);
-                    return (if *sign { reciprocal } else { -reciprocal }, Equal);
+                    let (reciprocal, o) = Float::power_of_2_prec(i64::from(1 - exp), prec);
+                    return if *sign {
+                        (reciprocal, o)
+                    } else {
+                        (-reciprocal, o.reverse())
+                    };
                 }
                 let sign = *sign;
                 let (reciprocal, exp_offset, o) =
@@ -370,16 +374,16 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round(Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.31830988618379064");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round(Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.31830988618379069");
+    /// assert_eq!(reciprocal.to_string(), "0.318309886183791");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round(Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.31830988618379069");
-    /// assert_eq!(o, Greater);
+    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn reciprocal_round(self, rm: RoundingMode) -> (Float, Ordering) {
@@ -437,16 +441,16 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round_ref(Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.31830988618379064");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round_ref(Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.31830988618379069");
+    /// assert_eq!(reciprocal.to_string(), "0.318309886183791");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round_ref(Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.31830988618379069");
-    /// assert_eq!(o, Greater);
+    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn reciprocal_round_ref(&self, rm: RoundingMode) -> (Float, Ordering) {
@@ -543,11 +547,14 @@ impl Float {
             }) => {
                 if x.is_power_of_2() {
                     let sign = *sign;
-                    *self = Float::power_of_2_prec(i64::from(1 - *exp), prec);
-                    if !sign {
+                    let o;
+                    (*self, o) = Float::power_of_2_prec(i64::from(1 - *exp), prec);
+                    return if sign {
+                        o
+                    } else {
                         self.neg_assign();
-                    }
-                    return Equal;
+                        o.reverse()
+                    };
                 }
                 let sign = *sign;
                 let (reciprocal, exp_offset, o) =
@@ -665,15 +672,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "0.31830988618379064");
+    /// assert_eq!(x.to_string(), "0.3183098861837905");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.31830988618379069");
+    /// assert_eq!(x.to_string(), "0.318309886183791");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.reciprocal_round_assign(Nearest), Greater);
-    /// assert_eq!(x.to_string(), "0.31830988618379069");
+    /// assert_eq!(x.reciprocal_round_assign(Nearest), Less);
+    /// assert_eq!(x.to_string(), "0.3183098861837905");
     /// ```
     #[inline]
     pub fn reciprocal_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -727,14 +734,8 @@ impl Reciprocal for Float {
     /// assert!(Float::NAN.reciprocal().is_nan());
     /// assert_eq!(Float::INFINITY.reciprocal().to_string(), "0.0");
     /// assert_eq!(Float::NEGATIVE_INFINITY.reciprocal().to_string(), "-0.0");
-    /// assert_eq!(
-    ///     Float::from(1.5).reciprocal().to_string(),
-    ///     "0.6666666666666666"
-    /// );
-    /// assert_eq!(
-    ///     Float::from(-1.5).reciprocal().to_string(),
-    ///     "-0.6666666666666666"
-    /// );
+    /// assert_eq!(Float::from(1.5).reciprocal().to_string(), "0.8");
+    /// assert_eq!(Float::from(-1.5).reciprocal().to_string(), "-0.8");
     /// ```
     #[inline]
     fn reciprocal(self) -> Float {
@@ -743,7 +744,7 @@ impl Reciprocal for Float {
     }
 }
 
-impl<'a> Reciprocal for &'a Float {
+impl Reciprocal for &Float {
     type Output = Float;
 
     /// Takes the reciprocal of a [`Float`], taking it by reference.
@@ -788,14 +789,8 @@ impl<'a> Reciprocal for &'a Float {
     /// assert!((&Float::NAN).reciprocal().is_nan());
     /// assert_eq!((&Float::INFINITY).reciprocal().to_string(), "0.0");
     /// assert_eq!((&Float::NEGATIVE_INFINITY).reciprocal().to_string(), "-0.0");
-    /// assert_eq!(
-    ///     (&Float::from(1.5)).reciprocal().to_string(),
-    ///     "0.6666666666666666"
-    /// );
-    /// assert_eq!(
-    ///     (&Float::from(-1.5)).reciprocal().to_string(),
-    ///     "-0.6666666666666666"
-    /// );
+    /// assert_eq!((&Float::from(1.5)).reciprocal().to_string(), "0.8");
+    /// assert_eq!((&Float::from(-1.5)).reciprocal().to_string(), "-0.8");
     /// ```
     #[inline]
     fn reciprocal(self) -> Float {
@@ -853,11 +848,11 @@ impl ReciprocalAssign for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x.reciprocal_assign();
-    /// assert_eq!(x.to_string(), "0.6666666666666666");
+    /// assert_eq!(x.to_string(), "0.8");
     ///
     /// let mut x = Float::from(-1.5);
     /// x.reciprocal_assign();
-    /// assert_eq!(x.to_string(), "-0.6666666666666666");
+    /// assert_eq!(x.to_string(), "-0.8");
     /// ```
     #[inline]
     fn reciprocal_assign(&mut self) {

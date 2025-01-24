@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -52,7 +52,7 @@ impl Sub<Integer> for Integer {
     }
 }
 
-impl<'a> Sub<&'a Integer> for Integer {
+impl Sub<&Integer> for Integer {
     type Output = Integer;
 
     /// Subtracts an [`Integer`] by another [`Integer`], taking the first by value and the second by
@@ -85,13 +85,13 @@ impl<'a> Sub<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub(mut self, other: &'a Integer) -> Integer {
+    fn sub(mut self, other: &Integer) -> Integer {
         self -= other;
         self
     }
 }
 
-impl<'a> Sub<Integer> for &'a Integer {
+impl Sub<Integer> for &Integer {
     type Output = Integer;
 
     /// Subtracts an [`Integer`] by another [`Integer`], taking the first by reference and the
@@ -129,7 +129,7 @@ impl<'a> Sub<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
+impl Sub<&Integer> for &Integer {
     type Output = Integer;
 
     /// Subtracts an [`Integer`] by another [`Integer`], taking both by reference.
@@ -160,7 +160,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     ///     1000000000000u64
     /// );
     /// ```
-    fn sub(self, other: &'a Integer) -> Integer {
+    fn sub(self, other: &Integer) -> Integer {
         match (self, other) {
             (x, y) if core::ptr::eq(x, y) => Integer::ZERO,
             (integer_zero!(), y) => -y.clone(),
@@ -267,7 +267,7 @@ impl SubAssign<Integer> for Integer {
     }
 }
 
-impl<'a> SubAssign<&'a Integer> for Integer {
+impl SubAssign<&Integer> for Integer {
     /// Subtracts an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -296,7 +296,7 @@ impl<'a> SubAssign<&'a Integer> for Integer {
     /// x -= &(Integer::from(10u32).pow(12) * Integer::from(4u32));
     /// assert_eq!(x, -2000000000000i64);
     /// ```
-    fn sub_assign(&mut self, other: &'a Integer) {
+    fn sub_assign(&mut self, other: &Integer) {
         match (&mut *self, other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), y) => *self = -y.clone(),

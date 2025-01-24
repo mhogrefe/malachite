@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,13 +11,15 @@ use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
-use malachite_float::test_util::generators::float_gen_var_2;
+use malachite_float::test_util::generators::{float_gen_var_14, float_gen_var_2};
 use malachite_float::ComparableFloat;
 use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sign);
     register_demo!(runner, demo_float_sign_debug);
+    register_demo!(runner, demo_float_sign_extreme);
+    register_demo!(runner, demo_float_sign_extreme_debug);
 
     register_bench!(runner, benchmark_float_sign);
 }
@@ -34,6 +36,26 @@ fn demo_float_sign(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_sign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_2().get(gm, config).take(limit) {
+        match n.sign() {
+            Less => println!("{:#x} is negative", ComparableFloat(n)),
+            Equal => println!("{:#x} is zero", ComparableFloat(n)),
+            Greater => println!("{:#x} is positive", ComparableFloat(n)),
+        }
+    }
+}
+
+fn demo_float_sign_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_14().get(gm, config).take(limit) {
+        match n.sign() {
+            Less => println!("{n} is negative"),
+            Equal => println!("{n} is zero"),
+            Greater => println!("{n} is positive"),
+        }
+    }
+}
+
+fn demo_float_sign_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_14().get(gm, config).take(limit) {
         match n.sign() {
             Less => println!("{:#x} is negative", ComparableFloat(n)),
             Equal => println!("{:#x} is zero", ComparableFloat(n)),

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -55,7 +55,7 @@ impl ModPowerOf2Neg for Natural {
     }
 }
 
-impl<'a> ModPowerOf2Neg for &'a Natural {
+impl ModPowerOf2Neg for &Natural {
     type Output = Natural;
 
     /// Negates a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -12,7 +12,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::XXAddYYToZZ;
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
 
@@ -103,7 +103,7 @@ impl XXAddYYToZZ for usize {
     /// This is equivalent to `add_ssaaaa` from `longlong.h`, GMP 6.2.1, where `(sh, sl)` is
     /// returned.
     fn xx_add_yy_to_zz(x_1: usize, x_0: usize, y_1: usize, y_0: usize) -> (usize, usize) {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             let (z_1, z_0) = u32::xx_add_yy_to_zz(
                 u32::wrapping_from(x_1),
                 u32::wrapping_from(x_0),

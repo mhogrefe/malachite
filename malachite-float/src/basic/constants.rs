@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,12 +10,15 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
+use malachite_base::num::arithmetic::traits::{
+    NegModPowerOf2, PowerOf2, RoundToMultipleOfPowerOf2,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeOne, NegativeZero, One,
     OneHalf, Two, Zero as ZeroTrait,
 };
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -166,12 +169,12 @@ impl NegativeZero for Float {
     const NEGATIVE_ZERO: Float = float_negative_zero!();
 }
 
-/// The constant Infinity.
+/// The constant $\infty$.
 impl InfinityTrait for Float {
     const INFINITY: Float = float_infinity!();
 }
 
-/// The constant -Infinity.
+/// The constant $-\infty$.
 impl NegativeInfinity for Float {
     const NEGATIVE_INFINITY: Float = float_negative_infinity!();
 }
@@ -188,12 +191,12 @@ impl Default for Float {
     }
 }
 
-/// The lowest value representable by this type, negative infinity.
+/// The lowest value representable by this type, $-\infty$.
 impl Min for Float {
     const MIN: Float = Float::NEGATIVE_INFINITY;
 }
 
-/// The highest value representable by this type, positive infinity.
+/// The highest value representable by this type, $\infty$.
 impl Max for Float {
     const MAX: Float = Float::INFINITY;
 }
@@ -202,6 +205,102 @@ impl Max for Float {
 impl_named!(Float);
 
 impl Float {
+    /// The minimum representable positive value, or $2^{-2^{30}}$, with precision 1.
+    pub const MIN_POSITIVE: Float = Float(Finite {
+        sign: true,
+        exponent: Float::MIN_EXPONENT,
+        precision: 1,
+        significand: Natural::HIGH_BIT,
+    });
+
+    /// Returns the minimum representable positive value, or $2^{-2^{30}}$, with the given
+    /// precision.
+    ///
+    /// $$
+    /// f(p) = 2^{-2^{30}},
+    /// $$
+    ///
+    /// and the output has precision `prec`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::min_positive_value_prec(1).to_string(), "too_small");
+    /// assert_eq!(Float::min_positive_value_prec(10).to_string(), "too_small");
+    /// assert_eq!(Float::min_positive_value_prec(100).to_string(), "too_small");
+    ///
+    /// assert_eq!(Float::min_positive_value_prec(1).get_prec(), Some(1));
+    /// assert_eq!(Float::min_positive_value_prec(10).get_prec(), Some(10));
+    /// assert_eq!(Float::min_positive_value_prec(100).get_prec(), Some(100));
+    /// ```
+    pub fn min_positive_value_prec(prec: u64) -> Float {
+        assert_ne!(prec, 0);
+        Float(Finite {
+            sign: true,
+            exponent: Float::MIN_EXPONENT,
+            precision: prec,
+            significand: Natural::power_of_2(
+                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+                    .0
+                    - 1,
+            ),
+        })
+    }
+
+    /// There is no maximum finite [`Float`], but there is one for any given precision. This
+    /// function returns that [`Float`].
+    ///
+    /// $$
+    /// f(p) = (1-(1/2)^p)2^{2^{30}-1},
+    /// $$
+    /// where $p$ is the `prec`. The output has precision `prec`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::max_finite_value_with_prec(1).to_string(), "too_big");
+    /// assert_eq!(Float::max_finite_value_with_prec(10).to_string(), "too_big");
+    /// assert_eq!(
+    ///     Float::max_finite_value_with_prec(100).to_string(),
+    ///     "too_big"
+    /// );
+    ///
+    /// assert_eq!(Float::max_finite_value_with_prec(1).get_prec(), Some(1));
+    /// assert_eq!(Float::max_finite_value_with_prec(10).get_prec(), Some(10));
+    /// assert_eq!(Float::max_finite_value_with_prec(100).get_prec(), Some(100));
+    /// ```
+    pub fn max_finite_value_with_prec(prec: u64) -> Float {
+        assert_ne!(prec, 0);
+        Float(Finite {
+            sign: true,
+            exponent: Float::MAX_EXPONENT,
+            precision: prec,
+            significand: Natural::low_mask(prec) << prec.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        })
+    }
+
     /// Returns the number 1, with the given precision.
     ///
     /// $$

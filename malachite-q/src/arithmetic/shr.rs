@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -80,7 +80,7 @@ macro_rules! impl_shr_unsigned {
             }
         }
 
-        impl<'a> Shr<$t> for &'a Rational {
+        impl Shr<$t> for &Rational {
             type Output = Rational;
 
             /// Right-shifts a [`Rational`] (divides it by a power of 2), taking it by reference.
@@ -181,7 +181,7 @@ macro_rules! impl_shr_signed {
             }
         }
 
-        impl<'a> Shr<$t> for &'a Rational {
+        impl Shr<$t> for &Rational {
             type Output = Rational;
 
             /// Right-shifts a [`Rational`] (divides it by a power of 2), taking it by reference.

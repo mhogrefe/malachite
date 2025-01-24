@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -630,7 +630,7 @@ impl FloorRoot<u64> for Natural {
     }
 }
 
-impl<'a> FloorRoot<u64> for &'a Natural {
+impl FloorRoot<u64> for &Natural {
     type Output = Natural;
 
     /// Returns the floor of the $n$th root of a [`Natural`], taking the [`Natural`] by reference.
@@ -762,7 +762,7 @@ impl CeilingRoot<u64> for Natural {
     }
 }
 
-impl<'a> CeilingRoot<u64> for &'a Natural {
+impl CeilingRoot<u64> for &Natural {
     type Output = Natural;
 
     /// Returns the ceiling of the $n$th root of a [`Natural`], taking the [`Natural`] by reference.
@@ -927,7 +927,7 @@ impl CheckedRoot<u64> for Natural {
     }
 }
 
-impl<'a> CheckedRoot<u64> for &'a Natural {
+impl CheckedRoot<u64> for &Natural {
     type Output = Natural;
 
     /// Returns the the $n$th root of a [`Natural`], or `None` if the [`Natural`] is not a perfect
@@ -1064,7 +1064,7 @@ impl RootRem<u64> for Natural {
     }
 }
 
-impl<'a> RootRem<u64> for &'a Natural {
+impl RootRem<u64> for &Natural {
     type RootOutput = Natural;
     type RemOutput = Natural;
 

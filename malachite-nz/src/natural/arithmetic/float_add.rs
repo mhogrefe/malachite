@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MPFR Library.
 //
@@ -25,7 +25,8 @@ use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    NegModPowerOf2, OverflowingAddAssign, Parity, PowerOf2, ShrRound, WrappingAddAssign,
+    NegModPowerOf2, OverflowingAddAssign, Parity, PowerOf2, SaturatingAddAssign, ShrRound,
+    WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -858,7 +859,7 @@ fn add_float_significands_same_prec_lt_w(
         // can also probably benefit from shift-and-op in a better way. Timings cannot be
         // conclusive.
         let sum = (x >> 1) + (y >> 1);
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         let round_bit = sum & (shift_bit >> 1);
         // since x + y fits on prec + 1 bits, the sticky bit is zero
         (sum ^ round_bit, 0, round_bit)
@@ -877,7 +878,7 @@ fn add_float_significands_same_prec_lt_w(
                 // carry
                 assert!(sum.even());
                 sum = HIGH_BIT | (sum >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
             }
             let round_bit = sum & (shift_bit >> 1);
             (sum & !mask, (sum & mask) ^ round_bit, round_bit)
@@ -889,7 +890,7 @@ fn add_float_significands_same_prec_lt_w(
                 // carry
                 sticky_bit |= sum & 1;
                 sum = HIGH_BIT | (sum >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
             }
             let round_bit = sum & (shift_bit >> 1);
             (
@@ -913,7 +914,7 @@ fn add_float_significands_same_prec_lt_w(
                 if round_bit == 0 || (sticky_bit == 0 && (sum & shift_bit) == 0) {
                     (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(shift_bit) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -921,7 +922,7 @@ fn add_float_significands_same_prec_lt_w(
             Floor | Down => (sum, x_exp, Less),
             Ceiling | Up => {
                 if sum.overflowing_add_assign(shift_bit) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -940,7 +941,7 @@ fn add_float_significands_same_prec_w(
 ) -> (Limb, i32, Ordering) {
     let (mut sum, sticky_bit, round_bit) = if x_exp == y_exp {
         let sum = x.wrapping_add(y);
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         // since x + y fits on Limb::WIDTH + 1 bits, the sticky bit is zero
         (HIGH_BIT | (sum >> 1), 0, sum & 1)
     } else {
@@ -956,7 +957,7 @@ fn add_float_significands_same_prec_w(
             let (sum, overflow) = x.overflowing_add(y >> exp_diff);
             if overflow {
                 // carry
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 (HIGH_BIT | (sum >> 1), sticky_bit, sum & 1)
             } else {
                 // no carry
@@ -977,7 +978,7 @@ fn add_float_significands_same_prec_w(
                 if round_bit == 0 || (sticky_bit == 0 && (sum & 1) == 0) {
                     (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -985,7 +986,7 @@ fn add_float_significands_same_prec_w(
             Floor | Down => (sum, x_exp, Less),
             Ceiling | Up => {
                 if sum.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -1016,7 +1017,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
             a1.wrapping_add_assign(1);
         }
         a0 = (a0 >> 1) | (a1 << WIDTH_M1);
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         let round_bit = a0 & shift_m1_bit;
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
         (a0 ^ round_bit, HIGH_BIT | (a1 >> 1), a0 & shift_m1_bit, 0)
@@ -1042,7 +1043,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                 sticky_bit |= a0 & 1;
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 HIGH_BIT | (a1 >> 1)
             } else {
                 a1
@@ -1071,7 +1072,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                 sticky_bit |= a0 & 1;
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 let round_bit = a0 & shift_m1_bit;
                 (
                     a0 & !mask,
@@ -1105,7 +1106,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                     (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(shift_bit) && sum_1.overflowing_add_assign(1)
                 {
-                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1113,7 +1114,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
             Floor | Down => (sum_0, sum_1, x_exp, Less),
             Ceiling | Up => {
                 if sum_0.overflowing_add_assign(shift_bit) && sum_1.overflowing_add_assign(1) {
-                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1139,7 +1140,7 @@ fn add_float_significands_same_prec_2w(
         if overflow {
             a1.wrapping_add_assign(1);
         }
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
         (
             (a1 << WIDTH_M1) | (a0 >> 1),
@@ -1195,7 +1196,7 @@ fn add_float_significands_same_prec_2w(
                 // carry in high word
                 let round_bit = sum_0 << WIDTH_M1;
                 // Shift the result by 1 to the right.
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 (
                     (sum_1 << WIDTH_M1) | (sum_0 >> 1),
                     HIGH_BIT | (sum_1 >> 1),
@@ -1216,7 +1217,7 @@ fn add_float_significands_same_prec_2w(
                 if round_bit == 0 || (sticky_bit == 0 && (sum_0 & 1) == 0) {
                     (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
-                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1224,7 +1225,7 @@ fn add_float_significands_same_prec_2w(
             Floor | Down => (sum_0, sum_1, x_exp, Less),
             Ceiling | Up => {
                 if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
-                    (sum_0, HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater)
+                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1262,7 +1263,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
         }
         // Since prec < 3 * Limb::WIDTH, we lose no bit in a0 >> 1.
         a0 = (a1 << WIDTH_M1) | (a0 >> 1);
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         let round_bit = a0 & shift_m1_bit;
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
         (
@@ -1299,7 +1300,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                 sticky_bit |= a0 & 1;
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 ((a2 << WIDTH_M1) | (a1 >> 1), HIGH_BIT | (a2 >> 1))
             } else {
                 (a1, a2)
@@ -1338,7 +1339,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                 sticky_bit |= a0 & 1;
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 let round_bit = a0 & shift_m1_bit;
                 sticky_bit |= (a0 & mask) ^ round_bit;
                 (
@@ -1371,7 +1372,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                 sticky_bit |= a0 & 1;
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 let round_bit = a0 & shift_m1_bit;
                 sticky_bit |= (a0 & mask) ^ round_bit;
                 (
@@ -1409,13 +1410,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                         sum_2.wrapping_add_assign(1);
                     }
                     if sum_2 == 0 {
-                        (
-                            sum_0,
-                            sum_1,
-                            HIGH_BIT,
-                            x_exp.checked_add(1).unwrap(),
-                            Greater,
-                        )
+                        (sum_0, sum_1, HIGH_BIT, x_exp.saturating_add(1), Greater)
                     } else {
                         (sum_0, sum_1, sum_2, x_exp, Greater)
                     }
@@ -1430,13 +1425,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                     sum_2.wrapping_add_assign(1);
                 }
                 if sum_2 == 0 {
-                    (
-                        sum_0,
-                        sum_1,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Greater,
-                    )
+                    (sum_0, sum_1, HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, sum_2, x_exp, Greater)
                 }
@@ -1758,7 +1747,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
     let mut sticky_bit;
     let last_index = n - 1;
     if exp_diff == 0 {
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         assert!(limbs_add_same_length_to_out(out, xs, ys));
         round_bit = out[0] & shift_bit;
         limbs_slice_shr_in_place(out, 1);
@@ -1774,7 +1763,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             out[last_index] = HIGH_BIT;
                         }
                         (x_exp, Greater)
@@ -1783,7 +1772,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         out[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1801,7 +1790,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 Ceiling | Up => {
                     out.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         out[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1818,7 +1807,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                     } else {
                         out.copy_from_slice(xs);
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             out[last_index] = HIGH_BIT;
                         }
                         (x_exp, Greater)
@@ -1831,7 +1820,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 Ceiling | Up => {
                     out.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         out[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1862,7 +1851,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
             sticky_bit |= round_bit;
             round_bit = out[0] & shift_bit;
             limbs_slice_shr_in_place(out, 1);
-            x_exp = x_exp.checked_add(1).unwrap();
+            x_exp.saturating_add_assign(1);
             out[last_index] |= HIGH_BIT;
             out[0] &= mask;
         }
@@ -1874,7 +1863,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                     (x_exp, Less)
                 } else {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         out[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1891,7 +1880,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
             Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         out[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1940,7 +1929,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
     let mut sticky_bit;
     let last_index = n - 1;
     if exp_diff == 0 {
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         assert!(limbs_slice_add_same_length_in_place_left(xs, ys));
         round_bit = xs[0] & shift_bit;
         limbs_slice_shr_in_place(xs, 1);
@@ -1956,7 +1945,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             xs[last_index] = HIGH_BIT;
                         }
                         (x_exp, Greater)
@@ -1965,7 +1954,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         xs[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1979,7 +1968,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Nearest | Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         xs[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -1994,7 +1983,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             xs[last_index] = HIGH_BIT;
                         }
                         (x_exp, Greater)
@@ -2003,7 +1992,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         xs[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2034,7 +2023,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
             sticky_bit |= round_bit;
             round_bit = xs[0] & shift_bit;
             limbs_slice_shr_in_place(xs, 1);
-            x_exp = x_exp.checked_add(1).unwrap();
+            x_exp.saturating_add_assign(1);
             xs[last_index] |= HIGH_BIT;
             xs[0] &= mask;
         }
@@ -2046,7 +2035,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                     (x_exp, Less)
                 } else {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         xs[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2063,7 +2052,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
             Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         xs[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2093,7 +2082,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
     let mut sticky_bit;
     let last_index = n - 1;
     if exp_diff == 0 {
-        x_exp = x_exp.checked_add(1).unwrap();
+        x_exp.saturating_add_assign(1);
         assert!(limbs_slice_add_same_length_in_place_left(ys, xs));
         round_bit = ys[0] & shift_bit;
         limbs_slice_shr_in_place(ys, 1);
@@ -2109,7 +2098,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                         (x_exp, Less)
                     } else {
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             ys[last_index] = HIGH_BIT;
                         }
                         (x_exp, Greater)
@@ -2118,7 +2107,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 Floor | Down => (x_exp, Less),
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         ys[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2136,7 +2125,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 Ceiling | Up => {
                     ys.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         ys[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2153,7 +2142,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                     } else {
                         ys.copy_from_slice(xs);
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             ys[last_index] = HIGH_BIT;
                         }
                         (x_exp, Greater)
@@ -2166,7 +2155,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 Ceiling | Up => {
                     ys.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         ys[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2197,7 +2186,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
             sticky_bit |= round_bit;
             round_bit = ys[0] & shift_bit;
             limbs_slice_shr_in_place(ys, 1);
-            x_exp = x_exp.checked_add(1).unwrap();
+            x_exp.saturating_add_assign(1);
             ys[last_index] |= HIGH_BIT;
             ys[0] &= mask;
         }
@@ -2209,7 +2198,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                     (x_exp, Less)
                 } else {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         ys[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2226,7 +2215,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
             Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         ys[last_index] = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2284,7 +2273,7 @@ fn add_float_significands_general_round(
             if following_bits == False {
                 if out[0] & shift_bit != 0 {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         *out.last_mut().unwrap() = HIGH_BIT;
                     }
                     (x_exp, Greater)
@@ -2295,7 +2284,7 @@ fn add_float_significands_general_round(
                 (x_exp, Less)
             } else {
                 if limbs_slice_add_limb_in_place(out, shift_bit) {
-                    x_exp = x_exp.checked_add(1).unwrap();
+                    x_exp.saturating_add_assign(1);
                     *out.last_mut().unwrap() = HIGH_BIT;
                 }
                 (x_exp, Greater)
@@ -2304,7 +2293,7 @@ fn add_float_significands_general_round(
         Floor | Down => (x_exp, Less),
         Ceiling | Up => {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
-                x_exp = x_exp.checked_add(1).unwrap();
+                x_exp.saturating_add_assign(1);
                 *out.last_mut().unwrap() = HIGH_BIT;
             }
             (x_exp, Greater)
@@ -2387,7 +2376,7 @@ fn add_float_significands_general(
             limbs_slice_add_same_length_in_place_left(out, &xs[xs_len - out_len..])
         };
         if y {
-            x_exp = x_exp.checked_add(1).unwrap();
+            x_exp.saturating_add_assign(1);
             round_bit = RoundBit::from((out[0] >> shift).odd());
             // LSB(out) --> rounding bit after the shift
             if shift != 0 {
@@ -2520,7 +2509,7 @@ fn add_float_significands_general(
                         })
                         && limbs_slice_add_limb_in_place(out, shift_bit)
                     {
-                        x_exp = x_exp.checked_add(1).unwrap();
+                        x_exp.saturating_add_assign(1);
                         out[out_len - 1] = HIGH_BIT;
                         round_bit = False;
                     }
@@ -2577,7 +2566,7 @@ fn add_float_significands_general(
                         }
                         round_bit.flip_assign();
                         if round_bit == False && limbs_slice_add_limb_in_place(out, shift_bit) {
-                            x_exp = x_exp.checked_add(1).unwrap();
+                            x_exp.saturating_add_assign(1);
                             out[out_len - 1] = HIGH_BIT;
                         }
                     }

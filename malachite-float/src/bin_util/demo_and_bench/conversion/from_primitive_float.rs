@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,6 +9,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
+use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
 use malachite_base::test_util::bench::bucketers::{
     pair_primitive_float_bit_u64_max_bucketer, primitive_float_bucketer,
     triple_1_2_primitive_float_bit_u64_max_bucketer,
@@ -19,7 +20,6 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_unsigned_pair_gen_var_4,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_float::conversion::from_primitive_float::alt_precision;
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
 use malachite_float::test_util::generators::{
     primitive_float_unsigned_rounding_mode_triple_gen_var_3,
@@ -182,7 +182,12 @@ fn benchmark_float_from_primitive_float_library_comparison<T: PrimitiveFloat>(
             ("Malachite", &mut |x| no_out!(Float::from(x))),
             ("rug", &mut |x| {
                 no_out!(rug::Float::with_val(
-                    max(1, u32::exact_from(alt_precision(x))),
+                    if !x.is_finite() || x == T::ZERO {
+                        1
+                    } else {
+                        let n = x.integer_mantissa();
+                        u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+                    },
                     x
                 ))
             }),

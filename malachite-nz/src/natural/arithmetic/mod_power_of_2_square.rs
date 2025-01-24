@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -392,7 +392,7 @@ impl ModPowerOf2Square for Natural {
     }
 }
 
-impl<'a> ModPowerOf2Square for &'a Natural {
+impl ModPowerOf2Square for &Natural {
     type Output = Natural;
 
     /// Squares a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The

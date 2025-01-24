@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
     float_float_integer_triple_gen, float_integer_integer_triple_gen, float_integer_pair_gen,
-    float_integer_pair_gen_var_1,
+    float_integer_pair_gen_var_1, float_integer_pair_gen_var_2,
 };
 use malachite_float::Float;
 use malachite_nz::integer::Integer;
@@ -493,16 +493,25 @@ fn test_partial_cmp_integer() {
     test("-4.0e-121", "-0x1.0E-100#1", s, Some(Greater));
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_cmp_integer_properties_helper(x: Float, y: Integer) {
+    let cmp = x.partial_cmp(&y);
+    assert_eq!(x.partial_cmp(&Float::exact_from(&y)), cmp);
+    assert_eq!(
+        rug::Float::exact_from(&x).partial_cmp(&rug::Integer::from(&y)),
+        cmp
+    );
+    assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));
+}
+
 #[test]
 fn partial_cmp_integer_properties() {
     float_integer_pair_gen().test_properties(|(x, y)| {
-        let cmp = x.partial_cmp(&y);
-        assert_eq!(x.partial_cmp(&Float::from(&y)), cmp);
-        assert_eq!(
-            rug::Float::exact_from(&x).partial_cmp(&rug::Integer::from(&y)),
-            cmp
-        );
-        assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));
+        partial_cmp_integer_properties_helper(x, y);
+    });
+
+    float_integer_pair_gen_var_2().test_properties(|(x, y)| {
+        partial_cmp_integer_properties_helper(x, y);
     });
 
     float_float_integer_triple_gen().test_properties(|(x, z, y)| {
@@ -522,8 +531,8 @@ fn partial_cmp_integer_properties() {
     });
 
     integer_pair_gen().test_properties(|(x, y)| {
-        assert_eq!(Float::from(&x).partial_cmp(&y), Some(x.cmp(&y)));
-        assert_eq!(x.partial_cmp(&Float::from(&y)), Some(x.cmp(&y)));
+        assert_eq!(Float::exact_from(&x).partial_cmp(&y), Some(x.cmp(&y)));
+        assert_eq!(x.partial_cmp(&Float::exact_from(&y)), Some(x.cmp(&y)));
     });
 
     float_integer_pair_gen_var_1().test_properties(|(x, y)| {

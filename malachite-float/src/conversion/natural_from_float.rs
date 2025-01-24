@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -21,12 +21,11 @@ impl RoundingFrom<Float> for Natural {
     /// [`Float`] by value. An [`Ordering`] is also returned, indicating whether the returned value
     /// is less than, equal to, or greater than the original value.
     ///
-    /// If the [`Float`] is negative (including negative infinity), then it will be rounded to zero
-    /// when the [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will
-    /// panic.
+    /// If the [`Float`] is negative (including $-\infty$), then it will be rounded to zero when the
+    /// [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
     ///
-    /// If the [`Float`] is NaN or positive infinity, the function will panic regardless of the
-    /// rounding mode.
+    /// If the [`Float`] is NaN or $\infty$, the function will panic regardless of the rounding
+    /// mode.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -38,7 +37,7 @@ impl RoundingFrom<Float> for Natural {
     /// # Panics
     /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`] is less
     /// than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`, or if the [`Float`] is NaN or
-    /// positive infinity.
+    /// $\infty$.
     ///
     /// # Examples
     /// ```
@@ -114,17 +113,16 @@ impl RoundingFrom<Float> for Natural {
     }
 }
 
-impl<'a> RoundingFrom<&'a Float> for Natural {
+impl RoundingFrom<&Float> for Natural {
     /// Converts a [`Float`] to a [`Natural`], using a specified [`RoundingMode`] and taking the
     /// [`Float`] by reference. An [`Ordering`] is also returned, indicating whether the returned
     /// value is less than, equal to, or greater than the original value.
     ///
-    /// If the [`Float`] is negative (including negative infinity), then it will be rounded to zero
-    /// when the [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will
-    /// panic.
+    /// If the [`Float`] is negative (including $-\infty$), then it will be rounded to zero when the
+    /// [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
     ///
-    /// If the [`Float`] is NaN or positive infinity, the function will panic regardless of the
-    /// rounding mode.
+    /// If the [`Float`] is NaN or $\infty$, the function will panic regardless of the rounding
+    /// mode.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -136,7 +134,7 @@ impl<'a> RoundingFrom<&'a Float> for Natural {
     /// # Panics
     /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`] is less
     /// than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`, or if the [`Float`] is NaN or
-    /// positive infinity.
+    /// $\infty$.
     ///
     /// # Examples
     /// ```
@@ -173,7 +171,7 @@ impl<'a> RoundingFrom<&'a Float> for Natural {
     ///     "(0, Greater)"
     /// );
     /// ```
-    fn rounding_from(f: &'a Float, rm: RoundingMode) -> (Natural, Ordering) {
+    fn rounding_from(f: &Float, rm: RoundingMode) -> (Natural, Ordering) {
         match f {
             float_either_zero!() => (Natural::ZERO, Equal),
             float_negative_infinity!() => match rm {
@@ -278,7 +276,7 @@ impl TryFrom<Float> for Natural {
     }
 }
 
-impl<'a> TryFrom<&'a Float> for Natural {
+impl TryFrom<&Float> for Natural {
     type Error = UnsignedFromFloatError;
 
     /// Converts a [`Float`] to a [`Natural`], taking the [`Float`] by reference. If the [`Float`]
@@ -311,7 +309,7 @@ impl<'a> TryFrom<&'a Float> for Natural {
     /// assert_eq!(Natural::try_from(&Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Natural::try_from(&Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
-    fn try_from(f: &'a Float) -> Result<Natural, Self::Error> {
+    fn try_from(f: &Float) -> Result<Natural, Self::Error> {
         match f {
             float_either_zero!() => Ok(Natural::ZERO),
             Float(Finite {
@@ -344,7 +342,7 @@ impl<'a> TryFrom<&'a Float> for Natural {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Float> for Natural {
+impl ConvertibleFrom<&Float> for Natural {
     /// Determines whether a [`Float`] can be converted to a [`Natural`] (when the [`Float`] is
     /// non-negative and an integer), taking the [`Float`] by reference.
     ///
@@ -373,7 +371,7 @@ impl<'a> ConvertibleFrom<&'a Float> for Natural {
     /// assert_eq!(Natural::convertible_from(&Float::INFINITY), false);
     /// assert_eq!(Natural::convertible_from(&Float::NAN), false);
     /// ```
-    fn convertible_from(f: &'a Float) -> bool {
+    fn convertible_from(f: &Float) -> bool {
         match f {
             float_either_zero!() => true,
             Float(Finite {

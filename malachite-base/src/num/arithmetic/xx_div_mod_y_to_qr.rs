@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -16,7 +16,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::XXDivModYToQR;
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::half::{wide_join_halves, wide_split_in_half};
 use crate::num::conversion::traits::WrappingFrom;
@@ -151,7 +151,7 @@ impl XXDivModYToQR for usize {
     ///
     /// This is `udiv_qrnnd` from `longlong.h`, FLINT 2.7.1, where `(q, r)` is returned.
     fn xx_div_mod_y_to_qr(x_1: usize, x_0: usize, y: usize) -> (usize, usize) {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             let (q, r) = u32::xx_div_mod_y_to_qr(
                 u32::wrapping_from(x_1),
                 u32::wrapping_from(x_0),

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -114,7 +114,7 @@ impl ModPowerOf2Inverse for Natural {
     }
 }
 
-impl<'a> ModPowerOf2Inverse for &'a Natural {
+impl ModPowerOf2Inverse for &Natural {
     type Output = Natural;
 
     /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be already

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -88,13 +88,13 @@ impl<'a> Ord for ComparableFloatRef<'a> {
     ///
     /// This implementation does not follow the IEEE 754 standard. This is how
     /// [`ComparableFloatRef`]s are ordered, least to greatest:
-    ///   - Negative infinity
+    ///   - $-\infty$
     ///   - Negative nonzero finite floats
     ///   - Negative zero
     ///   - NaN
     ///   - Positive zero
     ///   - Positive nonzero finite floats
-    ///   - Positive infinity
+    ///   - $\infty$
     ///
     /// For different comparison behavior that follows the IEEE 754 standard, consider just using
     /// [`Float`].
@@ -178,7 +178,7 @@ impl<'a> Ord for ComparableFloatRef<'a> {
     }
 }
 
-impl<'a> PartialOrd for ComparableFloatRef<'a> {
+impl PartialOrd for ComparableFloatRef<'_> {
     /// Compares two [`ComparableFloatRef`]s.
     ///
     /// See the documentation for the [`Ord`] implementation.
@@ -193,13 +193,13 @@ impl Ord for ComparableFloat {
     ///
     /// This implementation does not follow the IEEE 754 standard. This is how [`ComparableFloat`]s
     /// are ordered, least to greatest:
-    ///   - Negative infinity
+    ///   - $-\infty$
     ///   - Negative nonzero finite floats
     ///   - Negative zero
     ///   - NaN
     ///   - Positive zero
     ///   - Positive nonzero finite floats
-    ///   - Positive infinity
+    ///   - $\infty$
     ///
     /// For different comparison behavior that follows the IEEE 754 standard, consider just using
     /// [`Float`].

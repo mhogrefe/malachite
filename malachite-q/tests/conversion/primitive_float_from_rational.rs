@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -19,7 +19,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_1, integer_rounding_mode_pair_gen_var_1,
 };
-use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_4, rational_gen_var_5, rational_gen_var_6,
     rational_rounding_mode_pair_gen_var_5,
@@ -820,7 +820,7 @@ fn f64_rounding_from_rational_ref_fail() {
 
 #[test]
 fn test_f32_try_from_rational() {
-    let test = |s: &str, out: Result<f32, FloatFromRationalError>| {
+    let test = |s: &str, out: Result<f32, FloatConversionError>| {
         let u = Rational::from_str(s).unwrap();
         assert_eq!(f32::try_from(&u).map(NiceFloat), out.map(NiceFloat));
         assert_eq!(f32::try_from(u.clone()).map(NiceFloat), out.map(NiceFloat));
@@ -837,25 +837,25 @@ fn test_f32_try_from_rational() {
     test("-16777216", Ok(-1.6777216e7));
     test("16777218", Ok(1.6777218e7));
     test("-16777218", Ok(-1.6777218e7));
-    test("16777217", Err(FloatFromRationalError));
-    test("-16777217", Err(FloatFromRationalError));
+    test("16777217", Err(FloatConversionError::Inexact));
+    test("-16777217", Err(FloatConversionError::Inexact));
     test("33554432", Ok(3.3554432e7));
     test("-33554432", Ok(-3.3554432e7));
     test("33554436", Ok(3.3554436e7));
     test("-33554436", Ok(-3.3554436e7));
-    test("33554433", Err(FloatFromRationalError));
-    test("-33554433", Err(FloatFromRationalError));
-    test("33554434", Err(FloatFromRationalError));
-    test("-33554434", Err(FloatFromRationalError));
-    test("33554435", Err(FloatFromRationalError));
-    test("-33554435", Err(FloatFromRationalError));
+    test("33554433", Err(FloatConversionError::Inexact));
+    test("-33554433", Err(FloatConversionError::Inexact));
+    test("33554434", Err(FloatConversionError::Inexact));
+    test("-33554434", Err(FloatConversionError::Inexact));
+    test("33554435", Err(FloatConversionError::Inexact));
+    test("-33554435", Err(FloatConversionError::Inexact));
     test(
         "340282346638528859811704183484516925439",
-        Err(FloatFromRationalError),
+        Err(FloatConversionError::Inexact),
     );
     test(
         "-340282346638528859811704183484516925439",
-        Err(FloatFromRationalError),
+        Err(FloatConversionError::Inexact),
     );
     test("340282346638528859811704183484516925440", Ok(3.4028235e38));
     test(
@@ -864,25 +864,25 @@ fn test_f32_try_from_rational() {
     );
     test(
         "340282346638528859811704183484516925441",
-        Err(FloatFromRationalError),
+        Err(FloatConversionError::Inexact),
     );
     test(
         "-340282346638528859811704183484516925441",
-        Err(FloatFromRationalError),
+        Err(FloatConversionError::Inexact),
     );
     test(
         "10000000000000000000000000000000000000000000000000000",
-        Err(FloatFromRationalError),
+        Err(FloatConversionError::Inexact),
     );
     test(
         "-10000000000000000000000000000000000000000000000000000",
-        Err(FloatFromRationalError),
+        Err(FloatConversionError::Inexact),
     );
 
     test("1/2", Ok(0.5));
     test("-1/2", Ok(-0.5));
-    test("1/3", Err(FloatFromRationalError));
-    test("-1/3", Err(FloatFromRationalError));
+    test("1/3", Err(FloatConversionError::Inexact));
+    test("-1/3", Err(FloatConversionError::Inexact));
     test(
         "1/713623846352979940529142984724747568191373312",
         Ok(f32::MIN_POSITIVE_SUBNORMAL),
@@ -911,7 +911,7 @@ fn test_f32_try_from_rational() {
 
 #[test]
 fn test_f64_try_from_rational() {
-    let test = |s: &str, out: Result<f64, FloatFromRationalError>| {
+    let test = |s: &str, out: Result<f64, FloatConversionError>| {
         let u = Rational::from_str(s).unwrap();
         assert_eq!(f64::try_from(&u).map(NiceFloat), out.map(NiceFloat));
         assert_eq!(f64::try_from(u.clone()).map(NiceFloat), out.map(NiceFloat));
@@ -928,28 +928,28 @@ fn test_f64_try_from_rational() {
     test("-9007199254740992", Ok(-9.007199254740992e15));
     test("9007199254740994", Ok(9.007199254740994e15));
     test("-9007199254740994", Ok(-9.007199254740994e15));
-    test("9007199254740993", Err(FloatFromRationalError));
-    test("-9007199254740993", Err(FloatFromRationalError));
+    test("9007199254740993", Err(FloatConversionError::Inexact));
+    test("-9007199254740993", Err(FloatConversionError::Inexact));
     test("18014398509481984", Ok(1.8014398509481984e16));
     test("-18014398509481984", Ok(-1.8014398509481984e16));
     test("18014398509481988", Ok(1.8014398509481988e16));
     test("-18014398509481988", Ok(-1.8014398509481988e16));
-    test("18014398509481985", Err(FloatFromRationalError));
-    test("-18014398509481985", Err(FloatFromRationalError));
-    test("18014398509481986", Err(FloatFromRationalError));
-    test("-18014398509481986", Err(FloatFromRationalError));
-    test("18014398509481987", Err(FloatFromRationalError));
-    test("-18014398509481987", Err(FloatFromRationalError));
+    test("18014398509481985", Err(FloatConversionError::Inexact));
+    test("-18014398509481985", Err(FloatConversionError::Inexact));
+    test("18014398509481986", Err(FloatConversionError::Inexact));
+    test("-18014398509481986", Err(FloatConversionError::Inexact));
+    test("18014398509481987", Err(FloatConversionError::Inexact));
+    test("-18014398509481987", Err(FloatConversionError::Inexact));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", Err(FloatFromRationalError));
+        8177180919299881250404026184124858367", Err(FloatConversionError::Inexact));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858367", Err(FloatFromRationalError));
+        38177180919299881250404026184124858367", Err(FloatConversionError::Inexact));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
@@ -964,17 +964,17 @@ fn test_f64_try_from_rational() {
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", Err(FloatFromRationalError));
+        8177180919299881250404026184124858369", Err(FloatConversionError::Inexact));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858369", Err(FloatFromRationalError));
+        38177180919299881250404026184124858369", Err(FloatConversionError::Inexact));
 
     test("1/2", Ok(0.5));
     test("-1/2", Ok(-0.5));
-    test("1/3", Err(FloatFromRationalError));
-    test("-1/3", Err(FloatFromRationalError));
+    test("1/3", Err(FloatConversionError::Inexact));
+    test("-1/3", Err(FloatConversionError::Inexact));
 }
 
 #[test]
@@ -1473,9 +1473,9 @@ fn float_rounding_from_rational_properties() {
 
 #[allow(clippy::trait_duplication_in_bounds)]
 fn float_try_from_rational_properties_helper<
-    T: TryFrom<Rational, Error = FloatFromRationalError>
+    T: TryFrom<Rational, Error = FloatConversionError>
         + for<'a> TryFrom<&'a Integer>
-        + for<'a> TryFrom<&'a Rational, Error = FloatFromRationalError>
+        + for<'a> TryFrom<&'a Rational, Error = FloatConversionError>
         + for<'a> ConvertibleFrom<&'a Rational>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Rational>,

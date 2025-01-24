@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::InnerFloat::{Finite, Zero};
 use crate::{significand_bits, Float};
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 
@@ -64,7 +64,7 @@ impl TryFrom<Float> for Rational {
                 let bits = significand_bits(&significand);
                 Ok(
                     Rational::from(Integer::from_sign_and_abs(sign, significand))
-                        << (i64::from(exponent) - i64::exact_from(bits)),
+                        << (i128::from(exponent) - i128::from(bits)),
                 )
             }
             _ => Err(RationalFromFloatError),
@@ -72,7 +72,7 @@ impl TryFrom<Float> for Rational {
     }
 }
 
-impl<'a> TryFrom<&'a Float> for Rational {
+impl TryFrom<&Float> for Rational {
     type Error = RationalFromFloatError;
 
     /// Converts a [`Float`] to a [`Rational`], taking the [`Float`] by reference. If the [`Float`]
@@ -108,7 +108,7 @@ impl<'a> TryFrom<&'a Float> for Rational {
     /// );
     /// assert_eq!(Rational::try_from(&Float::NAN), Err(RationalFromFloatError));
     /// ```
-    fn try_from(x: &'a Float) -> Result<Rational, Self::Error> {
+    fn try_from(x: &Float) -> Result<Rational, Self::Error> {
         match x {
             float_either_zero!() => Ok(Rational::ZERO),
             Float(Finite {
@@ -120,7 +120,7 @@ impl<'a> TryFrom<&'a Float> for Rational {
                 let bits = significand_bits(significand);
                 Ok(
                     Rational::from(Integer::from_sign_and_abs_ref(*sign, significand))
-                        << (i64::from(*exponent) - i64::exact_from(bits)),
+                        << (i128::from(*exponent) - i128::from(bits)),
                 )
             }
             _ => Err(RationalFromFloatError),
@@ -128,7 +128,7 @@ impl<'a> TryFrom<&'a Float> for Rational {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Float> for Rational {
+impl ConvertibleFrom<&Float> for Rational {
     /// Determines whether a [`Float`] can be converted to a [`Rational`] (which is when the
     /// [`Float`] is finite), taking the [`Float`] by reference.
     ///
@@ -151,7 +151,7 @@ impl<'a> ConvertibleFrom<&'a Float> for Rational {
     /// assert_eq!(Rational::convertible_from(&Float::NAN), false);
     /// ```
     #[inline]
-    fn convertible_from(x: &'a Float) -> bool {
+    fn convertible_from(x: &Float) -> bool {
         x.is_finite()
     }
 }

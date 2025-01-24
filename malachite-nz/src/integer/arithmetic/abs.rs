@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -39,7 +39,7 @@ impl Abs for Integer {
     }
 }
 
-impl<'a> Abs for &'a Integer {
+impl Abs for &Integer {
     type Output = Integer;
 
     /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by reference.
@@ -136,7 +136,7 @@ impl UnsignedAbs for Integer {
     }
 }
 
-impl<'a> UnsignedAbs for &'a Integer {
+impl UnsignedAbs for &Integer {
     type Output = Natural;
 
     /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by reference and

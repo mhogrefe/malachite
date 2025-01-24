@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,7 +13,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::test_util::bench::bucketers::{
     pair_1_rational_bit_bucketer, pair_2_rational_bit_bucketer, rational_bit_bucketer,
 };
@@ -107,7 +107,7 @@ fn demo_float_rounding_from_rational_ref<
 }
 
 fn demo_float_try_from_rational<
-    T: TryFrom<Rational, Error = FloatFromRationalError> + PrimitiveFloat,
+    T: TryFrom<Rational, Error = FloatConversionError> + PrimitiveFloat,
 >(
     gm: GenMode,
     config: &GenConfig,
@@ -124,7 +124,7 @@ fn demo_float_try_from_rational<
 }
 
 fn demo_float_try_from_rational_ref<
-    T: for<'a> TryFrom<&'a Rational, Error = FloatFromRationalError> + PrimitiveFloat,
+    T: for<'a> TryFrom<&'a Rational, Error = FloatConversionError> + PrimitiveFloat,
 >(
     gm: GenMode,
     config: &GenConfig,

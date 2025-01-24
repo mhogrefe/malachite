@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::{float_gen, float_gen_var_4};
+use malachite_float::test_util::generators::{float_gen, float_gen_var_12, float_gen_var_4};
 use malachite_float::Float;
 use malachite_q::Rational;
 
@@ -34,6 +34,8 @@ fn test_is_power_of_2() {
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
+    test("too_big", "0x4.0E+268435455#1", true);
+    test("too_small", "0x1.0E-268435456#1", true);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
@@ -41,15 +43,26 @@ fn test_is_power_of_2() {
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
+    test("-too_big", "-0x4.0E+268435455#1", false);
+    test("-too_small", "-0x1.0E-268435456#1", false);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn is_power_of_2_properties_helper(x: Float) {
+    let is_power_of_2 = x.is_power_of_2();
+    if is_power_of_2 {
+        assert!(x > 0u32);
+    }
 }
 
 #[test]
 fn is_power_of_2_properties() {
     float_gen().test_properties(|x| {
-        let is_power_of_2 = x.is_power_of_2();
-        if is_power_of_2 {
-            assert!(x > 0u32);
-        }
+        is_power_of_2_properties_helper(x);
+    });
+
+    float_gen_var_12().test_properties(|x| {
+        is_power_of_2_properties_helper(x);
     });
 
     float_gen_var_4().test_properties(|x| {

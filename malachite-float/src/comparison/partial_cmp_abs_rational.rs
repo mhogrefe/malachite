@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,9 +17,9 @@ use malachite_q::Rational;
 impl PartialOrdAbs<Rational> for Float {
     /// Compares the absolute values of a [`Float`] and a [`Rational`].
     ///
-    /// NaN is not comparable to any [`Rational`]. Infinity and negative infinity are greater in
-    /// absolute value than any [`Rational`]. Both the [`Float`] zero and the [`Float`] negative
-    /// zero are equal to the [`Rational`] zero.
+    /// NaN is not comparable to any [`Rational`]. $\infty$ and $-\infty$ are greater in absolute
+    /// value than any [`Rational`]. Both the [`Float`] zero and the [`Float`] negative zero are
+    /// equal to the [`Rational`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -58,29 +58,26 @@ impl PartialOrdAbs<Rational> for Float {
                 Greater
             } else {
                 let e_x = i64::from(*e_x);
-                let ord_cmp = (e_x - 1).cmp(&y.floor_log_base_2_abs());
-                if ord_cmp == Equal {
-                    let shift = e_x - i64::exact_from(significand_bits(significand_x));
-                    let abs_shift = shift.unsigned_abs();
-                    match shift.sign() {
-                        Equal => {
-                            (significand_x * other.denominator_ref()).cmp(other.numerator_ref())
-                        }
-                        Greater => ((significand_x * other.denominator_ref()) << abs_shift)
-                            .cmp(other.numerator_ref()),
-                        Less => {
-                            let n_trailing_zeros = significand_x.trailing_zeros().unwrap();
-                            if abs_shift <= n_trailing_zeros {
-                                ((significand_x >> abs_shift) * other.denominator_ref())
-                                    .cmp(other.numerator_ref())
-                            } else {
-                                ((significand_x >> n_trailing_zeros) * other.denominator_ref())
-                                    .cmp(&(other.numerator_ref() << (abs_shift - n_trailing_zeros)))
-                            }
+                let exp_cmp = (e_x - 1).cmp(&y.floor_log_base_2_abs());
+                if exp_cmp != Equal {
+                    return Some(exp_cmp);
+                }
+                let shift = e_x - i64::exact_from(significand_bits(significand_x));
+                let abs_shift = shift.unsigned_abs();
+                match shift.sign() {
+                    Equal => (significand_x * other.denominator_ref()).cmp(other.numerator_ref()),
+                    Greater => ((significand_x * other.denominator_ref()) << abs_shift)
+                        .cmp(other.numerator_ref()),
+                    Less => {
+                        let n_trailing_zeros = significand_x.trailing_zeros().unwrap();
+                        if abs_shift <= n_trailing_zeros {
+                            ((significand_x >> abs_shift) * other.denominator_ref())
+                                .cmp(other.numerator_ref())
+                        } else {
+                            ((significand_x >> n_trailing_zeros) * other.denominator_ref())
+                                .cmp(&(other.numerator_ref() << (abs_shift - n_trailing_zeros)))
                         }
                     }
-                } else {
-                    ord_cmp
                 }
             }),
         }
@@ -91,8 +88,8 @@ impl PartialOrdAbs<Float> for Rational {
     /// Compares the absolute values of a [`Rational`] and a [`Float`].
     ///
     /// No [`Rational`] is comparable to NaN. Every [`Rational`] is smaller in absolute value than
-    /// infinity and negative infinity. The [`Rational`] zero is equal to both the [`Float`] zero
-    /// and the [`Float`] negative zero.
+    /// $\infty$ and $-\infty$. The [`Rational`] zero is equal to both the [`Float`] zero and the
+    /// [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

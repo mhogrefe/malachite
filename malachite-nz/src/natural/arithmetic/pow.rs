@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -574,7 +574,7 @@ impl Pow<u64> for Natural {
     }
 }
 
-impl<'a> Pow<u64> for &'a Natural {
+impl Pow<u64> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a power, taking the [`Natural`] by reference.

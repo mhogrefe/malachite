@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -1981,7 +1981,7 @@ impl<'a> DivExact<&'a Natural> for Natural {
     }
 }
 
-impl<'a> DivExact<Natural> for &'a Natural {
+impl DivExact<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -2051,7 +2051,7 @@ impl<'a> DivExact<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
+impl DivExact<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The first
@@ -2096,7 +2096,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     ///     123456789000u64
     /// );
     /// ```
-    fn div_exact(self, other: &'b Natural) -> Natural {
+    fn div_exact(self, other: &Natural) -> Natural {
         if self == other {
             return Natural::ONE;
         }

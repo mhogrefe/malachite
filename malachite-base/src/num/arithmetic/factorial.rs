@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,7 @@ use crate::num::arithmetic::traits::{
     CheckedDoubleFactorial, CheckedFactorial, CheckedMultifactorial, CheckedSubfactorial,
     DoubleFactorial, Factorial, Multifactorial, Parity, Subfactorial,
 };
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 
@@ -418,10 +418,10 @@ impl CheckedDoubleFactorial for usize {
     /// See [here](super::factorial#checked_double_factorial).
     #[inline]
     fn checked_double_factorial(n: u64) -> Option<usize> {
-        match usize::WIDTH {
-            u32::WIDTH => u32::checked_double_factorial(n).map(usize::wrapping_from),
-            u64::WIDTH => u64::checked_double_factorial(n).map(usize::wrapping_from),
-            _ => panic!("Unexpected usize width: {}", usize::WIDTH),
+        if USIZE_IS_U32 {
+            u32::checked_double_factorial(n).map(usize::wrapping_from)
+        } else {
+            u64::checked_double_factorial(n).map(usize::wrapping_from)
         }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,7 +11,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::test_util::common::{
     parse_hex_string, ORDERED_F32S, ORDERED_F64S, ORDERED_FLOAT_HEX_STRINGS,
 };
-use malachite_float::test_util::generators::float_primitive_float_pair_gen;
+use malachite_float::test_util::generators::{
+    float_primitive_float_pair_gen, float_primitive_float_pair_gen_var_1,
+};
 use malachite_float::Float;
 use rug;
 use std::cmp::Ordering::*;
@@ -88,6 +90,27 @@ fn test_partial_eq_primitive_float() {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_eq_primitive_float_properties_helper_helper<
+    T: PartialEq<Float> + PartialEq<rug::Float> + PrimitiveFloat,
+>(
+    n: Float,
+    f: T,
+) where
+    Float: TryFrom<T> + PartialEq<T> + PartialOrd<T>,
+    rug::Float: PartialEq<T>,
+{
+    let eq = n == f;
+    assert_eq!(f == n, eq);
+    let rn = rug::Float::exact_from(&n);
+    assert_eq!(rn == f, eq);
+    assert_eq!(f == rn, eq);
+    assert_eq!(n.partial_cmp(&f) == Some(Equal), eq);
+    if f.is_finite() {
+        assert_eq!(PartialEq::<Float>::eq(&n, &Float::exact_from(f)), eq);
+    }
+}
+
 fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Float> + PartialEq<rug::Float> + PrimitiveFloat,
 >()
@@ -96,15 +119,11 @@ where
     rug::Float: PartialEq<T>,
 {
     float_primitive_float_pair_gen::<T>().test_properties(|(n, f)| {
-        let eq = n == f;
-        assert_eq!(f == n, eq);
-        let rn = rug::Float::exact_from(&n);
-        assert_eq!(rn == f, eq);
-        assert_eq!(f == rn, eq);
-        assert_eq!(n.partial_cmp(&f) == Some(Equal), eq);
-        if f.is_finite() {
-            assert_eq!(PartialEq::<Float>::eq(&n, &Float::exact_from(f)), eq);
-        }
+        partial_eq_primitive_float_properties_helper_helper(n, f);
+    });
+
+    float_primitive_float_pair_gen_var_1::<T>().test_properties(|(n, f)| {
+        partial_eq_primitive_float_properties_helper_helper(n, f);
     });
 }
 

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -23,7 +23,7 @@ use crate::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOf2,
     WrappingSubAssign,
 };
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::logic::traits::LeadingZeros;
@@ -196,7 +196,7 @@ pub_crate_test! {limbs_invert_limb_u64(x: u64) -> u64 {
 }}
 
 // This is equivalent to `n_ll_mod_preinv` from `ulong_extras/ll_mod_preinv.c`, FLINT 2.7.1.
-pub_test! {limbs_mod_preinverted<
+pub_test! {mod_preinverted_double<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -274,7 +274,7 @@ pub_test! {fast_mod_mul<
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
-    limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)
+    mod_preinverted_double::<T, DT>(product_1, product_0, m, inv)
 }}
 
 macro_rules! impl_mod_mul_precomputed_fast {
@@ -415,7 +415,7 @@ impl ModMulPrecomputed<usize, usize> for usize {
     ///
     /// This is equivalent to `n_preinvert_limb` from `ulong_extras.h`, FLINT 2.7.1.
     fn precompute_mod_mul_data(&m: &usize) -> usize {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             usize::wrapping_from(u32::precompute_mod_mul_data(&u32::wrapping_from(m)))
         } else {
             usize::wrapping_from(u64::precompute_mod_mul_data(&u64::wrapping_from(m)))
@@ -440,7 +440,7 @@ impl ModMulPrecomputed<usize, usize> for usize {
     ///
     /// This is equivalent to `n_mulmod2_preinv` from `ulong_extras.h`, FLINT 2.7.1.
     fn mod_mul_precomputed(self, other: usize, m: usize, data: &usize) -> usize {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             usize::wrapping_from(u32::wrapping_from(self).mod_mul_precomputed(
                 u32::wrapping_from(other),
                 u32::wrapping_from(m),

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,6 +13,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -22,37 +23,6 @@ const fn const_limb_significant_bits(x: Limb) -> u64 {
     Limb::WIDTH - (x.leading_zeros() as u64)
 }
 
-const fn const_u64_power_of_2(pow: u64) -> u64 {
-    assert!(pow < Limb::WIDTH);
-    1 << pow
-}
-
-const fn const_u64_low_mask(bits: u64) -> u64 {
-    assert!(bits <= Limb::WIDTH);
-    if bits == Limb::WIDTH {
-        u64::MAX
-    } else {
-        const_u64_power_of_2(bits) - 1
-    }
-}
-
-const fn const_u64_mod_power_of_2(x: u64, pow: u64) -> u64 {
-    if x == 0 || pow >= Limb::WIDTH {
-        x
-    } else {
-        x & const_u64_low_mask(pow)
-    }
-}
-
-const fn const_u64_neg_mod_power_of_2(x: u64, pow: u64) -> u64 {
-    assert!(x == 0 || pow <= Limb::WIDTH);
-    const_u64_mod_power_of_2(x.wrapping_neg(), pow)
-}
-
-const fn const_i64_convertible_from_limb(value: Limb) -> bool {
-    (value as i64 as Limb) == value
-}
-
 impl Float {
     /// Converts an unsigned primitive integer to a [`Float`], after multiplying it by the specified
     /// power of 2.
@@ -60,8 +30,8 @@ impl Float {
     /// The type of the integer is `u64`, unless the `32_bit_limbs` feature is set, in which case
     /// the type is `u32`.
     ///
-    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
-    /// of significant bits.
+    /// If the integer is nonzero, the precision of the [`Float`] is the minimum possible precision
+    /// to represent the integer exactly.
     ///
     /// If you don't need to use this function in a const context, try just using `from` instead,
     /// followed by `>>` or `<<`.
@@ -72,6 +42,9 @@ impl Float {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if the result is too large or too small to be represented by a `Float`.
     ///
     /// # Examples
     /// ```
@@ -105,22 +78,21 @@ impl Float {
         if x == 0 {
             return Float::ZERO;
         }
-        assert!(const_i64_convertible_from_limb(x));
         let bits = const_limb_significant_bits(x);
         let bits_i32 = bits as i32;
-        let exponent = bits_i32.wrapping_add(pow);
-        if pow >= 0 {
-            assert!(exponent >= bits_i32);
-        } else {
-            assert!(exponent < bits_i32);
+        let exponent = bits_i32.saturating_add(pow);
+        assert!(exponent <= Float::MAX_EXPONENT);
+        assert!(exponent >= Float::MIN_EXPONENT);
+        let prec = bits - x.trailing_zeros() as u64;
+        let mut limbs = prec >> Limb::LOG_WIDTH;
+        if prec & Limb::WIDTH_MASK != 0 {
+            limbs += 1;
         }
         Float(Finite {
             sign: true,
             exponent,
-            precision: bits,
-            significand: Natural::const_from(
-                x << const_u64_neg_mod_power_of_2(bits, Limb::LOG_WIDTH),
-            ),
+            precision: prec,
+            significand: Natural::const_from(x << ((limbs << Limb::LOG_WIDTH) - bits)),
         })
     }
 
@@ -129,11 +101,13 @@ impl Float {
     /// The type of the integer is `u64`, unless the `32_bit_limbs` feature is set, in which case
     /// the type is `u32`.
     ///
-    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
-    /// of significant bits.
+    /// If the integer is nonzero, the precision of the [`Float`] is the minimum possible precision
+    /// to represent the integer exactly.
     ///
     /// If you don't need to use this function in a const context, try just using `from` instead; it
     /// will probably be slightly faster.
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -156,8 +130,8 @@ impl Float {
     /// The type of the integer is `i64`, unless the `32_bit_limbs` feature is set, in which case
     /// the type is `i32`.
     ///
-    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
-    /// of significant bits.
+    /// If the integer is nonzero, the precision of the [`Float`] is the minimum possible precision
+    /// to represent the integer exactly.
     ///
     /// If you don't need to use this function in a const context, try just using `from` instead,
     /// followed by `>>` or `<<`.
@@ -168,6 +142,9 @@ impl Float {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if the result is too large or too small to be represented by a `Float`.
     ///
     /// # Examples
     /// ```
@@ -218,22 +195,21 @@ impl Float {
             return Float::ZERO;
         }
         let x_abs = x.unsigned_abs();
-        assert!(const_i64_convertible_from_limb(x_abs));
         let bits = const_limb_significant_bits(x_abs);
         let bits_i32 = bits as i32;
-        let exponent = bits_i32.wrapping_add(pow);
-        if pow >= 0 {
-            assert!(exponent >= bits_i32);
-        } else {
-            assert!(exponent < bits_i32);
+        let exponent = bits_i32.saturating_add(pow);
+        assert!(exponent <= Float::MAX_EXPONENT);
+        assert!(exponent >= Float::MIN_EXPONENT);
+        let prec = bits - x_abs.trailing_zeros() as u64;
+        let mut limbs = prec >> Limb::LOG_WIDTH;
+        if prec & Limb::WIDTH_MASK != 0 {
+            limbs += 1;
         }
         Float(Finite {
             sign: x > 0,
             exponent,
-            precision: bits,
-            significand: Natural::const_from(
-                x_abs << const_u64_neg_mod_power_of_2(bits, Limb::LOG_WIDTH),
-            ),
+            precision: prec,
+            significand: Natural::const_from(x_abs << ((limbs << Limb::LOG_WIDTH) - bits)),
         })
     }
 
@@ -242,11 +218,13 @@ impl Float {
     /// The type of the integer is `i64`, unless the `32_bit_limbs` feature is set, in which case
     /// the type is `i32`.
     ///
-    /// If the integer is nonzero, the precision of the [`Float`] is equal to the integer's number
-    /// of significant bits.
+    /// If the integer is nonzero, the precision of the [`Float`] is the minimum possible precision
+    /// to represent the integer exactly.
     ///
     /// If you don't need to use this function in a const context, try just using `from` instead; it
     /// will probably be slightly faster.
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -271,12 +249,18 @@ impl Float {
     ///
     /// If you're only using `Nearest`, try using [`Float::from_unsigned_prec`] instead.
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is exact and the primitive integer cannot be exactly
+    /// represented with the specified precision.
     ///
     /// # Examples
     /// See [here](super::from_primitive_int#from_unsigned_prec_round).
@@ -302,12 +286,17 @@ impl Float {
     /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_unsigned_prec_round`].
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// See [here](super::from_primitive_int#from_unsigned_prec).
@@ -326,12 +315,18 @@ impl Float {
     ///
     /// If you're only using `Nearest`, try using [`Float::from_signed_prec`] instead.
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is exact and the primitive integer cannot be exactly
+    /// represented with the specified precision.
     ///
     /// # Examples
     /// See [here](super::from_primitive_int#from_signed_prec_round).
@@ -357,12 +352,17 @@ impl Float {
     /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_signed_prec_round`].
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// See [here](super::from_primitive_int#from_signed_prec).
@@ -389,6 +389,8 @@ macro_rules! impl_from_unsigned {
             /// If you want to create a [`Float`] from an unsigned primitive integer in a const
             /// context, try [`Float::const_from_unsigned`] instead.
             ///
+            /// This function does not overflow or underflow.
+            ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
@@ -396,7 +398,7 @@ macro_rules! impl_from_unsigned {
             /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(u: $t) -> Float {
-                Float::from(Natural::from(u))
+                Float::exact_from(Natural::from(u))
             }
         }
     };
@@ -417,6 +419,8 @@ macro_rules! impl_from_signed {
             /// If you want to create a [`Float`] from an signed primitive integer in a const
             /// context, try [`Float::const_from_signed`] instead.
             ///
+            /// This function does not overflow or underflow.
+            ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
@@ -424,7 +428,7 @@ macro_rules! impl_from_signed {
             /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(i: $t) -> Float {
-                Float::from(Integer::from(i))
+                Float::exact_from(Integer::from(i))
             }
         }
     };

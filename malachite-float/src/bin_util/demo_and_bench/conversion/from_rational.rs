@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -21,7 +21,8 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, Float};
 use malachite_q::test_util::bench::bucketers::{
-    pair_rational_bit_u64_max_bucketer, triple_1_2_rational_bit_u64_max_bucketer,
+    pair_rational_bit_u64_max_bucketer, rational_bit_bucketer,
+    triple_1_2_rational_bit_u64_max_bucketer,
 };
 use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 
@@ -61,6 +62,11 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_from_rational_prec_round_library_comparison
     );
+    register_bench!(
+        runner,
+        benchmark_float_try_from_rational_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_float_convertible_from_rational);
 }
 
 fn demo_float_from_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -394,5 +400,49 @@ fn benchmark_float_from_rational_prec_round_library_comparison(
                 ))
             }),
         ],
+    );
+}
+
+#[allow(unused_must_use)]
+fn benchmark_float_try_from_rational_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::try_from(Rational)",
+        BenchmarkType::EvaluationStrategy,
+        rational_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_bit_bucketer("x"),
+        &mut [
+            ("Float::try_from(Rational)", &mut |x| {
+                no_out!(Float::try_from(x))
+            }),
+            ("Float::try_from(&Rational)", &mut |x| {
+                no_out!(Float::try_from(&x))
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_convertible_from_rational(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::convertible_from(Rational)",
+        BenchmarkType::Single,
+        rational_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_bit_bucketer("x"),
+        &mut [("Malachite", &mut |x| no_out!(Float::convertible_from(&x)))],
     );
 }

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -1430,6 +1430,14 @@ pub fn signed_rounding_mode_pair_gen_var_4<
     )
 }
 
+// All `(T, RoundingMode)`s where `T` is small and signed.
+pub fn signed_rounding_mode_pair_gen_var_5<T: PrimitiveSigned>() -> Generator<(T, RoundingMode)> {
+    Generator::new_no_special(
+        &exhaustive_signed_rounding_mode_pair_gen,
+        &random_signed_rounding_mode_pair_gen_var_4,
+    )
+}
+
 // -- (PrimitiveSigned, ToSciOptions) --
 
 pub fn signed_to_sci_options_pair_gen<T: PrimitiveSigned>() -> Generator<(T, ToSciOptions)> {
@@ -2280,7 +2288,16 @@ pub fn unsigned_pair_gen_var_44<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     )
 }
 
-// var 45 is in malachite-nz
+// vars 45 through 49 are in malachite-nz
+
+// All pairs of unsigneds of the same type, where each value is greater than 1.
+pub fn unsigned_pair_gen_var_50<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_primitive_int_unsigned_pair_gen_var_3,
+        &random_unsigned_pair_gen_var_38,
+        &special_random_unsigned_pair_gen_var_41,
+    )
+}
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
@@ -2826,6 +2843,15 @@ pub fn unsigned_rounding_mode_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generato
     Generator::new_no_special(
         &exhaustive_primitive_int_rounding_mode_pair_gen_var_2,
         &random_unsigned_rounding_mode_pair_gen_var_3,
+    )
+}
+
+// All `(T, RoundingMode)`s where `T` is small and unsigned.
+pub fn unsigned_rounding_mode_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(T, RoundingMode)>
+{
+    Generator::new_no_special(
+        &exhaustive_unsigned_rounding_mode_pair_gen,
+        &random_unsigned_rounding_mode_pair_gen_var_4,
     )
 }
 

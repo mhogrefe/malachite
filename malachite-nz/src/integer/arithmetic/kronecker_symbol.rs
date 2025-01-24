@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -242,7 +242,7 @@ impl LegendreSymbol<Integer> for Integer {
     }
 }
 
-impl<'a> LegendreSymbol<&'a Integer> for Integer {
+impl LegendreSymbol<&Integer> for Integer {
     /// Computes the Legendre symbol of two [`Integer`]s, taking the first by value and the second
     /// by reference.
     ///
@@ -276,14 +276,14 @@ impl<'a> LegendreSymbol<&'a Integer> for Integer {
     /// assert_eq!(Integer::from(-11).legendre_symbol(&Integer::from(5)), 1);
     /// ```
     #[inline]
-    fn legendre_symbol(self, other: &'a Integer) -> i8 {
+    fn legendre_symbol(self, other: &Integer) -> i8 {
         assert!(*other > 0u32);
         assert!(other.odd());
         (&self).kronecker_symbol(other)
     }
 }
 
-impl<'a> LegendreSymbol<Integer> for &'a Integer {
+impl LegendreSymbol<Integer> for &Integer {
     /// Computes the Legendre symbol of two [`Integer`]s, taking the first by reference and the
     /// second by value.
     ///
@@ -324,7 +324,7 @@ impl<'a> LegendreSymbol<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> LegendreSymbol<&'a Integer> for &'b Integer {
+impl LegendreSymbol<&Integer> for &Integer {
     /// Computes the Legendre symbol of two [`Integer`]s, taking both by reference.
     ///
     /// This implementation is identical to that of [`JacobiSymbol`], since there is no
@@ -357,7 +357,7 @@ impl<'a, 'b> LegendreSymbol<&'a Integer> for &'b Integer {
     /// assert_eq!((&Integer::from(-11)).legendre_symbol(&Integer::from(5)), 1);
     /// ```
     #[inline]
-    fn legendre_symbol(self, other: &'a Integer) -> i8 {
+    fn legendre_symbol(self, other: &Integer) -> i8 {
         assert!(*other > 0u32);
         assert!(other.odd());
         self.kronecker_symbol(other)
@@ -403,7 +403,7 @@ impl JacobiSymbol<Integer> for Integer {
     }
 }
 
-impl<'a> JacobiSymbol<&'a Integer> for Integer {
+impl JacobiSymbol<&Integer> for Integer {
     /// Computes the Jacobi symbol of two [`Integer`]s, taking the first by value and the second by
     /// reference.
     ///
@@ -436,14 +436,14 @@ impl<'a> JacobiSymbol<&'a Integer> for Integer {
     /// assert_eq!(Integer::from(-11).jacobi_symbol(&Integer::from(9)), 1);
     /// ```
     #[inline]
-    fn jacobi_symbol(self, other: &'a Integer) -> i8 {
+    fn jacobi_symbol(self, other: &Integer) -> i8 {
         assert!(*other > 0u32);
         assert!(other.odd());
         (&self).kronecker_symbol(other)
     }
 }
 
-impl<'a> JacobiSymbol<Integer> for &'a Integer {
+impl JacobiSymbol<Integer> for &Integer {
     /// Computes the Jacobi symbol of two [`Integer`]s, taking the first by reference and the second
     /// by value.
     ///
@@ -483,7 +483,7 @@ impl<'a> JacobiSymbol<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> JacobiSymbol<&'a Integer> for &'b Integer {
+impl JacobiSymbol<&Integer> for &Integer {
     /// Computes the Jacobi symbol of two [`Integer`]s, taking both by reference.
     ///
     /// $$
@@ -515,7 +515,7 @@ impl<'a, 'b> JacobiSymbol<&'a Integer> for &'b Integer {
     /// assert_eq!((&Integer::from(-11)).jacobi_symbol(&Integer::from(9)), 1);
     /// ```
     #[inline]
-    fn jacobi_symbol(self, other: &'a Integer) -> i8 {
+    fn jacobi_symbol(self, other: &Integer) -> i8 {
         assert!(*other > 0u32);
         assert!(other.odd());
         self.kronecker_symbol(other)
@@ -559,7 +559,7 @@ impl KroneckerSymbol<Integer> for Integer {
     }
 }
 
-impl<'a> KroneckerSymbol<&'a Integer> for Integer {
+impl KroneckerSymbol<&Integer> for Integer {
     /// Computes the Kronecker symbol of two [`Integer`]s, taking the first by value and the second
     /// by reference.
     ///
@@ -592,12 +592,12 @@ impl<'a> KroneckerSymbol<&'a Integer> for Integer {
     /// assert_eq!(Integer::from(-11).kronecker_symbol(&Integer::from(-8)), 1);
     /// ```
     #[inline]
-    fn kronecker_symbol(self, other: &'a Integer) -> i8 {
+    fn kronecker_symbol(self, other: &Integer) -> i8 {
         (&self).kronecker_symbol(other)
     }
 }
 
-impl<'a> KroneckerSymbol<Integer> for &'a Integer {
+impl KroneckerSymbol<Integer> for &Integer {
     /// Computes the Kronecker symbol of two [`Integer`]s, taking the first by reference and the
     /// second value.
     ///
@@ -635,7 +635,7 @@ impl<'a> KroneckerSymbol<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> KroneckerSymbol<&'a Integer> for &'b Integer {
+impl KroneckerSymbol<&Integer> for &Integer {
     /// Computes the Kronecker symbol of two [`Integer`]s, taking both by reference.
     ///
     /// $$
@@ -672,7 +672,7 @@ impl<'a, 'b> KroneckerSymbol<&'a Integer> for &'b Integer {
     ///     1
     /// );
     /// ```
-    fn kronecker_symbol(self, other: &'a Integer) -> i8 {
+    fn kronecker_symbol(self, other: &Integer) -> i8 {
         match (self, other) {
             (x, integer_zero!()) => i8::from(*x.unsigned_abs_ref() == 1u32),
             (integer_zero!(), y) => i8::from(*y.unsigned_abs_ref() == 1u32),

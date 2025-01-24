@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -8,7 +8,9 @@
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::{float_gen, float_pair_gen};
+use malachite_float::test_util::generators::{
+    float_gen, float_gen_var_12, float_pair_gen, float_pair_gen_var_10,
+};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::test_util::generators::integer_pair_gen;
 use rug;
@@ -135,34 +137,51 @@ fn test_clone_from() {
     );
 }
 
+fn clone_and_clone_from_properties_helper_1(x: Float) {
+    let mut_x = x.clone();
+    assert!(mut_x.is_valid());
+    assert_eq!(ComparableFloatRef(&mut_x), ComparableFloatRef(&x));
+
+    assert_eq!(
+        ComparableFloat(Float::from(&rug::Float::exact_from(&x).clone())),
+        ComparableFloat(x)
+    );
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn clone_and_clone_from_properties_helper_2(x: Float, y: Float) {
+    let mut mut_x = x.clone();
+    mut_x.clone_from(&y);
+    assert!(mut_x.is_valid());
+    assert_eq!(ComparableFloatRef(&mut_x), ComparableFloatRef(&y));
+
+    let mut rug_x = rug::Float::exact_from(&x);
+    rug_x.clone_from(&rug::Float::exact_from(&y));
+    assert_eq!(ComparableFloat(Float::from(&rug_x)), ComparableFloat(y));
+}
+
 #[allow(clippy::redundant_clone)]
 #[test]
 fn clone_and_clone_from_properties() {
     float_gen().test_properties(|x| {
-        let mut_x = x.clone();
-        assert!(mut_x.is_valid());
-        assert_eq!(ComparableFloatRef(&mut_x), ComparableFloatRef(&x));
+        clone_and_clone_from_properties_helper_1(x);
+    });
 
-        assert_eq!(
-            ComparableFloat(Float::from(&rug::Float::exact_from(&x).clone())),
-            ComparableFloat(x)
-        );
+    float_gen_var_12().test_properties(|x| {
+        clone_and_clone_from_properties_helper_1(x);
     });
 
     float_pair_gen().test_properties(|(x, y)| {
-        let mut mut_x = x.clone();
-        mut_x.clone_from(&y);
-        assert!(mut_x.is_valid());
-        assert_eq!(ComparableFloatRef(&mut_x), ComparableFloatRef(&y));
+        clone_and_clone_from_properties_helper_2(x, y);
+    });
 
-        let mut rug_x = rug::Float::exact_from(&x);
-        rug_x.clone_from(&rug::Float::exact_from(&y));
-        assert_eq!(ComparableFloat(Float::from(&rug_x)), ComparableFloat(y));
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        clone_and_clone_from_properties_helper_2(x, y);
     });
 
     integer_pair_gen().test_properties(|(i, j)| {
-        let x = Float::from(&i);
-        let y = Float::from(&j);
+        let x = Float::exact_from(&i);
+        let y = Float::exact_from(&j);
 
         let mut mut_i = i.clone();
         let mut mut_x = x.clone();

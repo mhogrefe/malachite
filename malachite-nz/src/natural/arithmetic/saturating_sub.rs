@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -92,7 +92,7 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
     }
 }
 
-impl<'a> SaturatingSub<Natural> for &'a Natural {
+impl SaturatingSub<Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -133,7 +133,7 @@ impl<'a> SaturatingSub<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
+impl SaturatingSub<&Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference and returning 0 if
@@ -169,7 +169,7 @@ impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub(self, other: &'a Natural) -> Natural {
+    fn saturating_sub(self, other: &Natural) -> Natural {
         CheckedSub::checked_sub(self, other).unwrap_or(Natural::ZERO)
     }
 }

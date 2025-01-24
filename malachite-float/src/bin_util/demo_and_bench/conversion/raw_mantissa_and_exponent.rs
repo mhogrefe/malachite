@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,7 +11,7 @@ use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
-use malachite_float::test_util::generators::float_gen_var_3;
+use malachite_float::test_util::generators::{float_gen_var_13, float_gen_var_3};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::pair_1_natural_bit_bucketer;
@@ -20,14 +20,20 @@ use malachite_nz::test_util::generators::natural_signed_pair_gen_var_4;
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_raw_mantissa_and_exponent);
     register_demo!(runner, demo_float_raw_mantissa_and_exponent_debug);
+    register_demo!(runner, demo_float_raw_mantissa_and_exponent_extreme);
+    register_demo!(runner, demo_float_raw_mantissa_and_exponent_extreme_debug);
     register_demo!(runner, demo_float_raw_mantissa_and_exponent_ref);
     register_demo!(runner, demo_float_raw_mantissa_and_exponent_ref_debug);
     register_demo!(runner, demo_float_raw_mantissa);
     register_demo!(runner, demo_float_raw_mantissa_debug);
+    register_demo!(runner, demo_float_raw_mantissa_extreme);
+    register_demo!(runner, demo_float_raw_mantissa_extreme_debug);
     register_demo!(runner, demo_float_raw_mantissa_ref);
     register_demo!(runner, demo_float_raw_mantissa_ref_debug);
     register_demo!(runner, demo_float_raw_exponent);
     register_demo!(runner, demo_float_raw_exponent_debug);
+    register_demo!(runner, demo_float_raw_exponent_extreme);
+    register_demo!(runner, demo_float_raw_exponent_extreme_debug);
     register_demo!(runner, demo_float_raw_exponent_ref);
     register_demo!(runner, demo_float_raw_exponent_ref_debug);
     register_demo!(runner, demo_float_from_raw_mantissa_and_exponent);
@@ -59,6 +65,30 @@ fn demo_float_raw_mantissa_and_exponent(gm: GenMode, config: &GenConfig, limit: 
 
 fn demo_float_raw_mantissa_and_exponent_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.raw_mantissa_and_exponent() = {:?}",
+            ComparableFloat(n.clone()),
+            n.raw_mantissa_and_exponent()
+        );
+    }
+}
+
+fn demo_float_raw_mantissa_and_exponent_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{}.raw_mantissa_and_exponent() = {:?}",
+            n.clone(),
+            n.raw_mantissa_and_exponent()
+        );
+    }
+}
+
+fn demo_float_raw_mantissa_and_exponent_extreme_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
         println!(
             "{:#x}.raw_mantissa_and_exponent() = {:?}",
             ComparableFloat(n.clone()),
@@ -103,6 +133,22 @@ fn demo_float_raw_mantissa_debug(gm: GenMode, config: &GenConfig, limit: usize) 
     }
 }
 
+fn demo_float_raw_mantissa_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!("{}.raw_mantissa() = {}", n.clone(), n.raw_mantissa());
+    }
+}
+
+fn demo_float_raw_mantissa_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.raw_mantissa() = {:#x}",
+            ComparableFloat(n.clone()),
+            n.raw_mantissa()
+        );
+    }
+}
+
 fn demo_float_raw_mantissa_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
         println!("(&{}).raw_mantissa() = {}", n, (&n).raw_mantissa());
@@ -127,6 +173,22 @@ fn demo_float_raw_exponent(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_raw_exponent_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen_var_3().get(gm, config).take(limit) {
+        println!(
+            "{:#x}.raw_exponent() = {}",
+            ComparableFloat(n.clone()),
+            n.raw_exponent()
+        );
+    }
+}
+
+fn demo_float_raw_exponent_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
+        println!("{}.raw_exponent() = {}", n.clone(), n.raw_exponent());
+    }
+}
+
+fn demo_float_raw_exponent_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_13().get(gm, config).take(limit) {
         println!(
             "{:#x}.raw_exponent() = {}",
             ComparableFloat(n.clone()),

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -1425,7 +1425,30 @@ where
     )
 }
 
-// var 3 is in malachite-float.
+// vars 3 and 4 are in malachite-float.
+
+pub fn random_integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds::<T>(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
 
 // -- (Integer, RoundingMode) --
 
@@ -3882,6 +3905,8 @@ pub fn random_unsigned_pair_gen_var_37(config: &GenConfig) -> It<(Limb, Limb)> {
     )
 }
 
+// var 38 is in malachite-base.
+
 // -- (PrimitiveUnsigned * 6) --
 
 pub fn random_unsigned_sextuple_gen_var_1(
@@ -4155,13 +4180,13 @@ pub fn random_natural_vec_natural_pair_gen_var_4(
 
 // -- (Vec<Natural>, PrimitiveUnsigned) --
 
-struct PowerOfTwoDigitsGenerator {
+struct PowerOf2DigitsGenerator {
     log_bases: GeometricRandomNaturalValues<u64>,
     digit_counts: GeometricRandomNaturalValues<usize>,
     xs: RandomPrimitiveInts<u64>,
 }
 
-impl Iterator for PowerOfTwoDigitsGenerator {
+impl Iterator for PowerOf2DigitsGenerator {
     type Item = (Vec<Natural>, u64);
 
     fn next(&mut self) -> Option<(Vec<Natural>, u64)> {
@@ -4176,7 +4201,7 @@ impl Iterator for PowerOfTwoDigitsGenerator {
 }
 
 pub fn random_natural_vec_unsigned_pair_gen_var_1(config: &GenConfig) -> It<(Vec<Natural>, u64)> {
-    Box::new(PowerOfTwoDigitsGenerator {
+    Box::new(PowerOf2DigitsGenerator {
         log_bases: geometric_random_positive_unsigneds(
             EXAMPLE_SEED.fork("log_bases"),
             config.get_or("mean_log_base_n", 4),

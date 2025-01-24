@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -528,7 +528,7 @@ impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
+impl ModMulPrecomputed<Natural, Natural> for &Natural {
     type Output = Natural;
     type Data = ModMulData;
 
@@ -618,7 +618,7 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
+impl ModMulPrecomputed<Natural, &Natural> for &Natural {
     type Output = Natural;
     type Data = ModMulData;
 
@@ -687,12 +687,12 @@ impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by reference and `c` is taken by value.
     #[inline]
-    fn mod_mul_precomputed(self, other: Natural, m: &'b Natural, data: &ModMulData) -> Natural {
+    fn mod_mul_precomputed(self, other: Natural, m: &Natural, data: &ModMulData) -> Natural {
         other.mod_mul_precomputed(self, m, data)
     }
 }
 
-impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
+impl ModMulPrecomputed<&Natural, Natural> for &Natural {
     type Output = Natural;
     type Data = ModMulData;
 
@@ -760,7 +760,7 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by reference and `m` is taken by value.
-    fn mod_mul_precomputed(self, other: &'b Natural, m: Natural, data: &ModMulData) -> Natural {
+    fn mod_mul_precomputed(self, other: &Natural, m: Natural, data: &ModMulData) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
             *other < m,
@@ -785,7 +785,7 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
+impl ModMulPrecomputed<&Natural, &Natural> for &Natural {
     type Output = Natural;
     type Data = ModMulData;
 
@@ -852,7 +852,7 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// This is equivalent to `_fmpz_mod_mulN` from fmpz_mod/mul.c, FLINT 2.7.1, where `b`, `c`, and
     /// `m` are taken by reference.
-    fn mod_mul_precomputed(self, other: &'b Natural, m: &'c Natural, data: &ModMulData) -> Natural {
+    fn mod_mul_precomputed(self, other: &Natural, m: &Natural, data: &ModMulData) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         match (self, other, m, data) {
@@ -1316,7 +1316,7 @@ impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a> ModMul<Natural, Natural> for &'a Natural {
+impl ModMul<Natural, Natural> for &Natural {
     type Output = Natural;
 
     /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
@@ -1359,7 +1359,7 @@ impl<'a> ModMul<Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
+impl ModMul<Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
@@ -1396,12 +1396,12 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by reference and `c` is taken by value.
     #[inline]
-    fn mod_mul(self, other: Natural, m: &'b Natural) -> Natural {
+    fn mod_mul(self, other: Natural, m: &Natural) -> Natural {
         self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
     }
 }
 
-impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
+impl ModMul<&Natural, Natural> for &Natural {
     type Output = Natural;
 
     /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
@@ -1438,13 +1438,13 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by reference and `m` is taken by value.
     #[inline]
-    fn mod_mul(self, other: &'b Natural, m: Natural) -> Natural {
+    fn mod_mul(self, other: &Natural, m: Natural) -> Natural {
         let data = precompute_mod_mul_data_helper(&m);
         self.mod_mul_precomputed(other, m, &data)
     }
 }
 
-impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
+impl ModMul<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
@@ -1480,7 +1480,7 @@ impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by reference.
     #[inline]
-    fn mod_mul(self, other: &'b Natural, m: &'c Natural) -> Natural {
+    fn mod_mul(self, other: &Natural, m: &Natural) -> Natural {
         self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
     }
 }

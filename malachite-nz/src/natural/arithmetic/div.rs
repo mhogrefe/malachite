@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -2092,7 +2092,7 @@ impl<'a> Div<&'a Natural> for Natural {
     }
 }
 
-impl<'a> Div<Natural> for &'a Natural {
+impl Div<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -2146,7 +2146,7 @@ impl<'a> Div<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> Div<&'b Natural> for &'a Natural {
+impl Div<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The quotient is
@@ -2178,7 +2178,7 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     ///     810000006723u64
     /// );
     /// ```
-    fn div(self, other: &'b Natural) -> Natural {
+    fn div(self, other: &Natural) -> Natural {
         match (self, other) {
             (_, &Natural::ZERO) => panic!("division by zero"),
             (x, y) if x == y => Natural::ONE,
@@ -2442,7 +2442,7 @@ impl<'a> CheckedDiv<&'a Natural> for Natural {
     }
 }
 
-impl<'a> CheckedDiv<Natural> for &'a Natural {
+impl CheckedDiv<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -2506,7 +2506,7 @@ impl<'a> CheckedDiv<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> CheckedDiv<&'b Natural> for &'a Natural {
+impl CheckedDiv<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The quotient is
@@ -2548,7 +2548,7 @@ impl<'a, 'b> CheckedDiv<&'b Natural> for &'a Natural {
     /// );
     /// assert_eq!((&Natural::ONE).checked_div(&Natural::ZERO), None);
     /// ```
-    fn checked_div(self, other: &'b Natural) -> Option<Natural> {
+    fn checked_div(self, other: &Natural) -> Option<Natural> {
         match (self, other) {
             (_, &Natural::ZERO) => None,
             (x, y) if x == y => Some(Natural::ONE),

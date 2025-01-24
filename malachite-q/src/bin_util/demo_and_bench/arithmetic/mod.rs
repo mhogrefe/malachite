@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     abs::register(runner);
+    abs_diff::register(runner);
     add::register(runner);
     approximate::register(runner);
     ceiling::register(runner);
@@ -39,6 +40,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod abs;
+mod abs_diff;
 mod add;
 mod approximate;
 mod ceiling;

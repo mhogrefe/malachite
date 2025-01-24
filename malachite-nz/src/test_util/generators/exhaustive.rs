@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -784,7 +784,19 @@ where
     )
 }
 
-// var 3 is in malachite-float.
+// vars 3 and 4 are in malachite-float.
+
+pub fn exhaustive_integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>(
+) -> It<(Integer, T, RoundingMode)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_integers(),
+        exhaustive_unsigneds::<T>(),
+        exhaustive_rounding_modes(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
+}
 
 // -- (Integer, RoundingMode) --
 
@@ -2273,14 +2285,14 @@ pub fn exhaustive_natural_vec_primitive_int_pair_gen_var_1<T: PrimitiveInt>(
 
 // -- (Vec<Natural>, u64) --
 
-struct PowerOfTwoDigitsGenerator;
+struct PowerOf2DigitsGenerator;
 
 impl
     ExhaustiveDependentPairsYsGenerator<
         u64,
         Vec<Natural>,
         ExhaustiveVecs<Natural, PrimitiveIntIncreasingRange<u64>, ExhaustiveNaturalRange>,
-    > for PowerOfTwoDigitsGenerator
+    > for PowerOf2DigitsGenerator
 {
     #[inline]
     fn get_ys(
@@ -2301,7 +2313,7 @@ pub fn exhaustive_natural_vec_unsigned_pair_gen_var_1() -> It<(Vec<Natural>, u64
             BitDistributorOutputType::normal(1),
         ),
         primitive_int_increasing_inclusive_range(1, u64::MAX),
-        PowerOfTwoDigitsGenerator,
+        PowerOf2DigitsGenerator,
     )))
 }
 

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2, ShlRound, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
@@ -14,27 +14,32 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, unsigned_gen, unsigned_gen_var_5,
 };
+use malachite_float::test_util::arithmetic::shl::shl_naive;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::{
-    float_gen, float_signed_pair_gen_var_2, float_unsigned_pair_gen_var_2,
+    float_gen, float_signed_pair_gen_var_2, float_signed_pair_gen_var_3,
+    float_unsigned_pair_gen_var_2, float_unsigned_pair_gen_var_3,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
+use malachite_q::Rational;
 use std::ops::{Shl, ShlAssign, Shr};
 
 fn test_shl_unsigned_helper<T: PrimitiveUnsigned, F: Fn(Float, T, Float)>(f: F)
 where
     Float: ShlAssign<T> + Shl<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
     for<'a> &'a Float: Shl<T, Output = Float>,
 {
-    let test = |s, s_hex, v: u8, out: &str, out_hex: &str| {
+    let test = |s, s_hex, v: u64, out: &str, out_hex: &str| {
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
-        let v = T::from(v);
+        let v = T::exact_from(v);
 
         let mut n = x.clone();
         n <<= v;
@@ -44,11 +49,17 @@ where
 
         let n = x.clone() << v;
         assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
         assert!(n.is_valid());
 
         let n = &x << v;
         assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
         assert!(n.is_valid());
+
+        let n = shl_naive(x.clone(), v);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
 
         f(x, v, n);
     };
@@ -128,6 +139,41 @@ where
         "-3.9824418129956972e30",
         "-0x3.243f6a8885a30E+25#53",
     );
+
+    let test_extreme = |s, s_hex, v: i32, out: &str, out_hex: &str| {
+        let v = u64::exact_from(v);
+        if T::convertible_from(v) {
+            test(s, s_hex, v, out, out_hex);
+        }
+    };
+    test_extreme(
+        "1.0",
+        "0x1.0#1",
+        Float::MAX_EXPONENT - 1,
+        "too_big",
+        "0x4.0E+268435455#1",
+    );
+    test_extreme(
+        "1.0",
+        "0x1.0#1",
+        Float::MAX_EXPONENT,
+        "Infinity",
+        "Infinity",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MAX_EXPONENT - 1,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MAX_EXPONENT,
+        "-Infinity",
+        "-Infinity",
+    );
 }
 
 #[test]
@@ -156,12 +202,13 @@ fn test_shl_unsigned() {
 fn test_shl_signed_helper<T: PrimitiveSigned, F: Fn(Float, T, Float)>(f: F)
 where
     Float: ShlAssign<T> + Shl<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
     for<'a> &'a Float: Shl<T, Output = Float>,
 {
-    let test = |s, s_hex, v: i8, out: &str, out_hex: &str| {
+    let test = |s, s_hex, v: i64, out: &str, out_hex: &str| {
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
-        let v = T::from(v);
+        let v = T::exact_from(v);
 
         let mut n = x.clone();
         n <<= v;
@@ -171,11 +218,17 @@ where
 
         let n = x.clone() << v;
         assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
         assert!(n.is_valid());
 
         let n = &x << v;
         assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
         assert!(n.is_valid());
+
+        let n = shl_naive(x.clone(), v);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
 
         f(x, v, n);
     };
@@ -308,6 +361,91 @@ where
         "-2.4782796245465248e-30",
         "-0x3.243f6a8885a30E-25#53",
     );
+
+    let test_extreme = |s, s_hex, v: i32, out: &str, out_hex: &str| {
+        let v = i64::from(v);
+        if T::convertible_from(v) {
+            test(s, s_hex, v, out, out_hex);
+        }
+    };
+    test_extreme(
+        "1.0",
+        "0x1.0#1",
+        Float::MAX_EXPONENT - 1,
+        "too_big",
+        "0x4.0E+268435455#1",
+    );
+    test_extreme(
+        "1.0",
+        "0x1.0#1",
+        Float::MAX_EXPONENT,
+        "Infinity",
+        "Infinity",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MAX_EXPONENT - 1,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MAX_EXPONENT,
+        "-Infinity",
+        "-Infinity",
+    );
+    test_extreme(
+        "1.0",
+        "0x1.0#1",
+        Float::MIN_EXPONENT,
+        "too_small",
+        "0x2.0E-268435456#1",
+    );
+    test_extreme(
+        "1.0",
+        "0x1.0#1",
+        Float::MIN_EXPONENT - 1,
+        "too_small",
+        "0x1.0E-268435456#1",
+    );
+    test_extreme("1.0", "0x1.0#1", Float::MIN_EXPONENT - 2, "0.0", "0x0.0");
+    test_extreme(
+        "1.5",
+        "0x1.8#2",
+        Float::MIN_EXPONENT - 2,
+        "too_small",
+        "0x1.0E-268435456#2",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MIN_EXPONENT,
+        "-too_small",
+        "-0x2.0E-268435456#1",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MIN_EXPONENT - 1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+    );
+    test_extreme(
+        "-1.0",
+        "-0x1.0#1",
+        Float::MIN_EXPONENT - 2,
+        "-0.0",
+        "-0x0.0",
+    );
+    test_extreme(
+        "-1.5",
+        "-0x1.8#2",
+        Float::MIN_EXPONENT - 2,
+        "-too_small",
+        "-0x1.0E-268435456#2",
+    );
 }
 
 #[test]
@@ -333,43 +471,89 @@ fn test_shl_signed() {
     test_shl_signed_helper::<isize, _>(|_, _, _| {});
 }
 
-fn shl_properties_helper_unsigned<T: PrimitiveUnsigned>()
+fn shl_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(n: Float, u: T)
 where
     for<'a> &'a Integer: Shl<T, Output = Integer>,
-    Float: Shl<T, Output = Float> + ShlAssign<T> + Shr<T, Output = Float>,
+    Float: Shl<T, Output = Float>
+        + ShlRound<T, Output = Float>
+        + ShlAssign<T>
+        + Shr<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
     for<'a> &'a Float: Shl<T, Output = Float>,
     u64: TryFrom<T>,
+    i128: TryFrom<T>,
 {
-    float_unsigned_pair_gen_var_2::<T>().test_properties(|(n, u)| {
-        let mut mut_n = n.clone();
-        mut_n <<= u;
-        assert!(mut_n.is_valid());
-        let shifted = mut_n;
+    let mut mut_n = n.clone();
+    mut_n <<= u;
+    assert!(mut_n.is_valid());
+    let shifted = mut_n;
 
-        let shifted_alt = &n << u;
-        assert!(shifted_alt.is_valid());
+    let shifted_alt = &n << u;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    let shifted_alt = n.clone() << u;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    let shifted_alt = n.clone().shl_round(u, Nearest).0;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+
+    if i128::from(n.get_exponent().unwrap_or(1))
+        .wrapping_add(i128::exact_from(u))
+        .lt_abs(&1_000_000)
+    {
+        let shifted_alt = shl_naive(n.clone(), u);
         assert_eq!(
             ComparableFloatRef(&shifted_alt),
             ComparableFloatRef(&shifted)
         );
-        let shifted_alt = n.clone() << u;
-        assert!(shifted_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&shifted_alt),
-            ComparableFloatRef(&shifted)
-        );
+    }
+
+    if shifted.is_normal() {
         assert_eq!(n.get_prec(), shifted.get_prec());
+    }
 
-        if !n.is_nan() {
-            assert!((&n << u).ge_abs(&n));
-        }
-        assert_eq!(ComparableFloat(-&n << u), ComparableFloat(-(&n << u)));
+    if !n.is_nan() {
+        assert!((&n << u).ge_abs(&n));
+    }
+    assert_eq!(ComparableFloat(-&n << u), ComparableFloat(-(&n << u)));
 
+    if shifted.is_normal() {
         assert_eq!(ComparableFloatRef(&(&n << u >> u)), ComparableFloatRef(&n));
         assert_eq!(
             ComparableFloat(&n << u),
             ComparableFloat(n * Float::power_of_2(u64::exact_from(u)))
         );
+    }
+}
+
+fn shl_properties_helper_unsigned<T: PrimitiveUnsigned>()
+where
+    for<'a> &'a Integer: Shl<T, Output = Integer>,
+    Float: Shl<T, Output = Float>
+        + ShlRound<T, Output = Float>
+        + ShlAssign<T>
+        + Shr<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
+    for<'a> &'a Float: Shl<T, Output = Float>,
+    u64: TryFrom<T>,
+    i128: TryFrom<T>,
+{
+    float_unsigned_pair_gen_var_2::<T>().test_properties(|(n, u)| {
+        shl_properties_helper_unsigned_helper(n, u);
+    });
+
+    float_unsigned_pair_gen_var_3::<T>().test_properties(|(n, u)| {
+        shl_properties_helper_unsigned_helper(n, u);
     });
 
     float_gen().test_properties(|n| {
@@ -395,55 +579,113 @@ where
     });
 
     integer_unsigned_pair_gen_var_2::<T>().test_properties(|(n, u)| {
-        assert_eq!(&n << u, Float::from(n) << u);
+        assert_eq!(&n << u, Float::exact_from(n) << u);
     });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shl_properties_helper_signed_helper<T: PrimitiveSigned>(n: Float, i: T)
+where
+    for<'a> &'a Integer: Shl<T, Output = Integer>,
+    Float: Shl<T, Output = Float>
+        + ShlRound<T, Output = Float>
+        + ShlAssign<T>
+        + Shr<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
+    for<'a> &'a Float: Shl<T, Output = Float>
+        + Shl<<T as UnsignedAbs>::Output, Output = Float>
+        + Shr<T, Output = Float>
+        + Shr<<T as UnsignedAbs>::Output, Output = Float>,
+    i64: TryFrom<T>,
+    i128: TryFrom<T>,
+{
+    let mut mut_n = n.clone();
+    mut_n <<= i;
+    assert!(mut_n.is_valid());
+    let shifted = mut_n;
+
+    let shifted_alt = &n << i;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    let shifted_alt = n.clone() << i;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    let shifted_alt = n.clone().shl_round(i, Nearest).0;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+
+    if i128::from(n.get_exponent().unwrap_or(1))
+        .wrapping_add(i128::exact_from(i))
+        .lt_abs(&1_000_000)
+    {
+        let shifted_alt = shl_naive(n.clone(), i);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+    }
+
+    if shifted.is_normal() {
+        assert_eq!(n.get_prec(), shifted.get_prec());
+    }
+
+    if i >= T::ZERO {
+        assert_eq!(
+            ComparableFloatRef(&(&n << i.unsigned_abs())),
+            ComparableFloatRef(&shifted)
+        );
+    } else if i != T::MIN {
+        assert_eq!(
+            ComparableFloatRef(&(&n >> i.unsigned_abs())),
+            ComparableFloatRef(&shifted)
+        );
+    }
+    assert_eq!(ComparableFloat(-&n << i), ComparableFloat(-(&n << i)));
+    if let Some(neg_i) = i.checked_neg() {
+        assert_eq!(ComparableFloat(&n << neg_i), ComparableFloat(&n >> i));
+    }
+
+    if shifted.is_normal() {
+        if shifted.get_exponent() != Some(Float::MIN_EXPONENT) {
+            assert_eq!(ComparableFloatRef(&(&n << i >> i)), ComparableFloatRef(&n));
+        }
+        assert_eq!(
+            ComparableFloat(shifted),
+            ComparableFloat(n * Float::power_of_2(i64::exact_from(i)))
+        );
+    }
 }
 
 fn shl_properties_helper_signed<T: PrimitiveSigned>()
 where
     for<'a> &'a Integer: Shl<T, Output = Integer>,
-    Float: Shl<T, Output = Float> + ShlAssign<T> + Shr<T, Output = Float>,
+    Float: Shl<T, Output = Float>
+        + ShlRound<T, Output = Float>
+        + ShlAssign<T>
+        + Shr<T, Output = Float>,
+    Rational: Shl<T, Output = Rational>,
     for<'a> &'a Float: Shl<T, Output = Float>
         + Shl<<T as UnsignedAbs>::Output, Output = Float>
-        + Shr<T, Output = Float>,
+        + Shr<T, Output = Float>
+        + Shr<<T as UnsignedAbs>::Output, Output = Float>,
     i64: TryFrom<T>,
+    i128: TryFrom<T>,
 {
     float_signed_pair_gen_var_2::<T>().test_properties(|(n, i)| {
-        let mut mut_n = n.clone();
-        mut_n <<= i;
-        assert!(mut_n.is_valid());
-        let shifted = mut_n;
+        shl_properties_helper_signed_helper(n, i);
+    });
 
-        let shifted_alt = &n << i;
-        assert!(shifted_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&shifted_alt),
-            ComparableFloatRef(&shifted)
-        );
-        let shifted_alt = n.clone() << i;
-        assert!(shifted_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&shifted_alt),
-            ComparableFloatRef(&shifted)
-        );
-        assert_eq!(n.get_prec(), shifted.get_prec());
-
-        if i >= T::ZERO {
-            assert_eq!(
-                ComparableFloat(&n << i.unsigned_abs()),
-                ComparableFloat(shifted)
-            );
-        }
-        assert_eq!(ComparableFloat(-&n << i), ComparableFloat(-(&n << i)));
-        if let Some(neg_i) = i.checked_neg() {
-            assert_eq!(ComparableFloat(&n << neg_i), ComparableFloat(&n >> i));
-        }
-
-        assert_eq!(ComparableFloatRef(&(&n << i >> i)), ComparableFloatRef(&n));
-        assert_eq!(
-            ComparableFloat(&n << i),
-            ComparableFloat(n * Float::power_of_2(i64::exact_from(i)))
-        );
+    float_signed_pair_gen_var_3::<T>().test_properties(|(n, i)| {
+        shl_properties_helper_signed_helper(n, i);
     });
 
     float_gen().test_properties(|n| {

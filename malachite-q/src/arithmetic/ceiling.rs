@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -50,7 +50,7 @@ impl Ceiling for Rational {
     }
 }
 
-impl<'a> Ceiling for &'a Rational {
+impl Ceiling for &Rational {
     type Output = Integer;
 
     /// Finds the ceiling of a [`Rational`], taking the [`Rational`] by reference.

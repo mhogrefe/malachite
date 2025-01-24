@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,12 +13,14 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_2_float_complexity_bucketer,
 };
-use malachite_float::test_util::generators::{float_gen, float_gen_rm};
+use malachite_float::test_util::generators::{float_gen, float_gen_rm, float_gen_var_12};
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_neg);
     register_demo!(runner, demo_float_neg_debug);
+    register_demo!(runner, demo_float_neg_extreme);
+    register_demo!(runner, demo_float_neg_extreme_debug);
     register_demo!(runner, demo_float_neg_ref);
     register_demo!(runner, demo_float_neg_ref_debug);
     register_demo!(runner, demo_float_neg_assign);
@@ -37,6 +39,22 @@ fn demo_float_neg(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_neg_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen().get(gm, config).take(limit) {
+        println!(
+            "-({:#x}) = {:#x}",
+            ComparableFloat(n.clone()),
+            ComparableFloat(-n)
+        );
+    }
+}
+
+fn demo_float_neg_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_12().get(gm, config).take(limit) {
+        println!("-({}) = {}", n.clone(), -n);
+    }
+}
+
+fn demo_float_neg_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "-({:#x}) = {:#x}",
             ComparableFloat(n.clone()),

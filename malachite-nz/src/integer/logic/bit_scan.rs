@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -146,7 +146,7 @@ impl Natural {
     }
 }
 
-impl<'a> BitScan for &'a Integer {
+impl BitScan for &Integer {
     /// Given an [`Integer`] and a starting index, searches the [`Integer`] for the smallest index
     /// of a `false` bit that is greater than or equal to the starting index.
     ///

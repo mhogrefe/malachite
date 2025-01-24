@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 macro_rules! impl_partial_eq_limb {
@@ -187,7 +187,7 @@ impl PartialEq<usize> for Natural {
     /// See [here](super::partial_eq_primitive_int#partial_eq).
     #[inline]
     fn eq(&self, other: &usize) -> bool {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             *self == u32::wrapping_from(*other)
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);

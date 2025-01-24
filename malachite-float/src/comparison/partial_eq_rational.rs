@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,8 +17,8 @@ use malachite_q::Rational;
 impl PartialEq<Rational> for Float {
     /// Determines whether a [`Float`] is equal to a [`Rational`].
     ///
-    /// Infinity, negative infinity, and NaN are not equal to any [`Rational`]. Both the [`Float`]
-    /// zero and the [`Float`] negative zero are equal to the [`Rational`] zero.
+    /// $\infty$, $-\infty$, and NaN are not equal to any [`Rational`]. Both the [`Float`] zero and
+    /// the [`Float`] negative zero are equal to the [`Rational`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -67,8 +67,8 @@ impl PartialEq<Rational> for Float {
 impl PartialEq<Float> for Rational {
     /// Determines whether a [`Rational`] is equal to a [`Float`].
     ///
-    /// No [`Rational`] is equal to infinity, negative infinity, or NaN. The [`Rational`] zero is
-    /// equal to both the [`Float`] zero and the [`Float`] negative zero.
+    /// No [`Rational`] is equal to $\infty$, $-\infty$, or NaN. The [`Rational`] zero is equal to
+    /// both the [`Float`] zero and the [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

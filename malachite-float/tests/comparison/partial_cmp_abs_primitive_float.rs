@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,7 +17,8 @@ use malachite_float::test_util::common::{
 };
 use malachite_float::test_util::generators::{
     float_float_primitive_float_triple_gen, float_gen, float_gen_var_2,
-    float_primitive_float_pair_gen, float_primitive_float_primitive_float_triple_gen,
+    float_primitive_float_pair_gen, float_primitive_float_pair_gen_var_1,
+    float_primitive_float_primitive_float_triple_gen,
 };
 use malachite_float::Float;
 use std::cmp::Ordering::{self, *};
@@ -99,6 +100,27 @@ fn test_partial_cmp_abs_primitive_float() {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_cmp_abs_primitive_float_properties_helper_helper<
+    T: PartialOrd<T> + PartialOrdAbs<Float> + PrimitiveFloat,
+>(
+    n: Float,
+    u: T,
+) where
+    Float: TryFrom<T> + PartialOrd<T> + PartialOrdAbs<T>,
+{
+    let cmp = n.partial_cmp_abs(&u);
+    assert_eq!((&n).abs().partial_cmp(&u.abs()), cmp);
+
+    let cmp_rev = cmp.map(Ordering::reverse);
+    assert_eq!(u.partial_cmp_abs(&n), cmp_rev);
+
+    assert_eq!(
+        PartialOrdAbs::<Float>::partial_cmp_abs(&n, &Float::exact_from(u)),
+        cmp
+    );
+}
+
 fn partial_cmp_abs_primitive_float_properties_helper<
     T: PartialOrd<T> + PartialOrdAbs<Float> + PrimitiveFloat,
 >()
@@ -106,16 +128,11 @@ where
     Float: TryFrom<T> + PartialOrd<T> + PartialOrdAbs<T>,
 {
     float_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
-        let cmp = n.partial_cmp_abs(&u);
-        assert_eq!((&n).abs().partial_cmp(&u.abs()), cmp);
+        partial_cmp_abs_primitive_float_properties_helper_helper(n, u);
+    });
 
-        let cmp_rev = cmp.map(Ordering::reverse);
-        assert_eq!(u.partial_cmp_abs(&n), cmp_rev);
-
-        assert_eq!(
-            PartialOrdAbs::<Float>::partial_cmp_abs(&n, &Float::exact_from(u)),
-            cmp
-        );
+    float_primitive_float_pair_gen_var_1::<T>().test_properties(|(n, u)| {
+        partial_cmp_abs_primitive_float_properties_helper_helper(n, u);
     });
 
     float_float_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {

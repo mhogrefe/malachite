@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -91,7 +91,7 @@ pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option
     }
 }}
 
-impl<'a> BitScan for &'a Natural {
+impl BitScan for &Natural {
     /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index of
     /// a `false` bit that is greater than or equal to the starting index.
     ///

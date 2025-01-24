@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -40,7 +40,7 @@ pub_crate_test! {limbs_divisible_by_power_of_2(xs: &[Limb], pow: u64) -> bool {
         && xs[zeros].divisible_by_power_of_2(pow & Limb::WIDTH_MASK)
 }}
 
-impl<'a> DivisibleByPowerOf2 for &'a Natural {
+impl DivisibleByPowerOf2 for &Natural {
     /// Returns whether a [`Natural`] is divisible by $2^k$.
     ///
     /// $f(x, k) = (2^k|x)$.

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,6 +14,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::{
     float_primitive_float_pair_gen, float_primitive_float_pair_gen_rm,
+    float_primitive_float_pair_gen_var_1,
 };
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
@@ -21,8 +22,12 @@ use malachite_float::Float;
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_float_partial_eq_primitive_float);
     register_primitive_float_demos!(runner, demo_float_partial_eq_primitive_float_debug);
+    register_primitive_float_demos!(runner, demo_float_partial_eq_primitive_float_extreme);
+    register_primitive_float_demos!(runner, demo_float_partial_eq_primitive_float_extreme_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_partial_eq_float);
     register_primitive_float_demos!(runner, demo_primitive_float_partial_eq_float_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_partial_eq_float_extreme);
+    register_primitive_float_demos!(runner, demo_primitive_float_partial_eq_float_extreme_debug);
 
     register_primitive_float_benches!(
         runner,
@@ -73,6 +78,45 @@ fn demo_float_partial_eq_primitive_float_debug<T: PrimitiveFloat>(
     }
 }
 
+fn demo_float_partial_eq_primitive_float_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialEq<T>,
+{
+    for (x, y) in float_primitive_float_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        if x == y {
+            println!("{} = {}", x, NiceFloat(y));
+        } else {
+            println!("{} ≠ {}", x, NiceFloat(y));
+        }
+    }
+}
+
+fn demo_float_partial_eq_primitive_float_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialEq<T>,
+{
+    for (x, y) in float_primitive_float_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let cx = ComparableFloatRef(&x);
+        if x == y {
+            println!("{:#x} = {}", cx, NiceFloat(y));
+        } else {
+            println!("{:#x} ≠ {}", cx, NiceFloat(y));
+        }
+    }
+}
+
 fn demo_primitive_float_partial_eq_float<T: PartialEq<Float> + PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -96,6 +140,41 @@ fn demo_primitive_float_partial_eq_float_debug<T: PartialEq<Float> + PrimitiveFl
     limit: usize,
 ) {
     for (y, x) in float_primitive_float_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let cy = ComparableFloatRef(&y);
+        if x == y {
+            println!("{} = {:#x}", NiceFloat(x), cy);
+        } else {
+            println!("{} ≠ {:#x}", NiceFloat(x), cy);
+        }
+    }
+}
+
+fn demo_primitive_float_partial_eq_float_extreme<T: PartialEq<Float> + PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_primitive_float_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        if x == y {
+            println!("{} = {}", NiceFloat(x), y);
+        } else {
+            println!("{} ≠ {}", NiceFloat(x), y);
+        }
+    }
+}
+
+fn demo_primitive_float_partial_eq_float_extreme_debug<T: PartialEq<Float> + PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_primitive_float_pair_gen_var_1::<T>()
         .get(gm, config)
         .take(limit)
     {

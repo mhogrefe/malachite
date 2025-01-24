@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -19,12 +19,16 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FloatConversionError {
+    Inexact,
+    Overflow,
+    Underflow,
+}
+
 fn abs_is_neg_power_of_2(x: &Rational) -> bool {
     x.numerator == 1u32 && x.denominator.is_power_of_2()
 }
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct FloatFromRationalError;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -165,7 +169,7 @@ macro_rules! float_impls {
         }
 
         impl TryFrom<Rational> for $f {
-            type Error = FloatFromRationalError;
+            type Error = FloatConversionError;
 
             /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by value. If
             /// the input isn't exactly equal to any float, an error is returned.
@@ -186,9 +190,9 @@ macro_rules! float_impls {
                     let sign = value.sign;
                     let (mantissa, exponent, _) = value
                         .sci_mantissa_and_exponent_round(Exact)
-                        .ok_or(FloatFromRationalError)?;
+                        .ok_or(FloatConversionError::Inexact)?;
                     let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
-                        .ok_or(FloatFromRationalError);
+                        .ok_or(FloatConversionError::Inexact);
                     if sign {
                         f
                     } else {
@@ -235,7 +239,7 @@ macro_rules! float_impls {
             }
         }
 
-        impl<'a> RoundingFrom<&'a Rational> for $f {
+        impl RoundingFrom<&Rational> for $f {
             /// Converts a [`Rational`] to a value of a primitive float according to a specified
             /// [`RoundingMode`], taking the [`Rational`] by reference.
             ///
@@ -278,7 +282,7 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_rational#rounding_from).
-            fn rounding_from(value: &'a Rational, mut rm: RoundingMode) -> ($f, Ordering) {
+            fn rounding_from(value: &Rational, mut rm: RoundingMode) -> ($f, Ordering) {
                 if *value == 0u32 {
                     (0.0, Equal)
                 } else {
@@ -370,8 +374,8 @@ macro_rules! float_impls {
             }
         }
 
-        impl<'a> TryFrom<&'a Rational> for $f {
-            type Error = FloatFromRationalError;
+        impl TryFrom<&Rational> for $f {
+            type Error = FloatConversionError;
 
             /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by reference.
             /// If the input isn't exactly equal to any float, an error is returned.
@@ -385,15 +389,15 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_rational#try_from).
-            fn try_from(value: &'a Rational) -> Result<$f, Self::Error> {
+            fn try_from(value: &Rational) -> Result<$f, Self::Error> {
                 if *value == 0 {
                     Ok(0.0)
                 } else {
                     let (mantissa, exponent, _) = value
                         .sci_mantissa_and_exponent_round_ref(Exact)
-                        .ok_or(FloatFromRationalError)?;
+                        .ok_or(FloatConversionError::Inexact)?;
                     let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
-                        .ok_or(FloatFromRationalError);
+                        .ok_or(FloatConversionError::Inexact);
                     if value.sign {
                         f
                     } else {
@@ -403,7 +407,7 @@ macro_rules! float_impls {
             }
         }
 
-        impl<'a> ConvertibleFrom<&'a Rational> for $f {
+        impl ConvertibleFrom<&Rational> for $f {
             /// Determines whether a [`Rational`] can be exactly converted to a primitive float,
             /// taking the [`Rational`] by reference.
             ///
@@ -416,7 +420,7 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_rational#convertible_from).
-            fn convertible_from(value: &'a Rational) -> bool {
+            fn convertible_from(value: &Rational) -> bool {
                 if *value == 0 {
                     true
                 } else {

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -395,6 +395,7 @@ pub mod num {
         pub mod primitive_int_increasing_range;
     }
     pub mod factorization {
+        pub mod is_prime;
         pub mod prime_indicator_sequence;
         pub mod prime_indicator_sequence_less_than;
         pub mod prime_sieve;

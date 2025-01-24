@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,16 +11,14 @@ use crate::{
     float_either_infinity, float_either_zero, float_infinity, float_nan, float_zero, Float,
 };
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, Square, SquareAssign};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, IsPowerOf2, Square, SquareAssign,
+};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_square::{
     square_float_significand_in_place, square_float_significand_ref,
 };
-
-pub fn square_prec_round_naive(x: Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    x.clone().mul_prec_round(x, prec, rm)
-}
 
 impl Float {
     /// Squares a [`Float`], rounding the result to the specified precision and with the specified
@@ -46,6 +44,28 @@ impl Float {
     /// - $f(\text{NaN},p,m)=\text{NaN}$
     /// - $f(\pm\infty,p,m)=\infty$
     /// - $f(\pm0.0,p,m)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::square_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
@@ -124,6 +144,28 @@ impl Float {
     /// - $f(\pm\infty,p,m)=\infty$
     /// - $f(\pm0.0,p,m)=0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::square_prec_ref`] instead. If
     /// you know that your target precision is the precision of the input, consider using
     /// [`Float::square_round_ref`] instead. If both of these things are true, consider using
@@ -184,12 +226,46 @@ impl Float {
                 significand: x,
                 ..
             }) => {
+                let twice_exp = x_exp << 1;
+                if twice_exp - 1 > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float squaring");
+                    return match rm {
+                        Ceiling | Up | Nearest => (float_infinity!(), Greater),
+                        _ => (Float::max_finite_value_with_prec(prec), Less),
+                    };
+                } else if twice_exp < Float::MIN_EXPONENT - 1 {
+                    assert!(rm != Exact, "Inexact Float squaring");
+                    return match rm {
+                        Floor | Down | Nearest => (float_zero!(), Less),
+                        _ => (Float::min_positive_value_prec(prec), Greater),
+                    };
+                }
                 let (square, exp_offset, o) = square_float_significand_ref(x, *x_prec, prec, rm);
                 let exp = x_exp
                     .arithmetic_checked_shl(1u32)
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
+                if exp > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float squaring");
+                    return match rm {
+                        Ceiling | Up | Nearest => (float_infinity!(), Greater),
+                        _ => (Float::max_finite_value_with_prec(prec), Less),
+                    };
+                } else if exp < Float::MIN_EXPONENT {
+                    return if rm == Nearest
+                        && exp == Float::MIN_EXPONENT - 1
+                        && (o == Less || !square.is_power_of_2())
+                    {
+                        (Float::min_positive_value_prec(prec), Greater)
+                    } else {
+                        match rm {
+                            Exact => panic!("Inexact float squaring"),
+                            Ceiling | Up => (Float::min_positive_value_prec(prec), Greater),
+                            _ => (float_zero!(), Less),
+                        }
+                    };
+                }
                 (
                     Float(Finite {
                         sign: true,
@@ -225,6 +301,14 @@ impl Float {
     /// - $f(\text{NaN},p)=\text{NaN}$
     /// - $f(\pm\infty,p)=\infty$
     /// - $f(\pm0.0,p)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_round`] instead. If you know that your target precision is the
@@ -279,6 +363,14 @@ impl Float {
     /// - $f(\text{NaN},p)=\text{NaN}$
     /// - $f(\pm\infty,p)=\infty$
     /// - $f(\pm0.0,p)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_round_ref`] instead. If you know that your target precision is the
@@ -335,6 +427,28 @@ impl Float {
     /// - $f(\pm\infty,m)=\infty$
     /// - $f(\pm0.0,m)=0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
     /// If you want to specify an output precision, consider using [`Float::square_prec_round`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
     /// [`Float::square`] instead.
@@ -358,15 +472,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = Float::from(PI).square_round(Floor);
-    /// assert_eq!(square.to_string(), "9.869604401089356");
+    /// assert_eq!(square.to_string(), "9.86960440108935");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_round(Ceiling);
-    /// assert_eq!(square.to_string(), "9.869604401089358");
+    /// assert_eq!(square.to_string(), "9.86960440108936");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_round(Nearest);
-    /// assert_eq!(square.to_string(), "9.869604401089358");
+    /// assert_eq!(square.to_string(), "9.86960440108936");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -399,6 +513,28 @@ impl Float {
     /// - $f(\pm\infty,m)=\infty$
     /// - $f(\pm0.0,m)=0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
     /// If you want to specify an output precision, consider using [`Float::square_prec_round_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
     /// `(&Float).square()` instead.
@@ -422,15 +558,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = Float::from(PI).square_round_ref(Floor);
-    /// assert_eq!(square.to_string(), "9.869604401089356");
+    /// assert_eq!(square.to_string(), "9.86960440108935");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_round_ref(Ceiling);
-    /// assert_eq!(square.to_string(), "9.869604401089358");
+    /// assert_eq!(square.to_string(), "9.86960440108936");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_round_ref(Nearest);
-    /// assert_eq!(square.to_string(), "9.869604401089358");
+    /// assert_eq!(square.to_string(), "9.86960440108936");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -458,7 +594,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::square_prec_round`] documentation for information on special cases.
+    /// See the [`Float::square_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::square_prec_assign`] instead.
     /// If you know that your target precision is the precision of the input, consider using
@@ -522,13 +659,74 @@ impl Float {
                 precision: ref mut x_prec,
                 significand: ref mut x,
             }) => {
+                let twice_exp = *x_exp << 1;
+                if twice_exp - 1 > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float squaring");
+                    return match rm {
+                        Ceiling | Up | Nearest => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        _ => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                    };
+                } else if twice_exp < Float::MIN_EXPONENT - 1 {
+                    assert!(rm != Exact, "Inexact Float squaring");
+                    return match rm {
+                        Floor | Down | Nearest => {
+                            *self = float_zero!();
+                            Less
+                        }
+                        _ => {
+                            *self = Float::min_positive_value_prec(prec);
+                            Greater
+                        }
+                    };
+                }
                 let (exp_offset, o) = square_float_significand_in_place(x, *x_prec, prec, rm);
-                *x_sign = true;
                 *x_exp = x_exp
                     .arithmetic_checked_shl(1u32)
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
+                if *x_exp > Float::MAX_EXPONENT {
+                    assert!(rm != Exact, "Inexact Float squaring");
+                    return match rm {
+                        Ceiling | Up | Nearest => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        _ => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                    };
+                } else if *x_exp < Float::MIN_EXPONENT {
+                    return if rm == Nearest
+                        && *x_exp == Float::MIN_EXPONENT - 1
+                        && (o == Less || !x.is_power_of_2())
+                    {
+                        {
+                            *self = Float::min_positive_value_prec(prec);
+                            Greater
+                        }
+                    } else {
+                        match rm {
+                            Exact => panic!("Inexact float squaring"),
+                            Ceiling | Up => {
+                                *self = Float::min_positive_value_prec(prec);
+                                Greater
+                            }
+                            _ => {
+                                *self = float_zero!();
+                                Less
+                            }
+                        }
+                    };
+                }
+                *x_sign = true;
                 *x_prec = prec;
                 o
             }
@@ -552,7 +750,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::square_prec`] documentation for information on special cases.
+    /// See the [`Float::square_prec`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_round_assign`] instead. If you know that your target precision is the
@@ -604,7 +803,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
-    /// See the [`Float::square_round`] documentation for information on special cases.
+    /// See the [`Float::square_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::square_prec_round_assign`] instead. If you know you'll be using the `Nearest`
@@ -630,15 +830,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "9.869604401089356");
+    /// assert_eq!(x.to_string(), "9.86960440108935");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "9.869604401089358");
+    /// assert_eq!(x.to_string(), "9.86960440108936");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_round_assign(Nearest), Greater);
-    /// assert_eq!(x.to_string(), "9.869604401089358");
+    /// assert_eq!(x.to_string(), "9.86960440108936");
     /// ```
     #[inline]
     pub fn square_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -669,6 +869,14 @@ impl Square for Float {
     /// - $f(\pm\infty)=\infty$
     /// - $f(\pm0.0)=0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec`] instead. If you want to specify the output precision, consider using
     /// [`Float::square_round`]. If you want both of these things, consider using
@@ -690,8 +898,8 @@ impl Square for Float {
     /// assert!(Float::NAN.square().is_nan());
     /// assert_eq!(Float::INFINITY.square(), Float::INFINITY);
     /// assert_eq!(Float::NEGATIVE_INFINITY.square(), Float::INFINITY);
-    /// assert_eq!(Float::from(1.5).square(), 2.25);
-    /// assert_eq!(Float::from(-1.5).square(), 2.25);
+    /// assert_eq!(Float::from(1.5).square(), 2.0);
+    /// assert_eq!(Float::from(-1.5).square(), 2.0);
     /// ```
     #[inline]
     fn square(self) -> Float {
@@ -700,7 +908,7 @@ impl Square for Float {
     }
 }
 
-impl<'a> Square for &'a Float {
+impl Square for &Float {
     type Output = Float;
 
     /// Squares a [`Float`], taking it by reference.
@@ -721,6 +929,14 @@ impl<'a> Square for &'a Float {
     /// - $f(\text{NaN})=\text{NaN}$
     /// - $f(\pm\infty)=\infty$
     /// - $f(\pm0.0)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_ref`] instead. If you want to specify the output precision, consider
@@ -743,8 +959,8 @@ impl<'a> Square for &'a Float {
     /// assert!((&Float::NAN).square().is_nan());
     /// assert_eq!((&Float::INFINITY).square(), Float::INFINITY);
     /// assert_eq!((&Float::NEGATIVE_INFINITY).square(), Float::INFINITY);
-    /// assert_eq!((&Float::from(1.5)).square(), 2.25);
-    /// assert_eq!((&Float::from(-1.5)).square(), 2.25);
+    /// assert_eq!((&Float::from(1.5)).square(), 2.0);
+    /// assert_eq!((&Float::from(-1.5)).square(), 2.0);
     /// ```
     #[inline]
     fn square(self) -> Float {
@@ -768,7 +984,8 @@ impl SquareAssign for Float {
     /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// See the [`Float::square`] documentation for information on special cases.
+    /// See the [`Float::square`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_assign`] instead. If you want to specify the output precision, consider
@@ -802,11 +1019,11 @@ impl SquareAssign for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x.square_assign();
-    /// assert_eq!(x, 2.25);
+    /// assert_eq!(x, 2.0);
     ///
     /// let mut x = Float::from(-1.5);
     /// x.square_assign();
-    /// assert_eq!(x, 2.25);
+    /// assert_eq!(x, 2.0);
     /// ```
     #[inline]
     fn square_assign(&mut self) {

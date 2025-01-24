@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::*;
@@ -17,39 +17,11 @@ use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::Rational;
-use std::cmp::{max, Ordering::*};
+use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;
-
-#[test]
-fn test_from_natural() {
-    let test = |s, out, out_hex| {
-        let u = Natural::from_str(s).unwrap();
-
-        let x = Float::from(u.clone());
-        assert!(x.is_valid());
-        assert_eq!(x.to_string(), out);
-        assert_eq!(to_hex_string(&x), out_hex);
-
-        let x = Float::from(&u);
-        assert!(x.is_valid());
-        assert_eq!(x.to_string(), out);
-        assert_eq!(to_hex_string(&x), out_hex);
-
-        let rug_x = rug::Float::with_val(
-            max(1, u32::exact_from(u.significant_bits())),
-            rug::Integer::from(&u),
-        );
-        let x = Float::exact_from(&rug_x);
-        assert_eq!(x.to_string(), out);
-        assert_eq!(to_hex_string(&x), out_hex);
-    };
-    test("0", "0.0", "0x0.0");
-    test("1", "1.0", "0x1.0#1");
-    test("123", "123.0", "0x7b.0#7");
-    test("1000000000000", "1000000000000.0", "0xe8d4a51000.0#40");
-}
 
 #[test]
 fn test_from_natural_prec() {
@@ -93,6 +65,67 @@ fn test_from_natural_prec() {
         64,
         "2.8990594813843508038e20",
         "0xf.b740d3d8283d70cE+16#64",
+        Less,
+    );
+
+    let test_big = |u: Natural, prec, out, out_hex, out_o| {
+        let (x, o) = Float::from_natural_prec(u.clone(), prec);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = Float::from_natural_prec_ref(&u, prec);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let rug_x = rug::Float::with_val(u32::exact_from(prec), rug::Integer::from(&u));
+        let x = Float::exact_from(&rug_x);
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+    };
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        10,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        1,
+        "too_big",
+        "0x4.0E+268435455#1",
         Less,
     );
 }
@@ -338,6 +371,289 @@ fn test_from_natural_prec_round() {
         "0x2.3a88E+18#15",
         Less,
     );
+    let test_big = |u: Natural, prec, rm, out, out_hex, out_o| {
+        let (x, o) = Float::from_natural_prec_round(u.clone(), prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        let (x, o) = Float::from_natural_prec_round_ref(&u, prec, rm);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+        assert_eq!(to_hex_string(&x), out_hex);
+        assert_eq!(o, out_o);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_x, o) =
+                rug::Float::with_val_round(u32::exact_from(prec), rug::Integer::from(&u), rm);
+            let x = Float::exact_from(&rug_x);
+            assert_eq!(x.to_string(), out);
+            assert_eq!(to_hex_string(&x), out_hex);
+            assert_eq!(o, out_o);
+        }
+    };
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        Floor,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        Ceiling,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        Down,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        Up,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        Nearest,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(1000),
+        10,
+        Exact,
+        "1.072e301",
+        "0x1.000E+250#10",
+        Equal,
+    );
+
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        10,
+        Floor,
+        "too_big",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        10,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        10,
+        Down,
+        "too_big",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        10,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        Floor,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        Ceiling,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        Down,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        Up,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        Nearest,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        10,
+        Exact,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        1,
+        Nearest,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
 }
 
 #[test]
@@ -362,69 +678,112 @@ fn from_natural_prec_round_ref_fail() {
     ));
 }
 
+#[allow(clippy::needless_borrow)]
 #[test]
-fn test_from_natural_min_prec() {
+fn test_try_from_natural() {
     let test = |s, out, out_hex| {
-        let u = Natural::from_str(s).unwrap();
+        let x = Natural::from_str(s).unwrap();
 
-        let x = Float::from_natural_min_prec(u.clone());
-        assert!(x.is_valid());
-        assert_eq!(x.to_string(), out);
-        assert_eq!(to_hex_string(&x), out_hex);
+        let of = Float::try_from(x.clone());
+        assert!(of.as_ref().map_or(true, Float::is_valid));
+        let ofs = of.as_ref().map(ToString::to_string);
+        assert_eq!(ofs.as_ref().map(String::as_str), out);
+        let ofs = of.map(|f| to_hex_string(&f));
+        assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
 
-        let x = Float::from_natural_min_prec_ref(&u);
-        assert!(x.is_valid());
-        assert_eq!(x.to_string(), out);
-        assert_eq!(to_hex_string(&x), out_hex);
+        let of = Float::try_from(&x);
+        assert!(of.as_ref().map_or(true, Float::is_valid));
+        let ofs = of.as_ref().map(ToString::to_string);
+        assert_eq!(ofs.as_ref().map(String::as_str), out);
+        let ofs = of.map(|f| to_hex_string(&f));
+        assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
     };
-    test("0", "0.0", "0x0.0");
-    test("1", "1.0", "0x1.0#1");
-    test("123", "123.0", "0x7b.0#7");
-    test("1000000000000", "1.0e12", "0xe.8d4a51E+9#28");
+    test("0", Ok("0.0"), Ok("0x0.0"));
+    test("1", Ok("1.0"), Ok("0x1.0#1"));
+    test("123", Ok("123.0"), Ok("0x7b.0#7"));
+    test("1000000000000", Ok("1.0e12"), Ok("0xe.8d4a51E+9#28"));
+
+    let test_big = |x: Natural, out, out_hex| {
+        let of = Float::try_from(x.clone());
+        assert!(of.as_ref().map_or(true, Float::is_valid));
+        let ofs = of.as_ref().map(ToString::to_string);
+        assert_eq!(ofs.as_ref().map(String::as_str), out);
+        let ofs = of.map(|f| to_hex_string(&f));
+        assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
+
+        let of = Float::try_from(&x);
+        assert!(of.as_ref().map_or(true, Float::is_valid));
+        let ofs = of.as_ref().map(ToString::to_string);
+        assert_eq!(ofs.as_ref().map(String::as_str), out);
+        let ofs = of.map(|f| to_hex_string(&f));
+        assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
+    };
+    test_big(Natural::power_of_2(1000), Ok("1.0e301"), Ok("0x1.0E+250#1"));
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        Err(&&FloatConversionError::Overflow),
+        Err(&&FloatConversionError::Overflow),
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        Ok("too_big"),
+        Ok("0x4.0E+268435455#1"),
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        Ok("too_big"),
+        Ok("0x6.0E+268435455#2"),
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        Ok("too_big"),
+        Ok("0x6.008E+268435455#12"),
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        Ok("too_big"),
+        Ok("0x5.ff8E+268435455#12"),
+    );
 }
 
 #[test]
-fn from_natural_properties() {
-    natural_gen().test_properties(|n| {
-        let float_n = Float::from(n.clone());
-        assert!(float_n.is_valid());
+fn test_convertible_from_natural() {
+    let test = |s, out| {
+        let x = Natural::from_str(s).unwrap();
+        assert_eq!(Float::convertible_from(&x), out);
+    };
+    test("0", true);
+    test("1", true);
+    test("123", true);
 
-        let float_n_alt = Float::from(&n);
-        assert!(float_n_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&float_n_alt),
-            ComparableFloatRef(&float_n)
-        );
-        assert_eq!(float_n, n);
-
-        let rug_n = rug::Float::with_val(
-            max(1, u32::exact_from(n.significant_bits())),
-            rug::Integer::from(&n),
-        );
-        assert_eq!(
-            ComparableFloatRef(&float_n),
-            ComparableFloatRef(&Float::from(&rug_n))
-        );
-
-        assert_eq!(
-            ComparableFloatRef(&Float::from(Integer::from(&n))),
-            ComparableFloatRef(&float_n)
-        );
-
-        assert_eq!(
-            float_n.get_prec(),
-            if n == 0u32 {
-                None
-            } else {
-                Some(n.significant_bits())
-            }
-        );
-        assert_eq!(Natural::exact_from(&float_n), n);
-        let bits = max(1, n.significant_bits());
-        let (f, o) = Float::from_natural_prec(n, bits);
-        assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
-        assert_eq!(o, Equal);
-    });
+    let test_big = |x: Natural, out| {
+        assert_eq!(Float::convertible_from(&x), out);
+    };
+    test_big(Natural::power_of_2(1000), true);
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
+        false,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT)) - Natural::ONE,
+        true,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
+        true,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Natural::from(3u8),
+        true,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3073u16),
+        true,
+    );
+    test_big(
+        Natural::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Natural::from(3071u16),
+        true,
+    );
 }
 
 #[test]
@@ -549,28 +908,23 @@ fn from_natural_prec_round_properties() {
 }
 
 #[test]
-fn from_natural_min_prec_properties() {
-    natural_gen().test_properties(|n| {
-        let float_n = Float::from_natural_min_prec(n.clone());
-        assert!(float_n.is_valid());
-
-        let float_n_alt = Float::from_natural_min_prec_ref(&n);
-        assert!(float_n_alt.is_valid());
+fn float_try_from_natural_properties() {
+    natural_gen().test_properties(|x| {
+        let of = Float::try_from(&x);
+        assert!(of.as_ref().map_or(true, Float::is_valid));
         assert_eq!(
-            ComparableFloatRef(&float_n_alt),
-            ComparableFloatRef(&float_n)
+            Float::try_from(x.clone()).map(ComparableFloat),
+            of.clone().map(ComparableFloat)
         );
-        assert_eq!(float_n, n);
+        if let Ok(f) = of {
+            assert_eq!(-x, -f);
+        }
+    });
+}
 
-        assert_eq!(float_n.get_min_prec(), float_n.get_prec());
-
-        assert_eq!(
-            ComparableFloatRef(&Float::from_integer_min_prec(Integer::from(&n))),
-            ComparableFloatRef(&float_n)
-        );
-        let prec = Float::from(&n).get_min_prec().unwrap_or(1);
-        let (f, o) = Float::from_natural_prec(n, prec);
-        assert_eq!(ComparableFloat(f), ComparableFloat(float_n));
-        assert_eq!(o, Equal);
+#[test]
+fn float_convertible_from_natural_properties() {
+    natural_gen().test_properties(|x| {
+        assert_eq!(Float::convertible_from(&x), Float::try_from(&x).is_ok());
     });
 }

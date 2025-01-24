@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
-    float_natural_pair_gen, float_natural_pair_gen_var_1,
+    float_natural_pair_gen, float_natural_pair_gen_var_1, float_natural_pair_gen_var_2,
 };
 use malachite_float::Float;
 use malachite_nz::natural::Natural;
@@ -150,19 +150,28 @@ fn test_partial_eq_natural() {
     test("-4.0e-121", "-0x1.0E-100#1", s, false);
 }
 
+#[allow(clippy::needless_pass_by_value, clippy::cmp_owned)]
+fn partial_eq_natural_properties_helper(x: Float, y: Natural) {
+    let eq = x == y;
+    assert_eq!(y == x, eq);
+    assert_eq!(x == Float::exact_from(&y), eq);
+    assert_eq!(rug::Float::exact_from(&x) == rug::Integer::from(&y), eq);
+}
+
 #[allow(clippy::cmp_owned)]
 #[test]
 fn partial_eq_natural_properties() {
     float_natural_pair_gen().test_properties(|(x, y)| {
-        let eq = x == y;
-        assert_eq!(y == x, eq);
-        assert_eq!(x == Float::from(&y), eq);
-        assert_eq!(rug::Float::exact_from(&x) == rug::Integer::from(&y), eq);
+        partial_eq_natural_properties_helper(x, y);
+    });
+
+    float_natural_pair_gen_var_2().test_properties(|(x, y)| {
+        partial_eq_natural_properties_helper(x, y);
     });
 
     natural_pair_gen().test_properties(|(x, y)| {
-        assert_eq!(Float::from(&x) == y, x == y);
-        assert_eq!(x == Float::from(&y), x == y);
+        assert_eq!(Float::exact_from(&x) == y, x == y);
+        assert_eq!(x == Float::exact_from(&y), x == y);
     });
 
     float_natural_pair_gen_var_1().test_properties(|(x, y)| {

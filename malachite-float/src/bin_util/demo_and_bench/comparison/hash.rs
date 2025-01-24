@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,12 +11,14 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::hash::hash;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
-use malachite_float::test_util::generators::float_gen;
+use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_comparable_float_hash);
     register_demo!(runner, demo_comparable_float_hash_debug);
+    register_demo!(runner, demo_comparable_float_hash_extreme);
+    register_demo!(runner, demo_comparable_float_hash_extreme_debug);
     register_demo!(runner, demo_comparable_float_ref_hash);
     register_demo!(runner, demo_comparable_float_ref_hash_debug);
 
@@ -32,6 +34,19 @@ fn demo_comparable_float_hash(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_comparable_float_hash_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        let cx = ComparableFloat(x);
+        println!("hash({:#x}) = {}", cx, hash(&cx));
+    }
+}
+
+fn demo_comparable_float_hash_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("hash({}) = {}", x.clone(), hash(&ComparableFloat(x)));
+    }
+}
+
+fn demo_comparable_float_hash_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         let cx = ComparableFloat(x);
         println!("hash({:#x}) = {}", cx, hash(&cx));
     }

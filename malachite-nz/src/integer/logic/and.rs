@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -889,7 +889,7 @@ impl BitAnd<Integer> for Integer {
     }
 }
 
-impl<'a> BitAnd<&'a Integer> for Integer {
+impl BitAnd<&Integer> for Integer {
     type Output = Integer;
 
     /// Takes the bitwise and of two [`Integer`]s, taking the first by value and the second by
@@ -920,13 +920,13 @@ impl<'a> BitAnd<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn bitand(mut self, other: &'a Integer) -> Integer {
+    fn bitand(mut self, other: &Integer) -> Integer {
         self &= other;
         self
     }
 }
 
-impl<'a> BitAnd<Integer> for &'a Integer {
+impl BitAnd<Integer> for &Integer {
     type Output = Integer;
 
     /// Takes the bitwise and of two [`Integer`]s, taking the first by reference and the seocnd by
@@ -963,7 +963,7 @@ impl<'a> BitAnd<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
+impl BitAnd<&Integer> for &Integer {
     type Output = Integer;
 
     /// Takes the bitwise and of two [`Integer`]s, taking both by reference.
@@ -992,7 +992,7 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     ///     -1000000004096i64
     /// );
     /// ```
-    fn bitand(self, other: &'a Integer) -> Integer {
+    fn bitand(self, other: &Integer) -> Integer {
         match (self.sign, other.sign) {
             (true, true) => Integer {
                 sign: true,
@@ -1055,7 +1055,7 @@ impl BitAndAssign<Integer> for Integer {
     }
 }
 
-impl<'a> BitAndAssign<&'a Integer> for Integer {
+impl BitAndAssign<&Integer> for Integer {
     /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -1083,7 +1083,7 @@ impl<'a> BitAndAssign<&'a Integer> for Integer {
     /// x &= &Integer::from(0x7ffffff0);
     /// assert_eq!(x, 0x70f0f0f0);
     /// ```
-    fn bitand_assign(&mut self, other: &'a Integer) {
+    fn bitand_assign(&mut self, other: &Integer) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitand_assign(&other.abs),
             (true, false) => self.abs.and_assign_pos_neg(&other.abs),

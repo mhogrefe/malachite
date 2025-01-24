@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -55,7 +55,7 @@ impl NextPowerOf2 for Rational {
     }
 }
 
-impl<'a> NextPowerOf2 for &'a Rational {
+impl NextPowerOf2 for &Rational {
     type Output = Rational;
 
     /// Finds the smallest power of 2 greater than or equal to a [`Rational`]. The [`Rational`] is

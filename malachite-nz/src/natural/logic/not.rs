@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -103,7 +103,7 @@ impl Not for Natural {
     }
 }
 
-impl<'a> Not for &'a Natural {
+impl Not for &Natural {
     type Output = Integer;
 
     /// Returns the bitwise negation of a [`Natural`], taking it by reference and returning an

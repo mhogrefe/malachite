@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -33,6 +33,9 @@ impl Float {
     ///
     /// This function reads `prec + z` bits, or `prec + z + 1` bits if `rm` is `Nearest`, where `z`
     /// is the number of leading false bits in `bits`.
+    ///
+    /// This function always produces a value in the interval $[1/2,1]$. In particular, it never
+    /// overflows or underflows.
     ///
     /// $$
     /// f((x_k),p,m) = C+\varepsilon,
@@ -175,8 +178,11 @@ impl Float {
     /// The approximation has precision `prec` and is rounded according to the `Nearest` rounding
     /// mode.
     ///
-    ///  This function reads `prec + z + 1` bits, where `z` is the number of leading false bits in
-    ///  `bits`.
+    /// This function reads `prec + z + 1` bits, where `z` is the number of leading false bits in
+    /// `bits`.
+    ///
+    /// This function always produces a value in the interval $[1/2,1]$. In particular, it never
+    /// overflows or underflows.
     ///
     /// $$
     /// f((x_k),p,m) = C+\varepsilon,

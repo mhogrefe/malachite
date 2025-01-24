@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,7 +14,8 @@ use malachite_base::{apply_fn_to_signeds, apply_fn_to_unsigneds};
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
     float_float_signed_triple_gen, float_float_unsigned_triple_gen, float_signed_pair_gen,
-    float_signed_signed_triple_gen, float_unsigned_pair_gen, float_unsigned_unsigned_triple_gen,
+    float_signed_pair_gen_var_4, float_signed_signed_triple_gen, float_unsigned_pair_gen,
+    float_unsigned_pair_gen_var_5, float_unsigned_unsigned_triple_gen,
 };
 use malachite_float::Float;
 use rug;
@@ -896,6 +897,29 @@ fn test_partial_cmp_i64() {
     test("-4.0e-121", "-0x1.0E-100#1", -100, Some(Greater));
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_cmp_primitive_int_properties_helper_unsigned_helper<
+    T: PartialOrd<Float> + PartialOrd<rug::Float> + PrimitiveUnsigned,
+>(
+    n: Float,
+    u: T,
+) where
+    Float: From<T> + PartialOrd<T>,
+    rug::Float: PartialOrd<T>,
+{
+    let cmp = n.partial_cmp(&u);
+    assert_eq!(rug::Float::exact_from(&n).partial_cmp(&u), cmp);
+    assert_eq!(PartialOrd::<Float>::partial_cmp(&n, &Float::from(u)), cmp);
+
+    let cmp_rev = cmp.map(Ordering::reverse);
+    assert_eq!(u.partial_cmp(&n), cmp_rev);
+    assert_eq!(u.partial_cmp(&rug::Float::exact_from(&n)), cmp_rev);
+    assert_eq!(
+        PartialOrd::<Float>::partial_cmp(&Float::from(u), &n),
+        cmp_rev
+    );
+}
+
 #[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_primitive_int_properties_helper_unsigned<
     T: PartialOrd<Float> + PartialOrd<rug::Float> + PrimitiveUnsigned,
@@ -905,17 +929,11 @@ where
     rug::Float: PartialOrd<T>,
 {
     float_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
-        let cmp = n.partial_cmp(&u);
-        assert_eq!(rug::Float::exact_from(&n).partial_cmp(&u), cmp);
-        assert_eq!(PartialOrd::<Float>::partial_cmp(&n, &Float::from(u)), cmp);
+        partial_cmp_primitive_int_properties_helper_unsigned_helper(n, u);
+    });
 
-        let cmp_rev = cmp.map(Ordering::reverse);
-        assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&rug::Float::exact_from(&n)), cmp_rev);
-        assert_eq!(
-            PartialOrd::<Float>::partial_cmp(&Float::from(u), &n),
-            cmp_rev
-        );
+    float_unsigned_pair_gen_var_5::<T>().test_properties(|(n, u)| {
+        partial_cmp_primitive_int_properties_helper_unsigned_helper(n, u);
     });
 
     float_float_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
@@ -940,6 +958,29 @@ where
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_cmp_primitive_int_properties_helper_signed_helper<
+    T: PartialOrd<Float> + PartialOrd<rug::Float> + PrimitiveSigned,
+>(
+    n: Float,
+    i: T,
+) where
+    Float: From<T> + PartialOrd<T>,
+    rug::Float: PartialOrd<T>,
+{
+    let cmp = n.partial_cmp(&i);
+    assert_eq!(rug::Float::exact_from(&n).partial_cmp(&i), cmp);
+    assert_eq!(PartialOrd::<Float>::partial_cmp(&n, &Float::from(i)), cmp);
+
+    let cmp_rev = cmp.map(Ordering::reverse);
+    assert_eq!(i.partial_cmp(&n), cmp_rev);
+    assert_eq!(i.partial_cmp(&rug::Float::exact_from(&n)), cmp_rev);
+    assert_eq!(
+        PartialOrd::<Float>::partial_cmp(&Float::from(i), &n),
+        cmp_rev
+    );
+}
+
 #[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_primitive_int_properties_helper_signed<
     T: PartialOrd<Float> + PartialOrd<rug::Float> + PrimitiveSigned,
@@ -949,17 +990,11 @@ where
     rug::Float: PartialOrd<T>,
 {
     float_signed_pair_gen::<T>().test_properties(|(n, i)| {
-        let cmp = n.partial_cmp(&i);
-        assert_eq!(rug::Float::exact_from(&n).partial_cmp(&i), cmp);
-        assert_eq!(PartialOrd::<Float>::partial_cmp(&n, &Float::from(i)), cmp);
+        partial_cmp_primitive_int_properties_helper_signed_helper(n, i);
+    });
 
-        let cmp_rev = cmp.map(Ordering::reverse);
-        assert_eq!(i.partial_cmp(&n), cmp_rev);
-        assert_eq!(i.partial_cmp(&rug::Float::exact_from(&n)), cmp_rev);
-        assert_eq!(
-            PartialOrd::<Float>::partial_cmp(&Float::from(i), &n),
-            cmp_rev
-        );
+    float_signed_pair_gen_var_4::<T>().test_properties(|(n, i)| {
+        partial_cmp_primitive_int_properties_helper_signed_helper(n, i);
     });
 
     float_float_signed_triple_gen::<T>().test_properties(|(n, m, i)| {

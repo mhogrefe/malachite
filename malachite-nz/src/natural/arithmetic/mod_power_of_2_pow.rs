@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -164,7 +164,7 @@ impl ModPowerOf2Pow<Natural> for Natural {
     }
 }
 
-impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
+impl ModPowerOf2Pow<&Natural> for Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
@@ -204,7 +204,7 @@ impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
     }
 }
 
-impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
+impl ModPowerOf2Pow<Natural> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
@@ -243,7 +243,7 @@ impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
+impl ModPowerOf2Pow<&Natural> for &Natural {
     type Output = Natural;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
@@ -339,7 +339,7 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
     }
 }
 
-impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
+impl ModPowerOf2PowAssign<&Natural> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be already
     /// reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///

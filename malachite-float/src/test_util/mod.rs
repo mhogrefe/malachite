@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,9 @@
 pub mod arithmetic;
 pub mod bench;
 pub mod common;
+pub mod comparison;
 pub mod constants;
+pub mod conversion;
 pub mod exhaustive;
 pub mod extra_variadic;
 pub mod generators;

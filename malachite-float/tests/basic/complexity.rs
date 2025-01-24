@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -8,7 +8,8 @@
 
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::float_gen;
+use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
+use malachite_float::Float;
 
 #[test]
 fn test_complexity() {
@@ -32,6 +33,8 @@ fn test_complexity() {
     test("3.1415926535897931", "0x3.243f6a8885a30#53", 53);
     test("3.0e120", "0x1.0E+100#1", 400);
     test("4.0e-121", "0x1.0E-100#1", 400);
+    test("too_big", "0x4.0E+268435455#1", 1073741822);
+    test("too_small", "0x1.0E-268435456#1", 1073741824);
 
     test("-1.0", "-0x1.0#1", 1);
     test("-2.0", "-0x2.0#1", 1);
@@ -41,6 +44,8 @@ fn test_complexity() {
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", 53);
     test("-3.0e120", "-0x1.0E+100#1", 400);
     test("-4.0e-121", "-0x1.0E-100#1", 400);
+    test("-too_big", "-0x4.0E+268435455#1", 1073741822);
+    test("-too_small", "-0x1.0E-268435456#1", 1073741824);
 }
 
 #[test]
@@ -65,6 +70,8 @@ fn test_significant_bits() {
     test("3.1415926535897931", "0x3.243f6a8885a30#53", 53);
     test("3.0e120", "0x1.0E+100#1", 1);
     test("4.0e-121", "0x1.0E-100#1", 1);
+    test("too_big", "0x4.0E+268435455#1", 1);
+    test("too_small", "0x1.0E-268435456#1", 1);
 
     test("-1.0", "-0x1.0#1", 1);
     test("-2.0", "-0x2.0#1", 1);
@@ -74,23 +81,42 @@ fn test_significant_bits() {
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", 53);
     test("-3.0e120", "-0x1.0E+100#1", 1);
     test("-4.0e-121", "-0x1.0E-100#1", 1);
+    test("-too_big", "-0x4.0E+268435455#1", 1);
+    test("-too_small", "-0x1.0E-268435456#1", 1);
+}
+
+fn complexity_properties_helper(x: Float) {
+    let complexity = x.complexity();
+    assert_ne!(complexity, 0);
+    assert_eq!((-x).complexity(), complexity);
 }
 
 #[test]
 fn complexity_properties() {
     float_gen().test_properties(|x| {
-        let complexity = x.complexity();
-        assert_ne!(complexity, 0);
-        assert_eq!((-x).complexity(), complexity);
+        complexity_properties_helper(x);
     });
+
+    float_gen_var_12().test_properties(|x| {
+        complexity_properties_helper(x);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn significant_bits_properties_helper(x: Float) {
+    let bits = x.significant_bits();
+    assert_ne!(bits, 0);
+    assert_eq!((-&x).significant_bits(), bits);
+    assert!(bits <= x.complexity());
 }
 
 #[test]
 fn significant_bits_properties() {
     float_gen().test_properties(|x| {
-        let bits = x.significant_bits();
-        assert_ne!(bits, 0);
-        assert_eq!((-&x).significant_bits(), bits);
-        assert!(bits <= x.complexity());
+        significant_bits_properties_helper(x);
+    });
+
+    float_gen_var_12().test_properties(|x| {
+        significant_bits_properties_helper(x);
     });
 }

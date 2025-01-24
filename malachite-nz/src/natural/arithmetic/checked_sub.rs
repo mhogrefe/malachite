@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -247,7 +247,7 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
     }
 }
 
-impl<'a> CheckedSub<Natural> for &'a Natural {
+impl CheckedSub<Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -308,7 +308,7 @@ impl<'a> CheckedSub<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
+impl CheckedSub<&Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference and returning
@@ -360,7 +360,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
     ///     "Some(2000000000000)"
     /// );
     /// ```
-    fn checked_sub(self, other: &'a Natural) -> Option<Natural> {
+    fn checked_sub(self, other: &Natural) -> Option<Natural> {
         match (self, other) {
             (x, y) if core::ptr::eq(x, y) => Some(Natural::ZERO),
             (x, &Natural::ZERO) => Some(x.clone()),

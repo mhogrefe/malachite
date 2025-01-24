@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -110,7 +110,7 @@ impl<'a> AbsDiff<&'a Natural> for Natural {
     }
 }
 
-impl<'a> AbsDiff<Natural> for &'a Natural {
+impl AbsDiff<Natural> for &Natural {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Natural`]s, taking the first by
@@ -164,7 +164,7 @@ impl<'a> AbsDiff<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> AbsDiff<&'a Natural> for &'b Natural {
+impl AbsDiff<&Natural> for &Natural {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Natural`]s, taking both by
@@ -209,7 +209,7 @@ impl<'a, 'b> AbsDiff<&'a Natural> for &'b Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn abs_diff(self, other: &'a Natural) -> Natural {
+    fn abs_diff(self, other: &Natural) -> Natural {
         if self >= other {
             self - other
         } else {

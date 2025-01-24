@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -56,7 +56,7 @@ impl Div<Integer> for Integer {
     }
 }
 
-impl<'a> Div<&'a Integer> for Integer {
+impl Div<&Integer> for Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
@@ -94,13 +94,13 @@ impl<'a> Div<&'a Integer> for Integer {
     /// assert_eq!(Integer::from(-23) / &Integer::from(-10), 2);
     /// ```
     #[inline]
-    fn div(mut self, other: &'a Integer) -> Integer {
+    fn div(mut self, other: &Integer) -> Integer {
         self /= other;
         self
     }
 }
 
-impl<'a> Div<Integer> for &'a Integer {
+impl Div<Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
@@ -143,7 +143,7 @@ impl<'a> Div<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> Div<&'b Integer> for &'a Integer {
+impl Div<&Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference. The quotient is
@@ -181,7 +181,7 @@ impl<'a, 'b> Div<&'b Integer> for &'a Integer {
     /// assert_eq!(&Integer::from(-23) / &Integer::from(-10), 2);
     /// ```
     #[inline]
-    fn div(self, other: &'b Integer) -> Integer {
+    fn div(self, other: &Integer) -> Integer {
         Integer::from_sign_and_abs(self.sign == other.sign, &self.abs / &other.abs)
     }
 }
@@ -236,7 +236,7 @@ impl DivAssign<Integer> for Integer {
     }
 }
 
-impl<'a> DivAssign<&'a Integer> for Integer {
+impl DivAssign<&Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference. The quotient is rounded towards zero. The quotient and
     /// remainder (which is not computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
@@ -280,7 +280,7 @@ impl<'a> DivAssign<&'a Integer> for Integer {
     /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign(&mut self, other: &'a Integer) {
+    fn div_assign(&mut self, other: &Integer) {
         self.abs /= &other.abs;
         self.sign = self.sign == other.sign || self.abs == 0;
     }
@@ -337,7 +337,7 @@ impl CheckedDiv<Integer> for Integer {
     }
 }
 
-impl<'a> CheckedDiv<&'a Integer> for Integer {
+impl CheckedDiv<&Integer> for Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
@@ -380,7 +380,7 @@ impl<'a> CheckedDiv<&'a Integer> for Integer {
     /// assert_eq!(Integer::ONE.checked_div(&Integer::ZERO), None);
     /// ```
     #[inline]
-    fn checked_div(self, other: &'a Integer) -> Option<Integer> {
+    fn checked_div(self, other: &Integer) -> Option<Integer> {
         match (self, other) {
             (_, &integer_zero!()) => None,
             (x, y) => Some(x / y),
@@ -388,7 +388,7 @@ impl<'a> CheckedDiv<&'a Integer> for Integer {
     }
 }
 
-impl<'a> CheckedDiv<Integer> for &'a Integer {
+impl CheckedDiv<Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
@@ -438,7 +438,7 @@ impl<'a> CheckedDiv<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> CheckedDiv<&'b Integer> for &'a Integer {
+impl CheckedDiv<&Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference. The quotient is
@@ -480,7 +480,7 @@ impl<'a, 'b> CheckedDiv<&'b Integer> for &'a Integer {
     /// );
     /// assert_eq!((&Integer::ONE).checked_div(&Integer::ZERO), None);
     /// ```
-    fn checked_div(self, other: &'b Integer) -> Option<Integer> {
+    fn checked_div(self, other: &Integer) -> Option<Integer> {
         match (self, other) {
             (_, &integer_zero!()) => None,
             (x, y) => Some(x / y),

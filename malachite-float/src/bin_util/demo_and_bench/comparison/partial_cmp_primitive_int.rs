@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -16,8 +16,8 @@ use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_unsigned_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_signed_pair_gen, float_signed_pair_gen_rm, float_unsigned_pair_gen,
-    float_unsigned_pair_gen_rm,
+    float_signed_pair_gen, float_signed_pair_gen_rm, float_signed_pair_gen_var_4,
+    float_unsigned_pair_gen, float_unsigned_pair_gen_rm, float_unsigned_pair_gen_var_5,
 };
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
@@ -26,12 +26,20 @@ use std::cmp::Ordering::*;
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_partial_cmp_unsigned);
     register_unsigned_demos!(runner, demo_float_partial_cmp_unsigned_debug);
+    register_unsigned_demos!(runner, demo_float_partial_cmp_unsigned_extreme);
+    register_unsigned_demos!(runner, demo_float_partial_cmp_unsigned_extreme_debug);
     register_unsigned_demos!(runner, demo_unsigned_partial_cmp_float);
     register_unsigned_demos!(runner, demo_unsigned_partial_cmp_float_debug);
+    register_unsigned_demos!(runner, demo_unsigned_partial_cmp_float_extreme);
+    register_unsigned_demos!(runner, demo_unsigned_partial_cmp_float_extreme_debug);
     register_signed_demos!(runner, demo_float_partial_cmp_signed);
     register_signed_demos!(runner, demo_float_partial_cmp_signed_debug);
+    register_signed_demos!(runner, demo_float_partial_cmp_signed_extreme);
+    register_signed_demos!(runner, demo_float_partial_cmp_signed_extreme_debug);
     register_signed_demos!(runner, demo_signed_partial_cmp_float);
     register_signed_demos!(runner, demo_signed_partial_cmp_float_debug);
+    register_signed_demos!(runner, demo_signed_partial_cmp_float_extreme);
+    register_signed_demos!(runner, demo_signed_partial_cmp_float_extreme_debug);
 
     register_unsigned_benches!(
         runner,
@@ -86,6 +94,47 @@ fn demo_float_partial_cmp_unsigned_debug<T: PrimitiveUnsigned>(
     }
 }
 
+fn demo_float_partial_cmp_unsigned_extreme<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+{
+    for (x, y) in float_unsigned_pair_gen_var_5::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{x} and {y} are incomparable"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
+        }
+    }
+}
+
+fn demo_float_partial_cmp_unsigned_extreme_debug<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+{
+    for (x, y) in float_unsigned_pair_gen_var_5::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let cx = ComparableFloatRef(&x);
+        match x.partial_cmp(&y) {
+            None => println!("{cx:#x} and {y:#x} are incomparable"),
+            Some(Less) => println!("{cx:#x} < {y:#x}"),
+            Some(Equal) => println!("{cx:#x} = {y:#x}"),
+            Some(Greater) => println!("{cx:#x} > {y:#x}"),
+        }
+    }
+}
+
 fn demo_unsigned_partial_cmp_float<T: PartialOrd<Float> + PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -107,6 +156,43 @@ fn demo_unsigned_partial_cmp_float_debug<T: PartialOrd<Float> + PrimitiveUnsigne
     limit: usize,
 ) {
     for (y, x) in float_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
+        let cy = ComparableFloatRef(&y);
+        match x.partial_cmp(&y) {
+            None => println!("{x:x} and {cy:#x} are incomparable"),
+            Some(Less) => println!("{x:#x} < {cy:#x}"),
+            Some(Equal) => println!("{x:#x} = {cy:#x}"),
+            Some(Greater) => println!("{x:#x} > {cy:#x}"),
+        }
+    }
+}
+
+fn demo_unsigned_partial_cmp_float_extreme<T: PartialOrd<Float> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_unsigned_pair_gen_var_5::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{x} and {y} are incomparable"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
+        }
+    }
+}
+
+fn demo_unsigned_partial_cmp_float_extreme_debug<T: PartialOrd<Float> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_unsigned_pair_gen_var_5::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp(&y) {
             None => println!("{x:x} and {cy:#x} are incomparable"),
@@ -149,6 +235,47 @@ fn demo_float_partial_cmp_signed_debug<T: PrimitiveSigned>(
     }
 }
 
+fn demo_float_partial_cmp_signed_extreme<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+{
+    for (x, y) in float_signed_pair_gen_var_4::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{x} and {y} are incomparable"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
+        }
+    }
+}
+
+fn demo_float_partial_cmp_signed_extreme_debug<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+{
+    for (x, y) in float_signed_pair_gen_var_4::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let cx = ComparableFloatRef(&x);
+        match x.partial_cmp(&y) {
+            None => println!("{cx:#x} and {y:#x} are incomparable"),
+            Some(Less) => println!("{cx:#x} < {y:#x}"),
+            Some(Equal) => println!("{cx:#x} = {y:#x}"),
+            Some(Greater) => println!("{cx:#x} > {y:#x}"),
+        }
+    }
+}
+
 fn demo_signed_partial_cmp_float<T: PartialOrd<Float> + PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
@@ -170,6 +297,43 @@ fn demo_signed_partial_cmp_float_debug<T: PartialOrd<Float> + PrimitiveSigned>(
     limit: usize,
 ) {
     for (y, x) in float_signed_pair_gen::<T>().get(gm, config).take(limit) {
+        let cy = ComparableFloatRef(&y);
+        match x.partial_cmp(&y) {
+            None => println!("{x:x} and {cy:#x} are incomparable"),
+            Some(Less) => println!("{x:#x} < {cy:#x}"),
+            Some(Equal) => println!("{x:#x} = {cy:#x}"),
+            Some(Greater) => println!("{x:#x} > {cy:#x}"),
+        }
+    }
+}
+
+fn demo_signed_partial_cmp_float_extreme<T: PartialOrd<Float> + PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_signed_pair_gen_var_4::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{x} and {y} are incomparable"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
+        }
+    }
+}
+
+fn demo_signed_partial_cmp_float_extreme_debug<T: PartialOrd<Float> + PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_signed_pair_gen_var_4::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
         let cy = ComparableFloatRef(&y);
         match x.partial_cmp(&y) {
             None => println!("{x:x} and {cy:#x} are incomparable"),

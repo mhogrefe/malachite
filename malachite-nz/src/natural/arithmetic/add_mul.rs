@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Some optimizations contributed by florian1345.
 //
@@ -541,7 +541,7 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
+impl AddMul<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by reference.
@@ -571,7 +571,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     65537000000000000u64
     /// );
     /// ```
-    fn add_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+    fn add_mul(self, y: &Natural, z: &Natural) -> Natural {
         match (self, y, z) {
             (Natural(Small(x)), y, z) => (y * z).add_limb(*x),
             (x, Natural(Small(y)), z) => x.add_mul_limb_ref_ref(z, *y),

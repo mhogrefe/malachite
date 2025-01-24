@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -463,7 +463,7 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
     }
 }
 
-impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
+impl SubMul<&Integer, &Integer> for Integer {
     type Output = Integer;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first by value
@@ -495,13 +495,13 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub_mul(mut self, y: &'a Integer, z: &'b Integer) -> Integer {
+    fn sub_mul(mut self, y: &Integer, z: &Integer) -> Integer {
         self.sub_mul_assign(y, z);
         self
     }
 }
 
-impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
+impl SubMul<&Integer, &Integer> for &Integer {
     type Output = Integer;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking all three by
@@ -532,7 +532,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     ///     -65537000000000000i64
     /// );
     /// ```
-    fn sub_mul(self, y: &'a Integer, z: &'b Integer) -> Integer {
+    fn sub_mul(self, y: &Integer, z: &Integer) -> Integer {
         if self.sign == (y.sign != z.sign) {
             Integer {
                 sign: self.sign,

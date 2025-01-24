@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -42,7 +42,7 @@ impl Square for Integer {
     }
 }
 
-impl<'a> Square for &'a Integer {
+impl Square for &Integer {
     type Output = Integer;
 
     /// Squares an [`Integer`], taking it by reference.

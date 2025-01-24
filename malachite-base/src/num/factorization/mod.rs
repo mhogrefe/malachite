@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
+pub mod is_prime;
 /// An efficient prime sieve.
 pub mod prime_sieve;
 /// [`Primes`](traits::Primes), a trait for generating prime numbers.

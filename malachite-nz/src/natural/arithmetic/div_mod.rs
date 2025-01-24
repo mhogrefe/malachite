@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -2019,7 +2019,7 @@ impl<'a> DivMod<&'a Natural> for Natural {
     }
 }
 
-impl<'a> DivMod<Natural> for &'a Natural {
+impl DivMod<Natural> for &Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
@@ -2093,7 +2093,7 @@ impl<'a> DivMod<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
+impl DivMod<&Natural> for &Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
@@ -2140,7 +2140,7 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     ///     "(810000006723, 530068894399)"
     /// );
     /// ```
-    fn div_mod(self, other: &'b Natural) -> (Natural, Natural) {
+    fn div_mod(self, other: &Natural) -> (Natural, Natural) {
         if self == other {
             return (Natural::ONE, Natural::ZERO);
         }
@@ -2433,7 +2433,7 @@ impl<'a> DivRem<&'a Natural> for Natural {
     }
 }
 
-impl<'a> DivRem<Natural> for &'a Natural {
+impl DivRem<Natural> for &Natural {
     type DivOutput = Natural;
     type RemOutput = Natural;
 
@@ -2489,7 +2489,7 @@ impl<'a> DivRem<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
+impl DivRem<&Natural> for &Natural {
     type DivOutput = Natural;
     type RemOutput = Natural;
 
@@ -2540,7 +2540,7 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     /// );
     /// ```
     #[inline]
-    fn div_rem(self, other: &'b Natural) -> (Natural, Natural) {
+    fn div_rem(self, other: &Natural) -> (Natural, Natural) {
         self.div_mod(other)
     }
 }
@@ -2764,7 +2764,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     }
 }
 
-impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
+impl CeilingDivNegMod<Natural> for &Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
@@ -2822,7 +2822,7 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
+impl CeilingDivNegMod<&Natural> for &Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
@@ -2870,7 +2870,7 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     ///     "(810000006724, 704498996588)"
     /// );
     /// ```
-    fn ceiling_div_neg_mod(self, other: &'b Natural) -> (Natural, Natural) {
+    fn ceiling_div_neg_mod(self, other: &Natural) -> (Natural, Natural) {
         let (q, r) = self.div_mod(other);
         if r == 0 {
             (q, r)

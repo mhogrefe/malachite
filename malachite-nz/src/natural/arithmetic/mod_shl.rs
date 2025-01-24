@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -132,7 +132,7 @@ macro_rules! impl_mod_shl_unsigned {
             }
         }
 
-        impl<'a> ModShl<$t, Natural> for &'a Natural {
+        impl ModShl<$t, Natural> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
@@ -160,7 +160,7 @@ macro_rules! impl_mod_shl_unsigned {
             }
         }
 
-        impl<'a, 'b> ModShl<$t, &'b Natural> for &'a Natural {
+        impl ModShl<$t, &Natural> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
@@ -183,7 +183,7 @@ macro_rules! impl_mod_shl_unsigned {
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
             #[inline]
-            fn mod_shl(self, bits: $t, m: &'b Natural) -> Natural {
+            fn mod_shl(self, bits: $t, m: &Natural) -> Natural {
                 mod_shl_ref_ref_unsigned(self, bits, m)
             }
         }
@@ -214,7 +214,7 @@ macro_rules! impl_mod_shl_unsigned {
             }
         }
 
-        impl<'a> ModShlAssign<$t, &'a Natural> for Natural {
+        impl ModShlAssign<$t, &Natural> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
             /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
             /// [`Natural`] on the right-hand side is taken by reference.
@@ -235,7 +235,7 @@ macro_rules! impl_mod_shl_unsigned {
             /// # Examples
             /// See [here](super::mod_shl#mod_shl_assign).
             #[inline]
-            fn mod_shl_assign(&mut self, bits: $t, m: &'a Natural) {
+            fn mod_shl_assign(&mut self, bits: $t, m: &Natural) {
                 mod_shl_assign_ref_unsigned(self, bits, m);
             }
         }
@@ -354,7 +354,7 @@ macro_rules! impl_mod_shl_signed {
             }
         }
 
-        impl<'a> ModShl<$t, &'a Natural> for Natural {
+        impl ModShl<$t, &Natural> for Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
@@ -377,13 +377,13 @@ macro_rules! impl_mod_shl_signed {
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
             #[inline]
-            fn mod_shl(mut self, bits: $t, m: &'a Natural) -> Natural {
+            fn mod_shl(mut self, bits: $t, m: &Natural) -> Natural {
                 self.mod_shl_assign(bits, m);
                 self
             }
         }
 
-        impl<'a> ModShl<$t, Natural> for &'a Natural {
+        impl ModShl<$t, Natural> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
@@ -411,7 +411,7 @@ macro_rules! impl_mod_shl_signed {
             }
         }
 
-        impl<'a, 'b> ModShl<$t, &'b Natural> for &'a Natural {
+        impl ModShl<$t, &Natural> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
@@ -434,7 +434,7 @@ macro_rules! impl_mod_shl_signed {
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
             #[inline]
-            fn mod_shl(self, bits: $t, m: &'b Natural) -> Natural {
+            fn mod_shl(self, bits: $t, m: &Natural) -> Natural {
                 mod_shl_ref_ref_signed(self, bits, m)
             }
         }
@@ -465,7 +465,7 @@ macro_rules! impl_mod_shl_signed {
             }
         }
 
-        impl<'a> ModShlAssign<$t, &'a Natural> for Natural {
+        impl ModShlAssign<$t, &Natural> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
             /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
             /// [`Natural`] on the right-hand side is taken by reference.
@@ -486,7 +486,7 @@ macro_rules! impl_mod_shl_signed {
             /// # Examples
             /// See [here](super::mod_shl#mod_shl_assign).
             #[inline]
-            fn mod_shl_assign(&mut self, bits: $t, m: &'a Natural) {
+            fn mod_shl_assign(&mut self, bits: $t, m: &Natural) {
                 mod_shl_assign_ref_signed(self, bits, m);
             }
         }

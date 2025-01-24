@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -1598,8 +1598,16 @@ fn limbs_fft_mulmod_2expp1<'a>(
 ) {
     let bits = n * w;
     let limbs = bits >> Limb::LOG_WIDTH;
-    assert_eq!(xs[limbs], 0);
-    assert_eq!(ys[limbs], 0);
+    let carry = (xs[limbs] << 1) + ys[limbs];
+    if carry.odd() {
+        limbs_neg_in_place(&mut xs[..=limbs]);
+        limbs_fft_normmod_2expp1(&mut xs[..limbs]);
+        return;
+    } else if carry & 2 != 0 {
+        limbs_neg_to_out(xs, &ys[..=limbs]);
+        limbs_fft_normmod_2expp1(&mut xs[..limbs]);
+        return;
+    }
     let depth = bits.ceiling_log_base_2();
     let off = if depth < 12 {
         MULMOD_TAB[0]
@@ -1639,12 +1647,11 @@ fn limbs_fft_mulmod_2expp1<'a>(
     let k = (n_2 << Limb::LOG_WIDTH) - b;
     for (ps, qs) in xss.iter_mut().zip(yss.iter_mut()) {
         limbs_fft_normmod_2expp1(qs);
-        assert_eq!(*ps.last().unwrap(), 0);
-        assert_eq!(*qs.last().unwrap(), 0);
+        let carry = (ps.last().unwrap() << 1) + qs.last().unwrap();
         *ps.last_mut().unwrap() = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
             &mut ps[..n_2],
             &qs[..n_2],
-            0,
+            carry,
             k,
             scratch,
         ));
@@ -1687,7 +1694,6 @@ fn limbs_fft_mulmod_2expp1<'a>(
     let mut xs_hi = &mut xs[1..];
     for j in 0..two_n - 2 {
         if out[j] != 0 {
-            fail_on_untested_path("limbs_fft_mulmod_2expp1_helper, out[j] != 0");
             limbs_sub_limb_in_place(xs_hi, 1);
         } else if xss[j].last().unwrap().get_highest_bit() {
             // coefficient was -ve
@@ -1754,7 +1760,12 @@ fn limbs_fft_mulmod_2expp1_same<'a>(
 ) {
     let bits = n * w;
     let limbs = bits >> Limb::LOG_WIDTH;
-    assert_eq!(xs[limbs], 0);
+    let carry = xs[limbs] * 3;
+    if carry & 3 != 0 {
+        limbs_neg_in_place(&mut xs[..=limbs]);
+        limbs_fft_normmod_2expp1(&mut xs[..limbs]);
+        return;
+    }
     let depth = bits.ceiling_log_base_2();
     let off = if depth < 12 {
         MULMOD_TAB[0]
@@ -2391,7 +2402,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
         assert!(trunc > n << 1);
         // trunc must be divisible by 2*sqrt
         let two_sqrt = sqrt << 1;
-        trunc = two_sqrt * ((trunc + two_sqrt - 1) / two_sqrt);
+        trunc = two_sqrt * trunc.div_ceil(two_sqrt);
         j1 = limbs_fft_split_bits(&mut xss, xs, bits);
         for ps in &mut xss[j1..] {
             slice_set_zero(ps);
@@ -2502,7 +2513,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
                         &mut ts2,
                         &mut us2,
                         &mut ss2,
-                        combine_scratch,
+                        combine_scratch
                     );
                 }
                 limbs_ifft_radix2(xss_hi, wy, &mut ts, &mut us);
@@ -2526,7 +2537,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
                         &mut ts2,
                         &mut us2,
                         &mut ss2,
-                        combine_scratch,
+                        combine_scratch
                     );
                 }
                 limbs_ifft_radix2(xss_chunk, wy, &mut ts, &mut us);
@@ -2547,7 +2558,7 @@ pub_crate_test! {
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
-    scratch: &mut [Limb],
+    scratch: &mut [Limb]
 ) {
     limbs_mul_greater_to_out_fft_with_cutoff(out, xs, ys, FFT_MULMOD_2EXPP1_CUTOFF, scratch);
 }}
@@ -2756,7 +2767,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
         assert!(trunc > n << 1);
         // trunc must be divisible by 2*sqrt
         let two_sqrt = sqrt << 1;
-        trunc = two_sqrt * ((trunc + two_sqrt - 1) / two_sqrt);
+        trunc = two_sqrt * trunc.div_ceil(two_sqrt);
         j1 = limbs_fft_split_bits(&mut xss, xs, bits);
         for ps in &mut xss[j1..] {
             slice_set_zero(ps);

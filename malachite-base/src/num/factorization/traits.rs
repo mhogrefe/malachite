@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,4 +15,8 @@ pub trait Primes {
     fn primes_less_than_or_equal_to(n: &Self) -> Self::LI;
 
     fn primes() -> Self::I;
+}
+
+pub trait IsPrime {
+    fn is_prime(&self) -> bool;
 }

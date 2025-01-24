@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -426,8 +426,8 @@ fn try_from_float_properties() {
         if let Ok(n) = integer_x {
             assert_eq!(Integer::exact_from(&x), n);
             assert_eq!(n, x);
-            assert_eq!(Float::from(&n), x);
-            assert_eq!(Float::from(n), x);
+            assert_eq!(Float::exact_from(&n), x);
+            assert_eq!(Float::exact_from(n), x);
         }
     });
 }
@@ -491,7 +491,7 @@ fn rounding_from_float_properties() {
     });
 
     integer_gen().test_properties(|n| {
-        let x = Float::from(&n);
+        let x = Float::exact_from(&n);
         let no = (n, Equal);
         assert_eq!(Integer::rounding_from(&x, Floor), no);
         assert_eq!(Integer::rounding_from(&x, Down), no);
@@ -500,7 +500,7 @@ fn rounding_from_float_properties() {
         assert_eq!(Integer::rounding_from(&x, Nearest), no);
         assert_eq!(Integer::rounding_from(&x, Exact), no);
 
-        let x = Float::from((no.0 << 1) | Integer::ONE) >> 1;
+        let x = Float::exact_from((no.0 << 1) | Integer::ONE) >> 1;
         assert!(Integer::rounding_from(x, Nearest).0.even());
     });
 }

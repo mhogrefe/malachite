@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,6 +9,11 @@
 pub mod add;
 pub mod div;
 pub mod mul;
+pub mod power_of_2;
 pub mod reciprocal;
+pub mod shl;
+pub mod shl_round;
+pub mod shr;
+pub mod shr_round;
 pub mod square;
 pub mod sub;

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,6 +13,24 @@ use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_q::Rational;
+
+fn reduce_exponent_in_hex_string(s: &str) -> Option<(String, i32)> {
+    if let Some(exp_index) = s.find('E') {
+        let tail = &s[exp_index + 1..];
+        let hash_index = tail.find('#').unwrap();
+        let tail = &tail[..hash_index];
+        let original_exponent = i32::from_str(tail).unwrap();
+        if original_exponent.unsigned_abs() < 20 {
+            return None;
+        }
+        let mut new_s = s[..=exp_index].to_string();
+        new_s += "+20";
+        new_s += &s[exp_index + hash_index + 1..];
+        Some((new_s, (original_exponent << 2) - 80))
+    } else {
+        None
+    }
+}
 
 fn from_hex_string(s: &str) -> Float {
     match s {
@@ -32,12 +50,22 @@ fn from_hex_string(s: &str) -> Float {
             let precision = u64::from_str(&s[hash_index + 1..]).unwrap();
             let mut options = FromSciStringOptions::default();
             options.set_base(16);
-            let x = Float::from_rational_prec_round(
-                Rational::from_sci_string_with_options(&s[..hash_index], options).unwrap(),
-                precision,
-                Exact,
-            )
-            .0;
+            let x = if let Some((alt_s, exp_offset)) = reduce_exponent_in_hex_string(s) {
+                let hash_index = alt_s.find('#').unwrap();
+                Float::from_rational_prec_round(
+                    Rational::from_sci_string_with_options(&alt_s[..hash_index], options).unwrap(),
+                    precision,
+                    Exact,
+                )
+                .0 << exp_offset
+            } else {
+                Float::from_rational_prec_round(
+                    Rational::from_sci_string_with_options(&s[..hash_index], options).unwrap(),
+                    precision,
+                    Exact,
+                )
+                .0
+            };
             if sign {
                 x
             } else {

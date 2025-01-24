@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -47,9 +47,9 @@ macro_rules! impl_from_unsigned {
         impl PartialOrdAbs<$t> for Float {
             /// Compares the absolute values of a [`Float`] and an unsigned primitive integer.
             ///
-            /// NaN is not comparable to any primitive integer. Infinity and negative infinity are
-            /// greater in absolute value than any primitive integer. Both the [`Float`] zero and
-            /// the [`Float`] negative zero are equal to the integer zero.
+            /// NaN is not comparable to any primitive integer. $\infty$ and $-\infty$ are greater
+            /// in absolute value than any primitive integer. Both the [`Float`] zero and the
+            /// [`Float`] negative zero are equal to the integer zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -70,8 +70,8 @@ macro_rules! impl_from_unsigned {
             /// Compares the absolute values of an unsigned primitive integer and a [`Float`].
             ///
             /// No primitive integer is comparable to NaN. Every primitive integer is smaller in
-            /// absolute value than infinity and negative infinity. The integer zero is equal to
-            /// both the [`Float`] zero and the [`Float`] negative zero.
+            /// absolute value than $\infty$ and $-\infty$. The integer zero is equal to both the
+            /// [`Float`] zero and the [`Float`] negative zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -122,9 +122,9 @@ macro_rules! impl_from_signed {
         impl PartialOrdAbs<$t> for Float {
             /// Compares the absolute values of a [`Float`] and a signed primitive integer.
             ///
-            /// NaN is not comparable to any primitive integer. Infinity and negative infinity are
-            /// greater in absolute value than any primitive integer. Both the [`Float`] zero and
-            /// the [`Float`] negative zero are equal to the integer zero.
+            /// NaN is not comparable to any primitive integer. $\infty$ and $-\infty$ are greater
+            /// in absolute value than any primitive integer. Both the [`Float`] zero and the
+            /// [`Float`] negative zero are equal to the integer zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -145,8 +145,8 @@ macro_rules! impl_from_signed {
             /// Compares the absolute values of a signed primitive integer and a [`Float`].
             ///
             /// No primitive integer is comparable to NaN. Every primitive integer is smaller in
-            /// absolute value than infinity and negative infinity. The integer zero is equal to
-            /// both the [`Float`] zero and the [`Float`] negative zero.
+            /// absolute value than $\infty$ and $-\infty$. The integer zero is equal to both the
+            /// [`Float`] zero and the [`Float`] negative zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

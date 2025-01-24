@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -20,26 +20,34 @@ use crate::test_util::generators::{
     div_prec_round_valid, div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
     mul_prec_round_valid, mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
     rational_div_float_prec_round_valid, rational_div_float_round_valid, reciprocal_round_valid,
-    square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    shl_round_valid, shr_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    RandomExtremeFiniteFloats, RandomExtremeNonNegativeFiniteFloats,
+    RandomExtremeNonzeroFiniteFloats, RandomExtremePositiveFiniteFloats,
+    RandomMixedExtremePositiveFiniteFloats,
 };
 use crate::test_util::generators::{
     from_primitive_float_prec_round_valid, integer_rounding_from_float_valid,
     natural_rounding_from_float_valid, reciprocal_prec_round_valid, set_prec_round_valid,
     signed_rounding_from_float_valid, unsigned_rounding_from_float_valid,
+    RandomMixedExtremeFiniteFloats, RandomMixedExtremeNonNegativeFiniteFloats,
 };
 use crate::Float;
 use crate::InnerFloat::Finite;
+use malachite_base::bools::random::{random_bools, weighted_random_bools};
+use malachite_base::iterators::{with_special_values, WithSpecialValues};
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
-    geometric_random_positive_unsigneds, geometric_random_signeds,
-    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
+    geometric_random_natural_signeds, geometric_random_positive_unsigneds,
+    geometric_random_signeds, geometric_random_unsigned_inclusive_range,
+    geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
 use malachite_base::num::random::striped::{striped_random_signeds, striped_random_unsigneds};
 use malachite_base::num::random::{random_primitive_floats, random_unsigned_inclusive_range};
@@ -50,7 +58,10 @@ use malachite_base::test_util::generators::common::{reshape_2_1_to_3, GenConfig,
 use malachite_base::tuples::random::{random_pairs, random_pairs_from_single};
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::random::{striped_random_naturals, StripedRandomNaturalInclusiveRange};
+use malachite_nz::natural::random::{
+    striped_random_naturals, striped_random_positive_naturals, StripedRandomNaturalInclusiveRange,
+    StripedRandomNaturals,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_q::random::striped_random_rationals;
@@ -191,6 +202,307 @@ pub fn special_random_float_gen_var_11(config: &GenConfig) -> It<Float> {
         EXAMPLE_SEED,
         config,
         (Limb::WIDTH << 1) + 1,
+    )
+}
+
+fn striped_random_extreme_positive_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> RandomExtremePositiveFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>> {
+    RandomExtremePositiveFiniteFloats {
+        exponents: geometric_random_natural_signeds(
+            seed.fork("exponents"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+        ),
+        exponent_modes: random_bools(seed.fork("exponent_modes")),
+        xs: striped_random_positive_naturals(
+            seed.fork("significands"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+#[inline]
+fn striped_random_extreme_non_negative_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    zero_p_numerator: u64,
+    zero_p_denominator: u64,
+) -> RandomExtremeNonNegativeFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>>
+{
+    RandomExtremeNonNegativeFiniteFloats {
+        bs: weighted_random_bools(seed.fork("bs"), zero_p_numerator, zero_p_denominator),
+        xs: striped_random_extreme_positive_finite_floats(
+            seed.fork("xs"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+#[inline]
+fn striped_random_extreme_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    zero_p_numerator: u64,
+    zero_p_denominator: u64,
+) -> RandomExtremeFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>> {
+    RandomExtremeFiniteFloats {
+        bs: random_bools(seed.fork("bs")),
+        xs: striped_random_extreme_non_negative_finite_floats(
+            seed.fork("xs"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+            zero_p_numerator,
+            zero_p_denominator,
+        ),
+    }
+}
+
+#[inline]
+fn striped_random_extreme_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> WithSpecialValues<
+    RandomExtremeFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>>,
+> {
+    with_special_values(
+        seed,
+        vec![Float::INFINITY, Float::NEGATIVE_INFINITY, Float::NAN],
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+        &|seed_2| {
+            striped_random_extreme_finite_floats(
+                seed_2,
+                mean_sci_exponent_abs_numerator,
+                mean_sci_exponent_abs_denominator,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+                mean_special_p_numerator,
+                mean_special_p_denominator,
+            )
+        },
+    )
+}
+
+pub fn special_random_float_gen_var_12(config: &GenConfig) -> It<Float> {
+    Box::new(striped_random_extreme_floats(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_n", 64),
+        config.get_or("mean_exponent_d", 1),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_precision_n", 64),
+        config.get_or("mean_precision_d", 1),
+        config.get_or("mean_zero_p_n", 1),
+        config.get_or("mean_zero_p_d", 64),
+    ))
+}
+
+#[inline]
+fn striped_random_extreme_nonzero_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> RandomExtremeNonzeroFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>> {
+    RandomExtremeNonzeroFiniteFloats {
+        bs: random_bools(seed.fork("bs")),
+        xs: striped_random_extreme_positive_finite_floats(
+            seed.fork("xs"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+pub fn special_random_float_gen_var_13(config: &GenConfig) -> It<Float> {
+    Box::new(striped_random_extreme_nonzero_finite_floats(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_n", 64),
+        config.get_or("mean_exponent_d", 1),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_precision_n", 64),
+        config.get_or("mean_precision_d", 1),
+    ))
+}
+
+pub fn special_random_float_gen_var_14(config: &GenConfig) -> It<Float> {
+    Box::new(
+        striped_random_extreme_floats(
+            EXAMPLE_SEED,
+            config.get_or("mean_exponent_n", 64),
+            config.get_or("mean_exponent_d", 1),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_precision_n", 64),
+            config.get_or("mean_precision_d", 1),
+            config.get_or("mean_zero_p_n", 1),
+            config.get_or("mean_zero_p_d", 64),
+        )
+        .filter(|f| !f.is_nan()),
+    )
+}
+
+fn striped_random_mixed_extreme_positive_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> RandomMixedExtremePositiveFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>>
+{
+    RandomMixedExtremePositiveFiniteFloats {
+        exponents: geometric_random_natural_signeds(
+            seed.fork("exponents"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+        ),
+        exponent_modes: random_unsigned_inclusive_range(seed.fork("exponent_modes"), 0, 3),
+        xs: striped_random_positive_naturals(
+            seed.fork("significands"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+#[inline]
+fn striped_random_mixed_extreme_non_negative_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    zero_p_numerator: u64,
+    zero_p_denominator: u64,
+) -> RandomMixedExtremeNonNegativeFiniteFloats<
+    StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
+> {
+    RandomMixedExtremeNonNegativeFiniteFloats {
+        bs: weighted_random_bools(seed.fork("bs"), zero_p_numerator, zero_p_denominator),
+        xs: striped_random_mixed_extreme_positive_finite_floats(
+            seed.fork("xs"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+#[inline]
+fn striped_random_mixed_extreme_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    zero_p_numerator: u64,
+    zero_p_denominator: u64,
+) -> RandomMixedExtremeFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>> {
+    RandomMixedExtremeFiniteFloats {
+        bs: random_bools(seed.fork("bs")),
+        xs: striped_random_mixed_extreme_non_negative_finite_floats(
+            seed.fork("xs"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+            zero_p_numerator,
+            zero_p_denominator,
+        ),
+    }
+}
+
+#[inline]
+fn striped_random_mixed_extreme_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> WithSpecialValues<
+    RandomMixedExtremeFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>>,
+> {
+    with_special_values(
+        seed,
+        vec![Float::INFINITY, Float::NEGATIVE_INFINITY, Float::NAN],
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+        &|seed_2| {
+            striped_random_mixed_extreme_finite_floats(
+                seed_2,
+                mean_sci_exponent_abs_numerator,
+                mean_sci_exponent_abs_denominator,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+                mean_special_p_numerator,
+                mean_special_p_denominator,
+            )
+        },
     )
 }
 
@@ -551,6 +863,22 @@ pub fn special_random_float_pair_gen_var_9(config: &GenConfig) -> It<(Float, Flo
     )
 }
 
+pub fn special_random_float_pair_gen_var_10(config: &GenConfig) -> It<(Float, Float)> {
+    Box::new(random_pairs_from_single(
+        striped_random_mixed_extreme_floats(
+            EXAMPLE_SEED,
+            config.get_or("mean_exponent_n", 64),
+            config.get_or("mean_exponent_d", 1),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_precision_n", 64),
+            config.get_or("mean_precision_d", 1),
+            config.get_or("mean_zero_p_n", 1),
+            config.get_or("mean_zero_p_d", 64),
+        ),
+    ))
+}
+
 // -- (Float, Float, Float) --
 
 pub fn special_random_float_triple_gen(config: &GenConfig) -> It<(Float, Float, Float)> {
@@ -743,6 +1071,34 @@ pub fn special_random_float_float_unsigned_triple_gen_var_1<T: PrimitiveUnsigned
     ))
 }
 
+pub fn special_random_float_float_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, Float, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_mixed_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Float, Float, PrimitiveUnsigned, RoundingMode) --
 
 pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_1(
@@ -773,7 +1129,7 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_1(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, prec, rm)| add_prec_round_valid(x, y, *prec, *rm)),
+        .filter(|(x, y, prec, rm)| add_prec_round_valid(x, y, *prec, *rm, false)),
     )
 }
 
@@ -805,7 +1161,7 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_2(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, prec, rm)| sub_prec_round_valid(x, y, *prec, *rm)),
+        .filter(|(x, y, prec, rm)| sub_prec_round_valid(x, y, *prec, *rm, false)),
     )
 }
 
@@ -837,7 +1193,7 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_3(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm)),
+        .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm, false)),
     )
 }
 
@@ -869,7 +1225,135 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_4(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, prec, rm)| div_prec_round_valid(x, y, *prec, *rm)),
+        .filter(|(x, y, prec, rm)| div_prec_round_valid(x, y, *prec, *rm, false)),
+    )
+}
+
+pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| add_prec_round_valid(x, y, *prec, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_6(
+    config: &GenConfig,
+) -> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| sub_prec_round_valid(x, y, *prec, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_7(
+    config: &GenConfig,
+) -> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| mul_prec_round_valid(x, y, *prec, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_8(
+    config: &GenConfig,
+) -> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| div_prec_round_valid(x, y, *prec, *rm, true)),
     )
 }
 
@@ -928,7 +1412,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_1(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, rm)| add_round_valid(x, y, *rm)),
+        .filter(|(x, y, rm)| add_round_valid(x, y, *rm, false)),
     )
 }
 
@@ -953,7 +1437,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_2(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, rm)| sub_round_valid(x, y, *rm)),
+        .filter(|(x, y, rm)| sub_round_valid(x, y, *rm, false)),
     )
 }
 
@@ -995,7 +1479,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_4(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| add_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| add_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1017,7 +1501,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_5(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| add_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| add_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1037,7 +1521,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_6(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| add_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| add_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1059,7 +1543,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_7(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| add_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| add_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1079,7 +1563,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_8(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| add_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| add_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1098,7 +1582,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_9(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| add_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| add_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1118,7 +1602,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_10(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1140,7 +1624,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_11(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1160,7 +1644,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_12(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1182,7 +1666,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_13(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1202,7 +1686,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_14(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1221,7 +1705,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_15(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| sub_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1246,7 +1730,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_16(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm)),
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm, false)),
     )
 }
 
@@ -1266,7 +1750,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_17(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1288,7 +1772,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_18(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1308,7 +1792,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_19(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1330,7 +1814,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_20(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1350,7 +1834,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_21(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1369,7 +1853,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_22(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| mul_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1394,7 +1878,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_23(
             },
             &random_rounding_modes,
         )
-        .filter(|(x, y, rm)| div_round_valid(x, y, *rm)),
+        .filter(|(x, y, rm)| div_round_valid(x, y, *rm, false)),
     )
 }
 
@@ -1414,7 +1898,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_24(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| div_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| div_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1436,7 +1920,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_25(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| div_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| div_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1456,7 +1940,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_26(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| div_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| div_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1493,7 +1977,7 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_27(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| div_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| div_round_valid(x, y, *rm, false)),
     ))
 }
 
@@ -1529,8 +2013,108 @@ pub fn special_random_float_float_rounding_mode_triple_gen_var_28(
             },
             &random_rounding_modes,
         )
-        .filter(|((x, y), rm)| div_round_valid(x, y, *rm)),
+        .filter(|((x, y), rm)| div_round_valid(x, y, *rm, false)),
     ))
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_29(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| add_round_valid(x, y, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_30(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| sub_round_valid(x, y, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_31(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| mul_round_valid(x, y, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_rounding_mode_triple_gen_var_32(
+    config: &GenConfig,
+) -> It<(Float, Float, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| div_round_valid(x, y, *rm, true)),
+    )
 }
 
 // -- (Float, Integer) --
@@ -1568,6 +2152,34 @@ pub fn special_random_float_integer_pair_gen_var_1(config: &GenConfig) -> It<(Fl
         EXAMPLE_SEED,
         &|seed| {
             striped_random_finite_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_integer_pair_gen_var_2(config: &GenConfig) -> It<(Float, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
                 seed,
                 config.get_or("mean_exponent_n", 64),
                 config.get_or("mean_exponent_d", 1),
@@ -1681,6 +2293,34 @@ pub fn special_random_float_natural_pair_gen_var_1(config: &GenConfig) -> It<(Fl
     ))
 }
 
+pub fn special_random_float_natural_pair_gen_var_2(config: &GenConfig) -> It<(Float, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Float, Natural, Natural) --
 
 pub fn special_random_float_natural_natural_triple_gen(
@@ -1722,6 +2362,28 @@ pub fn special_random_float_primitive_float_pair_gen<T: PrimitiveFloat>(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &random_primitive_floats,
+    ))
+}
+
+pub fn special_random_float_primitive_float_pair_gen_var_1<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(Float, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
                 seed,
                 config.get_or("mean_exponent_n", 64),
                 config.get_or("mean_exponent_d", 1),
@@ -1852,6 +2514,62 @@ pub fn special_random_float_signed_pair_gen_var_2<T: PrimitiveSigned>(
     ))
 }
 
+pub fn special_random_float_signed_pair_gen_var_3<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_signed_pair_gen_var_4<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_signeds::<T>(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Float, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn special_random_float_signed_signed_triple_gen<T: PrimitiveSigned>(
@@ -1880,6 +2598,200 @@ pub fn special_random_float_signed_signed_triple_gen<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+// -- (Float, PrimitiveSigned, RoundingMode) --
+
+pub fn special_random_float_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shl_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shl_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_signed_rounding_mode_triple_gen_var_3<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| random_rounding_modes(seed).filter(|&rm| rm != Exact),
+        )
+        .filter(|&(ref x, bits, rm)| shl_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_signed_rounding_mode_triple_gen_var_4<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shr_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_signed_rounding_mode_triple_gen_var_5<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shr_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_signed_rounding_mode_triple_gen_var_6<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| random_rounding_modes(seed).filter(|&rm| rm != Exact),
+        )
+        .filter(|&(ref x, bits, rm)| shr_round_valid(x, bits, rm)),
+    )
 }
 
 // -- (Float, PrimitiveUnsigned) --
@@ -1963,6 +2875,90 @@ pub fn special_random_float_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
                 seed,
                 config.get_or("mean_small_n", 64),
                 config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds::<T>(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
             )
         },
     ))
@@ -2060,7 +3056,7 @@ pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_2(
             },
             &random_rounding_modes,
         )
-        .filter(|&(ref x, p, rm)| square_prec_round_valid(x, p, rm)),
+        .filter(|&(ref x, p, rm)| square_prec_round_valid(x, p, rm, false)),
     )
 }
 
@@ -2093,6 +3089,262 @@ pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_3(
             &random_rounding_modes,
         )
         .filter(|&(ref x, p, rm)| reciprocal_prec_round_valid(x, p, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, p, rm)| set_prec_round_valid(x, p, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shl_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shl_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_7<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| random_rounding_modes(seed).filter(|&rm| rm != Exact),
+        )
+        .filter(|&(ref x, bits, rm)| shl_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shr_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_9<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, bits, rm)| shr_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_10<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| random_rounding_modes(seed).filter(|&rm| rm != Exact),
+        )
+        .filter(|&(ref x, bits, rm)| shr_round_valid(x, bits, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_11(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, p, rm)| square_prec_round_valid(x, p, rm, true)),
     )
 }
 
@@ -2154,6 +3406,34 @@ pub fn special_random_float_rational_pair_gen_var_1(config: &GenConfig) -> It<(F
     ))
 }
 
+pub fn special_random_float_rational_pair_gen_var_2(config: &GenConfig) -> It<(Float, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Float, Rational, PrimitiveUnsigned) --
 
 pub fn special_random_float_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -2163,6 +3443,43 @@ pub fn special_random_float_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsig
         EXAMPLE_SEED,
         &|seed| {
             striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_rational_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, Rational, T)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
                 seed,
                 config.get_or("mean_exponent_n", 64),
                 config.get_or("mean_exponent_d", 1),
@@ -2397,6 +3714,88 @@ pub fn special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_5(
             &random_rounding_modes,
         )
         .filter(|(x, y, prec, rm)| rational_div_float_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_6(
+    config: &GenConfig,
+) -> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| add_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_7(
+    config: &GenConfig,
+) -> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| sub_rational_prec_round_valid(x, y, *prec, *rm)),
     )
 }
 
@@ -2635,6 +4034,74 @@ pub fn special_random_float_rational_rounding_mode_triple_gen_var_6(
     )
 }
 
+pub fn special_random_float_rational_rounding_mode_triple_gen_var_7(
+    config: &GenConfig,
+) -> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| add_rational_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn special_random_float_rational_rounding_mode_triple_gen_var_8(
+    config: &GenConfig,
+) -> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| sub_rational_round_valid(x, y, *rm)),
+    )
+}
+
 // -- (Float, RoundingMode) --
 
 pub fn special_random_float_rounding_mode_pair_gen(
@@ -2839,7 +4306,7 @@ pub fn special_random_float_rounding_mode_pair_gen_var_7(
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| square_round_valid(f, *rm)),
+        .filter(|(f, rm)| square_round_valid(f, *rm, false)),
     )
 }
 
@@ -2859,7 +4326,7 @@ pub fn special_random_float_rounding_mode_pair_gen_var_8(
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| square_round_valid(f, *rm)),
+        .filter(|(f, rm)| square_round_valid(f, *rm, false)),
     )
 }
 
@@ -2881,7 +4348,7 @@ pub fn special_random_float_rounding_mode_pair_gen_var_9(
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| square_round_valid(f, *rm)),
+        .filter(|(f, rm)| square_round_valid(f, *rm, false)),
     )
 }
 
@@ -2901,7 +4368,7 @@ pub fn special_random_float_rounding_mode_pair_gen_var_10(
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| square_round_valid(f, *rm)),
+        .filter(|(f, rm)| square_round_valid(f, *rm, false)),
     )
 }
 
@@ -2923,7 +4390,7 @@ pub fn special_random_float_rounding_mode_pair_gen_var_11(
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| square_round_valid(f, *rm)),
+        .filter(|(f, rm)| square_round_valid(f, *rm, false)),
     )
 }
 
@@ -2943,7 +4410,7 @@ pub fn special_random_float_rounding_mode_pair_gen_var_12(
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| square_round_valid(f, *rm)),
+        .filter(|(f, rm)| square_round_valid(f, *rm, false)),
     )
 }
 
@@ -3050,6 +4517,142 @@ pub fn special_random_float_rounding_mode_pair_gen_var_17(
             &random_rounding_modes,
         )
         .filter(|(f, rm)| reciprocal_round_valid(f, *rm)),
+    )
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn special_random_float_rounding_mode_pair_gen_var_18<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, RoundingMode)>
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(f, rm)| unsigned_rounding_from_float_valid::<T>(f, *rm)),
+    )
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn special_random_float_rounding_mode_pair_gen_var_19<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Float, RoundingMode)>
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(f, rm)| signed_rounding_from_float_valid::<T>(f, *rm)),
+    )
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn special_random_float_rounding_mode_pair_gen_var_20<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(Float, RoundingMode)>
+where
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(f, rm)| *rm != Exact || T::convertible_from(f)),
+    )
+}
+
+pub fn special_random_float_rounding_mode_pair_gen_var_21(
+    config: &GenConfig,
+) -> It<(Float, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
+pub fn special_random_float_rounding_mode_pair_gen_var_22(
+    config: &GenConfig,
+) -> It<(Float, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(f, rm)| square_round_valid(f, *rm, true)),
     )
 }
 
@@ -3271,6 +4874,36 @@ pub fn special_random_signed_unsigned_rounding_mode_triple_gen_var_4<T: Primitiv
         },
         &|seed| random_rounding_modes(seed).filter(|rm| *rm != Exact),
     ))
+}
+
+pub fn special_random_signed_unsigned_rounding_mode_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(i64, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_signeds(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(pow, _, rm)| {
+            rm != Exact
+                || (Float::MIN_EXPONENT..=Float::MAX_EXPONENT)
+                    .contains(&i32::saturating_from(pow).saturating_add(1))
+        }),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

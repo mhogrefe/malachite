@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -182,7 +182,7 @@ impl ModPowerOf2 for Natural {
     }
 }
 
-impl<'a> ModPowerOf2 for &'a Natural {
+impl ModPowerOf2 for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
@@ -289,7 +289,7 @@ impl RemPowerOf2 for Natural {
     }
 }
 
-impl<'a> RemPowerOf2 for &'a Natural {
+impl RemPowerOf2 for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
@@ -403,7 +403,7 @@ impl NegModPowerOf2 for Natural {
     }
 }
 
-impl<'a> NegModPowerOf2 for &'a Natural {
+impl NegModPowerOf2 for &Natural {
     type Output = Natural;
 
     /// Divides the negative of a [`Natural`] by a $2^k$, returning just the remainder. The

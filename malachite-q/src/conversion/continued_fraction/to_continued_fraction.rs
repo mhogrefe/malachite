@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -100,7 +100,7 @@ impl ContinuedFraction for Rational {
     }
 }
 
-impl<'a> ContinuedFraction for &'a Rational {
+impl ContinuedFraction for &Rational {
     type CF = RationalContinuedFraction;
 
     /// Returns the continued fraction of a [`Rational`], taking the [`Rational`] by reference.

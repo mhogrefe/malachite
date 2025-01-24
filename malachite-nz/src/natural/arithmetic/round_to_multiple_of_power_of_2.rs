@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -470,7 +470,7 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
     }
 }
 
-impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
+impl RoundToMultipleOfPowerOf2<u64> for &Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of $2^k$ according to a specified rounding mode. The

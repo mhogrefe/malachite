@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -56,7 +56,7 @@ impl SaturatingSubMul<Natural, Natural> for Natural {
     }
 }
 
-impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
+impl SaturatingSubMul<Natural, &Natural> for Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first two by
@@ -95,12 +95,12 @@ impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: Natural, z: &'a Natural) -> Natural {
+    fn saturating_sub_mul(self, y: Natural, z: &Natural) -> Natural {
         self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
-impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
+impl SaturatingSubMul<&Natural, Natural> for Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
@@ -139,12 +139,12 @@ impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: &'a Natural, z: Natural) -> Natural {
+    fn saturating_sub_mul(self, y: &Natural, z: Natural) -> Natural {
         self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
-impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
+impl SaturatingSubMul<&Natural, &Natural> for Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first by value
@@ -183,12 +183,12 @@ impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+    fn saturating_sub_mul(self, y: &Natural, z: &Natural) -> Natural {
         self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
-impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
+impl SaturatingSubMul<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
@@ -226,7 +226,7 @@ impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: &'b Natural, z: &'c Natural) -> Natural {
+    fn saturating_sub_mul(self, y: &Natural, z: &Natural) -> Natural {
         self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
@@ -273,7 +273,7 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     }
 }
 
-impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
+impl SaturatingSubMulAssign<Natural, &Natural> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by value and the second by reference and replacing the
     /// left-hand side [`Natural`] with 0 if the result is negative.
@@ -308,14 +308,14 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: Natural, z: &Natural) {
         if self.sub_mul_assign_val_ref_no_panic(y, z) {
             *self = Natural::ZERO;
         }
     }
 }
 
-impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
+impl SaturatingSubMulAssign<&Natural, Natural> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by reference and the second by value and replacing the
     /// left-hand side [`Natural`] with 0 if the result is negative.
@@ -350,14 +350,14 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: &Natural, z: Natural) {
         if self.sub_mul_assign_ref_val_no_panic(y, z) {
             *self = Natural::ZERO;
         }
     }
 }
 
-impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
+impl SaturatingSubMulAssign<&Natural, &Natural> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
     /// [`Natural`]s on the right-hand side by reference and replacing the left-hand side
     /// [`Natural`] with 0 if the result is negative.
@@ -392,7 +392,7 @@ impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: &Natural, z: &Natural) {
         if self.sub_mul_assign_ref_ref_no_panic(y, z) {
             *self = Natural::ZERO;
         }

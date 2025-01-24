@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -16,9 +16,9 @@ use malachite_nz::integer::Integer;
 impl PartialOrdAbs<Integer> for Float {
     /// Compares the absolute values of a [`Float`] and an [`Integer`].
     ///
-    /// NaN is not comparable to any [`Integer`]. Infinity and negative infinity are greater in
-    /// absolute value than any [`Integer`]. Both the [`Float`] zero and the [`Float`] negative zero
-    /// are equal to the [`Integer`] zero.
+    /// NaN is not comparable to any [`Integer`]. $\infty$ and $-\infty$ are greater in absolute
+    /// value than any [`Integer`]. Both the [`Float`] zero and the [`Float`] negative zero are
+    /// equal to the [`Integer`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -69,8 +69,8 @@ impl PartialOrdAbs<Float> for Integer {
     /// Compares the absolute values of an [`Integer`] and a [`Float`].
     ///
     /// No [`Integer`] is comparable to NaN. Every [`Integer`] is smaller in absolute value than
-    /// infinity and negative infinity. The [`Integer`] zero is equal to both the [`Float`] zero and
-    /// the [`Float`] negative zero.
+    /// $\infty$ and $-\infty$. The [`Integer`] zero is equal to both the [`Float`] zero and the
+    /// [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

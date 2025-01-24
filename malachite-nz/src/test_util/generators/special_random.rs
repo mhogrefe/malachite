@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -1677,7 +1677,32 @@ where
     )
 }
 
-// var 3 is in malachite-float.
+// vars 4 and 5 are in malachite-float.
+
+pub fn special_random_integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed.fork("xs"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds::<T>(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
 
 // -- (Integer, RoundingMode) --
 
@@ -4764,13 +4789,13 @@ pub fn striped_random_natural_vec_natural_pair_gen_var_4(
 
 // -- (Vec<Natural>, PrimitiveUnsigned) --
 
-struct PowerOfTwoDigitsGenerator {
+struct PowerOf2DigitsGenerator {
     log_bases: GeometricRandomNaturalValues<u64>,
     digit_counts: GeometricRandomNaturalValues<usize>,
     bit_source: StripedBitSource,
 }
 
-impl Iterator for PowerOfTwoDigitsGenerator {
+impl Iterator for PowerOf2DigitsGenerator {
     type Item = (Vec<Natural>, u64);
 
     fn next(&mut self) -> Option<(Vec<Natural>, u64)> {
@@ -4790,7 +4815,7 @@ impl Iterator for PowerOfTwoDigitsGenerator {
 pub fn special_random_natural_vec_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(Vec<Natural>, u64)> {
-    Box::new(PowerOfTwoDigitsGenerator {
+    Box::new(PowerOf2DigitsGenerator {
         log_bases: geometric_random_positive_unsigneds(
             EXAMPLE_SEED.fork("log_bases"),
             config.get_or("mean_log_base_n", 4),

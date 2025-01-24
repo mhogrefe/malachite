@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -36,7 +36,7 @@ pub struct NaturalBitIterator<'a> {
     j_mask: Limb,
 }
 
-impl<'a> Iterator for NaturalBitIterator<'a> {
+impl Iterator for NaturalBitIterator<'_> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
@@ -64,7 +64,7 @@ impl<'a> Iterator for NaturalBitIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
+impl DoubleEndedIterator for NaturalBitIterator<'_> {
     fn next_back(&mut self) -> Option<bool> {
         if self.remaining != 0 {
             let bit = self.current_limb_back & self.j_mask != 0;
@@ -86,9 +86,9 @@ impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for NaturalBitIterator<'a> {}
+impl ExactSizeIterator for NaturalBitIterator<'_> {}
 
-impl<'a> Index<u64> for NaturalBitIterator<'a> {
+impl Index<u64> for NaturalBitIterator<'_> {
     type Output = bool;
 
     /// A function to retrieve a [`Natural`]'s bits by index.

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -34,7 +34,7 @@ pub_crate_test! {limbs_significant_bits<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
     ((u64::wrapping_from(xs.len()) - 1) << T::LOG_WIDTH) + xs.last().unwrap().significant_bits()
 }}
 
-impl<'a> SignificantBits for &'a Natural {
+impl SignificantBits for &Natural {
     /// Returns the number of significant bits of a [`Natural`].
     ///
     /// $$

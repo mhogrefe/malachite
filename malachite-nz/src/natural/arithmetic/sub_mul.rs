@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -445,7 +445,7 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
+impl SubMul<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
@@ -481,7 +481,7 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     995705032704u64
     /// );
     /// ```
-    fn sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+    fn sub_mul(self, y: &Natural, z: &Natural) -> Natural {
         self.checked_sub_mul(y, z).unwrap_or_else(|| {
             sub_mul_panic(self, y, z);
         })

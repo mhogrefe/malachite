@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -61,7 +61,7 @@ struct HalfGcdJacobiContext<'a, 'b, 'c> {
     bits_mut: &'c mut u8,
 }
 
-impl<'a, 'b, 'c> GcdSubdivideStepContext for HalfGcdJacobiContext<'a, 'b, 'c> {
+impl GcdSubdivideStepContext for HalfGcdJacobiContext<'_, '_, '_> {
     // This is equivalent to `hgcd_jacobi_hook` from `mpn/hgcd_jacobi.c`, GMP 6.2.1.
     fn gcd_subdiv_step_hook(
         &mut self,
@@ -513,7 +513,7 @@ struct JacobiContext<'a> {
     bits_mut: &'a mut u8,
 }
 
-impl<'a> GcdSubdivideStepContext for JacobiContext<'a> {
+impl GcdSubdivideStepContext for JacobiContext<'_> {
     // This is equivalent to `jacobi_hook` from `mpn/jacobi.c`, GMP 6.2.1.
     fn gcd_subdiv_step_hook(
         &mut self,
@@ -754,7 +754,7 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
     }
 }
 
-impl<'a> LegendreSymbol<Natural> for &'a Natural {
+impl LegendreSymbol<Natural> for &Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking both the first by reference and the
     /// second by value.
     ///
@@ -802,7 +802,7 @@ impl<'a> LegendreSymbol<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> LegendreSymbol<&'a Natural> for &'b Natural {
+impl LegendreSymbol<&Natural> for &Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking both by reference.
     ///
     /// This implementation is identical to that of [`JacobiSymbol`], since there is no
@@ -842,7 +842,7 @@ impl<'a, 'b> LegendreSymbol<&'a Natural> for &'b Natural {
     /// );
     /// ```
     #[inline]
-    fn legendre_symbol(self, other: &'a Natural) -> i8 {
+    fn legendre_symbol(self, other: &Natural) -> i8 {
         assert_ne!(*other, 0u32);
         assert!(other.odd());
         self.kronecker_symbol(other)
@@ -922,7 +922,7 @@ impl<'a> JacobiSymbol<&'a Natural> for Natural {
     }
 }
 
-impl<'a> JacobiSymbol<Natural> for &'a Natural {
+impl JacobiSymbol<Natural> for &Natural {
     /// Computes the Jacobi symbol of two [`Natural`]s, taking the first by reference and the second
     /// by value.
     ///
@@ -971,7 +971,7 @@ impl<'a> JacobiSymbol<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> JacobiSymbol<&'a Natural> for &'b Natural {
+impl JacobiSymbol<&Natural> for &Natural {
     /// Computes the Jacobi symbol of two [`Natural`]s, taking both by reference.
     ///
     /// $$
@@ -1012,7 +1012,7 @@ impl<'a, 'b> JacobiSymbol<&'a Natural> for &'b Natural {
     /// );
     /// ```
     #[inline]
-    fn jacobi_symbol(self, other: &'a Natural) -> i8 {
+    fn jacobi_symbol(self, other: &Natural) -> i8 {
         assert_ne!(*other, 0u32);
         assert!(other.odd());
         self.kronecker_symbol(other)
@@ -1114,7 +1114,7 @@ impl<'a> KroneckerSymbol<&'a Natural> for Natural {
     }
 }
 
-impl<'a> KroneckerSymbol<Natural> for &'a Natural {
+impl KroneckerSymbol<Natural> for &Natural {
     /// Computes the Kronecker symbol of two [`Natural`]s, taking the first by reference and the
     /// second by value.
     ///
@@ -1162,7 +1162,7 @@ impl<'a> KroneckerSymbol<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
+impl KroneckerSymbol<&Natural> for &Natural {
     /// Computes the Kronecker symbol of two [`Natural`]s, taking both by reference.
     ///
     /// $$
@@ -1203,7 +1203,7 @@ impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
     ///     -1
     /// );
     /// ```
-    fn kronecker_symbol(self, other: &'a Natural) -> i8 {
+    fn kronecker_symbol(self, other: &Natural) -> i8 {
         match (self, other) {
             (x, &Natural::ZERO) => i8::from(*x == 1u32),
             (&Natural::ZERO, y) => i8::from(*y == 1u32),

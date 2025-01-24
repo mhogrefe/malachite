@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -281,7 +281,7 @@ impl<'a> DivRound<&'a Natural> for Natural {
     }
 }
 
-impl<'a> DivRound<Natural> for &'a Natural {
+impl DivRound<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -386,7 +386,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
+impl DivRound<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference and rounding
@@ -475,7 +475,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     ///     (Natural::from(4u32), Greater)
     /// );
     /// ```
-    fn div_round(self, other: &'b Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn div_round(self, other: &Natural, rm: RoundingMode) -> (Natural, Ordering) {
         let (q, r) = self.div_mod(other);
         if r == 0 {
             (q, Equal)

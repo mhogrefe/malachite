@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::mod_mul::{
-    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, limbs_mod_preinverted,
+    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, mod_preinverted_double,
     naive_mod_mul, test_invert_u32_table, test_invert_u64_table,
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
@@ -70,7 +70,7 @@ fn limbs_invert_limb_u64_fail() {
 }
 
 #[test]
-fn test_limbs_mod_preinverted() {
+fn test_mod_preinverted_double() {
     fn test<
         T: TryFrom<DT> + PrimitiveUnsigned,
         DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -81,7 +81,7 @@ fn test_limbs_mod_preinverted() {
         out: T,
     ) {
         let d_inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
-        assert_eq!(limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv), out);
+        assert_eq!(mod_preinverted_double::<T, DT>(x_1, x_0, d, d_inv), out);
         assert_eq!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)), out);
     }
     test::<u8, u16>(0, 0, 1, 0);
@@ -185,7 +185,7 @@ fn mod_mul_preinverted_properties_helper<
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >() {
     unsigned_quadruple_gen_var_5::<T, DT>().test_properties(|(x_1, x_0, d, d_inv)| {
-        let r = limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv);
+        let r = mod_preinverted_double::<T, DT>(x_1, x_0, d, d_inv);
         let n = DT::join_halves(x_1, x_0);
         assert_eq!(T::exact_from(n % DT::from(d)), r);
         assert!(r < d);

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -153,7 +153,7 @@ impl Natural {
     }
 }
 
-impl<'a, 'b> EqModPowerOf2<&'b Integer> for &'a Integer {
+impl EqModPowerOf2<&Integer> for &Integer {
     /// Returns whether one [`Integer`] is equal to another modulo $2^k$; that is, whether their $k$
     /// least-significant bits (in two's complement) are equal.
     ///
@@ -188,7 +188,7 @@ impl<'a, 'b> EqModPowerOf2<&'b Integer> for &'a Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod_power_of_2(self, other: &'b Integer, pow: u64) -> bool {
+    fn eq_mod_power_of_2(self, other: &Integer, pow: u64) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod_power_of_2(&other.abs, pow)
         } else {

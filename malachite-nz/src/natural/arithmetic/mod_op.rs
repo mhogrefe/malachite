@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -1585,7 +1585,7 @@ impl<'a> Mod<&'a Natural> for Natural {
     }
 }
 
-impl<'a> Mod<Natural> for &'a Natural {
+impl Mod<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -1630,7 +1630,7 @@ impl<'a> Mod<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
+impl Mod<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning just
@@ -1670,7 +1670,7 @@ impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_op(self, other: &'b Natural) -> Natural {
+    fn mod_op(self, other: &Natural) -> Natural {
         self % other
     }
 }
@@ -1854,7 +1854,7 @@ impl<'a> Rem<&'a Natural> for Natural {
     }
 }
 
-impl<'a> Rem<Natural> for &'a Natural {
+impl Rem<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
@@ -1911,7 +1911,7 @@ impl<'a> Rem<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
+impl Rem<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning just
@@ -1951,7 +1951,7 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     ///     530068894399u64
     /// );
     /// ```
-    fn rem(self, other: &'b Natural) -> Natural {
+    fn rem(self, other: &Natural) -> Natural {
         match (self, other) {
             (_, &Natural::ZERO) => panic!("division by zero"),
             (_, &Natural::ONE) => Natural::ZERO,
@@ -2163,7 +2163,7 @@ impl<'a> NegMod<&'a Natural> for Natural {
     }
 }
 
-impl<'a> NegMod<Natural> for &'a Natural {
+impl NegMod<Natural> for &Natural {
     type Output = Natural;
 
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking the first by reference
@@ -2212,7 +2212,7 @@ impl<'a> NegMod<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
+impl NegMod<&Natural> for &Natural {
     type Output = Natural;
 
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking both by reference and
@@ -2251,7 +2251,7 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     ///     704498996588u64
     /// );
     /// ```
-    fn neg_mod(self, other: &'b Natural) -> Natural {
+    fn neg_mod(self, other: &Natural) -> Natural {
         let r = self % other;
         if r == 0 {
             r

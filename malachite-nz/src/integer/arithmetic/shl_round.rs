@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -110,7 +110,7 @@ macro_rules! impl_shl_round_signed {
             }
         }
 
-        impl<'a> ShlRound<$t> for &'a Integer {
+        impl<'a> ShlRound<$t> for &Integer {
             type Output = Integer;
 
             /// Left-shifts an [`Integer`] (multiplies or divides it by a power of 2), taking it by

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -48,7 +48,7 @@ impl DivisibleBy<Integer> for Integer {
     }
 }
 
-impl<'a> DivisibleBy<&'a Integer> for Integer {
+impl DivisibleBy<&Integer> for Integer {
     /// Returns whether an [`Integer`] is divisible by another [`Integer`]; in other words, whether
     /// the first is a multiple of the second. The first [`Integer`] is taken by value and the
     /// second by reference.
@@ -83,12 +83,12 @@ impl<'a> DivisibleBy<&'a Integer> for Integer {
     ///     true
     /// );
     /// ```
-    fn divisible_by(self, other: &'a Integer) -> bool {
+    fn divisible_by(self, other: &Integer) -> bool {
         self.abs.divisible_by(&other.abs)
     }
 }
 
-impl<'a> DivisibleBy<Integer> for &'a Integer {
+impl DivisibleBy<Integer> for &Integer {
     /// Returns whether an [`Integer`] is divisible by another [`Integer`]; in other words, whether
     /// the first is a multiple of the second. The first [`Integer`] is taken by reference and the
     /// second by value.
@@ -130,7 +130,7 @@ impl<'a> DivisibleBy<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
+impl DivisibleBy<&Integer> for &Integer {
     /// Returns whether an [`Integer`] is divisible by another [`Integer`]; in other words, whether
     /// the first is a multiple of the second. Both [`Integer`]s are taken by reference.
     ///
@@ -166,7 +166,7 @@ impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
     ///     true
     /// );
     /// ```
-    fn divisible_by(self, other: &'b Integer) -> bool {
+    fn divisible_by(self, other: &Integer) -> bool {
         (&self.abs).divisible_by(&other.abs)
     }
 }

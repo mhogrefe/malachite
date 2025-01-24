@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -90,7 +90,7 @@ impl Neg for Natural {
     }
 }
 
-impl<'a> Neg for &'a Natural {
+impl Neg for &Natural {
     type Output = Integer;
 
     /// Negates a [`Natural`], taking it by reference and returning an [`Integer`].

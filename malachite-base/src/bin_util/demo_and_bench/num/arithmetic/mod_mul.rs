@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::mod_mul::{
-    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, limbs_mod_preinverted,
+    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, mod_preinverted_double,
     naive_mod_mul,
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
@@ -29,7 +29,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_invert_limb_u64);
     register_generic_demos_2!(
         runner,
-        demo_limbs_mod_preinverted,
+        demo_mod_preinverted_double,
         [u8, u16],
         [u16, u32],
         [u32, u64],
@@ -42,7 +42,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_limbs_invert_limb_u64_algorithms);
     register_generic_benches_2!(
         runner,
-        benchmark_limbs_mod_preinverted_algorithms,
+        benchmark_mod_preinverted_double_algorithms,
         [u8, u16],
         [u16, u32],
         [u32, u64],
@@ -79,7 +79,7 @@ fn demo_limbs_invert_limb_u64(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_mod_preinverted<
+fn demo_mod_preinverted_double<
     T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -92,12 +92,12 @@ fn demo_limbs_mod_preinverted<
         .take(limit)
     {
         println!(
-            "limbs_mod_preinverted({}, {}, {}, {}) = {}",
+            "mod_preinverted_double({}, {}, {}, {}) = {}",
             x_1,
             x_0,
             m,
             inv,
-            limbs_mod_preinverted::<T, DT>(x_1, x_0, m, inv)
+            mod_preinverted_double::<T, DT>(x_1, x_0, m, inv)
         );
     }
 }
@@ -168,7 +168,7 @@ fn benchmark_limbs_invert_limb_u64_algorithms(
     );
 }
 
-fn benchmark_limbs_mod_preinverted_algorithms<
+fn benchmark_mod_preinverted_double_algorithms<
     T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -179,7 +179,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
 ) {
     run_benchmark(
         &format!(
-            "limbs_mod_preinverted({}, {}, {}, {})",
+            "mod_preinverted_double({}, {}, {}, {})",
             T::NAME,
             T::NAME,
             T::NAME,
@@ -193,7 +193,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
         &quadruple_1_2_bit_bucketer("x"),
         &mut [
             ("default", &mut |(x_1, x_0, d, d_inv)| {
-                no_out!(limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv))
+                no_out!(mod_preinverted_double::<T, DT>(x_1, x_0, d, d_inv))
             }),
             ("naive", &mut |(x_1, x_0, d, _)| {
                 no_out!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)))

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,7 +17,7 @@ use malachite_base::num::conversion::string::to_string::{
 use malachite_base::num::conversion::traits::{Digits, ToStringBase};
 use malachite_base::vecs::vec_pad_left;
 
-impl<'a> Display for BaseFmtWrapper<&'a Integer> {
+impl Display for BaseFmtWrapper<&Integer> {
     /// Writes a wrapped [`Integer`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
@@ -73,7 +73,7 @@ impl<'a> Display for BaseFmtWrapper<&'a Integer> {
     }
 }
 
-impl<'a> Debug for BaseFmtWrapper<&'a Integer> {
+impl Debug for BaseFmtWrapper<&Integer> {
     /// Writes a wrapped [`Integer`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the

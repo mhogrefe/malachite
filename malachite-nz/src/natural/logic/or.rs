@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -330,7 +330,7 @@ impl<'a> BitOr<&'a Natural> for Natural {
     }
 }
 
-impl<'a> BitOr<Natural> for &'a Natural {
+impl BitOr<Natural> for &Natural {
     type Output = Natural;
 
     /// Takes the bitwise or of two [`Natural`]s, taking the first by reference and the second by
@@ -366,7 +366,7 @@ impl<'a> BitOr<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
+impl BitOr<&Natural> for &Natural {
     type Output = Natural;
 
     /// Takes the bitwise or of two [`Natural`]s, taking both by reference.
@@ -395,7 +395,7 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     ///     1000000004095u64
     /// );
     /// ```
-    fn bitor(self, other: &'a Natural) -> Natural {
+    fn bitor(self, other: &Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.or_limb_ref(y),
             (&Natural(Small(x)), y) => y.or_limb_ref(x),

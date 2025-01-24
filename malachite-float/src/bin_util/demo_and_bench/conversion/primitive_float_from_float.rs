@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -16,20 +16,35 @@ use malachite_float::conversion::primitive_float_from_float::FloatFromFloatError
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer,
 };
-use malachite_float::test_util::generators::{float_gen, float_rounding_mode_pair_gen_var_6};
+use malachite_float::test_util::generators::{
+    float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_20,
+    float_rounding_mode_pair_gen_var_6,
+};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_primitive_float_rounding_from_float);
     register_primitive_float_demos!(runner, demo_primitive_float_rounding_from_float_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_rounding_from_float_extreme);
+    register_primitive_float_demos!(
+        runner,
+        demo_primitive_float_rounding_from_float_extreme_debug
+    );
     register_primitive_float_demos!(runner, demo_primitive_float_rounding_from_float_ref);
     register_primitive_float_demos!(runner, demo_primitive_float_rounding_from_float_ref_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_try_from_float);
     register_primitive_float_demos!(runner, demo_primitive_float_try_from_float_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_try_from_float_extreme);
+    register_primitive_float_demos!(runner, demo_primitive_float_try_from_float_extreme_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_try_from_float_ref);
     register_primitive_float_demos!(runner, demo_primitive_float_try_from_float_ref_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_convertible_from_float);
     register_primitive_float_demos!(runner, demo_primitive_float_convertible_from_float_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_convertible_from_float_extreme);
+    register_primitive_float_demos!(
+        runner,
+        demo_primitive_float_convertible_from_float_extreme_debug
+    );
 
     register_primitive_float_benches!(runner, benchmark_primitive_float_try_from_float);
     register_primitive_float_benches!(runner, benchmark_primitive_float_convertible_from_float);
@@ -69,6 +84,54 @@ fn demo_primitive_float_rounding_from_float_debug<T: PrimitiveFloat + RoundingFr
     for<'a> T: ConvertibleFrom<&'a Float>,
 {
     for (x, rm) in float_rounding_mode_pair_gen_var_6::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x_out, o) = T::rounding_from(x.clone(), rm);
+        println!(
+            "{}::rounding_from({:#x}, {}) = ({}, {:?})",
+            T::NAME,
+            ComparableFloat(x),
+            rm,
+            NiceFloat(x_out),
+            o
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_rounding_from_float_extreme<T: PrimitiveFloat + RoundingFrom<Float>>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    for (x, rm) in float_rounding_mode_pair_gen_var_20::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x_out, o) = T::rounding_from(x.clone(), rm);
+        println!(
+            "{}::rounding_from({}, {}) = ({}, {:?})",
+            T::NAME,
+            x,
+            rm,
+            NiceFloat(x_out),
+            o
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_rounding_from_float_extreme_debug<T: PrimitiveFloat + RoundingFrom<Float>>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    for (x, rm) in float_rounding_mode_pair_gen_var_20::<T>()
         .get(gm, config)
         .take(limit)
     {
@@ -166,6 +229,40 @@ fn demo_primitive_float_try_from_float_debug<
     }
 }
 
+fn demo_primitive_float_try_from_float_extreme<
+    T: TryFrom<Float, Error = FloatFromFloatError> + PrimitiveFloat,
+>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "{}::try_from({}) = {:?}",
+            T::NAME,
+            x.clone(),
+            T::try_from(x).map(NiceFloat)
+        );
+    }
+}
+
+fn demo_primitive_float_try_from_float_extreme_debug<
+    T: TryFrom<Float, Error = FloatFromFloatError> + PrimitiveFloat,
+>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "{}::try_from({:#x}) = {:?}",
+            T::NAME,
+            ComparableFloat(x.clone()),
+            T::try_from(x).map(NiceFloat)
+        );
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_try_from_float_ref<T: PrimitiveFloat>(
     gm: GenMode,
@@ -229,6 +326,42 @@ fn demo_primitive_float_convertible_from_float_debug<T: PrimitiveFloat>(
     for<'a> T: ConvertibleFrom<&'a Float>,
 {
     for f in float_gen().get(gm, config).take(limit) {
+        println!(
+            "{:#x} is {}convertible to an {}",
+            ComparableFloatRef(&f),
+            if T::convertible_from(&f) { "" } else { "not " },
+            T::NAME
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_convertible_from_float_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    for f in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "{} is {}convertible to an {}",
+            f,
+            if T::convertible_from(&f) { "" } else { "not " },
+            T::NAME
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_convertible_from_float_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> T: ConvertibleFrom<&'a Float>,
+{
+    for f in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "{:#x} is {}convertible to an {}",
             ComparableFloatRef(&f),

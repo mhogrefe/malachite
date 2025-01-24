@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,7 +14,7 @@ use malachite_float::test_util::common::{
     parse_hex_string, ORDERED_FLOAT_HEX_STRINGS, ORDERED_FLOAT_STRINGS,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_pair_gen, float_pair_gen_var_1, float_triple_gen,
+    float_gen, float_pair_gen, float_pair_gen_var_1, float_pair_gen_var_10, float_triple_gen,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -59,13 +59,22 @@ fn test_eq() {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn eq_properties_helper(x: Float, y: Float) {
+    let e = x == y;
+    assert_eq!(y == x, e);
+    assert_eq!(rug::Float::exact_from(&x) == rug::Float::exact_from(&y), e);
+}
+
 #[allow(clippy::cmp_owned)]
 #[test]
 fn eq_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        let e = x == y;
-        assert_eq!(y == x, e);
-        assert_eq!(rug::Float::exact_from(&x) == rug::Float::exact_from(&y), e);
+        eq_properties_helper(x, y);
+    });
+
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        eq_properties_helper(x, y);
     });
 
     float_gen().test_properties(|x| {
@@ -111,22 +120,31 @@ fn test_comparable_float_eq() {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn comparable_float_eq_properties_helper(x: Float, y: Float) {
+    let rx = ComparableFloatRef(&x);
+    let ry = ComparableFloatRef(&y);
+    let e = rx == ry;
+    assert_eq!(ry == rx, e);
+
+    let x = ComparableFloat(x.clone());
+    let y = ComparableFloat(y.clone());
+    assert_eq!(x == y, e);
+    assert_eq!(y == x, e);
+
+    if e && !x.is_nan() {
+        assert_eq!(x, y);
+    }
+}
+
 #[test]
 fn comparable_float_eq_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        let rx = ComparableFloatRef(&x);
-        let ry = ComparableFloatRef(&y);
-        let e = rx == ry;
-        assert_eq!(ry == rx, e);
+        comparable_float_eq_properties_helper(x, y);
+    });
 
-        let x = ComparableFloat(x.clone());
-        let y = ComparableFloat(y.clone());
-        assert_eq!(x == y, e);
-        assert_eq!(y == x, e);
-
-        if e && !x.is_nan() {
-            assert_eq!(x, y);
-        }
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        comparable_float_eq_properties_helper(x, y);
     });
 
     float_gen().test_properties(|x| {

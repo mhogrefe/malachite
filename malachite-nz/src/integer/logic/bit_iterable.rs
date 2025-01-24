@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -24,7 +24,7 @@ pub struct NegativeBitIterator<'a> {
     first_true_index: Option<u64>,
 }
 
-impl<'a> Iterator for NegativeBitIterator<'a> {
+impl Iterator for NegativeBitIterator<'_> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
@@ -52,7 +52,7 @@ impl<'a> Iterator for NegativeBitIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NegativeBitIterator<'a> {
+impl DoubleEndedIterator for NegativeBitIterator<'_> {
     fn next_back(&mut self) -> Option<bool> {
         let previous_j = self.j;
         self.bits.next_back().map(|bit| {
@@ -76,7 +76,7 @@ impl<'a> DoubleEndedIterator for NegativeBitIterator<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for NegativeBitIterator<'a> {}
+impl ExactSizeIterator for NegativeBitIterator<'_> {}
 
 trait SignExtendedBitIterator: DoubleEndedIterator<Item = bool> {
     const EXTENSION: bool;
@@ -112,7 +112,7 @@ trait SignExtendedBitIterator: DoubleEndedIterator<Item = bool> {
     }
 }
 
-impl<'a> SignExtendedBitIterator for NaturalBitIterator<'a> {
+impl SignExtendedBitIterator for NaturalBitIterator<'_> {
     const EXTENSION: bool = false;
 
     fn needs_sign_extension(&self) -> bool {
@@ -120,7 +120,7 @@ impl<'a> SignExtendedBitIterator for NaturalBitIterator<'a> {
     }
 }
 
-impl<'a> SignExtendedBitIterator for NegativeBitIterator<'a> {
+impl SignExtendedBitIterator for NegativeBitIterator<'_> {
     const EXTENSION: bool = true;
 
     fn needs_sign_extension(&self) -> bool {
@@ -151,7 +151,7 @@ pub enum IntegerBitIterator<'a> {
     Negative(NegativeBitIterator<'a>, bool),
 }
 
-impl<'a> Iterator for IntegerBitIterator<'a> {
+impl Iterator for IntegerBitIterator<'_> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
@@ -167,7 +167,7 @@ impl<'a> Iterator for IntegerBitIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for IntegerBitIterator<'a> {
+impl DoubleEndedIterator for IntegerBitIterator<'_> {
     fn next_back(&mut self) -> Option<bool> {
         match *self {
             IntegerBitIterator::Zero => None,
@@ -181,7 +181,7 @@ impl<'a> DoubleEndedIterator for IntegerBitIterator<'a> {
     }
 }
 
-impl<'a> Index<u64> for IntegerBitIterator<'a> {
+impl Index<u64> for IntegerBitIterator<'_> {
     type Output = bool;
 
     /// A function to retrieve an [`Integer`]'s two's complement bits by index. Indexing at or above

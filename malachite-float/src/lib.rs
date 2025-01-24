@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -110,8 +110,8 @@ use malachite_nz::platform::Limb;
 /// be changed in the future to match MPFR's behavior.
 ///
 /// `Float`s are similar to the primitive floats defined by the IEEE 754 standard. They include NaN,
-/// positive and negative infinity, and positive and negative zero. There is only one NaN; there is
-/// no concept of a NaN payload.
+/// positive and $-\infty$, and positive and negative zero. There is only one NaN; there is no
+/// concept of a NaN payload.
 ///
 /// All the finite `Float`s are dyadic rationals (rational numbers whose denominator is a power of
 /// 2). A finite `Float` consists of several fields:
@@ -137,8 +137,8 @@ use malachite_nz::platform::Limb;
 /// things like $-\text{NaN}=\text{NaN}$ and $-(0.0) = -0.0$.
 ///
 /// The `Float` type is designed to be very similar to the `mpfr_t` type in
-/// [MPFR](https://www.mpfr.org/), and all Malachite functions produce exactly the same result as
-/// their counterparts in MPFR, unless otherwise noted.
+/// [MPFR](https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types), and all Malachite
+/// functions produce exactly the same result as their counterparts in MPFR, unless otherwise noted.
 ///
 /// Here are the structural difference between `Float` and `mpfr_t`:
 /// - `Float` can only represent a single `NaN` value, with no sign or payload.
@@ -148,9 +148,10 @@ use malachite_nz::platform::Limb;
 /// - The types of `mpfr_t` components are configuration- and platform-dependent. The types of
 ///   `Float` components are platform-independent, although the `Limb` type is
 ///   configuration-dependent: it is `u64` by default, but may be changed to `u32` using the
-///   `--32_bit_limbs` compiler flag. The type of the exponent is always `i64` and the type of the
-///   precision is always `u64`. The `Limb` type only affects functions that extract the raw
-///   significand. All other functions have the same behavior when compiled with either type.
+///   `--32_bit_limbs` compiler flag. The type of the exponent is always `i32` and the type of the
+///   precision is always `u64`. The `Limb` type only has a visible effect on the functions that
+///   extract the raw significand. All other functions have the same interface when compiled with
+///   either `Limb` type.
 ///
 /// `Float`s whose precision is 64 bits or less can be represented without any memory allocation.
 /// (Unless Malachite is compiled with `32_bit_limbs`, in which case the limit is 32).
@@ -181,19 +182,34 @@ pub(crate) fn significand_bits(significand: &Natural) -> u64 {
     significand.limb_count() << Limb::LOG_WIDTH
 }
 
-#[cfg(feature = "test_build")]
 impl Float {
+    /// The maximum raw exponent of any [`Float`], equal to $2^{30}-1$, or $1,073,741,823$. This is
+    /// one more than the maximum scientific exponent. If we write a [`Float`] as $\pm m2^e$, with
+    /// $1\leq m<2$ and $e$ an integer, we must have $e\leq 2^{30}-2$. If the result of a
+    /// calculation would produce a [`Float`] with an exponent larger than this, $\pm\infty$ is
+    /// returned instead.
+    pub const MAX_EXPONENT: i32 = 0x3fff_ffff;
+    /// The minimum raw exponent of any [`Float`], equal to $-(2^{30}-1)$, or $-1,073,741,823$. This
+    /// is one more than the minimum scientific exponent. If we write a [`Float`] as $\pm m2^e$,
+    /// with $1\leq m<2$ and $e$ an integer, we must have $e\geq -2^{30}$. If the result of a
+    /// calculation would produce a [`Float`] with an exponent smaller than this, $\pm0.0$ is
+    /// returned instead.
+    pub const MIN_EXPONENT: i32 = -Float::MAX_EXPONENT;
+
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         match self {
             Float(Finite {
                 precision,
                 significand,
+                exponent,
                 ..
             }) => {
-                if *precision == 0 {
-                    return false;
-                }
-                if !significand.is_valid() {
+                if *precision == 0
+                    || !significand.is_valid()
+                    || *exponent > Float::MAX_EXPONENT
+                    || *exponent < Float::MIN_EXPONENT
+                {
                     return false;
                 }
                 let bits = significand.significant_bits();
@@ -265,7 +281,7 @@ impl Deref for ComparableFloat {
     }
 }
 
-impl<'a> Deref for ComparableFloatRef<'a> {
+impl Deref for ComparableFloatRef<'_> {
     type Target = Float;
 
     /// Allows a [`ComparableFloatRef`] to dereference to a [`Float`].

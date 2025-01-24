@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::natural::Natural;
 use malachite_base::num::conversion::traits::IsInteger;
 
-impl<'a> IsInteger for &'a Natural {
+impl IsInteger for &Natural {
     /// Determines whether a [`Natural`] is an integer. It always returns `true`.
     ///
     /// $f(x) = \textrm{true}$.

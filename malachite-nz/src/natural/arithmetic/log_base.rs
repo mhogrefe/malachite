@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -162,7 +162,7 @@ pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, boo
     }
 }
 
-impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
+impl FloorLogBase<&Natural> for &Natural {
     type Output = u64;
 
     /// Returns the floor of the base-$b$ logarithm of a positive [`Natural`].
@@ -202,7 +202,7 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
+impl CeilingLogBase<&Natural> for &Natural {
     type Output = u64;
 
     /// Returns the ceiling of the base-$b$ logarithm of a positive [`Natural`].
@@ -256,7 +256,7 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
+impl CheckedLogBase<&Natural> for &Natural {
     type Output = u64;
 
     /// Returns the base-$b$ logarithm of a positive [`Natural`]. If the [`Natural`] is not a power

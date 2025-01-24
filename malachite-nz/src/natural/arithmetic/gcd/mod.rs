@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -179,7 +179,7 @@ impl<'a> Gcd<&'a Natural> for Natural {
     }
 }
 
-impl<'a> Gcd<Natural> for &'a Natural {
+impl Gcd<Natural> for &Natural {
     type Output = Natural;
 
     /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking the first by
@@ -215,7 +215,7 @@ impl<'a> Gcd<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
+impl Gcd<&Natural> for &Natural {
     type Output = Natural;
 
     /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking both by reference.
@@ -244,7 +244,7 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     /// assert_eq!((&Natural::from(12u32)).gcd(&Natural::from(90u32)), 6);
     /// ```
     #[inline]
-    fn gcd(self, other: &'a Natural) -> Natural {
+    fn gcd(self, other: &Natural) -> Natural {
         match (self, other) {
             (x, &Natural::ZERO) => x.clone(),
             (&Natural::ZERO, y) => y.clone(),

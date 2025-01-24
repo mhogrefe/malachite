@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -14,7 +14,7 @@ use crate::num::arithmetic::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u
 use crate::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
 };
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
@@ -39,7 +39,7 @@ pub_test! {simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> 
 // m.get_highest_bit(), x < m, y < m
 //
 // This is equivalent to `n_mulmod_preinv` from `ulong_extras/mulmod_preinv.c`, FLINT 2.7.1.
-fn mul_mod_helper<
+pub(crate) fn mul_mod_helper<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -69,7 +69,7 @@ fn mul_mod_helper<
 // m.get_highest_bit(), x < m
 //
 // This is equivalent to `n_powmod_ui_preinv` from ulong_extras/powmod_ui_preinv.c, FLINT 2.7.1.
-fn fast_mod_pow<
+pub(crate) fn fast_mod_pow<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -250,7 +250,7 @@ impl ModPowPrecomputed<u64, usize> for usize {
     /// # Worst-case complexity
     /// Constant time and additional memory.
     fn precompute_mod_pow_data(&m: &usize) -> (usize, u64) {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             let (inverse, shift) = u32::precompute_mod_pow_data(&u32::wrapping_from(m));
             (usize::wrapping_from(inverse), shift)
         } else {
@@ -280,7 +280,7 @@ impl ModPowPrecomputed<u64, usize> for usize {
     /// See [here](super::mod_pow#mod_pow_precomputed).
     fn mod_pow_precomputed(self, exp: u64, m: usize, data: &(usize, u64)) -> usize {
         let (inverse, shift) = *data;
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             usize::wrapping_from(u32::wrapping_from(self).mod_pow_precomputed(
                 exp,
                 u32::wrapping_from(m),

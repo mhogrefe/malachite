@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use malachite_base::num::logic::traits::SignificantBits;
 
-impl<'a> SignificantBits for &'a Integer {
+impl SignificantBits for &Integer {
     /// Returns the number of significant bits of an [`Integer`]'s absolute value.
     ///
     /// $$

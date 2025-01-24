@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -572,7 +572,7 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     }
 }
 
-impl<'a> DivisibleBy<Natural> for &'a Natural {
+impl DivisibleBy<Natural> for &Natural {
     /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
     /// the first is a multiple of the second. The first [`Natural`]s are taken by reference and the
     /// second by value.
@@ -623,7 +623,7 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
+impl DivisibleBy<&Natural> for &Natural {
     /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
     /// the first is a multiple of the second. Both [`Natural`]s are taken by reference.
     ///
@@ -662,7 +662,7 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     ///     true
     /// );
     /// ```
-    fn divisible_by(self, other: &'b Natural) -> bool {
+    fn divisible_by(self, other: &Natural) -> bool {
         match (self, other) {
             (x, &Natural(Small(y))) => x.divisible_by_limb(y),
             (&Natural(Small(x)), y) => y.limb_divisible_by_natural(x),

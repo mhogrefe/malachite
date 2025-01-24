@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -29,7 +29,7 @@ use malachite_base::num::logic::traits::BitAccess;
 // non-negative.
 pub_crate_test! {limbs_get_bit(xs: &[Limb], index: u64) -> bool {
     xs.get(usize::exact_from(index >> Limb::LOG_WIDTH))
-        .map_or(false, |x| x.get_bit(index & Limb::WIDTH_MASK))
+        .is_some_and(|x| x.get_bit(index & Limb::WIDTH_MASK))
 }}
 
 fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {

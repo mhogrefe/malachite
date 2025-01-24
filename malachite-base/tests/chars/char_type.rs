@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -38,8 +38,8 @@ fn test_char_type() {
             (CharType::AsciiUpper, 26),
             (CharType::AsciiNumeric, 10),
             (CharType::AsciiNonAlphanumericGraphic, 33),
-            (CharType::NonAsciiGraphic, 147502),
-            (CharType::NonGraphic, 964467)
+            (CharType::NonAsciiGraphic, 152619),
+            (CharType::NonGraphic, 959350)
         ]
     );
 

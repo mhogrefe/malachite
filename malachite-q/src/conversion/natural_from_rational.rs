@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -51,7 +51,7 @@ impl TryFrom<Rational> for Natural {
     }
 }
 
-impl<'a> TryFrom<&'a Rational> for Natural {
+impl TryFrom<&Rational> for Natural {
     type Error = NaturalFromRationalError;
 
     /// Converts a [`Rational`] to a [`Natural`], taking the [`Rational`] by reference. If the
@@ -89,7 +89,7 @@ impl<'a> TryFrom<&'a Rational> for Natural {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Rational> for Natural {
+impl ConvertibleFrom<&Rational> for Natural {
     /// Determines whether a [`Rational`] can be converted to a [`Natural`] (when the [`Rational`]
     /// is non-negative and an integer), taking the [`Rational`] by reference.
     ///
@@ -192,7 +192,7 @@ impl RoundingFrom<Rational> for Natural {
     }
 }
 
-impl<'a> RoundingFrom<&'a Rational> for Natural {
+impl RoundingFrom<&Rational> for Natural {
     /// Converts a [`Rational`] to a [`Natural`], using a specified [`RoundingMode`] and taking the
     /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the returned
     /// value is less than, equal to, or greater than the original value.

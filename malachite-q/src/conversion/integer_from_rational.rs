@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -47,7 +47,7 @@ impl TryFrom<Rational> for Integer {
     }
 }
 
-impl<'a> TryFrom<&'a Rational> for Integer {
+impl TryFrom<&Rational> for Integer {
     type Error = IntegerFromRationalError;
 
     /// Converts a [`Rational`] to an [`Integer`], taking the [`Rational`] by reference. If the
@@ -82,7 +82,7 @@ impl<'a> TryFrom<&'a Rational> for Integer {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Rational> for Integer {
+impl ConvertibleFrom<&Rational> for Integer {
     /// Determines whether a [`Rational`] can be converted to an [`Integer`], taking the
     /// [`Rational`] by reference.
     ///
@@ -194,7 +194,7 @@ impl RoundingFrom<Rational> for Integer {
     }
 }
 
-impl<'a> RoundingFrom<&'a Rational> for Integer {
+impl RoundingFrom<&Rational> for Integer {
     /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking the
     /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the returned
     /// value is less than, equal to, or greater than the original value.

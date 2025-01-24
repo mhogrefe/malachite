@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use malachite_base::num::conversion::traits::IsInteger;
 
-impl<'a> IsInteger for &'a Integer {
+impl IsInteger for &Integer {
     /// Determines whether an [`Integer`] is an integer. It always returns `true`.
     ///
     /// $f(x) = \textrm{true}$.

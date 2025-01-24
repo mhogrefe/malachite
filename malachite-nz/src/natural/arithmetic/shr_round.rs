@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -439,7 +439,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             }
         }
 
-        impl<'a> ShrRound<$t> for &'a Natural {
+        impl<'a> ShrRound<$t> for &Natural {
             type Output = Natural;
 
             /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by reference, and
@@ -622,7 +622,7 @@ macro_rules! impl_natural_shr_round_signed {
             }
         }
 
-        impl<'a> ShrRound<$t> for &'a Natural {
+        impl<'a> ShrRound<$t> for &Natural {
             type Output = Natural;
 
             /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2), taking it by

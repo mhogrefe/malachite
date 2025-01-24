@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,6 @@ use crate::chars::constants::{
     CHAR_JUST_BELOW_SURROGATES, FIRST_SURROGATE_CODE_POINT, NUMBER_OF_CHARS,
     NUMBER_OF_SURROGATE_CODE_POINTS,
 };
-use crate::comparison::traits::Min;
 
 /// Converts a [`char`] to a [`u32`].
 ///

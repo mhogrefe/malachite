@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -92,7 +92,7 @@ impl Rational {
     }
 }
 
-impl<'a> FloorLogBase2 for &'a Rational {
+impl FloorLogBase2 for &Rational {
     type Output = i64;
 
     /// Returns the floor of the base-2 logarithm of a positive [`Rational`].
@@ -126,7 +126,7 @@ impl<'a> FloorLogBase2 for &'a Rational {
     }
 }
 
-impl<'a> CeilingLogBase2 for &'a Rational {
+impl CeilingLogBase2 for &Rational {
     type Output = i64;
 
     /// Returns the ceiling of the base-2 logarithm of a positive [`Rational`].
@@ -160,7 +160,7 @@ impl<'a> CeilingLogBase2 for &'a Rational {
     }
 }
 
-impl<'a> CheckedLogBase2 for &'a Rational {
+impl CheckedLogBase2 for &Rational {
     type Output = i64;
 
     /// Returns the base-2 logarithm of a positive [`Rational`]. If the [`Rational`] is not a power

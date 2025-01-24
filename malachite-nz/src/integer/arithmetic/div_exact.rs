@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -59,7 +59,7 @@ impl DivExact<Integer> for Integer {
     }
 }
 
-impl<'a> DivExact<&'a Integer> for Integer {
+impl DivExact<&Integer> for Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
@@ -103,13 +103,13 @@ impl<'a> DivExact<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_exact(mut self, other: &'a Integer) -> Integer {
+    fn div_exact(mut self, other: &Integer) -> Integer {
         self.div_exact_assign(other);
         self
     }
 }
 
-impl<'a> DivExact<Integer> for &'a Integer {
+impl DivExact<Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
@@ -160,7 +160,7 @@ impl<'a> DivExact<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
+impl DivExact<&Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference. The first
@@ -198,7 +198,7 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     ///     -123456789000i64
     /// );
     /// ```
-    fn div_exact(self, other: &'b Integer) -> Integer {
+    fn div_exact(self, other: &Integer) -> Integer {
         let q_abs = (&self.abs).div_exact(&other.abs);
         Integer {
             sign: self.sign == other.sign || q_abs == 0,
@@ -253,7 +253,7 @@ impl DivExactAssign<Integer> for Integer {
     }
 }
 
-impl<'a> DivExactAssign<&'a Integer> for Integer {
+impl DivExactAssign<&Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference. The first [`Integer`] must be exactly divisible by the second.
     /// If it isn't, this function may panic or return a meaningless result.
@@ -293,7 +293,7 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// x.div_exact_assign(&Integer::from_str("-987654321000").unwrap());
     /// assert_eq!(x, -123456789000i64);
     /// ```
-    fn div_exact_assign(&mut self, other: &'a Integer) {
+    fn div_exact_assign(&mut self, other: &Integer) {
         self.abs.div_exact_assign(&other.abs);
         self.sign = self.sign == other.sign || self.abs == 0;
     }

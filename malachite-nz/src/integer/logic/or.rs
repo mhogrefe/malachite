@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -935,7 +935,7 @@ impl<'a> BitOr<&'a Integer> for Integer {
     }
 }
 
-impl<'a> BitOr<Integer> for &'a Integer {
+impl BitOr<Integer> for &Integer {
     type Output = Integer;
 
     /// Takes the bitwise or of two [`Integer`]s, taking the first by reference and the second by
@@ -972,7 +972,7 @@ impl<'a> BitOr<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
+impl BitOr<&Integer> for &Integer {
     type Output = Integer;
 
     /// Takes the bitwise or of two [`Integer`]s, taking both by reference.
@@ -1001,7 +1001,7 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
     ///     -999999995905i64
     /// );
     /// ```
-    fn bitor(self, other: &'a Integer) -> Integer {
+    fn bitor(self, other: &Integer) -> Integer {
         match (self.sign, other.sign) {
             (true, true) => Integer {
                 sign: true,

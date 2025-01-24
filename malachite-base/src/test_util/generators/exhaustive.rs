@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,6 @@
 use crate::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use crate::chars::constants::NUMBER_OF_CHARS;
 use crate::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
-use crate::comparison::traits::Min;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::iterators::iter_windows;
 use crate::max;
@@ -644,6 +643,12 @@ pub fn exhaustive_primitive_int_unsigned_pair_gen_var_2<T: PrimitiveInt, U: Prim
     Box::new(exhaustive_pairs(
         primitive_int_increasing_inclusive_range(T::power_of_2(T::WIDTH - 2), T::MAX),
         exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_primitive_int_unsigned_pair_gen_var_3<T: PrimitiveInt>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs_from_single(
+        primitive_int_increasing_inclusive_range(T::TWO, T::MAX),
     ))
 }
 
@@ -2027,7 +2032,7 @@ pub fn exhaustive_unsigned_signed_pair_gen_var_2<T: PrimitiveFloat>() -> It<(u64
 
 // -- (PrimitiveUnsigned, PrimitiveSigned, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoPairWithExtraSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
+struct ModPowerOf2PairWithExtraSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
@@ -2039,7 +2044,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveSigned>
         u64,
         (T, U),
         ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, ExhaustiveSigneds<U>>,
-    > for ModPowerOfTwoPairWithExtraSignedGenerator<T, U>
+    > for ModPowerOf2PairWithExtraSignedGenerator<T, U>
 {
     #[inline]
     fn get_ys(&self, &pow: &u64) -> LongType<T, U> {
@@ -2057,7 +2062,7 @@ pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_1<
     reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoPairWithExtraSignedGenerator::<T, U> {
+        ModPowerOf2PairWithExtraSignedGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },
@@ -2297,13 +2302,13 @@ pub fn exhaustive_unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> It<(T, T)>
     Box::new(exhaustive_ordered_unique_pairs(exhaustive_unsigneds()))
 }
 
-struct ModPowerOfTwoSingleGenerator<T: PrimitiveUnsigned> {
+struct ModPowerOf2SingleGenerator<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
 }
 
 impl<T: PrimitiveUnsigned>
     ExhaustiveDependentPairsYsGenerator<u64, T, PrimitiveIntIncreasingRange<T>>
-    for ModPowerOfTwoSingleGenerator<T>
+    for ModPowerOf2SingleGenerator<T>
 {
     #[inline]
     fn get_ys(&self, &pow: &u64) -> PrimitiveIntIncreasingRange<T> {
@@ -2311,13 +2316,13 @@ impl<T: PrimitiveUnsigned>
     }
 }
 
-struct ModPowerOfTwoSingleGenerator2<T: PrimitiveUnsigned> {
+struct ModPowerOf2SingleGenerator2<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
 }
 
 impl<T: PrimitiveUnsigned>
     ExhaustiveDependentPairsYsGenerator<u64, T, PrimitiveIntIncreasingRange<T>>
-    for ModPowerOfTwoSingleGenerator2<T>
+    for ModPowerOf2SingleGenerator2<T>
 {
     #[inline]
     fn get_ys(&self, &pow: &u64) -> PrimitiveIntIncreasingRange<T> {
@@ -2329,7 +2334,7 @@ pub fn exhaustive_unsigned_pair_gen_var_14<T: PrimitiveUnsigned>() -> It<(T, u64
     permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoSingleGenerator {
+        ModPowerOf2SingleGenerator {
             phantom: PhantomData,
         },
     )))
@@ -2415,7 +2420,7 @@ pub fn exhaustive_unsigned_pair_gen_var_26<T: PrimitiveUnsigned>() -> It<(T, u64
     permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(1, T::WIDTH),
-        ModPowerOfTwoSingleGenerator2 {
+        ModPowerOf2SingleGenerator2 {
             phantom: PhantomData,
         },
     )))
@@ -2481,7 +2486,7 @@ pub fn exhaustive_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>() -> It<(T, T)>
     )
 }
 
-// var 32 is in malachite-nz.
+// vars 32 through 36 are in malachite-nz.
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
@@ -2719,7 +2724,7 @@ pub fn exhaustive_unsigned_triple_gen_var_9<T: PrimitiveUnsigned>() -> It<(T, T,
     )
 }
 
-struct ModPowerOfTwoPairGenerator<T: PrimitiveUnsigned> {
+struct ModPowerOf2PairGenerator<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
 }
 
@@ -2728,7 +2733,7 @@ impl<T: PrimitiveUnsigned>
         u64,
         (T, T),
         ExhaustivePairs1Input<PrimitiveIntIncreasingRange<T>>,
-    > for ModPowerOfTwoPairGenerator<T>
+    > for ModPowerOf2PairGenerator<T>
 {
     #[inline]
     fn get_ys(&self, &pow: &u64) -> ExhaustivePairs1Input<PrimitiveIntIncreasingRange<T>> {
@@ -2743,7 +2748,7 @@ pub fn exhaustive_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>() -> It<(T, T
     reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoPairGenerator {
+        ModPowerOf2PairGenerator {
             phantom: PhantomData,
         },
     ))))
@@ -2790,7 +2795,7 @@ pub fn exhaustive_unsigned_triple_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveU
     )
 }
 
-struct ModPowerOfTwoPairWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+struct ModPowerOf2PairWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
@@ -2800,7 +2805,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         u64,
         (T, U),
         ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, PrimitiveIntIncreasingRange<U>>,
-    > for ModPowerOfTwoPairWithExtraUnsignedGenerator<T, U>
+    > for ModPowerOf2PairWithExtraUnsignedGenerator<T, U>
 {
     #[inline]
     fn get_ys(
@@ -2819,7 +2824,7 @@ pub fn exhaustive_unsigned_triple_gen_var_15<T: PrimitiveUnsigned, U: PrimitiveU
     reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoPairWithExtraUnsignedGenerator::<T, U> {
+        ModPowerOf2PairWithExtraUnsignedGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },
@@ -2903,7 +2908,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned, U: Primitiv
     ))
 }
 
-struct ModPowerOfTwoTripleGenerator<T: PrimitiveUnsigned> {
+struct ModPowerOf2TripleGenerator<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
 }
 
@@ -2912,7 +2917,7 @@ impl<T: PrimitiveUnsigned>
         u64,
         (T, T, T),
         ExhaustiveTriples1Input<PrimitiveIntIncreasingRange<T>>,
-    > for ModPowerOfTwoTripleGenerator<T>
+    > for ModPowerOf2TripleGenerator<T>
 {
     #[inline]
     fn get_ys(&self, &pow: &u64) -> ExhaustiveTriples1Input<PrimitiveIntIncreasingRange<T>> {
@@ -2927,7 +2932,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>() -> It<(T,
     reshape_3_1_to_4(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoTripleGenerator {
+        ModPowerOf2TripleGenerator {
             phantom: PhantomData,
         },
     ))))
@@ -2973,7 +2978,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_7<T: PrimitiveUnsigned, U: Primitiv
     )
 }
 
-struct ModPowerOfTwoTripleWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+struct ModPowerOf2TripleWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
@@ -2983,7 +2988,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         u64,
         (T, T, U),
         ExhaustiveTriplesXXY<T, PrimitiveIntIncreasingRange<T>, U, PrimitiveIntIncreasingRange<U>>,
-    > for ModPowerOfTwoTripleWithExtraUnsignedGenerator<T, U>
+    > for ModPowerOf2TripleWithExtraUnsignedGenerator<T, U>
 {
     #[inline]
     fn get_ys(
@@ -3003,14 +3008,14 @@ pub fn exhaustive_unsigned_quadruple_gen_var_8<T: PrimitiveUnsigned, U: Primitiv
     reshape_3_1_to_4(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoTripleWithExtraUnsignedGenerator::<T, U> {
+        ModPowerOf2TripleWithExtraUnsignedGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },
     ))))
 }
 
-struct ModPowerOfTwoQuadrupleWithTwoExtraUnsignedsGenerator<
+struct ModPowerOf2QuadrupleWithTwoExtraUnsignedsGenerator<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 > {
@@ -3023,7 +3028,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         u64,
         (T, U, U),
         ExhaustiveTriplesXYY<T, PrimitiveIntIncreasingRange<T>, U, PrimitiveIntIncreasingRange<U>>,
-    > for ModPowerOfTwoQuadrupleWithTwoExtraUnsignedsGenerator<T, U>
+    > for ModPowerOf2QuadrupleWithTwoExtraUnsignedsGenerator<T, U>
 {
     #[inline]
     fn get_ys(
@@ -3043,7 +3048,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_9<T: PrimitiveUnsigned, U: Primitiv
     reshape_3_1_to_4(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoQuadrupleWithTwoExtraUnsignedsGenerator::<T, U> {
+        ModPowerOf2QuadrupleWithTwoExtraUnsignedsGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },
@@ -4212,14 +4217,14 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>() -
     ))
 }
 
-struct PowerOfTwoDigitsGenerator;
+struct PowerOf2DigitsGenerator;
 
 impl<T: PrimitiveUnsigned>
     ExhaustiveDependentPairsYsGenerator<
         u64,
         Vec<T>,
         ExhaustiveVecs<T, PrimitiveIntIncreasingRange<u64>, PrimitiveIntIncreasingRange<T>>,
-    > for PowerOfTwoDigitsGenerator
+    > for PowerOf2DigitsGenerator
 {
     #[inline]
     fn get_ys(
@@ -4241,7 +4246,7 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_10<T: PrimitiveUnsigned>() 
             BitDistributorOutputType::normal(1),
         ),
         primitive_int_increasing_inclusive_range(1, T::WIDTH),
-        PowerOfTwoDigitsGenerator,
+        PowerOf2DigitsGenerator,
     )))
 }
 

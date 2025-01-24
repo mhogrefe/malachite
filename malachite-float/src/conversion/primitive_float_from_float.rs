@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,9 +11,7 @@ use crate::{significand_bits, Float};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, IsPowerOf2, ShrRound};
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::{
-    ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
@@ -58,8 +56,8 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                 } else {
                     let target_prec = T::max_precision_for_sci_exponent(exponent);
                     let bits = significand_bits(&significand);
-                    let (mantissa, o) = significand
-                        .shr_round(i64::exact_from(bits) - i64::exact_from(target_prec), abs_rm);
+                    let (mantissa, o) =
+                        significand.shr_round(i128::from(bits) - i128::from(target_prec), abs_rm);
                     let mantissa = u64::wrapping_from(&mantissa);
                     if mantissa.significant_bits() > target_prec {
                         if exponent == T::MAX_EXPONENT {
@@ -75,7 +73,7 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                             (
                                 T::from_integer_mantissa_and_exponent(
                                     mantissa >> 1,
-                                    exponent - i64::exact_from(target_prec) + 2,
+                                    exponent - i64::wrapping_from(target_prec) + 2,
                                 )
                                 .unwrap(),
                                 o,
@@ -85,7 +83,7 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                         (
                             T::from_integer_mantissa_and_exponent(
                                 mantissa,
-                                exponent - i64::exact_from(target_prec) + 1,
+                                exponent - i64::wrapping_from(target_prec) + 1,
                             )
                             .unwrap(),
                             o,
@@ -143,8 +141,8 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                 } else {
                     let target_prec = T::max_precision_for_sci_exponent(exponent);
                     let bits = significand_bits(significand);
-                    let (mantissa, o) = significand
-                        .shr_round(i64::exact_from(bits) - i64::exact_from(target_prec), abs_rm);
+                    let (mantissa, o) =
+                        significand.shr_round(i128::from(bits) - i128::from(target_prec), abs_rm);
                     let mantissa = u64::wrapping_from(&mantissa);
                     if mantissa.significant_bits() > target_prec {
                         if exponent == T::MAX_EXPONENT {
@@ -160,7 +158,7 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                             (
                                 T::from_integer_mantissa_and_exponent(
                                     mantissa >> 1,
-                                    exponent - i64::exact_from(target_prec) + 2,
+                                    exponent - i64::wrapping_from(target_prec) + 2,
                                 )
                                 .unwrap(),
                                 o,
@@ -170,7 +168,7 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                         (
                             T::from_integer_mantissa_and_exponent(
                                 mantissa,
-                                exponent - i64::exact_from(target_prec) + 1,
+                                exponent - i64::wrapping_from(target_prec) + 1,
                             )
                             .unwrap(),
                             o,
@@ -220,11 +218,11 @@ fn primitive_float_try_from_float<T: PrimitiveFloat>(f: Float) -> Result<T, Floa
                     return Err(FloatFromFloatError::Inexact);
                 }
                 let mantissa = u64::wrapping_from(
-                    &(significand >> (i64::exact_from(bits) - i64::exact_from(target_prec))),
+                    &(significand >> (i128::from(bits) - i128::from(target_prec))),
                 );
                 T::from_integer_mantissa_and_exponent(
                     mantissa,
-                    exponent - i64::exact_from(target_prec) + 1,
+                    exponent - i64::wrapping_from(target_prec) + 1,
                 )
                 .unwrap()
             };
@@ -263,11 +261,11 @@ fn primitive_float_try_from_float_ref<T: PrimitiveFloat>(
                     return Err(FloatFromFloatError::Inexact);
                 }
                 let mantissa = u64::wrapping_from(
-                    &(significand >> (i64::exact_from(bits) - i64::exact_from(target_prec))),
+                    &(significand >> (i128::from(bits) - i128::from(target_prec))),
                 );
                 T::from_integer_mantissa_and_exponent(
                     mantissa,
-                    exponent - i64::exact_from(target_prec) + 1,
+                    exponent - i64::wrapping_from(target_prec) + 1,
                 )
                 .unwrap()
             };
@@ -318,7 +316,7 @@ macro_rules! impl_primitive_float_from {
             }
         }
 
-        impl<'a> RoundingFrom<&'a Float> for $t {
+        impl RoundingFrom<&Float> for $t {
             /// Converts a [`Float`] to a primitive float, using a specified [`RoundingMode`] and
             /// taking the [`Float`] by reference. An [`Ordering`] is also returned, indicating
             /// whether the returned value is less than, equal to, or greater than the original
@@ -335,7 +333,7 @@ macro_rules! impl_primitive_float_from {
             /// # Examples
             /// See [here](super::primitive_float_from_float#rounding_from).
             #[inline]
-            fn rounding_from(f: &'a Float, rm: RoundingMode) -> ($t, Ordering) {
+            fn rounding_from(f: &Float, rm: RoundingMode) -> ($t, Ordering) {
                 primitive_float_rounding_from_float_ref(f, rm)
             }
         }
@@ -357,7 +355,7 @@ macro_rules! impl_primitive_float_from {
             }
         }
 
-        impl<'a> TryFrom<&'a Float> for $t {
+        impl TryFrom<&Float> for $t {
             type Error = FloatFromFloatError;
 
             /// Converts a [`Float`] to a primitive float, taking the [`Float`] by reference. If the
@@ -369,12 +367,12 @@ macro_rules! impl_primitive_float_from {
             /// # Examples
             /// See [here](super::primitive_float_from_float#try_from).
             #[inline]
-            fn try_from(f: &'a Float) -> Result<$t, Self::Error> {
+            fn try_from(f: &Float) -> Result<$t, Self::Error> {
                 primitive_float_try_from_float_ref(f)
             }
         }
 
-        impl<'a> ConvertibleFrom<&'a Float> for $t {
+        impl ConvertibleFrom<&Float> for $t {
             /// Determines whether a [`Float`] can be converted to a primitive float, taking the
             /// [`Float`] by reference.
             ///
@@ -384,7 +382,7 @@ macro_rules! impl_primitive_float_from {
             /// # Examples
             /// See [here](super::primitive_float_from_float#convertible_from).
             #[inline]
-            fn convertible_from(f: &'a Float) -> bool {
+            fn convertible_from(f: &Float) -> bool {
                 primitive_float_convertible_from_float::<$t>(f)
             }
         }

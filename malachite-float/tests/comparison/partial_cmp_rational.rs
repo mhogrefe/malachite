@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -7,12 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_float::comparison::partial_cmp_rational::float_partial_cmp_rational_alt;
 use malachite_float::test_util::common::parse_hex_string;
+use malachite_float::test_util::comparison::partial_cmp_rational::float_partial_cmp_rational_alt;
 use malachite_float::test_util::generators::{
     float_float_rational_triple_gen, float_rational_pair_gen, float_rational_pair_gen_var_1,
-    float_rational_rational_triple_gen,
+    float_rational_pair_gen_var_2, float_rational_rational_triple_gen,
 };
+use malachite_float::Float;
 use malachite_q::Rational;
 use rug;
 use std::cmp::Ordering::{self, *};
@@ -803,16 +804,25 @@ fn test_partial_cmp_rational() {
     test("-4.0e-121", "-0x1.0E-100#1", "-22/7", Some(Greater));
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_cmp_rational_properties_helper(x: Float, y: Rational) {
+    let cmp = x.partial_cmp(&y);
+    assert_eq!(
+        rug::Float::exact_from(&x).partial_cmp(&rug::Rational::from(&y)),
+        cmp
+    );
+    assert_eq!(float_partial_cmp_rational_alt(&x, &y), cmp);
+    assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));
+}
+
 #[test]
 fn partial_cmp_rational_properties() {
     float_rational_pair_gen().test_properties(|(x, y)| {
-        let cmp = x.partial_cmp(&y);
-        assert_eq!(
-            rug::Float::exact_from(&x).partial_cmp(&rug::Rational::from(&y)),
-            cmp
-        );
-        assert_eq!(float_partial_cmp_rational_alt(&x, &y), cmp);
-        assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));
+        partial_cmp_rational_properties_helper(x, y);
+    });
+
+    float_rational_pair_gen_var_2().test_properties(|(x, y)| {
+        partial_cmp_rational_properties_helper(x, y);
     });
 
     float_float_rational_triple_gen().test_properties(|(x, z, y)| {

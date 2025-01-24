@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -367,7 +367,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
+impl CheckedSubMul<&Natural, &Natural> for &Natural {
     type Output = Natural;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
@@ -413,7 +413,7 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     "Some(995705032704)"
     /// );
     /// ```
-    fn checked_sub_mul(self, y: &'a Natural, z: &'b Natural) -> Option<Natural> {
+    fn checked_sub_mul(self, y: &Natural, z: &Natural) -> Option<Natural> {
         match (self, y, z) {
             (x, Natural(Small(small_y)), z) => x.checked_sub_mul_limb_ref_ref(z, *small_y),
             (x, y, Natural(Small(small_z))) => x.checked_sub_mul_limb_ref_ref(y, *small_z),

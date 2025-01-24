@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -119,7 +119,7 @@ impl<'a> ModInverse<&'a Natural> for Natural {
     }
 }
 
-impl<'a> ModInverse<Natural> for &'a Natural {
+impl ModInverse<Natural> for &Natural {
     type Output = Natural;
 
     /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
@@ -166,7 +166,7 @@ impl<'a> ModInverse<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
+impl ModInverse<&Natural> for &Natural {
     type Output = Natural;
 
     /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
@@ -201,7 +201,7 @@ impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
     ///     None
     /// );
     /// ```
-    fn mod_inverse(self, m: &'a Natural) -> Option<Natural> {
+    fn mod_inverse(self, m: &Natural) -> Option<Natural> {
         assert_ne!(*self, 0u32);
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {

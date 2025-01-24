@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -90,7 +90,7 @@ impl<T> BaseFmtWrapper<T> {
     }
 }
 
-impl<'a> Display for BaseFmtWrapper<&'a Natural> {
+impl Display for BaseFmtWrapper<&Natural> {
     /// Writes a wrapped [`Natural`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
@@ -138,7 +138,7 @@ impl<'a> Display for BaseFmtWrapper<&'a Natural> {
     }
 }
 
-impl<'a> Debug for BaseFmtWrapper<&'a Natural> {
+impl Debug for BaseFmtWrapper<&Natural> {
     /// Writes a wrapped [`Natural`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the

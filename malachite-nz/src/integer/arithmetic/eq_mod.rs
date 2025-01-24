@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -432,7 +432,7 @@ impl EqMod<Integer, Natural> for Integer {
     }
 }
 
-impl<'a> EqMod<Integer, &'a Natural> for Integer {
+impl EqMod<Integer, &Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first two numbers are taken by value and the third by reference.
@@ -477,7 +477,7 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Integer, m: &'a Natural) -> bool {
+    fn eq_mod(self, other: Integer, m: &Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, m)
         } else {
@@ -486,7 +486,7 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     }
 }
 
-impl<'a> EqMod<&'a Integer, Natural> for Integer {
+impl EqMod<&Integer, Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first and third numbers are taken by value and the second by reference.
@@ -531,7 +531,7 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'a Integer, m: Natural) -> bool {
+    fn eq_mod(self, other: &Integer, m: Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, m)
         } else {
@@ -540,7 +540,7 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     }
 }
 
-impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
+impl EqMod<&Integer, &Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first number is taken by value and the second and third by reference.
@@ -585,7 +585,7 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'a Integer, m: &'b Natural) -> bool {
+    fn eq_mod(self, other: &Integer, m: &Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, m)
         } else {
@@ -594,7 +594,7 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     }
 }
 
-impl<'a> EqMod<Integer, Natural> for &'a Integer {
+impl EqMod<Integer, Natural> for &Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first number is taken by reference and the second and third by value.
@@ -648,7 +648,7 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
     }
 }
 
-impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
+impl EqMod<Integer, &Natural> for &Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first and third numbers are taken by reference and the third by value.
@@ -693,7 +693,7 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Integer, m: &'b Natural) -> bool {
+    fn eq_mod(self, other: Integer, m: &Natural) -> bool {
         if self.sign == other.sign {
             (&self.abs).eq_mod(other.abs, m)
         } else {
@@ -702,7 +702,7 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     }
 }
 
-impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
+impl EqMod<&Integer, Natural> for &Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first two numbers are taken by reference and the third by value.
@@ -747,7 +747,7 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'b Integer, m: Natural) -> bool {
+    fn eq_mod(self, other: &Integer, m: Natural) -> bool {
         if self.sign == other.sign {
             (&self.abs).eq_mod(&other.abs, m)
         } else {
@@ -756,7 +756,7 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     }
 }
 
-impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
+impl EqMod<&Integer, &Natural> for &Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. All three numbers are taken by reference.
@@ -801,7 +801,7 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'b Integer, m: &'c Natural) -> bool {
+    fn eq_mod(self, other: &Integer, m: &Natural) -> bool {
         if self.sign == other.sign {
             (&self.abs).eq_mod(&other.abs, m)
         } else {

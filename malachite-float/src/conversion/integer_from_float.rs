@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -108,7 +108,7 @@ impl RoundingFrom<Float> for Integer {
     }
 }
 
-impl<'a> RoundingFrom<&'a Float> for Integer {
+impl RoundingFrom<&Float> for Integer {
     /// Converts a [`Float`] to an [`Integer`], using a specified [`RoundingMode`] and taking the
     /// [`Float`] by reference. An [`Ordering`] is also returned, indicating whether the returned
     /// value is less than, equal to, or greater than the original value.
@@ -161,7 +161,7 @@ impl<'a> RoundingFrom<&'a Float> for Integer {
     ///     "(-2, Less)"
     /// );
     /// ```
-    fn rounding_from(f: &'a Float, rm: RoundingMode) -> (Integer, Ordering) {
+    fn rounding_from(f: &Float, rm: RoundingMode) -> (Integer, Ordering) {
         match f {
             float_either_zero!() => (Integer::ZERO, Equal),
             Float(Finite {
@@ -265,7 +265,7 @@ impl TryFrom<Float> for Integer {
     }
 }
 
-impl<'a> TryFrom<&'a Float> for Integer {
+impl TryFrom<&Float> for Integer {
     type Error = SignedFromFloatError;
 
     /// Converts a [`Float`] to an [`Integer`], taking the [`Float`] by reference. If the [`Float`]
@@ -296,7 +296,7 @@ impl<'a> TryFrom<&'a Float> for Integer {
     /// assert_eq!(Integer::try_from(&Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Integer::try_from(&Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
-    fn try_from(f: &'a Float) -> Result<Integer, Self::Error> {
+    fn try_from(f: &Float) -> Result<Integer, Self::Error> {
         match f {
             Float(Zero { .. }) => Ok(Integer::ZERO),
             Float(Finite {
@@ -327,7 +327,7 @@ impl<'a> TryFrom<&'a Float> for Integer {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Float> for Integer {
+impl ConvertibleFrom<&Float> for Integer {
     /// Determines whether a [`Float`] can be converted to an [`Integer`], taking the [`Float`] by
     /// reference.
     ///
@@ -353,7 +353,7 @@ impl<'a> ConvertibleFrom<&'a Float> for Integer {
     /// assert_eq!(Integer::convertible_from(&Float::INFINITY), false);
     /// assert_eq!(Integer::convertible_from(&Float::NAN), false);
     /// ```
-    fn convertible_from(f: &'a Float) -> bool {
+    fn convertible_from(f: &Float) -> bool {
         match f {
             Float(Zero { .. }) => true,
             Float(Finite {

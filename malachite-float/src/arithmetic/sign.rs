@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,8 +15,8 @@ impl Sign for Float {
     /// Returns the sign of a [`Float`].
     ///
     /// Returns `Greater` if the sign is positive and `Less` if the sign is negative. Never returns
-    /// `Equal`. Positive infinity and positive zero have a positive sign, and negative infinity and
-    /// negative zero have a negative sign.
+    /// `Equal`. $\infty$ and positive zero have a positive sign, and $-\infty$ and negative zero
+    /// have a negative sign.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

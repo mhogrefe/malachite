@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{CheckedPrimorial, Primorial};
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::conversion::traits::WrappingFrom;
 
 const PRIMORIALS_U8: [u8; 5] = [1, 2, 6, 30, 210];
@@ -166,10 +166,10 @@ impl CheckedPrimorial for usize {
     /// See [here](super::primorial#checked_primorial).
     #[inline]
     fn checked_primorial(n: u64) -> Option<usize> {
-        match usize::WIDTH {
-            u32::WIDTH => u32::checked_primorial(n).map(usize::wrapping_from),
-            u64::WIDTH => u64::checked_primorial(n).map(usize::wrapping_from),
-            _ => panic!("Unexpected usize width: {}", usize::WIDTH),
+        if USIZE_IS_U32 {
+            u32::checked_primorial(n).map(usize::wrapping_from)
+        } else {
+            u64::checked_primorial(n).map(usize::wrapping_from)
         }
     }
 
@@ -195,10 +195,10 @@ impl CheckedPrimorial for usize {
     /// See [here](super::primorial#checked_product_of_first_n_primes).
     #[inline]
     fn checked_product_of_first_n_primes(n: u64) -> Option<usize> {
-        match usize::WIDTH {
-            u32::WIDTH => u32::checked_product_of_first_n_primes(n).map(usize::wrapping_from),
-            u64::WIDTH => u64::checked_product_of_first_n_primes(n).map(usize::wrapping_from),
-            _ => panic!("Unexpected usize width: {}", usize::WIDTH),
+        if USIZE_IS_U32 {
+            u32::checked_product_of_first_n_primes(n).map(usize::wrapping_from)
+        } else {
+            u64::checked_product_of_first_n_primes(n).map(usize::wrapping_from)
         }
     }
 }

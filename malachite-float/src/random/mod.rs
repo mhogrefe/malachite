@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,7 +17,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::num::random::geometric::{
-    geometric_random_signeds, GeometricRandomNaturalValues, GeometricRandomSigneds,
+    geometric_random_signed_inclusive_range, GeometricRandomNaturalValues,
+    GeometricRandomSignedRange,
 };
 use malachite_base::random::Seed;
 use malachite_nz::natural::random::{
@@ -33,7 +34,7 @@ use malachite_nz::platform::Limb;
 /// This `struct` is created by [`random_positive_finite_floats`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomPositiveFiniteFloats<I: Iterator<Item = Natural>> {
-    exponents: GeometricRandomSigneds<i32>,
+    exponents: GeometricRandomSignedRange<i32>,
     xs: I,
 }
 
@@ -126,8 +127,10 @@ pub fn random_positive_finite_floats(
     mean_precision_denominator: u64,
 ) -> RandomPositiveFiniteFloats<RandomNaturals<GeometricRandomNaturalValues<u64>>> {
     RandomPositiveFiniteFloats {
-        exponents: geometric_random_signeds(
+        exponents: geometric_random_signed_inclusive_range(
             seed.fork("exponents"),
+            Float::MIN_EXPONENT,
+            Float::MAX_EXPONENT,
             mean_sci_exponent_abs_numerator,
             mean_sci_exponent_abs_denominator,
         ),
@@ -213,8 +216,10 @@ pub fn random_positive_floats_with_precision(
 ) -> RandomPositiveFiniteFloats<UniformRandomNaturalRange> {
     assert_ne!(prec, 0);
     RandomPositiveFiniteFloats {
-        exponents: geometric_random_signeds(
+        exponents: geometric_random_signed_inclusive_range(
             seed.fork("exponents"),
+            Float::MIN_EXPONENT,
+            Float::MAX_EXPONENT,
             mean_sci_exponent_abs_numerator,
             mean_sci_exponent_abs_denominator,
         ),
@@ -957,8 +962,10 @@ pub fn striped_random_positive_finite_floats(
     mean_precision_denominator: u64,
 ) -> RandomPositiveFiniteFloats<StripedRandomNaturals<GeometricRandomNaturalValues<u64>>> {
     RandomPositiveFiniteFloats {
-        exponents: geometric_random_signeds(
+        exponents: geometric_random_signed_inclusive_range(
             seed.fork("exponents"),
+            Float::MIN_EXPONENT,
+            Float::MAX_EXPONENT,
             mean_sci_exponent_abs_numerator,
             mean_sci_exponent_abs_denominator,
         ),
@@ -1043,8 +1050,10 @@ pub fn striped_random_positive_floats_with_precision(
 ) -> RandomPositiveFiniteFloats<StripedRandomNaturalInclusiveRange> {
     assert_ne!(prec, 0);
     RandomPositiveFiniteFloats {
-        exponents: geometric_random_signeds(
+        exponents: geometric_random_signed_inclusive_range(
             seed.fork("exponents"),
+            Float::MIN_EXPONENT,
+            Float::MAX_EXPONENT,
             mean_sci_exponent_abs_numerator,
             mean_sci_exponent_abs_denominator,
         ),

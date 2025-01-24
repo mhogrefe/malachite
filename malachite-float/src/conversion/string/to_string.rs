@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,11 +10,24 @@ use crate::alloc::string::ToString;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
 use core::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};
-use malachite_base::num::arithmetic::traits::{Abs, ModPowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::{
+    Abs, ModPowerOf2, RoundToMultipleOfPowerOf2, ShrRound,
+};
 use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::{ExactFrom, ToSci};
+use malachite_base::num::conversion::traits::{ExactFrom, ToSci, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_q::Rational;
+
+fn replace_exponent_in_hex_string(s: &str, new_exponent: i32) -> String {
+    let exp_index = s.find('E').unwrap_or_else(|| panic!("{s}"));
+    let mut new_s = s[..exp_index].to_string();
+    if new_exponent > 0 {
+        write!(new_s, "E+{new_exponent}").unwrap();
+    } else {
+        write!(new_s, "E{new_exponent}").unwrap();
+    }
+    new_s
+}
 
 impl Display for Float {
     fn fmt(&self, f: &mut Formatter) -> Result {
@@ -25,6 +38,16 @@ impl Display for Float {
             float_zero!() => write!(f, "0.0"),
             float_negative_zero!() => write!(f, "-0.0"),
             _ => {
+                let exp = self.get_exponent().unwrap();
+                if exp.unsigned_abs() > 10000 {
+                    // The current slow implementation would take forever to try to convert a Float
+                    // with a very large or small exponent to a decimal string. Best to
+                    // short-circuit it for now.
+                    if *self < 0u32 {
+                        write!(f, "-")?;
+                    }
+                    return write!(f, "{}", if exp >= 0 { "too_big" } else { "too_small" });
+                }
                 let mut lower = self.clone();
                 let mut higher = self.clone();
                 lower.decrement();
@@ -88,10 +111,25 @@ impl LowerHex for Float {
                 if f.alternate() {
                     f.write_str("0x")?;
                 }
-                let s = Rational::exact_from(self)
-                    .abs()
-                    .to_sci_with_options(options)
-                    .to_string();
+                let pr = precision.round_to_multiple_of_power_of_2(5, Up).0;
+                let s = if u64::from(exponent.unsigned_abs()) > (pr << 2) {
+                    let new_exponent = if *exponent > 0 {
+                        i32::exact_from(pr << 1)
+                    } else {
+                        -i32::exact_from(pr << 1)
+                    } + i32::wrapping_from(exponent.mod_power_of_2(2));
+                    let mut s = Rational::exact_from(self >> (exponent - new_exponent))
+                        .abs()
+                        .to_sci_with_options(options)
+                        .to_string();
+                    s = replace_exponent_in_hex_string(&s, (exponent - 1).shr_round(2, Floor).0);
+                    s
+                } else {
+                    Rational::exact_from(self)
+                        .abs()
+                        .to_sci_with_options(options)
+                        .to_string()
+                };
                 if s.contains('.') {
                     write!(f, "{s}")
                 } else if let Some(i) = s.find('E') {
@@ -126,7 +164,7 @@ impl LowerHex for ComparableFloat {
     }
 }
 
-impl<'a> Display for ComparableFloatRef<'a> {
+impl Display for ComparableFloatRef<'_> {
     fn fmt(&self, f: &mut Formatter) -> Result {
         if let x @ Float(Finite { precision, .. }) = &self.0 {
             write!(f, "{x}")?;
@@ -138,7 +176,7 @@ impl<'a> Display for ComparableFloatRef<'a> {
     }
 }
 
-impl<'a> LowerHex for ComparableFloatRef<'a> {
+impl LowerHex for ComparableFloatRef<'_> {
     fn fmt(&self, f: &mut Formatter) -> Result {
         if let x @ Float(Finite { precision, .. }) = &self.0 {
             if f.alternate() {
@@ -154,7 +192,7 @@ impl<'a> LowerHex for ComparableFloatRef<'a> {
     }
 }
 
-impl<'a> Debug for ComparableFloatRef<'a> {
+impl Debug for ComparableFloatRef<'_> {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         Display::fmt(self, f)

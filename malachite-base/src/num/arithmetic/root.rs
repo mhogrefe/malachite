@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the FLINT Library.
 //
@@ -23,7 +23,7 @@ use crate::num::arithmetic::traits::{
     FloorRootAssign, FloorSqrt, Parity, Pow, PowerOf2, RootAssignRem, RootRem, SqrtRem, XMulYToZZ,
 };
 use crate::num::basic::floats::PrimitiveFloat;
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{
     RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom,
@@ -1010,14 +1010,11 @@ pub_test! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
-    }
-    if exp >= u32::WIDTH || n.significant_bits() <= exp {
+    } else if exp >= u32::WIDTH || n.significant_bits() <= exp {
         return 1;
-    }
-    if exp == 2 {
+    } else if exp == 2 {
         return n.floor_sqrt();
-    }
-    if exp == 3 {
+    } else if exp == 3 {
         return cbrt_chebyshev_approx_u32(n);
     }
     let exp = u32::wrapping_from(exp);
@@ -1056,14 +1053,11 @@ pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
-    }
-    if exp == 2 {
+    } else if exp == 2 {
         return n.floor_sqrt();
-    }
-    if exp == 3 {
+    } else if exp == 3 {
         return cbrt_chebyshev_approx_u64(n);
-    }
-    if exp >= u64::WIDTH || (1 << exp) > n {
+    } else if exp >= u64::WIDTH || (1 << exp) > n {
         return 1;
     }
     let exp = u32::wrapping_from(exp);
@@ -1937,10 +1931,10 @@ impl FloorRoot<u64> for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn floor_root(self, exp: u64) -> usize {
-        match usize::WIDTH {
-            u32::WIDTH => usize::wrapping_from(u32::wrapping_from(self).floor_root(exp)),
-            u64::WIDTH => usize::wrapping_from(u64::wrapping_from(self).floor_root(exp)),
-            _ => panic!("Unsupported usize size"),
+        if USIZE_IS_U32 {
+            usize::wrapping_from(u32::wrapping_from(self).floor_root(exp))
+        } else {
+            usize::wrapping_from(u64::wrapping_from(self).floor_root(exp))
         }
     }
 }
@@ -1965,10 +1959,10 @@ impl CeilingRoot<u64> for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn ceiling_root(self, exp: u64) -> usize {
-        match usize::WIDTH {
-            u32::WIDTH => usize::wrapping_from(u32::wrapping_from(self).ceiling_root(exp)),
-            u64::WIDTH => usize::wrapping_from(u64::wrapping_from(self).ceiling_root(exp)),
-            _ => panic!("Unsupported usize size"),
+        if USIZE_IS_U32 {
+            usize::wrapping_from(u32::wrapping_from(self).ceiling_root(exp))
+        } else {
+            usize::wrapping_from(u64::wrapping_from(self).ceiling_root(exp))
         }
     }
 }
@@ -1999,14 +1993,14 @@ impl CheckedRoot<u64> for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn checked_root(self, exp: u64) -> Option<usize> {
-        match usize::WIDTH {
-            u32::WIDTH => u32::wrapping_from(self)
+        if USIZE_IS_U32 {
+            u32::wrapping_from(self)
                 .checked_root(exp)
-                .map(usize::wrapping_from),
-            u64::WIDTH => u64::wrapping_from(self)
+                .map(usize::wrapping_from)
+        } else {
+            u64::wrapping_from(self)
                 .checked_root(exp)
-                .map(usize::wrapping_from),
-            _ => panic!("Unsupported usize size"),
+                .map(usize::wrapping_from)
         }
     }
 }
@@ -2033,16 +2027,12 @@ impl RootRem<u64> for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn root_rem(self, exp: u64) -> (usize, usize) {
-        match usize::WIDTH {
-            u32::WIDTH => {
-                let (sqrt, rem) = u32::wrapping_from(self).root_rem(exp);
-                (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
-            }
-            u64::WIDTH => {
-                let (sqrt, rem) = u64::wrapping_from(self).root_rem(exp);
-                (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
-            }
-            _ => panic!("Unsupported usize size"),
+        if USIZE_IS_U32 {
+            let (sqrt, rem) = u32::wrapping_from(self).root_rem(exp);
+            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
+        } else {
+            let (sqrt, rem) = u64::wrapping_from(self).root_rem(exp);
+            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
         }
     }
 }

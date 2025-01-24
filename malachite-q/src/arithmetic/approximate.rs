@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -152,7 +152,7 @@ impl Approximate for Rational {
     }
 }
 
-impl<'a> Approximate for &'a Rational {
+impl Approximate for &Rational {
     /// Finds the best approximation of a [`Rational`] using a denominator no greater than a
     /// specified maximum, taking the [`Rational`] by reference.
     ///

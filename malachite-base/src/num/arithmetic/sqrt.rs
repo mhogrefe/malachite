@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -21,7 +21,7 @@ use crate::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, Ln,
     RoundToMultipleOfPowerOf2, ShrRound, Sqrt, SqrtAssign, SqrtAssignRem, SqrtRem,
 };
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
@@ -707,10 +707,10 @@ impl FloorSqrt for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn floor_sqrt(self) -> usize {
-        match usize::WIDTH {
-            u32::WIDTH => usize::wrapping_from(u32::wrapping_from(self).floor_sqrt()),
-            u64::WIDTH => usize::wrapping_from(u64::wrapping_from(self).floor_sqrt()),
-            _ => panic!("Unsupported usize size"),
+        if USIZE_IS_U32 {
+            usize::wrapping_from(u32::wrapping_from(self).floor_sqrt())
+        } else {
+            usize::wrapping_from(u64::wrapping_from(self).floor_sqrt())
         }
     }
 }
@@ -732,10 +732,10 @@ impl CeilingSqrt for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn ceiling_sqrt(self) -> usize {
-        match usize::WIDTH {
-            u32::WIDTH => usize::wrapping_from(u32::wrapping_from(self).ceiling_sqrt()),
-            u64::WIDTH => usize::wrapping_from(u64::wrapping_from(self).ceiling_sqrt()),
-            _ => panic!("Unsupported usize size"),
+        if USIZE_IS_U32 {
+            usize::wrapping_from(u32::wrapping_from(self).ceiling_sqrt())
+        } else {
+            usize::wrapping_from(u64::wrapping_from(self).ceiling_sqrt())
         }
     }
 }
@@ -763,14 +763,14 @@ impl CheckedSqrt for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn checked_sqrt(self) -> Option<usize> {
-        match usize::WIDTH {
-            u32::WIDTH => u32::wrapping_from(self)
+        if USIZE_IS_U32 {
+            u32::wrapping_from(self)
                 .checked_sqrt()
-                .map(usize::wrapping_from),
-            u64::WIDTH => u64::wrapping_from(self)
+                .map(usize::wrapping_from)
+        } else {
+            u64::wrapping_from(self)
                 .checked_sqrt()
-                .map(usize::wrapping_from),
-            _ => panic!("Unsupported usize size"),
+                .map(usize::wrapping_from)
         }
     }
 }
@@ -794,16 +794,12 @@ impl SqrtRem for usize {
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn sqrt_rem(self) -> (usize, usize) {
-        match usize::WIDTH {
-            u32::WIDTH => {
-                let (sqrt, rem) = u32::wrapping_from(self).sqrt_rem();
-                (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
-            }
-            u64::WIDTH => {
-                let (sqrt, rem) = u64::wrapping_from(self).sqrt_rem();
-                (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
-            }
-            _ => panic!("Unsupported usize size"),
+        if USIZE_IS_U32 {
+            let (sqrt, rem) = u32::wrapping_from(self).sqrt_rem();
+            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
+        } else {
+            let (sqrt, rem) = u64::wrapping_from(self).sqrt_rem();
+            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
         }
     }
 }

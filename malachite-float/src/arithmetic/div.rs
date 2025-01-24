@@ -236,18 +236,18 @@ fn div_rational_prec_round_assign_direct(
             o
         }
         (None, Some(log_d)) => {
-            let o = x.div_prec_round_assign(Float::from_natural_min_prec(n), prec, rm);
+            let o = x.div_prec_round_assign(Float::exact_from(n), prec, rm);
             *x <<= log_d;
             o
         }
         (Some(log_n), None) => {
-            let o = x.mul_prec_round_assign(Float::from_natural_min_prec(d), prec, rm);
+            let o = x.mul_prec_round_assign(Float::exact_from(d), prec, rm);
             *x >>= log_n;
             o
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec(n);
-            let d = Float::from_natural_min_prec(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + d.significant_bits();
             x.mul_prec_round_assign(d, mul_prec, Floor);
             x.div_prec_round_assign(n, prec, rm)
@@ -288,18 +288,18 @@ fn div_rational_prec_round_assign_direct_ref(
             o
         }
         (None, Some(log_d)) => {
-            let o = x.div_prec_round_assign(Float::from_natural_min_prec_ref(n), prec, rm);
+            let o = x.div_prec_round_assign(Float::exact_from(n), prec, rm);
             *x <<= log_d;
             o
         }
         (Some(log_n), None) => {
-            let o = x.mul_prec_round_assign(Float::from_natural_min_prec_ref(d), prec, rm);
+            let o = x.mul_prec_round_assign(Float::exact_from(d), prec, rm);
             *x >>= log_n;
             o
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec_ref(n);
-            let d = Float::from_natural_min_prec_ref(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + d.significant_bits();
             x.mul_prec_round_assign(d, mul_prec, Floor);
             x.div_prec_round_assign(n, prec, rm)
@@ -354,16 +354,16 @@ pub_test! {div_rational_prec_round_direct_ref_val(
             (quotient << log_d >> log_n, o)
         }
         (None, Some(log_d)) => {
-            let (quotient, o) = x.div_prec_round_ref_val(Float::from_natural_min_prec(n), prec, rm);
+            let (quotient, o) = x.div_prec_round_ref_val(Float::exact_from(n), prec, rm);
             (quotient << log_d, o)
         }
         (Some(log_n), None) => {
-            let (quotient, o) = x.mul_prec_round_ref_val(Float::from_natural_min_prec(d), prec, rm);
+            let (quotient, o) = x.mul_prec_round_ref_val(Float::exact_from(d), prec, rm);
             (quotient >> log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec(n);
-            let d = Float::from_natural_min_prec(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + d.significant_bits();
             x.mul_prec_round_ref_val(d, mul_prec, Floor)
                 .0
@@ -403,17 +403,17 @@ pub_test! {div_rational_prec_round_direct_ref_ref(
         }
         (None, Some(log_d)) => {
             let (quotient, o) =
-                x.div_prec_round_ref_val(Float::from_natural_min_prec_ref(n), prec, rm);
+                x.div_prec_round_ref_val(Float::exact_from(n), prec, rm);
             (quotient << log_d, o)
         }
         (Some(log_n), None) => {
             let (quotient, o) =
-                x.mul_prec_round_ref_val(Float::from_natural_min_prec_ref(d), prec, rm);
+                x.mul_prec_round_ref_val(Float::exact_from(d), prec, rm);
             (quotient >> log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec_ref(n);
-            let d = Float::from_natural_min_prec_ref(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + d.significant_bits();
             x.mul_prec_round_ref_val(d, mul_prec, Floor)
                 .0
@@ -594,11 +594,11 @@ pub_test! {rational_div_float_prec_round_direct(
             (quotient << log_n >> log_d, o)
         }
         (None, Some(log_d)) => {
-            let (quotient, o) = Float::from_natural_min_prec(n).div_prec_round(y, prec, rm);
+            let (quotient, o) = Float::exact_from(n).div_prec_round(y, prec, rm);
             (quotient >> log_d, o)
         }
         (Some(log_n), None) => {
-            let d = Float::from_natural_min_prec(d);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             let (quotient, o) = y
                 .mul_prec_round(d, mul_prec, Floor)
@@ -607,8 +607,8 @@ pub_test! {rational_div_float_prec_round_direct(
             (quotient << log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec(n);
-            let d = Float::from_natural_min_prec(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             n.div_prec_round(y.mul_prec_round(d, mul_prec, Floor).0, prec, rm)
         }
@@ -641,11 +641,11 @@ pub_test! {rational_div_float_prec_round_direct_val_ref(
             (quotient << log_n >> log_d, o)
         }
         (None, Some(log_d)) => {
-            let (quotient, o) = Float::from_natural_min_prec(n).div_prec_round_val_ref(y, prec, rm);
+            let (quotient, o) = Float::exact_from(n).div_prec_round_val_ref(y, prec, rm);
             (quotient >> log_d, o)
         }
         (Some(log_n), None) => {
-            let d = Float::from_natural_min_prec(d);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             let (quotient, o) = y
                 .mul_prec_round_ref_val(d, mul_prec, Floor)
@@ -654,8 +654,8 @@ pub_test! {rational_div_float_prec_round_direct_val_ref(
             (quotient << log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec(n);
-            let d = Float::from_natural_min_prec(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             n.div_prec_round(y.mul_prec_round_ref_val(d, mul_prec, Floor).0, prec, rm)
         }
@@ -692,11 +692,11 @@ pub_test! {rational_div_float_prec_round_direct_ref_val(
             (quotient << log_n >> log_d, o)
         }
         (None, Some(log_d)) => {
-            let (quotient, o) = Float::from_natural_min_prec_ref(n).div_prec_round(y, prec, rm);
+            let (quotient, o) = Float::exact_from(n).div_prec_round(y, prec, rm);
             (quotient >> log_d, o)
         }
         (Some(log_n), None) => {
-            let d = Float::from_natural_min_prec_ref(d);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             let (quotient, o) = y
                 .mul_prec_round(d, mul_prec, Floor)
@@ -705,8 +705,8 @@ pub_test! {rational_div_float_prec_round_direct_ref_val(
             (quotient << log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec_ref(n);
-            let d = Float::from_natural_min_prec_ref(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             n.div_prec_round(y.mul_prec_round(d, mul_prec, Floor).0, prec, rm)
         }
@@ -744,11 +744,11 @@ pub_test! {rational_div_float_prec_round_direct_ref_ref(
         }
         (None, Some(log_d)) => {
             let (quotient, o) =
-                Float::from_natural_min_prec_ref(n).div_prec_round_val_ref(y, prec, rm);
+                Float::exact_from(n).div_prec_round_val_ref(y, prec, rm);
             (quotient >> log_d, o)
         }
         (Some(log_n), None) => {
-            let d = Float::from_natural_min_prec_ref(d);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             let (quotient, o) = y
                 .mul_prec_round_ref_val(d, mul_prec, Floor)
@@ -757,8 +757,8 @@ pub_test! {rational_div_float_prec_round_direct_ref_ref(
             (quotient << log_n, o)
         }
         (None, None) => {
-            let n = Float::from_natural_min_prec_ref(n);
-            let d = Float::from_natural_min_prec_ref(d);
+            let n = Float::exact_from(n);
+            let d = Float::exact_from(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
             n.div_prec_round(y.mul_prec_round_ref_val(d, mul_prec, Floor).0, prec, rm)
         }
@@ -5038,7 +5038,7 @@ impl Div<Float> for Float {
     }
 }
 
-impl<'a> Div<&'a Float> for Float {
+impl Div<&Float> for Float {
     type Output = Float;
 
     /// Divides two [`Float`]s, taking the first by value and the second by reference.
@@ -5110,13 +5110,13 @@ impl<'a> Div<&'a Float> for Float {
     /// assert_eq!((Float::from(-1.5) / &Float::from(-2.5)).to_string(), "0.6");
     /// ```
     #[inline]
-    fn div(self, other: &'a Float) -> Float {
+    fn div(self, other: &Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_val_ref(other, prec, Nearest).0
     }
 }
 
-impl<'a> Div<Float> for &'a Float {
+impl Div<Float> for &Float {
     type Output = Float;
 
     /// Divides two [`Float`]s, taking the first by reference and the second by value.
@@ -5194,7 +5194,7 @@ impl<'a> Div<Float> for &'a Float {
     }
 }
 
-impl<'a, 'b> Div<&'a Float> for &'b Float {
+impl Div<&Float> for &Float {
     type Output = Float;
 
     /// Divides two [`Float`]s, taking both by reference.
@@ -5266,7 +5266,7 @@ impl<'a, 'b> Div<&'a Float> for &'b Float {
     /// assert_eq!((&Float::from(-1.5) / &Float::from(-2.5)).to_string(), "0.6");
     /// ```
     #[inline]
-    fn div(self, other: &'a Float) -> Float {
+    fn div(self, other: &Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_ref_ref(other, prec, Nearest).0
     }
@@ -5357,7 +5357,7 @@ impl DivAssign<Float> for Float {
     }
 }
 
-impl<'a> DivAssign<&'a Float> for Float {
+impl DivAssign<&Float> for Float {
     /// Divides a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side by
     /// reference.
     ///
@@ -5529,7 +5529,7 @@ impl Div<Rational> for Float {
     }
 }
 
-impl<'a> Div<&'a Rational> for Float {
+impl Div<&Rational> for Float {
     type Output = Float;
 
     /// Divides a [`Float`] by a [`Rational`], taking the first by value and the second by
@@ -5620,7 +5620,7 @@ impl<'a> Div<&'a Rational> for Float {
     }
 }
 
-impl<'a> Div<Rational> for &'a Float {
+impl Div<Rational> for &Float {
     type Output = Float;
 
     /// Divides a [`Float`] by a [`Rational`], taking the first by reference and the second by
@@ -5711,7 +5711,7 @@ impl<'a> Div<Rational> for &'a Float {
     }
 }
 
-impl<'a, 'b> Div<&'a Rational> for &'b Float {
+impl Div<&Rational> for &Float {
     type Output = Float;
 
     /// Divides a [`Float`] by a [`Rational`], taking both by reference.
@@ -5869,7 +5869,7 @@ impl DivAssign<Rational> for Float {
     }
 }
 
-impl<'a> DivAssign<&'a Rational> for Float {
+impl DivAssign<&Rational> for Float {
     /// Divides a [`Float`] by a [`Rational`] in place, taking the [`Rational`] by reference.
     ///
     /// If the output has a precision, it is the precision of the input [`Float`]. If the quotient
@@ -6019,7 +6019,7 @@ impl Div<Float> for Rational {
     }
 }
 
-impl<'a> Div<&'a Float> for Rational {
+impl Div<&Float> for Rational {
     type Output = Float;
 
     /// Divides a [`Rational`] by a [`Float`], taking the [`Rational`] by value and the [`Float`] by
@@ -6102,7 +6102,7 @@ impl<'a> Div<&'a Float> for Rational {
     }
 }
 
-impl<'a> Div<Float> for &'a Rational {
+impl Div<Float> for &Rational {
     type Output = Float;
 
     /// Divides a [`Rational`] by a [`Float`], taking the [`Rational`] by reference and the
@@ -6185,7 +6185,7 @@ impl<'a> Div<Float> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Div<&'a Float> for &'b Rational {
+impl Div<&Float> for &Rational {
     type Output = Float;
 
     /// Divides a [`Rational`] by a [`Float`], taking both by reference.

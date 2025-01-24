@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, FromOtherTypeSlice, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
@@ -591,7 +591,7 @@ macro_rules! impl_from_larger_than_limb {
     };
 }
 
-impl<'a> TryFrom<&'a Natural> for usize {
+impl TryFrom<&Natural> for usize {
     type Error = UnsignedFromNaturalError;
 
     /// Converts a [`Natural`] to a [`usize`], returning an error if the [`Natural`] is too large.
@@ -602,7 +602,7 @@ impl<'a> TryFrom<&'a Natural> for usize {
     /// # Examples
     /// See [here](super::primitive_int_from_natural#try_from).
     fn try_from(value: &Natural) -> Result<usize, Self::Error> {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             u32::try_from(value).map(usize::wrapping_from)
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
@@ -611,7 +611,7 @@ impl<'a> TryFrom<&'a Natural> for usize {
     }
 }
 
-impl<'a> SaturatingFrom<&'a Natural> for usize {
+impl SaturatingFrom<&Natural> for usize {
     /// Converts a [`Natural`] to a [`usize`]. If the [`Natural`] is too large to fit in a
     /// [`usize`], the largest representable value is returned.
     ///
@@ -621,7 +621,7 @@ impl<'a> SaturatingFrom<&'a Natural> for usize {
     /// # Examples
     /// See [here](super::primitive_int_from_natural#saturating_from).
     fn saturating_from(value: &Natural) -> usize {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             usize::wrapping_from(u32::saturating_from(value))
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
@@ -630,7 +630,7 @@ impl<'a> SaturatingFrom<&'a Natural> for usize {
     }
 }
 
-impl<'a> OverflowingFrom<&'a Natural> for usize {
+impl OverflowingFrom<&Natural> for usize {
     /// Converts a [`Natural`] to a [`usize`], wrapping modulo $2^W$, where $W$ is the width of a
     /// limb.
     ///
@@ -642,7 +642,7 @@ impl<'a> OverflowingFrom<&'a Natural> for usize {
     /// # Examples
     /// See [here](super::primitive_int_from_natural#overflowing_from).
     fn overflowing_from(value: &Natural) -> (usize, bool) {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             let (result, overflow) = u32::overflowing_from(value);
             (usize::wrapping_from(result), overflow)
         } else {
@@ -653,7 +653,7 @@ impl<'a> OverflowingFrom<&'a Natural> for usize {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Natural> for usize {
+impl ConvertibleFrom<&Natural> for usize {
     /// Determines whether a [`Natural`] can be converted to a [`usize`].
     ///
     /// # Worst-case complexity
@@ -662,7 +662,7 @@ impl<'a> ConvertibleFrom<&'a Natural> for usize {
     /// # Examples
     /// See [here](super::primitive_int_from_natural#convertible_from).
     fn convertible_from(value: &Natural) -> bool {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             u32::convertible_from(value)
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
@@ -671,7 +671,7 @@ impl<'a> ConvertibleFrom<&'a Natural> for usize {
     }
 }
 
-impl<'a> ConvertibleFrom<&'a Natural> for isize {
+impl ConvertibleFrom<&Natural> for isize {
     /// Determines whether a [`Natural`] can be converted to an [`isize`].
     ///
     /// # Worst-case complexity
@@ -680,7 +680,7 @@ impl<'a> ConvertibleFrom<&'a Natural> for isize {
     /// # Examples
     /// See [here](super::primitive_int_from_natural#convertible_from).
     fn convertible_from(value: &Natural) -> bool {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             i32::convertible_from(value)
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);

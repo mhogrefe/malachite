@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,38 +13,62 @@ use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_2_float_complexity_bucketer,
 };
 use malachite_float::test_util::common::to_hex_string;
-use malachite_float::test_util::generators::{float_gen, float_gen_rm};
+use malachite_float::test_util::generators::{float_gen, float_gen_rm, float_gen_var_12};
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_is_nan);
     register_demo!(runner, demo_float_is_nan_debug);
+    register_demo!(runner, demo_float_is_nan_extreme);
+    register_demo!(runner, demo_float_is_nan_extreme_debug);
     register_demo!(runner, demo_float_is_finite);
     register_demo!(runner, demo_float_is_finite_debug);
+    register_demo!(runner, demo_float_is_finite_extreme);
+    register_demo!(runner, demo_float_is_finite_extreme_debug);
     register_demo!(runner, demo_float_is_infinite);
     register_demo!(runner, demo_float_is_infinite_debug);
+    register_demo!(runner, demo_float_is_infinite_extreme);
+    register_demo!(runner, demo_float_is_infinite_extreme_debug);
     register_demo!(runner, demo_float_is_positive_zero);
     register_demo!(runner, demo_float_is_positive_zero_debug);
+    register_demo!(runner, demo_float_is_positive_zero_extreme);
+    register_demo!(runner, demo_float_is_positive_zero_extreme_debug);
     register_demo!(runner, demo_float_is_negative_zero);
     register_demo!(runner, demo_float_is_negative_zero_debug);
+    register_demo!(runner, demo_float_is_negative_zero_extreme);
+    register_demo!(runner, demo_float_is_negative_zero_extreme_debug);
     register_demo!(runner, demo_float_is_zero);
     register_demo!(runner, demo_float_is_zero_debug);
+    register_demo!(runner, demo_float_is_zero_extreme);
+    register_demo!(runner, demo_float_is_zero_extreme_debug);
     register_demo!(runner, demo_float_is_normal);
     register_demo!(runner, demo_float_is_normal_debug);
+    register_demo!(runner, demo_float_is_normal_extreme);
+    register_demo!(runner, demo_float_is_normal_extreme_debug);
     register_demo!(runner, demo_float_is_sign_positive);
     register_demo!(runner, demo_float_is_sign_positive_debug);
+    register_demo!(runner, demo_float_is_sign_positive_extreme);
+    register_demo!(runner, demo_float_is_sign_positive_extreme_debug);
     register_demo!(runner, demo_float_is_sign_negative);
     register_demo!(runner, demo_float_is_sign_negative_debug);
+    register_demo!(runner, demo_float_is_sign_negative_extreme);
+    register_demo!(runner, demo_float_is_sign_negative_extreme_debug);
     register_demo!(runner, demo_float_classify);
     register_demo!(runner, demo_float_classify_debug);
+    register_demo!(runner, demo_float_classify_extreme);
+    register_demo!(runner, demo_float_classify_extreme_debug);
     register_demo!(runner, demo_float_into_non_nan);
     register_demo!(runner, demo_float_into_non_nan_debug);
     register_demo!(runner, demo_float_to_non_nan);
     register_demo!(runner, demo_float_to_non_nan_debug);
+    register_demo!(runner, demo_float_to_non_nan_extreme);
+    register_demo!(runner, demo_float_to_non_nan_extreme_debug);
     register_demo!(runner, demo_float_into_finite);
     register_demo!(runner, demo_float_into_finite_debug);
     register_demo!(runner, demo_float_to_finite);
     register_demo!(runner, demo_float_to_finite_debug);
+    register_demo!(runner, demo_float_to_finite_extreme);
+    register_demo!(runner, demo_float_to_finite_extreme_debug);
 
     register_bench!(runner, benchmark_float_is_nan_library_comparison);
     register_bench!(runner, benchmark_float_is_finite_library_comparison);
@@ -80,6 +104,26 @@ fn demo_float_is_nan_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_is_nan_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_nan() {
+            println!("{x} is NaN");
+        } else {
+            println!("{x} is not NaN");
+        }
+    }
+}
+
+fn demo_float_is_nan_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_nan() {
+            println!("{:#x} is NaN", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not NaN", ComparableFloat(x));
+        }
+    }
+}
+
 fn demo_float_is_finite(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         if x.is_finite() {
@@ -92,6 +136,26 @@ fn demo_float_is_finite(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_finite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        if x.is_finite() {
+            println!("{:#x} is finite", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not finite", ComparableFloat(x));
+        }
+    }
+}
+
+fn demo_float_is_finite_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_finite() {
+            println!("{x} is finite");
+        } else {
+            println!("{x} is not finite");
+        }
+    }
+}
+
+fn demo_float_is_finite_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         if x.is_finite() {
             println!("{:#x} is finite", ComparableFloat(x));
         } else {
@@ -120,6 +184,26 @@ fn demo_float_is_infinite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_is_infinite_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_finite() {
+            println!("{x} is infinite");
+        } else {
+            println!("{x} is not infinite");
+        }
+    }
+}
+
+fn demo_float_is_infinite_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_infinite() {
+            println!("{:#x} is infinite", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not infinite", ComparableFloat(x));
+        }
+    }
+}
+
 fn demo_float_is_positive_zero(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         if x.is_zero() {
@@ -132,6 +216,26 @@ fn demo_float_is_positive_zero(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_positive_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        if x.is_finite() {
+            println!("{:#x} is positive zero", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not positive zero", ComparableFloat(x));
+        }
+    }
+}
+
+fn demo_float_is_positive_zero_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_zero() {
+            println!("{x} is positive zero");
+        } else {
+            println!("{x} is not positive zero");
+        }
+    }
+}
+
+fn demo_float_is_positive_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         if x.is_finite() {
             println!("{:#x} is positive zero", ComparableFloat(x));
         } else {
@@ -160,6 +264,26 @@ fn demo_float_is_negative_zero_debug(gm: GenMode, config: &GenConfig, limit: usi
     }
 }
 
+fn demo_float_is_negative_zero_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_zero() {
+            println!("{x} is negative zero");
+        } else {
+            println!("{x} is not negative zero");
+        }
+    }
+}
+
+fn demo_float_is_negative_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_finite() {
+            println!("{:#x} is negative zero", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not negative zero", ComparableFloat(x));
+        }
+    }
+}
+
 fn demo_float_is_zero(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         if x.is_zero() {
@@ -172,6 +296,26 @@ fn demo_float_is_zero(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        if x.is_finite() {
+            println!("{:#x} is zero", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not zero", ComparableFloat(x));
+        }
+    }
+}
+
+fn demo_float_is_zero_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_zero() {
+            println!("{x} is zero");
+        } else {
+            println!("{x} is not zero");
+        }
+    }
+}
+
+fn demo_float_is_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         if x.is_finite() {
             println!("{:#x} is zero", ComparableFloat(x));
         } else {
@@ -200,6 +344,26 @@ fn demo_float_is_normal_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_is_normal_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_normal() {
+            println!("{x} is normal");
+        } else {
+            println!("{x} is not normal");
+        }
+    }
+}
+
+fn demo_float_is_normal_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_normal() {
+            println!("{:#x} is normal", ComparableFloat(x));
+        } else {
+            println!("{:#x} is not normal", ComparableFloat(x));
+        }
+    }
+}
+
 fn demo_float_is_sign_positive(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         if x.is_sign_positive() {
@@ -212,6 +376,26 @@ fn demo_float_is_sign_positive(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_sign_positive_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        if x.is_sign_positive() {
+            println!("{:#x} has a positive sign", ComparableFloat(x));
+        } else {
+            println!("{:#x} does not have a positive sign", ComparableFloat(x));
+        }
+    }
+}
+
+fn demo_float_is_sign_positive_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_sign_positive() {
+            println!("{x} has a positive sign");
+        } else {
+            println!("{x} does not have a positive sign");
+        }
+    }
+}
+
+fn demo_float_is_sign_positive_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         if x.is_sign_positive() {
             println!("{:#x} has a positive sign", ComparableFloat(x));
         } else {
@@ -240,6 +424,26 @@ fn demo_float_is_sign_negative_debug(gm: GenMode, config: &GenConfig, limit: usi
     }
 }
 
+fn demo_float_is_sign_negative_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_sign_negative() {
+            println!("{x} has a negative sign");
+        } else {
+            println!("{x} does not have a negative sign");
+        }
+    }
+}
+
+fn demo_float_is_sign_negative_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        if x.is_sign_negative() {
+            println!("{:#x} has a negative sign", ComparableFloat(x));
+        } else {
+            println!("{:#x} does not have a negative sign", ComparableFloat(x));
+        }
+    }
+}
+
 fn demo_float_classify(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         println!("classify({}) = {:?}", x, x.classify());
@@ -248,6 +452,22 @@ fn demo_float_classify(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_classify_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        println!(
+            "classify({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.classify()
+        );
+    }
+}
+
+fn demo_float_classify_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("classify({}) = {:?}", x, x.classify());
+    }
+}
+
+fn demo_float_classify_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "classify({:#x}) = {:?}",
             ComparableFloatRef(&x),
@@ -290,6 +510,23 @@ fn demo_float_to_non_nan_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_to_non_nan_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("to_non_nan({}) = {:?}", x, x.to_non_nan());
+    }
+}
+
+fn demo_float_to_non_nan_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "to_non_nan({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.to_non_nan()
+                .map_or("None".to_string(), |f| to_hex_string(&f))
+        );
+    }
+}
+
 fn demo_float_into_finite(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         println!("into_finite({}) = {:?}", x.clone(), x.into_finite());
@@ -315,6 +552,23 @@ fn demo_float_to_finite(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_to_finite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        println!(
+            "to_finite({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.to_finite()
+                .map_or("None".to_string(), |f| to_hex_string(&f))
+        );
+    }
+}
+
+fn demo_float_to_finite_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("to_finite({}) = {:?}", x, x.to_finite());
+    }
+}
+
+fn demo_float_to_finite_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "to_finite({:#x}) = {:?}",
             ComparableFloatRef(&x),

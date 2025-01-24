@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MPFR Library.
 //
@@ -31,8 +31,8 @@ use core::cmp::{
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, ModPowerOf2, ModPowerOf2Sub, NegAssign, NegModPowerOf2, OverflowingAddAssign,
-    OverflowingNegAssign, PowerOf2, SaturatingSubAssign, ShrRound, Sign, WrappingAddAssign,
-    WrappingNegAssign, WrappingSubAssign,
+    OverflowingNegAssign, PowerOf2, SaturatingAddAssign, SaturatingSubAssign, ShrRound, Sign,
+    WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -829,9 +829,7 @@ fn sub_float_significands_same_prec_lt_w(
                 Greater => (x - y, false),
             };
             let leading_zeros = a0.leading_zeros();
-            x_exp = x_exp
-                .checked_sub(i32::wrapping_from(leading_zeros))
-                .unwrap();
+            x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
             (a0 << leading_zeros, 0, 0, 0, neg)
         } else {
             let neg = x_exp < y_exp;
@@ -859,9 +857,7 @@ fn sub_float_significands_same_prec_lt_w(
                     a0 = (a0 << leading_zeros) | (sticky_bit >> (Limb::WIDTH - leading_zeros));
                 }
                 sticky_bit <<= leading_zeros;
-                x_exp = x_exp
-                    .checked_sub(i32::wrapping_from(leading_zeros))
-                    .unwrap();
+                x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 // shift > 0 since prec < Limb::WIDTH
                 assert_ne!(shift, 0);
                 let round_bit = a0 & (shift_bit >> 1);
@@ -889,7 +885,7 @@ fn sub_float_significands_same_prec_lt_w(
                 //   thus if prec = Limb::WIDTH - 1 we have round_bit = 1 but sticky_bit = 0.
                 //   However, in this case the round even rule will round up, which is what we get
                 //   with sticky_bit = 1: the final result will be correct, while sb is incorrect.
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 (
                     !mask,
                     1,
@@ -911,7 +907,7 @@ fn sub_float_significands_same_prec_lt_w(
                     if round_bit == 0 || (sticky_bit == 0 && (diff & shift_bit) == 0) {
                         (diff, x_exp, Less, neg)
                     } else if diff.overflowing_add_assign(shift_bit) {
-                        (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
+                        (HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                     } else {
                         (diff, x_exp, Greater, neg)
                     }
@@ -919,7 +915,7 @@ fn sub_float_significands_same_prec_lt_w(
                 Floor | Down => (diff, x_exp, Less, neg),
                 Ceiling | Up => {
                     if diff.overflowing_add_assign(shift_bit) {
-                        (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
+                        (HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                     } else {
                         (diff, x_exp, Greater, neg)
                     }
@@ -944,9 +940,7 @@ fn sub_float_significands_same_prec_w(
             Greater => (x - y, false),
         };
         let leading_zeros = LeadingZeros::leading_zeros(a0);
-        x_exp = x_exp
-            .checked_sub(i32::wrapping_from(leading_zeros))
-            .unwrap();
+        x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
         (a0 << leading_zeros, 0, 0, neg)
     } else {
         let neg = x_exp < y_exp;
@@ -965,7 +959,7 @@ fn sub_float_significands_same_prec_w(
             // a0 can only be zero when exp_diff = 1, x0 = B / 2, and y0 = B-1, where B = 2 ^
             // Limb::WIDTH, thus x0 - y0 / 2 = 1/2
             if a0 == 0 {
-                x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                x_exp.saturating_sub_assign(IWIDTH);
                 (HIGH_BIT, 0, 0, neg)
             } else {
                 let leading_zeros = LeadingZeros::leading_zeros(a0);
@@ -973,9 +967,7 @@ fn sub_float_significands_same_prec_w(
                     a0 = (a0 << leading_zeros) | (sticky_bit >> (Limb::WIDTH - leading_zeros));
                 }
                 sticky_bit <<= leading_zeros;
-                x_exp = x_exp
-                    .checked_sub(i32::wrapping_from(leading_zeros))
-                    .unwrap();
+                x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 let round_bit = sticky_bit & HIGH_BIT;
                 (a0, sticky_bit & !HIGH_BIT, round_bit, neg)
             }
@@ -1006,7 +998,7 @@ fn sub_float_significands_same_prec_w(
                 //
                 // If exp_diff > Limb::WIDTH + 1:
                 // - e) a0 = 111...111, round_bit = sticky_bit = 1
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 if exp_diff == Limb::WIDTH && y > HIGH_BIT {
                     // case (b)
                     (
@@ -1043,7 +1035,7 @@ fn sub_float_significands_same_prec_w(
                 if round_bit == 0 || (sticky_bit == 0 && (diff & 1) == 0) {
                     (diff, x_exp, Less, neg)
                 } else if diff.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
+                    (HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                 } else {
                     (diff, x_exp, Greater, neg)
                 }
@@ -1051,7 +1043,7 @@ fn sub_float_significands_same_prec_w(
             Floor | Down => (diff, x_exp, Less, neg),
             Ceiling | Up => {
                 if diff.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.checked_add(1).unwrap(), Greater, neg)
+                    (HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                 } else {
                     (diff, x_exp, Greater, neg)
                 }
@@ -1097,14 +1089,12 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
         if a1 == 0 {
             a1 = a0;
             a0 = 0;
-            x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+            x_exp.saturating_sub_assign(IWIDTH);
         }
         // now a1 != 0
         let leading_zeros = LeadingZeros::leading_zeros(a1);
         if leading_zeros != 0 {
-            x_exp = x_exp
-                .checked_sub(i32::wrapping_from(leading_zeros))
-                .unwrap();
+            x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
             (
                 a0 << leading_zeros,
                 (a1 << leading_zeros) | (a0 >> (Limb::WIDTH - leading_zeros)),
@@ -1145,7 +1135,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                 a1 = a0;
                 a0 = 0;
                 // Since sticky_bit = 0 already, no need to set it to 0
-                x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                x_exp.saturating_sub_assign(IWIDTH);
             }
             // now a1 != 0
             assert_ne!(a1, 0);
@@ -1155,9 +1145,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                 let diff_1 = (a1 << leading_zeros) | (a0 >> comp_zeros);
                 a0 = (a0 << leading_zeros) | (sticky_bit >> comp_zeros);
                 sticky_bit <<= leading_zeros;
-                x_exp = x_exp
-                    .checked_sub(i32::wrapping_from(leading_zeros))
-                    .unwrap();
+                x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 diff_1
             } else {
                 a1
@@ -1205,7 +1193,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                 let diff_1 = (a1 << 1) | (a0 >> WIDTH_M1);
                 a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
                 sticky_bit <<= 1;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 diff_1
             } else {
                 a1
@@ -1239,7 +1227,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                 // sticky_bit = 1 below is incorrect when prec = Limb::WIDTH * 2 - 1, exp_diff =
                 // Limb::WIDTH * 2, and y = 1000...000, but in that case the even rule would round
                 // up too.
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 (
                     !mask,
                     Limb::MAX,
@@ -1269,13 +1257,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
                 } else if diff_0.overflowing_add_assign(shift_bit)
                     && diff_1.overflowing_add_assign(1)
                 {
-                    (
-                        diff_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Greater,
-                        neg,
-                    )
+                    (diff_0, HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                 } else {
                     (diff_0, diff_1, x_exp, Greater, neg)
                 }
@@ -1283,13 +1265,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
             Floor | Down => (diff_0, diff_1, x_exp, Less, neg),
             Ceiling | Up => {
                 if diff_0.overflowing_add_assign(shift_bit) && diff_1.overflowing_add_assign(1) {
-                    (
-                        diff_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Greater,
-                        neg,
-                    )
+                    (diff_0, HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                 } else {
                     (diff_0, diff_1, x_exp, Greater, neg)
                 }
@@ -1334,14 +1310,12 @@ fn sub_float_significands_same_prec_2w(
         if a1 == 0 {
             a1 = a0;
             a0 = 0;
-            x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+            x_exp.saturating_sub_assign(IWIDTH);
         }
         let leading_zeros = LeadingZeros::leading_zeros(a1);
         if leading_zeros != 0 {
             // shift [a1, a0] left by leading_zeros bits and store in result
-            x_exp = x_exp
-                .checked_sub(i32::wrapping_from(leading_zeros))
-                .unwrap();
+            x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
             (
                 a0 << leading_zeros,
                 (a1 << leading_zeros) | (a0 >> (Limb::WIDTH - leading_zeros)),
@@ -1385,11 +1359,11 @@ fn sub_float_significands_same_prec_2w(
                 a1 = a0;
                 a0 = sticky_bit;
                 sticky_bit = 0;
-                x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                x_exp.saturating_sub_assign(IWIDTH);
             }
             if a1 == 0 {
                 assert_eq!(a0, HIGH_BIT);
-                x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                x_exp.saturating_sub_assign(IWIDTH);
                 (sticky_bit, a0, 0, 0, neg)
             } else {
                 let leading_zeros = LeadingZeros::leading_zeros(a1);
@@ -1399,9 +1373,7 @@ fn sub_float_significands_same_prec_2w(
                     a1 = (a1 << leading_zeros) | (a0 >> comp_zeros);
                     a0 = (a0 << leading_zeros) | (sticky_bit >> comp_zeros);
                     sticky_bit <<= leading_zeros;
-                    x_exp = x_exp
-                        .checked_sub(i32::wrapping_from(leading_zeros))
-                        .unwrap();
+                    x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 }
                 (a0, a1, sticky_bit & !HIGH_BIT, sticky_bit & HIGH_BIT, neg)
             }
@@ -1449,7 +1421,7 @@ fn sub_float_significands_same_prec_2w(
                 assert!(a1 >= HIGH_BIT);
                 a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
                 sticky_bit <<= 1;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
             }
             (a0, a1, sticky_bit & !HIGH_BIT, sticky_bit & HIGH_BIT, neg)
         } else {
@@ -1476,7 +1448,7 @@ fn sub_float_significands_same_prec_2w(
                 )
             } else {
                 // x = 1000...000, thus subtracting y yields an exponent shift
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 if exp_diff == TWICE_WIDTH && !tst {
                     // y > 1 / 2 * ulp(x)
                     let mut t = y_1.wrapping_neg();
@@ -1519,13 +1491,7 @@ fn sub_float_significands_same_prec_2w(
                 if round_bit == 0 || (sticky_bit == 0 && (diff_0 & 1) == 0) {
                     (diff_0, diff_1, x_exp, Less, neg)
                 } else if diff_0.overflowing_add_assign(1) && diff_1.overflowing_add_assign(1) {
-                    (
-                        diff_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Greater,
-                        neg,
-                    )
+                    (diff_0, HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                 } else {
                     (diff_0, diff_1, x_exp, Greater, neg)
                 }
@@ -1533,13 +1499,7 @@ fn sub_float_significands_same_prec_2w(
             Floor | Down => (diff_0, diff_1, x_exp, Less, neg),
             Ceiling | Up => {
                 if diff_0.overflowing_add_assign(1) && diff_1.overflowing_add_assign(1) {
-                    (
-                        diff_0,
-                        HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
-                        Greater,
-                        neg,
-                    )
+                    (diff_0, HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
                 } else {
                     (diff_0, diff_1, x_exp, Greater, neg)
                 }
@@ -1595,19 +1555,17 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
             a2 = a1;
             a1 = a0;
             a0 = 0;
-            x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+            x_exp.saturating_sub_assign(IWIDTH);
             if a2 == 0 {
                 a2 = a1;
                 a1 = 0;
-                x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                x_exp.saturating_sub_assign(IWIDTH);
             }
         }
         assert_ne!(a2, 0);
         let leading_zeros = LeadingZeros::leading_zeros(a2);
         if leading_zeros != 0 {
-            x_exp = x_exp
-                .checked_sub(i32::wrapping_from(leading_zeros))
-                .unwrap();
+            x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
             let comp_zeros = Limb::WIDTH - leading_zeros;
             (
                 a0 << leading_zeros,
@@ -1673,11 +1631,11 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 a1 = a0;
                 a0 = 0;
                 // since sticky_bit = 0 already, no need to set it to 0
-                x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                x_exp.saturating_sub_assign(IWIDTH);
                 if a2 == 0 {
                     a2 = a1;
                     a1 = 0;
-                    x_exp = x_exp.checked_sub(IWIDTH).unwrap();
+                    x_exp.saturating_sub_assign(IWIDTH);
                 }
             }
             assert_ne!(a2, 0);
@@ -1687,9 +1645,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 let diff_1 = (a1 << leading_zeros) | (a0 >> comp_zeros);
                 a0 = (a0 << leading_zeros) | (sticky_bit >> comp_zeros);
                 sticky_bit <<= leading_zeros;
-                x_exp = x_exp
-                    .checked_sub(i32::wrapping_from(leading_zeros))
-                    .unwrap();
+                x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 (diff_1, (a2 << leading_zeros) | (a1 >> comp_zeros))
             } else {
                 (a1, a2)
@@ -1753,7 +1709,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 let diff_1 = (a1 << 1) | (a0 >> WIDTH_M1);
                 a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
                 sticky_bit <<= 1;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 (diff_1, (a2 << 1) | (a1 >> WIDTH_M1))
             } else {
                 (a1, a2)
@@ -1800,7 +1756,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 let diff_1 = (a1 << 1) | (a0 >> WIDTH_M1);
                 a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
                 sticky_bit <<= 1;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 (diff_1, (a2 << 1) | (a1 >> WIDTH_M1))
             } else {
                 (a1, a2)
@@ -1836,7 +1792,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 // - sticky_bit = 1 below is incorrect when prec = Limb::WIDTH * 2 - 1, exp_diff =
                 //   Limb::WIDTH * 2 and y = 1000...000, but in that case the even rule wound round
                 //   up too.
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 (
                     !mask,
                     Limb::MAX,
@@ -1878,7 +1834,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                             diff_0,
                             diff_1,
                             HIGH_BIT,
-                            x_exp.checked_add(1).unwrap(),
+                            x_exp.saturating_add(1),
                             Greater,
                             neg,
                         )
@@ -1900,7 +1856,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                         diff_0,
                         diff_1,
                         HIGH_BIT,
-                        x_exp.checked_add(1).unwrap(),
+                        x_exp.saturating_add(1),
                         Greater,
                         neg,
                     )
@@ -2094,9 +2050,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 // ExactNormalize
                 if leading_zeros != 0 {
                     limbs_slice_shl_in_place(out, leading_zeros);
-                    x_exp = x_exp
-                        .checked_sub(i32::wrapping_from(leading_zeros))
-                        .unwrap();
+                    x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 }
                 // Last limb should be OK
                 assert_eq!(out[0] & (shift_bit - 1), 0);
@@ -2120,13 +2074,11 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 }
                 out.copy_within(0..k, len);
                 slice_set_zero(&mut out[..len]);
-                x_exp = x_exp
-                    .checked_sub(i32::exact_from(
-                        leading_zeros
-                            .checked_add(u64::exact_from(len << Limb::LOG_WIDTH))
-                            .unwrap(),
-                    ))
-                    .unwrap();
+                x_exp = i32::saturating_from(
+                    i128::from(x_exp)
+                        - (i128::from(leading_zeros)
+                            + (i128::wrapping_from(len) << Limb::LOG_WIDTH)),
+                );
                 // out[len] should have its low bits zero: it is x[0] - y[0].
                 assert_eq!(out[len] & Limb::wrapping_from(shift), 0);
             }
@@ -2184,7 +2136,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 // label SubD1Lose:
                 goto_sub_d1_lose = false;
                 limbs_sub_shl1_same_length_to_out(out, xs, ys);
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 assert_eq!(k, nm1);
                 goto_exact_normalize = true;
                 continue;
@@ -2217,7 +2169,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                         for o in out.iter_mut() {
                             *o = Limb::MAX;
                         }
-                        x_exp = x_exp.checked_sub(1).unwrap();
+                        x_exp.saturating_sub_assign(1);
                     } else {
                         // yl_shifted = 0: result is a power of 2.
                         let (out_last, out_init) = out.split_last_mut().unwrap();
@@ -2342,7 +2294,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 }
                 // - OUT >= 10000xxx001
                 // - Final exponent -1 since we have shifted the mantissa
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 round_bit = round_bit_2;
                 round_bit_2 = sticky_bit_2;
                 // We don't have anymore a valid Yp + 1, but since Oyr >= 100000xxx001, the final
@@ -2366,7 +2318,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
         if out_power_of_2 && round_bit != 0 {
             limbs_sub_limb_in_place(out, shift_bit);
             out[nm1] |= HIGH_BIT;
-            x_exp = x_exp.checked_sub(1).unwrap();
+            x_exp.saturating_sub_assign(1);
             round_bit = round_bit_2;
             round_bit_2 = sticky_bit_2;
             sticky_bit_2 = 0;
@@ -2398,7 +2350,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 if out_power_of_2 {
                     // deal with cancellation
                     out[nm1] |= HIGH_BIT;
-                    x_exp = x_exp.checked_sub(1).unwrap();
+                    x_exp.saturating_sub_assign(1);
                 }
                 (x_exp, Less, neg)
             }
@@ -2408,7 +2360,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
             if out_power_of_2 {
                 // deal with cancellation
                 out[nm1] |= HIGH_BIT;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
             }
             (x_exp, Less, neg)
         }
@@ -2601,9 +2553,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 // ExactNormalize
                 if leading_zeros != 0 {
                     limbs_slice_shl_in_place(xs, leading_zeros);
-                    x_exp = x_exp
-                        .checked_sub(i32::wrapping_from(leading_zeros))
-                        .unwrap();
+                    x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 }
                 // Last limb should be OK
                 assert_eq!(xs[0] & (shift_bit - 1), 0);
@@ -2627,13 +2577,11 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 }
                 xs.copy_within(0..k, len);
                 slice_set_zero(&mut xs[..len]);
-                x_exp = x_exp
-                    .checked_sub(i32::exact_from(
-                        leading_zeros
-                            .checked_add(u64::exact_from(len << Limb::LOG_WIDTH))
-                            .unwrap(),
-                    ))
-                    .unwrap();
+                x_exp = i32::saturating_from(
+                    i128::from(x_exp)
+                        - (i128::from(leading_zeros)
+                            + (i128::wrapping_from(len) << Limb::LOG_WIDTH)),
+                );
                 // out[len] should have its low bits zero: it is x[0] - y[0].
                 assert_eq!(xs[len] & Limb::wrapping_from(shift), 0);
             }
@@ -2691,7 +2639,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 // label SubD1Lose:
                 goto_sub_d1_lose = false;
                 limbs_sub_shl1_same_length_in_place_left(xs, ys);
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 assert_eq!(k, nm1);
                 goto_exact_normalize = true;
                 continue;
@@ -2724,7 +2672,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                         for x in xs.iter_mut() {
                             *x = Limb::MAX;
                         }
-                        x_exp = x_exp.checked_sub(1).unwrap();
+                        x_exp.saturating_sub_assign(1);
                     } else {
                         // yl_shifted = 0: result is a power of 2.
                         let (xs_last, xs_init) = xs.split_last_mut().unwrap();
@@ -2847,7 +2795,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 }
                 // - OUT >= 10000xxx001
                 // - Final exponent -1 since we have shifted the mantissa
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 round_bit = round_bit_2;
                 round_bit_2 = sticky_bit_2;
                 // We don't have anymore a valid Yp + 1, but since Oyr >= 100000xxx001, the final
@@ -2871,7 +2819,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
         if out_power_of_2 && round_bit != 0 {
             limbs_sub_limb_in_place(xs, shift_bit);
             xs[nm1] |= HIGH_BIT;
-            x_exp = x_exp.checked_sub(1).unwrap();
+            x_exp.saturating_sub_assign(1);
             round_bit = round_bit_2;
             round_bit_2 = sticky_bit_2;
             sticky_bit_2 = 0;
@@ -2900,7 +2848,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 if out_power_of_2 {
                     // deal with cancellation
                     xs[nm1] |= HIGH_BIT;
-                    x_exp = x_exp.checked_sub(1).unwrap();
+                    x_exp.saturating_sub_assign(1);
                 }
                 (x_exp, Less)
             }
@@ -2910,7 +2858,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
             if out_power_of_2 {
                 // deal with cancellation
                 xs[nm1] |= HIGH_BIT;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
             }
             (x_exp, Less)
         }
@@ -3041,9 +2989,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 // ExactNormalize
                 if leading_zeros != 0 {
                     limbs_slice_shl_in_place(ys, leading_zeros);
-                    x_exp = x_exp
-                        .checked_sub(i32::wrapping_from(leading_zeros))
-                        .unwrap();
+                    x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 }
                 // Last limb should be OK
                 assert_eq!(ys[0] & (shift_bit - 1), 0);
@@ -3067,13 +3013,11 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 }
                 ys.copy_within(0..k, len);
                 slice_set_zero(&mut ys[..len]);
-                x_exp = x_exp
-                    .checked_sub(i32::exact_from(
-                        leading_zeros
-                            .checked_add(u64::exact_from(len << Limb::LOG_WIDTH))
-                            .unwrap(),
-                    ))
-                    .unwrap();
+                x_exp = i32::saturating_from(
+                    i128::from(x_exp)
+                        - (i128::from(leading_zeros)
+                            + (i128::wrapping_from(len) << Limb::LOG_WIDTH)),
+                );
                 // out[len] should have its low bits zero: it is x[0] - y[0].
                 assert_eq!(ys[len] & Limb::wrapping_from(shift), 0);
             }
@@ -3131,7 +3075,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 // label SubD1Lose:
                 goto_sub_d1_lose = false;
                 limbs_sub_shl1_same_length_in_place_right(xs, ys);
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 assert_eq!(k, nm1);
                 goto_exact_normalize = true;
                 continue;
@@ -3164,7 +3108,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                         for o in ys.iter_mut() {
                             *o = Limb::MAX;
                         }
-                        x_exp = x_exp.checked_sub(1).unwrap();
+                        x_exp.saturating_sub_assign(1);
                     } else {
                         // yl_shifted = 0: result is a power of 2.
                         let (ys_last, ys_init) = ys.split_last_mut().unwrap();
@@ -3289,7 +3233,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 }
                 // - OUT >= 10000xxx001
                 // - Final exponent -1 since we have shifted the mantissa
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
                 round_bit = round_bit_2;
                 round_bit_2 = sticky_bit_2;
                 // We don't have anymore a valid Yp + 1, but since Oyr >= 100000xxx001, the final
@@ -3313,7 +3257,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
         if ys_power_of_2 && round_bit != 0 {
             limbs_sub_limb_in_place(ys, shift_bit);
             ys[nm1] |= HIGH_BIT;
-            x_exp = x_exp.checked_sub(1).unwrap();
+            x_exp.saturating_sub_assign(1);
             round_bit = round_bit_2;
             round_bit_2 = sticky_bit_2;
             sticky_bit_2 = 0;
@@ -3342,7 +3286,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 if ys_power_of_2 {
                     // deal with cancellation
                     ys[nm1] |= HIGH_BIT;
-                    x_exp = x_exp.checked_sub(1).unwrap();
+                    x_exp.saturating_sub_assign(1);
                 }
                 (x_exp, Less)
             }
@@ -3352,7 +3296,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
             if ys_power_of_2 {
                 // deal with cancellation
                 ys[nm1] |= HIGH_BIT;
-                x_exp = x_exp.checked_sub(1).unwrap();
+                x_exp.saturating_sub_assign(1);
             }
             (x_exp, Less)
         }
@@ -3374,7 +3318,7 @@ fn exponent_shift_compare<'a>(
     // optimization here.
     //
     // the cases b=0 or c=0 are also treated apart in agm and sub (which calls sub1)
-    let sdiff_exp = x_exp.checked_sub(y_exp).unwrap();
+    let sdiff_exp = i64::from(x_exp) - i64::from(y_exp);
     let mut sign;
     let mut diff_exp;
     // index of the most significant limb of x and y
@@ -3385,7 +3329,7 @@ fn exponent_shift_compare<'a>(
     let mut res = 0;
     if sdiff_exp >= 0 {
         sign = Greater; // assumes |x| > |y|; will be changed if not.
-        diff_exp = u64::exact_from(sdiff_exp);
+        diff_exp = u64::wrapping_from(sdiff_exp);
         let mut cancel = 0;
         // If diff_exp != 0, i.e. diff_exp > 0, then |x| > |y|. Otherwise...
         if diff_exp == 0 {
@@ -3459,7 +3403,7 @@ fn exponent_shift_compare<'a>(
     } else {
         // We necessarily have |x| < |y|.
         sign = Less;
-        diff_exp = u64::exact_from(sdiff_exp.checked_neg().unwrap());
+        diff_exp = u64::exact_from(-sdiff_exp);
         swap(&mut xs, &mut ys);
         swap(&mut xi, &mut yi);
         swap(&mut x_exp, &mut y_exp);
@@ -3653,7 +3597,7 @@ fn sub_float_significands_general<'a>(
     let mut xs_len = xs.len();
     let mut ys_len = ys.len();
     let out_len = out.len();
-    let mut add_exp = 0;
+    let mut add_exp = false;
     let (sign, cancel) = exponent_shift_compare(xs, x_exp, x_prec, ys, y_exp, y_prec);
     if sign == Equal {
         // x == y. Return exact number 0. Setting the most-significant limb to 0 is a sufficient
@@ -3750,7 +3694,7 @@ fn sub_float_significands_general<'a>(
             );
             let last_out = out.last_mut().unwrap();
             if !last_out.get_highest_bit() {
-                exp_a = exp_a.checked_sub(1).unwrap();
+                exp_a.saturating_sub_assign(1);
                 // The following is valid whether out_len = 1 or out_len > 1.
                 *last_out |= HIGH_BIT;
             }
@@ -3795,11 +3739,10 @@ fn sub_float_significands_general<'a>(
     let cancel2 = if cancel >= exp_diff {
         // Note that cancel is signed and will be converted to mpfr_uexp_t (type of diff_exp) in the
         // expression below, so that this will work even if cancel is very large and diff_exp = 0.
-        (isize::exact_from(cancel) - isize::exact_from(exp_diff) + IWIDTH_M1) >> Limb::LOG_WIDTH
+        (i128::from(cancel) - i128::from(exp_diff) + i128::wrapping_from(IWIDTH_M1))
+            >> Limb::LOG_WIDTH
     } else {
-        ((isize::exact_from(exp_diff) - isize::exact_from(cancel)) >> Limb::LOG_WIDTH)
-            .checked_neg()
-            .unwrap()
+        -((i128::from(exp_diff) - i128::from(cancel)) >> Limb::LOG_WIDTH)
     };
     // The high cancel2 limbs from x should not be taken into account
     //
@@ -3841,7 +3784,7 @@ fn sub_float_significands_general<'a>(
         }
     }
     // subtract high(y)
-    if isize::exact_from(out_len) + cancel2 > 0 {
+    if i128::wrapping_from(out_len) + cancel2 > 0 {
         if cancel2 >= 0 {
             let cancel2 = usize::exact_from(cancel2);
             if out_len + cancel2 <= ys_len {
@@ -3865,7 +3808,7 @@ fn sub_float_significands_general<'a>(
             }
         } else {
             // cancel2 < 0
-            let neg_cancel2 = usize::exact_from(cancel2.checked_neg().unwrap());
+            let neg_cancel2 = usize::exact_from(-cancel2);
             let (out_lo, out_hi) = out.split_at_mut(out_len - neg_cancel2);
             let borrow = if out_len - neg_cancel2 <= ys_len {
                 // ```
@@ -3904,7 +3847,7 @@ fn sub_float_significands_general<'a>(
                 if limbs_slice_add_limb_in_place(out, shift_bit) {
                     // result is a power of 2: 11111111111111 + 1 = 1000000000000000
                     out[out_len - 1] = HIGH_BIT;
-                    add_exp = 1;
+                    add_exp = true;
                 }
                 // result larger than exact value
                 inexact = 1;
@@ -3925,7 +3868,7 @@ fn sub_float_significands_general<'a>(
             if limbs_slice_add_limb_in_place(out, shift_bit) {
                 // result is a power of 2: 11111111111111 + 1 = 1000000000000000
                 out[out_len - 1] = HIGH_BIT;
-                add_exp = 1;
+                add_exp = true;
             }
             // result larger than exact value
             inexact = 1;
@@ -3938,7 +3881,7 @@ fn sub_float_significands_general<'a>(
         xs_len.saturating_sub_assign(out_len + cancel1);
         let ys_len0 = ys_len;
         ys_len = usize::saturating_from(
-            isize::exact_from(ys_len) - (isize::exact_from(out_len) + cancel2),
+            i128::wrapping_from(ys_len) - (i128::wrapping_from(out_len) + cancel2),
         );
         // For rounding to nearest, we couldn't conclude up to here in the following cases:
         // - shift = 0, then cmp_low = 0: we can either truncate, subtract one ulp or add one ulp:
@@ -4097,7 +4040,7 @@ fn sub_float_significands_general<'a>(
                             if limbs_slice_add_limb_in_place(out, shift_bit) {
                                 // result is a power of 2: 11111111111111 + 1 = 1000000000000000
                                 out[out_len - 1] = HIGH_BIT;
-                                add_exp = 1;
+                                add_exp = true;
                             }
                             // result larger than exact value
                             inexact = 1;
@@ -4118,7 +4061,7 @@ fn sub_float_significands_general<'a>(
                                             // result is a power of 2: 11111111111111 + 1 =
                                             // 1000000000000000
                                             out[out_len - 1] = HIGH_BIT;
-                                            add_exp = 1;
+                                            add_exp = true;
                                         }
                                         // result larger than exact value
                                         inexact = 1;
@@ -4186,7 +4129,7 @@ fn sub_float_significands_general<'a>(
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
                             // result is a power of 2: 11111111111111 + 1 = 1000000000000000
                             out[out_len - 1] = HIGH_BIT;
-                            add_exp = 1;
+                            add_exp = true;
                         }
                         // result larger than exact value
                         1
@@ -4205,22 +4148,25 @@ fn sub_float_significands_general<'a>(
     if !goto_end_of_sub && *last_out >> WIDTH_M1 == 0 {
         // case 1 - varepsilon
         *last_out = HIGH_BIT;
-        add_exp = 1;
+        add_exp = true;
     }
     // We have to set MPFR_EXP(out) to MPFR_EXP(x) - cancel + diff_exp, taking care of
     // underflows/overflows in that computation, and of the allowed exponent range
     let exp_a = if cancel != 0 {
-        // OK: add_exp is an int equal to 0 or 1
+        x_exp = i32::saturating_from(i128::from(x_exp) - i128::from(cancel));
+        if add_exp {
+            x_exp.saturating_add_assign(1);
+        }
         x_exp
-            .checked_sub(i32::exact_from(cancel).checked_sub(add_exp).unwrap())
-            .unwrap()
     } else {
         // cancel = 0: MPFR_EXP(out) <- MPFR_EXP(x) + diff_exp
         //
         // In case cancel = 0, diff_exp can still be 1, in case x is just below a power of two, y is
         // very small, prec(out) < prec(x), and rnd = away or nearest
-        assert!(add_exp == 0 || add_exp == 1);
-        x_exp.checked_add(add_exp).unwrap()
+        if add_exp {
+            x_exp.saturating_add_assign(1);
+        }
+        x_exp
     };
     // check that result is msb-normalized
     assert!(last_out.get_highest_bit());

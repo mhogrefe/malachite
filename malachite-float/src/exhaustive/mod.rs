@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,8 +15,8 @@ use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::exhaustive::{
-    exhaustive_signeds, primitive_int_increasing_inclusive_range, ExhaustiveSigneds,
-    PrimitiveIntIncreasingRange, PrimitiveIntUpDown,
+    exhaustive_signed_inclusive_range, primitive_int_increasing_inclusive_range,
+    ExhaustiveSignedRange, PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
 use malachite_base::num::logic::traits::{LowMask, NotAssign};
@@ -108,6 +108,8 @@ pub fn exhaustive_positive_floats_with_sci_exponent_and_precision(
     sci_exponent: i32,
     prec: u64,
 ) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+    assert!(sci_exponent < Float::MAX_EXPONENT);
+    assert!(sci_exponent >= Float::MIN_EXPONENT - 1);
     assert_ne!(prec, 0);
     ExhaustivePositiveFloatsWithSciExponentAndPrecision {
         exponent: sci_exponent + 1,
@@ -236,6 +238,8 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponent {
 pub fn exhaustive_positive_floats_with_sci_exponent(
     sci_exponent: i32,
 ) -> ExhaustivePositiveFloatsWithSciExponent {
+    assert!(sci_exponent < Float::MAX_EXPONENT);
+    assert!(sci_exponent >= Float::MIN_EXPONENT - 1);
     ExhaustivePositiveFloatsWithSciExponent(exhaustive_positive_floats_with_sci_exponent_helper(
         sci_exponent,
     ))
@@ -267,12 +271,12 @@ fn exhaustive_floats_with_precision_helper(
     Float,
     RulerSequence<usize>,
     FloatsWithPrecisionAndSciExponentGenerator,
-    ExhaustiveSigneds<i32>,
+    ExhaustiveSignedRange<i32>,
     ExhaustivePositiveFloatsWithSciExponentAndPrecision,
 > {
     exhaustive_dependent_pairs(
         ruler_sequence(),
-        exhaustive_signeds(),
+        exhaustive_signed_inclusive_range(Float::MIN_EXPONENT, Float::MAX_EXPONENT),
         FloatsWithPrecisionAndSciExponentGenerator { precision: prec },
     )
 }
@@ -288,7 +292,7 @@ pub struct ExhaustivePositiveFloatsWithPrecision(
         Float,
         RulerSequence<usize>,
         FloatsWithPrecisionAndSciExponentGenerator,
-        ExhaustiveSigneds<i32>,
+        ExhaustiveSignedRange<i32>,
         ExhaustivePositiveFloatsWithSciExponentAndPrecision,
     >,
 );
@@ -460,7 +464,7 @@ pub fn exhaustive_floats_with_precision(prec: u64) -> ExhaustiveFloatsWithPrecis
 }
 
 #[derive(Clone, Debug)]
-struct ExhaustivePositiveFiniteFloatsGenerator;
+pub(crate) struct ExhaustivePositiveFiniteFloatsGenerator;
 
 impl ExhaustiveDependentPairsYsGenerator<i32, Float, ExhaustivePositiveFloatsWithSciExponent>
     for ExhaustivePositiveFiniteFloatsGenerator
@@ -477,12 +481,12 @@ fn exhaustive_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
     Float,
     RulerSequence<usize>,
     ExhaustivePositiveFiniteFloatsGenerator,
-    Chain<Once<i32>, PrimitiveIntUpDown<i32>>,
+    ExhaustiveSignedRange<i32>,
     ExhaustivePositiveFloatsWithSciExponent,
 > {
     exhaustive_dependent_pairs(
         ruler_sequence(),
-        exhaustive_signeds(),
+        exhaustive_signed_inclusive_range(Float::MIN_EXPONENT, Float::MAX_EXPONENT),
         ExhaustivePositiveFiniteFloatsGenerator,
     )
 }
@@ -498,7 +502,7 @@ pub struct ExhaustivePositiveFiniteFloats(
         Float,
         RulerSequence<usize>,
         ExhaustivePositiveFiniteFloatsGenerator,
-        Chain<Once<i32>, PrimitiveIntUpDown<i32>>,
+        ExhaustiveSignedRange<i32>,
         ExhaustivePositiveFloatsWithSciExponent,
     >,
 );

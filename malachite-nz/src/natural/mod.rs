@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -22,11 +22,7 @@ use malachite_base::slices::slice_trailing_zeros;
 /// A natural (non-negative) integer.
 ///
 /// Any `Natural` small enough to fit into a [`Limb`](crate#limbs) is represented inline. Only
-/// `Natural`s outside this range incur the costs of heap-allocation. Here's a diagram of a slice of
-/// `Natural`s (using 32-bit limbs) containing the first 8 values of [Sylvester's
-/// sequence](https://oeis.org/A000058):
-///
-/// ![Natural memory layout][natural-mem-layout]
+/// `Natural`s outside this range incur the costs of heap-allocation.
 #[cfg_attr(
     feature = "doc-images",
     embed_doc_image("natural-mem-layout", "images/natural-mem-layout.svg")

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -12,7 +12,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::XMulYToZZ;
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
 use crate::num::conversion::traits::{HasHalf, SplitInHalf, WrappingFrom};
@@ -103,7 +103,7 @@ impl XMulYToZZ for usize {
     /// This is equivalent to `umul_ppmm` from `longlong.h`, GMP 6.2.1, where `(w1, w0)` is
     /// returned.
     fn x_mul_y_to_zz(x: usize, y: usize) -> (usize, usize) {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             let (z_1, z_0) = u32::x_mul_y_to_zz(u32::wrapping_from(x), u32::wrapping_from(y));
             (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
         } else {

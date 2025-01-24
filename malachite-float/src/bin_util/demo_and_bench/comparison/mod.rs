@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,11 +13,11 @@ pub(crate) fn register(runner: &mut Runner) {
     cmp_abs::register(runner);
     eq::register(runner);
     hash::register(runner);
-    is_integer::register(runner);
     partial_cmp_abs_integer::register(runner);
     partial_cmp_abs_natural::register(runner);
     partial_cmp_abs_primitive_float::register(runner);
     partial_cmp_abs_primitive_int::register(runner);
+    partial_cmp_abs_rational::register(runner);
     partial_cmp_integer::register(runner);
     partial_cmp_natural::register(runner);
     partial_cmp_primitive_float::register(runner);
@@ -34,11 +34,11 @@ mod cmp;
 mod cmp_abs;
 mod eq;
 mod hash;
-mod is_integer;
 mod partial_cmp_abs_integer;
 mod partial_cmp_abs_natural;
 mod partial_cmp_abs_primitive_float;
 mod partial_cmp_abs_primitive_int;
+mod partial_cmp_abs_rational;
 mod partial_cmp_integer;
 mod partial_cmp_natural;
 mod partial_cmp_primitive_float;

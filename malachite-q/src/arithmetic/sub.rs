@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -86,7 +86,7 @@ impl Sub<Rational> for Rational {
     }
 }
 
-impl<'a> Sub<&'a Rational> for Rational {
+impl Sub<&Rational> for Rational {
     type Output = Rational;
 
     /// Subtracts a [`Rational`] by another [`Rational`], taking the first by value and the second
@@ -116,12 +116,12 @@ impl<'a> Sub<&'a Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn sub(self, other: &'a Rational) -> Rational {
+    fn sub(self, other: &Rational) -> Rational {
         -(other - self)
     }
 }
 
-impl<'a> Sub<Rational> for &'a Rational {
+impl Sub<Rational> for &Rational {
     type Output = Rational;
 
     /// Subtracts a [`Rational`] by another [`Rational`], taking the first by reference and the
@@ -192,7 +192,7 @@ impl<'a> Sub<Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Sub<&'a Rational> for &'b Rational {
+impl Sub<&Rational> for &Rational {
     type Output = Rational;
 
     /// Subtracts a [`Rational`] by another [`Rational`], taking both by reference.
@@ -220,7 +220,7 @@ impl<'a, 'b> Sub<&'a Rational> for &'b Rational {
     ///     "1507/700"
     /// );
     /// ```
-    fn sub(self, other: &'a Rational) -> Rational {
+    fn sub(self, other: &Rational) -> Rational {
         if *self == 0u32 {
             return -other.clone();
         } else if *other == 0u32 {
@@ -324,7 +324,7 @@ impl SubAssign<Rational> for Rational {
     }
 }
 
-impl<'a> SubAssign<&'a Rational> for Rational {
+impl SubAssign<&Rational> for Rational {
     /// Subtracts a [`Rational`] by another [`Rational`] in place, taking the [`Rational`] on the
     /// right-hand side by reference.
     ///
@@ -353,7 +353,7 @@ impl<'a> SubAssign<&'a Rational> for Rational {
     /// x -= &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "1507/700");
     /// ```
-    fn sub_assign(&mut self, other: &'a Rational) {
+    fn sub_assign(&mut self, other: &Rational) {
         if *self == 0u32 {
             self.clone_from(other);
             self.neg_assign();

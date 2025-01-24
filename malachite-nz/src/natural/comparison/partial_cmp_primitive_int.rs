@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,7 +11,7 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::ShrRound;
-use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::*;
@@ -205,7 +205,7 @@ impl PartialOrd<usize> for Natural {
     /// See [here](super::partial_cmp_primitive_int#partial_cmp).
     #[inline]
     fn partial_cmp(&self, other: &usize) -> Option<Ordering> {
-        if usize::WIDTH == u32::WIDTH {
+        if USIZE_IS_U32 {
             self.partial_cmp(&u32::wrapping_from(*other))
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);

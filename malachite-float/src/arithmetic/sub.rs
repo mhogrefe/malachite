@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MPFR Library.
 //
@@ -19,14 +19,120 @@ use crate::{
 use core::cmp::max;
 use core::cmp::Ordering::{self, *};
 use core::ops::{Sub, SubAssign};
-use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, NegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::SaturatingFrom;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+
+// x and y must be finite, nonzero, and not equal
+fn float_rational_diff_exponent_range(x: &Float, y: &Rational) -> (i64, i64) {
+    let log_x_abs = i64::from(x.get_exponent().unwrap() - 1);
+    let log_y_abs = y.floor_log_base_2_abs();
+    let m = max(log_x_abs, log_y_abs);
+    if (*x > 0) != (*y > 0) {
+        (m, m + 1)
+    } else if log_x_abs.abs_diff(log_y_abs) > 1 {
+        (m - 1, m)
+    } else {
+        let mut log_x_denominator = i64::exact_from(x.get_prec().unwrap())
+            .saturating_sub(log_x_abs)
+            .saturating_sub(1);
+        if log_x_denominator < 0 {
+            log_x_denominator = 0;
+        }
+        let log_y_denominator = i64::exact_from(y.denominator_ref().ceiling_log_base_2());
+        let min_exp = log_x_denominator
+            .checked_neg()
+            .unwrap()
+            .checked_sub(log_y_denominator)
+            .unwrap();
+        if log_x_abs == log_y_abs {
+            (min_exp, m - 1)
+        } else {
+            (min_exp, m)
+        }
+    }
+}
+
+// x and y must be finite, nonzero, and not sum to zero
+fn float_rational_diff_sign(x: &Float, y: &Rational) -> bool {
+    match ((*x > 0), (*y < 0)) {
+        (true, true) => true,
+        (false, false) => false,
+        _ => {
+            if x.gt_abs(y) {
+                *x > 0
+            } else {
+                *y < 0
+            }
+        }
+    }
+}
+
+fn sub_rational_prec_round_naive_ref_val(
+    x: &Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    match (x, y) {
+        (x @ Float(NaN | Infinity { .. }), _) => (x.clone(), Equal),
+        (float_negative_zero!(), y) => {
+            if y == 0u32 {
+                (float_negative_zero!(), Equal)
+            } else {
+                Float::from_rational_prec_round(-y, prec, rm)
+            }
+        }
+        (float_zero!(), y) => Float::from_rational_prec_round(-y, prec, rm),
+        (x, y) => {
+            let (mut sum, o) =
+                Float::from_rational_prec_round(Rational::exact_from(x) - y, prec, rm);
+            if rm == Floor && sum == 0u32 {
+                sum.neg_assign();
+            }
+            (sum, o)
+        }
+    }
+}
+
+fn sub_rational_prec_round_naive_ref_ref(
+    x: &Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    match (x, y) {
+        (x @ Float(NaN | Infinity { .. }), _) => (x.clone(), Equal),
+        (float_negative_zero!(), y) => {
+            if *y == 0u32 {
+                (float_negative_zero!(), Equal)
+            } else {
+                let (f, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
+                (-f, o.reverse())
+            }
+        }
+        (float_zero!(), y) => {
+            let (f, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
+            (-f, o.reverse())
+        }
+        (x, y) => {
+            let (mut sum, o) =
+                Float::from_rational_prec_round(Rational::exact_from(x) - y, prec, rm);
+            if rm == Floor && sum == 0u32 {
+                sum.neg_assign();
+            }
+            (sum, o)
+        }
+    }
+}
 
 impl Float {
     /// Subtracts two [`Float`]s, rounding the result to the specified precision and with the
@@ -61,6 +167,29 @@ impl Float {
     /// - $f(0.0,0.0,p,m)=f(-0.0,-0.0,p,m)=-0.0$ if $m$ is `Floor`
     /// - $f(x,x,p,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_prec`] instead. If you
     /// know that your target precision is the maximum of the precisions of the two inputs, consider
@@ -152,6 +281,29 @@ impl Float {
     /// - $f(x,x,p,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_prec_val_ref`] instead.
     /// If you know that your target precision is the maximum of the precisions of the two inputs,
     /// consider using [`Float::sub_round_val_ref`] instead. If both of these things are true,
@@ -242,6 +394,29 @@ impl Float {
     /// - $f(x,x,p,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_prec_ref_val`] instead.
     /// If you know that your target precision is the maximum of the precisions of the two inputs,
     /// consider using [`Float::sub_round_ref_val`] instead. If both of these things are true,
@@ -331,6 +506,29 @@ impl Float {
     /// - $f(x,x,p,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_prec_ref_ref`] instead.
     /// If you know that your target precision is the maximum of the precisions of the two inputs,
     /// consider using [`Float::sub_round_ref_ref`] instead. If both of these things are true,
@@ -418,6 +616,14 @@ impl Float {
     /// - $f(x,x,p)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_round`] instead. If you know that your target precision is the maximum of
     /// the precisions of the two inputs, consider using `-` instead.
@@ -478,6 +684,14 @@ impl Float {
     /// - $f(0.0,0.0,p)=f(-0.0,-0.0,p,m)=-0.0$ if $m$ is `Floor`
     /// - $f(x,x,p)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_round_val_ref`] instead. If you know that your target precision is the
@@ -540,6 +754,14 @@ impl Float {
     /// - $f(x,x,p)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_round_ref_val`] instead. If you know that your target precision is the
     /// maximum of the precisions of the two inputs, consider using `-` instead.
@@ -600,6 +822,14 @@ impl Float {
     /// - $f(0.0,0.0,p)=f(-0.0,-0.0,p,m)=-0.0$ if $m$ is `Floor`
     /// - $f(x,x,p)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,p)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_round_ref_ref`] instead. If you know that your target precision is the
@@ -664,6 +894,28 @@ impl Float {
     /// - $f(0.0,0.0,m)=f(-0.0,-0.0,m)=-0.0$ if $m$ is `Floor`
     /// - $f(x,x,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you want to specify an output precision, consider using [`Float::sub_prec_round`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `-`
@@ -740,6 +992,28 @@ impl Float {
     /// - $f(x,x,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using [`Float::sub_prec_round_val_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `-`
     /// instead.
@@ -814,6 +1088,28 @@ impl Float {
     /// - $f(0.0,0.0,m)=f(-0.0,-0.0,m)=-0.0$ if $m$ is `Floor`
     /// - $f(x,x,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you want to specify an output precision, consider using [`Float::sub_prec_round_ref_val`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `-`
@@ -890,6 +1186,28 @@ impl Float {
     /// - $f(x,x,m)=0.0$ if $x$ is finite and nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is finite and nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using [`Float::sub_prec_round_ref_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `-`
     /// instead.
@@ -951,7 +1269,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_prec_round`] documentation for information on special cases.
+    /// See the [`Float::sub_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_prec_assign`] instead. If
     /// you know that your target precision is the maximum of the precisions of the two inputs,
@@ -1027,7 +1346,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_prec_round`] documentation for information on special cases.
+    /// See the [`Float::sub_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_prec_assign_ref`]
     /// instead. If you know that your target precision is the maximum of the precisions of the two
@@ -1118,7 +1438,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_prec`] documentation for information on special cases.
+    /// See the [`Float::sub_prec`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_round_assign`] instead. If you know that your target precision is the
@@ -1168,7 +1489,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_prec`] documentation for information on special cases.
+    /// See the [`Float::sub_prec`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_round_assign_ref`] instead. If you know that your target precision is the
@@ -1220,7 +1542,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
-    /// See the [`Float::sub_round`] documentation for information on special cases.
+    /// See the [`Float::sub_round`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to specify an output precision, consider using [`Float::sub_prec_round_assign`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using `-=`
@@ -1283,7 +1606,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
-    /// See the [`Float::sub_round`] documentation for information on special cases.
+    /// See the [`Float::sub_round`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_prec_round_assign_ref`] instead. If you know you'll be using the `Nearest`
@@ -1353,6 +1677,29 @@ impl Float {
     /// - $f(-0.0,0,p,m)=-0.0$
     /// - $f(x,x,p,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_rational_prec`] instead.
     /// If you know that your target precision is the precision of the [`Float`] input, consider
@@ -1446,6 +1793,29 @@ impl Float {
     /// - $f(-0.0,0,p,m)=-0.0$
     /// - $f(x,x,p,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_rational_prec_val_ref`]
     /// instead. If you know that your target precision is the precision of the [`Float`] input,
@@ -1558,6 +1928,29 @@ impl Float {
     /// - $f(x,x,p,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_rational_prec_ref_val`]
     /// instead. If you know that your target precision is the precision of the [`Float`] input,
     /// consider using [`Float::sub_rational_round_ref_val`] instead. If both of these things are
@@ -1656,6 +2049,33 @@ impl Float {
             }
             (_, y) if y == 0 => Float::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
+                if *x == y {
+                    return (
+                        if rm == Floor {
+                            float_negative_zero!()
+                        } else {
+                            float_zero!()
+                        },
+                        Equal,
+                    );
+                }
+                let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, &y);
+                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                    assert!(rm != Exact, "Inexact Float subtraction");
+                    return match (float_rational_diff_sign(x, &y), rm) {
+                        (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
+                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
+                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                    };
+                }
+                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                {
+                    // If we can't rule out overflow or underflow, use slow-but-correct naive
+                    // algorithm.
+                    return sub_rational_prec_round_naive_ref_val(x, y, prec, rm);
+                }
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
@@ -1726,6 +2146,29 @@ impl Float {
     /// - $f(-0.0,0,p,m)=-0.0$
     /// - $f(x,x,p,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,p,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_rational_prec_ref_ref`]
     /// instead. If you know that your target precision is the precision of the [`Float`] input,
@@ -1825,6 +2268,33 @@ impl Float {
             }
             (_, y) if *y == 0 => Float::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
+                if x == y {
+                    return (
+                        if rm == Floor {
+                            float_negative_zero!()
+                        } else {
+                            float_zero!()
+                        },
+                        Equal,
+                    );
+                }
+                let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, y);
+                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                    assert!(rm != Exact, "Inexact Float subtraction");
+                    return match (float_rational_diff_sign(x, y), rm) {
+                        (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
+                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
+                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                    };
+                }
+                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                {
+                    // If we can't rule out overflow or underflow, use slow-but-correct naive
+                    // algorithm.
+                    return sub_rational_prec_round_naive_ref_ref(x, y, prec, rm);
+                }
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
@@ -1894,6 +2364,14 @@ impl Float {
     /// - $f(-0.0,0,p)=-0.0$
     /// - $f(x,x,p)=0.0$ if $x$ is nonzero
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_round`] instead. If you know that your target precision is the
     /// precision of the [`Float`] input, consider using `-` instead.
@@ -1952,6 +2430,14 @@ impl Float {
     /// - $f(0.0,0,p)=0.0$
     /// - $f(-0.0,0,p)=-0.0$
     /// - $f(x,x,p)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_round_val_ref`] instead. If you know that your target precision
@@ -2012,6 +2498,14 @@ impl Float {
     /// - $f(-0.0,0,p)=-0.0$
     /// - $f(x,x,p)=0.0$ if $x$ is nonzero
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_round_ref_val`] instead. If you know that your target precision
     /// is the precision of the [`Float`] input, consider using `-` instead.
@@ -2070,6 +2564,14 @@ impl Float {
     /// - $f(0.0,0,p)=0.0$
     /// - $f(-0.0,0,p)=-0.0$
     /// - $f(x,x,p)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_round_ref_ref`] instead. If you know that your target precision
@@ -2135,6 +2637,28 @@ impl Float {
     /// - $f(x,x,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_rational_prec_round`] instead. If you know you'll be using the `Nearest`
     /// rounding mode, consider using `-` instead.
@@ -2160,18 +2684,18 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).sub_rational_round(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
+    /// assert_eq!(sum.to_string(), "2.808259320256457");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "2.8082593202564601");
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn sub_rational_round(self, other: Rational, rm: RoundingMode) -> (Float, Ordering) {
@@ -2210,6 +2734,28 @@ impl Float {
     /// - $f(x,x,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_rational_prec_round_val_ref`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using `-` instead.
@@ -2236,18 +2782,18 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
+    /// assert_eq!(sum.to_string(), "2.808259320256457");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "2.8082593202564601");
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn sub_rational_round_val_ref(
@@ -2290,6 +2836,28 @@ impl Float {
     /// - $f(x,x,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_rational_prec_round_ref_val`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using `-` instead.
@@ -2316,18 +2884,18 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
+    /// assert_eq!(sum.to_string(), "2.808259320256457");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "2.8082593202564601");
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn sub_rational_round_ref_val(
@@ -2370,6 +2938,28 @@ impl Float {
     /// - $f(x,x,m)=0.0$ if $x$ is nonzero and $m$ is not `Floor`
     /// - $f(x,x,m)=-0.0$ if $x$ is nonzero and $m$ is `Floor`
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_rational_prec_round_ref_ref`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using `-` instead.
@@ -2396,18 +2986,18 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
+    /// assert_eq!(sum.to_string(), "2.808259320256457");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "2.8082593202564601");
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).sub_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "2.8082593202564596");
-    /// assert_eq!(o, Less);
+    /// assert_eq!(sum.to_string(), "2.808259320256461");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn sub_rational_round_ref_ref(
@@ -2438,7 +3028,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_rational_prec_round`] documentation for information on special cases.
+    /// See the [`Float::sub_rational_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::sub_rational_prec_assign`]
     /// instead. If you know that your target precision is the precision of the [`Float`] input,
@@ -2536,6 +3127,45 @@ impl Float {
             }
             (_, y) if y == 0 => self.set_prec_round(prec, rm),
             (x, y) => {
+                if *x == y {
+                    *self = if rm == Floor {
+                        float_negative_zero!()
+                    } else {
+                        float_zero!()
+                    };
+                    return Equal;
+                }
+                let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, &y);
+                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                    assert!(rm != Exact, "Inexact Float subtraction");
+                    return match (float_rational_diff_sign(x, &y), rm) {
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Float::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                }
+                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                {
+                    // If we can't rule out overflow or underflow, use slow-but-correct naive
+                    // algorithm.
+                    let (diff, o) = sub_rational_prec_round_naive_ref_val(&*x, y, prec, rm);
+                    *self = diff;
+                    return o;
+                }
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
@@ -2598,7 +3228,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_rational_prec_round`] documentation for information on special cases.
+    /// See the [`Float::sub_rational_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using
     /// [`Float::sub_rational_prec_assign_ref`] instead. If you know that your target precision is
@@ -2695,6 +3326,45 @@ impl Float {
             }
             (_, y) if *y == 0 => self.set_prec_round(prec, rm),
             (x, y) => {
+                if *x == *y {
+                    *self = if rm == Floor {
+                        float_negative_zero!()
+                    } else {
+                        float_zero!()
+                    };
+                    return Equal;
+                }
+                let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, y);
+                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                    assert!(rm != Exact, "Inexact Float subtraction");
+                    return match (float_rational_diff_sign(x, y), rm) {
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Float::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Float::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                }
+                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                {
+                    // If we can't rule out overflow or underflow, use slow-but-correct naive
+                    // algorithm.
+                    let (diff, o) = sub_rational_prec_round_naive_ref_ref(&*x, y, prec, rm);
+                    *self = diff;
+                    return o;
+                }
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
@@ -2756,7 +3426,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_rational_prec`] documentation for information on special cases.
+    /// See the [`Float::sub_rational_prec`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_round_assign`] instead. If you know that your target precision is
@@ -2815,7 +3486,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::sub_rational_prec_val_ref`] documentation for information on special cases.
+    /// See the [`Float::sub_rational_prec_val_ref`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_round_assign_ref`] instead. If you know that your target
@@ -2876,7 +3548,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
     ///
-    /// See the [`Float::sub_rational_round`] documentation for information on special cases.
+    /// See the [`Float::sub_rational_round`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_rational_prec_round_assign`] instead. If you know you'll be using the `Nearest`
@@ -2907,21 +3580,21 @@ impl Float {
     ///     x.sub_rational_round_assign(Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "2.8082593202564596");
+    /// assert_eq!(x.to_string(), "2.808259320256457");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.sub_rational_round_assign(Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.8082593202564601");
+    /// assert_eq!(x.to_string(), "2.808259320256461");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.sub_rational_round_assign(Rational::from_unsigneds(1u8, 3), Nearest),
-    ///     Less
+    ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.8082593202564596");
+    /// assert_eq!(x.to_string(), "2.808259320256461");
     /// ```
     #[inline]
     pub fn sub_rational_round_assign(&mut self, other: Rational, rm: RoundingMode) -> Ordering {
@@ -2950,7 +3623,7 @@ impl Float {
     /// If the output has a precision, it is the precision of the input [`Float`].
     ///
     /// See the [`Float::sub_rational_round_val_ref`] documentation for information on special
-    /// cases.
+    /// cases, overflow, and underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::sub_rational_prec_round_assign_ref`] instead. If you know you'll be using the
@@ -2981,21 +3654,21 @@ impl Float {
     ///     x.sub_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "2.8082593202564596");
+    /// assert_eq!(x.to_string(), "2.808259320256457");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.sub_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.8082593202564601");
+    /// assert_eq!(x.to_string(), "2.808259320256461");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.sub_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Nearest),
-    ///     Less
+    ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.8082593202564596");
+    /// assert_eq!(x.to_string(), "2.808259320256461");
     /// ```
     #[inline]
     pub fn sub_rational_round_assign_ref(
@@ -3038,6 +3711,14 @@ impl Sub<Float> for Float {
     /// - $f(0.0,x)=f(-0.0,x)=-x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(x,x)=0.0$ if $x$ is finite and nonzero
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using [`Float::sub_prec`]
     /// instead. If you want to specify the output precision, consider using [`Float::sub_round`].
     /// If you want both of these things, consider using [`Float::sub_prec_round`].
@@ -3073,7 +3754,7 @@ impl Sub<Float> for Float {
     }
 }
 
-impl<'a> Sub<&'a Float> for Float {
+impl Sub<&Float> for Float {
     type Output = Float;
 
     /// Subtracts two [`Float`]s, taking the first by value and the second by reference.
@@ -3102,6 +3783,14 @@ impl<'a> Sub<&'a Float> for Float {
     /// - $f(x,0.0)=f(x,-0.0)=x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(0.0,x)=f(-0.0,x)=-x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(x,x)=0.0$ if $x$ is finite and nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_val_ref`] instead. If you want to specify the output precision, consider
@@ -3138,13 +3827,13 @@ impl<'a> Sub<&'a Float> for Float {
     /// assert_eq!(Float::from(-1.5) - &Float::from(-2.5), 1.0);
     /// ```
     #[inline]
-    fn sub(self, other: &'a Float) -> Float {
+    fn sub(self, other: &Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_val_ref(other, prec, Nearest).0
     }
 }
 
-impl<'a> Sub<Float> for &'a Float {
+impl Sub<Float> for &Float {
     type Output = Float;
 
     /// Subtracts two [`Float`]s, taking the first by reference and the second by value.
@@ -3173,6 +3862,14 @@ impl<'a> Sub<Float> for &'a Float {
     /// - $f(x,0.0)=f(x,-0.0)=x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(0.0,x)=f(-0.0,x)=-x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(x,x)=0.0$ if $x$ is finite and nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_ref_val`] instead. If you want to specify the output precision, consider
@@ -3215,7 +3912,7 @@ impl<'a> Sub<Float> for &'a Float {
     }
 }
 
-impl<'a, 'b> Sub<&'a Float> for &'b Float {
+impl Sub<&Float> for &Float {
     type Output = Float;
 
     /// Subtracts two [`Float`]s, taking both by reference.
@@ -3244,6 +3941,14 @@ impl<'a, 'b> Sub<&'a Float> for &'b Float {
     /// - $f(x,0.0)=f(x,-0.0)=x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(0.0,x)=f(-0.0,x)=-x$ if $x$ is not NaN and $x$ is nonzero
     /// - $f(x,x)=0.0$ if $x$ is finite and nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using [`Float::sub_prec`]
     /// instead. If you want to specify the output precision, consider using [`Float::sub_round`].
@@ -3279,7 +3984,7 @@ impl<'a, 'b> Sub<&'a Float> for &'b Float {
     /// assert_eq!(&Float::from(-1.5) - &Float::from(-2.5), 1.0);
     /// ```
     #[inline]
-    fn sub(self, other: &'a Float) -> Float {
+    fn sub(self, other: &Float) -> Float {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_ref_ref(other, prec, Nearest).0
     }
@@ -3301,7 +4006,7 @@ impl SubAssign<Float> for Float {
     /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// See the `-` documentation for information on special cases.
+    /// See the `-` documentation for information on special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_assign`] instead. If you want to specify the output precision, consider
@@ -3360,7 +4065,7 @@ impl SubAssign<Float> for Float {
     }
 }
 
-impl<'a> SubAssign<&'a Float> for Float {
+impl SubAssign<&Float> for Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side
     /// by reference.
     ///
@@ -3376,7 +4081,7 @@ impl<'a> SubAssign<&'a Float> for Float {
     /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// See the `-` documentation for information on special cases.
+    /// See the `-` documentation for information on special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_prec_assign`] instead. If you want to specify the output precision, consider
@@ -3462,6 +4167,14 @@ impl Sub<Rational> for Float {
     /// - $f(0.0,x)=f(-0.0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec`] instead. If you want to specify the output precision, consider
     /// using [`Float::sub_rational_round`]. If you want both of these things, consider using
@@ -3501,7 +4214,7 @@ impl Sub<Rational> for Float {
     }
 }
 
-impl<'a> Sub<&'a Rational> for Float {
+impl Sub<&Rational> for Float {
     type Output = Float;
 
     /// Subtracts a [`Float`] by a [`Rational`], taking the first by value and the second by
@@ -3528,6 +4241,14 @@ impl<'a> Sub<&'a Rational> for Float {
     /// - $f(x,0)=x$
     /// - $f(0.0,x)=f(-0.0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_val_ref`] instead. If you want to specify the output precision,
@@ -3571,7 +4292,7 @@ impl<'a> Sub<&'a Rational> for Float {
     }
 }
 
-impl<'a> Sub<Rational> for &'a Float {
+impl Sub<Rational> for &Float {
     type Output = Float;
 
     /// Subtracts a [`Float`] by a [`Rational`], taking the first by reference and the second by
@@ -3598,6 +4319,14 @@ impl<'a> Sub<Rational> for &'a Float {
     /// - $f(x,0)=x$
     /// - $f(0.0,x)=f(-0.0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_ref_val`] instead. If you want to specify the output precision,
@@ -3641,7 +4370,7 @@ impl<'a> Sub<Rational> for &'a Float {
     }
 }
 
-impl<'a, 'b> Sub<&'a Rational> for &'b Float {
+impl Sub<&Rational> for &Float {
     type Output = Float;
 
     /// Subtracts a [`Float`] by a [`Rational`], taking both by reference.
@@ -3667,6 +4396,14 @@ impl<'a, 'b> Sub<&'a Rational> for &'b Float {
     /// - $f(x,0)=x$
     /// - $f(0.0,x)=f(-0.0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_ref_ref`] instead. If you want to specify the output precision,
@@ -3725,7 +4462,7 @@ impl SubAssign<Rational> for Float {
     /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
-    /// See the `-` documentation for information on special cases.
+    /// See the `-` documentation for information on special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_assign`] instead. If you want to specify the output precision,
@@ -3782,7 +4519,7 @@ impl SubAssign<Rational> for Float {
     }
 }
 
-impl<'a> SubAssign<&'a Rational> for Float {
+impl SubAssign<&Rational> for Float {
     /// Subtracts a [`Rational`] by a [`Float`] in place, taking the [`Rational`] by reference.
     ///
     /// If the output has a precision, it is the precision of the input [`Float`]. If the difference
@@ -3797,7 +4534,7 @@ impl<'a> SubAssign<&'a Rational> for Float {
     /// - If $x-y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y|\rfloor-p}$,
     ///   where $p$ is the precision of the input [`Float`].
     ///
-    /// See the `-` documentation for information on special cases.
+    /// See the `-` documentation for information on special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::sub_rational_prec_assign_ref`] instead. If you want to specify the output
@@ -3881,6 +4618,14 @@ impl Sub<Float> for Rational {
     /// - $f(0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -3918,7 +4663,7 @@ impl Sub<Float> for Rational {
     }
 }
 
-impl<'a> Sub<&'a Float> for Rational {
+impl Sub<&Float> for Rational {
     type Output = Float;
 
     /// Subtracts a [`Rational`] by a [`Float`], taking the [`Rational`] by value and the [`Float`]
@@ -3945,6 +4690,14 @@ impl<'a> Sub<&'a Float> for Rational {
     /// - $f(x,0.0)=f(x,-0.0)=x$
     /// - $f(0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -3983,7 +4736,7 @@ impl<'a> Sub<&'a Float> for Rational {
     }
 }
 
-impl<'a> Sub<Float> for &'a Rational {
+impl Sub<Float> for &Rational {
     type Output = Float;
 
     /// Subtracts a [`Rational`] by a [`Float`], taking the [`Rational`] by value and the [`Float`]
@@ -4010,6 +4763,14 @@ impl<'a> Sub<Float> for &'a Rational {
     /// - $f(x,0.0)=f(x,-0.0)=x$
     /// - $f(0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -4048,7 +4809,7 @@ impl<'a> Sub<Float> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Sub<&'a Float> for &'b Rational {
+impl Sub<&Float> for &Rational {
     type Output = Float;
 
     /// Subtracts a [`Rational`] by a [`Float`], taking both by reference.
@@ -4074,6 +4835,14 @@ impl<'a, 'b> Sub<&'a Float> for &'b Rational {
     /// - $f(x,0.0)=f(x,-0.0)=x$
     /// - $f(0,x)=-x$
     /// - $f(x,x)=0.0$ if $x$ is nonzero
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,y)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,y)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,y)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,y)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

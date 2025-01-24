@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -166,7 +166,7 @@ impl Rational {
     }
 }
 
-impl<'a> SignificantBits for &'a Rational {
+impl SignificantBits for &Rational {
     /// Returns the sum of the bits needed to represent the numerator and denominator.
     ///
     /// # Worst-case complexity

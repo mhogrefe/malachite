@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
-use malachite_float::test_util::generators::{float_gen, float_gen_var_4};
+use malachite_float::test_util::generators::{float_gen, float_gen_var_12, float_gen_var_4};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
 
@@ -67,6 +67,18 @@ fn test_neg() {
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
     );
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        "-too_big",
+        "-0x4.0E+268435455#1",
+    );
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "-too_small",
+        "-0x1.0E-268435456#1",
+    );
 
     test("-1.0", "-0x1.0#1", "1.0", "0x1.0#1");
     test("-2.0", "-0x2.0#1", "2.0", "0x2.0#1");
@@ -89,33 +101,53 @@ fn test_neg() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
     );
+    test(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        "too_big",
+        "0x4.0E+268435455#1",
+    );
+    test(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        "too_small",
+        "0x1.0E-268435456#1",
+    );
+}
+
+fn neg_properties_helper(x: Float) {
+    let neg = -x.clone();
+    assert!(neg.is_valid());
+
+    let neg_alt = -&x;
+    assert!(neg_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&neg), ComparableFloatRef(&neg_alt));
+
+    let mut neg_alt = x.clone();
+    neg_alt.neg_assign();
+    assert!(neg_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&neg), ComparableFloatRef(&neg_alt));
+
+    assert_eq!(
+        ComparableFloatRef(&-Float::from(&rug::Float::exact_from(&x))),
+        ComparableFloatRef(&neg)
+    );
+    assert_eq!(
+        ComparableFloatRef(&neg) == ComparableFloatRef(&x),
+        x.is_nan()
+    );
+
+    assert_eq!(ComparableFloat(-neg), ComparableFloat(x));
 }
 
 #[test]
 fn neg_properties() {
     float_gen().test_properties(|x| {
-        let neg = -x.clone();
-        assert!(neg.is_valid());
+        neg_properties_helper(x);
+    });
 
-        let neg_alt = -&x;
-        assert!(neg_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&neg), ComparableFloatRef(&neg_alt));
-
-        let mut neg_alt = x.clone();
-        neg_alt.neg_assign();
-        assert!(neg_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&neg), ComparableFloatRef(&neg_alt));
-
-        assert_eq!(
-            ComparableFloatRef(&-Float::from(&rug::Float::exact_from(&x))),
-            ComparableFloatRef(&neg)
-        );
-        assert_eq!(
-            ComparableFloatRef(&neg) == ComparableFloatRef(&x),
-            x.is_nan()
-        );
-
-        assert_eq!(ComparableFloat(-neg), ComparableFloat(x));
+    float_gen_var_12().test_properties(|x| {
+        neg_properties_helper(x);
     });
 
     float_gen_var_4().test_properties(|x| {

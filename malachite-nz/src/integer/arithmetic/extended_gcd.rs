@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -77,7 +77,7 @@ impl ExtendedGcd for Integer {
     }
 }
 
-impl<'a> ExtendedGcd<&'a Integer> for Integer {
+impl ExtendedGcd<&Integer> for Integer {
     type Gcd = Natural;
     type Cofactor = Integer;
 
@@ -130,7 +130,7 @@ impl<'a> ExtendedGcd<&'a Integer> for Integer {
     ///     "(3, 27, 10)"
     /// );
     /// ```
-    fn extended_gcd(self, other: &'a Integer) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: &Integer) -> (Natural, Integer, Integer) {
         let a_sign = self.sign;
         let (gcd, mut x, mut y) = self.unsigned_abs().extended_gcd(other.unsigned_abs_ref());
         if !a_sign {
@@ -143,7 +143,7 @@ impl<'a> ExtendedGcd<&'a Integer> for Integer {
     }
 }
 
-impl<'a> ExtendedGcd<Integer> for &'a Integer {
+impl ExtendedGcd<Integer> for &Integer {
     type Gcd = Natural;
     type Cofactor = Integer;
 
@@ -209,7 +209,7 @@ impl<'a> ExtendedGcd<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> ExtendedGcd<&'a Integer> for &'b Integer {
+impl ExtendedGcd<&Integer> for &Integer {
     type Gcd = Natural;
     type Cofactor = Integer;
 
@@ -262,7 +262,7 @@ impl<'a, 'b> ExtendedGcd<&'a Integer> for &'b Integer {
     ///     "(3, 27, 10)"
     /// );
     /// ```
-    fn extended_gcd(self, other: &'a Integer) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: &Integer) -> (Natural, Integer, Integer) {
         let (gcd, mut x, mut y) = self
             .unsigned_abs_ref()
             .extended_gcd(other.unsigned_abs_ref());

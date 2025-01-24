@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -32,7 +32,7 @@ impl From<Natural> for Rational {
     }
 }
 
-impl<'a> From<&'a Natural> for Rational {
+impl From<&Natural> for Rational {
     /// Converts a [`Natural`] to a [`Rational`], taking the [`Natural`] by reference.
     ///
     /// # Worst-case complexity
@@ -49,7 +49,7 @@ impl<'a> From<&'a Natural> for Rational {
     ///
     /// assert_eq!(Rational::from(&Natural::from(123u32)), 123);
     /// ```
-    fn from(value: &'a Natural) -> Rational {
+    fn from(value: &Natural) -> Rational {
         Rational {
             sign: true,
             numerator: value.clone(),

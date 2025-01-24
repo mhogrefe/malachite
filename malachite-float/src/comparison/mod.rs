@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,6 +14,7 @@ pub mod cmp;
 pub mod cmp_abs;
 /// Equality of [`Float`](crate::Float)s.
 pub mod eq;
+pub mod eq_abs_rational;
 /// Hashing of [`Float`](crate::Float)s.
 pub mod hash;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)

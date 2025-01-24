@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -113,7 +113,7 @@ impl Convergents for Rational {
     }
 }
 
-impl<'a> Convergents for &'a Rational {
+impl Convergents for &Rational {
     type C = RationalConvergents;
 
     /// Returns the convergents of a [`Rational`], taking the [`Rational`] by reference.

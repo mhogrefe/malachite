@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -243,7 +243,7 @@ macro_rules! impl_natural_shl_unsigned {
             }
         }
 
-        impl<'a> Shl<$t> for &'a Natural {
+        impl Shl<$t> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2), taking it by reference.
@@ -344,7 +344,7 @@ macro_rules! impl_natural_shl_signed {
             }
         }
 
-        impl<'a> Shl<$t> for &'a Natural {
+        impl<'a> Shl<$t> for &Natural {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power of

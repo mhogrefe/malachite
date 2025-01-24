@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -590,7 +590,7 @@ impl
 }
 
 #[inline]
-fn exhaustive_rational_range_to_infinity_helper(
+const fn exhaustive_rational_range_to_infinity_helper(
     a: Rational,
 ) -> ExhaustiveDependentPairs<
     Natural,
@@ -660,7 +660,9 @@ impl Iterator for ExhaustiveRationalRangeToInfinity {
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_rational_range_to_infinity(a: Rational) -> ExhaustiveRationalRangeToInfinity {
+pub const fn exhaustive_rational_range_to_infinity(
+    a: Rational,
+) -> ExhaustiveRationalRangeToInfinity {
     ExhaustiveRationalRangeToInfinity(exhaustive_rational_range_to_infinity_helper(a))
 }
 
@@ -686,7 +688,7 @@ impl
 }
 
 #[inline]
-fn exhaustive_rational_range_to_negative_infinity_helper(
+const fn exhaustive_rational_range_to_negative_infinity_helper(
     a: Rational,
 ) -> ExhaustiveDependentPairs<
     Natural,
@@ -758,7 +760,7 @@ impl Iterator for ExhaustiveRationalRangeToNegativeInfinity {
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_rational_range_to_negative_infinity(
+pub const fn exhaustive_rational_range_to_negative_infinity(
     a: Rational,
 ) -> ExhaustiveRationalRangeToNegativeInfinity {
     ExhaustiveRationalRangeToNegativeInfinity(

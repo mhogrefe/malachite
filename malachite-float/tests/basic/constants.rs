@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -53,6 +53,81 @@ fn test_zero() {
         ComparableFloat(Float::from(&rug::Float::with_val(1, Special::Zero))),
         ComparableFloat(zero)
     );
+}
+
+#[test]
+fn test_min_positive_value_prec() {
+    let min_positive = Float::MIN_POSITIVE;
+    assert!(min_positive.is_valid());
+    assert_eq!(min_positive.to_string(), "too_small");
+    assert_eq!(
+        format!("{:#x}", ComparableFloatRef(&min_positive)),
+        "0x1.0E-268435456#1"
+    );
+    assert_eq!(min_positive.get_prec(), Some(1));
+    assert_eq!(
+        ComparableFloatRef(&Float::from(
+            &(rug::Float::with_val(1, 1.0) << (Float::MIN_EXPONENT - 1))
+        )),
+        ComparableFloatRef(&min_positive)
+    );
+    assert_eq!(
+        ComparableFloat(Float::min_positive_value_prec(1)),
+        ComparableFloat(min_positive)
+    );
+
+    let test = |p, out, out_hex| {
+        let min_positive = Float::min_positive_value_prec(p);
+        assert!(min_positive.is_valid());
+        assert_eq!(min_positive.to_string(), out);
+        assert_eq!(to_hex_string(&min_positive), out_hex);
+        assert_eq!(
+            ComparableFloat(Float::from(
+                &(rug::Float::with_val(u32::exact_from(p), 1.0) << (Float::MIN_EXPONENT - 1))
+            )),
+            ComparableFloat(min_positive)
+        );
+    };
+    test(1, "too_small", "0x1.0E-268435456#1");
+    test(2, "too_small", "0x1.0E-268435456#2");
+    test(3, "too_small", "0x1.0E-268435456#3");
+    test(10, "too_small", "0x1.000E-268435456#10");
+    test(
+        100,
+        "too_small",
+        "0x1.0000000000000000000000000E-268435456#100",
+    );
+}
+
+#[test]
+#[should_panic]
+fn min_positive_value_prec_fail() {
+    Float::min_positive_value_prec(0);
+}
+
+#[test]
+fn test_max_finite_value_with_prec() {
+    let test = |p, out, out_hex| {
+        let max_finite = Float::max_finite_value_with_prec(p);
+        assert!(max_finite.is_valid());
+        assert_eq!(max_finite.to_string(), out);
+        assert_eq!(to_hex_string(&max_finite), out_hex);
+    };
+    test(1, "too_big", "0x4.0E+268435455#1");
+    test(2, "too_big", "0x6.0E+268435455#2");
+    test(3, "too_big", "0x7.0E+268435455#3");
+    test(10, "too_big", "0x7.feE+268435455#10");
+    test(
+        100,
+        "too_big",
+        "0x7.ffffffffffffffffffffffff8E+268435455#100",
+    );
+}
+
+#[test]
+#[should_panic]
+fn max_finite_value_with_prec_fail() {
+    Float::max_finite_value_with_prec(0);
 }
 
 #[test]

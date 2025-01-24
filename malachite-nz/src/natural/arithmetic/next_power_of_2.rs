@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -147,7 +147,7 @@ impl NextPowerOf2 for Natural {
     }
 }
 
-impl<'a> NextPowerOf2 for &'a Natural {
+impl NextPowerOf2 for &Natural {
     type Output = Natural;
 
     /// Finds the smallest power of 2 greater than or equal to a [`Natural`]. The [`Natural`] is

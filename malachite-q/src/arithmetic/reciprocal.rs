@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -43,7 +43,7 @@ impl Reciprocal for Rational {
     }
 }
 
-impl<'a> Reciprocal for &'a Rational {
+impl Reciprocal for &Rational {
     type Output = Rational;
 
     /// Reciprocates a [`Rational`], taking it by reference.

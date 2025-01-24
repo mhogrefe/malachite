@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -88,7 +88,7 @@ impl<'a> ExtendedGcdContext<'a> {
     }
 }
 
-impl<'a> GcdSubdivideStepContext for ExtendedGcdContext<'a> {
+impl GcdSubdivideStepContext for ExtendedGcdContext<'_> {
     // This is equivalent to `mpn_gcdext_hook` from `mpn/gcdext_lehmer.c`, GMP 6.2.1.
     fn gcd_subdiv_step_hook(
         &mut self,
@@ -869,7 +869,7 @@ impl<'a> ExtendedGcd<&'a Natural> for Natural {
     }
 }
 
-impl<'a> ExtendedGcd<Natural> for &'a Natural {
+impl ExtendedGcd<Natural> for &Natural {
     type Gcd = Natural;
     type Cofactor = Integer;
 
@@ -929,7 +929,7 @@ impl<'a> ExtendedGcd<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ExtendedGcd<&'a Natural> for &'b Natural {
+impl ExtendedGcd<&Natural> for &Natural {
     type Gcd = Natural;
     type Cofactor = Integer;
 
@@ -974,7 +974,7 @@ impl<'a, 'b> ExtendedGcd<&'a Natural> for &'b Natural {
     ///     "(2, -9, 47)"
     /// );
     /// ```
-    fn extended_gcd(self, other: &'a Natural) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: &Natural) -> (Natural, Integer, Integer) {
         match (self, other) {
             (&Natural::ZERO, &Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if a == b => (b.clone(), Integer::ZERO, Integer::ONE),

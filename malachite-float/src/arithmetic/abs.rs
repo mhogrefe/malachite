@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -16,6 +16,8 @@ use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
 impl Float {
     /// If `self` is negative zero, returns positive zero; otherwise, returns `self`, taking `self`
     /// by value.
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -55,6 +57,8 @@ impl Float {
 
     /// If `self` is negative zero, returns positive zero; otherwise, returns `self`, taking `self`
     /// by reference.
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -101,6 +105,8 @@ impl Float {
     }
 
     /// If `self` is negative zero, replaces it with positive zero; otherwise, does nothing.
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -161,6 +167,8 @@ impl Abs for Float {
     /// - $f(\infty) = f(-\infty) = \infty$
     /// - $f(0.0) = f(-0.0) = 0.0$
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -196,7 +204,7 @@ impl Abs for Float {
     }
 }
 
-impl<'a> Abs for &'a Float {
+impl Abs for &Float {
     type Output = Float;
 
     /// Takes the absolute value of a [`Float`], taking the [`Float`] by reference.
@@ -209,6 +217,8 @@ impl<'a> Abs for &'a Float {
     /// - $f(\text{NaN}) = \text{NaN}$
     /// - $f(\infty) = f(-\infty) = \infty$
     /// - $f(0.0) = f(-0.0) = 0.0$
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -275,6 +285,8 @@ impl AbsAssign for Float {
     /// - $-\infty \gets \infty$
     /// - $0.0 \gets 0.0$
     /// - $-0.0 \gets 0.0$
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

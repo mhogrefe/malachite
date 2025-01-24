@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,6 +9,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_bit_bucketer, pair_primitive_int_bit_u64_max_bucketer, signed_bit_bucketer,
     triple_1_2_primitive_int_bit_u64_max_bucketer, unsigned_bit_bucketer,
@@ -32,7 +33,7 @@ use malachite_nz::natural::Natural;
 use rug::float::Round;
 use rug::ops::AssignRound;
 use rug::Assign;
-use std::cmp::{max, Ordering};
+use std::cmp::Ordering;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_from_unsigned);
@@ -410,7 +411,11 @@ fn benchmark_float_from_unsigned_library_comparison<T: PrimitiveUnsigned>(
             ("Malachite", &mut |n| no_out!(Float::from(n))),
             ("rug", &mut |n| {
                 no_out!(rug::Float::with_val(
-                    max(1, u32::exact_from(n.significant_bits())),
+                    if n == T::ZERO {
+                        1
+                    } else {
+                        u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+                    },
                     n
                 ))
             }),
@@ -543,7 +548,11 @@ fn benchmark_float_from_signed_library_comparison<T: PrimitiveSigned>(
             ("Malachite", &mut |n| no_out!(Float::from(n))),
             ("rug", &mut |n| {
                 no_out!(rug::Float::with_val(
-                    max(1, u32::exact_from(n.significant_bits())),
+                    if n == T::ZERO {
+                        1
+                    } else {
+                        u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
+                    },
                     n
                 ))
             }),

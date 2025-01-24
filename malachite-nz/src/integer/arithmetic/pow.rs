@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -49,7 +49,7 @@ impl Pow<u64> for Integer {
     }
 }
 
-impl<'a> Pow<u64> for &'a Integer {
+impl Pow<u64> for &Integer {
     type Output = Integer;
 
     /// Raises an [`Integer`] to a power, taking the [`Integer`] by reference.

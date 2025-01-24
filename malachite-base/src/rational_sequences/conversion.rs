@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -26,7 +26,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     "[1, 2]"
     /// );
     /// ```
-    pub fn from_vec(non_repeating: Vec<T>) -> RationalSequence<T> {
+    pub const fn from_vec(non_repeating: Vec<T>) -> RationalSequence<T> {
         RationalSequence {
             non_repeating,
             repeating: vec![],

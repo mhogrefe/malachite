@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -34,7 +34,7 @@ pub struct LimbIterator<'a> {
     pub(crate) j: u64,
 }
 
-impl<'a> Iterator for LimbIterator<'a> {
+impl Iterator for LimbIterator<'_> {
     type Item = Limb;
 
     /// A function to iterate through the [limbs](crate#limbs) of a [`Natural`] in ascending order
@@ -84,7 +84,7 @@ impl<'a> Iterator for LimbIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for LimbIterator<'a> {
+impl DoubleEndedIterator for LimbIterator<'_> {
     /// A function to iterate through the [limbs](crate#limbs) of a [`Natural`] in descending order
     /// (most-significant first).
     ///
@@ -127,9 +127,9 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for LimbIterator<'a> {}
+impl ExactSizeIterator for LimbIterator<'_> {}
 
-impl<'a> Index<usize> for LimbIterator<'a> {
+impl Index<usize> for LimbIterator<'_> {
     type Output = Limb;
 
     /// A function to retrieve a [`Natural`]'s [limbs](crate#limbs) by index.

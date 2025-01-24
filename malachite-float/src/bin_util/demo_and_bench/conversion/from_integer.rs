@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -22,13 +22,8 @@ use malachite_nz::test_util::bench::bucketers::{
     triple_1_2_integer_bit_u64_max_bucketer,
 };
 use malachite_nz::test_util::generators::{integer_gen, integer_unsigned_pair_gen_var_6};
-use std::cmp::max;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_float_from_integer);
-    register_demo!(runner, demo_float_from_integer_debug);
-    register_demo!(runner, demo_float_from_integer_ref);
-    register_demo!(runner, demo_float_from_integer_ref_debug);
     register_demo!(runner, demo_float_from_integer_prec);
     register_demo!(runner, demo_float_from_integer_prec_debug);
     register_demo!(runner, demo_float_from_integer_prec_ref);
@@ -37,13 +32,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_from_integer_prec_round_debug);
     register_demo!(runner, demo_float_from_integer_prec_round_ref);
     register_demo!(runner, demo_float_from_integer_prec_round_ref_debug);
-    register_demo!(runner, demo_float_from_integer_min_prec);
-    register_demo!(runner, demo_float_from_integer_min_prec_debug);
-    register_demo!(runner, demo_float_from_integer_min_prec_ref);
-    register_demo!(runner, demo_float_from_integer_min_prec_ref_debug);
+    register_demo!(runner, demo_float_try_from_integer);
+    register_demo!(runner, demo_float_try_from_integer_debug);
+    register_demo!(runner, demo_float_try_from_integer_ref);
+    register_demo!(runner, demo_float_try_from_integer_ref_debug);
+    register_demo!(runner, demo_float_convertible_from_integer);
 
-    register_bench!(runner, benchmark_float_from_integer_evaluation_strategy);
-    register_bench!(runner, benchmark_float_from_integer_library_comparison);
     register_bench!(
         runner,
         benchmark_float_from_integer_prec_evaluation_strategy
@@ -57,42 +51,8 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_from_integer_prec_round_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_float_from_integer_min_prec_evaluation_strategy
-    );
-}
-
-fn demo_float_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
-        println!("Float::from({}) = {}", n.clone(), Float::from(n));
-    }
-}
-
-fn demo_float_from_integer_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
-        println!(
-            "Float::from({:#x}) = {:#x}",
-            n.clone(),
-            ComparableFloat(Float::from(n))
-        );
-    }
-}
-
-fn demo_float_from_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
-        println!("Float::from(&{}) = {}", n, Float::from(&n));
-    }
-}
-
-fn demo_float_from_integer_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
-        println!(
-            "Float::from(&{:#x}) = {:#x}",
-            n,
-            ComparableFloat(Float::from(&n))
-        );
-    }
+    register_bench!(runner, benchmark_float_try_from_integer_evaluation_strategy);
+    register_bench!(runner, benchmark_float_convertible_from_integer);
 }
 
 fn demo_float_from_integer_prec(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -216,93 +176,50 @@ fn demo_float_from_integer_prec_round_ref_debug(gm: GenMode, config: &GenConfig,
     }
 }
 
-fn demo_float_from_integer_min_prec(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
+fn demo_float_try_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen().get(gm, config).take(limit) {
+        println!("Float::try_from({}) = {:?}", x.clone(), Float::try_from(x));
+    }
+}
+
+fn demo_float_try_from_integer_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen().get(gm, config).take(limit) {
         println!(
-            "Float::from_integer_min_prec({}) = {}",
-            n.clone(),
-            Float::from_integer_min_prec(n)
+            "Float::try_from({}) = {:?}",
+            x.clone(),
+            Float::try_from(x).map(|f| format!("{:#x}", ComparableFloat(f)))
         );
     }
 }
 
-fn demo_float_from_integer_min_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
+fn demo_float_try_from_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen().get(gm, config).take(limit) {
+        println!("Float::try_from(&{}) = {:?}", x, Float::try_from(&x));
+    }
+}
+
+fn demo_float_try_from_integer_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen().get(gm, config).take(limit) {
         println!(
-            "Float::from_integer_min_prec({:#x}) = {:#x}",
-            n.clone(),
-            ComparableFloat(Float::from_integer_min_prec(n))
+            "Float::try_from(&{}) = {:?}",
+            x,
+            Float::try_from(&x).map(|f| format!("{:#x}", ComparableFloat(f)))
         );
     }
 }
 
-fn demo_float_from_integer_min_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
+fn demo_float_convertible_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen().get(gm, config).take(limit) {
         println!(
-            "Float::from_integer_min_prec_ref(&{}) = {}",
-            n,
-            Float::from_integer_min_prec_ref(&n)
+            "{} is {}convertible to a Float",
+            x,
+            if Float::convertible_from(&x) {
+                ""
+            } else {
+                "not "
+            },
         );
     }
-}
-
-fn demo_float_from_integer_min_prec_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, config).take(limit) {
-        println!(
-            "Float::from_integer_min_prec_ref(&{:#x}) = {:#x}",
-            n,
-            ComparableFloat(Float::from_integer_min_prec_ref(&n))
-        );
-    }
-}
-
-#[allow(unused_must_use)]
-fn benchmark_float_from_integer_evaluation_strategy(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        "Float::from(Integer)",
-        BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &integer_bit_bucketer("n"),
-        &mut [
-            ("Float::from(Integer)", &mut |n| no_out!(Float::from(n))),
-            ("Float::from(&Integer)", &mut |n| no_out!(Float::from(&n))),
-        ],
-    );
-}
-
-#[allow(unused_must_use)]
-fn benchmark_float_from_integer_library_comparison(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        "Float::from(&Integer)",
-        BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &integer_bit_bucketer("n"),
-        &mut [
-            ("Malachite", &mut |n| no_out!(Float::from(&n))),
-            ("rug", &mut |n| {
-                no_out!(rug::Float::with_val(
-                    max(1, u32::exact_from(n.significant_bits())),
-                    rug::Integer::from(&n),
-                ))
-            }),
-        ],
-    );
 }
 
 fn benchmark_float_from_integer_prec_evaluation_strategy(
@@ -416,27 +333,46 @@ fn benchmark_float_from_integer_prec_round_library_comparison(
     );
 }
 
-fn benchmark_float_from_integer_min_prec_evaluation_strategy(
+#[allow(unused_must_use)]
+fn benchmark_float_try_from_integer_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::from_integer_min_prec(Integer)",
+        "Float::try_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
-        &integer_bit_bucketer("n"),
+        &integer_bit_bucketer("x"),
         &mut [
-            ("Float::from(Integer)", &mut |n| {
-                no_out!(Float::from_integer_min_prec(n))
+            ("Float::try_from(Integer)", &mut |x| {
+                no_out!(Float::try_from(x))
             }),
-            ("Float::from(&Integer)", &mut |n| {
-                no_out!(Float::from_integer_min_prec_ref(&n))
+            ("Float::try_from(&Integer)", &mut |x| {
+                no_out!(Float::try_from(&x))
             }),
         ],
+    );
+}
+
+fn benchmark_float_convertible_from_integer(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::convertible_from(Integer)",
+        BenchmarkType::Single,
+        integer_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &integer_bit_bucketer("x"),
+        &mut [("Malachite", &mut |x| no_out!(Float::convertible_from(&x)))],
     );
 }

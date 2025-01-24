@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -56,7 +56,7 @@ impl AbsDiff<Integer> for Integer {
     }
 }
 
-impl<'a> AbsDiff<&'a Integer> for Integer {
+impl AbsDiff<&Integer> for Integer {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Integer`]s, taking the first by
@@ -94,12 +94,12 @@ impl<'a> AbsDiff<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn abs_diff(self, other: &'a Integer) -> Natural {
+    fn abs_diff(self, other: &Integer) -> Natural {
         (self - other).unsigned_abs()
     }
 }
 
-impl<'a> AbsDiff<Integer> for &'a Integer {
+impl AbsDiff<Integer> for &Integer {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Integer`]s, taking the first by
@@ -142,7 +142,7 @@ impl<'a> AbsDiff<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> AbsDiff<&'a Integer> for &'b Integer {
+impl AbsDiff<&Integer> for &Integer {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Integer`]s, taking both by
@@ -181,7 +181,7 @@ impl<'a, 'b> AbsDiff<&'a Integer> for &'b Integer {
     /// );
     /// ```
     #[inline]
-    fn abs_diff(self, other: &'a Integer) -> Natural {
+    fn abs_diff(self, other: &Integer) -> Natural {
         (self - other).unsigned_abs()
     }
 }

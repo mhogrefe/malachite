@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::rounding_modes::RoundingMode::*;
 
-impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
+impl FloorLogBasePowerOf2<i64> for &Rational {
     type Output = i64;
 
     /// Returns the floor of the base-$2^k$ logarithm of a positive [`Rational`].
@@ -65,7 +65,7 @@ impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
     }
 }
 
-impl<'a> CeilingLogBasePowerOf2<i64> for &'a Rational {
+impl CeilingLogBasePowerOf2<i64> for &Rational {
     type Output = i64;
 
     /// Returns the ceiling of the base-$2^k$ logarithm of a positive [`Rational`].
@@ -116,7 +116,7 @@ impl<'a> CeilingLogBasePowerOf2<i64> for &'a Rational {
     }
 }
 
-impl<'a> CheckedLogBasePowerOf2<i64> for &'a Rational {
+impl CheckedLogBasePowerOf2<i64> for &Rational {
     type Output = i64;
 
     /// Returns the base-$2^k$ logarithm of a positive [`Rational`]. If the [`Rational`] is not a

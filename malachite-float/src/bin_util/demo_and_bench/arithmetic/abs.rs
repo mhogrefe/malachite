@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -13,18 +13,22 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_2_float_complexity_bucketer,
 };
-use malachite_float::test_util::generators::{float_gen, float_gen_rm};
+use malachite_float::test_util::generators::{float_gen, float_gen_rm, float_gen_var_12};
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_abs_negative_zero);
     register_demo!(runner, demo_float_abs_negative_zero_debug);
+    register_demo!(runner, demo_float_abs_negative_zero_extreme);
+    register_demo!(runner, demo_float_abs_negative_zero_extreme_debug);
     register_demo!(runner, demo_float_abs_negative_zero_ref);
     register_demo!(runner, demo_float_abs_negative_zero_ref_debug);
     register_demo!(runner, demo_float_abs_negative_zero_assign);
     register_demo!(runner, demo_float_abs_negative_zero_assign_debug);
     register_demo!(runner, demo_float_abs);
     register_demo!(runner, demo_float_abs_debug);
+    register_demo!(runner, demo_float_abs_extreme);
+    register_demo!(runner, demo_float_abs_extreme_debug);
     register_demo!(runner, demo_float_abs_ref);
     register_demo!(runner, demo_float_abs_ref_debug);
     register_demo!(runner, demo_float_abs_assign);
@@ -52,6 +56,26 @@ fn demo_float_abs_negative_zero(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_abs_negative_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen().get(gm, config).take(limit) {
+        println!(
+            "abs_negative_zero({:#x}) = {:#x}",
+            ComparableFloat(n.clone()),
+            ComparableFloat(n.abs_negative_zero())
+        );
+    }
+}
+
+fn demo_float_abs_negative_zero_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "abs_negative_zero({}) = {}",
+            n.clone(),
+            n.abs_negative_zero()
+        );
+    }
+}
+
+fn demo_float_abs_negative_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "abs_negative_zero({:#x}) = {:#x}",
             ComparableFloat(n.clone()),
@@ -108,6 +132,22 @@ fn demo_float_abs(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_abs_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in float_gen().get(gm, config).take(limit) {
+        println!(
+            "|{:#x}| = {:#x}",
+            ComparableFloat(n.clone()),
+            ComparableFloat(n.abs())
+        );
+    }
+}
+
+fn demo_float_abs_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_12().get(gm, config).take(limit) {
+        println!("|{}| = {}", n.clone(), n.abs());
+    }
+}
+
+fn demo_float_abs_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "|{:#x}| = {:#x}",
             ComparableFloat(n.clone()),

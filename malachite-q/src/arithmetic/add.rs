@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -89,7 +89,7 @@ impl Add<Rational> for Rational {
     }
 }
 
-impl<'a> Add<&'a Rational> for Rational {
+impl Add<&Rational> for Rational {
     type Output = Rational;
 
     /// Adds two [`Rational`]s, taking both by the first by value and the second by reference.
@@ -118,12 +118,12 @@ impl<'a> Add<&'a Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn add(self, other: &'a Rational) -> Rational {
+    fn add(self, other: &Rational) -> Rational {
         other + self
     }
 }
 
-impl<'a> Add<Rational> for &'a Rational {
+impl Add<Rational> for &Rational {
     type Output = Rational;
 
     /// Adds two [`Rational`]s, taking the first by reference and the second by value
@@ -192,7 +192,7 @@ impl<'a> Add<Rational> for &'a Rational {
     }
 }
 
-impl<'a, 'b> Add<&'a Rational> for &'b Rational {
+impl Add<&Rational> for &Rational {
     type Output = Rational;
 
     /// Adds two [`Rational`]s, taking both by reference.
@@ -220,7 +220,7 @@ impl<'a, 'b> Add<&'a Rational> for &'b Rational {
     ///     "2893/700"
     /// );
     /// ```
-    fn add(self, other: &'a Rational) -> Rational {
+    fn add(self, other: &Rational) -> Rational {
         if *self == 0u32 {
             return other.clone();
         } else if *other == 0u32 {
@@ -323,7 +323,7 @@ impl AddAssign<Rational> for Rational {
     }
 }
 
-impl<'a> AddAssign<&'a Rational> for Rational {
+impl AddAssign<&Rational> for Rational {
     /// Adds a [`Rational`] to a [`Rational`] in place, taking the [`Rational`] on the right-hand
     /// side by reference.
     ///
@@ -352,7 +352,7 @@ impl<'a> AddAssign<&'a Rational> for Rational {
     /// x += &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "2893/700");
     /// ```
-    fn add_assign(&mut self, other: &'a Rational) {
+    fn add_assign(&mut self, other: &Rational) {
         if *self == 0u32 {
             self.clone_from(other);
             return;

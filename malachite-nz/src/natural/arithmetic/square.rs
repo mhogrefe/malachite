@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -1084,7 +1084,7 @@ impl Square for Natural {
     }
 }
 
-impl<'a> Square for &'a Natural {
+impl Square for &Natural {
     type Output = Natural;
 
     /// Squares a [`Natural`], taking it by reference.

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,8 +15,8 @@ use malachite_nz::natural::Natural;
 impl PartialEq<Natural> for Float {
     /// Determines whether a [`Float`] is equal to a [`Natural`].
     ///
-    /// Infinity, negative infinity, and NaN are not equal to any [`Natural`]. Both the [`Float`]
-    /// zero and the [`Float`] negative zero are equal to the [`Natural`] zero.
+    /// $\infty$, $-\infty$, and NaN are not equal to any [`Natural`]. Both the [`Float`] zero and
+    /// the [`Float`] negative zero are equal to the [`Natural`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -58,8 +58,8 @@ impl PartialEq<Natural> for Float {
 impl PartialEq<Float> for Natural {
     /// Determines whether a [`Natural`] is equal to a [`Float`].
     ///
-    /// No [`Natural`] is equal to infinity, negative infinity, or NaN. The [`Natural`] zero is
-    /// equal to both the [`Float`] zero and the [`Float`] negative zero.
+    /// No [`Natural`] is equal to $\infty$, $-\infty$, or NaN. The [`Natural`] zero is equal to
+    /// both the [`Float`] zero and the [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

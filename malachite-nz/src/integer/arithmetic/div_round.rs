@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -152,7 +152,7 @@ impl DivRound<Integer> for Integer {
     }
 }
 
-impl<'a> DivRound<&'a Integer> for Integer {
+impl DivRound<&Integer> for Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
@@ -288,13 +288,13 @@ impl<'a> DivRound<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_round(mut self, other: &'a Integer, rm: RoundingMode) -> (Integer, Ordering) {
+    fn div_round(mut self, other: &Integer, rm: RoundingMode) -> (Integer, Ordering) {
         let o = self.div_round_assign(other, rm);
         (self, o)
     }
 }
 
-impl<'a> DivRound<Integer> for &'a Integer {
+impl DivRound<Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
@@ -439,7 +439,7 @@ impl<'a> DivRound<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
+impl DivRound<&Integer> for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference and rounding
@@ -573,7 +573,7 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     ///     (Integer::from(4), Greater)
     /// );
     /// ```
-    fn div_round(self, other: &'b Integer, rm: RoundingMode) -> (Integer, Ordering) {
+    fn div_round(self, other: &Integer, rm: RoundingMode) -> (Integer, Ordering) {
         let q_sign = self.sign == other.sign;
         let (q_abs, o) = (&self.abs).div_round(&other.abs, if q_sign { rm } else { -rm });
         (
@@ -694,7 +694,7 @@ impl DivRoundAssign<Integer> for Integer {
     }
 }
 
-impl<'a> DivRoundAssign<&'a Integer> for Integer {
+impl DivRoundAssign<&Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference and rounding according to a specified rounding mode. An
     /// [`Ordering`] is returned, indicating whether the assigned value is less than, equal to, or
@@ -791,7 +791,7 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     /// assert_eq!(n.div_round_assign(&Integer::from(-4), Nearest), Greater);
     /// assert_eq!(n, 4);
     /// ```
-    fn div_round_assign(&mut self, other: &'a Integer, rm: RoundingMode) -> Ordering {
+    fn div_round_assign(&mut self, other: &Integer, rm: RoundingMode) -> Ordering {
         let q_sign = self.sign == other.sign;
         let o = self
             .abs

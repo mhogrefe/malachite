@@ -6,6 +6,8 @@ Malachite is an arbitrary-precision arithmetic library for [Rust](https://www.ru
 achieves high performance in part by using algorithms derived from [GMP](https://gmplib.org/),
 [FLINT](https://www.flintlib.org/), and [MPFR](https://www.mpfr.org/).
 
+The documentation for Malachite is [here][docs.rs](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
+
 ```rust
 use malachite::num::arithmetic::traits::Factorial;
 use malachite::Natural;
@@ -66,8 +68,7 @@ features = [ "naturals_and_integers" ]
 ```
 
 The `malachite` crate re-exports three sub-crates.
-- **malachite-base** ([crates.io](https://crates.io/crates/malachite-base),
-  [docs.rs](https://docs.rs/malachite-base/latest/malachite_base/)) is a collection of utilities
+- **malachite-base** ([crates.io](https://crates.io/crates/malachite-base)) is a collection of utilities
   supporting the other crates. It includes
   - Traits that wrap functions from the standard library, like
   [`CheckedAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedAdd.html);
@@ -77,8 +78,7 @@ The `malachite` crate re-exports three sub-crates.
     and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html);
   - Iterator-producing functions that let you generate values for testing.
-- **malachite-nz** ([crates.io](https://crates.io/crates/malachite-nz),
-  [docs.rs](https://docs.rs/malachite-nz/latest/malachite_nz/)) defines two bignum types,
+- **malachite-nz** ([crates.io](https://crates.io/crates/malachite-nz)) defines two bignum types,
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s and
   [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html)s. The
   functions defined on these types include
@@ -105,8 +105,7 @@ The `malachite` crate re-exports three sub-crates.
 
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `naturals_and_integers` or `malachite-nz` feature.
-- **malachite-q** ([crates.io](https://crates.io/crates/malachite-q),
-  [docs.rs](https://docs.rs/malachite-q/latest/malachite_q/)) defines
+- **malachite-q** ([crates.io](https://crates.io/crates/malachite-q)) defines
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The
   functions defined on this type include
   - All the ones you'd expect, like addition, subtraction, multiplication, and division;
@@ -126,7 +125,7 @@ The `malachite` crate re-exports three sub-crates.
 
 Malachite is under active development, with many more types and features planned for the future.
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that
-its API is not stable yet, and that it is licensed under LGPL 3.0.
+its API is not stable yet, and that Malachite is licensed under LGPL 3.0.
 
 Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, and shekohex for additional contributions.
 
@@ -158,4 +157,4 @@ flags.
   {% endfor %}
 </ul>
 
-Copyright © 2024 Mikhail Hogrefe
+Copyright © 2025 Mikhail Hogrefe

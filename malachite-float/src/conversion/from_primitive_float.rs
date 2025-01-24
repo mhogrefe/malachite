@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -11,25 +11,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
-use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-
-// This differs from the `precision` function provided by `PrimitiveFloat`. That function returns
-// the smallest precision necessary to represent the float, whereas this function returns the
-// maximum precision of any float in the same binade. If the float is non-finite or zero, 1 is
-// returned.
-pub_test! {alt_precision<T: PrimitiveFloat>(x: T) -> u64 {
-    if x.is_finite() && x != T::ZERO {
-        let (mantissa, exponent) = x.raw_mantissa_and_exponent();
-        if exponent == 0 {
-            mantissa.significant_bits()
-        } else {
-            T::MANTISSA_WIDTH + 1
-        }
-    } else {
-        1
-    }
-}}
 
 impl Float {
     /// Converts a primitive float to a [`Float`]. If the [`Float`] is nonzero and finite, it has
@@ -40,12 +22,18 @@ impl Float {
     ///
     /// If you're only using `Nearest`, try using [`Float::from_primitive_float_prec`] instead.
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.sci_exponent().abs())`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is exact and the primitive float cannot be exactly
+    /// represented with the specified precision.
     ///
     /// # Examples
     /// See [here](super::from_primitive_float#from_primitive_float_prec_round).
@@ -91,12 +79,17 @@ impl Float {
     /// Rounding may occur, in which case `Nearest` is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_primitive_float_prec_round`].
     ///
+    /// This function does not overflow or underflow.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.sci_exponent().abs())`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
     ///
     /// # Examples
     /// See [here](super::from_primitive_float#from_primitive_float_prec).
@@ -135,12 +128,13 @@ macro_rules! impl_from_primitive_float {
         impl From<$t> for Float {
             /// Converts a primitive float to a [`Float`].
             ///
-            /// If the primitive float is finite and nonzero, the precision of the [`Float`] is
-            /// equal to the maximum precision of any primitive float in the same binade (for normal
-            /// `f32`s this is 24, and for normal `f64`s it is 53). If you want to specify a
-            /// different precision, try [`Float::from_primitive_float_prec`]. This may require
-            /// rounding, which uses `Nearest` by default. To specify a rounding mode as well as a
-            /// precision, try [`Float::from_primitive_float_prec_round`].
+            /// If the primitive float is finite and nonzero, the precision of the [`Float`] is the
+            /// minimum possible precision to represent the primitive float exactly. If you want to
+            /// specify a different precision, try [`Float::from_primitive_float_prec`]. This may
+            /// require rounding, which uses `Nearest` by default. To specify a rounding mode as
+            /// well as a precision, try [`Float::from_primitive_float_prec_round`].
+            ///
+            /// This function does not overflow or underflow.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -169,7 +163,7 @@ macro_rules! impl_from_primitive_float {
                     }
                 } else {
                     let (m, e) = x.integer_mantissa_and_exponent();
-                    let abs = Float::from_unsigned_prec(m, alt_precision(x)).0 << e;
+                    let abs = Float::from(m) << e;
                     if x.is_sign_positive() {
                         abs
                     } else {

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -298,7 +298,7 @@ impl<'a> BitAnd<&'a Natural> for Natural {
     }
 }
 
-impl<'a> BitAnd<Natural> for &'a Natural {
+impl BitAnd<Natural> for &Natural {
     type Output = Natural;
 
     /// Takes the bitwise and of two [`Natural`]s, taking the first by reference and the seocnd by
@@ -334,7 +334,7 @@ impl<'a> BitAnd<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
+impl BitAnd<&Natural> for &Natural {
     type Output = Natural;
 
     /// Takes the bitwise and of two [`Natural`]s, taking both by reference.
@@ -363,7 +363,7 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
     ///     999999995904u64
     /// );
     /// ```
-    fn bitand(self, other: &'a Natural) -> Natural {
+    fn bitand(self, other: &Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => Natural(Small(x.and_limb_ref(y))),
             (&Natural(Small(x)), y) => Natural(Small(y.and_limb_ref(x))),

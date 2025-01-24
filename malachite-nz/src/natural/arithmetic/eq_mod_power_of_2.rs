@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -108,7 +108,7 @@ impl Natural {
     }
 }
 
-impl<'a, 'b> EqModPowerOf2<&'b Natural> for &'a Natural {
+impl EqModPowerOf2<&Natural> for &Natural {
     /// Returns whether one [`Natural`] is equal to another modulo $2^k$; that is, whether their $k$
     /// least-significant bits are equal.
     ///
@@ -143,7 +143,7 @@ impl<'a, 'b> EqModPowerOf2<&'b Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod_power_of_2(self, other: &'b Natural, pow: u64) -> bool {
+    fn eq_mod_power_of_2(self, other: &Natural, pow: u64) -> bool {
         match (self, other) {
             (_, &Natural(Small(y))) => self.eq_mod_power_of_2_limb(y, pow),
             (&Natural(Small(x)), _) => other.eq_mod_power_of_2_limb(x, pow),

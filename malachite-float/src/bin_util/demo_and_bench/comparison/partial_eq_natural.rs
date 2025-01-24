@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,14 +10,20 @@ use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::pair_2_pair_float_natural_max_complexity_bucketer;
-use malachite_float::test_util::generators::{float_natural_pair_gen, float_natural_pair_gen_rm};
+use malachite_float::test_util::generators::{
+    float_natural_pair_gen, float_natural_pair_gen_rm, float_natural_pair_gen_var_2,
+};
 use malachite_float::ComparableFloatRef;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_partial_eq_natural);
     register_demo!(runner, demo_float_partial_eq_natural_debug);
+    register_demo!(runner, demo_float_partial_eq_natural_extreme);
+    register_demo!(runner, demo_float_partial_eq_natural_extreme_debug);
     register_demo!(runner, demo_natural_partial_eq_float);
     register_demo!(runner, demo_natural_partial_eq_float_debug);
+    register_demo!(runner, demo_natural_partial_eq_float_extreme);
+    register_demo!(runner, demo_natural_partial_eq_float_extreme_debug);
 
     register_bench!(
         runner,
@@ -50,6 +56,27 @@ fn demo_float_partial_eq_natural_debug(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
+fn demo_float_partial_eq_natural_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_natural_pair_gen_var_2().get(gm, config).take(limit) {
+        if x == y {
+            println!("{x} = {y}");
+        } else {
+            println!("{x} ≠ {y}");
+        }
+    }
+}
+
+fn demo_float_partial_eq_natural_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_natural_pair_gen_var_2().get(gm, config).take(limit) {
+        let cx = ComparableFloatRef(&x);
+        if x == y {
+            println!("{cx:#x} = {y:#x}");
+        } else {
+            println!("{cx:#x} ≠ {y:#x}");
+        }
+    }
+}
+
 fn demo_natural_partial_eq_float(gm: GenMode, config: &GenConfig, limit: usize) {
     for (y, x) in float_natural_pair_gen().get(gm, config).take(limit) {
         if x == y {
@@ -62,6 +89,27 @@ fn demo_natural_partial_eq_float(gm: GenMode, config: &GenConfig, limit: usize) 
 
 fn demo_natural_partial_eq_float_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (y, x) in float_natural_pair_gen().get(gm, config).take(limit) {
+        let cy = ComparableFloatRef(&y);
+        if x == y {
+            println!("{x:#x} = {cy:#x}");
+        } else {
+            println!("{x:#x} ≠ {cy:#x}");
+        }
+    }
+}
+
+fn demo_natural_partial_eq_float_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x) in float_natural_pair_gen_var_2().get(gm, config).take(limit) {
+        if x == y {
+            println!("{x} = {y}");
+        } else {
+            println!("{x} ≠ {y}");
+        }
+    }
+}
+
+fn demo_natural_partial_eq_float_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x) in float_natural_pair_gen_var_2().get(gm, config).take(limit) {
         let cy = ComparableFloatRef(&y);
         if x == y {
             println!("{x:#x} = {cy:#x}");

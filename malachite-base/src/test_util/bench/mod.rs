@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -71,7 +71,7 @@ where
     I::Item: Clone,
 {
     let reps = 5;
-    let min_bucket_size = 2;
+    let min_bucket_size = 1;
 
     let mut durations_maps = Vec::new();
     for _ in 0..options.series_options.len() {

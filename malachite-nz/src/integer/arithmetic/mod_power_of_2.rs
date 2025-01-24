@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -57,7 +57,7 @@ impl ModPowerOf2 for Integer {
     }
 }
 
-impl<'a> ModPowerOf2 for &'a Integer {
+impl ModPowerOf2 for &Integer {
     type Output = Natural;
 
     /// Divides an [`Integer`] by $2^k$, taking it by reference and returning just the remainder.
@@ -190,7 +190,7 @@ impl RemPowerOf2 for Integer {
     }
 }
 
-impl<'a> RemPowerOf2 for &'a Integer {
+impl RemPowerOf2 for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by $2^k$, taking it by reference and returning just the remainder.
@@ -321,7 +321,7 @@ impl CeilingModPowerOf2 for Integer {
     }
 }
 
-impl<'a> CeilingModPowerOf2 for &'a Integer {
+impl CeilingModPowerOf2 for &Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by $2^k$, taking it by reference and returning just the remainder.

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -988,7 +988,7 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-impl<'a> EqMod<Natural, Natural> for &'a Natural {
+impl EqMod<Natural, Natural> for &Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. The first is taken
     /// by reference and the second and third by value.
@@ -1056,7 +1056,7 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
+impl EqMod<Natural, &Natural> for &Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. The first and third
     /// are taken by reference and the second by value.
@@ -1100,7 +1100,7 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, m: &'b Natural) -> bool {
+    fn eq_mod(self, other: Natural, m: &Natural) -> bool {
         match (self, other, m) {
             (x, y, &Natural::ZERO) => *x == y,
             (x, Natural::ZERO, m) => x.divisible_by(m),
@@ -1124,7 +1124,7 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
+impl EqMod<&Natural, Natural> for &Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. The first and
     /// second are taken by reference and the third by value.
@@ -1168,7 +1168,7 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'b Natural, m: Natural) -> bool {
+    fn eq_mod(self, other: &Natural, m: Natural) -> bool {
         match (self, other, m) {
             (x, y, Natural::ZERO) => x == y,
             (x, &Natural::ZERO, m) => x.divisible_by(m),
@@ -1192,7 +1192,7 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
+impl EqMod<&Natural, &Natural> for &Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. All three are taken
     /// by reference.
@@ -1236,7 +1236,7 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'b Natural, m: &'c Natural) -> bool {
+    fn eq_mod(self, other: &Natural, m: &Natural) -> bool {
         match (self, other, m) {
             (x, y, &Natural::ZERO) => x == y,
             (x, &Natural::ZERO, m) => x.divisible_by(m),

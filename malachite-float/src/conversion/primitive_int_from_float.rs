@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -252,12 +252,12 @@ macro_rules! impl_unsigned_from {
             /// returned, indicating whether the returned value is less than, equal to, or greater
             /// than the original value.
             ///
-            /// If the [`Float`] is negative (including negative infinity), then it will be rounded
-            /// to zero when the [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise,
-            /// this function will panic.
+            /// If the [`Float`] is negative (including $-\infty$), then it will be rounded to zero
+            /// when the [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this
+            /// function will panic.
             ///
             /// If the [`Float`] is greater than the maximum representable value of the unsigned
-            /// type (including infinity), then it will be rounded to the maximum value when the
+            /// type (including $\infty$), then it will be rounded to the maximum value when the
             /// [`RoundingMode`] is `Floor`, `Down`, or `Nearest`. Otherwise, this function will
             /// panic.
             ///
@@ -280,18 +280,18 @@ macro_rules! impl_unsigned_from {
             }
         }
 
-        impl<'a> RoundingFrom<&'a Float> for $t {
+        impl RoundingFrom<&Float> for $t {
             /// Converts a [`Float`] to an unsigned primitive integer, using a specified
             /// [`RoundingMode`] and taking the [`Float`] by reference. An [`Ordering`] is also
             /// returned, indicating whether the returned value is less than, equal to, or greater
             /// than the original value.
             ///
-            /// If the [`Float`] is negative (including negative infinity), then it will be rounded
-            /// to zero when the [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise,
-            /// this function will panic.
+            /// If the [`Float`] is negative (including $-\infty$), then it will be rounded to zero
+            /// when the [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this
+            /// function will panic.
             ///
             /// If the [`Float`] is greater than the maximum representable value of the unsigned
-            /// type (including infinity), then it will be rounded to the maximum value when the
+            /// type (including $\infty$), then it will be rounded to the maximum value when the
             /// [`RoundingMode`] is `Floor`, `Down`, or `Nearest`. Otherwise, this function will
             /// panic.
             ///
@@ -309,7 +309,7 @@ macro_rules! impl_unsigned_from {
             /// # Examples
             /// See [here](super::primitive_int_from_float#rounding_from).
             #[inline]
-            fn rounding_from(f: &'a Float, rm: RoundingMode) -> ($t, Ordering) {
+            fn rounding_from(f: &Float, rm: RoundingMode) -> ($t, Ordering) {
                 unsigned_rounding_from_float_ref(f, rm)
             }
         }
@@ -334,7 +334,7 @@ macro_rules! impl_unsigned_from {
             }
         }
 
-        impl<'a> TryFrom<&'a Float> for $t {
+        impl TryFrom<&Float> for $t {
             type Error = UnsignedFromFloatError;
 
             /// Converts a [`Float`] to a primitive unsigned integer, taking the [`Float`] by
@@ -349,12 +349,12 @@ macro_rules! impl_unsigned_from {
             /// # Examples
             /// See [here](super::primitive_int_from_float#try_from).
             #[inline]
-            fn try_from(f: &'a Float) -> Result<$t, Self::Error> {
+            fn try_from(f: &Float) -> Result<$t, Self::Error> {
                 unsigned_try_from_float_ref(f)
             }
         }
 
-        impl<'a> ConvertibleFrom<&'a Float> for $t {
+        impl ConvertibleFrom<&Float> for $t {
             /// Determines whether a [`Float`] can be converted to an unsigned primitive integer,
             /// taking the [`Float`] by reference.
             ///
@@ -368,7 +368,7 @@ macro_rules! impl_unsigned_from {
             /// # Examples
             /// See [here](super::primitive_int_from_float#convertible_from).
             #[inline]
-            fn convertible_from(f: &'a Float) -> bool {
+            fn convertible_from(f: &Float) -> bool {
                 unsigned_convertible_from_float::<$t>(f)
             }
         }
@@ -697,12 +697,11 @@ macro_rules! impl_signed_from {
             /// than the original value.
             ///
             /// If the [`Float`] is less than the minimum representable value of the signed type
-            /// (including negative infinity), then it will be rounded to zero when the
-            /// [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will
-            /// panic.
+            /// (including $-\infty$), then it will be rounded to zero when the [`RoundingMode`] is
+            /// `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
             ///
             /// If the [`Float`] is greater than the maximum representable value of the signed type
-            /// (including infinity), then it will be rounded to the maximum value when the
+            /// (including $\infty$), then it will be rounded to the maximum value when the
             /// [`RoundingMode`] is `Floor`, `Down`, or `Nearest`. Otherwise, this function will
             /// panic.
             ///
@@ -726,19 +725,18 @@ macro_rules! impl_signed_from {
             }
         }
 
-        impl<'a> RoundingFrom<&'a Float> for $t {
+        impl RoundingFrom<&Float> for $t {
             /// Converts a [`Float`] to a signed primitive integer, using a specified
             /// [`RoundingMode`] and taking the [`Float`] by reference. An [`Ordering`] is also
             /// returned, indicating whether the returned value is less than, equal to, or greater
             /// than the original value.
             ///
             /// If the [`Float`] is less than the minimum representable value of the signed type
-            /// (including negative infinity), then it will be rounded to zero when the
-            /// [`RoundingMode`] is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will
-            /// panic.
+            /// (including $-\infty$), then it will be rounded to zero when the [`RoundingMode`] is
+            /// `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
             ///
             /// If the [`Float`] is greater than the maximum representable value of the signed type
-            /// (including infinity), then it will be rounded to the maximum value when the
+            /// (including $\infty$), then it will be rounded to the maximum value when the
             /// [`RoundingMode`] is `Floor`, `Down`, or `Nearest`. Otherwise, this function will
             /// panic.
             ///
@@ -757,7 +755,7 @@ macro_rules! impl_signed_from {
             /// # Examples
             /// See [here](super::primitive_int_from_float#rounding_from).
             #[inline]
-            fn rounding_from(f: &'a Float, rm: RoundingMode) -> ($t, Ordering) {
+            fn rounding_from(f: &Float, rm: RoundingMode) -> ($t, Ordering) {
                 signed_rounding_from_float_ref(f, rm)
             }
         }
@@ -780,7 +778,7 @@ macro_rules! impl_signed_from {
             }
         }
 
-        impl<'a> TryFrom<&'a Float> for $t {
+        impl TryFrom<&Float> for $t {
             type Error = SignedFromFloatError;
 
             /// Converts a [`Float`] to a primitive signed integer, taking the [`Float`] by
@@ -793,12 +791,12 @@ macro_rules! impl_signed_from {
             /// # Examples
             /// See [here](super::primitive_int_from_float#try_from).
             #[inline]
-            fn try_from(f: &'a Float) -> Result<$t, Self::Error> {
+            fn try_from(f: &Float) -> Result<$t, Self::Error> {
                 signed_try_from_float_ref(f)
             }
         }
 
-        impl<'a> ConvertibleFrom<&'a Float> for $t {
+        impl ConvertibleFrom<&Float> for $t {
             /// Determines whether a [`Float`] can be converted to a signed primitive integer,
             /// taking the [`Float`] by reference.
             ///
@@ -808,7 +806,7 @@ macro_rules! impl_signed_from {
             /// # Examples
             /// See [here](super::primitive_int_from_float#convertible_from).
             #[inline]
-            fn convertible_from(f: &'a Float) -> bool {
+            fn convertible_from(f: &Float) -> bool {
                 signed_convertible_from_float::<$t>(f)
             }
         }

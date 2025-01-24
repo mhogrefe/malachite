@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -8,7 +8,6 @@
 
 use crate::chars::crement::increment_char;
 use crate::chars::CharType;
-use crate::comparison::traits::Min;
 use core::ops::RangeInclusive;
 
 /// Generates all ASCII [`char`]s, in ascending order.

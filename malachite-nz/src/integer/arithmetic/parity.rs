@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::Parity;
 
-impl<'a> Parity for &'a Integer {
+impl Parity for &Integer {
     /// Tests whether an [`Integer`] is even.
     ///
     /// $f(x) = (2|x)$.

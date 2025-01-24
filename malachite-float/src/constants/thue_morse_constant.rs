@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -105,13 +105,14 @@ impl Float {
             }
         }
         let increment = match rm {
-            Up | Ceiling | Exact => true, // Exact never happens
+            Up | Ceiling => true,
             Down | Floor => false,
             Nearest => match lsb {
                 1 => !next_tms,
                 2 => tms.next().unwrap(),
                 _ => limbs[0] & (lsb >> 1) != 0,
             },
+            Exact => unreachable!(),
         };
         limbs[0] &= !(lsb - 1);
         let mut significand = Natural::from_owned_limbs_asc(limbs);

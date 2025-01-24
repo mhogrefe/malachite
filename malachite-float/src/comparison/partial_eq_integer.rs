@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,8 +15,8 @@ use malachite_nz::integer::Integer;
 impl PartialEq<Integer> for Float {
     /// Determines whether a [`Float`] is equal to an [`Integer`].
     ///
-    /// Infinity, negative infinity, and NaN are not equal to any [`Integer`]. Both the [`Float`]
-    /// zero and the [`Float`] negative zero are equal to the [`Integer`] zero.
+    /// $\infty$, $-\infty$, and NaN are not equal to any [`Integer`]. Both the [`Float`] zero and
+    /// the [`Float`] negative zero are equal to the [`Integer`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -59,8 +59,8 @@ impl PartialEq<Integer> for Float {
 impl PartialEq<Float> for Integer {
     /// Determines whether an [`Integer`] is equal to a [`Float`].
     ///
-    /// No [`Integer`] is equal to infinity, negative infinity, or NaN. The [`Integer`] zero is
-    /// equal to both the [`Float`] zero and the [`Float`] negative zero.
+    /// No [`Integer`] is equal to $\infty$, $-\infty$, or NaN. The [`Integer`] zero is equal to
+    /// both the [`Float`] zero and the [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

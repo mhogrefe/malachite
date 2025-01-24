@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -9,8 +9,9 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
-    float_rational_pair_gen, float_rational_pair_gen_var_1,
+    float_rational_pair_gen, float_rational_pair_gen_var_1, float_rational_pair_gen_var_2,
 };
+use malachite_float::Float;
 use malachite_q::Rational;
 use rug;
 use std::str::FromStr;
@@ -487,12 +488,21 @@ fn test_partial_eq_rational() {
     test("-4.0e-121", "-0x1.0E-100#1", "-22/7", false);
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn partial_eq_rational_properties_helper(x: Float, y: Rational) {
+    let eq = x == y;
+    assert_eq!(y == x, eq);
+    assert_eq!(rug::Float::exact_from(&x) == rug::Rational::from(&y), eq);
+}
+
 #[test]
 fn partial_eq_rational_properties() {
     float_rational_pair_gen().test_properties(|(x, y)| {
-        let eq = x == y;
-        assert_eq!(y == x, eq);
-        assert_eq!(rug::Float::exact_from(&x) == rug::Rational::from(&y), eq);
+        partial_eq_rational_properties_helper(x, y);
+    });
+
+    float_rational_pair_gen_var_2().test_properties(|(x, y)| {
+        partial_eq_rational_properties_helper(x, y);
     });
 
     float_rational_pair_gen_var_1().test_properties(|(x, y)| {

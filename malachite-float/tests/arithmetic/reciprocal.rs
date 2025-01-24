@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -497,8 +497,6 @@ fn test_reciprocal_prec() {
         "-0x0.518#10",
         Less,
     );
-
-    // yyy
 
     // - in reciprocal_float_significand_short
     // - in limbs_reciprocal_limb_to_out_mod_with_fraction
@@ -1165,8 +1163,6 @@ fn test_reciprocal_round() {
         "-0x0.517cc1b727220c#53",
         Less,
     );
-
-    // yyy
 
     // - rm == Floor || rm == Down in reciprocal_float_significand_same_prec_lt_w
     test("1.5", "0x1.8#2", Down, "0.5", "0x0.8#2", Less);
@@ -2156,8 +2152,6 @@ fn test_reciprocal_prec_round() {
         "-0x0.518#10",
         Less,
     );
-
-    // yyy
 
     // - rm == Floor || rm == Down in reciprocal_float_significand_short
     test("1.5", "0x1.8#2", 1, Down, "0.5", "0x0.8#1", Less);

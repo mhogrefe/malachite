@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -40,10 +40,12 @@ use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_16, float_float_rounding_mode_triple_gen_var_17,
     float_float_rounding_mode_triple_gen_var_18, float_float_rounding_mode_triple_gen_var_19,
     float_float_rounding_mode_triple_gen_var_20, float_float_rounding_mode_triple_gen_var_21,
-    float_float_rounding_mode_triple_gen_var_22,
-    float_float_unsigned_rounding_mode_quadruple_gen_var_3, float_float_unsigned_triple_gen_var_1,
-    float_gen, float_pair_gen, float_pair_gen_var_2, float_pair_gen_var_3, float_pair_gen_var_4,
-    float_pair_gen_var_5, float_pair_gen_var_6, float_pair_gen_var_7, float_rational_pair_gen,
+    float_float_rounding_mode_triple_gen_var_22, float_float_rounding_mode_triple_gen_var_31,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_3,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_7, float_float_unsigned_triple_gen_var_1,
+    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_10,
+    float_pair_gen_var_2, float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5,
+    float_pair_gen_var_6, float_pair_gen_var_7, float_rational_pair_gen,
     float_rational_rounding_mode_triple_gen_var_4,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_3,
     float_rational_unsigned_triple_gen_var_1, float_rounding_mode_pair_gen,
@@ -1510,6 +1512,16 @@ fn test_mul_prec() {
     );
     test(
         "1.5", "0x1.8#2", "1.5", "0x1.8#2", 3, "2.0", "0x2.0#3", Less,
+    );
+    test(
+        "-6.5933e-41",
+        "-0x5.be5cE-34#17",
+        "too_small",
+        "0x1.abfd74a88E-268435431#34",
+        68,
+        "-0.0",
+        "-0x0.0",
+        Greater,
     );
 }
 
@@ -4328,6 +4340,210 @@ fn test_mul_round() {
         1512f14b2397a5630d41d067d57d9b327d751eacb350f8e13428d4508849e4464775e72f3b4fb63d6bef2d97b6\
         f0118aa022becb98c8c88fdcb280078abcbe4c3b8423dc1dfc91e6b09ea9115cd0cd#1336",
         Greater,
+    );
+    // - exp_sum - 1 > Float::MAX_EXPONENT
+    // - exp_sum - 1 > Float::MAX_EXPONENT && sign && rm == Floor | Down
+    test(
+        "2.0",
+        "0x2.0#1",
+        "too_big",
+        "0x4.0E+268435455#1",
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    // - exp_sum - 1 > Float::MAX_EXPONENT && sign && rm == Ceiling | Up | Nearest
+    test(
+        "2.0",
+        "0x2.0#1",
+        "too_big",
+        "0x4.0E+268435455#1",
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - exp_sum - 1 > Float::MAX_EXPONENT && !sign && rm == Ceiling | Down
+    test(
+        "2.0",
+        "0x2.0#1",
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Down,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    // - exp_sum - 1 > Float::MAX_EXPONENT && !sign && rm == Floor | Up | Nearest
+    test(
+        "2.0",
+        "0x2.0#1",
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    // - exp > Float::MAX_EXPONENT
+    // - exp > Float::MAX_EXPONENT && sign && rm == Floor | Down
+    test(
+        "1.5",
+        "0x1.8#2",
+        "too_big",
+        "0x6.0E+268435455#2",
+        Down,
+        "too_big",
+        "0x6.0E+268435455#2",
+        Less,
+    );
+    // - exp > Float::MAX_EXPONENT && sign && rm == Ceiling | Up | Nearest
+    test(
+        "1.5",
+        "0x1.8#2",
+        "too_big",
+        "0x6.0E+268435455#2",
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - exp > Float::MAX_EXPONENT && !sign && rm == Ceiling | Down
+    test(
+        "1.5",
+        "0x1.8#2",
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Down,
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Greater,
+    );
+    // - exp > Float::MAX_EXPONENT && !sign && rm == Floor | Up | Nearest
+    test(
+        "1.5",
+        "0x1.8#2",
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    // - exp < Float::MIN_EXPONENT
+    // - exp < Float::MIN_EXPONENT not special
+    // - exp < Float::MIN_EXPONENT && sign && rm == Floor | Down | Nearest
+    test(
+        "0.5",
+        "0x0.8#1",
+        "too_small",
+        "0x1.0E-268435456#1",
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - exp < Float::MIN_EXPONENT && sign && rm == Ceiling | Up
+    test(
+        "0.5",
+        "0x0.8#1",
+        "too_small",
+        "0x1.0E-268435456#1",
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    // - exp < Float::MIN_EXPONENT && !sign && rm == Ceiling | Down | Nearest
+    test(
+        "0.5",
+        "0x0.8#1",
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    // - exp < Float::MIN_EXPONENT && !sign && rm == Floor | Up
+    test(
+        "0.5",
+        "0x0.8#1",
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    // - exp < Float::MIN_EXPONENT special
+    // - exp < Float::MIN_EXPONENT special and sign
+    test(
+        "0.8",
+        "0x0.c#2",
+        "too_small",
+        "0x1.0E-268435456#1",
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#2",
+        Greater,
+    );
+    // - exp < Float::MIN_EXPONENT special and !sign
+    test(
+        "0.8",
+        "0x0.c#2",
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#2",
+        Less,
+    );
+    // - exp_sum < Float::MIN_EXPONENT - 1
+    // - exp_sum < Float::MIN_EXPONENT - 1 && sign && rm == Floor | Down | Nearest
+    test(
+        "0.1",
+        "0x0.2#1",
+        "too_small",
+        "0x1.0E-268435456#1",
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - exp_sum < Float::MIN_EXPONENT - 1 && sign && rm == Ceiling | Up
+    test(
+        "0.1",
+        "0x0.2#1",
+        "too_small",
+        "0x1.0E-268435456#1",
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    // - exp_sum < Float::MIN_EXPONENT - 1 && !sign && rm == Ceiling | Down | Nearest
+    test(
+        "0.1",
+        "0x0.2#1",
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    // - exp_sum < Float::MIN_EXPONENT - 1 && !sign && rm == Floor | Up
+    test(
+        "0.1",
+        "0x0.2#1",
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
     );
 }
 
@@ -9766,89 +9982,97 @@ fn mul_rational_prec_round_fail() {
     });
 }
 
-#[test]
-fn mul_prec_round_properties() {
-    float_float_unsigned_rounding_mode_quadruple_gen_var_3().test_properties(|(x, y, prec, rm)| {
-        let (product, o) = x.clone().mul_prec_round(y.clone(), prec, rm);
-        assert!(product.is_valid());
-        let (product_alt, o_alt) = x.clone().mul_prec_round_val_ref(&y, prec, rm);
-        assert!(product_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
-        let (product_alt, o_alt) = x.mul_prec_round_ref_val(y.clone(), prec, rm);
-        assert!(product_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
-        let (product_alt, o_alt) = x.mul_prec_round_ref_ref(&y, prec, rm);
-        assert!(product_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
+#[allow(clippy::needless_pass_by_value)]
+fn mul_prec_round_properties_helper(
+    x: Float,
+    y: Float,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    let (product, o) = x.clone().mul_prec_round(y.clone(), prec, rm);
+    assert!(product.is_valid());
+    let (product_alt, o_alt) = x.clone().mul_prec_round_val_ref(&y, prec, rm);
+    assert!(product_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&product_alt),
+        ComparableFloatRef(&product)
+    );
+    assert_eq!(o_alt, o);
+    let (product_alt, o_alt) = x.mul_prec_round_ref_val(y.clone(), prec, rm);
+    assert!(product_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&product_alt),
+        ComparableFloatRef(&product)
+    );
+    assert_eq!(o_alt, o);
+    let (product_alt, o_alt) = x.mul_prec_round_ref_ref(&y, prec, rm);
+    assert!(product_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&product_alt),
+        ComparableFloatRef(&product)
+    );
+    assert_eq!(o_alt, o);
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.mul_prec_round_assign(y.clone(), prec, rm);
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
-        assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.mul_prec_round_assign(y.clone(), prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
+    assert_eq!(o_alt, o);
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.mul_prec_round_assign_ref(&y, prec, rm);
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
-        assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.mul_prec_round_assign_ref(&y, prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
+    assert_eq!(o_alt, o);
 
+    if !extreme {
         let (product_alt, o_alt) = mul_prec_round_naive(x.clone(), y.clone(), prec, rm);
         assert_eq!(
             ComparableFloatRef(&product_alt),
             ComparableFloatRef(&product)
         );
         assert_eq!(o_alt, o);
+    }
 
-        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_product, rug_o) = rug_mul_prec_round(
-                &rug::Float::exact_from(&x),
-                &rug::Float::exact_from(&y),
-                prec,
-                rm,
-            );
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_product)),
-                ComparableFloatRef(&product),
-            );
-            assert_eq!(rug_o, o);
+    if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_product, rug_o) = rug_mul_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+            rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_product)),
+            ComparableFloatRef(&product),
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if o == Equal && product.is_finite() && product != 0 {
+        assert_eq!(
+            ComparableFloatRef(
+                &product
+                    .div_prec_round_ref_ref(&x, y.significant_bits(), Exact)
+                    .0
+            ),
+            ComparableFloatRef(&y)
+        );
+        assert_eq!(
+            ComparableFloatRef(
+                &product
+                    .div_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                    .0
+            ),
+            ComparableFloatRef(&x)
+        );
+    }
+
+    if product.is_finite() {
+        if product.is_normal() {
+            assert_eq!(product.get_prec(), Some(prec));
         }
-
-        if o == Equal && product.is_finite() && product != 0 {
-            assert_eq!(
-                ComparableFloatRef(
-                    &product
-                        .div_prec_round_ref_ref(&x, y.significant_bits(), Exact)
-                        .0
-                ),
-                ComparableFloatRef(&y)
-            );
-            assert_eq!(
-                ComparableFloatRef(
-                    &product
-                        .div_prec_round_ref_ref(&y, x.significant_bits(), Exact)
-                        .0
-                ),
-                ComparableFloatRef(&x)
-            );
-        }
-
-        let r_product = if product.is_finite() {
-            if product.is_normal() {
-                assert_eq!(product.get_prec(), Some(prec));
-            }
+        if !extreme {
             let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
             assert_eq!(product.partial_cmp(&r_product), Some(o));
             if o == Less {
@@ -9860,70 +10084,73 @@ fn mul_prec_round_properties() {
                 next.decrement();
                 assert!(next < r_product);
             }
-            Some(r_product)
-        } else {
-            assert_eq!(o, Equal);
-            None
-        };
-
-        match (
-            r_product.is_some() && *r_product.as_ref().unwrap() >= 0u32,
-            rm,
-        ) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
+            match (r_product >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
             }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
         }
+    }
 
-        let (product_alt, o_alt) = y.mul_prec_round_ref_ref(&x, prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
+    let (product_alt, o_alt) = y.mul_prec_round_ref_ref(&x, prec, rm);
+    assert_eq!(
+        ComparableFloatRef(&product_alt),
+        ComparableFloatRef(&product)
+    );
+    assert_eq!(o_alt, o);
 
-        let (mut product_alt, mut o_alt) = x.mul_prec_round_ref_val(-&y, prec, -rm);
-        product_alt.neg_assign();
-        o_alt = o_alt.reverse();
-        assert_eq!(
-            ComparableFloat(product_alt.abs_negative_zero()),
-            ComparableFloat(product.abs_negative_zero_ref())
-        );
-        assert_eq!(o_alt, o);
+    let (mut product_alt, mut o_alt) = x.mul_prec_round_ref_val(-&y, prec, -rm);
+    product_alt.neg_assign();
+    o_alt = o_alt.reverse();
+    assert_eq!(
+        ComparableFloat(product_alt.abs_negative_zero()),
+        ComparableFloat(product.abs_negative_zero_ref())
+    );
+    assert_eq!(o_alt, o);
 
-        let (mut product_alt, mut o_alt) = (-&x).mul_prec_round_val_ref(&y, prec, -rm);
-        product_alt.neg_assign();
-        o_alt = o_alt.reverse();
-        assert_eq!(
-            ComparableFloat(product_alt.abs_negative_zero()),
-            ComparableFloat(product.abs_negative_zero_ref())
-        );
-        assert_eq!(o_alt, o);
+    let (mut product_alt, mut o_alt) = (-&x).mul_prec_round_val_ref(&y, prec, -rm);
+    product_alt.neg_assign();
+    o_alt = o_alt.reverse();
+    assert_eq!(
+        ComparableFloat(product_alt.abs_negative_zero()),
+        ComparableFloat(product.abs_negative_zero_ref())
+    );
+    assert_eq!(o_alt, o);
 
-        let (product_alt, o_alt) = (-&x).mul_prec_round(-&y, prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
+    let (product_alt, o_alt) = (-&x).mul_prec_round(-&y, prec, rm);
+    assert_eq!(
+        ComparableFloatRef(&product_alt),
+        ComparableFloatRef(&product)
+    );
+    assert_eq!(o_alt, o);
 
-        if o == Equal {
-            for rm in exhaustive_rounding_modes() {
-                let (s, oo) = x.mul_prec_round_ref_ref(&y, prec, rm);
-                assert_eq!(
-                    ComparableFloat(s.abs_negative_zero_ref()),
-                    ComparableFloat(product.abs_negative_zero_ref())
-                );
-                assert_eq!(oo, Equal);
-            }
-        } else {
-            // QQQ assert_panic!(x.mul_prec_round_ref_ref(&y, prec, Exact));
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = x.mul_prec_round_ref_ref(&y, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(product.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
         }
+    } else {
+        assert_panic!(x.mul_prec_round_ref_ref(&y, prec, Exact));
+    }
+}
+
+#[test]
+fn mul_prec_round_properties() {
+    float_float_unsigned_rounding_mode_quadruple_gen_var_3().test_properties(|(x, y, prec, rm)| {
+        mul_prec_round_properties_helper(x, y, prec, rm, false);
+    });
+
+    float_float_unsigned_rounding_mode_quadruple_gen_var_7().test_properties(|(x, y, prec, rm)| {
+        mul_prec_round_properties_helper(x, y, prec, rm, true);
     });
 
     float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(x, prec, rm)| {
@@ -10017,7 +10244,7 @@ fn mul_prec_round_properties() {
     });
 }
 
-fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
+fn mul_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     let (product, o) = x.clone().mul_prec(y.clone(), prec);
     assert!(product.is_valid());
     let (product_alt, o_alt) = x.clone().mul_prec_val_ref(&y, prec);
@@ -10054,12 +10281,14 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
     assert_eq!(o_alt, o);
 
-    let (product_alt, o_alt) = mul_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-    assert_eq!(
-        ComparableFloatRef(&product_alt),
-        ComparableFloatRef(&product)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (product_alt, o_alt) = mul_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+    }
 
     let (rug_product, rug_o) = rug_mul_prec(
         &rug::Float::exact_from(&x),
@@ -10094,19 +10323,19 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
         if product.is_normal() {
             assert_eq!(product.get_prec(), Some(prec));
         }
-        let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
-        assert_eq!(product.partial_cmp(&r_product), Some(o));
-        if o == Less {
-            let mut next = product.clone();
-            next.increment();
-            assert!(next > r_product);
-        } else if o == Greater {
-            let mut next = product.clone();
-            next.decrement();
-            assert!(next < r_product);
+        if !extreme {
+            let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
+            assert_eq!(product.partial_cmp(&r_product), Some(o));
+            if o == Less {
+                let mut next = product.clone();
+                next.increment();
+                assert!(next > r_product);
+            } else if o == Greater {
+                let mut next = product.clone();
+                next.decrement();
+                assert!(next < r_product);
+            }
         }
-    } else {
-        assert_eq!(o, Equal);
     }
 
     let (product_alt, o_alt) = y.mul_prec_ref_ref(&x, prec);
@@ -10122,8 +10351,8 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
         product_alt.abs_negative_zero_assign();
         o_alt = o_alt.reverse();
         assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
+            ComparableFloat(product_alt),
+            ComparableFloat(product.abs_negative_zero_ref())
         );
         assert_eq!(o_alt, o);
 
@@ -10132,8 +10361,8 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
         product_alt.abs_negative_zero_assign();
         o_alt = o_alt.reverse();
         assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
+            ComparableFloat(product_alt),
+            ComparableFloat(product.abs_negative_zero_ref())
         );
         assert_eq!(o_alt, o);
 
@@ -10149,14 +10378,14 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64) {
 #[test]
 fn mul_prec_properties() {
     float_float_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
-        mul_prec_properties_helper(x, y, prec);
+        mul_prec_properties_helper(x, y, prec, false);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_float_unsigned_triple_gen_var_1().test_properties_with_config(&config, |(x, y, prec)| {
-        mul_prec_properties_helper(x, y, prec);
+        mul_prec_properties_helper(x, y, prec, false);
     });
 
     let mut config = GenConfig::new();
@@ -10164,7 +10393,11 @@ fn mul_prec_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     config.insert("small_n", 16 << Limb::LOG_WIDTH);
     float_float_unsigned_triple_gen_var_1().test_properties_with_config(&config, |(x, y, prec)| {
-        mul_prec_properties_helper(x, y, prec);
+        mul_prec_properties_helper(x, y, prec, false);
+    });
+
+    float_float_unsigned_triple_gen_var_2().test_properties(|(x, y, prec)| {
+        mul_prec_properties_helper(x, y, prec, true);
     });
 
     float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
@@ -10253,7 +10486,7 @@ fn mul_prec_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
+fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bool) {
     let (product, o) = x.clone().mul_round(y.clone(), rm);
     assert!(product.is_valid());
     let (product_alt, o_alt) = x.clone().mul_round_val_ref(&y, rm);
@@ -10290,16 +10523,20 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
     assert_eq!(o_alt, o);
 
-    let (product_alt, o_alt) = mul_prec_round_naive(
-        x.clone(),
-        y.clone(),
-        max(x.significant_bits(), y.significant_bits()),
-        rm,
-    );
-    assert_eq!(
-        ComparableFloatRef(&product_alt),
-        ComparableFloatRef(&product)
-    );
+    if !extreme {
+        let (product_alt, o_alt) = mul_prec_round_naive(
+            x.clone(),
+            y.clone(),
+            max(x.significant_bits(), y.significant_bits()),
+            rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+        assert_eq!(o_alt, o);
+    }
+
     assert_eq!(o_alt, o);
     let (product_alt, o_alt) =
         x.mul_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), rm);
@@ -10314,42 +10551,36 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
         assert_eq!(product.div_round_ref_ref(&y, Exact).0, x);
     }
 
-    let r_product = if product.is_finite() {
+    if product.is_finite() {
         if x.is_normal() && y.is_normal() && product.is_normal() {
             assert_eq!(
                 product.get_prec(),
                 Some(max(x.get_prec().unwrap(), y.get_prec().unwrap()))
             );
         }
-        let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
-        assert_eq!(product.partial_cmp(&r_product), Some(o));
-        if o == Less {
-            let mut next = product.clone();
-            next.increment();
-            assert!(next > r_product);
-        } else if o == Greater {
-            let mut next = product.clone();
-            next.decrement();
-            assert!(next < r_product);
+        if !extreme {
+            let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
+            assert_eq!(product.partial_cmp(&r_product), Some(o));
+            if o == Less {
+                let mut next = product.clone();
+                next.increment();
+                assert!(next > r_product);
+            } else if o == Greater {
+                let mut next = product.clone();
+                next.decrement();
+                assert!(next < r_product);
+            }
+            match (r_product >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
+            }
         }
-        Some(r_product)
-    } else {
-        assert_eq!(o, Equal);
-        None
-    };
-
-    match (
-        r_product.is_some() && *r_product.as_ref().unwrap() >= 0u32,
-        rm,
-    ) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
     }
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
@@ -10411,31 +10642,35 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
 #[test]
 fn mul_round_properties() {
     float_float_rounding_mode_triple_gen_var_16().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_17().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_18().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_19().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_20().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_21().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_22().test_properties(|(x, y, rm)| {
-        mul_round_properties_helper(x, y, rm);
+        mul_round_properties_helper(x, y, rm, false);
+    });
+
+    float_float_rounding_mode_triple_gen_var_31().test_properties(|(x, y, rm)| {
+        mul_round_properties_helper(x, y, rm, true);
     });
 
     float_rounding_mode_pair_gen().test_properties(|(x, rm)| {
@@ -10520,7 +10755,7 @@ fn mul_round_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn mul_properties_helper_1(x: Float, y: Float) {
+fn mul_properties_helper_1(x: Float, y: Float, extreme: bool) {
     let product = x.clone() * y.clone();
     assert!(product.is_valid());
     let product_alt = x.clone() * &y;
@@ -10552,17 +10787,20 @@ fn mul_properties_helper_1(x: Float, y: Float) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
 
-    let product_alt = mul_prec_round_naive(
-        x.clone(),
-        y.clone(),
-        max(x.significant_bits(), y.significant_bits()),
-        Nearest,
-    )
-    .0;
-    assert_eq!(
-        ComparableFloatRef(&product_alt),
-        ComparableFloatRef(&product)
-    );
+    if !extreme {
+        let product_alt = mul_prec_round_naive(
+            x.clone(),
+            y.clone(),
+            max(x.significant_bits(), y.significant_bits()),
+            Nearest,
+        )
+        .0;
+        assert_eq!(
+            ComparableFloatRef(&product_alt),
+            ComparableFloatRef(&product)
+        );
+    }
+
     let product_alt = x
         .mul_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), Nearest)
         .0;
@@ -10593,15 +10831,17 @@ fn mul_properties_helper_1(x: Float, y: Float) {
             product.get_prec(),
             Some(max(x.get_prec().unwrap(), y.get_prec().unwrap()))
         );
-        let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
-        if product < r_product {
-            let mut next = product.clone();
-            next.increment();
-            assert!(next > r_product);
-        } else if product > r_product {
-            let mut next = product.clone();
-            next.decrement();
-            assert!(next < r_product);
+        if !extreme {
+            let r_product = Rational::exact_from(&x) * Rational::exact_from(&y);
+            if product < r_product {
+                let mut next = product.clone();
+                next.increment();
+                assert!(next > r_product);
+            } else if product > r_product {
+                let mut next = product.clone();
+                next.decrement();
+                assert!(next < r_product);
+            }
         }
     }
 
@@ -10650,38 +10890,42 @@ where
 #[test]
 fn mul_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_pair_gen().test_properties_with_config(&config, |(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_2().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_3().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_4().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_5().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_6().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_7().test_properties(|(x, y)| {
-        mul_properties_helper_1(x, y);
+        mul_properties_helper_1(x, y, false);
+    });
+
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        mul_properties_helper_1(x, y, true);
     });
 
     apply_fn_to_primitive_floats!(mul_properties_helper_2);

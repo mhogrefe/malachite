@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -17,29 +17,43 @@ use malachite_float::test_util::bench::bucketers::{
     pair_2_max_triple_1_float_complexity_triple_2_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_rm, float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_1_rm,
+    float_gen, float_gen_rm, float_gen_var_12, float_unsigned_pair_gen_var_1,
+    float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_1,
     float_unsigned_rounding_mode_triple_gen_var_1_rm,
+    float_unsigned_rounding_mode_triple_gen_var_4,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_to_significand);
     register_demo!(runner, demo_float_to_significand_debug);
+    register_demo!(runner, demo_float_to_significand_extreme);
+    register_demo!(runner, demo_float_to_significand_extreme_debug);
     register_demo!(runner, demo_float_into_significand);
     register_demo!(runner, demo_float_into_significand_debug);
     register_demo!(runner, demo_float_significand_ref);
     register_demo!(runner, demo_float_significand_ref_debug);
     register_demo!(runner, demo_float_get_exponent);
     register_demo!(runner, demo_float_get_exponent_debug);
+    register_demo!(runner, demo_float_get_exponent_extreme);
+    register_demo!(runner, demo_float_get_exponent_extreme_debug);
     register_demo!(runner, demo_float_get_prec);
     register_demo!(runner, demo_float_get_prec_debug);
+    register_demo!(runner, demo_float_get_prec_extreme);
+    register_demo!(runner, demo_float_get_prec_extreme_debug);
     register_demo!(runner, demo_float_get_min_prec);
     register_demo!(runner, demo_float_get_min_prec_debug);
+    register_demo!(runner, demo_float_get_min_prec_extreme);
+    register_demo!(runner, demo_float_get_min_prec_extreme_debug);
     register_demo!(runner, demo_float_set_prec_round);
     register_demo!(runner, demo_float_set_prec_round_debug);
+    register_demo!(runner, demo_float_set_prec_round_extreme);
+    register_demo!(runner, demo_float_set_prec_round_extreme_debug);
     register_demo!(runner, demo_float_set_prec);
     register_demo!(runner, demo_float_set_prec_debug);
+    register_demo!(runner, demo_float_set_prec_extreme);
+    register_demo!(runner, demo_float_set_prec_extreme_debug);
     register_demo!(runner, demo_float_from_float_prec_round);
     register_demo!(runner, demo_float_from_float_prec_round_debug);
     register_demo!(runner, demo_float_from_float_prec_round_ref);
@@ -68,6 +82,22 @@ fn demo_float_to_significand(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_to_significand_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        println!(
+            "to_significand({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.to_significand()
+        );
+    }
+}
+
+fn demo_float_to_significand_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("to_significand({}) = {:?}", x, x.to_significand());
+    }
+}
+
+fn demo_float_to_significand_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "to_significand({:#x}) = {:?}",
             ComparableFloatRef(&x),
@@ -128,6 +158,22 @@ fn demo_float_get_exponent_debug(gm: GenMode, config: &GenConfig, limit: usize) 
     }
 }
 
+fn demo_float_get_exponent_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("get_exponent({}) = {:?}", x, x.get_exponent());
+    }
+}
+
+fn demo_float_get_exponent_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "get_exponent({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.get_exponent()
+        );
+    }
+}
+
 fn demo_float_get_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         println!("get_prec({}) = {:?}", x, x.get_prec());
@@ -144,6 +190,22 @@ fn demo_float_get_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_get_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("get_prec({}) = {:?}", x, x.get_prec());
+    }
+}
+
+fn demo_float_get_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!(
+            "get_prec({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.get_prec()
+        );
+    }
+}
+
 fn demo_float_get_min_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         println!("get_min_prec({}) = {:?}", x, x.get_min_prec());
@@ -152,6 +214,22 @@ fn demo_float_get_min_prec(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_get_min_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        println!(
+            "get_min_prec({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.get_min_prec()
+        );
+    }
+}
+
+fn demo_float_get_min_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        println!("get_min_prec({}) = {:?}", x, x.get_min_prec());
+    }
+}
+
+fn demo_float_get_min_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         println!(
             "get_min_prec({:#x}) = {:?}",
             ComparableFloatRef(&x),
@@ -189,6 +267,35 @@ fn demo_float_set_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize
     }
 }
 
+fn demo_float_set_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let old_x = x.clone();
+        let o = x.set_prec_round(prec, rm);
+        println!("x := {old_x}; x.set_prec_round({prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_set_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let old_x = x.clone();
+        let o = x.set_prec_round(prec, rm);
+        println!(
+            "x := {:#x}; x.set_prec_round({}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(old_x),
+            prec,
+            rm,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
 fn demo_float_set_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         let old_x = x.clone();
@@ -199,6 +306,28 @@ fn demo_float_set_prec(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_set_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let old_x = x.clone();
+        let o = x.set_prec(prec);
+        println!(
+            "x := {:#x}; x.set_prec({}) = {:?}; x = {:#x}",
+            ComparableFloat(old_x),
+            prec,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_set_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec) in float_unsigned_pair_gen_var_4().get(gm, config).take(limit) {
+        let old_x = x.clone();
+        let o = x.set_prec(prec);
+        println!("x := {old_x}; x.set_prec({prec}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_set_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec) in float_unsigned_pair_gen_var_4().get(gm, config).take(limit) {
         let old_x = x.clone();
         let o = x.set_prec(prec);
         println!(

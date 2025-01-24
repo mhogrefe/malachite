@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -51,7 +51,7 @@ impl Pow<u64> for Rational {
     }
 }
 
-impl<'a> Pow<u64> for &'a Rational {
+impl Pow<u64> for &Rational {
     type Output = Rational;
 
     /// Raises a [`Rational`] to a power, taking the [`Rational`] by reference.
@@ -186,7 +186,7 @@ impl Pow<i64> for Rational {
     }
 }
 
-impl<'a> Pow<i64> for &'a Rational {
+impl Pow<i64> for &Rational {
     type Output = Rational;
 
     /// Raises a [`Rational`] to a power, taking the [`Rational`] by reference.

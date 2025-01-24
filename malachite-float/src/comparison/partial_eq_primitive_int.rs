@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -41,8 +41,8 @@ macro_rules! impl_partial_eq_unsigned {
         impl PartialEq<$t> for Float {
             /// Determines whether a [`Float`] is equal to an unsigned primitive integer.
             ///
-            /// Infinity, negative infinity, and NaN are not equal to any primitive integer. Both
-            /// the [`Float`] zero and the [`Float`] negative zero are equal to the integer zero.
+            /// $\infty$, $-\infty$, and NaN are not equal to any primitive integer. Both the
+            /// [`Float`] zero and the [`Float`] negative zero are equal to the integer zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -62,8 +62,8 @@ macro_rules! impl_partial_eq_unsigned {
         impl PartialEq<Float> for $t {
             /// Determines whether an unsigned primitive integer is equal to a [`Float`].
             ///
-            /// No primitive integer is equal to infinity, negative infinity, or NaN. The integer
-            /// zero is equal to both the [`Float`] zero and the [`Float`] negative zero.
+            /// No primitive integer is equal to $\infty$, $-\infty$, or NaN. The integer zero is
+            /// equal to both the [`Float`] zero and the [`Float`] negative zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -110,8 +110,8 @@ macro_rules! impl_partial_eq_signed {
         impl PartialEq<$t> for Float {
             /// Determines whether a [`Float`] is equal to a signed primitive integer.
             ///
-            /// Infinity, negative infinity, and NaN are not equal to any primitive integer. Both
-            /// the [`Float`] zero and the [`Float`] negative zero are equal to the integer zero.
+            /// $\infty$, $-\infty$, and NaN are not equal to any primitive integer. Both the
+            /// [`Float`] zero and the [`Float`] negative zero are equal to the integer zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -131,8 +131,8 @@ macro_rules! impl_partial_eq_signed {
         impl PartialEq<Float> for $t {
             /// Determines whether a signed primitive integer is equal to a [`Float`].
             ///
-            /// No primitive integer is equal to infinity, negative infinity, or NaN. The integer
-            /// zero is equal to both the [`Float`] zero and the [`Float`] negative zero.
+            /// No primitive integer is equal to $\infty$, $-\infty$, or NaN. The integer zero is
+            /// equal to both the [`Float`] zero and the [`Float`] negative zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

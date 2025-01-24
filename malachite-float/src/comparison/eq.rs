@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -113,7 +113,7 @@ impl PartialEq for ComparableFloat {
 
 impl Eq for ComparableFloat {}
 
-impl<'a, 'b> PartialEq<ComparableFloatRef<'b>> for ComparableFloatRef<'a> {
+impl<'a> PartialEq<ComparableFloatRef<'a>> for ComparableFloatRef<'_> {
     /// Compares two [`ComparableFloatRef`]s for equality.
     ///
     /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
@@ -165,7 +165,7 @@ impl<'a, 'b> PartialEq<ComparableFloatRef<'b>> for ComparableFloatRef<'a> {
     ///     ComparableFloatRef(&Float::one_prec(100))
     /// );
     /// ```
-    fn eq(&self, other: &ComparableFloatRef<'b>) -> bool {
+    fn eq(&self, other: &ComparableFloatRef<'a>) -> bool {
         match (&self.0, &other.0) {
             (float_nan!(), float_nan!()) => true,
             (Float(Infinity { sign: s_x }), Float(Infinity { sign: s_y }))
@@ -189,4 +189,4 @@ impl<'a, 'b> PartialEq<ComparableFloatRef<'b>> for ComparableFloatRef<'a> {
     }
 }
 
-impl<'a> Eq for ComparableFloatRef<'a> {}
+impl Eq for ComparableFloatRef<'_> {}

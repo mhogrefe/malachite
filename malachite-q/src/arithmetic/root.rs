@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -97,7 +97,7 @@ impl CheckedRoot<u64> for Rational {
     }
 }
 
-impl<'a> CheckedRoot<u64> for &'a Rational {
+impl CheckedRoot<u64> for &Rational {
     type Output = Rational;
 
     /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a perfect
@@ -272,7 +272,7 @@ impl CheckedRoot<i64> for Rational {
     }
 }
 
-impl<'a> CheckedRoot<i64> for &'a Rational {
+impl CheckedRoot<i64> for &Rational {
     type Output = Rational;
 
     /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a perfect

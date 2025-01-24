@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -37,6 +37,10 @@ impl Float {
     ///     \lfloor \log_2 x \rfloor\right ).
     /// $$
     ///
+    /// This function does not overflow or underflow. The returned exponent is always in the range
+    /// $[-2^{30}, 2^{30}-1]$. Notice that although a [`Float`]'s maximum scientific exponent is
+    /// $2^{30}-2$, this function may return an exponent one larger than this limit due to rounding.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
@@ -47,6 +51,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::rounding_modes::RoundingMode::{self, *};
     /// use malachite_float::Float;
@@ -81,12 +86,12 @@ impl Float {
     ///     Some((1.8626451, 29, Equal)),
     /// );
     /// test(
-    ///     Float::from(Natural::from(10u32).pow(52)),
+    ///     Float::exact_from(Natural::from(10u32).pow(52)),
     ///     Nearest,
     ///     Some((1.670478, 172, Greater)),
     /// );
     ///
-    /// test(Float::from(Natural::from(10u32).pow(52)), Exact, None);
+    /// test(Float::exact_from(Natural::from(10u32).pow(52)), Exact, None);
     /// ```
     pub fn sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         &self,
@@ -126,6 +131,8 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     ///
     /// The inverse operation is [`Self::from_raw_mantissa_and_exponent`].
     ///
+    /// The raw exponent is in the range $[-(2^{30}-1), 2^{30}-1]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -137,7 +144,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, RawMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::platform::Limb;
@@ -152,7 +159,8 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     ///     assert_eq!(m.to_string(), "14488038916154245120");
     ///     assert_eq!(e, 2);
     ///
-    ///     let (m, e) = Float::from(Natural::from(3u32).pow(50u64)).raw_mantissa_and_exponent();
+    ///     let (m, e) =
+    ///         Float::exact_from(Natural::from(3u32).pow(50u64)).raw_mantissa_and_exponent();
     ///     assert_eq!(m.to_string(), "202070319366191015160784900114134073344");
     ///     assert_eq!(e, 80);
     ///
@@ -181,6 +189,8 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// The raw exponent is one more than the floor of the base-2 logarithm of the absolute value of
     /// `self`.
     ///
+    /// The raw exponent is in the range $[-(2^{30}-1), 2^{30}-1]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -191,7 +201,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, RawMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -199,7 +209,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// assert_eq!(Float::ONE.raw_exponent(), 1);
     /// assert_eq!(Float::from(std::f64::consts::PI).raw_exponent(), 2);
     /// assert_eq!(
-    ///     Float::from(Natural::from(3u32).pow(50u64)).raw_exponent(),
+    ///     Float::exact_from(Natural::from(3u32).pow(50u64)).raw_exponent(),
     ///     80
     /// );
     /// assert_eq!(
@@ -220,12 +230,15 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// Constructs a [`Float`] from its raw mantissa and exponent. The resulting [`Float`] is
     /// positive and has the smallest precision possible.
     ///
+    /// The number of significant bits of the raw mantissa must be divisible by the limb width. The
+    /// raw exponent must be in the range $[-(2^{30}-1), 2^{30}-1]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `raw_mantissa` is zero, or if its number of significant bits is not divisible by
-    /// the limb width.
+    /// Panics if `raw_mantissa` is zero, if its number of significant bits is not divisible by the
+    /// limb width, or if `raw_exponent` is out of range.
     ///
     /// # Examples
     /// ```
@@ -264,6 +277,8 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// }
     /// ```
     fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i32) -> Float {
+        assert!(raw_exponent <= Float::MAX_EXPONENT);
+        assert!(raw_exponent >= Float::MIN_EXPONENT);
         let bits = raw_mantissa.significant_bits();
         assert_ne!(bits, 0);
         assert!(bits.divisible_by_power_of_2(Limb::LOG_WIDTH));
@@ -277,7 +292,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     }
 }
 
-impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
+impl RawMantissaAndExponent<Natural, i32, Float> for &Float {
     /// Returns the raw mantissa and exponent of a [`Float`], taking the [`Float`] by reference.
     ///
     /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
@@ -285,6 +300,8 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// whose number of significant bits is a multiple of the limb width, and which is equal to the
     /// absolute value of `self` multiplied by some integer power of 2. The raw exponent is one more
     /// than the floor of the base-2 logarithm of the absolute value of `self`.
+    ///
+    /// The raw exponent is in the range $[-(2^{30}-1), 2^{30}-1]$.
     ///
     /// The inverse operation is [`Float::from_raw_mantissa_and_exponent`].
     ///
@@ -303,7 +320,7 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, RawMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::platform::Limb;
@@ -318,7 +335,8 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     ///     assert_eq!(m.to_string(), "14488038916154245120");
     ///     assert_eq!(e, 2);
     ///
-    ///     let (m, e) = (&Float::from(Natural::from(3u32).pow(50u64))).raw_mantissa_and_exponent();
+    ///     let (m, e) =
+    ///         (&Float::exact_from(Natural::from(3u32).pow(50u64))).raw_mantissa_and_exponent();
     ///     assert_eq!(m.to_string(), "202070319366191015160784900114134073344");
     ///     assert_eq!(e, 80);
     ///
@@ -346,6 +364,8 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// The raw exponent is one more than the floor of the base-2 logarithm of the absolute value of
     /// `self`.
     ///
+    /// The raw exponent is in the range $[-(2^{30}-1), 2^{30}-1]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -356,7 +376,7 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, RawMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -364,7 +384,7 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// assert_eq!((&Float::ONE).raw_exponent(), 1);
     /// assert_eq!((&Float::from(std::f64::consts::PI)).raw_exponent(), 2);
     /// assert_eq!(
-    ///     (&Float::from(Natural::from(3u32).pow(50u64))).raw_exponent(),
+    ///     (&Float::exact_from(Natural::from(3u32).pow(50u64))).raw_exponent(),
     ///     80
     /// );
     /// assert_eq!(
@@ -386,9 +406,15 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
+    /// The number of significant bits of the raw mantissa must be divisible by the limb width. The
+    /// raw exponent must be in the range $[-(2^{30}-1), 2^{30}-1]$.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
     /// # Panics
-    /// Panics if `raw_mantissa` is zero, or if its number of significant bits is not divisible by
-    /// the limb width.
+    /// Panics if `raw_mantissa` is zero, if its number of significant bits is not divisible by the
+    /// limb width, or if `raw_exponent` is out of range.
     ///
     /// # Examples
     /// ```
@@ -438,7 +464,7 @@ impl<'a> RawMantissaAndExponent<Natural, i32, Float> for &'a Float {
     }
 }
 
-impl IntegerMantissaAndExponent<Natural, i32> for Float {
+impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// Returns a [`Float`]'s integer mantissa and exponent, taking the [`Float`] by value.
     ///
     /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
@@ -450,6 +476,8 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     ///
     /// The inverse operation is
     /// [`from_integer_mantissa_and_exponent`](IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
+    ///
+    /// The integer exponent is less than or equal to $2^{30}-2$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -465,7 +493,7 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -480,7 +508,7 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     ///     (Natural::from(884279719003555u64), -48)
     /// );
     /// assert_eq!(
-    ///     Float::from(Natural::from(3u32).pow(50u64)).integer_mantissa_and_exponent(),
+    ///     Float::exact_from(Natural::from(3u32).pow(50u64)).integer_mantissa_and_exponent(),
     ///     (Natural::from_str("717897987691852588770249").unwrap(), 0)
     /// );
     /// assert_eq!(
@@ -493,7 +521,7 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     ///     )
     /// );
     /// ```
-    fn integer_mantissa_and_exponent(self) -> (Natural, i32) {
+    fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
         if let Float(Finite {
             exponent,
             significand,
@@ -503,7 +531,10 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
             let zeros = significand.trailing_zeros().unwrap();
             let shifted = significand >> zeros;
             let bits = shifted.significant_bits();
-            (shifted, exponent - i32::exact_from(bits))
+            (
+                shifted,
+                i64::exact_from(i128::from(exponent) - i128::from(bits)),
+            )
         } else {
             panic!()
         }
@@ -518,6 +549,8 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// $$
     /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
     ///
+    /// The integer exponent is less than or equal to $2^{30}-2$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -528,7 +561,7 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -536,7 +569,7 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// assert_eq!(Float::ONE.integer_exponent(), 0);
     /// assert_eq!(Float::from(std::f64::consts::PI).integer_exponent(), -48);
     /// assert_eq!(
-    ///     Float::from(Natural::from(3u32).pow(50u64)).integer_exponent(),
+    ///     Float::exact_from(Natural::from(3u32).pow(50u64)).integer_exponent(),
     ///     0
     /// );
     /// assert_eq!(
@@ -546,17 +579,19 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     ///     -179
     /// );
     /// ```
-    fn integer_exponent(self) -> i32 {
+    fn integer_exponent(self) -> i64 {
         if let Float(Finite {
             exponent,
             significand,
             ..
         }) = self
         {
-            exponent
-                - i32::exact_from(
-                    significand.significant_bits() - significand.trailing_zeros().unwrap(),
-                )
+            i64::exact_from(
+                i128::from(exponent)
+                    - i128::from(
+                        significand.significant_bits() - significand.trailing_zeros().unwrap(),
+                    ),
+            )
         } else {
             panic!()
         }
@@ -571,9 +606,9 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// f(x) = 2^{e_i}m_i.
     /// $$
     ///
-    /// The input does not have to be reduced; that is, the mantissa does not have to be odd.
-    ///
-    /// The result is an [`Option`], but for this trait implementation the result is always `Some`.
+    /// The input does not have to be reduced; that is, the mantissa does not have to be odd. If the
+    /// inputs correspond to a number too large in absolute value or too close to zero to be
+    /// represented by a [`Float`], `None` is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -621,13 +656,19 @@ impl IntegerMantissaAndExponent<Natural, i32> for Float {
     /// ```
     fn from_integer_mantissa_and_exponent(
         integer_mantissa: Natural,
-        integer_exponent: i32,
+        integer_exponent: i64,
     ) -> Option<Float> {
-        Some(Float::from(integer_mantissa) << integer_exponent)
+        let nonzero = integer_mantissa != 0u32;
+        let x = Float::exact_from(integer_mantissa) << integer_exponent;
+        if x.is_infinite() || (nonzero && x == 0) {
+            None
+        } else {
+            Some(x)
+        }
     }
 }
 
-impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
+impl IntegerMantissaAndExponent<Natural, i64, Float> for &Float {
     /// Returns a [`Float`]'s integer mantissa and exponent, taking the [`Float`] by reference.
     ///
     /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
@@ -639,6 +680,8 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     ///
     /// The inverse operation is
     /// [`from_integer_mantissa_and_exponent`](IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
+    ///
+    /// The integer exponent is less than or equal to $2^{30}-2$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -654,7 +697,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -669,7 +712,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     ///     (Natural::from(884279719003555u64), -48)
     /// );
     /// assert_eq!(
-    ///     (&Float::from(Natural::from(3u32).pow(50u64))).integer_mantissa_and_exponent(),
+    ///     (&Float::exact_from(Natural::from(3u32).pow(50u64))).integer_mantissa_and_exponent(),
     ///     (Natural::from_str("717897987691852588770249").unwrap(), 0)
     /// );
     /// assert_eq!(
@@ -681,7 +724,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     ///     )
     /// );
     /// ```
-    fn integer_mantissa_and_exponent(self) -> (Natural, i32) {
+    fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
         if let Float(Finite {
             exponent,
             significand,
@@ -691,7 +734,10 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
             let zeros = significand.trailing_zeros().unwrap();
             let shifted = significand >> zeros;
             let bits = shifted.significant_bits();
-            (shifted, exponent - i32::exact_from(bits))
+            (
+                shifted,
+                i64::exact_from(i128::from(*exponent) - i128::from(bits)),
+            )
         } else {
             panic!()
         }
@@ -706,6 +752,8 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// $$
     /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
     ///
+    /// The integer exponent is less than or equal to $2^{30}-2$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -716,7 +764,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -724,7 +772,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// assert_eq!((&Float::ONE).integer_exponent(), 0);
     /// assert_eq!((&Float::from(std::f64::consts::PI)).integer_exponent(), -48);
     /// assert_eq!(
-    ///     (&Float::from(Natural::from(3u32).pow(50u64))).integer_exponent(),
+    ///     (&Float::exact_from(Natural::from(3u32).pow(50u64))).integer_exponent(),
     ///     0
     /// );
     /// assert_eq!(
@@ -733,17 +781,19 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     ///     -179
     /// );
     /// ```
-    fn integer_exponent(self) -> i32 {
+    fn integer_exponent(self) -> i64 {
         if let Float(Finite {
             exponent,
             significand,
             ..
         }) = self
         {
-            exponent
-                - i32::exact_from(
-                    significand.significant_bits() - significand.trailing_zeros().unwrap(),
-                )
+            i64::exact_from(
+                i128::from(*exponent)
+                    - i128::from(
+                        significand.significant_bits() - significand.trailing_zeros().unwrap(),
+                    ),
+            )
         } else {
             panic!()
         }
@@ -758,9 +808,9 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     /// f(x) = 2^{e_i}m_i.
     /// $$
     ///
-    /// The input does not have to be reduced; that is, the mantissa does not have to be odd.
-    ///
-    /// The result is an [`Option`], but for this trait implementation the result is always `Some`.
+    /// The input does not have to be reduced; that is, the mantissa does not have to be odd. If the
+    /// inputs correspond to a number too large in absolute value or too close to zero to be
+    /// represented by a [`Float`], `None` is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -813,11 +863,12 @@ impl<'a> IntegerMantissaAndExponent<Natural, i32, Float> for &'a Float {
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
+    #[inline]
     fn from_integer_mantissa_and_exponent(
         integer_mantissa: Natural,
-        integer_exponent: i32,
+        integer_exponent: i64,
     ) -> Option<Float> {
-        Some(Float::from(integer_mantissa) << integer_exponent)
+        Float::from_integer_mantissa_and_exponent(integer_mantissa, integer_exponent)
     }
 }
 
@@ -831,6 +882,8 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// f(x) = (\frac{|x|}{2^{\lfloor \log_2 |x| \rfloor}}, \lfloor \log_2 |x| \rfloor).
     /// $$
     ///
+    /// The returned exponent is always in the range $[-2^{30}, 2^{30}-2]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -841,7 +894,7 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -849,10 +902,10 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// assert_eq!(Float::ONE.sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
     /// let (m, e) = Float::from(std::f64::consts::PI).sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.5707963267948966");
+    /// assert_eq!(m.to_string(), "1.570796326794897");
     /// assert_eq!(e, 1);
     ///
-    /// let (m, e) = Float::from(Natural::from(3u32).pow(50u64)).sci_mantissa_and_exponent();
+    /// let (m, e) = Float::exact_from(Natural::from(3u32).pow(50u64)).sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.187662594419065093441695");
     /// assert_eq!(e, 79);
     ///
@@ -882,6 +935,8 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// f(x) = \lfloor \log_2 |x| \rfloor.
     /// $$
     ///
+    /// The returned exponent is always in the range $[-2^{30}, 2^{30}-2]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -892,7 +947,7 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -900,7 +955,7 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// assert_eq!(Float::ONE.sci_exponent(), 0);
     /// assert_eq!(Float::from(std::f64::consts::PI).sci_exponent(), 1);
     /// assert_eq!(
-    ///     Float::from(Natural::from(3u32).pow(50u64)).sci_exponent(),
+    ///     Float::exact_from(Natural::from(3u32).pow(50u64)).sci_exponent(),
     ///     79
     /// );
     /// assert_eq!(
@@ -925,7 +980,8 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// $$
     ///
     /// If the mantissa is zero or not finite, this function panics. If it is finite but not in the
-    /// interval $[1, 2)$, this function returns `None`.
+    /// interval $[1, 2)$, `None` is returned. If the inputs correspond to a number too large in
+    /// absolute value or too close to zero to be represented by a [`Float`], `None` is returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -971,7 +1027,10 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     fn from_sci_mantissa_and_exponent(mut sci_mantissa: Float, sci_exponent: i32) -> Option<Float> {
         assert!(sci_mantissa.is_finite());
         assert!(!sci_mantissa.is_zero());
-        if sci_mantissa.is_sign_negative() || (&sci_mantissa).raw_exponent() != 1 {
+        if sci_mantissa.is_sign_negative()
+            || (&sci_mantissa).raw_exponent() != 1
+            || !(Float::MIN_EXPONENT - 1..=Float::MAX_EXPONENT - 1).contains(&sci_exponent)
+        {
             return None;
         }
         if let Float(Finite { exponent, .. }) = &mut sci_mantissa {
@@ -983,7 +1042,7 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     }
 }
 
-impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
+impl SciMantissaAndExponent<Float, i32, Float> for &Float {
     /// Returns a [`Float`]'s scientific mantissa and exponent, taking the [`Float`] by reference.
     ///
     /// When $x$ is finite and nonzero, we can write $|x| = 2^{e_s}m_s$, where $e_s$ is an integer
@@ -992,6 +1051,8 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     /// $$
     /// f(x) = (\frac{|x|}{2^{\lfloor \log_2 |x| \rfloor}}, \lfloor \log_2 |x| \rfloor).
     /// $$
+    ///
+    /// The returned exponent is always in the range $[-2^{30}, 2^{30}-2]$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -1007,7 +1068,7 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -1015,11 +1076,11 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     /// assert_eq!((&Float::ONE).sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
     /// let (m, e): (Float, i32) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.5707963267948966");
+    /// assert_eq!(m.to_string(), "1.570796326794897");
     /// assert_eq!(e, 1);
     ///
     /// let (m, e): (Float, i32) =
-    ///     (&Float::from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
+    ///     (&Float::exact_from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
     /// assert_eq!(m.to_string(), "1.187662594419065093441695");
     /// assert_eq!(e, 79);
     ///
@@ -1060,6 +1121,8 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     /// f(x) = \lfloor \log_2 |x| \rfloor.
     /// $$
     ///
+    /// The returned exponent is always in the range $[-2^{30}, 2^{30}-2]$.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -1070,7 +1133,7 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+    /// use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
     /// use malachite_float::Float;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -1086,7 +1149,7 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     ///     1
     /// );
     /// assert_eq!(
-    ///     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&Float::from(
+    ///     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&Float::exact_from(
     ///         Natural::from(3u32).pow(50u64)
     ///     )),
     ///     79
@@ -1114,6 +1177,10 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
     ///
     /// If the mantissa is zero or not finite, this function panics. If it is finite but not in the
     /// interval $[1, 2)$, this function returns `None`.
+    ///
+    /// If the mantissa is zero or not finite, this function panics. If it is finite but not in the
+    /// interval $[1, 2)$, `None` is returned. If the inputs correspond to a number too large in
+    /// absolute value or too close to zero to be represented by a [`Float`], `None` is returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -1164,7 +1231,7 @@ impl<'a> SciMantissaAndExponent<Float, i32, Float> for &'a Float {
 
 macro_rules! impl_mantissa_and_exponent {
     ($t:ident) => {
-        impl<'a> SciMantissaAndExponent<$t, i32, Float> for &'a Float {
+        impl SciMantissaAndExponent<$t, i32, Float> for &Float {
             /// Returns a [`Float`]'s scientific mantissa and exponent, taking the [`Float`] by
             /// value.
             ///
@@ -1178,6 +1245,8 @@ macro_rules! impl_mantissa_and_exponent {
             /// f(x) \approx (\frac{|x|}{2^{\lfloor \log_2 |x| \rfloor}},
             /// \lfloor \log_2 |x| \rfloor).
             /// $$
+            ///
+            /// The returned exponent is always in the range $[-2^{30}, 2^{30}-2]$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -1207,7 +1276,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// $$
             ///
             /// If the mantissa is zero or not finite, this function panics. If it is finite but not
-            /// in the interval $[1, 2)$, this function returns `None`.
+            /// in the interval $[1, 2)$, `None` is returned. If the inputs correspond to a number
+            /// too large in absolute value or too close to zero to be represented by a [`Float`],
+            /// `None` is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -1222,14 +1293,17 @@ macro_rules! impl_mantissa_and_exponent {
             ) -> Option<Float> {
                 assert!(sci_mantissa.is_finite());
                 assert_ne!(sci_mantissa, 0.0);
-                if sci_mantissa < 1.0 || sci_mantissa >= 2.0 {
+                if sci_mantissa < 1.0
+                    || sci_mantissa >= 2.0
+                    || sci_exponent > Float::MAX_EXPONENT - 1
+                    || sci_exponent < Float::MIN_EXPONENT - 1
+                {
                     None
                 } else {
                     let m = sci_mantissa.integer_mantissa();
-                    Some(
-                        Float::from(m)
-                            << (sci_exponent - i32::exact_from(m.significant_bits()) + 1),
-                    )
+                    (Float::from(m)
+                        << (i128::from(sci_exponent) - i128::from(m.significant_bits()) + 1))
+                        .to_finite()
                 }
             }
         }

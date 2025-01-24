@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -15,7 +15,7 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, ShrRound, Sign,
+    ModPowerOf2, ModPowerOf2Assign, Parity, ShrRound, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -25,6 +25,9 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
+
+const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 impl Natural {
     /// Returns a [`Natural`]'s scientific mantissa and exponent, rounding according to the
@@ -126,8 +129,7 @@ impl Natural {
                         exact = false;
                         highest_discarded_limb = xs[len - 4];
                     }
-                    significant_bits =
-                        most_significant_limbs[2].significant_bits() + (Limb::WIDTH << 1);
+                    significant_bits = most_significant_limbs[2].significant_bits() + TWICE_WIDTH;
                 }
             }
         }
@@ -181,7 +183,7 @@ impl Natural {
                 if !exact && rm == Nearest {
                     // len is at least 4, since the only way `exact` is false at this point is if
                     // xs[..len - 3] is nonzero
-                    half_compare = highest_discarded_limb.cmp(&Limb::power_of_2(Limb::WIDTH - 1));
+                    half_compare = highest_discarded_limb.cmp(&HIGH_BIT);
                 }
             }
         }
@@ -309,7 +311,7 @@ impl Natural {
     }
 }
 
-impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
+impl IntegerMantissaAndExponent<Natural, u64, Natural> for &Natural {
     /// Returns a [`Natural`]'s integer mantissa and exponent.
     ///
     /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is
@@ -468,7 +470,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
 
 macro_rules! impl_mantissa_and_exponent {
     ($t:ident) => {
-        impl<'a> SciMantissaAndExponent<$t, u64, Natural> for &'a Natural {
+        impl SciMantissaAndExponent<$t, u64, Natural> for &Natural {
             /// Returns a [`Natural`]'s scientific mantissa and exponent.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and

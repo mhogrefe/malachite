@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -50,9 +50,9 @@ macro_rules! impl_from_unsigned {
         impl PartialOrd<$t> for Float {
             /// Compares a [`Float`] to an unsigned primitive integer.
             ///
-            /// NaN is not comparable to any primitive integer. Infinity is greater than any
-            /// primitive integer, and negative infinity is less. Both the [`Float`] zero and the
-            /// [`Float`] negative zero are equal to the integer zero.
+            /// NaN is not comparable to any primitive integer. $\infty$ is greater than any
+            /// primitive integer, and $-\infty$ is less. Both the [`Float`] zero and the [`Float`]
+            /// negative zero are equal to the integer zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -72,8 +72,8 @@ macro_rules! impl_from_unsigned {
         impl PartialOrd<Float> for $t {
             /// Compares an unsigned primitive integer to a [`Float`].
             ///
-            /// No integer is comparable to NaN. Every integer is smaller than infinity and greater
-            /// than negative infinity. The integer zero is equal to both the [`Float`] zero and the
+            /// No integer is comparable to NaN. Every integer is smaller than $\infty$ and greater
+            /// than $-\infty$. The integer zero is equal to both the [`Float`] zero and the
             /// [`Float`] negative zero.
             ///
             /// # Worst-case complexity
@@ -136,9 +136,9 @@ macro_rules! impl_from_signed {
         impl PartialOrd<$t> for Float {
             /// Compares a [`Float`] to a signed primitive integer.
             ///
-            /// NaN is not comparable to any primitive integer. Infinity is greater than any
-            /// primitive integer, and negative infinity is less. Both the [`Float`] zero and the
-            /// [`Float`] negative zero are equal to the integer zero.
+            /// NaN is not comparable to any primitive integer. $\infty$ is greater than any
+            /// primitive integer, and $-\infty$ is less. Both the [`Float`] zero and the [`Float`]
+            /// negative zero are equal to the integer zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -158,8 +158,8 @@ macro_rules! impl_from_signed {
         impl PartialOrd<Float> for $t {
             /// Compares a signed primitive integer to a [`Float`].
             ///
-            /// No integer is comparable to NaN. Every integer is smaller than infinity and greater
-            /// than negative infinity. The integer zero is equal to both the [`Float`] zero and the
+            /// No integer is comparable to NaN. Every integer is smaller than $\infty$ and greater
+            /// than $-\infty$. The integer zero is equal to both the [`Float`] zero and the
             /// [`Float`] negative zero.
             ///
             /// # Worst-case complexity

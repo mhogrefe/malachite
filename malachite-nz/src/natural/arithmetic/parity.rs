@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::Parity;
 
-impl<'a> Parity for &'a Natural {
+impl Parity for &Natural {
     /// Tests whether a [`Natural`] is even.
     ///
     /// $f(x) = (2|x)$.

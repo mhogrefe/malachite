@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -84,7 +84,7 @@ impl<'a> ModNeg<&'a Natural> for Natural {
     }
 }
 
-impl<'a> ModNeg<Natural> for &'a Natural {
+impl ModNeg<Natural> for &Natural {
     type Output = Natural;
 
     /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
@@ -123,7 +123,7 @@ impl<'a> ModNeg<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
+impl ModNeg<&Natural> for &Natural {
     type Output = Natural;
 
     /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
@@ -152,7 +152,7 @@ impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
     ///     999999999993u64
     /// );
     /// ```
-    fn mod_neg(self, m: &'b Natural) -> Natural {
+    fn mod_neg(self, m: &Natural) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         if *self == 0 {
             Natural::ZERO

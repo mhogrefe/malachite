@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -1205,7 +1205,7 @@ impl BitXor<Integer> for Integer {
     }
 }
 
-impl<'a> BitXor<&'a Integer> for Integer {
+impl BitXor<&Integer> for Integer {
     type Output = Integer;
 
     /// Takes the bitwise xor of two [`Integer`]s, taking the first by value and the second by
@@ -1236,13 +1236,13 @@ impl<'a> BitXor<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn bitxor(mut self, other: &'a Integer) -> Integer {
+    fn bitxor(mut self, other: &Integer) -> Integer {
         self ^= other;
         self
     }
 }
 
-impl<'a> BitXor<Integer> for &'a Integer {
+impl BitXor<Integer> for &Integer {
     type Output = Integer;
 
     /// Takes the bitwise xor of two [`Integer`]s, taking the first by reference and the second by
@@ -1279,7 +1279,7 @@ impl<'a> BitXor<Integer> for &'a Integer {
     }
 }
 
-impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
+impl BitXor<&Integer> for &Integer {
     type Output = Integer;
 
     /// Takes the bitwise xor of two [`Integer`]s, taking both by reference.
@@ -1303,7 +1303,7 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     ///     8191
     /// );
     /// ```
-    fn bitxor(self, other: &'a Integer) -> Integer {
+    fn bitxor(self, other: &Integer) -> Integer {
         match (self.sign, other.sign) {
             (true, true) => Integer {
                 sign: true,
@@ -1368,7 +1368,7 @@ impl BitXorAssign<Integer> for Integer {
     }
 }
 
-impl<'a> BitXorAssign<&'a Integer> for Integer {
+impl BitXorAssign<&Integer> for Integer {
     /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -1395,7 +1395,7 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
     /// x ^= &Integer::from(0x0f000000);
     /// assert_eq!(x, 0xf0f0_f0f0u32);
     /// ```
-    fn bitxor_assign(&mut self, other: &'a Integer) {
+    fn bitxor_assign(&mut self, other: &Integer) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitxor_assign(&other.abs),
             (true, false) => {

@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -48,7 +48,7 @@ impl FloorRoot<u64> for Integer {
     }
 }
 
-impl<'a> FloorRoot<u64> for &'a Integer {
+impl FloorRoot<u64> for &Integer {
     type Output = Integer;
 
     /// Returns the floor of the $n$th root of an [`Integer`], taking the [`Integer`] by reference.
@@ -175,7 +175,7 @@ impl CeilingRoot<u64> for Integer {
     }
 }
 
-impl<'a> CeilingRoot<u64> for &'a Integer {
+impl CeilingRoot<u64> for &Integer {
     type Output = Integer;
 
     /// Returns the ceiling of the $n$th root of an [`Integer`], taking the [`Integer`] by
@@ -343,7 +343,7 @@ impl CheckedRoot<u64> for Integer {
     }
 }
 
-impl<'a> CheckedRoot<u64> for &'a Integer {
+impl CheckedRoot<u64> for &Integer {
     type Output = Integer;
 
     /// Returns the the $n$th root of an [`Integer`], or `None` if the [`Integer`] is not a perfect

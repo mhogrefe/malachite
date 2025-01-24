@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -37,7 +37,7 @@ impl Abs for Rational {
     }
 }
 
-impl<'a> Abs for &'a Rational {
+impl Abs for &Rational {
     type Output = Rational;
 
     /// Takes the absolute value of a [`Rational`], taking the [`Rational`] by reference.

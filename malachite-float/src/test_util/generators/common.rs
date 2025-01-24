@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -10,7 +10,6 @@ use crate::test_util::common::rug_round_exact_from_rounding_mode;
 use crate::Float;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::It;
@@ -76,14 +75,14 @@ pub fn float_primitive_float_pair_rm<T: PrimitiveFloat>(
     Box::new(xs.map(|(x, y)| ((rug::Float::exact_from(&x), y), (x, y))))
 }
 
-pub fn float_unsigned_rounding_mode_triple_rm<T: PrimitiveUnsigned>(
+pub fn float_t_rounding_mode_triple_rm<T: Clone + 'static>(
     xs: It<(Float, T, RoundingMode)>,
 ) -> It<((rug::Float, T, rug::float::Round), (Float, T, RoundingMode))> {
     Box::new(xs.map(|(x, p, rm)| {
         (
             (
                 rug::Float::exact_from(&x),
-                p,
+                p.clone(),
                 rug_round_exact_from_rounding_mode(rm),
             ),
             (x, p, rm),

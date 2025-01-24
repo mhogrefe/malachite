@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -14,6 +14,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::{
     float_primitive_float_pair_gen, float_primitive_float_pair_gen_rm,
+    float_primitive_float_pair_gen_var_1,
 };
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
@@ -22,8 +23,12 @@ use std::cmp::Ordering::*;
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_float_partial_cmp_primitive_float);
     register_primitive_float_demos!(runner, demo_float_partial_cmp_primitive_float_debug);
+    register_primitive_float_demos!(runner, demo_float_partial_cmp_primitive_float_extreme);
+    register_primitive_float_demos!(runner, demo_float_partial_cmp_primitive_float_extreme_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_partial_cmp_float);
     register_primitive_float_demos!(runner, demo_primitive_float_partial_cmp_float_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_partial_cmp_float_extreme);
+    register_primitive_float_demos!(runner, demo_primitive_float_partial_cmp_float_extreme_debug);
 
     register_primitive_float_benches!(
         runner,
@@ -76,6 +81,47 @@ fn demo_float_partial_cmp_primitive_float_debug<T: PrimitiveFloat>(
     }
 }
 
+fn demo_float_partial_cmp_primitive_float_extreme<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+{
+    for (x, y) in float_primitive_float_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{} and {} are incomparable", x, NiceFloat(y)),
+            Some(Less) => println!("{} < {}", x, NiceFloat(y)),
+            Some(Equal) => println!("{} = {}", x, NiceFloat(y)),
+            Some(Greater) => println!("{} > {}", x, NiceFloat(y)),
+        }
+    }
+}
+
+fn demo_float_partial_cmp_primitive_float_extreme_debug<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+{
+    for (x, y) in float_primitive_float_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let cx = ComparableFloatRef(&x);
+        match x.partial_cmp(&y) {
+            None => println!("{:#x} and {} are incomparable", cx, NiceFloat(y)),
+            Some(Less) => println!("{:#x} < {}", cx, NiceFloat(y)),
+            Some(Equal) => println!("{:#x} = {}", cx, NiceFloat(y)),
+            Some(Greater) => println!("{:#x} > {}", cx, NiceFloat(y)),
+        }
+    }
+}
+
 fn demo_primitive_float_partial_cmp_float<T: PartialOrd<Float> + PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -100,6 +146,43 @@ fn demo_primitive_float_partial_cmp_float_debug<T: PartialOrd<Float> + Primitive
     limit: usize,
 ) {
     for (y, x) in float_primitive_float_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let cy = ComparableFloatRef(&y);
+        match x.partial_cmp(&y) {
+            None => println!("{} and {:#x} are incomparable", NiceFloat(x), cy),
+            Some(Less) => println!("{} < {:#x}", NiceFloat(x), cy),
+            Some(Equal) => println!("{} = {:#x}", NiceFloat(x), cy),
+            Some(Greater) => println!("{} > {:#x}", NiceFloat(x), cy),
+        }
+    }
+}
+
+fn demo_primitive_float_partial_cmp_float_extreme<T: PartialOrd<Float> + PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_primitive_float_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{} and {} are incomparable", NiceFloat(x), y),
+            Some(Less) => println!("{} < {}", NiceFloat(x), y),
+            Some(Equal) => println!("{} = {}", NiceFloat(x), y),
+            Some(Greater) => println!("{} > {}", NiceFloat(x), y),
+        }
+    }
+}
+
+fn demo_primitive_float_partial_cmp_float_extreme_debug<T: PartialOrd<Float> + PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x) in float_primitive_float_pair_gen_var_1::<T>()
         .get(gm, config)
         .take(limit)
     {

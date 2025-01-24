@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -66,6 +66,7 @@ extern crate rug;
 
 pub mod arithmetic {
     pub mod abs;
+    pub mod abs_diff;
     pub mod add;
     pub mod approximate;
     pub mod ceiling;

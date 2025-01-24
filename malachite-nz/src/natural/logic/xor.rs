@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // Uses code adopted from the GNU MP Library.
 //
@@ -332,7 +332,7 @@ impl<'a> BitXor<&'a Natural> for Natural {
     }
 }
 
-impl<'a> BitXor<Natural> for &'a Natural {
+impl BitXor<Natural> for &Natural {
     type Output = Natural;
 
     /// Takes the bitwise xor of two [`Natural`]s, taking the first by reference and the second by
@@ -368,7 +368,7 @@ impl<'a> BitXor<Natural> for &'a Natural {
     }
 }
 
-impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
+impl BitXor<&Natural> for &Natural {
     type Output = Natural;
 
     /// Takes the bitwise xor of two [`Natural`]s, taking both by reference.
@@ -397,7 +397,7 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
     ///     8191
     /// );
     /// ```
-    fn bitxor(self, other: &'a Natural) -> Natural {
+    fn bitxor(self, other: &Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.xor_limb_ref(y),
             (&Natural(Small(x)), y) => y.xor_limb_ref(x),

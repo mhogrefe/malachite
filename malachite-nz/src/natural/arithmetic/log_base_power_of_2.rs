@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -92,7 +92,7 @@ pub_test! {limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u6
     }
 }}
 
-impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
+impl FloorLogBasePowerOf2<u64> for &Natural {
     type Output = u64;
 
     /// Returns the floor of the base-$2^k$ logarithm of a positive [`Natural`].
@@ -121,7 +121,7 @@ impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
     }
 }
 
-impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
+impl CeilingLogBasePowerOf2<u64> for &Natural {
     type Output = u64;
 
     /// Returns the ceiling of the base-$2^k$ logarithm of a positive [`Natural`].
@@ -157,7 +157,7 @@ impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
     }
 }
 
-impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
+impl CheckedLogBasePowerOf2<u64> for &Natural {
     type Output = u64;
 
     /// Returns the base-$2^k$ logarithm of a positive [`Natural`]. If the [`Natural`] is not a

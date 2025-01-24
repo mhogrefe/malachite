@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -47,7 +47,7 @@ struct FILIterator<'a, T> {
     phantom: PhantomData<*const T>,
 }
 
-impl<'a, T: PrimitiveUnsigned> Iterator for FILIterator<'a, T> {
+impl<T: PrimitiveUnsigned> Iterator for FILIterator<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -71,7 +71,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for FILIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for FILIterator<'a, T> {
+impl<T: PrimitiveUnsigned> DoubleEndedIterator for FILIterator<'_, T> {
     fn next_back(&mut self) -> Option<T> {
         if self.remaining != 0 {
             let digit = T::wrapping_from((self.limbs[self.limb_j] >> self.j) & self.mask);
@@ -89,9 +89,9 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for FILIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> ExactSizeIterator for FILIterator<'a, T> {}
+impl<T: PrimitiveUnsigned> ExactSizeIterator for FILIterator<'_, T> {}
 
-impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T> for FILIterator<'a, T> {
+impl<T: PrimitiveUnsigned> PowerOf2DigitIterator<T> for FILIterator<'_, T> {
     fn get(&self, index: u64) -> T {
         let log_log_base = self.log_base.floor_log_base_2();
         let log_ratio = Limb::LOG_WIDTH - log_log_base;
@@ -121,7 +121,7 @@ struct SOLIterator<'a, T> {
     phantom: PhantomData<*const T>,
 }
 
-impl<'a, T: PrimitiveUnsigned> Iterator for SOLIterator<'a, T> {
+impl<T: PrimitiveUnsigned> Iterator for SOLIterator<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -141,7 +141,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for SOLIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for SOLIterator<'a, T> {
+impl<T: PrimitiveUnsigned> DoubleEndedIterator for SOLIterator<'_, T> {
     fn next_back(&mut self) -> Option<T> {
         if self.remaining != 0 {
             let digit = T::wrapping_from(self.limbs[self.j]);
@@ -154,9 +154,9 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for SOLIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> ExactSizeIterator for SOLIterator<'a, T> {}
+impl<T: PrimitiveUnsigned> ExactSizeIterator for SOLIterator<'_, T> {}
 
-impl<'a, T: PrimitiveUnsigned> SOLIterator<'a, T> {
+impl<T: PrimitiveUnsigned> SOLIterator<'_, T> {
     fn get(&self, index: u64) -> T {
         let index = usize::exact_from(index);
         if index < self.limbs.len() {
@@ -179,7 +179,7 @@ struct MOLIterator<'a, T> {
     phantom: PhantomData<*const T>,
 }
 
-impl<'a, T: PrimitiveUnsigned> Iterator for MOLIterator<'a, T> {
+impl<T: PrimitiveUnsigned> Iterator for MOLIterator<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -192,15 +192,15 @@ impl<'a, T: PrimitiveUnsigned> Iterator for MOLIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for MOLIterator<'a, T> {
+impl<T: PrimitiveUnsigned> DoubleEndedIterator for MOLIterator<'_, T> {
     fn next_back(&mut self) -> Option<T> {
         self.chunks.next_back().map(T::from_other_type_slice)
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> ExactSizeIterator for MOLIterator<'a, T> {}
+impl<T: PrimitiveUnsigned> ExactSizeIterator for MOLIterator<'_, T> {}
 
-impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T> for MOLIterator<'a, T> {
+impl<T: PrimitiveUnsigned> PowerOf2DigitIterator<T> for MOLIterator<'_, T> {
     fn get(&self, index: u64) -> T {
         let start_index = usize::exact_from(index << self.log_ratio);
         if start_index >= self.limbs.len() {
@@ -232,7 +232,7 @@ struct IIterator<'a, T> {
     phantom: PhantomData<*const T>,
 }
 
-impl<'a, T: PrimitiveUnsigned> Iterator for IIterator<'a, T> {
+impl<T: PrimitiveUnsigned> Iterator for IIterator<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -252,7 +252,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for IIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for IIterator<'a, T> {
+impl<T: PrimitiveUnsigned> DoubleEndedIterator for IIterator<'_, T> {
     fn next_back(&mut self) -> Option<T> {
         if self.remaining != 0 {
             let digit = self.get(self.j);
@@ -265,9 +265,9 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for IIterator<'a, T> {
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> ExactSizeIterator for IIterator<'a, T> {}
+impl<T: PrimitiveUnsigned> ExactSizeIterator for IIterator<'_, T> {}
 
-impl<'a, T: PrimitiveUnsigned> IIterator<'a, T> {
+impl<T: PrimitiveUnsigned> IIterator<'_, T> {
     fn get(&self, index: u64) -> T {
         let start = index * self.log_base;
         let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
@@ -313,7 +313,7 @@ pub enum NaturalPowerOf2DigitPrimitiveIterator<'a, T: PrimitiveUnsigned> {
     Irregular(IrregularIterator<'a, T>),
 }
 
-impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterator<'a, T> {
+impl<T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterator<'_, T> {
     type Item = T;
 
     /// Iterates through the base-$2^k$ digits of a [`Natural`] in ascending order
@@ -342,9 +342,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterato
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator
-    for NaturalPowerOf2DigitPrimitiveIterator<'a, T>
-{
+impl<T: PrimitiveUnsigned> DoubleEndedIterator for NaturalPowerOf2DigitPrimitiveIterator<'_, T> {
     /// Iterates through the base-$2^k$ digits of a [`Natural`] in descending order
     /// (most-significant first).
     ///
@@ -361,10 +359,10 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator
     }
 }
 
-impl<'a, T: PrimitiveUnsigned> ExactSizeIterator for NaturalPowerOf2DigitPrimitiveIterator<'a, T> {}
+impl<T: PrimitiveUnsigned> ExactSizeIterator for NaturalPowerOf2DigitPrimitiveIterator<'_, T> {}
 
-impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T>
-    for NaturalPowerOf2DigitPrimitiveIterator<'a, T>
+impl<T: PrimitiveUnsigned> PowerOf2DigitIterator<T>
+    for NaturalPowerOf2DigitPrimitiveIterator<'_, T>
 {
     /// Retrieves the base-$2^k$ digits of a [`Natural`] by index.
     ///
@@ -558,7 +556,7 @@ struct NMOLIterator<'a> {
     chunks: Chunks<'a, Limb>,
 }
 
-impl<'a> Iterator for NMOLIterator<'a> {
+impl Iterator for NMOLIterator<'_> {
     type Item = Natural;
 
     fn next(&mut self) -> Option<Natural> {
@@ -571,15 +569,15 @@ impl<'a> Iterator for NMOLIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NMOLIterator<'a> {
+impl DoubleEndedIterator for NMOLIterator<'_> {
     fn next_back(&mut self) -> Option<Natural> {
         self.chunks.next_back().map(Natural::from_limbs_asc)
     }
 }
 
-impl<'a> ExactSizeIterator for NMOLIterator<'a> {}
+impl ExactSizeIterator for NMOLIterator<'_> {}
 
-impl<'a> PowerOf2DigitIterator<Natural> for NMOLIterator<'a> {
+impl PowerOf2DigitIterator<Natural> for NMOLIterator<'_> {
     fn get(&self, index: u64) -> Natural {
         let start_index = usize::exact_from(index << self.log_ratio);
         if start_index >= self.limbs.len() {
@@ -610,7 +608,7 @@ struct NIIterator<'a> {
     j: u64,
 }
 
-impl<'a> Iterator for NIIterator<'a> {
+impl Iterator for NIIterator<'_> {
     type Item = Natural;
 
     fn next(&mut self) -> Option<Natural> {
@@ -630,7 +628,7 @@ impl<'a> Iterator for NIIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NIIterator<'a> {
+impl DoubleEndedIterator for NIIterator<'_> {
     fn next_back(&mut self) -> Option<Natural> {
         if self.remaining != 0 {
             let digit = self.get(self.j);
@@ -643,9 +641,9 @@ impl<'a> DoubleEndedIterator for NIIterator<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for NIIterator<'a> {}
+impl ExactSizeIterator for NIIterator<'_> {}
 
-impl<'a> NIIterator<'a> {
+impl NIIterator<'_> {
     fn get(&self, index: u64) -> Natural {
         let start_index = index.checked_mul(self.log_base).unwrap();
         Natural::from_owned_limbs_asc(limbs_slice_get_bits(
@@ -672,7 +670,7 @@ pub enum NaturalPowerOf2DigitIterator<'a> {
     Irregular(NaturalIrregularIterator<'a>),
 }
 
-impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
+impl Iterator for NaturalPowerOf2DigitIterator<'_> {
     type Item = Natural;
 
     /// Iterates through the base-$2^k$ digits of a [`Natural`] in ascending order
@@ -705,7 +703,7 @@ impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
+impl DoubleEndedIterator for NaturalPowerOf2DigitIterator<'_> {
     /// Iterate through the base-$2^k$ digits of a [`Natural`] in descending order (most-significant
     /// first).
     ///
@@ -749,9 +747,9 @@ impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for NaturalPowerOf2DigitIterator<'a> {}
+impl ExactSizeIterator for NaturalPowerOf2DigitIterator<'_> {}
 
-impl<'a> PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'a> {
+impl PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'_> {
     /// Retrieves the base-$2^k$ digits of a [`Natural`] by index.
     ///
     /// $f(x, k, i) = d_i$, where $0 \leq d_i < 2^k$ for all $i$ and

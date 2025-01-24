@@ -1,4 +1,4 @@
-// Copyright © 2024 Mikhail Hogrefe
+// Copyright © 2025 Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //
@@ -28,6 +28,8 @@ impl Neg for Float {
     /// - $f(-\infty) = \infty$
     /// - $f(0.0) = -0.0$
     /// - $f(-0.0) = 0.0$
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -60,7 +62,7 @@ impl Neg for Float {
     }
 }
 
-impl<'a> Neg for &'a Float {
+impl Neg for &Float {
     type Output = Float;
 
     /// Negates a [`Float`], taking it by reference.
@@ -75,6 +77,8 @@ impl<'a> Neg for &'a Float {
     /// - $f(-\infty) = \infty$
     /// - $f(0.0) = -0.0$
     /// - $f(-0.0) = 0.0$
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -137,6 +141,8 @@ impl NegAssign for Float {
     /// - $-\infty \gets \infty$
     /// - $0.0 \gets -0.0$
     /// - $-0.0 \gets 0.0$
+    ///
+    /// This function does not overflow or underflow.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
