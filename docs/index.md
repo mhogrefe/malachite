@@ -6,7 +6,7 @@ Malachite is an arbitrary-precision arithmetic library for [Rust](https://www.ru
 achieves high performance in part by using algorithms derived from [GMP](https://gmplib.org/),
 [FLINT](https://www.flintlib.org/), and [MPFR](https://www.mpfr.org/).
 
-The documentation for Malachite is [here][docs.rs](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
+The documentation for Malachite is [here](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
 
 ```rust
 use malachite::num::arithmetic::traits::Factorial;
