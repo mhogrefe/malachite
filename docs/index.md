@@ -127,7 +127,7 @@ Malachite is under active development, with many more types and features planned
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that
 its API is not stable yet, and that Malachite is licensed under LGPL 3.0.
 
-Malachite is developed by Mikhail Hogrefe. Thanks to AMS21, b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, and shekohex for additional contributions.
+Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, shekohex, and skycloudd for additional contributions.
 
 # FAQ
 **How is "Malachite" pronounced, and what does it mean?**
