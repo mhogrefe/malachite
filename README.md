@@ -5,7 +5,7 @@ An arbitrary-precision arithmetic library for Rust.
 Parts of Malachite are derived from [GMP](https://gmplib.org/),
 [FLINT](https://www.flintlib.org/), and [MPFR](https://www.mpfr.org/).
 
-The documentation for Malachite is [here][docs.rs](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
+The documentation for Malachite is [here](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
 
 Floats (arbitrary-precision floating-point numbers) are in development and are currently
 experimental. They are missing many important functions. However, the floating-point functions that *are* currently implemented are thoroughly tested and documented, with the exception of string conversion
