@@ -416,7 +416,7 @@ checksum = "04cbf5b083de1c7e0222a7a51dbfdba1cbe1c6ab0b15e29fff3f6c077fd9cd9f"
 
 [[package]]
 name = "malachite"
-version = "0.4.20"
+version = "0.4.21"
 dependencies = [
  "embed-doc-image",
  "malachite-base",
@@ -428,7 +428,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.4.20"
+version = "0.4.21"
 dependencies = [
  "clap",
  "getrandom",
@@ -448,7 +448,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-criterion-bench"
-version = "0.4.20"
+version = "0.4.21"
 dependencies = [
  "criterion",
  "malachite-base",
@@ -459,7 +459,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.4.20"
+version = "0.4.21"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -474,7 +474,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.4.20"
+version = "0.4.21"
 dependencies = [
  "embed-doc-image",
  "indoc",
@@ -492,7 +492,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.4.20"
+version = "0.4.21"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",

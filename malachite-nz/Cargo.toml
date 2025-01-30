@@ -1,6 +1,6 @@
 [package]
 name = "malachite-nz"
-version = "0.4.20"
+version = "0.4.21"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
@@ -23,7 +23,7 @@ path = "src/bin.rs"
 [dependencies]
 itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
 libm = { version = "0.2.8", default-features = false }
-malachite-base = { version = "0.4.20", default-features = false, path = "../malachite-base" }
+malachite-base = { version = "0.4.21", default-features = false, path = "../malachite-base" }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
 indoc = { version = "2.0.4", optional = true}

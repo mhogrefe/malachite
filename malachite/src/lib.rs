@@ -27,9 +27,18 @@ pub use malachite_nz::natural::Natural;
 pub use malachite_nz::*;
 #[cfg(feature = "naturals_and_integers")]
 #[cfg(feature = "rationals")]
-pub use malachite_q::Rational;
+/// [`Rational`](rational::Rational), a type representing rational numbers with arbitrarily large
+/// numerators and denominators.
+pub mod rational {
+    pub use malachite_q::*;
+}
 
-#[cfg(feature = "32_bit_limbs")]
-pub use malachite_nz::platform_32 as platform;
-#[cfg(not(feature = "32_bit_limbs"))]
-pub use malachite_nz::platform_64 as platform;
+/// Various types and constants dependent on whether Malachite is built using 32-bit limbs or
+/// 64-bit limbs. `Limb` is the type such that `Vec`s of limbs are used to represent the bits of a
+/// [`Natural`].
+pub mod platform {
+    #[cfg(feature = "32_bit_limbs")]
+    pub use malachite_nz::platform_32::*;
+    #[cfg(not(feature = "32_bit_limbs"))]
+    pub use malachite_nz::platform_64::*;
+}
