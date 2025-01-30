@@ -8,6 +8,9 @@
 
 #![cfg_attr(not(feature = "random"), no_std)]
 
+/// This module contains various functions that support the other crates. This includes many
+/// numeric traits and their implementation for primitive numeric types, as well as many functions
+/// for exhaustively and randomly generating values of many types.
 pub mod base {
     pub use malachite_base::*;
 }
@@ -26,9 +29,7 @@ pub use malachite_nz::*;
 #[cfg(feature = "rationals")]
 pub use malachite_q::Rational;
 
-#[doc(hidden)]
 #[cfg(feature = "32_bit_limbs")]
 pub use malachite_nz::platform_32 as platform;
-#[doc(hidden)]
 #[cfg(not(feature = "32_bit_limbs"))]
 pub use malachite_nz::platform_64 as platform;
