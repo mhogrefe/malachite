@@ -41,7 +41,8 @@ impl Rational {
         out
     }
 
-    /// Mutates the denominator of a [`Rational`] using a provided closure.
+    /// Mutates the denominator of a [`Rational`] using a provided closure, and then returns
+    /// whatever the closure returns.
     ///
     /// After the closure executes, this function reduces the [`Rational`].
     ///
@@ -71,7 +72,8 @@ impl Rational {
         out
     }
 
-    /// Mutates the numerator and denominator of a [`Rational`] using a provided closure.
+    /// Mutates the numerator and denominator of a [`Rational`] using a provided closure, and then
+    /// returns whatever the closure returns.
     ///
     /// After the closure executes, this function reduces the [`Rational`].
     ///

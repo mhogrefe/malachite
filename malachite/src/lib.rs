@@ -7,7 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 #![cfg_attr(not(feature = "random"), no_std)]
-pub use malachite_base::*;
+
+pub mod base {
+    pub use malachite_base::*;
+}
 
 #[cfg(feature = "naturals_and_integers")]
 #[cfg(feature = "rationals")]
@@ -22,3 +25,10 @@ pub use malachite_nz::*;
 #[cfg(feature = "naturals_and_integers")]
 #[cfg(feature = "rationals")]
 pub use malachite_q::Rational;
+
+#[doc(hidden)]
+#[cfg(feature = "32_bit_limbs")]
+pub use malachite_nz::platform_32 as platform;
+#[doc(hidden)]
+#[cfg(not(feature = "32_bit_limbs"))]
+pub use malachite_nz::platform_64 as platform;

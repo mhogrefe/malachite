@@ -215,7 +215,7 @@ impl Float {
     /// whether the returned value is less than, equal to, or greater than the original value.
     ///
     /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of significant
-    /// bits, try just using `Float::from` instead.
+    /// bits, try just using `Float::try_from` instead.
     ///
     /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_integer_prec_round`].
@@ -278,7 +278,7 @@ impl Float {
     /// value.
     ///
     /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of significant
-    /// bits, try just using `Float::from` instead.
+    /// bits, try just using `Float::try_from` instead.
     ///
     /// Rounding may occur, in which case [`Nearest`] is used by default. To specify a rounding mode
     /// as well as a precision, try [`Float::from_integer_prec_round_ref`].
