@@ -8,6 +8,7 @@
 
 use crate::integer::Integer;
 use malachite_base::num::comparison::traits::EqAbs;
+use malachite_base::num::arithmetic::traits::Abs;
 
 macro_rules! impl_eq_abs {
     ($t: ident) => {

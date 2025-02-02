@@ -8,7 +8,7 @@
 
 use crate::integer::Integer;
 use core::cmp::Ordering;
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::arithmetic::traits::{UnsignedAbs, Abs};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 
 macro_rules! impl_float {
