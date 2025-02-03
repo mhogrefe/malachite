@@ -1,6 +1,6 @@
 [package]
 name = "malachite-bigint"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Steve Shi <shikangzhi@gmail.com>"]
 edition = "2021"
 license = "LGPL-3.0-only"
@@ -9,7 +9,7 @@ repository = "https://github.com/RustPython/malachite-bigint"
 rust-version = "1.74.0"
 
 [dependencies]
-malachite = "0.4.4"
+malachite = "<=0.4.18"
 num-traits = { version = "0.2.11", default-features = false, features = ["i128"] }
 num-integer = { version = "0.1.45", default-features = false, features = ["i128"] }
 derive_more = "0.99.17"
