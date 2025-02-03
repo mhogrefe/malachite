@@ -25,82 +25,80 @@ pub type SignedHalfLimb = i32;
 pub type SignedDoubleLimb = i128;
 pub type FloatWithLimbWidth = f64;
 
-pub const MAX_DIGITS_PER_LIMB: usize = 20;
+pub(crate) const MAX_DIGITS_PER_LIMB: usize = 20;
 
-pub const AORSMUL_FASTER_2AORSLSH: bool = true;
-pub const AORSMUL_FASTER_3AORSLSH: bool = true;
-pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
-pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
+pub(crate) const AORSMUL_FASTER_2AORSLSH: bool = true;
+pub(crate) const AORSMUL_FASTER_3AORSLSH: bool = true;
+pub(crate) const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
+pub(crate) const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
-pub const MUL_TOOM22_THRESHOLD: usize = 20;
-pub const MUL_TOOM33_THRESHOLD: usize = 39;
-pub const MUL_TOOM44_THRESHOLD: usize = 340; // unclear when 44 is better than 33
-pub const MUL_TOOM6H_THRESHOLD: usize = 345;
-pub const MUL_TOOM8H_THRESHOLD: usize = 640;
+pub(crate) const MUL_TOOM22_THRESHOLD: usize = 20;
+pub(crate) const MUL_TOOM33_THRESHOLD: usize = 39;
+pub(crate) const MUL_TOOM44_THRESHOLD: usize = 340; // unclear when 44 is better than 33
+pub(crate) const MUL_TOOM6H_THRESHOLD: usize = 345;
+pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 640;
 
-pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 60;
-pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
-pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 600;
-pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
+pub(crate) const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 60;
+pub(crate) const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
+pub(crate) const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 600;
+pub(crate) const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
 
-pub const MUL_FFT_THRESHOLD: usize = 1500;
+pub(crate) const MUL_FFT_THRESHOLD: usize = 1500;
 
-pub const DC_DIV_QR_THRESHOLD: usize = 85;
-pub const DC_DIVAPPR_Q_THRESHOLD: usize = 211;
-pub const MAYBE_DCP1_DIVAPPR: bool = true;
-pub const INV_NEWTON_THRESHOLD: usize = 789;
-pub const MU_DIV_QR_THRESHOLD: usize = 2094;
-pub const INV_MULMOD_BNM1_THRESHOLD: usize = 62;
-pub const MU_DIV_QR_SKEW_THRESHOLD: usize = 231;
+pub(crate) const DC_DIV_QR_THRESHOLD: usize = 85;
+pub(crate) const DC_DIVAPPR_Q_THRESHOLD: usize = 211;
+pub(crate) const MAYBE_DCP1_DIVAPPR: bool = true;
+pub(crate) const INV_NEWTON_THRESHOLD: usize = 789;
+pub(crate) const MU_DIV_QR_THRESHOLD: usize = 2094;
+pub(crate) const INV_MULMOD_BNM1_THRESHOLD: usize = 62;
+pub(crate) const MU_DIV_QR_SKEW_THRESHOLD: usize = 231;
 
-pub const MU_DIVAPPR_Q_THRESHOLD: usize = 2965;
-pub const FUDGE: usize = 311;
+pub(crate) const MU_DIVAPPR_Q_THRESHOLD: usize = 2965;
+pub(crate) const FUDGE: usize = 311;
 
-pub const MULLO_BASECASE_THRESHOLD: usize = 1;
-pub const MULLO_DC_THRESHOLD: usize = 56;
-pub const MULLO_MUL_N_THRESHOLD: usize = 10806;
+pub(crate) const MULLO_BASECASE_THRESHOLD: usize = 1;
+pub(crate) const MULLO_DC_THRESHOLD: usize = 56;
+pub(crate) const MULLO_MUL_N_THRESHOLD: usize = 10806;
 
-pub const BINV_NEWTON_THRESHOLD: usize = 2211;
-pub const DC_BDIV_QR_THRESHOLD: usize = 211;
-pub const MU_BDIV_QR_THRESHOLD: usize = 7547;
-pub const DC_BDIV_Q_THRESHOLD: usize = 211;
-pub const MU_BDIV_Q_THRESHOLD: usize = 1998;
+pub(crate) const BINV_NEWTON_THRESHOLD: usize = 2211;
+pub(crate) const DC_BDIV_QR_THRESHOLD: usize = 211;
+pub(crate) const MU_BDIV_QR_THRESHOLD: usize = 7547;
+pub(crate) const DC_BDIV_Q_THRESHOLD: usize = 211;
+pub(crate) const MU_BDIV_Q_THRESHOLD: usize = 1998;
 
-pub const MOD_1_NORM_THRESHOLD: usize = 0;
-pub const MOD_1_UNNORM_THRESHOLD: usize = 0;
-pub const MOD_1_1P_METHOD: bool = false;
-pub const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
-pub const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 0;
-pub const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 6;
-pub const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
+pub(crate) const MOD_1_NORM_THRESHOLD: usize = 0;
+pub(crate) const MOD_1_UNNORM_THRESHOLD: usize = 0;
+pub(crate) const MOD_1_1P_METHOD: bool = false;
+pub(crate) const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
+pub(crate) const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 0;
+pub(crate) const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 6;
+pub(crate) const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
 
-pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = 100000000;
+pub(crate) const BMOD_1_TO_MOD_1_THRESHOLD: usize = 100000000;
 
-pub const SQR_BASECASE_THRESHOLD: usize = 0;
-pub const SQR_TOOM2_THRESHOLD: usize = 43;
-pub const SQR_TOOM3_THRESHOLD: usize = 390;
-pub const SQR_TOOM4_THRESHOLD: usize = 1090;
-pub const SQR_TOOM6_THRESHOLD: usize = 336;
-pub const SQR_TOOM8_THRESHOLD: usize = 837;
+pub(crate) const SQR_BASECASE_THRESHOLD: usize = 0;
+pub(crate) const SQR_TOOM2_THRESHOLD: usize = 43;
+pub(crate) const SQR_TOOM3_THRESHOLD: usize = 390;
+pub(crate) const SQR_TOOM4_THRESHOLD: usize = 1090;
+pub(crate) const SQR_TOOM6_THRESHOLD: usize = 336;
+pub(crate) const SQR_TOOM8_THRESHOLD: usize = 837;
 
-pub const SQRLO_DC_THRESHOLD: usize = 389;
+pub(crate) const SQRLO_DC_THRESHOLD: usize = 389;
 
-pub const FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 6500;
+pub(crate) const FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 6500;
 
-pub const MATRIX22_STRASSEN_THRESHOLD: usize = 30;
+pub(crate) const MATRIX22_STRASSEN_THRESHOLD: usize = 30;
 
 // This section is created by digits_data.rs.
 
 // mp_bases[10] data, as literal values
-pub const MP_BASES_CHARS_PER_LIMB_10: usize = 19;
-pub const MP_BASES_BIG_BASE_CTZ_10: usize = 19;
-pub const MP_BASES_BIG_BASE_10: Limb = 0x8ac7230489e80000;
-pub const MP_BASES_BIG_BASE_INVERTED_10: Limb = 0xd83c94fb6d2ac34a;
-pub const MP_BASES_BIG_BASE_BINVERTED_10: Limb = 0x26b172506559ce15;
-pub const MP_BASES_NORMALIZATION_STEPS_10: u64 = 0;
+pub(crate) const MP_BASES_CHARS_PER_LIMB_10: usize = 19;
+pub(crate) const MP_BASES_BIG_BASE_10: Limb = 0x8ac7230489e80000;
+pub(crate) const MP_BASES_BIG_BASE_INVERTED_10: Limb = 0xd83c94fb6d2ac34a;
+pub(crate) const MP_BASES_NORMALIZATION_STEPS_10: u64 = 0;
 
 // Format is (chars_per_limb, logb2, log2b, big_base, big_base_inverted)
-pub const BASES: [(usize, Limb, Limb, Limb, Limb); 257] = [
+pub(crate) const BASES: [(usize, Limb, Limb, Limb, Limb); 257] = [
     (0, 0, 0, 0, 0),                                        // 0
     (0, 0, 0, 0, 0),                                        // 1
     (64, 0xffffffffffffffff, 0x1fffffffffffffff, 0x1, 0x0), // 2
@@ -1847,7 +1845,7 @@ pub const BASES: [(usize, Limb, Limb, Limb, Limb); 257] = [
 // This is equivalent to `__gmp_oddfac_table` in `mpn/comb_tables.c`, GMP 6.2.1, which is the
 // combination of `ONE_LIMB_ODD_FACTORIAL_TABLE` and `ONE_LIMB_ODD_FACTORIAL_EXTTABLE` in
 // `fac_table.h`, GMP 6.2.1.
-pub const ONE_LIMB_ODD_FACTORIAL_TABLE: [Limb; 68] = [
+pub(crate) const ONE_LIMB_ODD_FACTORIAL_TABLE: [Limb; 68] = [
     0x1,
     0x1,
     0x1,
@@ -1918,15 +1916,15 @@ pub const ONE_LIMB_ODD_FACTORIAL_TABLE: [Limb; 68] = [
     0xfe3152bcbff89f41,
 ];
 // This is equivalent to `ODD_FACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
-pub const ODD_FACTORIAL_TABLE_LIMIT: usize = 25;
+pub(crate) const ODD_FACTORIAL_TABLE_LIMIT: usize = 25;
 // This is equivalent to `ODD_FACTORIAL_EXTTABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
-pub const ODD_FACTORIAL_EXTTABLE_LIMIT: usize = 67;
+pub(crate) const ODD_FACTORIAL_EXTTABLE_LIMIT: usize = 67;
 // This is equivalent to `ODD_FACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.
-pub const ODD_FACTORIAL_TABLE_MAX: Limb = 0x335281867ec241ef;
+pub(crate) const ODD_FACTORIAL_TABLE_MAX: Limb = 0x335281867ec241ef;
 
 // This is equivalent to `__gmp_odd2fac_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
 // `ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE` from `fac_table.h`, GMP 6.2.1.
-pub const ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE: [Limb; 17] = [
+pub(crate) const ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE: [Limb; 17] = [
     0x1,
     0x3,
     0xf,
@@ -1946,17 +1944,17 @@ pub const ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE: [Limb; 17] = [
     0x57e22099c030d941,
 ];
 // This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
-pub const ODD_DOUBLEFACTORIAL_TABLE_LIMIT: usize = 33;
+pub(crate) const ODD_DOUBLEFACTORIAL_TABLE_LIMIT: usize = 33;
 // This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.
-pub const ODD_DOUBLEFACTORIAL_TABLE_MAX: Limb = 0x57e22099c030d941;
+pub(crate) const ODD_DOUBLEFACTORIAL_TABLE_MAX: Limb = 0x57e22099c030d941;
 
 // This is equivalent to `__gmp_limbroots_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
 // `NTH_ROOT_NUMB_MASK_TABLE` from `fac_table.h`, GMP 6.2.1.
-pub const NTH_ROOT_NUMB_MASK_TABLE: [Limb; 8] =
+pub(crate) const NTH_ROOT_NUMB_MASK_TABLE: [Limb; 8] =
     [Limb::MAX, 0xffffffff, 0x285145, 0xffff, 0x1bdb, 0x659, 0x235, 0xff];
 
 // This is equivalent to `ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE` from `fac_table.h`, GMP 6.2.1.
-pub const ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE: [Limb; 64] = [
+pub(crate) const ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE: [Limb; 64] = [
     0x1,
     0xaaaaaaaaaaaaaaab,
     0xaaaaaaaaaaaaaaab,
@@ -2023,13 +2021,13 @@ pub const ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE: [Limb; 64] = [
     0x8f15a826498852e3,
 ];
 
-pub const ODD_CENTRAL_BINOMIAL_OFFSET: usize = 13;
+pub(crate) const ODD_CENTRAL_BINOMIAL_OFFSET: usize = 13;
 
 // This table contains binomial(2k, k) / 2 ^ t.
 //
 // This is equivalent to `bin2kk` in `mpz/bin_uiui.c`, GMP 6.2.1, and
 // `ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE` from `fac_table.h`, GMP 6.2.1.
-pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE: [Limb; 23] = [
+pub(crate) const ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE: [Limb; 23] = [
     0x13d66b,
     0x4c842f,
     0x93ee7d,
@@ -2055,13 +2053,13 @@ pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE: [Limb; 23] = [
     0xc29cb72925ef2cff,
 ];
 
-pub const ODD_CENTRAL_BINOMIAL_TABLE_LIMIT: usize = 35;
+pub(crate) const ODD_CENTRAL_BINOMIAL_TABLE_LIMIT: usize = 35;
 
 // This table contains the inverses of elements in the previous table.
 //
 // This is equivalent to `bin2kkinv` in `mpz/bin_uiui.c`, GMP 6.2.1, and
 // `ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE` from `fac_table.h`, GMP 6.2.1.
-pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 23] = [
+pub(crate) const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 23] = [
     0x61e5bd199bb12643,
     0x78321494dc8342cf,
     0x4fd348704ebf7ad5,
@@ -2091,26 +2089,26 @@ pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 23] = [
 //
 // This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and `CENTRAL_BINOMIAL_2FAC_TABLE`
 // from `fac_table.h`, GMP 6.2.1.
-pub const CENTRAL_BINOMIAL_2FAC_TABLE: [u64; 23] =
+pub(crate) const CENTRAL_BINOMIAL_2FAC_TABLE: [u64; 23] =
     [3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3];
 
 // https://oeis.org/A005187, skipping the initial 0
 //
 // This is equivalent to `__gmp_fac2cnt_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
 // `TABLE_2N_MINUS_POPC_2N` from `fac_table.h`, GMP 6.2.1.
-pub const TABLE_2N_MINUS_POPC_2N: [u8; 40] = [
+pub(crate) const TABLE_2N_MINUS_POPC_2N: [u8; 40] = [
     1, 3, 4, 7, 8, 10, 11, 15, 16, 18, 19, 22, 23, 25, 26, 31, 32, 34, 35, 38, 39, 41, 42, 46, 47,
     49, 50, 53, 54, 56, 57, 63, 64, 66, 67, 70, 71, 73, 74, 78,
 ];
 
-pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;
+pub(crate) const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;
 
-pub const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
+pub(crate) const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
 
-pub const MULMOD_TAB: [u8; 19] = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1];
+pub(crate) const MULMOD_TAB: [u8; 19] = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1];
 
 // Use these tables to match FLINT for debugging
 // ```
-// pub const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];
-// pub const MULMOD_TAB: [u8; 15] = [4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 2, 1, 1];
+// pub(crate) const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];
+// pub(crate) const MULMOD_TAB: [u8; 15] = [4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 2, 1, 1];
 // ```

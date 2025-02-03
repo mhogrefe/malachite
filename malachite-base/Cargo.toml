@@ -1,6 +1,6 @@
 [package]
 name = "malachite-base"
-version = "0.4.22"
+version = "0.5.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
