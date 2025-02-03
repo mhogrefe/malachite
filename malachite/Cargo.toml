@@ -1,6 +1,6 @@
 [package]
 name = "malachite"
-version = "0.4.21"
+version = "0.4.22"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
@@ -13,10 +13,10 @@ keywords = ["mathematics", "math", "numerics", "bignum"]
 categories = ["mathematics"]
 
 [dependencies]
-malachite-base = { version = "0.4.21", default-features = false, path = "../malachite-base" }
-malachite-nz = { version = "0.4.21", default-features = false, optional = true, path = "../malachite-nz" }
-malachite-q = { version = "0.4.21", default-features = false, optional = true, path = "../malachite-q" }
-malachite-float = { version = "0.4.21", default-features = false, optional = true, path = "../malachite-float" }
+malachite-base = { version = "0.4.22", default-features = false, path = "../malachite-base" }
+malachite-nz = { version = "0.4.22", default-features = false, optional = true, path = "../malachite-nz" }
+malachite-q = { version = "0.4.22", default-features = false, optional = true, path = "../malachite-q" }
+malachite-float = { version = "0.4.22", default-features = false, optional = true, path = "../malachite-float" }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 embed-doc-image = { version = "0.1.4", optional = true }
 

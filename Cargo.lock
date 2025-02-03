@@ -416,7 +416,7 @@ checksum = "04cbf5b083de1c7e0222a7a51dbfdba1cbe1c6ab0b15e29fff3f6c077fd9cd9f"
 
 [[package]]
 name = "malachite"
-version = "0.4.21"
+version = "0.4.22"
 dependencies = [
  "embed-doc-image",
  "malachite-base",
@@ -428,7 +428,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.4.21"
+version = "0.4.22"
 dependencies = [
  "clap",
  "getrandom",
@@ -448,7 +448,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-criterion-bench"
-version = "0.4.21"
+version = "0.4.22"
 dependencies = [
  "criterion",
  "malachite-base",
@@ -459,7 +459,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.4.21"
+version = "0.4.22"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -474,7 +474,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.4.21"
+version = "0.4.22"
 dependencies = [
  "embed-doc-image",
  "indoc",
@@ -492,7 +492,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.4.21"
+version = "0.4.22"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -747,7 +747,7 @@ dependencies = [
  "proc-macro2",
  "pyo3-macros-backend",
  "quote",
- "syn 2.0.96",
+ "syn 2.0.98",
 ]
 
 [[package]]
@@ -760,7 +760,7 @@ dependencies = [
  "proc-macro2",
  "pyo3-build-config",
  "quote",
- "syn 2.0.96",
+ "syn 2.0.98",
 ]
 
 [[package]]
@@ -922,7 +922,7 @@ checksum = "5a9bf7cf98d04a2b28aead066b7496853d4779c9cc183c440dbac457641e19a0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.96",
+ "syn 2.0.98",
 ]
 
 [[package]]
@@ -972,9 +972,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.96"
+version = "2.0.98"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5d0adab1ae378d7f53bdebc67a39f1f151407ef230f0ce2883572f5d8985c80"
+checksum = "36147f1a48ae0ec2b5b3bc5b537d267457555a10dc06f3dbc8cb11ba3006d3b1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1099,7 +1099,7 @@ dependencies = [
  "log",
  "proc-macro2",
  "quote",
- "syn 2.0.96",
+ "syn 2.0.98",
  "wasm-bindgen-shared",
 ]
 
@@ -1121,7 +1121,7 @@ checksum = "8ae87ea40c9f689fc23f209965b6fb8a99ad69aeeb0231408be24920604395de"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.96",
+ "syn 2.0.98",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -1276,5 +1276,5 @@ checksum = "fa4f8080344d4671fb4e831a13ad1e68092748387dfc4f55e356242fae12ce3e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.96",
+ "syn 2.0.98",
 ]
