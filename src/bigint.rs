@@ -79,7 +79,7 @@ impl Neg for Sign {
     From,
     Into,
 )]
-#[display("{}", "self.0")]
+#[display("{}", self.0)]
 #[into(owned, ref, ref_mut)]
 pub struct BigInt(Integer);
 
@@ -679,4 +679,10 @@ fn test_to_signed_bytes() {
     let b = i.to_signed_bytes_le();
     let i2 = BigInt::from_signed_bytes_le(&b);
     assert_eq!(i, i2);
+}
+
+#[test]
+fn test_display_bigint() {
+    let n = BigInt::from_str("1234567890").unwrap();
+    assert_eq!(format!("{}", n), "1234567890");
 }
