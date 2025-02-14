@@ -1,13 +1,17 @@
 use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
 use malachite::{
-    num::{
-        arithmetic::traits::{
-            DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
+    base::{
+        num::{
+            arithmetic::traits::{
+                DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
+            },
+            conversion::traits::{
+                Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase,
+            },
+            logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
         },
-        conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
-        logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
+        rounding_modes::RoundingMode,
     },
-    rounding_modes::RoundingMode,
     Natural,
 };
 use num_integer::Roots;
@@ -179,7 +183,7 @@ impl FromPrimitive for BigUint {
 impl Zero for BigUint {
     #[inline]
     fn zero() -> Self {
-        Self(<Natural as malachite::num::basic::traits::Zero>::ZERO)
+        Self(<Natural as malachite::base::num::basic::traits::Zero>::ZERO)
     }
 
     #[inline]
@@ -191,7 +195,7 @@ impl Zero for BigUint {
 impl One for BigUint {
     #[inline]
     fn one() -> Self {
-        Self(<Natural as malachite::num::basic::traits::One>::ONE)
+        Self(<Natural as malachite::base::num::basic::traits::One>::ONE)
     }
 }
 

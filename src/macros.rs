@@ -274,16 +274,16 @@ macro_rules! forward_assign_primitive_into {
 macro_rules! forward_pow_primitive {
     ($lhs:ty, $rhs:ty) => {
         impl_binary_op!($lhs, $rhs, $lhs, Pow, pow, |lhs: $lhs, rhs: $rhs| {
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, rhs as _).into()
+            <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, rhs as _).into()
         });
         impl_binary_op!(&$lhs, $rhs, $lhs, Pow, pow, |lhs: &$lhs, rhs: $rhs| {
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, rhs as _).into()
+            <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, rhs as _).into()
         });
         impl_binary_op!($lhs, &$rhs, $lhs, Pow, pow, |lhs: $lhs, rhs: &$rhs| {
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, *rhs as _).into()
+            <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, *rhs as _).into()
         });
         impl_binary_op!(&$lhs, &$rhs, $lhs, Pow, pow, |lhs: &$lhs, rhs: &$rhs| {
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, *rhs as _).into()
+            <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, *rhs as _).into()
         });
     };
 }
@@ -291,8 +291,9 @@ macro_rules! forward_pow_primitive {
 macro_rules! forward_pow_biguint {
     ($lhs:ty) => {
         impl_binary_op!($lhs, BigUint, $lhs, Pow, pow, |lhs: $lhs, rhs: BigUint| {
-            let exp = malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
+            let exp =
+                malachite::base::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
+            <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
         });
         impl_binary_op!(
             &$lhs,
@@ -301,9 +302,10 @@ macro_rules! forward_pow_biguint {
             Pow,
             pow,
             |lhs: &$lhs, rhs: BigUint| {
-                let exp =
-                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
+                let exp = malachite::base::num::conversion::traits::SaturatingFrom::saturating_from(
+                    &rhs.0,
+                );
+                <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
             }
         );
         impl_binary_op!(
@@ -313,9 +315,10 @@ macro_rules! forward_pow_biguint {
             Pow,
             pow,
             |lhs: $lhs, rhs: &BigUint| {
-                let exp =
-                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
+                let exp = malachite::base::num::conversion::traits::SaturatingFrom::saturating_from(
+                    &rhs.0,
+                );
+                <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
             }
         );
         impl_binary_op!(
@@ -325,9 +328,10 @@ macro_rules! forward_pow_biguint {
             Pow,
             pow,
             |lhs: &$lhs, rhs: &BigUint| {
-                let exp =
-                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
+                let exp = malachite::base::num::conversion::traits::SaturatingFrom::saturating_from(
+                    &rhs.0,
+                );
+                <_ as malachite::base::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
             }
         );
     };

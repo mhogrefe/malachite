@@ -1,13 +1,15 @@
 use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
 use malachite::{
-    num::{
-        arithmetic::traits::{
-            Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
+    base::{
+        num::{
+            arithmetic::traits::{
+                Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
+            },
+            conversion::traits::{RoundingInto, ToStringBase},
+            logic::traits::BitAccess,
         },
-        conversion::traits::{RoundingInto, ToStringBase},
-        logic::traits::BitAccess,
+        rounding_modes::RoundingMode,
     },
-    rounding_modes::RoundingMode,
     Integer,
 };
 use num_integer::Roots;
@@ -208,7 +210,7 @@ impl From<BigUint> for BigInt {
 impl Zero for BigInt {
     #[inline]
     fn zero() -> Self {
-        Self(<Integer as malachite::num::basic::traits::Zero>::ZERO)
+        Self(<Integer as malachite::base::num::basic::traits::Zero>::ZERO)
     }
 
     #[inline]
@@ -220,7 +222,7 @@ impl Zero for BigInt {
 impl One for BigInt {
     #[inline]
     fn one() -> Self {
-        Self(<Integer as malachite::num::basic::traits::One>::ONE)
+        Self(<Integer as malachite::base::num::basic::traits::One>::ONE)
     }
 }
 
@@ -514,7 +516,7 @@ impl BigInt {
 
     #[inline]
     pub fn sign(&self) -> Sign {
-        match <_ as malachite::num::arithmetic::traits::Sign>::sign(&self.0) {
+        match <_ as malachite::base::num::arithmetic::traits::Sign>::sign(&self.0) {
             Ordering::Less => Minus,
             Ordering::Equal => NoSign,
             Ordering::Greater => Plus,
