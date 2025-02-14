@@ -2,14 +2,16 @@
 name = "malachite-bigint"
 version = "0.5.0"
 authors = ["Steve Shi <shikangzhi@gmail.com>"]
-edition = "2021"
+rust-version.workspace = true
+edition.workspace = true
 license = "LGPL-3.0-only"
 description = "A drop-in num-bigint replacement based on malachite"
-repository = "https://github.com/RustPython/malachite-bigint"
-rust-version = "1.74.0"
+repository = "https://github.com/mhogrefe/malachite"
 
 [dependencies]
-malachite = { version = "0.5.0", git = "https://github.com/mhogrefe/malachite.git" }
+malachite-base = { version = "0.5.0", path = "../malachite-base" }
+malachite-nz = { version = "0.5.0", path = "../malachite-nz" }
+
 num-traits = { version = "0.2.19", default-features = false, features = ["i128"] }
 num-integer = { version = "0.1.46", default-features = false, features = ["i128"] }
 derive_more = { version = "1.0.0", features = ["display", "from", "into"] }

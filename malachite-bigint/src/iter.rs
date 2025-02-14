@@ -1,6 +1,6 @@
 use std::iter::FusedIterator;
 
-use malachite::natural::conversion::to_limbs::LimbIterator;
+use malachite_nz::natural::conversion::to_limbs::LimbIterator;
 
 pub struct U32Digits<'a> {
     iter: LimbIterator<'a>,

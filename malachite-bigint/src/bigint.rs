@@ -1,17 +1,15 @@
 use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
-use malachite::{
-    base::{
-        num::{
-            arithmetic::traits::{
-                Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
-            },
-            conversion::traits::{RoundingInto, ToStringBase},
-            logic::traits::BitAccess,
+use malachite_base::{
+    num::{
+        arithmetic::traits::{
+            Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
         },
-        rounding_modes::RoundingMode,
+        conversion::traits::{RoundingInto, ToStringBase},
+        logic::traits::BitAccess,
     },
-    Integer,
+    rounding_modes::RoundingMode,
 };
+use malachite_nz::integer::Integer;
 use num_integer::Roots;
 use num_traits::{
     CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, FromPrimitive, Num, One, Pow, Signed,
@@ -210,7 +208,7 @@ impl From<BigUint> for BigInt {
 impl Zero for BigInt {
     #[inline]
     fn zero() -> Self {
-        Self(<Integer as malachite::base::num::basic::traits::Zero>::ZERO)
+        Self(<Integer as malachite_base::num::basic::traits::Zero>::ZERO)
     }
 
     #[inline]
@@ -222,7 +220,7 @@ impl Zero for BigInt {
 impl One for BigInt {
     #[inline]
     fn one() -> Self {
-        Self(<Integer as malachite::base::num::basic::traits::One>::ONE)
+        Self(<Integer as malachite_base::num::basic::traits::One>::ONE)
     }
 }
 
@@ -516,7 +514,7 @@ impl BigInt {
 
     #[inline]
     pub fn sign(&self) -> Sign {
-        match <_ as malachite::base::num::arithmetic::traits::Sign>::sign(&self.0) {
+        match <_ as malachite_base::num::arithmetic::traits::Sign>::sign(&self.0) {
             Ordering::Less => Minus,
             Ordering::Equal => NoSign,
             Ordering::Greater => Plus,

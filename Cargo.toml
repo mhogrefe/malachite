@@ -1,5 +1,5 @@
 [workspace]
-members = ['malachite', 'malachite-base', 'malachite-float', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
+members = ['malachite', 'malachite-base', 'malachite-bigint', 'malachite-float', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
 resolver = "2"
 
 [workspace.package]

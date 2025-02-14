@@ -1,19 +1,15 @@
 use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
-use malachite::{
-    base::{
-        num::{
-            arithmetic::traits::{
-                DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
-            },
-            conversion::traits::{
-                Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase,
-            },
-            logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
+use malachite_base::{
+    num::{
+        arithmetic::traits::{
+            DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
         },
-        rounding_modes::RoundingMode,
+        conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
+        logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
     },
-    Natural,
+    rounding_modes::RoundingMode,
 };
+use malachite_nz::{integer::Integer, natural::Natural};
 use num_integer::Roots;
 use num_traits::{
     CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, FromPrimitive, Num, One, Pow, ToPrimitive,
@@ -163,7 +159,7 @@ impl ToBigUint for BigUint {
 impl ToBigInt for BigUint {
     #[inline]
     fn to_bigint(&self) -> Option<crate::BigInt> {
-        Some(malachite::Integer::from(&self.0).into())
+        Some(Integer::from(&self.0).into())
     }
 }
 
@@ -183,7 +179,7 @@ impl FromPrimitive for BigUint {
 impl Zero for BigUint {
     #[inline]
     fn zero() -> Self {
-        Self(<Natural as malachite::base::num::basic::traits::Zero>::ZERO)
+        Self(<Natural as malachite_base::num::basic::traits::Zero>::ZERO)
     }
 
     #[inline]
@@ -195,7 +191,7 @@ impl Zero for BigUint {
 impl One for BigUint {
     #[inline]
     fn one() -> Self {
-        Self(<Natural as malachite::base::num::basic::traits::One>::ONE)
+        Self(<Natural as malachite_base::num::basic::traits::One>::ONE)
     }
 }
 
