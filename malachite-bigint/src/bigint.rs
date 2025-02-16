@@ -633,22 +633,21 @@ impl BigInt {
         }
     }
 }
-/// Perform in-place two's complement of the given binary representation,
-/// in little-endian byte order.
+/// Perform in-place two's complement of the given binary representation, in little-endian byte
+/// order.
 #[inline]
 fn twos_complement_le(digits: &mut [u8]) {
     twos_complement(digits)
 }
 
-/// Perform in-place two's complement of the given binary representation
-/// in big-endian byte order.
+/// Perform in-place two's complement of the given binary representation in big-endian byte order.
 #[inline]
 fn twos_complement_be(digits: &mut [u8]) {
     twos_complement(digits.iter_mut().rev())
 }
 
-/// Perform in-place two's complement of the given digit iterator
-/// starting from the least significant byte.
+/// Perform in-place two's complement of the given digit iterator starting from the least
+/// significant byte.
 #[inline]
 fn twos_complement<'a, I>(digits: I)
 where

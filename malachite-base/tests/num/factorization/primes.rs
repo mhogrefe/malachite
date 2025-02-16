@@ -10,8 +10,11 @@ use itertools::Itertools;
 use malachite_base::iterators::comparison::is_strictly_ascending;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::num::factorization::traits::Primes;
-use malachite_base::test_util::generators::unsigned_gen_var_5;
+use malachite_base::num::factorization::traits::{IsPrime, Primes};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
+    unsigned_gen_var_5, unsigned_pair_gen_var_28, unsigned_triple_gen_var_24,
+};
 use malachite_base::test_util::num::factorization::primes::primes_naive;
 
 fn test_primes_less_than_helper<T: PrimitiveUnsigned>() {
@@ -155,6 +158,9 @@ fn test_primes() {
         7717, 7723, 7727, 7741, 7753, 7757, 7759, 7789, 7793, 7817, 7823, 7829, 7841, 7853, 7867,
         7873, 7877, 7879, 7883, 7901, 7907, 7919,
     ];
+    for p in expected {
+        assert!(p.is_prime());
+    }
     assert_eq!(u16::primes().take(1000).collect_vec(), expected);
     assert_eq!(primes_naive::<u16>().take(1000).collect_vec(), expected);
 
@@ -176,6 +182,10 @@ fn test_primes() {
 fn primes_less_than_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_gen_var_5::<T>().test_properties(|n| {
         let ps = T::primes_less_than(&n).collect_vec();
+        for p in &ps {
+            let p: u64 = p.wrapping_into();
+            assert!(p.is_prime());
+        }
         assert!(is_strictly_ascending(ps.iter()));
         assert_eq!(
             T::primes_less_than_or_equal_to(&n.saturating_sub(T::ONE)).collect_vec(),
@@ -194,6 +204,10 @@ fn primes_less_than_properties() {
 fn primes_less_than_or_equal_to_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_gen_var_5::<T>().test_properties(|n| {
         let ps = T::primes_less_than_or_equal_to(&n).collect_vec();
+        for p in &ps {
+            let p: u64 = p.wrapping_into();
+            assert!(p.is_prime());
+        }
         assert!(is_strictly_ascending(ps.iter()));
         assert_eq!(
             T::primes_less_than(&n.saturating_add(T::ONE)).collect_vec(),
@@ -210,4 +224,74 @@ fn primes_less_than_or_equal_to_properties_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn primes_less_than_or_equal_to_properties() {
     apply_fn_to_unsigneds!(primes_less_than_or_equal_to_properties_helper);
+}
+
+// TODO replace with real version once available
+fn next_prime_after<T: IsPrime + PrimitiveUnsigned>(mut n: T) -> T {
+    loop {
+        n += T::ONE;
+        if n.is_prime() {
+            return n;
+        }
+    }
+}
+
+fn primes_less_than_jump_after_properties_helper<T: IsPrime + PrimitiveUnsigned>() {
+    let mut config = GenConfig::new();
+    config.insert("mean_small_n", 10000);
+    unsigned_triple_gen_var_24::<T, usize>().test_properties_with_config(
+        &config,
+        |(size, jump, skip)| {
+            let mut ps = T::primes_less_than(&size);
+            for _ in 0..skip {
+                ps.next();
+            }
+            if ps.jump_after(jump) {
+                let p = ps.next().unwrap();
+                assert!(p.is_prime());
+                assert_eq!(p, next_prime_after(jump));
+            } else {
+                assert!(ps.next().is_none());
+            }
+        },
+    );
+}
+
+#[test]
+fn primes_less_than_jump_after_properties() {
+    primes_less_than_jump_after_properties_helper::<u8>();
+    primes_less_than_jump_after_properties_helper::<u16>();
+    primes_less_than_jump_after_properties_helper::<u32>();
+    primes_less_than_jump_after_properties_helper::<u64>();
+    primes_less_than_jump_after_properties_helper::<usize>();
+}
+
+fn primes_jump_after_properties_helper<T: IsPrime + PrimitiveUnsigned>() {
+    let mut config = GenConfig::new();
+    config.insert("mean_small_n", 10000);
+    unsigned_pair_gen_var_28::<T, usize>().test_properties_with_config(&config, |(jump, skip)| {
+        let mut ps = T::primes();
+        for _ in 0..skip {
+            ps.next();
+        }
+        if ps.jump_after(jump) {
+            let p = ps.next().unwrap();
+            assert!(p.is_prime());
+            assert_eq!(p, next_prime_after(jump));
+        } else {
+            assert!(ps.next().is_none());
+        }
+    });
+}
+
+#[test]
+fn primes_jump_after_properties() {
+    let mut primes = u16::primes();
+    assert_eq!(primes.jump_after(u16::MAX), false);
+
+    primes_jump_after_properties_helper::<u8>();
+    primes_jump_after_properties_helper::<u16>();
+    primes_jump_after_properties_helper::<u32>();
+    primes_jump_after_properties_helper::<u64>();
+    primes_jump_after_properties_helper::<usize>();
 }

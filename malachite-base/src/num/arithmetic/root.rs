@@ -1160,7 +1160,7 @@ pub_test! {fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
     let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
-        (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
+        (((n / x.wrapping_pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         Down,
     ).0;
     if root >= upper_limit {
@@ -1258,7 +1258,7 @@ pub_test! {fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
     let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
-        (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
+        (((n / x.wrapping_pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         Down,
     ).0;
     if root >= upper_limit {
@@ -1354,7 +1354,7 @@ pub_test! {fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
     let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
-        (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
+        (((n / x.wrapping_pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         Down,
     ).0;
     if root >= upper_limit {

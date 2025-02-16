@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::sqrt::sqrt_rem_2_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, SqrtAssignRem,
     SqrtRem, Square,
@@ -24,8 +25,9 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::sqrt::{
     limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_helper, limbs_sqrt_rem,
     limbs_sqrt_rem_helper, limbs_sqrt_rem_helper_scratch_len, limbs_sqrt_rem_to_out,
-    limbs_sqrt_to_out, sqrt_rem_2_newton,
+    limbs_sqrt_to_out,
 };
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::bench::bucketers::{
     natural_bit_bucketer, pair_2_natural_bit_bucketer, triple_3_natural_bit_bucketer,
 };
@@ -80,12 +82,15 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_sqrt_rem_2_newton(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (h_hi, h_lo) in unsigned_pair_gen_var_31().get(gm, config).take(limit) {
+    for (h_hi, h_lo) in unsigned_pair_gen_var_31::<Limb>()
+        .get(gm, config)
+        .take(limit)
+    {
         println!(
             "sqrt_rem_2_newton({}, {}) = {:?}",
             h_hi,
             h_lo,
-            sqrt_rem_2_newton(h_hi, h_lo)
+            sqrt_rem_2_newton::<Limb, SignedLimb>(h_hi, h_lo)
         );
     }
 }
@@ -246,13 +251,13 @@ fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: &GenConfig, limit: usize, fi
     run_benchmark(
         "sqrt_rem_2_newton(Limb, Limb)",
         BenchmarkType::Single,
-        unsigned_pair_gen_var_31().get(gm, config),
+        unsigned_pair_gen_var_31::<Limb>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_max_bit_bucketer("n_hi", "n_lo"),
         &mut [("sqrt_rem_2_newton(Limb, Limb)", &mut |(n_hi, n_lo)| {
-            no_out!(sqrt_rem_2_newton(n_hi, n_lo))
+            no_out!(sqrt_rem_2_newton::<Limb, SignedLimb>(n_hi, n_lo))
         })],
     );
 }

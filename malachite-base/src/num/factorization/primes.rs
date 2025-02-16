@@ -8,6 +8,7 @@
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::factorization::prime_sieve::n_to_bit;
 use crate::num::factorization::prime_sieve::{
     id_to_n, limbs_prime_sieve_size, limbs_prime_sieve_u64,
 };
@@ -15,6 +16,21 @@ use crate::num::factorization::traits::Primes;
 use crate::num::logic::traits::TrailingZeros;
 use alloc::vec::Vec;
 use core::marker::PhantomData;
+
+const NUM_SMALL_PRIMES: usize = 172;
+
+// This is flint_primes_small from ulong_extras/compute_primes.c, FLINT 3.1.2.
+pub(crate) const SMALL_PRIMES: [u16; NUM_SMALL_PRIMES] = [
+    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+    101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193,
+    197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307,
+    311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421,
+    431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547,
+    557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659,
+    661, 673, 677, 683, 691, 701, 709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797,
+    809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 907, 911, 919, 929,
+    937, 941, 947, 953, 967, 971, 977, 983, 991, 997, 1009, 1013, 1019, 1021,
+];
 
 // This differs from the identically-named function in malachite-nz; this one returns None if there
 // are no more false bits.
@@ -53,27 +69,99 @@ fn limbs_index_of_next_false_bit<T: PrimitiveUnsigned>(xs: &[T], start: u64) -> 
 /// [`Primes::primes_less_than_or_equal_to`]; see their documentation for more.
 #[derive(Clone, Debug)]
 pub struct PrimesLessThanIterator<T: PrimitiveUnsigned> {
-    i: u8,
-    j: u64,
+    small: bool,
+    i: u64,
+    limit: T,
     sieve: Vec<u64>,
     phantom: PhantomData<*const T>,
 }
 
 impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
     fn new(n: T) -> PrimesLessThanIterator<T> {
+        let limit = n;
         let n: u64 = n.saturating_into();
         let mut sieve;
-        if n < 5 {
+        // 1031 is the smallest prime greater than 2^10.
+        if n < 1031 {
             sieve = Vec::with_capacity(0);
         } else {
             sieve = alloc::vec![0; limbs_prime_sieve_size::<u64>(n)];
             limbs_prime_sieve_u64(&mut sieve, n);
         }
         PrimesLessThanIterator {
+            small: true,
             i: 0,
-            j: n,
+            limit,
             sieve,
             phantom: PhantomData,
+        }
+    }
+
+    /// Moves the iterator to just after a given value, returning whether the iterator will return
+    /// any more values after that point. If `false` is returned, calling `next` will return `None`;
+    /// if `true` is returned, calling `next` will return smallest prime greater than $n$.
+    ///
+    /// # Worst-case complexity (amortized)
+    /// $T(n) = O(n\log \log n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::factorization::traits::Primes;
+    ///
+    /// let mut primes = u32::primes_less_than(&10_000);
+    /// assert_eq!(primes.jump_after(1000), true);
+    /// assert_eq!(primes.next(), Some(1009));
+    ///
+    /// assert_eq!(primes.jump_after(10_000), false);
+    /// assert_eq!(primes.next(), None);
+    /// ```
+    pub fn jump_after(&mut self, n: T) -> bool {
+        // 1021 is the greatest prime smaller than 2^10.
+        if n < T::saturating_from(1021) {
+            self.small = true;
+            self.i = u64::wrapping_from(match SMALL_PRIMES.binary_search(&n.wrapping_into()) {
+                Ok(i) => i + 1,
+                Err(i) => i,
+            });
+            if self.i == NUM_SMALL_PRIMES as u64 {
+                if self.sieve.is_empty() {
+                    false
+                } else {
+                    self.small = false;
+                    const NEXT_INDEX: u64 = n_to_bit(1031) - 1;
+                    self.i = NEXT_INDEX;
+                    let next_i =
+                        if let Some(next_i) = limbs_index_of_next_false_bit(&self.sieve, self.i) {
+                            next_i
+                        } else {
+                            return false;
+                        };
+                    let next_p = T::exact_from(id_to_n(next_i + 1));
+                    next_p <= self.limit
+                }
+            } else if let Ok(next_p) = T::try_from(SMALL_PRIMES[self.i as usize]) {
+                next_p <= self.limit
+            } else {
+                false
+            }
+        } else {
+            self.small = false;
+            self.i = if let Ok(n) = n.try_into() {
+                n_to_bit(n) + 1
+            } else {
+                return false;
+            };
+            let next_i = if let Some(next_i) = limbs_index_of_next_false_bit(&self.sieve, self.i) {
+                next_i
+            } else {
+                return false;
+            };
+            let next_p = T::exact_from(id_to_n(next_i + 1));
+            next_p <= self.limit
         }
     }
 }
@@ -82,27 +170,29 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesLessThanIterator<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        match self.i {
-            0 => {
-                if self.j < 2 {
-                    None
-                } else {
-                    self.i = 1;
-                    Some(T::TWO)
-                }
+        if self.small {
+            let p = if let Ok(p) = T::try_from(SMALL_PRIMES[self.i as usize]) {
+                p
+            } else {
+                return None;
+            };
+            if p > self.limit {
+                return None;
             }
-            1 => {
-                if self.j == 2 {
-                    None
-                } else {
-                    self.i = 2;
-                    self.j = 0;
-                    Some(T::from(3u8))
-                }
+            self.i += 1;
+            if self.i == NUM_SMALL_PRIMES as u64 {
+                self.small = false;
+                const NEXT_INDEX: u64 = n_to_bit(1031) - 1;
+                self.i = NEXT_INDEX;
             }
-            _ => {
-                self.j = limbs_index_of_next_false_bit(&self.sieve, self.j)? + 1;
-                Some(T::exact_from(id_to_n(self.j)))
+            Some(p)
+        } else {
+            self.i = limbs_index_of_next_false_bit(&self.sieve, self.i)? + 1;
+            let p = T::exact_from(id_to_n(self.i));
+            if p > self.limit {
+                None
+            } else {
+                Some(p)
             }
         }
     }
@@ -119,10 +209,50 @@ pub struct PrimesIterator<T: PrimitiveUnsigned> {
 
 impl<T: PrimitiveUnsigned> PrimesIterator<T> {
     fn new() -> PrimesIterator<T> {
-        let limit = T::saturating_from(256u16);
+        let limit = T::saturating_from(1024u16);
         PrimesIterator {
             limit,
             xs: PrimesLessThanIterator::new(limit),
+        }
+    }
+
+    /// Moves the iterator to just after a given value, returning whether the iterator will return
+    /// any more values after that point. If `false` is returned, calling `next` will return `None`
+    /// (which only happens if $n$ is very close to the maximum value of `T`); if `true` is
+    /// returned, calling `next` will return smallest prime greater than $n$.
+    ///
+    /// # Worst-case complexity (amortized)
+    /// $T(n) = O(n\log \log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::factorization::traits::Primes;
+    ///
+    /// let mut primes = u16::primes();
+    /// assert_eq!(primes.jump_after(1000), true);
+    /// assert_eq!(primes.next(), Some(1009));
+    ///
+    /// assert_eq!(primes.jump_after(u16::MAX), false);
+    /// assert_eq!(primes.next(), None);
+    /// ```
+    pub fn jump_after(&mut self, n: T) -> bool {
+        loop {
+            if self.xs.jump_after(n) {
+                return true;
+            } else if self.limit == T::MAX {
+                return false;
+            }
+            self.limit.saturating_mul_assign(T::TWO);
+            while self.limit != T::MAX && self.limit <= n {
+                self.limit.saturating_mul_assign(T::TWO);
+            }
+            let i = self.xs.i;
+            self.xs = T::primes_less_than_or_equal_to(&self.limit);
+            self.xs.i = i;
         }
     }
 }
@@ -139,10 +269,14 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesIterator<T> {
                 return None;
             }
             self.limit.saturating_mul_assign(T::TWO);
-            let j = self.xs.j;
+            let i = if self.xs.small {
+                n_to_bit(1031)
+            } else {
+                self.xs.i
+            };
             self.xs = T::primes_less_than_or_equal_to(&self.limit);
-            self.xs.i = 3;
-            self.xs.j = j;
+            self.xs.small = false;
+            self.xs.i = i;
         }
     }
 }

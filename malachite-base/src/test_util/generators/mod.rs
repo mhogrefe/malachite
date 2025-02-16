@@ -2363,8 +2363,8 @@ pub fn unsigned_triple_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     )
 }
 
-// All `(T, U, U)` where `T` and `U` are unsigned, both `U`s are small, and the first `U` is less
-// than or equal to the second.
+// All `(T, U, U)` where `T` and `U` are unsigned, both `U`s are small, and the second `U` is less
+// than or equal to the third.
 pub fn unsigned_triple_gen_var_5<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
 ) -> Generator<(T, U, U)> {
     Generator::new(
@@ -2551,6 +2551,15 @@ pub fn unsigned_triple_gen_var_23<T: PrimitiveUnsigned>() -> Generator<(T, T, T)
         &exhaustive_unsigned_triple_gen_var_20,
         &random_unsigned_triple_gen_var_10,
         &special_random_unsigned_triple_gen_var_23,
+    )
+}
+
+// All `(T, T, U)`, where `T` and `U` are unsigned, and everything is small.
+pub fn unsigned_triple_gen_var_24<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, T, U)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_triple_gen_var_21,
+        &random_unsigned_triple_gen_var_11,
     )
 }
 

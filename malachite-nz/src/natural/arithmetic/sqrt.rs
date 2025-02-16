@@ -42,61 +42,17 @@ use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
+use malachite_base::num::arithmetic::sqrt::sqrt_rem_2_newton;
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
-    ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
+    ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingSquare, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
-
-// Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
-//
-// # Worst-case complexity
-// Constant time and additional memory.
-//
-// This is equivalent to `mpn_sqrtrem2` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
-pub_test! {sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
-    assert!(n_hi.leading_zeros() < 2);
-    let (mut sqrt, mut r_lo) = sqrt_rem_newton::<Limb, SignedLimb>(n_hi);
-    const PREC: u64 = Limb::WIDTH >> 1;
-    const PREC_P_1: u64 = PREC + 1;
-    const PREC_M_1: u64 = PREC - 1;
-    // r_lo <= 2 * sqrt < 2 ^ (prec + 1)
-    r_lo = (r_lo << PREC_M_1) | (n_lo >> PREC_P_1);
-    let mut q = r_lo / sqrt;
-    // q <= 2 ^ prec, if q = 2 ^ prec, reduce the overestimate.
-    q -= q >> PREC;
-    // now we have q < 2 ^ prec
-    let u = r_lo - q * sqrt;
-    // now we have (rp_lo << prec + n_lo >> prec) / 2 = q * sqrt + u
-    sqrt = (sqrt << PREC) | q;
-    let mut r_hi = (u >> PREC_M_1) + 1;
-    r_lo = (u << PREC_P_1) | (n_lo.mod_power_of_2(PREC_P_1));
-    let q_squared = q.square();
-    if r_lo < q_squared {
-        assert_ne!(r_hi, 0);
-        r_hi -= 1;
-    }
-    r_lo.wrapping_sub_assign(q_squared);
-    if r_hi == 0 {
-        r_lo.wrapping_add_assign(sqrt);
-        if r_lo < sqrt {
-            r_hi += 1;
-        }
-        sqrt -= 1;
-        r_lo.wrapping_add_assign(sqrt);
-        if r_lo < sqrt {
-            r_hi += 1;
-        }
-    }
-    r_hi -= 1;
-    assert!(r_hi < 2);
-    (sqrt, r_hi == 1, r_lo)
-}}
 
 pub_const_test! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
@@ -136,7 +92,7 @@ pub_test! {limbs_sqrt_rem_helper(
     let out_hi = &mut out[h1..];
     let q = if h2 == 1 {
         let r_hi;
-        (out_hi[0], r_hi, xs_hi[0]) = sqrt_rem_2_newton(xs_hi[1], xs_hi[0]);
+        (out_hi[0], r_hi, xs_hi[0]) = sqrt_rem_2_newton::<Limb, SignedLimb>(xs_hi[1], xs_hi[0]);
         r_hi
     } else {
         limbs_sqrt_rem_helper(out_hi, xs_hi, 0, scratch)
@@ -386,10 +342,10 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
         }
         2 => {
             out[0] = if shift == 0 {
-                sqrt_rem_2_newton(xs[1], xs[0]).0
+                sqrt_rem_2_newton::<Limb, SignedLimb>(xs[1], xs[0]).0
             } else {
                 let lo = xs[0];
-                sqrt_rem_2_newton(
+                sqrt_rem_2_newton::<Limb, SignedLimb>(
                     (high << two_shift) | (lo >> (Limb::WIDTH - two_shift)),
                     lo << two_shift,
                 )
@@ -478,7 +434,8 @@ pub_test! {limbs_sqrt_rem_to_out(
         2 => {
             if shift == 0 {
                 let r_hi;
-                (out_sqrt[0], r_hi, out_rem[0]) = sqrt_rem_2_newton(xs[1], xs[0]);
+                (out_sqrt[0], r_hi, out_rem[0]) =
+                    sqrt_rem_2_newton::<Limb, SignedLimb>(xs[1], xs[0]);
                 if r_hi {
                     out_rem[1] = 1;
                     2
@@ -488,7 +445,7 @@ pub_test! {limbs_sqrt_rem_to_out(
             } else {
                 let mut lo = xs[0];
                 let hi = (high << two_shift) | (lo >> (Limb::WIDTH - two_shift));
-                out_sqrt[0] = sqrt_rem_2_newton(hi, lo << two_shift).0 >> shift;
+                out_sqrt[0] = sqrt_rem_2_newton::<Limb, SignedLimb>(hi, lo << two_shift).0 >> shift;
                 lo.wrapping_sub_assign(out_sqrt[0].wrapping_square());
                 out_rem[0] = lo;
                 usize::from(lo != 0)

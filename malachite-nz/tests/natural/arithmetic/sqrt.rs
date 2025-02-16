@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::sqrt::sqrt_rem_2_newton;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::arithmetic::traits::{
@@ -27,10 +28,10 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::arithmetic::sqrt::{
     limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_helper, limbs_sqrt_rem,
     limbs_sqrt_rem_helper, limbs_sqrt_rem_helper_scratch_len, limbs_sqrt_rem_to_out,
-    limbs_sqrt_to_out, sqrt_rem_2_newton,
+    limbs_sqrt_to_out,
 };
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::{DoubleLimb, Limb};
+use malachite_nz::platform::{DoubleLimb, Limb, SignedLimb};
 use malachite_nz::test_util::generators::natural_gen;
 use malachite_nz::test_util::natural::arithmetic::sqrt::{
     ceiling_sqrt_binary, checked_sqrt_binary, floor_sqrt_binary, sqrt_rem_binary,
@@ -43,7 +44,10 @@ use std::str::FromStr;
 #[test]
 fn test_sqrt_rem_2_newton() {
     fn test(n_hi: Limb, n_lo: Limb, sqrt: Limb, r_hi: bool, r_lo: Limb) {
-        assert_eq!(sqrt_rem_2_newton(n_hi, n_lo), (sqrt, r_hi, r_lo));
+        assert_eq!(
+            sqrt_rem_2_newton::<Limb, SignedLimb>(n_hi, n_lo),
+            (sqrt, r_hi, r_lo)
+        );
         assert_eq!(
             DoubleLimb::from(sqrt)
                 .square()
@@ -61,7 +65,7 @@ fn test_sqrt_rem_2_newton() {
 
 #[test]
 fn sqrt_rem_2_newton_fail() {
-    assert_panic!(sqrt_rem_2_newton(1, Limb::MAX));
+    assert_panic!(sqrt_rem_2_newton::<Limb, SignedLimb>(1, Limb::MAX));
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -668,7 +672,7 @@ fn test_sqrt_rem() {
 #[test]
 fn sqrt_rem_2_newton_properties() {
     unsigned_pair_gen_var_31().test_properties(|(n_hi, n_lo)| {
-        let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton(n_hi, n_lo);
+        let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton::<Limb, SignedLimb>(n_hi, n_lo);
         assert_eq!(
             DoubleLimb::from(sqrt)
                 .square()

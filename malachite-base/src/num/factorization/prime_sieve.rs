@@ -34,6 +34,11 @@ pub const SIEVE_2MSK2_U64: u64 = 0x0285021088402120;
 pub const SIEVE_2MSKT_U64: u64 = 0xa41210084421;
 pub const SEED_LIMIT_U64: u64 = 210;
 
+const C70M2U32W: u64 = 70 - (u32::WIDTH << 1);
+const C70MU32W: u64 = 70 - u32::WIDTH;
+const C2U32W: u64 = u32::WIDTH << 1;
+const C3U32WM70: u64 = 3 * u32::WIDTH - 70;
+
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
@@ -57,43 +62,44 @@ fn fill_bitpattern_u32(bit_array: &mut [u32], mut offset: u64) -> u64 {
                     mask |= SIEVE_MASK1_U32 >> offset;
                     mask2 |= SIEVE_MASK2_U32 >> offset;
                 }
-                let tail = if offset <= 70 - 2 * u32::WIDTH {
-                    SIEVE_MASK1_U32 << (70 - 2 * u32::WIDTH - offset) | SIEVE_MASKT_U32 >> offset
+                let tail = if offset <= C70M2U32W {
+                    SIEVE_MASK1_U32 << (C70M2U32W - offset) | SIEVE_MASKT_U32 >> offset
                 } else {
-                    mask2 |= SIEVE_MASK1_U32 << (70 - u32::WIDTH - offset);
-                    SIEVE_MASK1_U32 >> (offset + 2 * u32::WIDTH - 70)
+                    mask2 |= SIEVE_MASK1_U32 << (C70MU32W - offset);
+                    SIEVE_MASK1_U32 >> (offset - C70M2U32W)
                 };
                 (mask, mask2, tail)
-            } else if offset < 2 * u32::WIDTH {
-                let mut mask = SIEVE_MASK2_U32 >> (offset - u32::WIDTH)
-                    | SIEVE_MASKT_U32 << (2 * u32::WIDTH - offset);
-                if offset <= 70 - u32::WIDTH {
-                    let mut tail = SIEVE_MASK2_U32 << (70 - u32::WIDTH - offset);
-                    if offset != 70 - u32::WIDTH {
-                        tail |= SIEVE_MASK1_U32 >> (offset + 2 * u32::WIDTH - 70);
+            } else if offset < C2U32W {
+                let mut mask =
+                    SIEVE_MASK2_U32 >> (offset - u32::WIDTH) | SIEVE_MASKT_U32 << (C2U32W - offset);
+                if offset <= C70MU32W {
+                    let mut tail = SIEVE_MASK2_U32 << (C70MU32W - offset);
+                    if offset != C70MU32W {
+                        tail |= SIEVE_MASK1_U32 >> (offset - C70M2U32W);
                     }
                     (
                         mask,
                         SIEVE_MASKT_U32 >> (offset - u32::WIDTH)
-                            | SIEVE_MASK1_U32 << (70 - u32::WIDTH - offset),
+                            | SIEVE_MASK1_U32 << (C70MU32W - offset),
                         tail,
                     )
                 } else {
-                    mask |= SIEVE_MASK1_U32 << (70 - offset);
+                    let d70_offset = 70 - offset;
+                    let width_m_d70_offset = u32::WIDTH - d70_offset;
+                    mask |= SIEVE_MASK1_U32 << d70_offset;
                     (
                         mask,
-                        SIEVE_MASK2_U32 << (70 - offset)
-                            | SIEVE_MASK1_U32 >> (u32::WIDTH - (70 - offset)),
-                        SIEVE_MASK2_U32 >> (u32::WIDTH - (70 - offset)),
+                        SIEVE_MASK2_U32 << d70_offset | SIEVE_MASK1_U32 >> width_m_d70_offset,
+                        SIEVE_MASK2_U32 >> width_m_d70_offset,
                     )
                 }
             } else {
+                let d70_offset = 70 - offset;
+                let width_m_d70_offset = u32::WIDTH - d70_offset;
                 (
-                    SIEVE_MASK1_U32 << (70 - offset) | SIEVE_MASKT_U32 >> (offset - 2 * u32::WIDTH),
-                    SIEVE_MASK2_U32 << (70 - offset)
-                        | SIEVE_MASK1_U32 >> (offset + u32::WIDTH - 70),
-                    SIEVE_MASKT_U32 << (70 - offset)
-                        | SIEVE_MASK2_U32 >> (offset + u32::WIDTH - 70),
+                    SIEVE_MASK1_U32 << d70_offset | SIEVE_MASKT_U32 >> (offset - C2U32W),
+                    SIEVE_MASK2_U32 << d70_offset | SIEVE_MASK1_U32 >> width_m_d70_offset,
+                    SIEVE_MASKT_U32 << d70_offset | SIEVE_MASK2_U32 >> width_m_d70_offset,
                 )
             }
         } else {
@@ -107,9 +113,9 @@ fn fill_bitpattern_u32(bit_array: &mut [u32], mut offset: u64) -> u64 {
             break;
         }
         xs[1] = mask2;
-        let temp = mask2 >> (3 * u32::WIDTH - 70);
-        mask2 = mask2 << (70 - u32::WIDTH * 2) | mask >> (3 * u32::WIDTH - 70);
-        mask = mask << (70 - u32::WIDTH * 2) | tail;
+        let temp = mask2 >> C3U32WM70;
+        mask2 = mask2 << C70M2U32W | mask >> C3U32WM70;
+        mask = mask << C70M2U32W | tail;
         tail = temp;
         len -= 1;
         if len == 0 {
@@ -118,6 +124,13 @@ fn fill_bitpattern_u32(bit_array: &mut [u32], mut offset: u64) -> u64 {
     }
     2
 }
+
+const C110MU64W: u64 = 110 - u64::WIDTH;
+const C2U64WM110: u64 = (u64::WIDTH << 1) - 110;
+const C182MU64W: u64 = 182 - u64::WIDTH;
+const C182M2U64W: u64 = 182 - (u64::WIDTH << 1);
+const C3U64WM182: u64 = 3 * u64::WIDTH - 182;
+const C2U64W: u64 = u64::WIDTH << 1;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -140,19 +153,19 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
         let (m11, m12) = if m21 != 0 {
             if m21 < u64::WIDTH {
                 let mut m11 = (SIEVE_MASK1_U64 >> m21) | (SIEVE_MASKT_U64 << (u64::WIDTH - m21));
-                if m21 <= 110 - u64::WIDTH {
+                if m21 <= C110MU64W {
                     (
                         m11,
-                        SIEVE_MASK1_U64 << (110 - u64::WIDTH - m21) | SIEVE_MASKT_U64 >> m21,
+                        SIEVE_MASK1_U64 << (C110MU64W - m21) | SIEVE_MASKT_U64 >> m21,
                     )
                 } else {
                     m11 |= SIEVE_MASK1_U64 << (110 - m21);
-                    (m11, SIEVE_MASK1_U64 >> (m21 + u64::WIDTH - 110))
+                    (m11, SIEVE_MASK1_U64 >> (m21 - C110MU64W))
                 }
             } else {
                 (
                     SIEVE_MASK1_U64 << (110 - m21) | SIEVE_MASKT_U64 >> (m21 - u64::WIDTH),
-                    SIEVE_MASKT_U64 << (110 - m21) | SIEVE_MASK1_U64 >> (m21 + u64::WIDTH - 110),
+                    SIEVE_MASKT_U64 << (110 - m21) | SIEVE_MASK1_U64 >> (m21 - C110MU64W),
                 )
             }
         } else {
@@ -168,29 +181,28 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
                         m21 |= SIEVE_2MSK1_U64 >> offset;
                         m22 |= SIEVE_2MSK2_U64 >> offset;
                     }
-                    if offset <= 182 - 2 * u64::WIDTH {
+                    if offset <= C182M2U64W {
                         (
                             m21,
                             m22,
-                            SIEVE_2MSK1_U64 << (182 - 2 * u64::WIDTH - offset)
-                                | SIEVE_2MSKT_U64 >> offset,
+                            SIEVE_2MSK1_U64 << (C182M2U64W - offset) | SIEVE_2MSKT_U64 >> offset,
                         )
                     } else {
-                        m22 |= SIEVE_2MSK1_U64 << (182 - u64::WIDTH - offset);
-                        (m21, m22, SIEVE_2MSK1_U64 >> (offset + 2 * u64::WIDTH - 182))
+                        m22 |= SIEVE_2MSK1_U64 << (C182MU64W - offset);
+                        (m21, m22, SIEVE_2MSK1_U64 >> (offset - C182M2U64W))
                     }
-                } else if offset < 2 * u64::WIDTH {
+                } else if offset < C2U64W {
                     m21 = SIEVE_2MSK2_U64 >> (offset - u64::WIDTH)
-                        | SIEVE_2MSKT_U64 << (2 * u64::WIDTH - offset);
-                    if offset <= 182 - u64::WIDTH {
-                        let mut m23 = SIEVE_2MSK2_U64 << (182 - u64::WIDTH - offset);
-                        if offset != 182 - u64::WIDTH {
-                            m23 |= SIEVE_2MSK1_U64 >> (offset + 2 * u64::WIDTH - 182);
+                        | SIEVE_2MSKT_U64 << (C2U64W - offset);
+                    if offset <= C182MU64W {
+                        let mut m23 = SIEVE_2MSK2_U64 << (C182MU64W - offset);
+                        if offset != C182MU64W {
+                            m23 |= SIEVE_2MSK1_U64 >> (offset - C182M2U64W);
                         }
                         (
                             m21,
                             SIEVE_2MSKT_U64 >> (offset - u64::WIDTH)
-                                | SIEVE_2MSK1_U64 << (182 - u64::WIDTH - offset),
+                                | SIEVE_2MSK1_U64 << (C182MU64W - offset),
                             m23,
                         )
                     } else {
@@ -198,18 +210,15 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
                         (
                             m21,
                             SIEVE_2MSK2_U64 << (182 - offset)
-                                | SIEVE_2MSK1_U64 >> (u64::WIDTH + offset - 182),
-                            SIEVE_2MSK2_U64 >> (u64::WIDTH + offset - 182),
+                                | SIEVE_2MSK1_U64 >> (offset - C182MU64W),
+                            SIEVE_2MSK2_U64 >> (offset - C182MU64W),
                         )
                     }
                 } else {
                     (
-                        SIEVE_2MSK1_U64 << (182 - offset)
-                            | SIEVE_2MSKT_U64 >> (offset - 2 * u64::WIDTH),
-                        SIEVE_2MSK2_U64 << (182 - offset)
-                            | SIEVE_2MSK1_U64 >> (offset + u64::WIDTH - 182),
-                        SIEVE_2MSKT_U64 << (182 - offset)
-                            | SIEVE_2MSK2_U64 >> (offset + u64::WIDTH - 182),
+                        SIEVE_2MSK1_U64 << (182 - offset) | SIEVE_2MSKT_U64 >> (offset - C2U64W),
+                        SIEVE_2MSK2_U64 << (182 - offset) | SIEVE_2MSK1_U64 >> (offset - C182MU64W),
+                        SIEVE_2MSKT_U64 << (182 - offset) | SIEVE_2MSK2_U64 >> (offset - C182MU64W),
                     )
                 }
             } else {
@@ -223,16 +232,16 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
         if len == 0 {
             break;
         }
-        let temp = m11 >> (2 * u64::WIDTH - 110);
-        m11 = (m11 << (110 - u64::WIDTH)) | m12;
+        let temp = m11 >> C2U64WM110;
+        m11 = (m11 << C110MU64W) | m12;
         m12 = temp;
         xs[1] = m11 | m22;
-        let temp = m11 >> (2 * u64::WIDTH - 110);
-        m11 = (m11 << (110 - u64::WIDTH)) | m12;
+        let temp = m11 >> C2U64WM110;
+        m11 = (m11 << C110MU64W) | m12;
         m12 = temp;
-        let temp = m22 >> (3 * u64::WIDTH - 182);
-        m22 = m22 << (182 - u64::WIDTH * 2) | m21 >> (3 * u64::WIDTH - 182);
-        m21 = m21 << (182 - u64::WIDTH * 2) | m23;
+        let temp = m22 >> C3U64WM182;
+        m22 = m22 << C182M2U64W | m21 >> C3U64WM182;
+        m21 = m21 << C182M2U64W | m23;
         m23 = temp;
         len -= 1;
         if len == 0 {

@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// [`Factor`](traits::Factor), a trait for computing the prime factorization of a number.
+pub mod factor;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
 /// An efficient prime sieve.

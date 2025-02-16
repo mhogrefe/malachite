@@ -260,6 +260,57 @@ pub fn sqrt_rem_newton<
     (sqrt, n - square)
 }
 
+// Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
+//
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_sqrtrem2` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
+pub fn sqrt_rem_2_newton<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    n_hi: U,
+    n_lo: U,
+) -> (U, bool, U) {
+    assert!(n_hi.leading_zeros() < 2);
+    let (mut sqrt, mut r_lo) = sqrt_rem_newton::<U, S>(n_hi);
+    let prec = U::WIDTH >> 1;
+    let prec_p_1: u64 = prec + 1;
+    let prec_m_1: u64 = prec - 1;
+    // r_lo <= 2 * sqrt < 2 ^ (prec + 1)
+    r_lo = (r_lo << prec_m_1) | (n_lo >> prec_p_1);
+    let mut q = r_lo / sqrt;
+    // q <= 2 ^ prec, if q = 2 ^ prec, reduce the overestimate.
+    q -= q >> prec;
+    // now we have q < 2 ^ prec
+    let u = r_lo - q * sqrt;
+    // now we have (rp_lo << prec + n_lo >> prec) / 2 = q * sqrt + u
+    sqrt = (sqrt << prec) | q;
+    let mut r_hi = (u >> prec_m_1) + U::ONE;
+    r_lo = (u << prec_p_1) | (n_lo.mod_power_of_2(prec_p_1));
+    let q_squared = q.square();
+    if r_lo < q_squared {
+        assert_ne!(r_hi, U::ZERO);
+        r_hi -= U::ONE;
+    }
+    r_lo.wrapping_sub_assign(q_squared);
+    if r_hi == U::ZERO {
+        r_lo.wrapping_add_assign(sqrt);
+        if r_lo < sqrt {
+            r_hi += U::ONE;
+        }
+        sqrt -= U::ONE;
+        r_lo.wrapping_add_assign(sqrt);
+        if r_lo < sqrt {
+            r_hi += U::ONE;
+        }
+    }
+    r_hi -= U::ONE;
+    assert!(r_hi < U::TWO);
+    (sqrt, r_hi == U::ONE, r_lo)
+}
+
 // This is equivalent to `n_sqrt` from `ulong_extras/sqrt.c`, FLINT 2.7.1.
 fn floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,

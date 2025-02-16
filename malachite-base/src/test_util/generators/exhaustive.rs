@@ -2870,6 +2870,14 @@ pub fn exhaustive_unsigned_triple_gen_var_20<T: PrimitiveUnsigned>() -> It<(T, T
     ))
 }
 
+pub fn exhaustive_unsigned_triple_gen_var_21<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, T, U)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(

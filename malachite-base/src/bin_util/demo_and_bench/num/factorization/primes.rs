@@ -15,7 +15,9 @@ use malachite_base::num::factorization::primes::{
 use malachite_base::test_util::bench::bucketers::unsigned_direct_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::unsigned_gen_var_5;
+use malachite_base::test_util::generators::{
+    unsigned_gen_var_5, unsigned_pair_gen_var_28, unsigned_triple_gen_var_24,
+};
 use malachite_base::test_util::num::factorization::primes::primes_naive;
 use malachite_base::test_util::runner::Runner;
 
@@ -26,6 +28,42 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_prime_indicator_sequence_less_than);
     register_demo!(runner, demo_prime_indicator_sequence_less_than_or_equal_to);
     register_demo!(runner, demo_prime_indicator_sequence);
+    runner.register_demo(
+        "demo_primes_less_than_jump_after_u8",
+        &demo_primes_less_than_jump_after::<u8>,
+    );
+    runner.register_demo(
+        "demo_primes_less_than_jump_after_u16",
+        &demo_primes_less_than_jump_after::<u16>,
+    );
+    runner.register_demo(
+        "demo_primes_less_than_jump_after_u32",
+        &demo_primes_less_than_jump_after::<u32>,
+    );
+    runner.register_demo(
+        "demo_primes_less_than_jump_after_u64",
+        &demo_primes_less_than_jump_after::<u64>,
+    );
+    runner.register_demo(
+        "demo_primes_less_than_jump_after_u128",
+        &demo_primes_less_than_jump_after::<u128>,
+    );
+    runner.register_demo(
+        "demo_primes_less_than_jump_after_usize",
+        &demo_primes_less_than_jump_after::<usize>,
+    );
+    runner.register_demo("demo_primes_jump_after_u8", &demo_primes_jump_after::<u8>);
+    runner.register_demo("demo_primes_jump_after_u16", &demo_primes_jump_after::<u16>);
+    runner.register_demo("demo_primes_jump_after_u32", &demo_primes_jump_after::<u32>);
+    runner.register_demo("demo_primes_jump_after_u64", &demo_primes_jump_after::<u64>);
+    runner.register_demo(
+        "demo_primes_jump_after_u128",
+        &demo_primes_jump_after::<u128>,
+    );
+    runner.register_demo(
+        "demo_primes_jump_after_usize",
+        &demo_primes_jump_after::<usize>,
+    );
 
     register_unsigned_benches!(runner, benchmark_primes_less_than_algorithms);
     register_unsigned_benches!(runner, benchmark_primes_less_than_algorithms_2);
@@ -95,6 +133,58 @@ fn demo_prime_indicator_sequence_less_than_or_equal_to(
 fn demo_prime_indicator_sequence(_gm: GenMode, _config: &GenConfig, limit: usize) {
     for b in prime_indicator_sequence().take(limit) {
         println!("{b}");
+    }
+}
+
+fn demo_primes_less_than_jump_after<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    let mut config = config.clone();
+    config.insert("mean_small_n", 10000);
+    for (size, jump, skip) in unsigned_triple_gen_var_24::<T, usize>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let mut ps = T::primes_less_than(&size);
+        for _ in 0..skip {
+            ps.next();
+        }
+        if ps.jump_after(jump) {
+            let next = ps.next().unwrap();
+            println!(
+                "Created iterator less than {size}, skipped {skip}, jumped after {jump}, \
+                then returned {next}"
+            );
+        } else {
+            println!(
+                "Created iterator less than {size}, skipped {skip}, and jumped after {jump}, \
+                which was too far"
+            );
+        }
+    }
+}
+
+fn demo_primes_jump_after<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    let mut config = config.clone();
+    config.insert("mean_small_n", 10000);
+    for (jump, skip) in unsigned_pair_gen_var_28::<T, usize>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let mut ps = T::primes();
+        for _ in 0..skip {
+            ps.next();
+        }
+        if ps.jump_after(jump) {
+            let next = ps.next().unwrap();
+            println!("Created iterator, skipped {skip}, jumped after {jump}, then returned {next}");
+        } else {
+            println!(
+                "Created iterator, skipped {skip}, and jumped after {jump}, which was too far"
+            );
+        }
     }
 }
 

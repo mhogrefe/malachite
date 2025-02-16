@@ -215,9 +215,9 @@ dependencies = [
 
 [[package]]
 name = "csv-core"
-version = "0.1.11"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5efa2b3d7902f4b634a20cae3c9c4e6209dc4779feb6863329607560143efa70"
+checksum = "7d02f3b0da4c6504f86e9cd789d8dbafab48c2321be74e9987593de5a894d93d"
 dependencies = [
  "memchr",
 ]
@@ -437,7 +437,7 @@ checksum = "04cbf5b083de1c7e0222a7a51dbfdba1cbe1c6ab0b15e29fff3f6c077fd9cd9f"
 
 [[package]]
 name = "malachite"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "embed-doc-image",
  "malachite-base",
@@ -449,7 +449,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "clap",
  "getrandom",
@@ -469,7 +469,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-bigint"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "derive_more",
  "malachite-base",
@@ -482,7 +482,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-criterion-bench"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "criterion",
  "malachite-base",
@@ -493,7 +493,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -508,7 +508,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "embed-doc-image",
  "indoc",
@@ -526,7 +526,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "itertools 0.11.0",
  "malachite-base",
@@ -643,9 +643,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.20.2"
+version = "1.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
+checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "oorandom"
@@ -989,9 +989,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.13.2"
+version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
+checksum = "7fcf8323ef1faaee30a44a340193b1ac6814fd9b7b4e88e9d4519a3e4abe1cfd"
 
 [[package]]
 name = "strsim"

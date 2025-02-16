@@ -492,6 +492,7 @@ fn is_prime_helper<T: IsPrime + PrimitiveUnsigned>() {
     test(6855593, true);
     // - !n_is_strong_probabprime_precomp_u64(n, npre, 2, d) in n_is_probabprime_bpsw_u64
     test(1050535501, false);
+    test(1114427291855351, true);
 }
 
 #[test]
