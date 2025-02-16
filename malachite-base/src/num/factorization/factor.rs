@@ -386,7 +386,7 @@ fn factor_one_line_u64(mut n: u64, iters: usize) -> u64 {
 fn wyhash64(seed: &mut u64) -> u64 {
     seed.wrapping_add_assign(0x60bee2bee120fc15);
     let tmp = u128::from(*seed) * 0xa3b195354a39b70d;
-    let tmp = ((tmp >> 64) ^ tmp) * 0x1b03738712fad5c9;
+    let tmp = ((tmp >> 64) ^ tmp).wrapping_mul(0x1b03738712fad5c9);
     u64::wrapping_from((tmp >> 64) ^ tmp)
 }
 
