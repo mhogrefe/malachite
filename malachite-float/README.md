@@ -1,5 +1,5 @@
 - [crates.io](https://crates.io/crates/malachite-float)
-- [docs.rs](https://docs.rs/malachite-base/latest/malachite_float/)
+- [docs.rs](https://docs.rs/malachite-float/latest/malachite_float/)
 
 Rather than using this crate directly, use the
 [`malachite`](https://crates.io/crates/malachite) meta-crate. It re-exports all of this crate's
