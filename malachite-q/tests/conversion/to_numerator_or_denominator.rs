@@ -12,8 +12,8 @@ use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen;
 use num::{BigRational, Signed};
 use std::str::FromStr;
 

@@ -244,16 +244,16 @@ impl Natural {
     }
 
     fn or_limb_ref(&self, other: Limb) -> Natural {
-        Natural(match *self {
+        Natural(match self {
             Natural(Small(small)) => Small(small | other),
-            Natural(Large(ref limbs)) => Large(limbs_or_limb(limbs, other)),
+            Natural(Large(limbs)) => Large(limbs_or_limb(limbs, other)),
         })
     }
 
     fn or_assign_limb(&mut self, other: Limb) {
-        match *self {
-            Natural(Small(ref mut small)) => *small |= other,
-            Natural(Large(ref mut limbs)) => limbs_or_limb_in_place(limbs, other),
+        match self {
+            Natural(Small(small)) => *small |= other,
+            Natural(Large(limbs)) => limbs_or_limb_in_place(limbs, other),
         }
     }
 }
@@ -399,7 +399,7 @@ impl BitOr<&Natural> for &Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.or_limb_ref(y),
             (&Natural(Small(x)), y) => y.or_limb_ref(x),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => Natural(Large(limbs_or(xs, ys))),
+            (Natural(Large(xs)), Natural(Large(ys))) => Natural(Large(limbs_or(xs, ys))),
         }
     }
 }
@@ -431,8 +431,8 @@ impl BitOrAssign<Natural> for Natural {
     fn bitor_assign(&mut self, mut other: Natural) {
         match (&mut *self, &mut other) {
             (_, Natural(Small(y))) => self.or_assign_limb(*y),
-            (Natural(Small(ref mut x)), _) => *self = other.or_limb(*x),
-            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+            (Natural(Small(x)), _) => *self = other.or_limb(*x),
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 if limbs_or_in_place_either(xs, ys) {
                     swap(xs, ys);
                 }
@@ -467,8 +467,8 @@ impl<'a> BitOrAssign<&'a Natural> for Natural {
     fn bitor_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {
             (_, Natural(Small(y))) => self.or_assign_limb(*y),
-            (Natural(Small(ref mut x)), _) => *self = other.or_limb_ref(*x),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+            (Natural(Small(x)), _) => *self = other.or_limb_ref(*x),
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 limbs_or_in_place_left(xs, ys);
             }
         }

@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::test_util::generators::common::{
     rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
     rational_pair_1_rm, rational_pair_nm, rational_pair_nrm, rational_pair_rm, rational_rm,
@@ -14,7 +15,6 @@ use crate::test_util::generators::common::{
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
-use crate::Rational;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -102,8 +102,8 @@ where
 }
 
 // All `Rational`s that are not equal to any primitive float of type `T`.
-pub fn rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat>(
-) -> Generator<Rational> {
+pub fn rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat>()
+-> Generator<Rational> {
     Generator::new(
         &exhaustive_rational_gen_var_5::<T>,
         &random_rational_gen_var_5::<T>,
@@ -147,8 +147,8 @@ pub fn rational_integer_pair_gen() -> Generator<(Rational, Integer)> {
     )
 }
 
-pub fn rational_integer_pair_gen_rm(
-) -> Generator<((rug::Rational, rug::Integer), (Rational, Integer))> {
+pub fn rational_integer_pair_gen_rm()
+-> Generator<((rug::Rational, rug::Integer), (Rational, Integer))> {
     Generator::new(
         &|| rational_integer_pair_rm(exhaustive_rational_integer_pair_gen()),
         &|config| rational_integer_pair_rm(random_rational_integer_pair_gen(config)),
@@ -176,8 +176,8 @@ pub fn rational_natural_pair_gen() -> Generator<(Rational, Natural)> {
     )
 }
 
-pub fn rational_natural_pair_gen_rm(
-) -> Generator<((rug::Rational, rug::Integer), (Rational, Natural))> {
+pub fn rational_natural_pair_gen_rm()
+-> Generator<((rug::Rational, rug::Integer), (Rational, Natural))> {
     Generator::new(
         &|| rational_natural_pair_rm(exhaustive_rational_natural_pair_gen()),
         &|config| rational_natural_pair_rm(random_rational_natural_pair_gen(config)),
@@ -252,8 +252,8 @@ pub fn rational_primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(Rati
     )
 }
 
-pub fn rational_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
-) -> Generator<((rug::Rational, T), (Rational, T))> {
+pub fn rational_primitive_float_pair_gen_rm<T: PrimitiveFloat>()
+-> Generator<((rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_rm(exhaustive_rational_primitive_float_pair_gen()),
         &|config| rational_pair_1_rm(random_rational_primitive_float_pair_gen(config)),
@@ -263,8 +263,8 @@ pub fn rational_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
 
 // -- (Rational, PrimitiveFloat, PrimitiveFloat) --
 
-pub fn rational_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> Generator<(Rational, T, T)> {
+pub fn rational_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> Generator<(Rational, T, T)> {
     Generator::new(
         &exhaustive_rational_primitive_float_primitive_float_triple_gen,
         &random_rational_primitive_float_primitive_float_triple_gen,
@@ -282,8 +282,8 @@ pub fn rational_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(Rational, T)
     )
 }
 
-pub fn rational_signed_pair_gen_rm<T: PrimitiveSigned>(
-) -> Generator<((rug::Rational, T), (Rational, T))> {
+pub fn rational_signed_pair_gen_rm<T: PrimitiveSigned>()
+-> Generator<((rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_rm(exhaustive_rational_signed_pair_gen()),
         &|config| rational_pair_1_rm(random_rational_primitive_int_pair_gen(config)),
@@ -300,8 +300,8 @@ pub fn rational_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(Ration
     )
 }
 
-pub fn rational_signed_pair_gen_var_1_rm<T: PrimitiveSigned>(
-) -> Generator<((rug::Rational, T), (Rational, T))> {
+pub fn rational_signed_pair_gen_var_1_rm<T: PrimitiveSigned>()
+-> Generator<((rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_rm(exhaustive_rational_signed_pair_gen_var_1()),
         &|config| rational_pair_1_rm(random_rational_signed_pair_gen_var_1(config)),
@@ -319,8 +319,8 @@ pub fn rational_signed_pair_gen_var_2<T: PrimitiveSigned>() -> Generator<(Ration
     )
 }
 
-pub fn rational_signed_pair_gen_var_2_nrm<T: PrimitiveSigned>(
-) -> Generator<((BigRational, T), (rug::Rational, T), (Rational, T))> {
+pub fn rational_signed_pair_gen_var_2_nrm<T: PrimitiveSigned>()
+-> Generator<((BigRational, T), (rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_nrm(exhaustive_rational_signed_pair_gen_var_2()),
         &|config| rational_pair_1_nrm(random_rational_signed_pair_gen_var_2(config)),
@@ -400,8 +400,8 @@ pub fn rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned>() -> Generato
 
 // All `(Rational, T, U)` where `T` is small and signed, and positive and `U` is small, unsigned,
 // and positive.
-pub fn rational_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
-) -> Generator<(Rational, T, U)> {
+pub fn rational_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>()
+-> Generator<(Rational, T, U)> {
     Generator::new(
         &exhaustive_rational_signed_unsigned_triple_gen_var_1,
         &random_rational_signed_unsigned_triple_gen_var_1,
@@ -419,8 +419,8 @@ pub fn rational_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(Rational
     )
 }
 
-pub fn rational_unsigned_pair_gen_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Rational, T), (Rational, T))> {
+pub fn rational_unsigned_pair_gen_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_rm(exhaustive_rational_unsigned_pair_gen()),
         &|config| rational_pair_1_rm(random_rational_primitive_int_pair_gen(config)),
@@ -437,8 +437,8 @@ pub fn rational_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Ra
     )
 }
 
-pub fn rational_unsigned_pair_gen_var_1_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Rational, T), (Rational, T))> {
+pub fn rational_unsigned_pair_gen_var_1_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_rm(exhaustive_rational_unsigned_pair_gen_var_1()),
         &|config| rational_pair_1_rm(random_rational_unsigned_pair_gen_var_1(config)),
@@ -446,8 +446,8 @@ pub fn rational_unsigned_pair_gen_var_1_rm<T: PrimitiveUnsigned>(
     )
 }
 
-pub fn rational_unsigned_pair_gen_var_1_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigRational, T), (rug::Rational, T), (Rational, T))> {
+pub fn rational_unsigned_pair_gen_var_1_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigRational, T), (rug::Rational, T), (Rational, T))> {
     Generator::new(
         &|| rational_pair_1_nrm(exhaustive_rational_unsigned_pair_gen_var_1()),
         &|config| rational_pair_1_nrm(random_rational_unsigned_pair_gen_var_1(config)),
@@ -513,8 +513,8 @@ pub fn rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generato
 }
 
 // All `(Rational, T, T)` where `T` is unsigned and both `T`s are small.
-pub fn rational_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Rational, T, T)> {
+pub fn rational_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Rational, T, T)> {
     Generator::new(
         &exhaustive_rational_unsigned_unsigned_triple_gen_var_1,
         &random_rational_unsigned_unsigned_triple_gen_var_1,
@@ -569,8 +569,8 @@ pub fn rational_pair_gen_var_1() -> Generator<(Rational, Rational)> {
     )
 }
 
-pub fn rational_pair_gen_var_1_rm(
-) -> Generator<((rug::Rational, rug::Rational), (Rational, Rational))> {
+pub fn rational_pair_gen_var_1_rm()
+-> Generator<((rug::Rational, rug::Rational), (Rational, Rational))> {
     Generator::new(
         &|| rational_pair_rm(exhaustive_rational_pair_gen_var_1()),
         &|config| rational_pair_rm(random_rational_pair_gen_var_1(config)),
@@ -677,8 +677,8 @@ pub fn rational_rational_natural_triple_gen_var_1() -> Generator<(Rational, Rati
 // -- (Rational, Rational, Natural, Natural) --
 
 // All `(Rational, Rational, Natural, Natural)` where the last `Natural` is positive.
-pub fn rational_rational_natural_natural_quadruple_gen_var_1(
-) -> Generator<(Rational, Rational, Natural, Natural)> {
+pub fn rational_rational_natural_natural_quadruple_gen_var_1()
+-> Generator<(Rational, Rational, Natural, Natural)> {
     Generator::new(
         &exhaustive_rational_rational_natural_natural_quadruple_gen_var_1,
         &random_rational_rational_natural_natural_quadruple_gen_var_1,
@@ -688,8 +688,8 @@ pub fn rational_rational_natural_natural_quadruple_gen_var_1(
 
 // -- (Rational, Rational, PrimitiveFloat) --
 
-pub fn rational_rational_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> Generator<(Rational, Rational, T)> {
+pub fn rational_rational_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> Generator<(Rational, Rational, T)> {
     Generator::new(
         &exhaustive_rational_rational_primitive_float_triple_gen,
         &random_rational_rational_primitive_float_triple_gen,
@@ -699,8 +699,8 @@ pub fn rational_rational_primitive_float_triple_gen<T: PrimitiveFloat>(
 
 // -- (Rational, Rational, PrimitiveUnsigned) --
 
-pub fn rational_rational_unsigned_triple_gen<T: PrimitiveUnsigned>(
-) -> Generator<(Rational, Rational, T)> {
+pub fn rational_rational_unsigned_triple_gen<T: PrimitiveUnsigned>()
+-> Generator<(Rational, Rational, T)> {
     Generator::new(
         &exhaustive_rational_rational_unsigned_triple_gen,
         &random_rational_rational_primitive_int_triple_gen,
@@ -709,8 +709,8 @@ pub fn rational_rational_unsigned_triple_gen<T: PrimitiveUnsigned>(
 }
 
 // All `(Rational, Rational, T)` where `T` is unsigned and small.
-pub fn rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Rational, Rational, T)> {
+pub fn rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Rational, Rational, T)> {
     Generator::new(
         &exhaustive_rational_rational_unsigned_triple_gen_var_1,
         &random_rational_rational_unsigned_triple_gen_var_1,
@@ -720,8 +720,8 @@ pub fn rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
 
 // -- (Rational, Rational, PrimitiveSigned) --
 
-pub fn rational_rational_signed_triple_gen<T: PrimitiveSigned>(
-) -> Generator<(Rational, Rational, T)> {
+pub fn rational_rational_signed_triple_gen<T: PrimitiveSigned>()
+-> Generator<(Rational, Rational, T)> {
     Generator::new(
         &exhaustive_rational_rational_signed_triple_gen,
         &random_rational_rational_primitive_int_triple_gen,
@@ -731,8 +731,8 @@ pub fn rational_rational_signed_triple_gen<T: PrimitiveSigned>(
 
 // All `(Rational, Rational, T)` where `T` is signed and small, and if `T` is negative, neither
 // `Rational` is zero.
-pub fn rational_rational_signed_triple_gen_var_1<T: PrimitiveSigned>(
-) -> Generator<(Rational, Rational, T)> {
+pub fn rational_rational_signed_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(Rational, Rational, T)> {
     Generator::new(
         &exhaustive_rational_rational_signed_triple_gen_var_1,
         &random_rational_rational_signed_triple_gen_var_1,
@@ -781,8 +781,8 @@ pub fn rational_triple_gen_var_3() -> Generator<(Rational, Rational, Rational)> 
 
 // All `(Rational, Rational, RoundingMode)` triples that are a valid input to
 // `Rational::round_to_multiple`.
-pub fn rational_rational_rounding_mode_triple_gen_var_1(
-) -> Generator<(Rational, Rational, RoundingMode)> {
+pub fn rational_rational_rounding_mode_triple_gen_var_1()
+-> Generator<(Rational, Rational, RoundingMode)> {
     Generator::new(
         &exhaustive_rational_rational_rounding_mode_triple_gen_var_1,
         &random_rational_rational_rounding_mode_triple_gen_var_1,

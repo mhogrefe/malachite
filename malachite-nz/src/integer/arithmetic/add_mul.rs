@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer::Integer;
 use crate::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
     limbs_overflowing_sub_mul_limb_in_place_left,
 };
-use crate::integer::Integer;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
@@ -25,7 +25,7 @@ impl Natural {
             (x, &Natural::ZERO, _) | (x, _, 0) => (x.clone(), true),
             (x, y, 1) if x >= y => (x - y, true),
             (x, y, 1) => (y - x, false),
-            (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
+            (Natural(Large(xs)), Natural(Large(ys)), z) => {
                 let (out_limbs, sign) = limbs_overflowing_sub_mul_limb(xs, ys, z);
                 (Natural::from_owned_limbs_asc(out_limbs), sign)
             }
@@ -52,7 +52,7 @@ impl Natural {
                 x.sub_right_assign_no_panic(&*y);
                 false
             }
-            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
+            (Natural(Large(xs)), Natural(Large(ys)), z) => {
                 let (right, sign) = limbs_overflowing_sub_mul_limb_in_place_either(xs, ys, z);
                 if right {
                     b.trim();
@@ -87,7 +87,7 @@ impl Natural {
                 x.sub_right_assign_no_panic(y);
                 false
             }
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
+            (Natural(Large(xs)), Natural(Large(ys)), z) => {
                 let sign = limbs_overflowing_sub_mul_limb_in_place_left(xs, ys, z);
                 self.trim();
                 sign
@@ -111,7 +111,7 @@ impl Natural {
             (x, &Natural(Small(y)), z) => x.add_mul_limb_neg(z, y),
             (x, y, &Natural(Small(z))) => x.add_mul_limb_neg(y, z),
             (&Natural(Small(x)), y, z) => ((y * z).sub_limb(x), false),
-            (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
                 let (out_limbs, sign) = limbs_overflowing_sub_mul(xs, ys, zs);
                 (Natural::from_owned_limbs_asc(out_limbs), sign)
             }
@@ -134,9 +134,7 @@ impl Natural {
                 *self = y * z;
                 false
             }
-            (_, Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
+            (_, Natural(Large(ys)), Natural(Large(zs))) => self.add_mul_assign_neg_large(&ys, &zs),
         }
     }
 
@@ -149,9 +147,7 @@ impl Natural {
                 *self = y * z;
                 false
             }
-            (_, Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
+            (_, Natural(Large(ys)), Natural(Large(zs))) => self.add_mul_assign_neg_large(&ys, zs),
         }
     }
 
@@ -164,9 +160,7 @@ impl Natural {
                 *self = y * z;
                 false
             }
-            (_, &Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
+            (_, Natural(Large(ys)), Natural(Large(zs))) => self.add_mul_assign_neg_large(ys, &zs),
         }
     }
 
@@ -179,9 +173,7 @@ impl Natural {
                 *self = y * z;
                 false
             }
-            (_, &Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
+            (_, Natural(Large(ys)), Natural(Large(zs))) => self.add_mul_assign_neg_large(ys, zs),
         }
     }
 }

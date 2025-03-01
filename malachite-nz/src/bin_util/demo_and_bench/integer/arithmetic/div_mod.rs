@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     DivRound, Mod,
 };
 use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::{
@@ -434,10 +434,9 @@ fn benchmark_integer_ceiling_div_mod_library_comparison(
         file_name,
         &pair_2_pair_1_integer_bit_bucketer("x"),
         &mut [
-            (
-                "Malachite",
-                &mut |(_, (x, y))| no_out!(x.ceiling_div_mod(y)),
-            ),
+            ("Malachite", &mut |(_, (x, y))| {
+                no_out!(x.ceiling_div_mod(y))
+            }),
             ("rug", &mut |((x, y), _)| no_out!(x.div_rem_ceil(y))),
         ],
     );

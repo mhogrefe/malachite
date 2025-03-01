@@ -11,7 +11,7 @@ use crate::iterators::iterator_cache::IteratorCache;
 use crate::num::arithmetic::traits::CheckedPow;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
-use crate::num::random::{random_unsigned_range, RandomUnsignedRange};
+use crate::num::random::{RandomUnsignedRange, random_unsigned_range};
 use crate::random::Seed;
 use crate::tuples::exhaustive::clone_helper;
 use crate::tuples::random::next_helper;

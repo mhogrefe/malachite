@@ -14,10 +14,10 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::{
-    float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero, Float,
+    Float, float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero,
 };
-use core::cmp::max;
 use core::cmp::Ordering::{self, *};
+use core::cmp::max;
 use core::ops::{Sub, SubAssign};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, NegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;

@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer::Integer;
 use crate::integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement, limbs_twos_complement_in_place,
 };
-use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;

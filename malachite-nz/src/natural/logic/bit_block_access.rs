@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::logic::not::limbs_not_in_place;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
@@ -223,9 +223,9 @@ impl BitBlockAccess for Natural {
     /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(10, 10), 0);
     /// ```
     fn get_bits(&self, start: u64, end: u64) -> Natural {
-        match *self {
+        match self {
             Natural(Small(small)) => Natural(Small(small.get_bits(start, end))),
-            Natural(Large(ref limbs)) => {
+            Natural(Large(limbs)) => {
                 Natural::from_owned_limbs_asc(limbs_slice_get_bits(limbs, start, end))
             }
         }
@@ -350,7 +350,7 @@ impl BitBlockAccess for Natural {
         if start == end {
             return;
         }
-        if let Natural(Small(ref mut small_self)) = self {
+        if let Natural(Small(small_self)) = self {
             if let Natural(Small(small_bits)) = bits {
                 let bits_width = end - start;
                 let small_bits = small_bits.mod_power_of_2(bits_width);
@@ -361,9 +361,9 @@ impl BitBlockAccess for Natural {
             }
         }
         let limbs = self.promote_in_place();
-        match *bits {
-            Natural(Small(small_bits)) => limbs_assign_bits(limbs, start, end, &[small_bits]),
-            Natural(Large(ref bits_limbs)) => limbs_assign_bits(limbs, start, end, bits_limbs),
+        match bits {
+            Natural(Small(small_bits)) => limbs_assign_bits(limbs, start, end, &[*small_bits]),
+            Natural(Large(bits_limbs)) => limbs_assign_bits(limbs, start, end, bits_limbs),
         }
         self.trim();
     }

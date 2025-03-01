@@ -10,8 +10,8 @@ use itertools::Itertools;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 
 fn expected_range_len(a: &Natural, b: &Natural) -> usize {
     usize::exact_from(b) - usize::exact_from(a) + 1

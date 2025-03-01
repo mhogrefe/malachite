@@ -12,19 +12,19 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, triple_1_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_pair_gen_var_16, unsigned_vec_unsigned_pair_gen_var_20,
     unsigned_vec_unsigned_rounding_mode_triple_gen_var_2,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::shr_round::{
     limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_vec_shr_exact_in_place, limbs_vec_shr_round_in_place,
     limbs_vec_shr_round_nearest_in_place, limbs_vec_shr_round_up_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::triple_1_natural_bit_bucketer;
 use malachite_nz::test_util::generators::{
     natural_signed_rounding_mode_triple_gen_var_2, natural_unsigned_rounding_mode_triple_gen_var_1,

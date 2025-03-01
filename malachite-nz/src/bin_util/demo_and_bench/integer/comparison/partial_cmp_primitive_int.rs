@@ -8,7 +8,7 @@
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
@@ -127,10 +127,9 @@ fn benchmark_integer_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsigne
         file_name,
         &triple_3_pair_1_integer_bit_bucketer("x"),
         &mut [
-            (
-                "Malachite",
-                &mut |(_, _, (x, y))| no_out!(x.partial_cmp(&y)),
-            ),
+            ("Malachite", &mut |(_, _, (x, y))| {
+                no_out!(x.partial_cmp(&y))
+            }),
             ("num", &mut |((x, y), _, _)| {
                 no_out!(num_partial_cmp_primitive(&x, y))
             }),

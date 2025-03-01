@@ -11,9 +11,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
@@ -134,11 +134,11 @@ pub_test! {limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -
 
 impl Natural {
     fn eq_mod_power_of_2_neg_limb(&self, other: Limb, pow: u64) -> bool {
-        match *self {
-            Natural(Small(ref small)) => {
+        match self {
+            Natural(Small(small)) => {
                 pow <= Limb::WIDTH && small.wrapping_neg().eq_mod_power_of_2(other, pow)
             }
-            Natural(Large(ref limbs)) => limbs_eq_mod_power_of_2_neg_limb(limbs, other, pow),
+            Natural(Large(limbs)) => limbs_eq_mod_power_of_2_neg_limb(limbs, other, pow),
         }
     }
 
@@ -146,7 +146,7 @@ impl Natural {
         match (self, other) {
             (_, &Natural(Small(y))) => self.eq_mod_power_of_2_neg_limb(y, pow),
             (&Natural(Small(x)), _) => other.eq_mod_power_of_2_neg_limb(x, pow),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 limbs_eq_mod_power_of_2_neg_pos(xs, ys, pow)
             }
         }

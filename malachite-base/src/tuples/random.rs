@@ -8,7 +8,7 @@
 
 use crate::random::Seed;
 use std::cmp::Ordering::*;
-use std::iter::{repeat, Repeat};
+use std::iter::{Repeat, repeat};
 
 /// Generates random units; repeats `()`.
 ///

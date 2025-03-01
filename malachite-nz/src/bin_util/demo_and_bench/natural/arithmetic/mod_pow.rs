@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign};
 use malachite_base::test_util::bench::bucketers::quadruple_4_vec_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::mod_pow::{
@@ -314,10 +314,9 @@ fn benchmark_natural_mod_pow_library_comparison(
             ("Malachite", &mut |(_, _, (x, exp, m))| {
                 no_out!(x.mod_pow(exp, m))
             }),
-            (
-                "num",
-                &mut |((x, exp, m), _, _)| no_out!(x.modpow(&exp, &m)),
-            ),
+            ("num", &mut |((x, exp, m), _, _)| {
+                no_out!(x.modpow(&exp, &m))
+            }),
             ("rug", &mut |(_, (x, exp, m), _)| {
                 no_out!(x.pow_mod(&exp, &m).unwrap())
             }),

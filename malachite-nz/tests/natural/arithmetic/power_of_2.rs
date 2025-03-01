@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
-use malachite_base::test_util::generators::{unsigned_gen_var_15, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_15};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use itertools::{assert_equal, Itertools};
+use itertools::{Itertools, assert_equal};
 use malachite_base::bools::random::random_bools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -14,7 +14,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_unsigned_bit_chunks;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::{
-    uniform_primitive_int_assertions, CheckedToF64, MomentStats,
+    CheckedToF64, MomentStats, uniform_primitive_int_assertions,
 };
 use std::panic::catch_unwind;
 

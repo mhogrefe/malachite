@@ -11,12 +11,12 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_base::{apply_fn_to_signeds, apply_fn_to_unsigneds};
+use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
     float_signed_pair_gen, float_signed_pair_gen_var_4, float_unsigned_pair_gen,
     float_unsigned_pair_gen_var_5,
 };
-use malachite_float::Float;
 use rug;
 
 #[test]

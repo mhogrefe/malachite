@@ -6,17 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::test_util::common::rug_float_significant_bits;
 use crate::Float;
 use crate::InnerFloat::{Infinity, NaN, Zero};
+use crate::test_util::common::rug_float_significant_bits;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
-use std::cmp::max;
 use std::cmp::Ordering::{self, *};
+use std::cmp::max;
 
 pub fn rug_add_prec_round(
     x: &rug::Float,

@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::conversion::to_limbs::LimbIterator;
 use crate::natural::Natural;
+use crate::natural::conversion::to_limbs::LimbIterator;
 use crate::platform::Limb;
 use core::ops::Index;
 use malachite_base::num::arithmetic::traits::PowerOf2;

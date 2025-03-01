@@ -12,20 +12,20 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::float_extras::{limbs_float_can_round, round_helper_raw};
-use crate::natural::arithmetic::float_mul::{limbs_float_mul_high_same_length, MPFR_MULHIGH_TAB};
+use crate::natural::arithmetic::float_mul::{MPFR_MULHIGH_TAB, limbs_float_mul_high_same_length};
 use crate::natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::square::{
-    limbs_square_to_out, limbs_square_to_out_basecase, limbs_square_to_out_scratch_len,
-    SQR_FFT_THRESHOLD,
+    SQR_FFT_THRESHOLD, limbs_square_to_out, limbs_square_to_out_basecase,
+    limbs_square_to_out_scratch_len,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};

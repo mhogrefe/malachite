@@ -11,7 +11,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, triple_2_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_pair_gen_var_16, unsigned_vec_unsigned_pair_gen_var_32,
@@ -19,12 +19,12 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::shl::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,
 };
 use malachite_nz::natural::logic::not::limbs_not_in_place;
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::{
     pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer,

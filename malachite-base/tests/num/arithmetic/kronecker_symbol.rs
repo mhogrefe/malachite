@@ -16,8 +16,8 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, WrappingFrom};
 use malachite_base::test_util::generators::{
-    signed_gen, signed_gen_var_13, signed_pair_gen, signed_pair_gen_var_10, signed_pair_gen_var_8,
-    signed_pair_gen_var_9, signed_triple_gen, signed_triple_gen_var_6, signed_triple_gen_var_7,
+    signed_gen, signed_gen_var_13, signed_pair_gen, signed_pair_gen_var_8, signed_pair_gen_var_9,
+    signed_pair_gen_var_10, signed_triple_gen, signed_triple_gen_var_6, signed_triple_gen_var_7,
     unsigned_gen, unsigned_gen_var_22, unsigned_pair_gen_var_27, unsigned_pair_gen_var_40,
     unsigned_pair_gen_var_41, unsigned_pair_gen_var_42, unsigned_quadruple_gen_var_12,
     unsigned_triple_gen_var_19, unsigned_triple_gen_var_22, unsigned_triple_gen_var_23,

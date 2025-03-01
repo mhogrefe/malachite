@@ -11,7 +11,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
-use malachite_float::test_util::generators::{float_gen, float_gen_var_12, float_gen_var_4};
+use malachite_float::test_util::generators::{float_gen, float_gen_var_4, float_gen_var_12};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
 

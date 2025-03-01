@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::arithmetic::shr_round::shr_round_naive;
@@ -21,9 +21,9 @@ use malachite_float::test_util::bench::bucketers::{
 };
 use malachite_float::test_util::generators::{
     float_signed_rounding_mode_triple_gen_var_4, float_signed_rounding_mode_triple_gen_var_5,
-    float_signed_rounding_mode_triple_gen_var_6_rm,
+    float_signed_rounding_mode_triple_gen_var_6_rm, float_unsigned_rounding_mode_triple_gen_var_8,
+    float_unsigned_rounding_mode_triple_gen_var_9,
     float_unsigned_rounding_mode_triple_gen_var_10_rm,
-    float_unsigned_rounding_mode_triple_gen_var_8, float_unsigned_rounding_mode_triple_gen_var_9,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;

@@ -10,9 +10,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::logic::count_ones::limbs_count_ones;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::logic::count_ones::limbs_count_ones;
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::logic::traits::HammingDistance;
@@ -85,9 +85,9 @@ pub_test! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
 
 impl Natural {
     fn hamming_distance_limb(&self, other: Limb) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.hamming_distance(other),
-            Natural(Large(ref limbs)) => limbs_hamming_distance_limb(limbs, other),
+            Natural(Large(limbs)) => limbs_hamming_distance_limb(limbs, other),
         }
     }
 }
@@ -127,7 +127,7 @@ impl HammingDistance<&Natural> for &Natural {
         match (self, other) {
             (&Natural(Small(x)), _) => other.hamming_distance_limb(x),
             (_, &Natural(Small(y))) => self.hamming_distance_limb(y),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_hamming_distance(xs, ys),
+            (Natural(Large(xs)), Natural(Large(ys))) => limbs_hamming_distance(xs, ys),
         }
     }
 }

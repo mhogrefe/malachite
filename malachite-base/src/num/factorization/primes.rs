@@ -1,5 +1,17 @@
 // Copyright © 2025 Mikhail Hogrefe
 //
+// Uses code adopted from the GNU MP Library and the FLINT Library.
+//
+// Prime sieve code contributed to the GNU project by Marco Bodrato.
+//
+//      Copyright © 2009 Tom Boothby
+//
+//      Copyright © 2009 William Hart
+//
+//      Copyright © 2010 Fredrik Johansson
+//
+//      Copyright © 2010–2012, 2015, 2016 Free Software Foundation, Inc.
+//
 // This file is part of Malachite.
 //
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -189,11 +201,7 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesLessThanIterator<T> {
         } else {
             self.i = limbs_index_of_next_false_bit(&self.sieve, self.i)? + 1;
             let p = T::exact_from(id_to_n(self.i));
-            if p > self.limit {
-                None
-            } else {
-                Some(p)
-            }
+            if p > self.limit { None } else { Some(p) }
         }
     }
 }

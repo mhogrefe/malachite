@@ -67,5 +67,6 @@ pub mod prime_sieve;
 /// );
 /// ```
 pub mod primes;
+pub mod primitive_root_prime;
 /// Various traits for generating primes, primality testing, and factorization.
 pub mod traits;

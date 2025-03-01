@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use crate::Float;
+use crate::malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use core::ops::{Shl, ShlAssign};
 use malachite_base::rounding_modes::RoundingMode::*;
 

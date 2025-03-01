@@ -12,9 +12,9 @@ use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{integer_gen, natural_vec_integer_pair_gen_var_1};
+use malachite_q::Rational;
 use malachite_q::conversion::traits::ContinuedFraction;
 use malachite_q::test_util::conversion::continued_fraction::from_continued_fraction::*;
-use malachite_q::Rational;
 use std::str::FromStr;
 
 #[test]

@@ -10,11 +10,11 @@ use malachite_base::num::arithmetic::traits::{CheckedRoot, CheckedSqrt, Pow, Rec
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_3;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_gen_var_3, rational_signed_pair_gen_var_4,
     rational_unsigned_pair_gen_var_4,
 };
-use malachite_q::Rational;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -126,9 +126,9 @@ fn checked_root_ref_fail() {
 fn checked_root_properties() {
     rational_unsigned_pair_gen_var_4::<u64>().test_properties(|(n, exp)| {
         let root = n.clone().checked_root(exp);
-        assert!(root.as_ref().map_or(true, Rational::is_valid));
+        assert!(root.as_ref().is_none_or(Rational::is_valid));
         let root_alt = (&n).checked_root(exp);
-        assert!(root_alt.as_ref().map_or(true, Rational::is_valid));
+        assert!(root_alt.as_ref().is_none_or(Rational::is_valid));
         assert_eq!(root_alt, root);
         assert_eq!((&n).checked_root(u64::exact_from(exp)), root);
         if n != 0 {
@@ -144,9 +144,9 @@ fn checked_root_properties() {
 
     rational_signed_pair_gen_var_4::<i64>().test_properties(|(n, exp)| {
         let root = n.clone().checked_root(exp);
-        assert!(root.as_ref().map_or(true, Rational::is_valid));
+        assert!(root.as_ref().is_none_or(Rational::is_valid));
         let root_alt = (&n).checked_root(exp);
-        assert!(root_alt.as_ref().map_or(true, Rational::is_valid));
+        assert!(root_alt.as_ref().is_none_or(Rational::is_valid));
         assert_eq!(root_alt, root);
         assert_eq!((&n).checked_root(exp), root);
         if n != 0u32 {

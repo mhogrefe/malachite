@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::conversion::to_limbs::LimbIterator;
 use crate::natural::logic::not::limbs_not_in_place;
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, UnsignedAbs};
@@ -302,10 +302,10 @@ impl TwosComplementLimbIterator<'_> {
     /// }
     /// ```
     pub fn get(&self, index: u64) -> Limb {
-        match *self {
+        match self {
             TwosComplementLimbIterator::Zero => 0,
-            TwosComplementLimbIterator::Positive(ref limbs, _) => limbs[usize::exact_from(index)],
-            TwosComplementLimbIterator::Negative(ref limbs, _) => limbs.0.get(index),
+            TwosComplementLimbIterator::Positive(limbs, _) => limbs[usize::exact_from(index)],
+            TwosComplementLimbIterator::Negative(limbs, _) => limbs.0.get(index),
         }
     }
 }
@@ -339,12 +339,12 @@ impl Iterator for TwosComplementLimbIterator<'_> {
     /// }
     /// ```
     fn next(&mut self) -> Option<Limb> {
-        match *self {
+        match self {
             TwosComplementLimbIterator::Zero => None,
-            TwosComplementLimbIterator::Positive(ref mut limbs, ref mut extension_checked) => {
+            TwosComplementLimbIterator::Positive(limbs, extension_checked) => {
                 limbs.iterate_forward(extension_checked)
             }
-            TwosComplementLimbIterator::Negative(ref mut limbs, ref mut extension_checked) => {
+            TwosComplementLimbIterator::Negative(limbs, extension_checked) => {
                 limbs.0.iterate_forward(extension_checked)
             }
         }
@@ -382,12 +382,12 @@ impl DoubleEndedIterator for TwosComplementLimbIterator<'_> {
     /// }
     /// ```
     fn next_back(&mut self) -> Option<Limb> {
-        match *self {
+        match self {
             TwosComplementLimbIterator::Zero => None,
-            TwosComplementLimbIterator::Positive(ref mut limbs, ref mut extension_checked) => {
+            TwosComplementLimbIterator::Positive(limbs, extension_checked) => {
                 limbs.iterate_backward(extension_checked)
             }
-            TwosComplementLimbIterator::Negative(ref mut limbs, ref mut extension_checked) => {
+            TwosComplementLimbIterator::Negative(limbs, extension_checked) => {
                 limbs.0.iterate_backward(extension_checked)
             }
         }

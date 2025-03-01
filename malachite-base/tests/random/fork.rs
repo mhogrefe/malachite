@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::random::{Seed, EXAMPLE_SEED};
+use malachite_base::random::{EXAMPLE_SEED, Seed};
 
 #[test]
 fn test_fork() {

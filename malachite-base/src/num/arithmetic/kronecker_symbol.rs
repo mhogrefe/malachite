@@ -252,11 +252,7 @@ fn jacobi_symbol_signed<
     assert!(n > S::ZERO);
     assert!(n.odd());
     let s = a.unsigned_abs().jacobi_symbol(n.unsigned_abs());
-    if a < S::ZERO && n.get_bit(1) {
-        -s
-    } else {
-        s
-    }
+    if a < S::ZERO && n.get_bit(1) { -s } else { s }
 }
 
 fn kronecker_symbol_unsigned<T: PrimitiveUnsigned>(a: T, b: T) -> i8 {

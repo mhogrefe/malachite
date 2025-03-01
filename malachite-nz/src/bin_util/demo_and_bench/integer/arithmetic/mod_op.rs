@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::{
@@ -253,10 +253,9 @@ fn benchmark_integer_mod_evaluation_strategy(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [
-            (
-                "Integer.mod_op(Integer)",
-                &mut |(x, y)| no_out!(x.mod_op(y)),
-            ),
+            ("Integer.mod_op(Integer)", &mut |(x, y)| {
+                no_out!(x.mod_op(y))
+            }),
             ("Integer.mod_op(&Integer)", &mut |(x, y)| {
                 no_out!(x.mod_op(&y))
             }),

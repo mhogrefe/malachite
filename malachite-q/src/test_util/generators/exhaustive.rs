@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
@@ -14,7 +15,6 @@ use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_xxyz, exhaustive_triples_from_single,
     exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
-use crate::Rational;
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
@@ -24,17 +24,17 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
+use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
 use malachite_base::num::exhaustive::{
     exhaustive_finite_primitive_floats, exhaustive_nonzero_finite_primitive_floats,
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::common::{reshape_2_1_to_3, It};
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
@@ -44,12 +44,12 @@ use malachite_base::tuples::exhaustive::{
     lex_pairs,
 };
 use malachite_base::vecs::exhaustive::exhaustive_vecs;
-use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::exhaustive::exhaustive_integers;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
-use malachite_nz::natural::Natural;
 use num::BigRational;
 use std::ops::Shr;
 
@@ -82,8 +82,8 @@ where
     )
 }
 
-pub fn exhaustive_rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat>(
-) -> It<Rational> {
+pub fn exhaustive_rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat>()
+-> It<Rational> {
     Box::new(exhaustive_rationals().filter(|q| !T::convertible_from(q)))
 }
 
@@ -181,8 +181,8 @@ pub fn exhaustive_rational_primitive_float_pair_gen<T: PrimitiveFloat>() -> It<(
 
 // -- (Rational, PrimitiveFloat, PrimitiveFloat) --
 
-pub fn exhaustive_rational_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> It<(Rational, T, T)> {
+pub fn exhaustive_rational_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> It<(Rational, T, T)> {
     Box::new(exhaustive_triples_xyy(
         exhaustive_rationals(),
         exhaustive_primitive_floats(),
@@ -253,8 +253,8 @@ pub fn exhaustive_rational_signed_signed_triple_gen<T: PrimitiveSigned>() -> It<
     ))
 }
 
-pub fn exhaustive_rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned>(
-) -> It<(Rational, T, T)> {
+pub fn exhaustive_rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned>()
+-> It<(Rational, T, T)> {
     Box::new(
         exhaustive_triples_xyy_custom_output(
             exhaustive_rationals(),
@@ -285,8 +285,8 @@ pub fn exhaustive_rational_signed_unsigned_triple_gen_var_1<
 
 // -- (Rational, PrimitiveSigned, RoundingMode) --
 
-pub fn exhaustive_rational_signed_rounding_mode_triple_gen_var_1(
-) -> It<(Rational, i64, RoundingMode)> {
+pub fn exhaustive_rational_signed_rounding_mode_triple_gen_var_1()
+-> It<(Rational, i64, RoundingMode)> {
     Box::new(
         exhaustive_triples_custom_output(
             exhaustive_rationals(),
@@ -350,16 +350,16 @@ pub fn exhaustive_rational_unsigned_pair_gen_var_4() -> It<(Rational, u8)> {
 
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
-pub fn exhaustive_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(
-) -> It<(Rational, T, T)> {
+pub fn exhaustive_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>()
+-> It<(Rational, T, T)> {
     Box::new(exhaustive_triples_xyy(
         exhaustive_rationals(),
         exhaustive_unsigneds(),
     ))
 }
 
-pub fn exhaustive_rational_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> It<(Rational, T, T)> {
+pub fn exhaustive_rational_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(Rational, T, T)> {
     Box::new(exhaustive_triples_xyy_custom_output(
         exhaustive_rationals(),
         exhaustive_unsigneds::<T>(),
@@ -391,13 +391,8 @@ pub fn exhaustive_rational_pair_gen_var_2() -> It<(Rational, Rational)> {
 
 pub fn exhaustive_rational_pair_gen_var_3() -> It<(Rational, Rational)> {
     Box::new(
-        exhaustive_ordered_unique_pairs(exhaustive_rationals()).map(|(x, y)| {
-            if x < y {
-                (x, y)
-            } else {
-                (y, x)
-            }
-        }),
+        exhaustive_ordered_unique_pairs(exhaustive_rationals())
+            .map(|(x, y)| if x < y { (x, y) } else { (y, x) }),
     )
 }
 
@@ -442,8 +437,8 @@ pub fn exhaustive_rational_rational_natural_triple_gen_var_1() -> It<(Rational, 
 
 // -- (Rational, Rational, PrimitiveFloat) --
 
-pub fn exhaustive_rational_rational_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> It<(Rational, Rational, T)> {
+pub fn exhaustive_rational_rational_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> It<(Rational, Rational, T)> {
     Box::new(exhaustive_triples_xxy(
         exhaustive_rationals(),
         exhaustive_primitive_floats(),
@@ -463,8 +458,8 @@ pub(crate) fn round_to_multiple_rational_filter(t: &(Rational, Rational, Roundin
     }
 }
 
-pub fn exhaustive_rational_rational_rounding_mode_triple_gen_var_1(
-) -> It<(Rational, Rational, RoundingMode)> {
+pub fn exhaustive_rational_rational_rounding_mode_triple_gen_var_1()
+-> It<(Rational, Rational, RoundingMode)> {
     Box::new(
         reshape_2_1_to_3(Box::new(lex_pairs(
             exhaustive_pairs_from_single(exhaustive_rationals()),
@@ -476,8 +471,8 @@ pub fn exhaustive_rational_rational_rounding_mode_triple_gen_var_1(
 
 // -- (Rational, Rational, Natural, Natural) --
 
-pub fn exhaustive_rational_rational_natural_natural_quadruple_gen_var_1(
-) -> It<(Rational, Rational, Natural, Natural)> {
+pub fn exhaustive_rational_rational_natural_natural_quadruple_gen_var_1()
+-> It<(Rational, Rational, Natural, Natural)> {
     Box::new(exhaustive_quadruples_xxyz(
         exhaustive_rationals(),
         exhaustive_naturals(),
@@ -487,16 +482,16 @@ pub fn exhaustive_rational_rational_natural_natural_quadruple_gen_var_1(
 
 // -- (Rational, Rational, PrimitiveSigned) --
 
-pub fn exhaustive_rational_rational_signed_triple_gen<T: PrimitiveSigned>(
-) -> It<(Rational, Rational, T)> {
+pub fn exhaustive_rational_rational_signed_triple_gen<T: PrimitiveSigned>()
+-> It<(Rational, Rational, T)> {
     Box::new(exhaustive_triples_xxy(
         exhaustive_rationals(),
         exhaustive_signeds(),
     ))
 }
 
-pub fn exhaustive_rational_rational_signed_triple_gen_var_1<T: PrimitiveSigned>(
-) -> It<(Rational, Rational, T)> {
+pub fn exhaustive_rational_rational_signed_triple_gen_var_1<T: PrimitiveSigned>()
+-> It<(Rational, Rational, T)> {
     Box::new(
         exhaustive_triples_xxy_custom_output(
             exhaustive_rationals(),
@@ -511,16 +506,16 @@ pub fn exhaustive_rational_rational_signed_triple_gen_var_1<T: PrimitiveSigned>(
 
 // -- (Rational, Rational, PrimitiveUnsigned) --
 
-pub fn exhaustive_rational_rational_unsigned_triple_gen<T: PrimitiveUnsigned>(
-) -> It<(Rational, Rational, T)> {
+pub fn exhaustive_rational_rational_unsigned_triple_gen<T: PrimitiveUnsigned>()
+-> It<(Rational, Rational, T)> {
     Box::new(exhaustive_triples_xxy(
         exhaustive_rationals(),
         exhaustive_unsigneds(),
     ))
 }
 
-pub fn exhaustive_rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> It<(Rational, Rational, T)> {
+pub fn exhaustive_rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(Rational, Rational, T)> {
     Box::new(exhaustive_triples_xxy_custom_output(
         exhaustive_rationals(),
         exhaustive_unsigneds::<T>(),

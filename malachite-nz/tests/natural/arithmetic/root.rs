@@ -17,8 +17,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_32, unsigned_vec_unsigned_pair_gen_var_14,
 };
-use malachite_nz::natural::arithmetic::root::{limbs_floor_root, limbs_root_rem};
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::root::{limbs_floor_root, limbs_root_rem};
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
 use malachite_nz::test_util::natural::arithmetic::root::{
@@ -578,9 +578,9 @@ fn ceiling_cbrt_properties() {
 fn checked_cbrt_properties() {
     natural_gen().test_properties(|n| {
         let cbrt = n.clone().checked_root(3);
-        assert!(cbrt.as_ref().map_or(true, Natural::is_valid));
+        assert!(cbrt.as_ref().is_none_or(Natural::is_valid));
         let cbrt_alt = (&n).checked_root(3);
-        assert!(cbrt_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(cbrt_alt.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(cbrt_alt, cbrt);
         assert_eq!(checked_root_binary(&n, 3), cbrt);
         if let Some(cbrt) = cbrt {
@@ -716,9 +716,9 @@ fn ceiling_root_properties() {
 fn checked_root_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         let root = n.clone().checked_root(exp);
-        assert!(root.as_ref().map_or(true, Natural::is_valid));
+        assert!(root.as_ref().is_none_or(Natural::is_valid));
         let root_alt = (&n).checked_root(exp);
-        assert!(root_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(root_alt.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(root_alt, root);
         assert_eq!(checked_root_binary(&n, exp), root);
         if let Some(root) = root {

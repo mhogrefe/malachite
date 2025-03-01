@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::CheckedPow;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::random::Seed;
-use malachite_base::sets::random::{random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength};
+use malachite_base::sets::random::{RandomBTreeSetsFixedLength, random_b_tree_sets_fixed_length};
 use malachite_base::tuples::random::next_helper;
 use malachite_base::vecs::exhaustive::next_bit_pattern;
 use malachite_base::{

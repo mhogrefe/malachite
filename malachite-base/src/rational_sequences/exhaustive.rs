@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::exhaustive::PrimitiveIntIncreasingRange;
-use crate::rational_sequences::{rational_sequence_is_reduced, RationalSequence};
-use crate::tuples::exhaustive::{exhaustive_pairs_from_single, ExhaustivePairs1Input};
-use crate::vecs::exhaustive::{exhaustive_vecs, ExhaustiveVecs};
+use crate::rational_sequences::{RationalSequence, rational_sequence_is_reduced};
+use crate::tuples::exhaustive::{ExhaustivePairs1Input, exhaustive_pairs_from_single};
+use crate::vecs::exhaustive::{ExhaustiveVecs, exhaustive_vecs};
 
 /// Generates all [`RationalSequence`]s containing elements from an iterator.
 ///

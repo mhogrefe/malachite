@@ -8,13 +8,13 @@
 
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_float::Float;
 use malachite_float::test_util::common::{
-    parse_hex_string, ORDERED_F32S, ORDERED_F64S, ORDERED_FLOAT_HEX_STRINGS,
+    ORDERED_F32S, ORDERED_F64S, ORDERED_FLOAT_HEX_STRINGS, parse_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_primitive_float_pair_gen, float_primitive_float_pair_gen_var_1,
 };
-use malachite_float::Float;
 use rug;
 use std::cmp::Ordering::*;
 

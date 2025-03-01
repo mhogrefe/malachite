@@ -12,7 +12,7 @@ use malachite_base::test_util::bench::bucketers::{
     pair_1_bits_times_pair_2_bucketer, pair_1_vec_len_times_pair_2_bucketer,
     triple_3_pair_1_bits_times_pair_2_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_31;
 use malachite_base::test_util::runner::Runner;
@@ -171,10 +171,9 @@ fn benchmark_natural_pow_evaluation_strategy(
         &pair_1_bits_times_pair_2_bucketer("x", "exp"),
         &mut [
             ("Natural.pow(u64)", &mut |(x, exp)| no_out!(x.pow(exp))),
-            (
-                "(&Natural).pow(u64)",
-                &mut |(x, exp)| no_out!((&x).pow(exp)),
-            ),
+            ("(&Natural).pow(u64)", &mut |(x, exp)| {
+                no_out!((&x).pow(exp))
+            }),
         ],
     );
 }

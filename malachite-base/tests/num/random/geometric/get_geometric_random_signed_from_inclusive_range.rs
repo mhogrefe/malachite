@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::random::geometric::get_geometric_random_signed_from_inclusive_range;
 use malachite_base::num::random::VariableRangeGenerator;
+use malachite_base::num::random::geometric::get_geometric_random_signed_from_inclusive_range;
 use malachite_base::random::EXAMPLE_SEED;
 
 fn get_geometric_random_signed_from_inclusive_range_helper(

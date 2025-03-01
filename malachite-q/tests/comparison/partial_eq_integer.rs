@@ -8,8 +8,8 @@
 
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::generators::rational_integer_pair_gen;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_integer_pair_gen;
 use rug;
 use std::str::FromStr;
 

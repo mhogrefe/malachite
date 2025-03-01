@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::{
@@ -87,7 +87,7 @@ fn benchmark_integer_divisible_by_power_of_2_algorithms(
             }),
             (
                 "Integer.trailing_zeros().map_or(true, |z| z >= u64)",
-                &mut |(n, pow)| no_out!(n.trailing_zeros().map_or(true, |z| z >= pow)),
+                &mut |(n, pow)| no_out!(n.trailing_zeros().is_none_or(|z| z >= pow)),
             ),
         ],
     );

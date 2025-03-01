@@ -7,29 +7,28 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::natural::random::{
-    get_random_natural_less_than, get_random_natural_with_bits,
-    get_striped_random_natural_from_inclusive_range, get_striped_random_natural_with_bits,
-    random_naturals_less_than, striped_random_natural_inclusive_range, RandomNaturalsLessThan,
-    StripedRandomNaturalInclusiveRange,
-};
 use crate::natural::Natural;
-use malachite_base::bools::random::{random_bools, RandomBools};
+use crate::natural::random::{
+    RandomNaturalsLessThan, StripedRandomNaturalInclusiveRange, get_random_natural_less_than,
+    get_random_natural_with_bits, get_striped_random_natural_from_inclusive_range,
+    get_striped_random_natural_with_bits, random_naturals_less_than,
+    striped_random_natural_inclusive_range,
+};
+use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::num::arithmetic::traits::{PowerOf2, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
-    geometric_random_natural_signeds, geometric_random_negative_signeds,
-    geometric_random_nonzero_signeds, geometric_random_positive_signeds,
-    geometric_random_signed_inclusive_range, geometric_random_signeds,
-    get_geometric_random_signed_from_inclusive_range, GeometricRandomNaturalValues,
-    GeometricRandomNegativeSigneds, GeometricRandomNonzeroSigneds, GeometricRandomSignedRange,
-    GeometricRandomSigneds,
+    GeometricRandomNaturalValues, GeometricRandomNegativeSigneds, GeometricRandomNonzeroSigneds,
+    GeometricRandomSignedRange, GeometricRandomSigneds, geometric_random_natural_signeds,
+    geometric_random_negative_signeds, geometric_random_nonzero_signeds,
+    geometric_random_positive_signeds, geometric_random_signed_inclusive_range,
+    geometric_random_signeds, get_geometric_random_signed_from_inclusive_range,
 };
 use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::num::random::{
-    random_primitive_ints, RandomPrimitiveInts, VariableRangeGenerator,
+    RandomPrimitiveInts, VariableRangeGenerator, random_primitive_ints,
 };
 use malachite_base::random::Seed;
 

@@ -16,12 +16,12 @@ use malachite_base::test_util::generators::{
     unsigned_vec_triple_gen_var_31, unsigned_vec_triple_gen_var_32,
     unsigned_vec_unsigned_pair_gen_var_15, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::logic::or::{
     limbs_or, limbs_or_in_place_either, limbs_or_in_place_left, limbs_or_limb,
     limbs_or_limb_in_place, limbs_or_limb_to_out, limbs_or_same_length,
     limbs_or_same_length_in_place_left, limbs_or_same_length_to_out, limbs_or_to_out,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
 use malachite_nz::test_util::natural::logic::or::{natural_or_alt_1, natural_or_alt_2};

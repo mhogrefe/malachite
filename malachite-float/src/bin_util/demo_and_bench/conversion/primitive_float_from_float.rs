@@ -9,7 +9,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::conversion::primitive_float_from_float::FloatFromFloatError;
@@ -17,8 +17,8 @@ use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_20,
-    float_rounding_mode_pair_gen_var_6,
+    float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_6,
+    float_rounding_mode_pair_gen_var_20,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 

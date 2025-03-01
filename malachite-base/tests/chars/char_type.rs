@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::chars::exhaustive::chars_increasing;
 use malachite_base::chars::CharType;
+use malachite_base::chars::exhaustive::chars_increasing;
 use std::collections::HashSet;
 
 #[test]

@@ -8,13 +8,13 @@
 
 use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base::test_util::bench::bucketers::quadruple_3_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::large_type_gen_var_3;
 use malachite_base::test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 use malachite_nz::test_util::generators::natural_unsigned_unsigned_natural_quadruple_gen_var_1;
 
 pub(crate) fn register(runner: &mut Runner) {

@@ -6,8 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::integer::Integer;
+use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
@@ -15,8 +17,6 @@ use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::natural::logic::bit_block_access::limbs_assign_bits_helper;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::logic::trailing_zeros::limbs_trailing_zeros;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
@@ -199,9 +199,9 @@ pub_test! {limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits:
 
 impl Natural {
     fn neg_get_bits(&self, start: u64, end: u64) -> Natural {
-        Natural::from_owned_limbs_asc(match *self {
-            Natural(Small(small)) => limbs_neg_limb_get_bits(small, start, end),
-            Natural(Large(ref limbs)) => limbs_slice_neg_get_bits(limbs, start, end),
+        Natural::from_owned_limbs_asc(match self {
+            Natural(Small(small)) => limbs_neg_limb_get_bits(*small, start, end),
+            Natural(Large(limbs)) => limbs_slice_neg_get_bits(limbs, start, end),
         })
     }
 
@@ -234,9 +234,9 @@ impl Natural {
             }
         }
         let limbs = self.promote_in_place();
-        match *bits {
-            Natural(Small(small_bits)) => limbs_neg_assign_bits(limbs, start, end, &[small_bits]),
-            Natural(Large(ref bits_limbs)) => limbs_neg_assign_bits(limbs, start, end, bits_limbs),
+        match bits {
+            Natural(Small(small_bits)) => limbs_neg_assign_bits(limbs, start, end, &[*small_bits]),
+            Natural(Large(bits_limbs)) => limbs_neg_assign_bits(limbs, start, end, bits_limbs),
         }
         self.trim();
     }

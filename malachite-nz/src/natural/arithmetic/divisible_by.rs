@@ -10,6 +10,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_mod_barrett, limbs_modular_div_mod_barrett_scratch_len,
     limbs_modular_div_mod_divide_and_conquer, limbs_modular_div_mod_schoolbook,
@@ -18,10 +20,8 @@ use crate::natural::arithmetic::div_exact::{
 use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD,
+    BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, Limb, MU_BDIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
@@ -455,7 +455,7 @@ impl Natural {
             (&Natural::ZERO, _) => true,
             (_, 0) => false,
             (&Natural(Small(small)), y) => small.divisible_by(y),
-            (&Natural(Large(ref limbs)), y) => limbs_divisible_by_limb(limbs, y),
+            (Natural(Large(limbs)), y) => limbs_divisible_by_limb(limbs, y),
         }
     }
 
@@ -513,7 +513,7 @@ impl DivisibleBy<Natural> for Natural {
         match (&mut self, &mut other) {
             (x, &mut Natural(Small(y))) => x.divisible_by_limb(y),
             (&mut Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
-            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by(xs, ys)
             }
         }
@@ -565,7 +565,7 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
         match (&mut self, other) {
             (x, &Natural(Small(y))) => x.divisible_by_limb(y),
             (&mut Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_val_ref(xs, ys)
             }
         }
@@ -616,7 +616,7 @@ impl DivisibleBy<Natural> for &Natural {
         match (self, &mut other) {
             (x, &mut Natural(Small(y))) => x.divisible_by_limb(y),
             (&Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_ref_val(xs, ys)
             }
         }
@@ -666,7 +666,7 @@ impl DivisibleBy<&Natural> for &Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.divisible_by_limb(y),
             (&Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_ref_ref(xs, ys)
             }
         }

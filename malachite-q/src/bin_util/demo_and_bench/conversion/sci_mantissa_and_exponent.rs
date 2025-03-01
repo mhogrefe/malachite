@@ -10,19 +10,19 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::bucketers::pair_1_primitive_float_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     primitive_float_signed_pair_gen_var_1, primitive_float_signed_pair_gen_var_2,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_q::Rational;
 use malachite_q::test_util::bench::bucketers::{
     pair_1_rational_bit_bucketer, rational_bit_bucketer,
 };
 use malachite_q::test_util::generators::{
     rational_gen_var_1, rational_rounding_mode_pair_gen_var_4,
 };
-use malachite_q::Rational;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_rational_sci_mantissa_and_exponent);

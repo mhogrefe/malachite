@@ -8,15 +8,15 @@
 
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::{pair_1_bucketer, unsigned_direct_bucketer};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_float::test_util::constants::prime_constant::prime_constant_prec_round_naive;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
+use malachite_float::test_util::constants::prime_constant::prime_constant_prec_round_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_prime_constant_prec_round);

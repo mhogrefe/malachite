@@ -10,6 +10,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use crate::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
@@ -21,9 +23,7 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
 use crate::natural::comparison::cmp::limbs_cmp;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, DoubleLimb, Limb};
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
@@ -172,11 +172,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
             let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
                 let r = limbs_mod_limb(xs, m_0);
-                if y < m_0 {
-                    r == y
-                } else {
-                    r == y % m_0
-                }
+                if y < m_0 { r == y } else { r == y % m_0 }
             } else {
                 let r = limbs_mod_exact_odd_limb(xs, m_0, y);
                 r == 0 || r == m_0
@@ -708,10 +704,10 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], ms: &mut [Limb
 
 impl Natural {
     fn eq_mod_limb(&self, other: Limb, m: Limb) -> bool {
-        match *self {
+        match self {
             Natural(Small(small)) => small.eq_mod(other, m),
             Natural(Large(_)) if m == 0 => false,
-            Natural(Large(ref limbs)) => limbs_eq_limb_mod_limb(limbs, other, m),
+            Natural(Large(limbs)) => limbs_eq_limb_mod_limb(limbs, other, m),
         }
     }
 }
@@ -765,20 +761,20 @@ impl EqMod<Natural, Natural> for Natural {
             (x, y, Natural::ZERO) => x == y,
             (x, Natural::ZERO, m) => x.divisible_by(m),
             (Natural::ZERO, y, m) => y.divisible_by(m),
-            (ref x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (Natural(Small(x)), ref y, Natural(Small(m))) => y.eq_mod_limb(x, m),
+            (x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Small(m))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(&mut xs, &ys, m)
             }
-            (Natural(Large(ref mut xs)), Natural(Small(y)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod(xs, y, m)
+            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod(&mut xs, y, &mut m)
             }
-            (Natural(Small(x)), Natural(Large(ref mut ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod(ys, x, m)
+            (Natural(Small(x)), Natural(Large(mut ys)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod(&mut ys, x, &mut m)
             }
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_mod_ref_val_val(ys, xs, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(mut m))) => {
+                limbs_eq_mod_ref_val_val(&ys, &mut xs, &mut m)
             }
         }
     }
@@ -833,20 +829,20 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
             (x, y, &Natural::ZERO) => x == y,
             (x, Natural::ZERO, m) => x.divisible_by(m),
             (Natural::ZERO, y, m) => y.divisible_by(m),
-            (ref x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (Natural(Small(x)), ref y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
+            (x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Small(m))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(&mut xs, &ys, *m)
             }
-            (Natural(Large(ref mut xs)), Natural(Small(y)), &Natural(Large(ref m))) => {
-                limbs_eq_limb_mod_val_ref(xs, y, m)
+            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(m))) => {
+                limbs_eq_limb_mod_val_ref(&mut xs, y, m)
             }
-            (Natural(Small(x)), Natural(Large(ref mut ys)), &Natural(Large(ref m))) => {
-                limbs_eq_limb_mod_val_ref(ys, x, m)
+            (Natural(Small(x)), Natural(Large(mut ys)), Natural(Large(m))) => {
+                limbs_eq_limb_mod_val_ref(&mut ys, x, m)
             }
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Large(ref m))) => {
-                limbs_eq_mod_ref_val_ref(ys, xs, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(m))) => {
+                limbs_eq_mod_ref_val_ref(&ys, &mut xs, m)
             }
         }
     }
@@ -901,20 +897,20 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
             (x, y, Natural::ZERO) => x == *y,
             (x, &Natural::ZERO, m) => x.divisible_by(m),
             (Natural::ZERO, y, m) => y.divisible_by(m),
-            (ref x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
             (Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Small(m))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(&mut xs, ys, m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Small(y)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod(xs, y, m)
+            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod(&mut xs, *y, &mut m)
             }
-            (Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod_ref_val(ys, x, m)
+            (Natural(Small(x)), Natural(Large(ys)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod_ref_val(ys, x, &mut m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_mod_ref_val_val(ys, xs, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(mut m))) => {
+                limbs_eq_mod_ref_val_val(ys, &mut xs, &mut m)
             }
         }
     }
@@ -969,20 +965,20 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
             (x, y, &Natural::ZERO) => x == *y,
             (x, &Natural::ZERO, m) => x.divisible_by(m),
             (Natural::ZERO, y, m) => y.divisible_by(m),
-            (ref x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
             (Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Small(m))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(&mut xs, ys, *m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Small(y)), &Natural(Large(ref m))) => {
-                limbs_eq_limb_mod_val_ref(xs, y, m)
+            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(m))) => {
+                limbs_eq_limb_mod_val_ref(&mut xs, *y, m)
             }
-            (Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+            (Natural(Small(x)), Natural(Large(ys)), Natural(Large(m))) => {
                 limbs_eq_limb_mod_ref_ref(ys, x, m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
-                limbs_eq_mod_ref_val_ref(ys, xs, m)
+            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(m))) => {
+                limbs_eq_mod_ref_val_ref(ys, &mut xs, m)
             }
         }
     }
@@ -1038,19 +1034,19 @@ impl EqMod<Natural, Natural> for &Natural {
             (x, Natural::ZERO, m) => x.divisible_by(m),
             (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (&Natural(Small(x)), ref y, Natural(Small(m))) => y.eq_mod_limb(x, m),
+            (&Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), Natural(Small(m))) => {
-                limbs_eq_mod_limb_ref_val(xs, ys, m)
+            (Natural(Large(xs)), Natural(Large(mut ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_val(xs, &mut ys, m)
             }
-            (&Natural(Large(ref xs)), Natural(Small(y)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod_ref_val(xs, y, m)
+            (Natural(Large(xs)), Natural(Small(y)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod_ref_val(xs, y, &mut m)
             }
-            (&Natural(Small(x)), Natural(Large(ref mut ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod(ys, x, m)
+            (Natural(Small(x)), Natural(Large(mut ys)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod(&mut ys, *x, &mut m)
             }
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_mod_ref_val_val(xs, ys, m)
+            (Natural(Large(xs)), Natural(Large(mut ys)), Natural(Large(mut m))) => {
+                limbs_eq_mod_ref_val_val(xs, &mut ys, &mut m)
             }
         }
     }
@@ -1106,19 +1102,19 @@ impl EqMod<Natural, &Natural> for &Natural {
             (x, Natural::ZERO, m) => x.divisible_by(m),
             (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (&Natural(Small(x)), ref y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
+            (&Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Small(m))) => {
-                limbs_eq_mod_limb_ref_val(xs, ys, m)
+            (Natural(Large(xs)), Natural(Large(mut ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_val(xs, &mut ys, *m)
             }
-            (&Natural(Large(ref xs)), Natural(Small(y)), &Natural(Large(ref m))) => {
+            (Natural(Large(xs)), Natural(Small(y)), Natural(Large(m))) => {
                 limbs_eq_limb_mod_ref_ref(xs, y, m)
             }
-            (&Natural(Small(x)), Natural(Large(ref mut ys)), &Natural(Large(ref m))) => {
-                limbs_eq_limb_mod_val_ref(ys, x, m)
+            (Natural(Small(x)), Natural(Large(mut ys)), Natural(Large(m))) => {
+                limbs_eq_limb_mod_val_ref(&mut ys, *x, m)
             }
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Large(ref m))) => {
-                limbs_eq_mod_ref_val_ref(xs, ys, m)
+            (Natural(Large(xs)), Natural(Large(mut ys)), Natural(Large(m))) => {
+                limbs_eq_mod_ref_val_ref(xs, &mut ys, m)
             }
         }
     }
@@ -1176,17 +1172,17 @@ impl EqMod<&Natural, Natural> for &Natural {
             (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
             (&Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Small(m))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Small(m))) => {
                 limbs_eq_mod_limb_ref_ref(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Small(y)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod_ref_val(xs, y, m)
+            (Natural(Large(xs)), Natural(Small(y)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod_ref_val(xs, *y, &mut m)
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_limb_mod_ref_val(ys, x, m)
+            (Natural(Small(x)), Natural(Large(ys)), Natural(Large(mut m))) => {
+                limbs_eq_limb_mod_ref_val(ys, *x, &mut m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
-                limbs_eq_mod_ref_ref_val(xs, ys, m)
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(mut m))) => {
+                limbs_eq_mod_ref_ref_val(xs, ys, &mut m)
             }
         }
     }
@@ -1244,16 +1240,16 @@ impl EqMod<&Natural, &Natural> for &Natural {
             (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
             (&Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Small(m))) => {
-                limbs_eq_mod_limb_ref_ref(xs, ys, m)
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_ref(xs, ys, *m)
             }
-            (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref m))) => {
-                limbs_eq_limb_mod_ref_ref(xs, y, m)
+            (Natural(Large(xs)), Natural(Small(y)), Natural(Large(m))) => {
+                limbs_eq_limb_mod_ref_ref(xs, *y, m)
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
-                limbs_eq_limb_mod_ref_ref(ys, x, m)
+            (Natural(Small(x)), Natural(Large(ys)), Natural(Large(m))) => {
+                limbs_eq_limb_mod_ref_ref(ys, *x, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(m))) => {
                 limbs_eq_mod_ref_ref_ref(xs, ys, m)
             }
         }

@@ -19,11 +19,7 @@ fn mod_add<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let neg = m - x;
-    if neg > y {
-        x + y
-    } else {
-        y - neg
-    }
+    if neg > y { x + y } else { y - neg }
 }
 
 fn mod_add_assign<T: PrimitiveUnsigned>(x: &mut T, y: T, m: T) {

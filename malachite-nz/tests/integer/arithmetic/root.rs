@@ -377,9 +377,9 @@ fn ceiling_cbrt_properties() {
 fn checked_cbrt_properties() {
     integer_gen().test_properties(|n| {
         let cbrt = n.clone().checked_root(3);
-        assert!(cbrt.as_ref().map_or(true, Integer::is_valid));
+        assert!(cbrt.as_ref().is_none_or(Integer::is_valid));
         let cbrt_alt = (&n).checked_root(3);
-        assert!(cbrt_alt.as_ref().map_or(true, Integer::is_valid));
+        assert!(cbrt_alt.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(cbrt_alt, cbrt);
         if let Some(cbrt) = cbrt {
             assert_eq!((&cbrt).pow(3), n);
@@ -516,9 +516,9 @@ fn ceiling_root_properties() {
 fn checked_root_properties() {
     integer_unsigned_pair_gen_var_3().test_properties(|(n, exp)| {
         let root = n.clone().checked_root(exp);
-        assert!(root.as_ref().map_or(true, Integer::is_valid));
+        assert!(root.as_ref().is_none_or(Integer::is_valid));
         let root_alt = (&n).checked_root(exp);
-        assert!(root_alt.as_ref().map_or(true, Integer::is_valid));
+        assert!(root_alt.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(root_alt, root);
         if let Some(root) = root {
             assert_eq!((&root).pow(exp), n);

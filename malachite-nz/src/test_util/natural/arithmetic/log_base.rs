@@ -49,11 +49,7 @@ pub fn checked_log_base_naive(x: &Natural, base: &Natural) -> Option<u64> {
         result += 1;
         p *= base;
     }
-    if p == *x {
-        Some(result)
-    } else {
-        None
-    }
+    if p == *x { Some(result) } else { None }
 }
 
 fn log_by_squaring_helper(x: &Natural, base: &Natural) -> (u64, bool) {
@@ -106,11 +102,7 @@ pub fn ceiling_log_base_by_squaring(x: &Natural, base: &Natural) -> u64 {
         return x.ceiling_log_base_power_of_2(log_base);
     }
     let (log, exact) = log_by_squaring_helper(x, base);
-    if exact {
-        log
-    } else {
-        log + 1
-    }
+    if exact { log } else { log + 1 }
 }
 
 pub fn checked_log_base_by_squaring(x: &Natural, base: &Natural) -> Option<u64> {
@@ -118,9 +110,5 @@ pub fn checked_log_base_by_squaring(x: &Natural, base: &Natural) -> Option<u64> 
         return x.checked_log_base_power_of_2(log_base);
     }
     let (log, exact) = log_by_squaring_helper(x, base);
-    if exact {
-        Some(log)
-    } else {
-        None
-    }
+    if exact { Some(log) } else { None }
 }

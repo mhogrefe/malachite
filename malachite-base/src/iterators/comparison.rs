@@ -229,7 +229,7 @@ where
 {
     let mut previous = None;
     for direction in delta_directions(xs) {
-        if let Some(ref mut previous) = &mut previous {
+        if let Some(previous) = &mut previous {
             if direction == *previous {
                 return false;
             }

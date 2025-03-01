@@ -10,7 +10,7 @@ use malachite_base::num::basic::traits::{Infinity, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::test_util::common::{parse_hex_string, ORDERED_FLOAT_HEX_STRINGS};
+use malachite_float::test_util::common::{ORDERED_FLOAT_HEX_STRINGS, parse_hex_string};
 use malachite_float::test_util::generators::{
     float_gen, float_pair_gen, float_pair_gen_var_1, float_pair_gen_var_10, float_triple_gen,
 };

@@ -9,8 +9,8 @@
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
-use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
 use malachite_q::Rational;
+use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
 use std::str::FromStr;
 
 fn helper(d: &str, a: &str, out: &str) {

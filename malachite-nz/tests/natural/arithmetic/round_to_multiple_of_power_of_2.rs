@@ -25,6 +25,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_rounding_mode_triple_gen_var_2,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::{
     limbs_round_to_multiple_of_power_of_2, limbs_round_to_multiple_of_power_of_2_down,
     limbs_round_to_multiple_of_power_of_2_down_in_place,
@@ -32,11 +33,10 @@ use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::{
     limbs_round_to_multiple_of_power_of_2_nearest_in_place,
     limbs_round_to_multiple_of_power_of_2_up, limbs_round_to_multiple_of_power_of_2_up_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
-    natural_rounding_mode_pair_gen, natural_unsigned_pair_gen_var_10,
-    natural_unsigned_pair_gen_var_13, natural_unsigned_pair_gen_var_4,
+    natural_rounding_mode_pair_gen, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_pair_gen_var_10, natural_unsigned_pair_gen_var_13,
     natural_unsigned_rounding_mode_triple_gen_var_1,
 };
 use std::str::FromStr;

@@ -7,14 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{ModMul, ModMulAssign, ModMulPrecomputed};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_36;
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_mul::{
     limbs_mod_mul_two_limbs, limbs_precompute_mod_mul_two_limbs,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::{
     limb_pair_significant_bits_bucketer, limbs_mod_mul_two_limbs_bucketer,
     triple_3_natural_bit_bucketer,

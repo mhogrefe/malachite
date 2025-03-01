@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
-use malachite_float::test_util::generators::{float_gen_var_14, float_gen_var_2};
 use malachite_float::ComparableFloat;
+use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
+use malachite_float::test_util::generators::{float_gen_var_2, float_gen_var_14};
 use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {

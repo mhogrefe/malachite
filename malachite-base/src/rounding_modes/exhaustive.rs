@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::rounding_modes::{RoundingMode, ROUNDING_MODES};
+use crate::rounding_modes::{ROUNDING_MODES, RoundingMode};
 use core::iter::Copied;
 use core::slice::Iter;
 

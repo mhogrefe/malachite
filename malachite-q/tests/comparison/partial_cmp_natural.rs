@@ -8,11 +8,11 @@
 
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_pair_gen;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_natural_natural_triple_gen, rational_natural_pair_gen,
     rational_rational_natural_triple_gen,
 };
-use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 

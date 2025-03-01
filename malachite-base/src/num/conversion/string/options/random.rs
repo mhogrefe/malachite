@@ -6,15 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{random_bools, RandomBools};
+use crate::bools::random::{RandomBools, random_bools};
 use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
 use crate::num::random::geometric::{
-    geometric_random_negative_signeds, geometric_random_unsigneds, GeometricRandomNaturalValues,
-    GeometricRandomNegativeSigneds,
+    GeometricRandomNaturalValues, GeometricRandomNegativeSigneds,
+    geometric_random_negative_signeds, geometric_random_unsigneds,
 };
-use crate::num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
+use crate::num::random::{RandomUnsignedInclusiveRange, random_unsigned_inclusive_range};
 use crate::random::Seed;
-use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
+use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
 
 /// Generates random [`SciSizeOptions`]s.
 ///

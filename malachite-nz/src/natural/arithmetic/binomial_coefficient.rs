@@ -12,6 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::Natural;
 use crate::natural::arithmetic::div::limbs_hensel_div_limb_in_place;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_schoolbook_in_place, limbs_modular_invert_limb,
@@ -23,16 +24,15 @@ use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
-use crate::natural::Natural;
 use crate::platform::{
-    Limb, CENTRAL_BINOMIAL_2FAC_TABLE, ODD_CENTRAL_BINOMIAL_OFFSET,
+    CENTRAL_BINOMIAL_2FAC_TABLE, Limb, ODD_CENTRAL_BINOMIAL_OFFSET,
     ODD_CENTRAL_BINOMIAL_TABLE_LIMIT, ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT,
     ODD_FACTORIAL_TABLE_MAX, ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE,
     ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE,
     ONE_LIMB_ODD_FACTORIAL_TABLE, TABLE_2N_MINUS_POPC_2N,
 };
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering::*};
+use core::cmp::{Ordering::*, max, min};
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, BinomialCoefficient, DivAssignMod, DivExact, Parity, PowerOf2, Square,
     WrappingAddAssign,

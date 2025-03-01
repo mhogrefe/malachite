@@ -76,7 +76,7 @@ pub_test! {explicit_xx_div_mod_y_to_qr<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: 
         explicit_xx_div_mod_y_to_qr_normalized(x_1, x_0, y)
     } else {
         let (q, r) = explicit_xx_div_mod_y_to_qr_normalized(
-            x_1 << shift | (x_0 >> (T::WIDTH - shift)),
+            (x_1 << shift) | (x_0 >> (T::WIDTH - shift)),
             x_0 << shift,
             y << shift,
         );

@@ -15,8 +15,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_gen, unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
 };
-use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{

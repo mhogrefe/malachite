@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use num::bigint::Sign;
 use num::BigInt;
+use num::bigint::Sign;
 use std::cmp::Ordering::{self, *};
 
 pub fn num_sign(x: &BigInt) -> Ordering {

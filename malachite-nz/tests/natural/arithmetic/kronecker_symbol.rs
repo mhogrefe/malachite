@@ -17,14 +17,14 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_pair_gen_var_40, unsigned_vec_pair_gen_var_32,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::kronecker_symbol::{
     limbs_jacobi_symbol_init, limbs_jacobi_symbol_same_length,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
-    natural_gen, natural_gen_var_8, natural_pair_gen, natural_pair_gen_var_12,
-    natural_pair_gen_var_13, natural_pair_gen_var_14, natural_pair_gen_var_4, natural_triple_gen,
+    natural_gen, natural_gen_var_8, natural_pair_gen, natural_pair_gen_var_4,
+    natural_pair_gen_var_12, natural_pair_gen_var_13, natural_pair_gen_var_14, natural_triple_gen,
     natural_triple_gen_var_8, natural_triple_gen_var_9,
 };
 use malachite_nz::test_util::natural::arithmetic::kronecker_symbol::jacobi_symbol_simple;

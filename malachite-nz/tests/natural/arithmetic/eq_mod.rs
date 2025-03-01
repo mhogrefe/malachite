@@ -13,11 +13,12 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_19, unsigned_triple_gen_var_21, unsigned_vec_triple_gen_var_36,
-    unsigned_vec_unsigned_unsigned_triple_gen_var_10,
     unsigned_vec_unsigned_unsigned_triple_gen_var_7,
+    unsigned_vec_unsigned_unsigned_triple_gen_var_10,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod, limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref,
     limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref, limbs_eq_mod_limb_ref_ref,
@@ -26,7 +27,6 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_limb_mod_exact_odd_limb, limbs_mod_exact_odd_limb,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_pair_gen, natural_triple_gen, natural_triple_gen_var_1, natural_triple_gen_var_2,
@@ -822,8 +822,10 @@ fn limbs_eq_limb_mod_properties() {
     unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5().test_properties_with_config(
         &config,
         |(xs, y, ms)| {
-            assert!(!Natural::from_limbs_asc(&xs)
-                .eq_mod(Natural::from(y), Natural::from_limbs_asc(&ms)));
+            assert!(
+                !Natural::from_limbs_asc(&xs)
+                    .eq_mod(Natural::from(y), Natural::from_limbs_asc(&ms))
+            );
             assert!(!limbs_eq_limb_mod_ref_ref(&xs, y, &ms));
             assert!(!limbs_eq_limb_mod_naive_1(&xs, y, &ms));
             assert!(!limbs_eq_limb_mod_naive_2(&xs, y, &ms));
@@ -868,8 +870,10 @@ fn limbs_eq_mod_limb_properties() {
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16().test_properties_with_config(
         &config,
         |(xs, ys, m)| {
-            assert!(!Natural::from_limbs_asc(&xs)
-                .eq_mod(Natural::from_limbs_asc(&ys), Natural::from(m)));
+            assert!(
+                !Natural::from_limbs_asc(&xs)
+                    .eq_mod(Natural::from_limbs_asc(&ys), Natural::from(m))
+            );
             assert!(!limbs_eq_mod_limb_ref_ref(&xs, &ys, m));
             assert!(!limbs_eq_mod_limb_naive_1(&xs, &ys, m));
             assert!(!limbs_eq_mod_limb_naive_2(&xs, &ys, m));
@@ -904,16 +908,20 @@ fn limbs_eq_mod_properties() {
     });
 
     unsigned_vec_triple_gen_var_54().test_properties_with_config(&config, |(xs, ys, ms)| {
-        assert!(Natural::from_limbs_asc(&xs)
-            .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms)));
+        assert!(
+            Natural::from_limbs_asc(&xs)
+                .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms))
+        );
         assert!(limbs_eq_mod_ref_ref_ref(&xs, &ys, &ms));
         assert!(limbs_eq_mod_naive_1(&xs, &ys, &ms));
         assert!(limbs_eq_mod_naive_2(&xs, &ys, &ms));
     });
 
     unsigned_vec_triple_gen_var_55().test_properties_with_config(&config, |(xs, ys, ms)| {
-        assert!(!Natural::from_limbs_asc(&xs)
-            .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms)));
+        assert!(
+            !Natural::from_limbs_asc(&xs)
+                .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms))
+        );
         assert!(!limbs_eq_mod_ref_ref_ref(&xs, &ys, &ms));
         assert!(!limbs_eq_mod_naive_1(&xs, &ys, &ms));
         assert!(!limbs_eq_mod_naive_2(&xs, &ys, &ms));

@@ -12,10 +12,9 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::test_util::generators::{
-    signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_gen_var_5,
-    unsigned_pair_gen_var_16, unsigned_pair_gen_var_2, unsigned_pair_gen_var_25,
-    unsigned_signed_pair_gen_var_1, unsigned_signed_unsigned_triple_gen_var_2,
-    unsigned_triple_gen_var_18,
+    signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_gen_var_5, unsigned_pair_gen_var_2,
+    unsigned_pair_gen_var_16, unsigned_pair_gen_var_25, unsigned_signed_pair_gen_var_1,
+    unsigned_signed_unsigned_triple_gen_var_2, unsigned_triple_gen_var_18,
 };
 use std::panic::catch_unwind;
 

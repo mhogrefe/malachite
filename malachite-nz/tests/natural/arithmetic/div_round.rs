@@ -18,8 +18,8 @@ use malachite_base::test_util::generators::{
     unsigned_unsigned_rounding_mode_triple_gen_var_1,
     unsigned_vec_unsigned_rounding_mode_triple_gen_var_1,
 };
-use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_natural_rounding_mode_triple_gen_var_1, natural_pair_gen_var_5, natural_pair_gen_var_7,

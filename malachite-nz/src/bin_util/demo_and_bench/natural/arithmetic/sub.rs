@@ -10,10 +10,10 @@ use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_vec_min_len_bucketer, triple_1_2_vec_min_len_bucketer,
     triple_2_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
-    unsigned_vec_pair_gen_var_31, unsigned_vec_pair_gen_var_6, unsigned_vec_triple_gen_var_31,
+    unsigned_vec_pair_gen_var_6, unsigned_vec_pair_gen_var_31, unsigned_vec_triple_gen_var_31,
     unsigned_vec_triple_gen_var_40, unsigned_vec_unsigned_pair_gen,
     unsigned_vec_unsigned_pair_gen_var_1, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24,

@@ -18,10 +18,10 @@ use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_3, rational_rounding_mode_pair_gen_var_1,
 };
-use malachite_q::Rational;
 use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;

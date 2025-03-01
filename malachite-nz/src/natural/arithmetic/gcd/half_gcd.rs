@@ -34,7 +34,7 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{DoubleLimb, Limb};
-use core::cmp::{max, min, Ordering::*};
+use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{

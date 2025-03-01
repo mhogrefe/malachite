@@ -8,7 +8,7 @@
 
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::test_util::bench::bucketers::primitive_int_direct_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_gen;
 use malachite_base::test_util::num::factorization::is_prime::is_prime_naive;

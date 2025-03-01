@@ -15,8 +15,8 @@ use malachite_base::num::conversion::traits::WrappingInto;
 use malachite_base::test_util::generators::{
     large_type_gen_var_27, signed_pair_gen, signed_pair_gen_var_8,
 };
-use malachite_nz::integer::arithmetic::kronecker_symbol::limbs_kronecker_symbol;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::arithmetic::kronecker_symbol::limbs_kronecker_symbol;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{

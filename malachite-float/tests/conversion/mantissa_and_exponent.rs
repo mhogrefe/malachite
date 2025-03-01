@@ -24,7 +24,7 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::{
-    float_gen_var_13, float_gen_var_3, float_rounding_mode_pair_gen,
+    float_gen_var_3, float_gen_var_13, float_rounding_mode_pair_gen,
     float_rounding_mode_pair_gen_var_21, float_signed_pair_gen_var_1,
 };
 use malachite_float::{ComparableFloatRef, Float};
@@ -1773,7 +1773,7 @@ fn test_from_integer_mantissa_and_exponent() {
     let test = |m, e, out, out_hex| {
         let m = Natural::from_str(m).unwrap();
         let ox = Float::from_integer_mantissa_and_exponent(m.clone(), e);
-        assert!(ox.as_ref().map_or(true, Float::is_valid));
+        assert!(ox.as_ref().is_none_or(Float::is_valid));
         let os = ox.as_ref().map(ToString::to_string);
         assert_eq!(os.as_deref(), out);
         let os = ox.as_ref().map(to_hex_string);
@@ -1783,7 +1783,7 @@ fn test_from_integer_mantissa_and_exponent() {
             <&Float as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
                 m, e,
             );
-        assert!(ox_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(ox_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(ox_alt, ox);
     };
     test("0", 0, Some("0.0"), Some("0x0.0"));
@@ -2068,7 +2068,7 @@ fn test_from_sci_mantissa_and_exponent_float() {
         let m = parse_hex_string(ms_hex);
         assert_eq!(m.to_string(), ms);
         let ox = Float::from_sci_mantissa_and_exponent(m.clone(), e);
-        assert!(ox.as_ref().map_or(true, Float::is_valid));
+        assert!(ox.as_ref().is_none_or(Float::is_valid));
         let os = ox.as_ref().map(ToString::to_string);
         assert_eq!(os.as_deref(), out);
         let os = ox.as_ref().map(to_hex_string);
@@ -2076,7 +2076,7 @@ fn test_from_sci_mantissa_and_exponent_float() {
 
         let ox_alt =
             <&Float as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(m, e);
-        assert!(ox_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(ox_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(ox_alt, ox);
     };
     test("1.0", "0x1.0#1", 0, Some("1.0"), Some("0x1.0#1"));
@@ -2389,7 +2389,7 @@ fn test_from_sci_mantissa_and_exponent_primitive_float() {
         for<'a> &'a Float: SciMantissaAndExponent<T, i32, Float>,
     {
         let ox = <&Float as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(m, e);
-        assert!(ox.as_ref().map_or(true, Float::is_valid));
+        assert!(ox.as_ref().is_none_or(Float::is_valid));
         let os = ox.as_ref().map(ToString::to_string);
         assert_eq!(os.as_deref(), out);
         let os = ox.as_ref().map(to_hex_string);
@@ -2640,7 +2640,7 @@ fn from_integer_mantissa_and_exponent_properties() {
             <&Float as IntegerMantissaAndExponent<_, _, _>>::from_integer_mantissa_and_exponent(
                 mantissa, exponent,
             );
-        assert!(ox_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(ox_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(ox_alt, ox);
     });
 }
@@ -2825,7 +2825,7 @@ fn from_sci_mantissa_and_exponent_float_properties() {
         let ox_alt = <&Float as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(
             mantissa, exponent,
         );
-        assert!(ox_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(ox_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(ox_alt, ox);
     });
 }
@@ -2918,7 +2918,7 @@ where
 
         let ox_alt =
             Float::from_sci_mantissa_and_exponent(Float::from(mantissa), i32::exact_from(exponent));
-        assert!(ox_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(ox_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(ox_alt, ox);
     });
 }

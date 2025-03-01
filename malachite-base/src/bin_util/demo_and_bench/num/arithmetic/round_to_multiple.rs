@@ -11,7 +11,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::test_util::bench::bucketers::triple_1_2_max_bit_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     signed_signed_rounding_mode_triple_gen_var_2, unsigned_unsigned_rounding_mode_triple_gen_var_2,

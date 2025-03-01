@@ -642,9 +642,9 @@ fn test_to_non_nan() {
         assert_eq!(x.to_string(), s);
 
         let actual_out = x.to_non_nan();
-        assert!(actual_out.as_ref().map_or(true, Float::is_valid));
+        assert!(actual_out.as_ref().is_none_or(Float::is_valid));
         let actual_out_alt = x.into_non_nan();
-        assert!(actual_out_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(actual_out_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(actual_out_alt, actual_out);
 
         let s = actual_out.as_ref().map(|x| x.to_string());
@@ -766,9 +766,9 @@ fn test_to_finite() {
         assert_eq!(x.to_string(), s);
 
         let actual_out = x.to_finite();
-        assert!(actual_out.as_ref().map_or(true, Float::is_valid));
+        assert!(actual_out.as_ref().is_none_or(Float::is_valid));
         let actual_out_alt = x.into_finite();
-        assert!(actual_out_alt.as_ref().map_or(true, Float::is_valid));
+        assert!(actual_out_alt.as_ref().is_none_or(Float::is_valid));
         assert_eq!(actual_out_alt, actual_out);
 
         let s = actual_out.as_ref().map(|x| x.to_string());

@@ -12,8 +12,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_gen_var_4, unsigned_vec_gen_var_2, unsigned_vec_gen_var_4,
 };
-use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::integer_gen;

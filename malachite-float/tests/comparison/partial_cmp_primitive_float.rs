@@ -10,15 +10,15 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{primitive_float_gen, primitive_float_gen_var_11};
+use malachite_float::Float;
 use malachite_float::test_util::common::{
-    parse_hex_string, ORDERED_F32S, ORDERED_F64S, ORDERED_FLOAT_HEX_STRINGS,
+    ORDERED_F32S, ORDERED_F64S, ORDERED_FLOAT_HEX_STRINGS, parse_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_float_primitive_float_triple_gen, float_gen, float_gen_var_2,
     float_primitive_float_pair_gen, float_primitive_float_pair_gen_var_1,
     float_primitive_float_primitive_float_triple_gen,
 };
-use malachite_float::Float;
 use rug;
 use std::cmp::Ordering::{self, *};
 

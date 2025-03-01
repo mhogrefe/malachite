@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::pair_1_vec_natural_sum_bits_bucketer;
 use malachite_nz::test_util::generators::natural_vec_integer_pair_gen_var_1;
-use malachite_q::test_util::conversion::continued_fraction::from_continued_fraction::*;
 use malachite_q::Rational;
+use malachite_q::test_util::conversion::continued_fraction::from_continued_fraction::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_from_continued_fraction);

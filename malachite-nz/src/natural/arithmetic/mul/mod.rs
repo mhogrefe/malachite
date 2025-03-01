@@ -15,6 +15,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::add_mul::{
     limbs_slice_add_mul_limb_same_length_in_place_left,
@@ -26,6 +28,8 @@ use crate::natural::arithmetic::mul::fft::{
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
 use crate::natural::arithmetic::mul::toom::{
+    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_scratch_len,
+    limbs_mul_greater_to_out_toom_8h, limbs_mul_greater_to_out_toom_8h_scratch_len,
     limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
     limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
     limbs_mul_greater_to_out_toom_33, limbs_mul_greater_to_out_toom_33_scratch_len,
@@ -34,16 +38,11 @@ use crate::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_44, limbs_mul_greater_to_out_toom_44_scratch_len,
     limbs_mul_greater_to_out_toom_53, limbs_mul_greater_to_out_toom_53_scratch_len,
     limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
-    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_scratch_len,
-    limbs_mul_greater_to_out_toom_8h, limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD,
-    MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM42_TO_TOOM53_THRESHOLD,
-    MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
-    MUL_TOOM8H_THRESHOLD,
+    Limb, MUL_FFT_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD, MUL_TOOM22_THRESHOLD,
+    MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
+    MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD,
 };
 use alloc::vec::Vec;
 use core::cmp::max;
@@ -658,7 +657,7 @@ impl Mul<&Natural> for &Natural {
         match (self, other) {
             (Natural(Small(x)), y) => y.mul_limb_ref(*x),
             (x, Natural(Small(y))) => x.mul_limb_ref(*y),
-            (Natural(Large(ref xs)), Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 Natural::from_owned_limbs_asc(limbs_mul(xs, ys))
             }
         }
@@ -701,7 +700,7 @@ impl MulAssign<Natural> for Natural {
                 *self = other;
             }
             (_, Natural(Small(y))) => self.mul_assign_limb(*y),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 *xs = limbs_mul(xs, ys);
                 self.trim();
             }
@@ -742,7 +741,7 @@ impl<'a> MulAssign<&'a Natural> for Natural {
         match (&mut *self, other) {
             (Natural(Small(x)), _) => *self = other.mul_limb_ref(*x),
             (_, Natural(Small(y))) => self.mul_assign_limb(*y),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 *xs = limbs_mul(xs, ys);
                 self.trim();
             }

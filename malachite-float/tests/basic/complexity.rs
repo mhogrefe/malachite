@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
-use malachite_float::Float;
 
 #[test]
 fn test_complexity() {

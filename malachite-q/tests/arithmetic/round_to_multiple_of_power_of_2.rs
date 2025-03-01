@@ -19,11 +19,11 @@ use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{
     integer_rounding_mode_pair_gen, integer_unsigned_rounding_mode_triple_gen_var_1,
 };
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_signed_pair_gen_var_1, rational_signed_pair_gen_var_3,
     rational_signed_rounding_mode_triple_gen_var_1,
 };
-use malachite_q::Rational;
 use std::cmp::Ordering::*;
 use std::str::FromStr;
 

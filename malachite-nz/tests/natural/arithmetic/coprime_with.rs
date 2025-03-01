@@ -9,10 +9,10 @@
 use malachite_base::num::arithmetic::traits::{CoprimeWith, Gcd};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::coprime_with::{
     coprime_with_check_2, coprime_with_check_2_3, coprime_with_check_2_3_5,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen};
 use std::str::FromStr;

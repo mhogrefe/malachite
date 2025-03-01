@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::malachite_base::num::logic::traits::SignificantBits;
 use crate::Float;
 use crate::InnerFloat::Finite;
+use crate::malachite_base::num::logic::traits::SignificantBits;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, ShlRound, ShlRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;

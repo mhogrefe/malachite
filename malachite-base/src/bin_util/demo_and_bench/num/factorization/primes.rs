@@ -13,7 +13,7 @@ use malachite_base::num::factorization::primes::{
     prime_indicator_sequence_less_than_or_equal_to,
 };
 use malachite_base::test_util::bench::bucketers::unsigned_direct_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_pair_gen_var_28, unsigned_triple_gen_var_24,

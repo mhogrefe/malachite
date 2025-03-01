@@ -14,13 +14,13 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::primitive_float_gen;
+use malachite_float::Float;
 use malachite_float::conversion::primitive_float_from_float::FloatFromFloatError;
 use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_var_12, float_gen_var_4, float_rounding_mode_pair_gen_var_20,
-    float_rounding_mode_pair_gen_var_6,
+    float_gen, float_gen_var_4, float_gen_var_12, float_rounding_mode_pair_gen_var_6,
+    float_rounding_mode_pair_gen_var_20,
 };
-use malachite_float::Float;
 use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};

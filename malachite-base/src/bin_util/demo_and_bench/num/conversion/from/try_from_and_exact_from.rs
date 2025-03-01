@@ -15,7 +15,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::bucketers::{
     primitive_float_bucketer, signed_bit_bucketer, unsigned_bit_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_13, primitive_float_gen_var_14, signed_gen,
@@ -227,10 +227,9 @@ fn benchmark_primitive_int_try_from_primitive_float<
         limit,
         file_name,
         &primitive_float_bucketer("x"),
-        &mut [(
-            "Malachite",
-            &mut |n| no_out!(T::try_from(NiceFloat(n)).ok()),
-        )],
+        &mut [("Malachite", &mut |n| {
+            no_out!(T::try_from(NiceFloat(n)).ok())
+        })],
     );
 }
 

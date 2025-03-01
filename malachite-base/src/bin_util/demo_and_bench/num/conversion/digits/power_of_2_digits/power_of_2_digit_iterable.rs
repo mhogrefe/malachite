@@ -12,7 +12,7 @@ use malachite_base::num::conversion::traits::{
     ExactFrom, PowerOf2DigitIterable, PowerOf2DigitIterator, PowerOf2Digits,
 };
 use malachite_base::test_util::bench::bucketers::{pair_1_bit_bucketer, triple_1_bit_bucketer};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{unsigned_pair_gen_var_4, unsigned_triple_gen_var_3};
 use malachite_base::test_util::runner::Runner;

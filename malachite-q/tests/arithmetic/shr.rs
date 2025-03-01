@@ -16,10 +16,10 @@ use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, unsigned_gen, unsigned_gen_var_5,
 };
 use malachite_nz::integer::Integer;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_signed_pair_gen_var_1, rational_unsigned_pair_gen_var_1,
 };
-use malachite_q::Rational;
 use std::ops::{Shl, Shr, ShrAssign};
 use std::str::FromStr;
 

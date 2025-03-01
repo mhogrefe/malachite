@@ -473,20 +473,28 @@ macro_rules! shl_round_signed_fail_helper {
     ($t:ident) => {
         assert_panic!(Natural::from(123u32).shl_round_assign($t::NEGATIVE_ONE, Exact));
         assert_panic!(Natural::from(123u32).shl_round_assign($t::exact_from(-100), Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shl_round_assign($t::NEGATIVE_ONE, Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shl_round_assign($t::exact_from(-100), Exact));
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shl_round_assign($t::NEGATIVE_ONE, Exact)
+        );
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shl_round_assign($t::exact_from(-100), Exact)
+        );
         assert_panic!(Natural::from(123u32).shl_round($t::NEGATIVE_ONE, Exact));
         assert_panic!(Natural::from(123u32).shl_round($t::exact_from(-100), Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shl_round($t::NEGATIVE_ONE, Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shl_round($t::exact_from(-100), Exact));
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shl_round($t::NEGATIVE_ONE, Exact)
+        );
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shl_round($t::exact_from(-100), Exact)
+        );
         assert_panic!((&Natural::from(123u32)).shl_round($t::NEGATIVE_ONE, Exact));
         assert_panic!((&Natural::from(123u32)).shl_round($t::exact_from(-100), Exact));
         assert_panic!(

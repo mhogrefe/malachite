@@ -9,8 +9,8 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::test_util::generators::float_gen;
 use malachite_float::ComparableFloatRef;
+use malachite_float::test_util::generators::float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_to_string);

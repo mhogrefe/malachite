@@ -862,20 +862,28 @@ macro_rules! shr_round_unsigned_fail_helper {
     ($t:ident) => {
         assert_panic!(Integer::from(-123).shr_round_assign($t::ONE, Exact));
         assert_panic!(Integer::from(-123).shr_round_assign($t::exact_from(100), Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round_assign($t::ONE, Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round_assign($t::exact_from(100), Exact));
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round_assign($t::ONE, Exact)
+        );
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round_assign($t::exact_from(100), Exact)
+        );
         assert_panic!(Integer::from(-123).shr_round($t::ONE, Exact));
         assert_panic!(Integer::from(-123).shr_round($t::exact_from(100), Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round($t::ONE, Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round($t::exact_from(100), Exact));
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round($t::ONE, Exact)
+        );
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round($t::exact_from(100), Exact)
+        );
         assert_panic!((&Integer::from(-123)).shr_round($t::ONE, Exact));
         assert_panic!((&Integer::from(-123)).shr_round($t::exact_from(100), Exact));
         assert_panic!((&Integer::from_str("-1000000000001").unwrap()).shr_round($t::ONE, Exact));
@@ -1790,20 +1798,28 @@ macro_rules! shr_round_signed_fail_helper {
     ($t:ident) => {
         assert_panic!(Integer::from(-123).shr_round_assign($t::ONE, Exact));
         assert_panic!(Integer::from(-123).shr_round_assign($t::exact_from(100), Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round_assign($t::ONE, Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round_assign($t::exact_from(100), Exact));
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round_assign($t::ONE, Exact)
+        );
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round_assign($t::exact_from(100), Exact)
+        );
         assert_panic!(Integer::from(-123).shr_round($t::ONE, Exact));
         assert_panic!(Integer::from(-123).shr_round($t::exact_from(100), Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round($t::ONE, Exact));
-        assert_panic!(Integer::from_str("-1000000000001")
-            .unwrap()
-            .shr_round($t::exact_from(100), Exact));
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round($t::ONE, Exact)
+        );
+        assert_panic!(
+            Integer::from_str("-1000000000001")
+                .unwrap()
+                .shr_round($t::exact_from(100), Exact)
+        );
         assert_panic!((&Integer::from(-123)).shr_round($t::ONE, Exact));
         assert_panic!((&Integer::from(-123)).shr_round($t::exact_from(100), Exact));
         assert_panic!((&Integer::from_str("-1000000000001").unwrap()).shr_round($t::ONE, Exact));

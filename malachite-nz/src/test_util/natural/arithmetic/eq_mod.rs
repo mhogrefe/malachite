@@ -17,7 +17,7 @@ use crate::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
 use crate::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use crate::natural::arithmetic::sub::{limbs_sub, limbs_sub_limb};
 use crate::natural::comparison::cmp::limbs_cmp;
-use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::slices::slice_trailing_zeros;
 use std::cmp::Ordering::*;

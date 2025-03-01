@@ -23,8 +23,8 @@ macro_rules! impl_partial_eq_limb {
             /// # Examples
             /// See [here](super::partial_eq_primitive_int#partial_eq).
             fn eq(&self, other: &$u) -> bool {
-                match *self {
-                    Natural(Small(x)) => x == *other,
+                match self {
+                    Natural(Small(x)) => *x == *other,
                     Natural(Large(_)) => false,
                 }
             }

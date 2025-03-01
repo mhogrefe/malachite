@@ -15,6 +15,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
@@ -25,19 +27,18 @@ use crate::natural::arithmetic::div_mod::{
     limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns,
 };
 use crate::natural::arithmetic::gcd::half_gcd::{
-    extract_number, limbs_gcd_subdivide_step, limbs_half_gcd, limbs_half_gcd_2,
+    GcdSubdivideStepContext, HalfGcdMatrix, HalfGcdMatrix1, extract_number,
+    limbs_gcd_subdivide_step, limbs_half_gcd, limbs_half_gcd_2,
     limbs_half_gcd_matrix_1_mul_inverse_vector, limbs_half_gcd_matrix_1_mul_vector,
     limbs_half_gcd_matrix_adjust, limbs_half_gcd_matrix_init_scratch_len,
-    limbs_half_gcd_scratch_len, GcdSubdivideStepContext, HalfGcdMatrix, HalfGcdMatrix1,
+    limbs_half_gcd_scratch_len,
 };
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::sub::limbs_sub_greater_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
 use crate::platform::Limb;
-use core::cmp::{max, Ordering::*};
+use core::cmp::{Ordering::*, max};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{

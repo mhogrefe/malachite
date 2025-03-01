@@ -11,14 +11,14 @@ use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, quadruple_max_bit_bucketer,
     unsigned_direct_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_quadruple_gen_var_11, unsigned_vec_unsigned_pair_gen_var_23,
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::gcd::half_gcd::{
-    limbs_gcd_div, limbs_gcd_reduced, limbs_half_gcd_matrix_1_mul_vector, HalfGcdMatrix,
+    HalfGcdMatrix, limbs_gcd_div, limbs_gcd_reduced, limbs_half_gcd_matrix_1_mul_vector,
 };
 use malachite_nz::natural::arithmetic::gcd::limbs_gcd_limb;
 use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
@@ -35,7 +35,7 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_pair_gen_var_10,
 };
 use malachite_nz::test_util::natural::arithmetic::gcd::{
-    gcd_binary_nz, gcd_euclidean_nz, limbs_gcd_div_alt, limbs_gcd_div_naive, OwnedHalfGcdMatrix,
+    OwnedHalfGcdMatrix, gcd_binary_nz, gcd_euclidean_nz, limbs_gcd_div_alt, limbs_gcd_div_naive,
 };
 use num::Integer;
 
@@ -539,10 +539,9 @@ fn benchmark_natural_gcd_evaluation_strategy(
             ("Natural.gcd(Natural)", &mut |(x, y)| no_out!(x.gcd(y))),
             ("Natural.gcd(&Natural)", &mut |(x, y)| no_out!(x.gcd(&y))),
             ("&Natural.gcd(Natural)", &mut |(x, y)| no_out!((&x).gcd(y))),
-            (
-                "&Natural.gcd(&Natural)",
-                &mut |(x, y)| no_out!((&x).gcd(&y)),
-            ),
+            ("&Natural.gcd(&Natural)", &mut |(x, y)| {
+                no_out!((&x).gcd(&y))
+            }),
         ],
     );
 }
@@ -610,10 +609,9 @@ fn benchmark_natural_gcd_evaluation_strategy_2(
             ("Natural.gcd(Natural)", &mut |(x, y)| no_out!(x.gcd(y))),
             ("Natural.gcd(&Natural)", &mut |(x, y)| no_out!(x.gcd(&y))),
             ("&Natural.gcd(Natural)", &mut |(x, y)| no_out!((&x).gcd(y))),
-            (
-                "&Natural.gcd(&Natural)",
-                &mut |(x, y)| no_out!((&x).gcd(&y)),
-            ),
+            ("&Natural.gcd(&Natural)", &mut |(x, y)| {
+                no_out!((&x).gcd(&y))
+            }),
         ],
     );
 }

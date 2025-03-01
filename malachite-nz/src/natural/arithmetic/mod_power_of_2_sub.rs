@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::{
     limbs_neg_mod_power_of_2, limbs_neg_mod_power_of_2_in_place,
     limbs_slice_mod_power_of_2_in_place,
@@ -18,8 +20,6 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::logic::low_mask::limbs_low_mask;
 use crate::natural::logic::not::limbs_not_in_place;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::mem::swap;
@@ -202,7 +202,7 @@ impl Natural {
                     Natural(Small(diff))
                 }
             }
-            (&Natural(Large(ref limbs)), other, _) => {
+            (Natural(Large(limbs)), other, _) => {
                 Natural::from_owned_limbs_asc(limbs_sub_limb(limbs, other).0)
             }
         }
@@ -226,7 +226,7 @@ impl Natural {
                     Natural(Small(diff))
                 }
             }
-            (&Natural(Large(ref limbs)), other, _) => Natural::from_owned_limbs_asc(
+            (Natural(Large(limbs)), other, _) => Natural::from_owned_limbs_asc(
                 limbs_mod_power_of_2_limb_sub_limbs(other, limbs, pow),
             ),
         }
@@ -236,10 +236,10 @@ impl Natural {
         match (&mut *self, y, pow) {
             (_, 0, _) => {}
             (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)).mod_power_of_2_neg(pow),
-            (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
+            (Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_2_sub_assign(other, pow);
             }
-            (&mut Natural(Small(ref mut small)), other, _) => {
+            (Natural(Small(small)), other, _) => {
                 let (diff, overflow) = small.overflowing_sub(other);
                 if overflow {
                     let mut out = limbs_low_mask(pow);
@@ -249,7 +249,7 @@ impl Natural {
                     *small = diff;
                 }
             }
-            (&mut Natural(Large(ref mut limbs)), other, _) => {
+            (Natural(Large(limbs)), other, _) => {
                 limbs_sub_limb_in_place(limbs, other);
                 self.trim();
             }
@@ -261,10 +261,10 @@ impl Natural {
         match (&mut *self, other, pow) {
             (_, 0, _) => self.mod_power_of_2_neg_assign(pow),
             (&mut Natural::ZERO, _, _) => *self = Natural(Small(other)),
-            (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
+            (Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 *small = other.mod_power_of_2_sub(*small, pow);
             }
-            (&mut Natural(Small(ref mut small)), other, _) => {
+            (Natural(Small(small)), other, _) => {
                 let (diff, overflow) = other.overflowing_sub(*small);
                 if overflow {
                     let mut out = limbs_low_mask(pow);
@@ -274,7 +274,7 @@ impl Natural {
                     *small = diff;
                 }
             }
-            (&mut Natural(Large(ref mut limbs)), other, _) => {
+            (Natural(Large(limbs)), other, _) => {
                 limbs_mod_power_of_2_limb_sub_limbs_in_place(other, limbs, pow);
                 self.trim();
             }
@@ -404,7 +404,7 @@ impl ModPowerOf2Sub<Natural> for &Natural {
                 y.mod_power_of_2_right_sub_assign_limb(x, pow);
                 other
             }
-            (&Natural(Large(ref xs)), &mut Natural(Large(ref mut ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 limbs_mod_power_of_2_sub_in_place_right(xs, ys, pow);
                 other.trim();
                 other
@@ -459,7 +459,7 @@ impl ModPowerOf2Sub<&Natural> for &Natural {
             (x, y) if core::ptr::eq(x, y) => Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_2_right_sub_limb_ref(x, pow),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 Natural::from_owned_limbs_asc(limbs_mod_power_of_2_sub(xs, ys, pow))
             }
         }
@@ -511,7 +511,7 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
                 y.mod_power_of_2_right_sub_assign_limb(x, pow);
                 *self = other;
             }
-            (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 if limbs_mod_power_of_2_sub_in_place_either(xs, ys, pow) {
                     swap(xs, ys);
                 }
@@ -564,7 +564,7 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
             (x, y) if core::ptr::eq(x, y) => *self = Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_right_sub_limb_ref(x, pow),
-            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 limbs_mod_power_of_2_sub_in_place_left(xs, ys, pow);
                 self.trim();
             }

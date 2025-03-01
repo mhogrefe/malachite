@@ -10,9 +10,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
@@ -101,9 +101,9 @@ pub fn limbs_eq_mod_power_of_2(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
 
 impl Natural {
     fn eq_mod_power_of_2_limb(&self, other: Limb, pow: u64) -> bool {
-        match *self {
+        match self {
             Natural(Small(small)) => small.eq_mod_power_of_2(other, pow),
-            Natural(Large(ref limbs)) => limbs_eq_limb_mod_power_of_2(limbs, other, pow),
+            Natural(Large(limbs)) => limbs_eq_limb_mod_power_of_2(limbs, other, pow),
         }
     }
 }
@@ -147,9 +147,7 @@ impl EqModPowerOf2<&Natural> for &Natural {
         match (self, other) {
             (_, &Natural(Small(y))) => self.eq_mod_power_of_2_limb(y, pow),
             (&Natural(Small(x)), _) => other.eq_mod_power_of_2_limb(x, pow),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                limbs_eq_mod_power_of_2(xs, ys, pow)
-            }
+            (Natural(Large(xs)), Natural(Large(ys))) => limbs_eq_mod_power_of_2(xs, ys, pow),
         }
     }
 }

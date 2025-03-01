@@ -10,7 +10,7 @@ use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::iterators::iterator_to_bit_chunks;
-use std::panic::{catch_unwind, RefUnwindSafe};
+use std::panic::{RefUnwindSafe, catch_unwind};
 
 fn iterator_to_bit_chunks_helper<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>>(
     xs: &[T],

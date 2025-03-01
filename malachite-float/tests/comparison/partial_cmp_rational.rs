@@ -7,13 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::comparison::partial_cmp_rational::float_partial_cmp_rational_alt;
 use malachite_float::test_util::generators::{
     float_float_rational_triple_gen, float_rational_pair_gen, float_rational_pair_gen_var_1,
     float_rational_pair_gen_var_2, float_rational_rational_triple_gen,
 };
-use malachite_float::Float;
 use malachite_q::Rational;
 use rug;
 use std::cmp::Ordering::{self, *};

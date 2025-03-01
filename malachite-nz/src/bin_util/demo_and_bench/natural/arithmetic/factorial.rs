@@ -13,12 +13,12 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_bucketer, unsigned_direct_bucketer, usize_convertible_pair_ratio_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_pair_gen_var_18};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::factorial::limbs_odd_factorial;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::factorial::limbs_odd_factorial;
 use malachite_nz::test_util::generators::unsigned_bool_pair_gen_var_1;
 use malachite_nz::test_util::natural::arithmetic::factorial::{
     double_factorial_naive, factorial_naive, multifactorial_naive,

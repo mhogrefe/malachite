@@ -19,6 +19,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_pair_gen_var_26, unsigned_vec_unsigned_pair_gen_var_27,
     unsigned_vec_unsigned_pair_gen_var_28,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett_scratch_len, limbs_two_limb_inverse_helper,
 };
@@ -30,7 +31,6 @@ use malachite_nz::natural::arithmetic::mod_op::{
     limbs_mod_limb_small_unnormalized, limbs_mod_schoolbook, limbs_mod_three_limb_by_two_limb,
     limbs_mod_to_out,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_12, natural_gen, natural_gen_var_2, natural_pair_gen_var_5,

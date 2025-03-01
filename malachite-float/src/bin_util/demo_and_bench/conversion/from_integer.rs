@@ -8,7 +8,7 @@
 
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;

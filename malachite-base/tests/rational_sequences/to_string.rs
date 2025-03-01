@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::rational_sequences::RationalSequence;
-use malachite_base::strings::string_is_subset;
 use malachite_base::strings::ToDebugString;
+use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::generators::{unsigned_rational_sequence_gen, unsigned_vec_gen};
 
 #[test]

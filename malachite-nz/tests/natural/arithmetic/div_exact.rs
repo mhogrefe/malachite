@@ -20,6 +20,7 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_22, unsigned_pair_gen_var_11, unsigned_vec_pair_gen_var_12,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::div_exact::{
     limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out,
     limbs_div_exact_limb, limbs_div_exact_limb_in_place,
@@ -34,7 +35,6 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_scratch_len, limbs_modular_invert, limbs_modular_invert_limb,
     limbs_modular_invert_scratch_len, test_invert_limb_table,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,

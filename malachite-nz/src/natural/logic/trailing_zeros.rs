@@ -58,10 +58,10 @@ impl Natural {
     /// assert_eq!(Natural::from(10u32).pow(12).trailing_zeros(), Some(12));
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
-        match *self {
-            Natural::ZERO => None,
-            Natural(Small(small)) => Some(TrailingZeros::trailing_zeros(small)),
-            Natural(Large(ref limbs)) => Some(limbs_trailing_zeros(limbs)),
+        match self {
+            &Natural::ZERO => None,
+            Natural(Small(small)) => Some(TrailingZeros::trailing_zeros(*small)),
+            Natural(Large(limbs)) => Some(limbs_trailing_zeros(limbs)),
         }
     }
 }

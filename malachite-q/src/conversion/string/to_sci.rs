@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::log_base::log_base_helper;
 use crate::Rational;
+use crate::arithmetic::log_base::log_base_helper;
 use alloc::string::String;
-use core::cmp::{max, Ordering::*};
+use core::cmp::{Ordering::*, max};
 use core::fmt::{Formatter, Write};
 use malachite_base::num::arithmetic::traits::{
     Abs, CheckedLogBase2, DivExact, DivExactAssign, DivRound, DivisibleBy, Pow, Sign,
@@ -144,11 +144,7 @@ impl Rational {
             length = max(length, count.div_round(u64::from(m), Ceiling).0);
         }
         if let Some(temp) = temp {
-            if temp == 1 {
-                Some(length)
-            } else {
-                None
-            }
+            if temp == 1 { Some(length) } else { None }
         } else {
             None
         }

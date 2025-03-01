@@ -11,8 +11,8 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
-use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen;
 use num::BigRational;
 use std::str::FromStr;
 

@@ -405,9 +405,5 @@ pub fn jacobi_symbol_unsigned_double_fast_1<T: PrimitiveUnsigned>(
         x_0 >>= c;
     }
     let j = ((x_0 << 1u32) | T::ONE).jacobi_symbol((y_0 << 1u32) | T::ONE);
-    if bit {
-        -j
-    } else {
-        j
-    }
+    if bit { -j } else { j }
 }

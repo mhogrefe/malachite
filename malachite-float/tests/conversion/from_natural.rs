@@ -17,8 +17,8 @@ use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::Rational;
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -901,8 +901,10 @@ fn from_natural_prec_round_properties() {
         );
         let r_nearest = Rational::exact_from(&nearest.0);
         if r_nearest != 0u32 {
-            assert!((r_nearest - Rational::from(&n))
-                .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
+            assert!(
+                (r_nearest - Rational::from(&n))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+            );
         }
     });
 }

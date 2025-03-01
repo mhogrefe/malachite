@@ -12,9 +12,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::log_n_max;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{PowerOf2, Primorial, RotateLeftAssign};

@@ -6,10 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Float;
+use crate::InnerFloat::Finite;
 use crate::random::{
-    random_finite_floats, random_floats, random_non_negative_finite_floats,
-    random_nonzero_finite_floats, random_positive_finite_floats,
-    random_positive_floats_with_precision, RandomPositiveFiniteFloats,
+    RandomPositiveFiniteFloats, random_finite_floats, random_floats,
+    random_non_negative_finite_floats, random_nonzero_finite_floats, random_positive_finite_floats,
+    random_positive_floats_with_precision,
 };
 use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_xxyz, random_triples, random_triples_from_single,
@@ -29,12 +31,10 @@ use crate::test_util::generators::{
     set_prec_round_valid, shl_round_valid, shr_round_valid, signed_rounding_from_float_valid,
     unsigned_rounding_from_float_valid,
 };
-use crate::Float;
-use crate::InnerFloat::Finite;
 use malachite_base::bools::random::{
-    random_bools, weighted_random_bools, RandomBools, WeightedRandomBools,
+    RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
 };
-use malachite_base::iterators::{with_special_values, WithSpecialValues};
+use malachite_base::iterators::{WithSpecialValues, with_special_values};
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, NegModPowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -44,28 +44,28 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
-    geometric_random_natural_signeds, geometric_random_positive_unsigneds,
-    geometric_random_signeds, geometric_random_unsigned_inclusive_range,
-    geometric_random_unsigneds, GeometricRandomNaturalValues,
+    GeometricRandomNaturalValues, geometric_random_natural_signeds,
+    geometric_random_positive_unsigneds, geometric_random_signeds,
+    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
 };
 use malachite_base::num::random::{
-    random_primitive_ints, random_unsigned_inclusive_range, special_random_primitive_floats,
-    RandomUnsignedInclusiveRange,
+    RandomUnsignedInclusiveRange, random_primitive_ints, random_unsigned_inclusive_range,
+    special_random_primitive_floats,
 };
-use malachite_base::random::{Seed, EXAMPLE_SEED};
-use malachite_base::rounding_modes::random::random_rounding_modes;
+use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::common::{reshape_2_1_to_3, GenConfig, It};
+use malachite_base::rounding_modes::random::random_rounding_modes;
+use malachite_base::test_util::generators::common::{GenConfig, It, reshape_2_1_to_3};
 use malachite_base::tuples::random::{random_pairs, random_pairs_from_single};
-use malachite_nz::integer::random::random_integers;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::random::{
-    random_naturals, random_positive_naturals, RandomNaturals, UniformRandomNaturalRange,
-};
+use malachite_nz::integer::random::random_integers;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::{
+    RandomNaturals, UniformRandomNaturalRange, random_naturals, random_positive_naturals,
+};
 use malachite_nz::platform::Limb;
-use malachite_q::random::random_rationals;
 use malachite_q::Rational;
+use malachite_q::random::random_rationals;
 use std::collections::HashMap;
 
 // -- Float --

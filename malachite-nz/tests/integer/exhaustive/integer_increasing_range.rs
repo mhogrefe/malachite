@@ -10,8 +10,8 @@ use itertools::Itertools;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::integer::exhaustive::integer_increasing_range;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::exhaustive::integer_increasing_range;
 
 fn expected_range_len(a: &Integer, b: &Integer) -> usize {
     match (*a >= 0, *b >= 0) {

@@ -947,11 +947,7 @@ fn to_sci_with_options_helper_unsigned<T: PrimitiveUnsigned>() {
                     SciSizeOptions::Complete | SciSizeOptions::Scale(_) => None,
                     SciSizeOptions::Precision(p) => {
                         let log = x.floor_log_base(base);
-                        if log >= p {
-                            Some(log - p + 1)
-                        } else {
-                            None
-                        }
+                        if log >= p { Some(log - p + 1) } else { None }
                     }
                 };
                 if let Some(scale) = scale {
@@ -1028,11 +1024,7 @@ where
                     SciSizeOptions::Complete | SciSizeOptions::Scale(_) => None,
                     SciSizeOptions::Precision(p) => {
                         let log = x.unsigned_abs().floor_log_base(u_base);
-                        if log >= p {
-                            Some(log - p + 1)
-                        } else {
-                            None
-                        }
+                        if log >= p { Some(log - p + 1) } else { None }
                     }
                 };
                 if let Some(scale) = scale {

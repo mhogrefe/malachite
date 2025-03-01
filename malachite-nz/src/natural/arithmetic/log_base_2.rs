@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
-use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -112,9 +112,9 @@ impl FloorLogBase2 for &Natural {
     /// assert_eq!(Natural::from(100u32).floor_log_base_2(), 6);
     /// ```
     fn floor_log_base_2(self) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.floor_log_base_2(),
-            Natural(Large(ref limbs)) => limbs_floor_log_base_2(limbs),
+            Natural(Large(limbs)) => limbs_floor_log_base_2(limbs),
         }
     }
 }
@@ -145,9 +145,9 @@ impl CeilingLogBase2 for &Natural {
     /// assert_eq!(Natural::from(100u32).ceiling_log_base_2(), 7);
     /// ```
     fn ceiling_log_base_2(self) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.ceiling_log_base_2(),
-            Natural(Large(ref limbs)) => limbs_ceiling_log_base_2(limbs),
+            Natural(Large(limbs)) => limbs_ceiling_log_base_2(limbs),
         }
     }
 }
@@ -191,9 +191,9 @@ impl CheckedLogBase2 for &Natural {
     /// );
     /// ```
     fn checked_log_base_2(self) -> Option<u64> {
-        match *self {
+        match self {
             Natural(Small(small)) => small.checked_log_base_2(),
-            Natural(Large(ref limbs)) => limbs_checked_log_base_2(limbs),
+            Natural(Large(limbs)) => limbs_checked_log_base_2(limbs),
         }
     }
 }

@@ -148,11 +148,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
                 break;
             }
         }
-        if shift == 0 {
-            None
-        } else {
-            Some(Some(y))
-        }
+        if shift == 0 { None } else { Some(Some(y)) }
     }
 }
 
@@ -227,11 +223,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
             }
             self.in_inner_loop = false;
         }
-        if y == U::ZERO {
-            None
-        } else {
-            Some(Some(y))
-        }
+        if y == U::ZERO { None } else { Some(Some(y)) }
     }
 }
 
@@ -271,11 +263,11 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     IteratorToBitChunks<I, T, U>
 {
     pub(crate) fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
-        match *self {
-            IteratorToBitChunks::SameWidth(ref mut xs) => xs.next_with_wrapping(wrap),
-            IteratorToBitChunks::EvenFraction(ref mut xs) => xs.next_with_wrapping(wrap),
-            IteratorToBitChunks::EvenMultiple(ref mut xs) => xs.next_with_wrapping(wrap),
-            IteratorToBitChunks::Irregular(ref mut xs) => xs.next_with_wrapping(wrap),
+        match self {
+            IteratorToBitChunks::SameWidth(xs) => xs.next_with_wrapping(wrap),
+            IteratorToBitChunks::EvenFraction(xs) => xs.next_with_wrapping(wrap),
+            IteratorToBitChunks::EvenMultiple(xs) => xs.next_with_wrapping(wrap),
+            IteratorToBitChunks::Irregular(xs) => xs.next_with_wrapping(wrap),
         }
     }
 }
@@ -371,7 +363,7 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
             return IteratorToBitChunks::SameWidth(same_width_iterator_to_bit_chunks(
                 xs,
                 in_chunk_size,
-            ))
+            ));
         }
         Less => {
             if out_chunk_size.divisible_by(in_chunk_size) {

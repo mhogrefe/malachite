@@ -8,7 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitSource};
+use malachite_base::num::random::striped::{StripedBitSource, get_striped_unsigned_vec};
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToBinaryString;
 

@@ -10,8 +10,8 @@ use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, IsPowerOf2, NextPowerOf2, Reciprocal,
 };
 use malachite_nz::test_util::generators::natural_gen;
-use malachite_q::test_util::generators::{rational_gen, rational_gen_var_1, rational_gen_var_2};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_gen_var_1, rational_gen_var_2};
 use std::str::FromStr;
 
 #[test]

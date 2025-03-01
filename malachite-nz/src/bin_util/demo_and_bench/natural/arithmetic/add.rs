@@ -9,7 +9,7 @@
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_vec_max_len_bucketer, triple_2_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_pair_gen, unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_6,
@@ -19,6 +19,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_11,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::add::{
     limbs_add, limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_add_to_out_aliased,
@@ -26,7 +27,6 @@ use malachite_nz::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,

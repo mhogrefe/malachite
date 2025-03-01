@@ -11,8 +11,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::test_util::generators::natural_gen_var_2;
-use malachite_q::test_util::generators::rational_gen_var_2;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen_var_2;
 use std::str::FromStr;
 
 #[test]

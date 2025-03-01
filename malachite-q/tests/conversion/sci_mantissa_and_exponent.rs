@@ -19,10 +19,10 @@ use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     natural_gen_var_2, natural_rounding_mode_pair_gen_var_2,
 };
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen_var_1, rational_rounding_mode_pair_gen_var_4,
 };
-use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 use std::str::FromStr;

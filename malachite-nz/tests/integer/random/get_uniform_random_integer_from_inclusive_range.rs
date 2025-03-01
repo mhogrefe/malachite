@@ -11,8 +11,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::integer::random::get_uniform_random_integer_from_inclusive_range;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::random::get_uniform_random_integer_from_inclusive_range;
 use std::str::FromStr;
 
 fn get_uniform_random_integer_from_inclusive_range_helper(a: &str, b: &str, out: &str) {

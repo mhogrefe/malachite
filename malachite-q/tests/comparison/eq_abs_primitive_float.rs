@@ -9,8 +9,8 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
-use malachite_q::test_util::generators::{rational_gen, rational_primitive_float_pair_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_primitive_float_pair_gen};
 use std::cmp::Ordering::*;
 use std::str::FromStr;
 

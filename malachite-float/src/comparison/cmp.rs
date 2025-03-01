@@ -73,11 +73,7 @@ impl PartialOrd for Float {
                 }),
             ) => Some(s_x.cmp(s_y).then_with(|| {
                 let abs_cmp = e_x.cmp(e_y).then_with(|| x.cmp_normalized_no_shift(y));
-                if *s_x {
-                    abs_cmp
-                } else {
-                    abs_cmp.reverse()
-                }
+                if *s_x { abs_cmp } else { abs_cmp.reverse() }
             })),
         }
     }
@@ -168,11 +164,7 @@ impl<'a> Ord for ComparableFloatRef<'a> {
                     .cmp(e_y)
                     .then_with(|| x.cmp_normalized_no_shift(y))
                     .then_with(|| p_x.cmp(p_y));
-                if *s_x {
-                    abs_cmp
-                } else {
-                    abs_cmp.reverse()
-                }
+                if *s_x { abs_cmp } else { abs_cmp.reverse() }
             }),
         }
     }

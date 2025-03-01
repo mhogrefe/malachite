@@ -15,7 +15,7 @@ use malachite_base::test_util::bench::bucketers::{
     pair_2_vec_len_bucketer, pair_max_bit_bucketer, quadruple_2_vec_len_bucketer,
     triple_3_vec_len_bucketer, vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     large_type_gen_var_2, unsigned_pair_gen_var_31, unsigned_vec_gen_var_1,
@@ -647,10 +647,9 @@ fn benchmark_natural_sqrt_rem_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("x"),
         &mut [
-            (
-                "rug",
-                &mut |(x, _)| no_out!(x.sqrt_rem(rug::Integer::new())),
-            ),
+            ("rug", &mut |(x, _)| {
+                no_out!(x.sqrt_rem(rug::Integer::new()))
+            }),
             ("Malachite", &mut |(_, x)| no_out!(x.sqrt_rem())),
         ],
     );

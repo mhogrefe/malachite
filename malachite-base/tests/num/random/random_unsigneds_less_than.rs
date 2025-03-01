@@ -11,7 +11,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_unsigneds_less_than;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::{
-    uniform_primitive_int_assertions, CheckedToF64, MomentStats,
+    CheckedToF64, MomentStats, uniform_primitive_int_assertions,
 };
 use std::panic::catch_unwind;
 

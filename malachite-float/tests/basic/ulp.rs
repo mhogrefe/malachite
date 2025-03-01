@@ -15,7 +15,7 @@ use malachite_base::test_util::generators::primitive_float_gen_var_12;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::conversion::from_primitive_float::alt_precision;
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_var_12, float_gen_var_13, float_gen_var_3,
+    float_gen, float_gen_var_3, float_gen_var_12, float_gen_var_13,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -29,7 +29,7 @@ fn test_ulp() {
         assert_eq!(x.to_string(), s);
 
         let actual_out = x.ulp();
-        assert!(actual_out.as_ref().map_or(true, Float::is_valid));
+        assert!(actual_out.as_ref().is_none_or(Float::is_valid));
 
         let s = actual_out.as_ref().map(|x| x.to_string());
         assert_eq!(s.as_deref(), out);

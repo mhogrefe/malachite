@@ -16,8 +16,8 @@ use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{integer_gen, integer_unsigned_pair_gen_var_6};
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::Rational;
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -1366,8 +1366,10 @@ fn from_integer_prec_round_properties() {
                     && nearest.1 == ceiling.1
         );
         if r_nearest != 0u32 {
-            assert!((r_nearest - Rational::from(&n))
-                .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
+            assert!(
+                (r_nearest - Rational::from(&n))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+            );
         }
     });
 }

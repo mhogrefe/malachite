@@ -12,7 +12,7 @@ use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
+use malachite_base::test_util::stats::moments::{MomentStats, moment_stats};
 
 pub fn random_integers_helper_helper<I: Clone + Iterator<Item = Integer>>(
     xs: I,

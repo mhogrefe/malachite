@@ -13,13 +13,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_greater, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
 use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::mem::swap;
@@ -352,7 +352,7 @@ impl Natural {
             (x, _, 0) | (x, &Natural::ZERO, _) => x.clone(),
             (x, y, 1) => x + y,
             (x, &Natural::ONE, z) => x + Natural::from(z),
-            (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
+            (Natural(Large(xs)), Natural(Large(ys)), z) => {
                 Natural(Large(limbs_add_mul_limb(xs, ys, z)))
             }
             (x, y, z) => x + y * Natural::from(z),
@@ -364,7 +364,7 @@ impl Natural {
             (_, _, 0) | (_, &mut Natural::ZERO, _) => {}
             (x, _, 1) => *x += y,
             (x, &mut Natural::ONE, z) => *x += Natural::from(z),
-            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
+            (Natural(Large(xs)), Natural(Large(ys)), z) => {
                 if limbs_vec_add_mul_limb_in_place_either(xs, ys, z) {
                     *self = y;
                 }
@@ -378,7 +378,7 @@ impl Natural {
             (_, _, 0) | (_, &Natural::ZERO, _) => {}
             (x, y, 1) => *x += y,
             (x, &Natural::ONE, z) => *x += Natural::from(z),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
+            (Natural(Large(xs)), Natural(Large(ys)), z) => {
                 limbs_vec_add_mul_limb_in_place_left(xs, ys, z);
             }
             (x, y, z) => *x += y * Natural::from(z),
@@ -576,7 +576,7 @@ impl AddMul<&Natural, &Natural> for &Natural {
             (Natural(Small(x)), y, z) => (y * z).add_limb(*x),
             (x, Natural(Small(y)), z) => x.add_mul_limb_ref_ref(z, *y),
             (x, y, Natural(Small(z))) => x.add_mul_limb_ref_ref(y, *z),
-            (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
                 Natural(Large(limbs_add_mul(xs, ys, zs)))
             }
         }
@@ -615,7 +615,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
             (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
@@ -654,7 +654,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
             (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
@@ -693,7 +693,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
             (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
@@ -732,7 +732,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
             (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
             (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
             (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }

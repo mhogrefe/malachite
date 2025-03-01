@@ -11,7 +11,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::{
     triple_1_2_vec_max_len_bucketer, triple_1_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_unsigned_triple_gen_var_8,

@@ -15,7 +15,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{
-    unsigned_gen_var_11, unsigned_gen_var_3, unsigned_pair_gen_var_4,
+    unsigned_gen_var_3, unsigned_gen_var_11, unsigned_pair_gen_var_4,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -279,9 +279,11 @@ where
                 n.floor_log_base_power_of_2(log_base) + 1
             );
         }
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
+        assert!(
+            digits
+                .iter()
+                .all(|digit| digit.significant_bits() <= log_base)
+        );
 
         assert_eq!(
             PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(n, log_base),
@@ -350,9 +352,11 @@ where
                 n.floor_log_base_power_of_2(log_base) + 1
             );
         }
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
+        assert!(
+            digits
+                .iter()
+                .all(|digit| digit.significant_bits() <= log_base)
+        );
 
         assert_eq!(
             PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(n, log_base),
@@ -419,9 +423,11 @@ fn to_power_of_2_digits_asc_natural_properties() {
                 n.floor_log_base_power_of_2(log_base) + 1
             );
         }
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
+        assert!(
+            digits
+                .iter()
+                .all(|digit| digit.significant_bits() <= log_base)
+        );
     });
 
     natural_gen().test_properties(|n| {
@@ -463,9 +469,11 @@ fn to_power_of_2_digits_desc_natural_properties() {
                 n.floor_log_base_power_of_2(log_base) + 1
             );
         }
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
+        assert!(
+            digits
+                .iter()
+                .all(|digit| digit.significant_bits() <= log_base)
+        );
     });
 
     natural_gen().test_properties(|n| {

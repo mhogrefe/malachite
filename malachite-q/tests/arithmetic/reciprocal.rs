@@ -8,8 +8,8 @@
 
 use malachite_base::num::arithmetic::traits::{Abs, Reciprocal, ReciprocalAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_q::test_util::generators::rational_gen_var_1;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen_var_1;
 use num::BigRational;
 use std::str::FromStr;
 

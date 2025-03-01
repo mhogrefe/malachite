@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRoundAssign};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::triple_1_vec_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_unsigned_rounding_mode_triple_gen_var_1;
 use malachite_base::test_util::runner::Runner;
@@ -186,10 +186,9 @@ fn benchmark_natural_div_round_down_library_comparison(
         file_name,
         &pair_2_pair_1_natural_bit_bucketer("x"),
         &mut [
-            (
-                "Malachite",
-                &mut |(_, (x, y))| no_out!(x.div_round(y, Down)),
-            ),
+            ("Malachite", &mut |(_, (x, y))| {
+                no_out!(x.div_round(y, Down))
+            }),
             ("rug", &mut |((x, y), _)| no_out!(x.div_trunc(y))),
         ],
     );

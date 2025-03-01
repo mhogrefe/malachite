@@ -10,11 +10,11 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::conversion::primitive_float_from_natural::PrimitiveFloatFromNaturalError;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::conversion::primitive_float_from_natural::PrimitiveFloatFromNaturalError;
 use malachite_nz::test_util::bench::bucketers::{
     natural_bit_bucketer, pair_1_natural_bit_bucketer,
 };

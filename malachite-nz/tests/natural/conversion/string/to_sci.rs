@@ -437,11 +437,7 @@ fn to_sci_with_options_properties() {
                 SciSizeOptions::Complete | SciSizeOptions::Scale(_) => None,
                 SciSizeOptions::Precision(p) => {
                     let log = x.floor_log_base(&base);
-                    if log >= p {
-                        Some(log - p + 1)
-                    } else {
-                        None
-                    }
+                    if log >= p { Some(log - p + 1) } else { None }
                 }
             };
             if let Some(neg_scale) = neg_scale {

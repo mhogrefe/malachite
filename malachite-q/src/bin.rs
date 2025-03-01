@@ -63,9 +63,9 @@ extern crate serde_json;
 #[cfg(feature = "bin_build")]
 use crate::bin_util::demo_and_bench::register;
 #[cfg(feature = "bin_build")]
-use malachite_base::test_util::runner::cmd::read_command_line_arguments;
-#[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::Runner;
+#[cfg(feature = "bin_build")]
+use malachite_base::test_util::runner::cmd::read_command_line_arguments;
 
 // Examples:
 //

@@ -10,8 +10,8 @@ use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::traits::Infinity;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, signed_unsigned_pair_gen_var_19, signed_unsigned_pair_gen_var_20,
     unsigned_gen, unsigned_gen_var_5,

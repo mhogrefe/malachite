@@ -14,7 +14,7 @@
 
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
-    limbs_mul_limb_to_out, limbs_mul_to_out, limbs_mul_to_out_scratch_len, MUL_TOOM22_THRESHOLD,
+    MUL_TOOM22_THRESHOLD, limbs_mul_limb_to_out, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
 use crate::platform::Limb;
 

@@ -117,9 +117,11 @@ fn to_power_of_2_digits_asc_helper<
                 u.floor_log_base_power_of_2(log_base) + 1
             );
         }
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
+        assert!(
+            digits
+                .iter()
+                .all(|digit| digit.significant_bits() <= log_base)
+        );
     });
 
     unsigned_gen::<T>().test_properties(|u| {
@@ -165,9 +167,11 @@ fn to_power_of_2_digits_desc_helper<
             digits.len(),
             usize::exact_from(u.significant_bits().div_round(log_base, Ceiling).0)
         );
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
+        assert!(
+            digits
+                .iter()
+                .all(|digit| digit.significant_bits() <= log_base)
+        );
     });
 
     unsigned_gen::<T>().test_properties(|u| {

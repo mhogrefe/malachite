@@ -24,23 +24,23 @@ fn test_checked_sub_mul() {
 
         let on = u.clone().checked_sub_mul(v.clone(), w.clone());
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = u.clone().checked_sub_mul(v.clone(), &w);
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = u.clone().checked_sub_mul(&v, w.clone());
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = u.clone().checked_sub_mul(&v, &w);
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = (&u).checked_sub_mul(&v, &w);
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
     };
     test("0", "0", "0", "Some(0)");
     test("0", "0", "123", "Some(0)");
@@ -67,22 +67,22 @@ fn test_checked_sub_mul() {
 fn checked_sub_properties() {
     natural_triple_gen().test_properties(|(a, b, c)| {
         let result = (&a).checked_sub_mul(&b, &c);
-        assert!(result.as_ref().map_or(true, Natural::is_valid));
+        assert!(result.as_ref().is_none_or(Natural::is_valid));
 
         let result_alt = a.clone().checked_sub_mul(&b, &c);
-        assert!(result_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(result_alt.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(result_alt, result);
 
         let result_alt = a.clone().checked_sub_mul(&b, c.clone());
-        assert!(result_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(result_alt.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(result_alt, result);
 
         let result_alt = a.clone().checked_sub_mul(b.clone(), &c);
-        assert!(result_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(result_alt.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(result_alt, result);
 
         let result_alt = a.clone().checked_sub_mul(b.clone(), c.clone());
-        assert!(result_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(result_alt.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(result_alt, result);
 
         assert_eq!(a.checked_sub(b * c), result);

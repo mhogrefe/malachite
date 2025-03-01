@@ -147,9 +147,11 @@ fn to_significand_properties_helper(x: Float) {
         },
         |significand| {
             assert_ne!(*significand, 0u32);
-            assert!(significand
-                .significant_bits()
-                .divisible_by_power_of_2(Limb::LOG_WIDTH));
+            assert!(
+                significand
+                    .significant_bits()
+                    .divisible_by_power_of_2(Limb::LOG_WIDTH)
+            );
         },
     );
     assert_eq!((-x).into_significand(), significand);

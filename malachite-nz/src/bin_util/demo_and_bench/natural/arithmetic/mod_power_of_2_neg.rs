@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{
     ModNeg, ModPowerOf2, ModPowerOf2Neg, ModPowerOf2NegAssign, PowerOf2,
 };
 use malachite_base::test_util::bench::bucketers::pair_2_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;

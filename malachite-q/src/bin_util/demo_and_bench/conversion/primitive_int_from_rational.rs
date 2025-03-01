@@ -8,14 +8,14 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_q::Rational;
 use malachite_q::test_util::bench::bucketers::{
     pair_1_rational_bit_bucketer, rational_bit_bucketer,
 };
 use malachite_q::test_util::generators::{rational_gen, rational_rounding_mode_pair_gen_var_3};
-use malachite_q::Rational;
 use std::fmt::Debug;
 
 pub(crate) fn register(runner: &mut Runner) {

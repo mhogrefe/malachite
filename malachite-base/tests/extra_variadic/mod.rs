@@ -11,22 +11,22 @@ use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorO
 use malachite_base::iterators::iterator_cache::IteratorCache;
 use malachite_base::num::arithmetic::traits::CheckedPow;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
+use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::num::random::{random_unsigned_range, RandomUnsignedRange};
+use malachite_base::num::random::{RandomUnsignedRange, random_unsigned_range};
 use malachite_base::random::Seed;
-use malachite_base::sets::random::{random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength};
+use malachite_base::sets::random::{RandomBTreeSetsFixedLength, random_b_tree_sets_fixed_length};
 use malachite_base::tuples::exhaustive::{
-    clone_helper, exhaustive_dependent_pairs, ExhaustiveDependentPairs,
+    ExhaustiveDependentPairs, clone_helper, exhaustive_dependent_pairs,
 };
 use malachite_base::tuples::random::next_helper;
 use malachite_base::unions::UnionFromStrError;
-use malachite_base::vecs::exhaustive::{
-    exhaustive_ordered_unique_vecs_fixed_length, fixed_length_ordered_unique_indices_helper,
-    next_bit_pattern, unique_indices, validate_oi_map, ExhaustiveOrderedUniqueCollections,
-    ExhaustiveUniqueVecsGenerator, LexFixedLengthVecsOutput, UniqueIndices,
-};
 use malachite_base::vecs::ExhaustiveVecPermutations;
+use malachite_base::vecs::exhaustive::{
+    ExhaustiveOrderedUniqueCollections, ExhaustiveUniqueVecsGenerator, LexFixedLengthVecsOutput,
+    UniqueIndices, exhaustive_ordered_unique_vecs_fixed_length,
+    fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, validate_oi_map,
+};
 use std::cmp::max;
 use std::collections::HashMap;
 use std::fmt::{self, Display, Formatter};

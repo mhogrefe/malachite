@@ -16,10 +16,10 @@ use malachite_base::test_util::generators::{
     signed_signed_unsigned_triple_gen_var_2, unsigned_vec_unsigned_unsigned_triple_gen_var_8,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::arithmetic::eq_mod_power_of_2::{
     limbs_eq_mod_power_of_2_neg_limb, limbs_eq_mod_power_of_2_neg_pos,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
@@ -286,8 +286,10 @@ fn eq_mod_power_of_2_properties() {
     integer_integer_unsigned_triple_gen_var_2().test_properties(|(x, y, pow)| {
         assert!(x.eq_mod_power_of_2(&y, pow), "{x} {y} {pow}");
         #[cfg(feature = "32_bit_limbs")]
-        assert!(rug::Integer::from(&x)
-            .is_congruent_2pow(&rug::Integer::from(&y), Limb::exact_from(pow)));
+        assert!(
+            rug::Integer::from(&x)
+                .is_congruent_2pow(&rug::Integer::from(&y), Limb::exact_from(pow))
+        );
         assert!(y.eq_mod_power_of_2(&x, pow));
         assert_eq!(x.mod_power_of_2(pow), y.mod_power_of_2(pow));
     });
@@ -295,8 +297,10 @@ fn eq_mod_power_of_2_properties() {
     integer_integer_unsigned_triple_gen_var_3().test_properties(|(x, y, pow)| {
         assert!(!x.eq_mod_power_of_2(&y, pow));
         #[cfg(feature = "32_bit_limbs")]
-        assert!(!rug::Integer::from(&x)
-            .is_congruent_2pow(&rug::Integer::from(&y), Limb::exact_from(pow)));
+        assert!(
+            !rug::Integer::from(&x)
+                .is_congruent_2pow(&rug::Integer::from(&y), Limb::exact_from(pow))
+        );
         assert!(!y.eq_mod_power_of_2(&x, pow));
         assert_ne!(x.mod_power_of_2(pow), y.mod_power_of_2(pow));
     });

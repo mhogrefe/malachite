@@ -8,7 +8,7 @@
 
 use malachite_base::num::logic::traits::BitScan;
 use malachite_base::test_util::bench::bucketers::pair_1_vec_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_20;
 use malachite_base::test_util::runner::Runner;

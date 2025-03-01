@@ -102,19 +102,19 @@ pub fn from_bits_asc_signed_naive<T: PrimitiveSigned, I: Iterator<Item = bool>>(
     let mut n;
     if *bits.last().unwrap() {
         n = T::NEGATIVE_ONE;
-        for i in
-            bits.iter()
-                .enumerate()
-                .filter_map(|(i, &bit)| if bit { None } else { Some(u64::exact_from(i)) })
+        for i in bits
+            .iter()
+            .enumerate()
+            .filter_map(|(i, &bit)| if bit { None } else { Some(u64::exact_from(i)) })
         {
             n.clear_bit(i);
         }
     } else {
         n = T::ZERO;
-        for i in
-            bits.iter()
-                .enumerate()
-                .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
+        for i in bits
+            .iter()
+            .enumerate()
+            .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
         {
             n.set_bit(i);
         }

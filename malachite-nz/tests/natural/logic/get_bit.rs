@@ -14,8 +14,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_16,
 };
-use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_4};
 use malachite_nz::test_util::natural::logic::get_bit::num_get_bit;

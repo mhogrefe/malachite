@@ -45,11 +45,7 @@ macro_rules! impl_pow_signed {
                 } else if self == 0 || self == 1 {
                     self
                 } else if self == -1 {
-                    if exp.even() {
-                        1
-                    } else {
-                        -1
-                    }
+                    if exp.even() { 1 } else { -1 }
                 } else {
                     self.pow(u32::exact_from(exp))
                 }

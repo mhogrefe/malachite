@@ -13,8 +13,8 @@ use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBit
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::large_type_gen_var_4;
 use malachite_base::test_util::num::logic::bit_block_access::assign_bits_naive;
-use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{

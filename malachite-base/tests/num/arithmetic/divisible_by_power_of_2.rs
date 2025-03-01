@@ -11,8 +11,8 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
     signed_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_8,
-    signed_unsigned_pair_gen_var_9, unsigned_gen, unsigned_pair_gen_var_14,
-    unsigned_pair_gen_var_15, unsigned_pair_gen_var_2,
+    signed_unsigned_pair_gen_var_9, unsigned_gen, unsigned_pair_gen_var_2,
+    unsigned_pair_gen_var_14, unsigned_pair_gen_var_15,
 };
 
 fn divisible_by_power_of_2_primitive_helper<T: PrimitiveInt>() {

@@ -27,9 +27,9 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
-use crate::platform::{Limb, SignedLimb, FFT_TAB, MULMOD_TAB};
+use crate::platform::{FFT_TAB, Limb, MULMOD_TAB, SignedLimb};
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering::*};
+use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{

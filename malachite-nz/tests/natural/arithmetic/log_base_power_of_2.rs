@@ -18,11 +18,11 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_21, unsigned_vec_unsigned_pair_gen_var_13,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::log_base_power_of_2::{
     limbs_ceiling_log_base_power_of_2, limbs_checked_log_base_power_of_2,
     limbs_floor_log_base_power_of_2,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen_var_2, natural_unsigned_pair_gen_var_8};
 use malachite_nz::test_util::natural::arithmetic::log_base_power_of_2::*;

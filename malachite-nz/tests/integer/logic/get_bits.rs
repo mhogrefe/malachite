@@ -15,10 +15,10 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_unsigned_triple_gen_var_4,
 };
 use malachite_base::test_util::num::logic::bit_block_access::get_bits_naive;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{

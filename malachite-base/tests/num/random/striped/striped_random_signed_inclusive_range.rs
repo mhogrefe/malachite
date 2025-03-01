@@ -16,7 +16,7 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToBinaryString;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
+use malachite_base::test_util::stats::moments::{CheckedToF64, MomentStats, moment_stats};
 use std::panic::catch_unwind;
 
 fn striped_random_signed_inclusive_range_helper<

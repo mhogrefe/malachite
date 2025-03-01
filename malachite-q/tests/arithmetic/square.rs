@@ -9,8 +9,8 @@
 use malachite_base::num::arithmetic::traits::{Abs, CheckedSqrt, Square, SquareAssign};
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
 use std::str::FromStr;
 
 #[test]

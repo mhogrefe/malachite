@@ -45,11 +45,7 @@ fn float_partial_cmp_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> Opt
                 let abs_cmp = (i64::from(*e_x) - 1)
                     .cmp(&y.sci_exponent())
                     .then_with(|| m_x.cmp_normalized(&Natural::from(y.integer_mantissa())));
-                if *s_x {
-                    abs_cmp
-                } else {
-                    abs_cmp.reverse()
-                }
+                if *s_x { abs_cmp } else { abs_cmp.reverse() }
             }))
         }
     }

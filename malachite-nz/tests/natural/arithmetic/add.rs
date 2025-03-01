@@ -19,6 +19,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_11,
 };
 use malachite_base::vecs::vec_from_str;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::add::{
     limbs_add, limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
     limbs_add_same_length_to_out, limbs_add_same_length_with_carry_in_in_place_left,
@@ -27,7 +28,6 @@ use malachite_nz::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, natural_triple_gen, natural_vec_gen,
@@ -36,7 +36,7 @@ use malachite_nz::test_util::natural::arithmetic::add::natural_sum_alt;
 use num::BigUint;
 use rug;
 use std::cmp::max;
-use std::iter::{once, Sum};
+use std::iter::{Sum, once};
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]

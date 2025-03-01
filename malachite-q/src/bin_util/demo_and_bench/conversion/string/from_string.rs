@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::test_util::bench::bucketers::string_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::string_gen;
 use malachite_base::test_util::runner::Runner;
-use malachite_q::test_util::generators::string_gen_var_12;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::string_gen_var_12;
 use num::BigRational;
 use std::str::FromStr;
 
@@ -57,10 +57,9 @@ fn benchmark_rational_from_str_library_comparison(
                 no_out!(Rational::from_str(&s).unwrap())
             }),
             ("num", &mut |s| no_out!(BigRational::from_str(&s).unwrap())),
-            (
-                "rug",
-                &mut |s| no_out!(rug::Rational::from_str(&s).unwrap()),
-            ),
+            ("rug", &mut |s| {
+                no_out!(rug::Rational::from_str(&s).unwrap())
+            }),
         ],
     );
 }

@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
-use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, FloorLogBasePowerOf2,
@@ -114,9 +114,9 @@ impl FloorLogBasePowerOf2<u64> for &Natural {
     /// assert_eq!(Natural::from(4294967296u64).floor_log_base_power_of_2(8), 4);
     /// ```
     fn floor_log_base_power_of_2(self, pow: u64) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.floor_log_base_power_of_2(pow),
-            Natural(Large(ref limbs)) => limbs_floor_log_base_power_of_2(limbs, pow),
+            Natural(Large(limbs)) => limbs_floor_log_base_power_of_2(limbs, pow),
         }
     }
 }
@@ -150,9 +150,9 @@ impl CeilingLogBasePowerOf2<u64> for &Natural {
     /// );
     /// ```
     fn ceiling_log_base_power_of_2(self, pow: u64) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.ceiling_log_base_power_of_2(pow),
-            Natural(Large(ref limbs)) => limbs_ceiling_log_base_power_of_2(limbs, pow),
+            Natural(Large(limbs)) => limbs_ceiling_log_base_power_of_2(limbs, pow),
         }
     }
 }
@@ -192,9 +192,9 @@ impl CheckedLogBasePowerOf2<u64> for &Natural {
     /// );
     /// ```
     fn checked_log_base_power_of_2(self, pow: u64) -> Option<u64> {
-        match *self {
+        match self {
             Natural(Small(small)) => small.checked_log_base_power_of_2(pow),
-            Natural(Large(ref limbs)) => limbs_checked_log_base_power_of_2(limbs, pow),
+            Natural(Large(limbs)) => limbs_checked_log_base_power_of_2(limbs, pow),
         }
     }
 }

@@ -12,7 +12,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_primitive_float_bucketer, triple_1_primitive_float_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     primitive_float_unsigned_pair_gen_var_1, primitive_float_unsigned_pair_gen_var_2,

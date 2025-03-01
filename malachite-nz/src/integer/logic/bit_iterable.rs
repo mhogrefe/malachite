@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::natural::logic::bit_iterable::NaturalBitIterator;
 use crate::natural::Natural;
+use crate::natural::logic::bit_iterable::NaturalBitIterator;
 use core::ops::Index;
 use malachite_base::num::logic::traits::{BitAccess, BitIterable};
 
@@ -155,12 +155,12 @@ impl Iterator for IntegerBitIterator<'_> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
-        match *self {
+        match self {
             IntegerBitIterator::Zero => None,
-            IntegerBitIterator::Positive(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Positive(bits, extension_checked) => {
                 bits.iterate_forward(extension_checked)
             }
-            IntegerBitIterator::Negative(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Negative(bits, extension_checked) => {
                 bits.iterate_forward(extension_checked)
             }
         }
@@ -169,12 +169,12 @@ impl Iterator for IntegerBitIterator<'_> {
 
 impl DoubleEndedIterator for IntegerBitIterator<'_> {
     fn next_back(&mut self) -> Option<bool> {
-        match *self {
+        match self {
             IntegerBitIterator::Zero => None,
-            IntegerBitIterator::Positive(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Positive(bits, extension_checked) => {
                 bits.iterate_backward(extension_checked)
             }
-            IntegerBitIterator::Negative(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Negative(bits, extension_checked) => {
                 bits.iterate_backward(extension_checked)
             }
         }
@@ -212,16 +212,12 @@ impl Index<u64> for IntegerBitIterator<'_> {
     /// assert_eq!(bits[100], true);
     /// ```
     fn index(&self, index: u64) -> &bool {
-        let bit = match *self {
+        let bit = match self {
             IntegerBitIterator::Zero => false,
-            IntegerBitIterator::Positive(ref bits, _) => bits.limbs.n.get_bit(index),
-            IntegerBitIterator::Negative(ref bits, _) => bits.bits.limbs.n.get_bit_neg(index),
+            IntegerBitIterator::Positive(bits, _) => bits.limbs.n.get_bit(index),
+            IntegerBitIterator::Negative(bits, _) => bits.bits.limbs.n.get_bit_neg(index),
         };
-        if bit {
-            &true
-        } else {
-            &false
-        }
+        if bit { &true } else { &false }
     }
 }
 

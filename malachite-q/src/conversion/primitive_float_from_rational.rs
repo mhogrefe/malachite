@@ -159,11 +159,7 @@ macro_rules! float_impls {
                             _ => ($f::MIN_POSITIVE_SUBNORMAL, Greater),
                         }
                     };
-                    if sign {
-                        (f, o)
-                    } else {
-                        (-f, o.reverse())
-                    }
+                    if sign { (f, o) } else { (-f, o.reverse()) }
                 }
             }
         }
@@ -193,11 +189,7 @@ macro_rules! float_impls {
                         .ok_or(FloatConversionError::Inexact)?;
                     let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
                         .ok_or(FloatConversionError::Inexact);
-                    if sign {
-                        f
-                    } else {
-                        f.map(|x| -x)
-                    }
+                    if sign { f } else { f.map(|x| -x) }
                 }
             }
         }
@@ -398,11 +390,7 @@ macro_rules! float_impls {
                         .ok_or(FloatConversionError::Inexact)?;
                     let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
                         .ok_or(FloatConversionError::Inexact);
-                    if value.sign {
-                        f
-                    } else {
-                        f.map(|x| -x)
-                    }
+                    if value.sign { f } else { f.map(|x| -x) }
                 }
             }
         }

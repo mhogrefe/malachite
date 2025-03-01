@@ -16,8 +16,8 @@ use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_11,
 };
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_pair_gen_var_4};
 use malachite_nz::test_util::natural::arithmetic::extended_gcd::{

@@ -14,6 +14,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_limb_in_place,
@@ -37,9 +39,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
+use crate::platform::{DC_DIVAPPR_Q_THRESHOLD, Limb, MU_DIVAPPR_Q_THRESHOLD, SignedLimb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_2_newton;
@@ -671,7 +671,7 @@ impl FloorSqrt for &Natural {
     fn floor_sqrt(self) -> Natural {
         match self {
             Natural(Small(small)) => Natural::from(small.floor_sqrt()),
-            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_floor_sqrt(limbs)),
+            Natural(Large(limbs)) => Natural::from_owned_limbs_asc(limbs_floor_sqrt(limbs)),
         }
     }
 }
@@ -778,7 +778,7 @@ impl CeilingSqrt for &Natural {
     fn ceiling_sqrt(self) -> Natural {
         match self {
             Natural(Small(small)) => Natural::from(small.ceiling_sqrt()),
-            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_ceiling_sqrt(limbs)),
+            Natural(Large(limbs)) => Natural::from_owned_limbs_asc(limbs_ceiling_sqrt(limbs)),
         }
     }
 }
@@ -934,9 +934,7 @@ impl CheckedSqrt for &Natural {
     fn checked_sqrt(self) -> Option<Natural> {
         match self {
             Natural(Small(small)) => small.checked_sqrt().map(Natural::from),
-            Natural(Large(ref limbs)) => {
-                limbs_checked_sqrt(limbs).map(Natural::from_owned_limbs_asc)
-            }
+            Natural(Large(limbs)) => limbs_checked_sqrt(limbs).map(Natural::from_owned_limbs_asc),
         }
     }
 }
@@ -1032,7 +1030,7 @@ impl SqrtRem for &Natural {
                 let (sqrt, rem) = small.sqrt_rem();
                 (Natural::from(sqrt), Natural::from(rem))
             }
-            Natural(Large(ref limbs)) => {
+            Natural(Large(limbs)) => {
                 let (sqrt_limbs, rem_limbs) = limbs_sqrt_rem(limbs);
                 (
                     Natural::from_owned_limbs_asc(sqrt_limbs),

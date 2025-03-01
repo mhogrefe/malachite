@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::float_nan;
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::float_nan;
 use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::logic::traits::NotAssign;

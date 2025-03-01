@@ -10,12 +10,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use crate::integer::Integer;
-use crate::natural::logic::count_ones::limbs_count_ones;
-use crate::natural::logic::hamming_distance::limbs_hamming_distance_same_length;
+use crate::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::logic::count_ones::limbs_count_ones;
+use crate::natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::logic::traits::{
@@ -134,9 +134,9 @@ pub_test! {limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
 
 impl Natural {
     fn hamming_distance_neg_limb(&self, other: Limb) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.wrapping_neg().hamming_distance(other.wrapping_neg()),
-            Natural(Large(ref limbs)) => limbs_hamming_distance_limb_neg(limbs, other),
+            Natural(Large(limbs)) => limbs_hamming_distance_limb_neg(limbs, other),
         }
     }
 
@@ -144,9 +144,7 @@ impl Natural {
         match (self, other) {
             (&Natural(Small(x)), _) => other.hamming_distance_neg_limb(x),
             (_, &Natural(Small(y))) => self.hamming_distance_neg_limb(y),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                limbs_hamming_distance_neg(xs, ys)
-            }
+            (Natural(Large(xs)), Natural(Large(ys))) => limbs_hamming_distance_neg(xs, ys),
         }
     }
 }

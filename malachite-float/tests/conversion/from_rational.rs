@@ -20,9 +20,9 @@ use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::generators::rational_unsigned_rounding_mode_triple_gen_var_1;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::test_util::generators::integer_gen;
+use malachite_q::Rational;
 use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
-use malachite_q::Rational;
 use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -3916,8 +3916,10 @@ fn from_rational_prec_properties() {
             if x == 0u32 { None } else { Some(prec) }
         );
         if x != 0u32 {
-            assert!((Rational::exact_from(&float_x) - &x)
-                .le_abs(&(Rational::exact_from(float_x.ulp().unwrap()) >> 1)));
+            assert!(
+                (Rational::exact_from(&float_x) - &x)
+                    .le_abs(&(Rational::exact_from(float_x.ulp().unwrap()) >> 1))
+            );
         }
     });
 }
@@ -3995,8 +3997,10 @@ fn from_rational_prec_round_properties() {
             if x == 0u32 { None } else { Some(prec) }
         );
         if x != 0u32 {
-            assert!((Rational::exact_from(&float_x) - &x)
-                .le_abs(&Rational::exact_from(float_x.ulp().unwrap())));
+            assert!(
+                (Rational::exact_from(&float_x) - &x)
+                    .le_abs(&Rational::exact_from(float_x.ulp().unwrap()))
+            );
         }
     });
 

@@ -32,11 +32,7 @@ impl Sign for Rational {
     /// ```
     fn sign(&self) -> Ordering {
         if self.sign {
-            if self.numerator == 0 {
-                Equal
-            } else {
-                Greater
-            }
+            if self.numerator == 0 { Equal } else { Greater }
         } else {
             Less
         }

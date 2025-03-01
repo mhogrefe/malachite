@@ -21,6 +21,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_same_length_with_carry_in_to_out,
@@ -49,14 +51,12 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::logic::not::limbs_not_to_out;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, INV_MULMOD_BNM1_THRESHOLD,
-    INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
+    DC_DIV_QR_THRESHOLD, DC_DIVAPPR_Q_THRESHOLD, DoubleLimb, INV_MULMOD_BNM1_THRESHOLD,
+    INV_NEWTON_THRESHOLD, Limb, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::{min, Ordering::*};
+use core::cmp::{Ordering::*, min};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
@@ -1887,7 +1887,7 @@ impl Natural {
                 let (q, r) = small.div_rem(other);
                 (Natural(Small(q)), r)
             }
-            (Natural(Large(ref limbs)), other) => {
+            (Natural(Large(limbs)), other) => {
                 let (qs, r) = limbs_div_limb_mod(limbs, other);
                 (Natural::from_owned_limbs_asc(qs), r)
             }
@@ -1898,8 +1898,8 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => 0,
-            (Natural(Small(ref mut small)), other) => small.div_assign_rem(other),
-            (Natural(Large(ref mut limbs)), other) => {
+            (Natural(Small(small)), other) => small.div_assign_rem(other),
+            (Natural(Large(limbs)), other) => {
                 let r = limbs_div_limb_in_place_mod(limbs, other);
                 self.trim();
                 r
@@ -2079,7 +2079,7 @@ impl DivMod<Natural> for &Natural {
                 (q, Natural(Small(r)))
             }
             (Natural(Small(_)), _) => (Natural::ZERO, self.clone()),
-            (&Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() < ds.len() {
                     (Natural::ZERO, self.clone())
                 } else {
@@ -2152,7 +2152,7 @@ impl DivMod<&Natural> for &Natural {
                 (q, Natural(Small(r)))
             }
             (Natural(Small(_)), _) => (Natural::ZERO, self.clone()),
-            (&Natural(Large(ref ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() < ds.len() {
                     (Natural::ZERO, self.clone())
                 } else {
@@ -2226,7 +2226,7 @@ impl DivAssignMod<Natural> for Natural {
                 swap(self, &mut r);
                 r
             }
-            (&mut Natural(Large(ref mut ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() < ds.len() {
                     let mut r = Natural::ZERO;
                     swap(self, &mut r);
@@ -2303,7 +2303,7 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
                 swap(self, &mut r);
                 r
             }
-            (&mut Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() < ds.len() {
                     let mut r = Natural::ZERO;
                     swap(self, &mut r);

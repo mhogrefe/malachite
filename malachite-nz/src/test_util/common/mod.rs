@@ -125,10 +125,6 @@ impl From<&Integer> for rug::Integer {
     #[inline]
     fn from(n: &Integer) -> rug::Integer {
         let out = rug::Integer::from(n.unsigned_abs_ref());
-        if *n >= 0 {
-            out
-        } else {
-            -out
-        }
+        if *n >= 0 { out } else { -out }
     }
 }

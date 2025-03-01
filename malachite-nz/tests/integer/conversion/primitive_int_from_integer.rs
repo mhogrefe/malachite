@@ -15,9 +15,9 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::conversion::primitive_int_from_integer::SignedFromIntegerError;
 use malachite_nz::integer::conversion::primitive_int_from_integer::UnsignedFromIntegerError;
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_gen;
 use rug;

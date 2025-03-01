@@ -6,16 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::random::{
-    random_negative_rationals, random_non_negative_rationals, random_nonzero_rationals,
-    random_positive_rationals, random_rationals, RandomRationalsFromDoubleAndSign,
+    RandomRationalsFromDoubleAndSign, random_negative_rationals, random_non_negative_rationals,
+    random_nonzero_rationals, random_positive_rationals, random_rationals,
 };
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples_xxyz, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::round_to_multiple_rational_filter;
-use crate::Rational;
 use malachite_base::bools::random::random_bools;
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -24,8 +24,8 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
+use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
@@ -36,21 +36,21 @@ use malachite_base::num::random::{
     special_random_nonzero_finite_primitive_floats, special_random_primitive_floats,
 };
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{GenConfig, It};
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
-use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
+use malachite_base::unions::random::random_union2s;
 use malachite_base::vecs::random::random_vecs;
-use malachite_nz::integer::random::random_integers;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::random::random_integers;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     random_natural_range_to_infinity, random_naturals, random_positive_naturals,
 };
-use malachite_nz::natural::Natural;
 use num::BigRational;
 use std::cmp::Ordering::*;
 use std::ops::Shr;

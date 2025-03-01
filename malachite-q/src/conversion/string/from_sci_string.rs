@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::traits::SimplestRationalInInterval;
 use crate::Rational;
+use crate::arithmetic::traits::SimplestRationalInInterval;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::conversion::string::from_sci_string::preprocess_sci_string;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;

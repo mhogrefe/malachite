@@ -160,7 +160,7 @@ impl Natural {
             (_, 0) => *self = Natural::ZERO,
             (_, 1) | (&mut Natural::ZERO, _) => {}
             (&mut Natural::ONE, _) => *self = Natural::from(other),
-            (&mut Natural(Small(ref mut small)), other) => {
+            (Natural(Small(small)), other) => {
                 let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {
                     *small = lower;
@@ -168,7 +168,7 @@ impl Natural {
                     *self = Natural(Large(vec![lower, upper]));
                 }
             }
-            (&mut Natural(Large(ref mut limbs)), other) => {
+            (Natural(Large(limbs)), other) => {
                 limbs_vec_mul_limb_in_place(limbs, other);
             }
         }
@@ -187,7 +187,7 @@ impl Natural {
                     Large(vec![lower, upper])
                 }
             }),
-            (Natural(Large(ref limbs)), other) => Natural(Large(limbs_mul_limb(limbs, other))),
+            (Natural(Large(limbs)), other) => Natural(Large(limbs_mul_limb(limbs, other))),
         }
     }
 }

@@ -67,11 +67,7 @@ fn from_hex_string(s: &str) -> Float {
                 )
                 .0
             };
-            if sign {
-                x
-            } else {
-                -x
-            }
+            if sign { x } else { -x }
         }
     }
 }

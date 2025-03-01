@@ -6,6 +6,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// A trait for testing whether a number is prime.
+pub trait IsPrime {
+    fn is_prime(&self) -> bool;
+}
+
+/// A trait for finding the prime factorization of a number.
+pub trait Factor {
+    type FACTORS;
+
+    fn factor(&self) -> Self::FACTORS;
+}
+
 /// A trait for producing iterators of primes.
 pub trait Primes {
     type I: Iterator<Item = Self>;
@@ -18,14 +30,9 @@ pub trait Primes {
     fn primes() -> Self::I;
 }
 
-/// A trait for testing whether a number is prime.
-pub trait IsPrime {
-    fn is_prime(&self) -> bool;
-}
+/// A trait for finding a primitive root modulo a prime.
+pub trait PrimitiveRootPrime {
+    type Output;
 
-/// A trait for finding the prime factorization of a number.
-pub trait Factor {
-    type FACTORS;
-
-    fn factor(&self) -> Self::FACTORS;
+    fn primitive_root_prime(&self) -> Self::Output;
 }

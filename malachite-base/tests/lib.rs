@@ -401,6 +401,7 @@ pub mod num {
         pub mod prime_indicator_sequence_less_than;
         pub mod prime_sieve;
         pub mod primes;
+        pub mod primitive_root_prime;
     }
     pub mod float {
         pub mod basic {

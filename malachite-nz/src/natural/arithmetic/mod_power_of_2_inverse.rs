@@ -7,11 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2Inverse, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;

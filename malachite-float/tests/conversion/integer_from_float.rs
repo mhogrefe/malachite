@@ -12,11 +12,11 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::ToDebugString;
+use malachite_float::Float;
 use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_4, float_rounding_mode_pair_gen_var_2,
 };
-use malachite_float::Float;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;

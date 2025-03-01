@@ -30,10 +30,6 @@ impl Sign for Natural {
     /// assert_eq!(Natural::from(123u32).sign(), Greater);
     /// ```
     fn sign(&self) -> Ordering {
-        if *self == 0 {
-            Equal
-        } else {
-            Greater
-        }
+        if *self == 0 { Equal } else { Greater }
     }
 }

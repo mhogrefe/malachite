@@ -6,14 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::{
     limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref,
 };
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{

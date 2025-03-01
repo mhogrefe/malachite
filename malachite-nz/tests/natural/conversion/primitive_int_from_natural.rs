@@ -14,10 +14,10 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::conversion::primitive_int_from_natural::{
     SignedFromNaturalError, UnsignedFromNaturalError,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;

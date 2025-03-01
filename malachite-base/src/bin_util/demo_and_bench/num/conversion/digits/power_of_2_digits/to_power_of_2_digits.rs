@@ -10,7 +10,7 @@ use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2Digits};
 use malachite_base::test_util::bench::bucketers::pair_1_bit_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_4;
 use malachite_base::test_util::runner::Runner;
@@ -130,9 +130,11 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
             (
                 &format!("{}.power_of_2_digits(u64).rev().collect_vec()", T::NAME),
                 &mut |(x, log_base)| {
-                    no_out!(PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base)
-                        .rev()
-                        .collect_vec())
+                    no_out!(
+                        PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base)
+                            .rev()
+                            .collect_vec()
+                    )
                 },
             ),
         ],

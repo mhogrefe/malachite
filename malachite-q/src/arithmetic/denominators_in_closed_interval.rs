@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::arithmetic::traits::{DenominatorsInClosedInterval, SimplestRationalInInterval};
 use crate::exhaustive::{
     exhaustive_rationals_with_denominator_inclusive_range,
     exhaustive_rationals_with_denominator_range,
 };
-use crate::Rational;
 use alloc::collections::BTreeSet;
 use malachite_base::num::arithmetic::traits::{Ceiling, Reciprocal, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};

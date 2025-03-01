@@ -10,12 +10,12 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::test_util::bench::bucketers::unsigned_direct_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_low_mask);

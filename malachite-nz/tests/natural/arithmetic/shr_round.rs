@@ -26,16 +26,16 @@ use malachite_base::test_util::generators::{
     unsigned_unsigned_rounding_mode_triple_gen_var_4, unsigned_vec_unsigned_pair_gen_var_16,
     unsigned_vec_unsigned_pair_gen_var_20, unsigned_vec_unsigned_rounding_mode_triple_gen_var_2,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::shr_round::{
     limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_vec_shr_exact_in_place, limbs_vec_shr_round_in_place,
     limbs_vec_shr_round_nearest_in_place, limbs_vec_shr_round_up_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_rounding_mode_pair_gen, natural_signed_rounding_mode_triple_gen_var_2,
-    natural_unsigned_pair_gen_var_10, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_pair_gen_var_4, natural_unsigned_pair_gen_var_10,
     natural_unsigned_rounding_mode_triple_gen_var_1,
 };
 use std::ops::Shl;
@@ -560,20 +560,28 @@ macro_rules! shr_round_unsigned_fail_helper {
     ($t:ident) => {
         assert_panic!(Natural::from(123u32).shr_round_assign($t::ONE, Exact));
         assert_panic!(Natural::from(123u32).shr_round_assign($t::exact_from(100), Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round_assign($t::ONE, Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round_assign($t::exact_from(100), Exact));
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round_assign($t::ONE, Exact)
+        );
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round_assign($t::exact_from(100), Exact)
+        );
         assert_panic!(Natural::from(123u32).shr_round($t::ONE, Exact));
         assert_panic!(Natural::from(123u32).shr_round($t::exact_from(100), Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round($t::ONE, Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round($t::exact_from(100), Exact));
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round($t::ONE, Exact)
+        );
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round($t::exact_from(100), Exact)
+        );
         assert_panic!((&Natural::from(123u32)).shr_round($t::ONE, Exact));
         assert_panic!((&Natural::from(123u32)).shr_round($t::exact_from(100), Exact));
         assert_panic!((&Natural::from_str("1000000000001").unwrap()).shr_round($t::ONE, Exact));
@@ -1010,20 +1018,28 @@ macro_rules! shr_round_signed_fail_helper {
     ($t:ident) => {
         assert_panic!(Natural::from(123u32).shr_round_assign($t::ONE, Exact));
         assert_panic!(Natural::from(123u32).shr_round_assign($t::exact_from(100), Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round_assign($t::ONE, Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round_assign($t::exact_from(100), Exact));
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round_assign($t::ONE, Exact)
+        );
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round_assign($t::exact_from(100), Exact)
+        );
         assert_panic!(Natural::from(123u32).shr_round($t::ONE, Exact));
         assert_panic!(Natural::from(123u32).shr_round($t::exact_from(100), Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round($t::ONE, Exact));
-        assert_panic!(Natural::from_str("1000000000001")
-            .unwrap()
-            .shr_round($t::exact_from(100), Exact));
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round($t::ONE, Exact)
+        );
+        assert_panic!(
+            Natural::from_str("1000000000001")
+                .unwrap()
+                .shr_round($t::exact_from(100), Exact)
+        );
         assert_panic!((&Natural::from(123u32)).shr_round($t::ONE, Exact));
         assert_panic!((&Natural::from(123u32)).shr_round($t::exact_from(100), Exact));
         assert_panic!((&Natural::from_str("1000000000001").unwrap()).shr_round($t::ONE, Exact));

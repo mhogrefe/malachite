@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::logic::bit_scan::limbs_index_of_next_true_bit;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
@@ -111,7 +111,7 @@ impl Natural {
                 most_significant_limbs[0] = *x;
                 significant_bits = x.significant_bits();
             }
-            Natural(Large(ref xs)) => {
+            Natural(Large(xs)) => {
                 let len = xs.len();
                 if len == 2 {
                     most_significant_limbs[0] = xs[0];

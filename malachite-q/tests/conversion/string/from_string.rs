@@ -10,8 +10,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::string_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::generators::string_gen_var_12;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::string_gen_var_12;
 use num::BigRational;
 use std::str::FromStr;
 

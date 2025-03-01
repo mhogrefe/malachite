@@ -9,7 +9,7 @@
 #[cfg(feature = "random")]
 use crate::num::conversion::traits::ExactFrom;
 #[cfg(feature = "random")]
-use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use crate::num::random::{RandomUnsignedsLessThan, random_unsigneds_less_than};
 #[cfg(feature = "random")]
 use crate::random::Seed;
 use crate::slices::advance_indices;
@@ -158,11 +158,7 @@ pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Optio
             buffer.clear();
         }
     }
-    if buffer.is_empty() {
-        Some(xs)
-    } else {
-        None
-    }
+    if buffer.is_empty() { Some(xs) } else { None }
 }
 
 #[cfg(feature = "random")]

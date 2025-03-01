@@ -12,9 +12,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::add::limbs_add_limb_to_out;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::add::limbs_add_limb_to_out;
 use crate::platform::Limb;
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, WrappingSubAssign};

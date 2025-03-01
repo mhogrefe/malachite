@@ -9,7 +9,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::factorization::traits::Factor;
 use malachite_base::test_util::bench::bucketers::primitive_int_direct_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_gen_var_1;
 use malachite_base::test_util::num::factorization::factor::factor_naive;

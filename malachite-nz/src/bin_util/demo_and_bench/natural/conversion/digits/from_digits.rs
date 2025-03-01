@@ -13,18 +13,18 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_1_vec_len_times_pair_2_bits_bucketer, triple_2_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
-    unsigned_vec_unsigned_pair_gen_var_12, unsigned_vec_unsigned_pair_gen_var_5,
+    unsigned_vec_unsigned_pair_gen_var_5, unsigned_vec_unsigned_pair_gen_var_12,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::conversion::digits::general_digits::{
     from_digits_asc_large, from_digits_asc_limb, from_digits_desc_basecase, from_digits_desc_large,
     from_digits_desc_limb, from_digits_desc_naive, from_digits_desc_naive_primitive,
     limbs_from_digits_small_base, limbs_from_digits_small_base_basecase,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::pair_1_vec_len_times_pair_2_natural_bits_bucketer;
 use malachite_nz::test_util::generators::{

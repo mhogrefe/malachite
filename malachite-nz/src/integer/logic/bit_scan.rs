@@ -11,11 +11,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::logic::bit_scan::{
     limbs_index_of_next_false_bit, limbs_index_of_next_true_bit,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -112,7 +112,7 @@ pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64
 impl Natural {
     // self != 0
     fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
-        match *self {
+        match self {
             Natural(Small(small)) => {
                 if starting_index >= Limb::WIDTH {
                     None
@@ -127,13 +127,13 @@ impl Natural {
                     }
                 }
             }
-            Natural(Large(ref limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
+            Natural(Large(limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
         }
     }
 
     // self != 0
     fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => {
                 if starting_index >= Limb::WIDTH {
                     starting_index
@@ -141,7 +141,7 @@ impl Natural {
                     TrailingZeros::trailing_zeros(!((small - 1) | Limb::low_mask(starting_index)))
                 }
             }
-            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
+            Natural(Large(limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
         }
     }
 }

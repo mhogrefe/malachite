@@ -34,10 +34,6 @@ impl From<bool> for Integer {
     /// ```
     #[inline]
     fn from(b: bool) -> Integer {
-        if b {
-            Integer::ONE
-        } else {
-            Integer::ZERO
-        }
+        if b { Integer::ONE } else { Integer::ZERO }
     }
 }

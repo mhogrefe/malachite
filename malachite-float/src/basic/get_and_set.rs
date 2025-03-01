@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::Finite;
-use crate::{significand_bits, Float};
+use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     NegAssign, RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
@@ -343,11 +343,7 @@ impl Float {
                     *significand >>= significant_bits - target_bits;
                 }
                 *precision = prec;
-                if *sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if *sign { o } else { o.reverse() }
             }
             _ => Equal,
         }

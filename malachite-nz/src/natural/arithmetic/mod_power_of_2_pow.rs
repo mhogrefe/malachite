@@ -10,14 +10,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::mod_pow::{get_bits, get_window_size};
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::limbs_square_low;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
@@ -294,7 +294,7 @@ impl ModPowerOf2Pow<&Natural> for &Natural {
                 limbs_mod_power_of_2_pow(&mut xs, &[*e], pow);
                 Natural::from_owned_limbs_asc(xs)
             }
-            (_, Natural(Large(ref es))) => {
+            (_, Natural(Large(es))) => {
                 let mut xs = self.to_limbs_asc();
                 limbs_mod_power_of_2_pow(&mut xs, es, pow);
                 Natural::from_owned_limbs_asc(xs)
@@ -378,7 +378,7 @@ impl ModPowerOf2PowAssign<&Natural> for Natural {
             _ if pow == 0 => *self = Natural::ZERO,
             (_, &Natural::ZERO) => *self = Natural::ONE,
             (&mut (Natural::ZERO | Natural::ONE), _) | (_, &Natural::ONE) => {}
-            (Natural(Small(ref mut x)), Natural(Small(e)))
+            (Natural(Small(x)), Natural(Small(e)))
                 if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
             {
                 x.mod_power_of_2_pow_assign(u64::wrapping_from(*e), pow);
@@ -388,7 +388,7 @@ impl ModPowerOf2PowAssign<&Natural> for Natural {
                 limbs_mod_power_of_2_pow(xs, &[*e], pow);
                 self.trim();
             }
-            (_, Natural(Large(ref es))) => {
+            (_, Natural(Large(es))) => {
                 let xs = self.promote_in_place();
                 limbs_mod_power_of_2_pow(xs, es, pow);
                 self.trim();

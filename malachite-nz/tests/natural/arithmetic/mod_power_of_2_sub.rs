@@ -16,12 +16,12 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_11;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_power_of_2_sub::{
     limbs_mod_power_of_2_limb_sub_limbs, limbs_mod_power_of_2_limb_sub_limbs_in_place,
     limbs_mod_power_of_2_sub, limbs_mod_power_of_2_sub_in_place_either,
     limbs_mod_power_of_2_sub_in_place_left, limbs_mod_power_of_2_sub_in_place_right,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_natural_unsigned_triple_gen_var_4, natural_unsigned_pair_gen_var_11,

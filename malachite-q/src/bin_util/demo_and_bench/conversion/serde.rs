@@ -7,17 +7,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::test_util::bench::bucketers::string_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::string_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_q::Rational;
 use malachite_q::test_util::bench::bucketers::{
     rational_deserialize_bucketer, triple_3_rational_bit_bucketer,
 };
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_nrm, string_gen_var_11, string_triple_gen_var_3,
 };
-use malachite_q::Rational;
 use num::BigRational;
 
 pub(crate) fn register(runner: &mut Runner) {

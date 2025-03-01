@@ -11,17 +11,17 @@ use malachite_base::num::arithmetic::traits::{
     Square,
 };
 use malachite_base::test_util::bench::bucketers::{pair_2_bucketer, pair_2_vec_len_bucketer};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_20,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
     limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref, limbs_square_low,
     limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen_var_11, unsigned_vec_pair_gen_var_21,
     unsigned_vec_unsigned_pair_gen_var_30,

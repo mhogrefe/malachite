@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base::test_util::bench::bucketers::{
     triple_1_2_vec_max_len_bucketer, triple_1_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_triple_gen_var_36, unsigned_vec_unsigned_unsigned_triple_gen_var_5,
@@ -18,12 +18,12 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::arithmetic::eq_mod::{
     limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_limb_mod_ref,
     limbs_pos_eq_neg_mod, limbs_pos_eq_neg_mod_limb, limbs_pos_eq_neg_mod_ref,
     limbs_pos_limb_eq_neg_limb_mod,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_triple_1_2_integer_max_bit_bucketer, triple_1_2_integer_max_bit_bucketer,
 };

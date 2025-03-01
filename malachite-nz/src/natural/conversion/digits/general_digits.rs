@@ -14,6 +14,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -26,10 +28,8 @@ use crate::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    Limb, BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, MP_BASES_BIG_BASE_10,
+    BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, Limb, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };
 use alloc::vec::Vec;

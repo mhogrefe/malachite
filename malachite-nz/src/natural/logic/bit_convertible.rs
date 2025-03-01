@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::Natural;
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use itertools::Itertools;

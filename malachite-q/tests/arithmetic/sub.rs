@@ -8,9 +8,9 @@
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::test_util::generators::integer_pair_gen;
+use malachite_q::Rational;
 use malachite_q::test_util::arithmetic::sub::sub_naive;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
-use malachite_q::Rational;
 use num::BigRational;
 use rug;
 use std::str::FromStr;

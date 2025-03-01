@@ -318,11 +318,7 @@ impl ModAdd<&Natural, Natural> for &Natural {
             "other must be reduced mod m, but {other} >= {m}"
         );
         let sum = self + other;
-        if sum < m {
-            sum
-        } else {
-            sum - m
-        }
+        if sum < m { sum } else { sum - m }
     }
 }
 
@@ -366,11 +362,7 @@ impl ModAdd<&Natural, &Natural> for &Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         let sum = self + other;
-        if sum < *m {
-            sum
-        } else {
-            sum - m
-        }
+        if sum < *m { sum } else { sum - m }
     }
 }
 

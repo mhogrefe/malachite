@@ -183,11 +183,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
                 let (mantissa, exponent) = self.sci_mantissa_and_exponent();
                 let exact = mantissa == 1.0;
                 let (q, r) = exponent.div_mod(i64::exact_from(pow));
-                if exact && r == 0 {
-                    q
-                } else {
-                    q + 1
-                }
+                if exact && r == 0 { q } else { q + 1 }
             }
         }
 
@@ -220,11 +216,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
                     return None;
                 }
                 let (q, r) = exponent.div_mod(i64::exact_from(pow));
-                if r == 0 {
-                    Some(q)
-                } else {
-                    None
-                }
+                if r == 0 { Some(q) } else { None }
             }
         }
     };

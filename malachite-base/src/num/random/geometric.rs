@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::bools::random::{
-    get_weighted_random_bool, random_bools, weighted_random_bools, RandomBools, WeightedRandomBools,
+    RandomBools, WeightedRandomBools, get_weighted_random_bool, random_bools, weighted_random_bools,
 };
 use crate::num::arithmetic::traits::Gcd;
 use crate::num::basic::integers::PrimitiveInt;
@@ -392,9 +392,9 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            GeometricRandomSignedRange::NonNegative(ref mut xs) => xs.next(),
-            GeometricRandomSignedRange::NonPositive(ref mut xs) => xs.next(),
-            GeometricRandomSignedRange::BothSigns(ref mut xs) => xs.next(),
+            GeometricRandomSignedRange::NonNegative(xs) => xs.next(),
+            GeometricRandomSignedRange::NonPositive(xs) => xs.next(),
+            GeometricRandomSignedRange::BothSigns(xs) => xs.next(),
         }
     }
 }

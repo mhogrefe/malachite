@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::rational_sequences::{rational_sequence_is_reduced, RationalSequence};
+use malachite_base::rational_sequences::{RationalSequence, rational_sequence_is_reduced};
 use malachite_base::test_util::generators::unsigned_vec_pair_gen;
 
 #[test]

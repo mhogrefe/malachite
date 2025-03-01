@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
-use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
+use crate::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
+use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use malachite_base::num::arithmetic::traits::ModInverse;
 use malachite_base::num::basic::traits::One;
 

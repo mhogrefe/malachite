@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{random_bools, RandomBools};
+use crate::bools::random::{RandomBools, random_bools};
 use crate::chars::constants::NUMBER_OF_CHARS;
 use crate::chars::random::{
     random_ascii_chars, random_char_inclusive_range, random_char_range, random_chars,
@@ -21,25 +21,28 @@ use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::string::options::random::{
-    random_from_sci_string_options, random_sci_size_options, random_to_sci_options,
-    RandomFromSciStringOptions,
+    RandomFromSciStringOptions, random_from_sci_string_options, random_sci_size_options,
+    random_to_sci_options,
 };
 use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
 use crate::num::conversion::traits::{
     ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom,
     SplitInHalf, WrappingFrom, WrappingInto,
 };
+use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use crate::num::random::geometric::{
+    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
     geometric_random_natural_signeds, geometric_random_negative_signeds,
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
     geometric_random_signed_inclusive_range, geometric_random_signed_range,
     geometric_random_signeds, geometric_random_unsigned_inclusive_range,
-    geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
-    GeometricRandomSignedRange, GeometricRandomSigneds,
+    geometric_random_unsigned_range, geometric_random_unsigneds,
 };
 use crate::num::random::{
+    RandomPrimitiveInts, RandomUnsignedBitChunks, RandomUnsignedInclusiveRange,
+    RandomUnsignedRange, SpecialRandomNonzeroFiniteFloats, VariableRangeGenerator,
     random_highest_bit_set_unsigneds, random_natural_signeds, random_negative_signeds,
     random_nonzero_signeds, random_positive_signeds, random_positive_unsigneds,
     random_primitive_ints, random_signed_inclusive_range, random_signed_range,
@@ -48,27 +51,25 @@ use crate::num::random::{
     special_random_nonzero_finite_primitive_floats,
     special_random_positive_finite_primitive_floats,
     special_random_primitive_float_inclusive_range, special_random_primitive_float_range,
-    special_random_primitive_floats, RandomPrimitiveInts, RandomUnsignedBitChunks,
-    RandomUnsignedInclusiveRange, RandomUnsignedRange, SpecialRandomNonzeroFiniteFloats,
-    VariableRangeGenerator,
+    special_random_primitive_floats,
 };
-use crate::random::{Seed, EXAMPLE_SEED};
-use crate::rational_sequences::random::random_rational_sequences;
+use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rational_sequences::RationalSequence;
-use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
+use crate::rational_sequences::random::random_rational_sequences;
 use crate::rounding_modes::RoundingMode::{self, *};
+use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
 use crate::slices::slice_test_zero;
 use crate::strings::random::{random_strings, random_strings_using_chars};
 use crate::strings::strings_from_char_vecs;
 use crate::test_util::extra_variadic::{
-    random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
-    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyxy, random_quadruples_xyyx,
-    random_quadruples_xyyz, random_quadruples_xyzz, random_sextuples_from_single, random_triples,
-    random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
-    random_union3s, Union3,
+    Union3, random_duodecuples_from_single, random_octuples_from_single,
+    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyx,
+    random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
+    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
+    random_triples_xyx, random_triples_xyy, random_union3s,
 };
 use crate::test_util::generators::common::{
-    reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
+    GenConfig, It, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
 };
 use crate::test_util::generators::exhaustive::{
     float_rounding_mode_filter_var_1, valid_digit_chars,
@@ -83,16 +84,16 @@ use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRI
 use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
 use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
-use crate::unions::random::random_union2s;
 use crate::unions::Union2;
+use crate::unions::random::random_union2s;
 use crate::vecs::random::{
     random_vecs, random_vecs_fixed_length_from_single, random_vecs_length_inclusive_range,
     random_vecs_min_length,
 };
 use crate::vecs::random_values_from_vec;
-use itertools::repeat_n;
 use itertools::Itertools;
-use std::cmp::{max, min, Ordering::*};
+use itertools::repeat_n;
+use std::cmp::{Ordering::*, max, min};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::mem::swap;
@@ -1056,13 +1057,8 @@ pub fn random_primitive_int_pair_gen_var_1<T: PrimitiveInt>(_config: &GenConfig)
 // TODO make better
 pub fn random_primitive_int_pair_gen_var_2<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
     Box::new(
-        random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED)).map(|(x, y)| {
-            if x <= y {
-                (x, y)
-            } else {
-                (y, x)
-            }
-        }),
+        random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .map(|(x, y)| if x <= y { (x, y) } else { (y, x) }),
     )
 }
 
@@ -3112,6 +3108,10 @@ pub fn random_unsigned_gen_var_26<T: PrimitiveUnsigned>(_config: &GenConfig) -> 
 pub fn random_unsigned_gen_var_27<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
     let limit = smallest_invalid_value(T::checked_product_of_first_n_primes);
     Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
+pub fn random_unsigned_gen_var_28<T: PrimitiveUnsigned + IsPrime>(_config: &GenConfig) -> It<T> {
+    Box::new(random_primitive_ints(EXAMPLE_SEED).filter(T::is_prime))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveInt) --
@@ -6275,7 +6275,7 @@ pub fn random_primitive_int_vec_pair_gen_var_4<T: PrimitiveInt>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .filter(|(ref xs, ref es)| {
+        .filter(|(xs, es)| {
             !xs.is_empty()
                 && (es.len() > 1 || es.len() == 1 && es[0] > T::ONE)
                 && *es.last().unwrap() != T::ZERO
@@ -6539,7 +6539,7 @@ pub fn random_primitive_int_vec_pair_gen_var_27<T: PrimitiveInt>(
             ),
             xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
         }
-        .filter(|(ref xs, ref ys): &(Vec<T>, Vec<T>)| {
+        .filter(|(xs, ys): &(Vec<T>, Vec<T>)| {
             (*xs.last().unwrap() != T::ZERO || *ys.last().unwrap() != T::ZERO) && ys[0].odd()
         }),
     )

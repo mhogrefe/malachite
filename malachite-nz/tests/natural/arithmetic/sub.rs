@@ -13,14 +13,15 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    large_type_gen_var_9, unsigned_pair_gen_var_7, unsigned_vec_gen, unsigned_vec_pair_gen_var_31,
-    unsigned_vec_pair_gen_var_6, unsigned_vec_triple_gen_var_31, unsigned_vec_triple_gen_var_40,
+    large_type_gen_var_9, unsigned_pair_gen_var_7, unsigned_vec_gen, unsigned_vec_pair_gen_var_6,
+    unsigned_vec_pair_gen_var_31, unsigned_vec_triple_gen_var_31, unsigned_vec_triple_gen_var_40,
     unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_pair_gen_var_1,
     unsigned_vec_unsigned_vec_bool_triple_gen_var_1,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::sub::{
     limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_greater_in_place_left,
     limbs_sub_greater_to_out, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
@@ -29,7 +30,6 @@ use malachite_nz::natural::arithmetic::sub::{
     limbs_sub_same_length_to_out_with_overlap, limbs_sub_same_length_with_borrow_in_in_place_left,
     limbs_sub_same_length_with_borrow_in_to_out, limbs_vec_sub_in_place_right,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen_var_10};
 use malachite_nz::test_util::natural::arithmetic::sub::{

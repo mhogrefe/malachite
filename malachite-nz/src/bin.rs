@@ -65,9 +65,9 @@ use crate::bin_util::generate::digits_data::generate_string_data;
 #[cfg(feature = "bin_build")]
 use crate::bin_util::generate::factorial_data::generate_factorial_data;
 #[cfg(feature = "bin_build")]
-use malachite_base::test_util::runner::cmd::read_command_line_arguments;
-#[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::Runner;
+#[cfg(feature = "bin_build")]
+use malachite_base::test_util::runner::cmd::read_command_line_arguments;
 
 // Examples:
 //

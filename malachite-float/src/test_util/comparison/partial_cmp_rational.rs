@@ -25,11 +25,7 @@ pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ord
             }),
             y,
         ) => Some(if *y == 0u32 {
-            if *s_x {
-                Greater
-            } else {
-                Less
-            }
+            if *s_x { Greater } else { Less }
         } else {
             let s_cmp = s_x.cmp(&(*y > 0));
             if s_cmp != Equal {

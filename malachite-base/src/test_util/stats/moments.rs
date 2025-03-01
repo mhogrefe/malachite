@@ -45,11 +45,7 @@ apply_to_primitive_ints!(impl_checked_to_f64_for_primitive_ints);
 impl CheckedToF64 for bool {
     #[inline]
     fn checked_to_f64(&self) -> f64 {
-        if *self {
-            1.0
-        } else {
-            0.0
-        }
+        if *self { 1.0 } else { 0.0 }
     }
 }
 
@@ -185,11 +181,7 @@ fn pop_uniform_standard_deviation<T: CheckedToF64>(a: &T, b: &T) -> f64 {
 fn pop_uniform_skewness<T: CheckedToF64>(a: &T, b: &T) -> f64 {
     let a = a.checked_to_f64();
     let b = b.checked_to_f64();
-    if a == b {
-        f64::NAN
-    } else {
-        0.0
-    }
+    if a == b { f64::NAN } else { 0.0 }
 }
 
 fn pop_uniform_excess_kurtosis<T: CheckedToF64>(a: &T, b: &T) -> f64 {

@@ -9,11 +9,11 @@
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 use malachite_q::arithmetic::traits::{Approximate, ApproximateAssign};
 use malachite_q::test_util::arithmetic::approximate::approximate_naive;
 use malachite_q::test_util::bench::bucketers::pair_1_rational_bit_bucketer;

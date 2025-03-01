@@ -16,12 +16,12 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_unsigned_triple_gen_var_7,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::arithmetic::eq_mod::{
     limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_limb_mod_ref,
     limbs_pos_eq_neg_mod, limbs_pos_eq_neg_mod_limb, limbs_pos_eq_neg_mod_ref,
     limbs_pos_limb_eq_neg_limb_mod,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
@@ -745,8 +745,7 @@ fn eq_mod_properties() {
         assert!(!x.eq_mod(y, m));
         assert!(!y.eq_mod(x, m));
         assert!(
-            !rug::Integer::from(x).is_congruent(&rug::Integer::from(y),
-            &rug::Integer::from(m))
+            !rug::Integer::from(x).is_congruent(&rug::Integer::from(y), &rug::Integer::from(m))
         );
     });
 

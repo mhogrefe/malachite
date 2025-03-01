@@ -81,7 +81,7 @@ pub trait PowerOf2Digits<T>: Sized {
     /// The input digits are in descending order: most- to least-significant. The base is $2^k$,
     /// where $k$ is `log_base`.
     fn from_power_of_2_digits_desc<I: Iterator<Item = T>>(log_base: u64, digits: I)
-        -> Option<Self>;
+    -> Option<Self>;
 }
 
 /// Converts a string slice in a given base to a value.

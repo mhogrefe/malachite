@@ -27,7 +27,7 @@ macro_rules! impl_partial_ord_limb {
             /// # Examples
             /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
-                match *self {
+                match self {
                     Natural(Small(small)) => small.partial_cmp(other),
                     Natural(Large(_)) => Some(Greater),
                 }

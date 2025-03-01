@@ -8,23 +8,23 @@
 
 use crate::num::conversion::traits::ExactFrom;
 use crate::num::random::geometric::{
-    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
-    GeometricRandomNaturalValues,
+    GeometricRandomNaturalValues, geometric_random_unsigned_inclusive_range,
+    geometric_random_unsigneds,
 };
 use crate::num::random::{
-    random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
-    RandomUnsignedRange,
+    RandomUnsignedInclusiveRange, RandomUnsignedRange, random_unsigned_inclusive_range,
+    random_unsigned_range,
 };
 use crate::random::Seed;
 use crate::sets::random::{
-    random_b_tree_sets_fixed_length, random_b_tree_sets_from_length_iterator, RandomBTreeSets,
-    RandomBTreeSetsFixedLength,
+    RandomBTreeSets, RandomBTreeSetsFixedLength, random_b_tree_sets_fixed_length,
+    random_b_tree_sets_from_length_iterator,
 };
 use crate::vecs::exhaustive::validate_oi_map;
 use std::cmp::Ordering::*;
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::iter::{repeat, Repeat};
+use std::iter::{Repeat, repeat};
 
 /// Generates random [`Vec`]s of a given length using elements from a single iterator.
 ///
@@ -730,9 +730,9 @@ where
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
             RandomOrderedUniqueVecsFixedLength::Zero => Some(vec![]),
-            RandomOrderedUniqueVecsFixedLength::One(ref mut xs) => xs.next().map(|x| vec![x]),
-            RandomOrderedUniqueVecsFixedLength::Two(ref mut xs) => xs.next(),
-            RandomOrderedUniqueVecsFixedLength::GreaterThan2(ref mut xs) => xs.next(),
+            RandomOrderedUniqueVecsFixedLength::One(xs) => xs.next().map(|x| vec![x]),
+            RandomOrderedUniqueVecsFixedLength::Two(xs) => xs.next(),
+            RandomOrderedUniqueVecsFixedLength::GreaterThan2(xs) => xs.next(),
         }
     }
 }
@@ -1351,9 +1351,9 @@ where
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
             RandomUniqueVecsFixedLength::Zero => Some(vec![]),
-            RandomUniqueVecsFixedLength::One(ref mut xs) => xs.next().map(|x| vec![x]),
-            RandomUniqueVecsFixedLength::Two(ref mut xs) => xs.next(),
-            RandomUniqueVecsFixedLength::GreaterThan2(ref mut xs) => xs.next(),
+            RandomUniqueVecsFixedLength::One(xs) => xs.next().map(|x| vec![x]),
+            RandomUniqueVecsFixedLength::Two(xs) => xs.next(),
+            RandomUniqueVecsFixedLength::GreaterThan2(xs) => xs.next(),
         }
     }
 }

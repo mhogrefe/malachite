@@ -10,15 +10,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use crate::natural::arithmetic::gcd::half_gcd::limbs_gcd_reduced;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::comparison::cmp::limbs_cmp;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
-use core::cmp::{min, Ordering::*};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
+use core::cmp::{Ordering::*, min};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -250,8 +250,8 @@ impl Gcd<&Natural> for &Natural {
             (&Natural::ZERO, y) => y.clone(),
             (x, y) if core::ptr::eq(x, y) => x.clone(),
             (Natural(Small(x)), Natural(Small(y))) => Natural::from(x.gcd(*y)),
-            (Natural(Large(ref xs)), Natural(Small(y))) => Natural::from(limbs_gcd_limb(xs, *y)),
-            (Natural(Small(x)), Natural(Large(ref ys))) => Natural::from(limbs_gcd_limb(ys, *x)),
+            (Natural(Large(xs)), Natural(Small(y))) => Natural::from(limbs_gcd_limb(xs, *y)),
+            (Natural(Small(x)), Natural(Large(ys))) => Natural::from(limbs_gcd_limb(ys, *x)),
             (Natural(Large(xs)), Natural(Large(ys))) => {
                 let c = limbs_cmp(xs, ys);
                 if c == Equal {
@@ -304,14 +304,14 @@ impl GcdAssign<Natural> for Natural {
         match (&mut *self, other) {
             (_, Natural::ZERO) => {}
             (&mut Natural::ZERO, y) => *self = y,
-            (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(y),
-            (Natural(Large(ref xs)), Natural(Small(y))) => {
+            (Natural(Small(x)), Natural(Small(y))) => x.gcd_assign(y),
+            (Natural(Large(xs)), Natural(Small(y))) => {
                 *self = Natural::from(limbs_gcd_limb(xs, y));
             }
-            (Natural(Small(x)), Natural(Large(ref ys))) => {
-                *self = Natural::from(limbs_gcd_limb(ys, *x));
+            (Natural(Small(x)), Natural(Large(ys))) => {
+                *self = Natural::from(limbs_gcd_limb(&ys, *x));
             }
-            (Natural(Large(ref mut xs)), Natural(Large(mut ys))) => {
+            (Natural(Large(xs)), Natural(Large(mut ys))) => {
                 let mut xs: &mut [Limb] = &mut *xs;
                 let mut ys: &mut [Limb] = &mut ys;
                 match limbs_cmp(xs, ys) {
@@ -361,14 +361,14 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
         match (&mut *self, other) {
             (_, &Natural::ZERO) => {}
             (&mut Natural::ZERO, y) => self.clone_from(y),
-            (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(*y),
-            (Natural(Large(ref xs)), Natural(Small(y))) => {
+            (Natural(Small(x)), Natural(Small(y))) => x.gcd_assign(*y),
+            (Natural(Large(xs)), Natural(Small(y))) => {
                 *self = Natural::from(limbs_gcd_limb(xs, *y));
             }
-            (Natural(Small(x)), Natural(Large(ref ys))) => {
+            (Natural(Small(x)), Natural(Large(ys))) => {
                 *self = Natural::from(limbs_gcd_limb(ys, *x));
             }
-            (Natural(Large(ref mut xs)), Natural(Large(ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 let c = limbs_cmp(xs, ys);
                 if c == Equal {
                     return;

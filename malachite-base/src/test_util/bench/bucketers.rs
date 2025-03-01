@@ -284,14 +284,14 @@ pub fn pair_string_max_len_bucketer<'a>(
 
 pub fn pair_1_string_len_bucketer<T>(s_name: &str) -> Bucketer<(String, T)> {
     Bucketer {
-        bucketing_function: &|(ref s, _)| s.len(),
+        bucketing_function: &|(s, _)| s.len(),
         bucketing_label: format!("{s_name}.len()"),
     }
 }
 
 pub fn pair_2_string_len_bucketer<T>(s_name: &str) -> Bucketer<(T, String)> {
     Bucketer {
-        bucketing_function: &|(_, ref s)| s.len(),
+        bucketing_function: &|(_, s)| s.len(),
         bucketing_label: format!("{s_name}.len()"),
     }
 }
@@ -708,42 +708,42 @@ pub fn quadruple_1_2_3_primitive_int_bit_i64_u64_max_bucketer<'a, T: PrimitiveIn
 
 pub fn pair_1_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
     Bucketer {
-        bucketing_function: &|(ref xs, _)| xs.len(),
+        bucketing_function: &|(xs, _)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
 
 pub fn pair_1_vec_len_sub_1_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
     Bucketer {
-        bucketing_function: &|(ref xs, _)| xs.len() - 1,
+        bucketing_function: &|(xs, _)| xs.len() - 1,
         bucketing_label: format!("{xs_name}.len() - 1"),
     }
 }
 
 pub fn pair_2_vec_len_bucketer<T, U>(ys_name: &str) -> Bucketer<(T, Vec<U>)> {
     Bucketer {
-        bucketing_function: &|(_, ref ys)| ys.len(),
+        bucketing_function: &|(_, ys)| ys.len(),
         bucketing_label: format!("{ys_name}.len()"),
     }
 }
 
 pub fn triple_1_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(Vec<T>, U, V)> {
     Bucketer {
-        bucketing_function: &|(ref xs, _, _)| xs.len(),
+        bucketing_function: &|(xs, _, _)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
 
 pub fn triple_3_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(T, U, Vec<V>)> {
     Bucketer {
-        bucketing_function: &|(_, _, ref xs)| xs.len(),
+        bucketing_function: &|(_, _, xs)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
 
 pub fn triple_2_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(T, Vec<U>, V)> {
     Bucketer {
-        bucketing_function: &|(_, ref xs, _)| xs.len(),
+        bucketing_function: &|(_, xs, _)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
@@ -801,21 +801,21 @@ pub fn triple_2_3_vec_min_len_bucketer<'a, T, U, V>(
 
 pub fn quadruple_2_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, Vec<U>, V, W)> {
     Bucketer {
-        bucketing_function: &|(_, ref xs, _, _)| xs.len(),
+        bucketing_function: &|(_, xs, _, _)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
 
 pub fn quadruple_3_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U, Vec<V>, W)> {
     Bucketer {
-        bucketing_function: &|(_, _, ref xs, _)| xs.len(),
+        bucketing_function: &|(_, _, xs, _)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
 
 pub fn quadruple_4_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U, V, Vec<W>)> {
     Bucketer {
-        bucketing_function: &|(_, _, _, ref xs)| xs.len(),
+        bucketing_function: &|(_, _, _, xs)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
@@ -834,7 +834,7 @@ pub fn quintuple_1_vec_len_bucketer<T, U, V, W, X>(
     xs_name: &str,
 ) -> Bucketer<(Vec<T>, U, V, W, X)> {
     Bucketer {
-        bucketing_function: &|(ref xs, _, _, _, _)| xs.len(),
+        bucketing_function: &|(xs, _, _, _, _)| xs.len(),
         bucketing_label: format!("{xs_name}.len()"),
     }
 }
@@ -898,7 +898,7 @@ pub fn pair_1_vec_len_times_pair_2_bits_bucketer<'a, T, U: PrimitiveUnsigned>(
     y_name: &'a str,
 ) -> Bucketer<'a, (Vec<T>, U)> {
     Bucketer {
-        bucketing_function: &|(ref xs, ref y)| {
+        bucketing_function: &|(xs, y)| {
             xs.len()
                 .checked_mul(usize::exact_from(y.significant_bits()))
                 .unwrap()
@@ -936,7 +936,7 @@ where
     for<'b> &'b U: SignificantBits,
 {
     Bucketer {
-        bucketing_function: &|(_, ref x, y)| {
+        bucketing_function: &|(_, x, y)| {
             let x_bits: usize = ExactFrom::<u64>::exact_from(x.significant_bits());
             x_bits.checked_mul(ExactFrom::<V>::exact_from(*y)).unwrap()
         },
@@ -952,7 +952,7 @@ where
     usize: ExactFrom<U>,
 {
     Bucketer {
-        bucketing_function: &|(ref xs, y)| xs.len().checked_mul(usize::exact_from(*y)).unwrap(),
+        bucketing_function: &|(xs, y)| xs.len().checked_mul(usize::exact_from(*y)).unwrap(),
         bucketing_label: format!("{xs_name}.len() * {y_name}"),
     }
 }
@@ -966,7 +966,7 @@ where
     for<'b> &'b T: SignificantBits,
 {
     Bucketer {
-        bucketing_function: &|(ref x, y)| {
+        bucketing_function: &|(x, y)| {
             let x_bits: usize = ExactFrom::<u64>::exact_from(x.significant_bits());
             x_bits.checked_mul(ExactFrom::<U>::exact_from(*y)).unwrap()
         },
@@ -983,7 +983,7 @@ where
     for<'b> &'b V: SignificantBits,
 {
     Bucketer {
-        bucketing_function: &|(_, _, (ref x, y))| {
+        bucketing_function: &|(_, _, (x, y))| {
             let x_bits: usize = ExactFrom::<u64>::exact_from(x.significant_bits());
             x_bits.checked_mul(ExactFrom::<W>::exact_from(*y)).unwrap()
         },

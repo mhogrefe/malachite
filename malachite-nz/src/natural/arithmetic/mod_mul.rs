@@ -10,9 +10,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
 use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOf2Mul,

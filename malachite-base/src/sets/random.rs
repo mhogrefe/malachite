@@ -8,12 +8,12 @@
 
 use crate::num::conversion::traits::ExactFrom;
 use crate::num::random::geometric::{
-    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
-    GeometricRandomNaturalValues,
+    GeometricRandomNaturalValues, geometric_random_unsigned_inclusive_range,
+    geometric_random_unsigneds,
 };
 use crate::num::random::{
-    random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
-    RandomUnsignedRange,
+    RandomUnsignedInclusiveRange, RandomUnsignedRange, random_unsigned_inclusive_range,
+    random_unsigned_range,
 };
 use crate::random::Seed;
 #[cfg(not(feature = "test_build"))]

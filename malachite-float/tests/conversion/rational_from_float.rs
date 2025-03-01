@@ -9,10 +9,10 @@
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::strings::ToDebugString;
+use malachite_float::Float;
 use malachite_float::conversion::rational_from_float::RationalFromFloatError;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::float_gen;
-use malachite_float::Float;
 use malachite_q::Rational;
 
 #[test]

@@ -10,16 +10,16 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::from::{SignedFromFloatError, UnsignedFromFloatError};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_18,
-    float_rounding_mode_pair_gen_var_19, float_rounding_mode_pair_gen_var_4,
-    float_rounding_mode_pair_gen_var_5,
+    float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_4,
+    float_rounding_mode_pair_gen_var_5, float_rounding_mode_pair_gen_var_18,
+    float_rounding_mode_pair_gen_var_19,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 

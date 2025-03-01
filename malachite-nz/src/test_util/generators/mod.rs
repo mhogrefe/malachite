@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use crate::natural::Natural;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
@@ -76,8 +76,8 @@ where
 }
 
 // All `Integer`s that are not equal to any floating point value of type `T`.
-pub fn integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>(
-) -> Generator<Integer> {
+pub fn integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>()
+-> Generator<Integer> {
     Generator::new(
         &exhaustive_integer_gen_var_2::<T>,
         &random_integer_gen_var_2::<T>,
@@ -384,8 +384,8 @@ pub fn integer_triple_gen_var_3() -> Generator<(Integer, Integer, Integer)> {
 // -- (Integer, Integer, Integer, PrimitiveUnsigned) --
 
 // All `(Integer, Integer, Integer, T)` where `T` is unsigned and small.
-pub fn integer_integer_integer_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, Integer, Integer, T)> {
+pub fn integer_integer_integer_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Integer, Integer, Integer, T)> {
     Generator::new(
         &exhaustive_integer_integer_integer_unsigned_quadruple_gen_var_1,
         &random_integer_integer_integer_unsigned_quadruple_gen_var_1,
@@ -443,8 +443,8 @@ pub fn integer_integer_natural_triple_gen_var_2() -> Generator<(Integer, Integer
 
 // -- (Integer, Integer, PrimitiveFloat) --
 
-pub fn integer_integer_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> Generator<(Integer, Integer, T)> {
+pub fn integer_integer_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> Generator<(Integer, Integer, T)> {
     Generator::new(
         &exhaustive_integer_integer_primitive_float_triple_gen,
         &random_integer_integer_primitive_float_triple_gen,
@@ -464,8 +464,8 @@ pub fn integer_integer_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Int
 
 // -- (Integer, Integer, PrimitiveUnsigned) --
 
-pub fn integer_integer_unsigned_triple_gen<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, Integer, T)> {
+pub fn integer_integer_unsigned_triple_gen<T: PrimitiveUnsigned>()
+-> Generator<(Integer, Integer, T)> {
     Generator::new(
         &exhaustive_integer_integer_unsigned_triple_gen,
         &random_integer_integer_primitive_int_triple_gen,
@@ -474,8 +474,8 @@ pub fn integer_integer_unsigned_triple_gen<T: PrimitiveUnsigned>(
 }
 
 // All `(Integer, Integer, T)` where `T` is unsigned and small.
-pub fn integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, Integer, T)> {
+pub fn integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Integer, Integer, T)> {
     Generator::new(
         &exhaustive_integer_integer_unsigned_triple_gen_var_1,
         &random_integer_integer_unsigned_triple_gen_var_1,
@@ -484,8 +484,8 @@ pub fn integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn integer_integer_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, rug::Integer, T), (Integer, Integer, T))> {
+pub fn integer_integer_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, rug::Integer, T), (Integer, Integer, T))> {
     Generator::new(
         &|| integer_integer_triple_1_2_rm(exhaustive_integer_integer_unsigned_triple_gen_var_1()),
         &|config| {
@@ -501,8 +501,8 @@ pub fn integer_integer_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
 
 // All `(Integer, Integer, T)` where `T` is unsigned and small, and the `Integer`s are equal mod 2
 // to the power of the `T`.
-pub fn integer_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, Integer, T)>
+pub fn integer_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(Integer, Integer, T)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -515,8 +515,8 @@ where
 
 // All `(Integer, Integer, T)` where `T` is unsigned and small, and the `Integer`s are not equal mod
 // 2 to the power of the `T`.
-pub fn integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, Integer, T)> {
+pub fn integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>()
+-> Generator<(Integer, Integer, T)> {
     Generator::new(
         &exhaustive_integer_integer_unsigned_triple_gen_var_3,
         &random_integer_integer_unsigned_triple_gen_var_3,
@@ -528,8 +528,8 @@ pub fn integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
 
 // All `(Integer, Integer, RoundingMode)` triples where the second `Integer` is positive and if the
 // `RoundingMode` is `Exact`, the first `Integer` is divisible by the second.
-pub fn integer_integer_rounding_mode_triple_gen_var_1(
-) -> Generator<(Integer, Integer, RoundingMode)> {
+pub fn integer_integer_rounding_mode_triple_gen_var_1()
+-> Generator<(Integer, Integer, RoundingMode)> {
     Generator::new(
         &exhaustive_integer_integer_rounding_mode_triple_gen_var_1,
         &random_integer_integer_rounding_mode_triple_gen_var_1,
@@ -539,8 +539,8 @@ pub fn integer_integer_rounding_mode_triple_gen_var_1(
 
 // All `(Integer, Integer, RoundingMode)` triples that are a valid input to
 // `Integer::round_to_multiple`.
-pub fn integer_integer_rounding_mode_triple_gen_var_2(
-) -> Generator<(Integer, Integer, RoundingMode)> {
+pub fn integer_integer_rounding_mode_triple_gen_var_2()
+-> Generator<(Integer, Integer, RoundingMode)> {
     Generator::new(
         &exhaustive_integer_integer_rounding_mode_triple_gen_var_2,
         &random_integer_integer_rounding_mode_triple_gen_var_2,
@@ -587,8 +587,8 @@ pub fn integer_primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(Integ
     )
 }
 
-pub fn integer_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
-) -> Generator<((rug::Integer, T), (Integer, T))> {
+pub fn integer_primitive_float_pair_gen_rm<T: PrimitiveFloat>()
+-> Generator<((rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_rm(exhaustive_integer_primitive_float_pair_gen()),
         &|config| integer_pair_1_rm(random_integer_primitive_float_pair_gen(config)),
@@ -598,8 +598,8 @@ pub fn integer_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
 
 // -- (Integer, PrimitiveFloat, PrimitiveFloat) --
 
-pub fn integer_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> Generator<(Integer, T, T)> {
+pub fn integer_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> Generator<(Integer, T, T)> {
     Generator::new(
         &exhaustive_integer_primitive_float_primitive_float_triple_gen,
         &random_integer_primitive_float_primitive_float_triple_gen,
@@ -617,8 +617,8 @@ pub fn integer_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(Integer, T)> 
     )
 }
 
-pub fn integer_signed_pair_gen_rm<T: PrimitiveSigned>(
-) -> Generator<((rug::Integer, T), (Integer, T))> {
+pub fn integer_signed_pair_gen_rm<T: PrimitiveSigned>()
+-> Generator<((rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_rm(exhaustive_integer_signed_pair_gen()),
         &|config| integer_pair_1_rm(random_integer_primitive_int_pair_gen(config)),
@@ -635,8 +635,8 @@ pub fn integer_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(Integer
     )
 }
 
-pub fn integer_signed_pair_gen_var_1_rm<T: PrimitiveSigned>(
-) -> Generator<((rug::Integer, T), (Integer, T))> {
+pub fn integer_signed_pair_gen_var_1_rm<T: PrimitiveSigned>()
+-> Generator<((rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_rm(exhaustive_integer_signed_pair_gen_var_1()),
         &|config| integer_pair_1_rm(random_integer_signed_pair_gen_var_1(config)),
@@ -657,8 +657,8 @@ pub fn integer_signed_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Inte
 // -- (Integer, PrimitiveSigned, PrimitiveUnsigned) --
 
 // All `(Integer, T, U)` where `T` is signed and small and `U` is unsigned, small, and positive.
-pub fn integer_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, U)> {
+pub fn integer_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>()
+-> Generator<(Integer, T, U)> {
     Generator::new(
         &exhaustive_integer_signed_unsigned_triple_gen_var_1,
         &random_integer_signed_unsigned_triple_gen_var_1,
@@ -670,8 +670,8 @@ pub fn integer_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: Primitive
 
 // All `(Integer, T, RoundingMode)` where `T` is signed and the triple is a valid input to
 // `Integer::shl_round`.
-pub fn integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
-) -> Generator<(Integer, T, RoundingMode)>
+pub fn integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(Integer, T, RoundingMode)>
 where
     Integer: Shr<T, Output = Integer>,
 {
@@ -684,8 +684,8 @@ where
 
 // All `(Integer, T, RoundingMode)` where `T` is signed and the triple is a valid input to
 // `Integer::shr_round`.
-pub fn integer_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
-) -> Generator<(Integer, T, RoundingMode)>
+pub fn integer_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> Generator<(Integer, T, RoundingMode)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -706,8 +706,8 @@ pub fn integer_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(Integer, 
     )
 }
 
-pub fn integer_unsigned_pair_gen_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T), (Integer, T))> {
+pub fn integer_unsigned_pair_gen_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_rm(exhaustive_integer_unsigned_pair_gen()),
         &|config| integer_pair_1_rm(random_integer_primitive_int_pair_gen(config)),
@@ -716,8 +716,8 @@ pub fn integer_unsigned_pair_gen_rm<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn integer_unsigned_pair_gen_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+pub fn integer_unsigned_pair_gen_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen()),
         &|config| integer_pair_1_nrm(random_integer_primitive_int_pair_gen(config)),
@@ -735,8 +735,8 @@ pub fn integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Int
 }
 
 #[allow(clippy::type_complexity)]
-pub fn integer_unsigned_pair_gen_var_1_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+pub fn integer_unsigned_pair_gen_var_1_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_1()),
         &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_1(config)),
@@ -753,8 +753,8 @@ pub fn integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Int
     )
 }
 
-pub fn integer_unsigned_pair_gen_var_2_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T), (Integer, T))> {
+pub fn integer_unsigned_pair_gen_var_2_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_rm(exhaustive_integer_unsigned_pair_gen_var_2()),
         &|config| integer_pair_1_rm(random_integer_unsigned_pair_gen_var_2(config)),
@@ -763,8 +763,8 @@ pub fn integer_unsigned_pair_gen_var_2_rm<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn integer_unsigned_pair_gen_var_2_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+pub fn integer_unsigned_pair_gen_var_2_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_2()),
         &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_2(config)),
@@ -783,8 +783,8 @@ pub fn integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Int
 }
 
 #[allow(clippy::type_complexity)]
-pub fn integer_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+pub fn integer_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Generator::new(
         &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_3()),
         &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_3(config)),
@@ -824,8 +824,8 @@ pub fn integer_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> Generator<(Int
 // -- (Integer, PrimitiveUnsigned, bool) --
 
 // All `(Integer, T, bool)` where `T` is unsigned and small.
-pub fn integer_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, bool)> {
+pub fn integer_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, bool)> {
     Generator::new(
         &exhaustive_integer_unsigned_bool_triple_gen_var_1,
         &random_integer_unsigned_bool_triple_gen_var_1,
@@ -834,8 +834,8 @@ pub fn integer_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn integer_unsigned_bool_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T, bool), (Integer, T, bool))> {
+pub fn integer_unsigned_bool_triple_gen_var_1_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T, bool), (Integer, T, bool))> {
     Generator::new(
         &|| integer_triple_1_rm(exhaustive_integer_unsigned_bool_triple_gen_var_1()),
         &|config| integer_triple_1_rm(random_integer_unsigned_bool_triple_gen_var_1(config)),
@@ -849,8 +849,8 @@ pub fn integer_unsigned_bool_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
 
 // -- (Integer, PrimitiveUnsigned, Natural) --
 
-pub fn integer_unsigned_natural_triple_gen<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, Natural)> {
+pub fn integer_unsigned_natural_triple_gen<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, Natural)> {
     Generator::new(
         &exhaustive_integer_unsigned_natural_triple_gen,
         &random_integer_primitive_int_natural_triple_gen,
@@ -870,8 +870,8 @@ pub fn integer_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator
 
 // All `(Integer, T, U)` where `T` and `U` are unsigned, the `T` is between 2 and 36, inclusive, and
 // the `U` is small.
-pub fn integer_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, U)> {
+pub fn integer_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
+-> Generator<(Integer, T, U)> {
     Generator::new(
         &exhaustive_integer_unsigned_unsigned_triple_gen_var_1,
         &random_integer_unsigned_unsigned_triple_gen_var_1,
@@ -881,8 +881,8 @@ pub fn integer_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
 
 // All `(Integer, T, T)` where `T` is unsigned, both `T`s are small, and the first `T` is less than
 // or equal to the second.
-pub fn integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, T)> {
+pub fn integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, T)> {
     Generator::new(
         &exhaustive_integer_unsigned_unsigned_triple_gen_var_2,
         &random_integer_unsigned_unsigned_triple_gen_var_2,
@@ -891,8 +891,8 @@ pub fn integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
 }
 
 // All `(Integer, T, T)` where `T` is unsigned and both `T`s are small.
-pub fn integer_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, T)> {
+pub fn integer_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, T)> {
     Generator::new(
         &exhaustive_integer_unsigned_unsigned_triple_gen_var_3,
         &random_integer_unsigned_unsigned_triple_gen_var_3,
@@ -904,8 +904,8 @@ pub fn integer_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
 
 // All `(Integer, T, T, Natural)` where `T` is unsigned and the first `T` is smaller than the
 // second.
-pub fn integer_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, T, Natural)> {
+pub fn integer_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, T, Natural)> {
     Generator::new(
         &exhaustive_integer_unsigned_unsigned_natural_quadruple_gen_var_1,
         &random_integer_unsigned_unsigned_natural_triple_gen_var_1,
@@ -928,8 +928,8 @@ pub fn integer_unsigned_rounding_mode_triple_gen_var_1() -> Generator<(Integer, 
 
 // All `(Integer, T, RoundingMode)` where `T` is unsigned and the triple is a valid input to
 // `Integer::shr_round`.
-pub fn integer_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, RoundingMode)>
+pub fn integer_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, RoundingMode)>
 where
     Integer: Shl<T, Output = Integer>,
 {
@@ -943,8 +943,8 @@ where
 // vars 3 and 4 are in malachite-float
 
 // All `(Integer, T, RoundingMode)` where the `T` is small and unsigned.
-pub fn integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>(
-) -> Generator<(Integer, T, RoundingMode)> {
+pub fn integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>()
+-> Generator<(Integer, T, RoundingMode)> {
     Generator::new(
         &exhaustive_integer_unsigned_rounding_mode_triple_gen_var_5,
         &random_integer_unsigned_rounding_mode_triple_gen_var_5,
@@ -1080,8 +1080,8 @@ where
 }
 
 // All `Natural`s that are not equal to any floating point value of type `T`.
-pub fn natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>(
-) -> Generator<Natural> {
+pub fn natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>()
+-> Generator<Natural> {
     Generator::new(
         &exhaustive_natural_gen_var_4::<T>,
         &random_natural_gen_var_4::<T>,
@@ -1599,8 +1599,8 @@ pub fn natural_quadruple_gen_var_3() -> Generator<(Natural, Natural, Natural, Na
 // -- (Natural, Natural, Natural, PrimitiveUnsigned) --
 
 // All `(Natural, Natural, Natural, T)` where `T` is unsigned and small.
-pub fn natural_natural_natural_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, Natural, Natural, T)> {
+pub fn natural_natural_natural_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Natural, Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_1,
         &random_natural_natural_natural_unsigned_quadruple_gen_var_1,
@@ -1610,8 +1610,8 @@ pub fn natural_natural_natural_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned
 
 // All `(Natural, Natural, Natural, u64)` where all `Natural`s are less than 2 to the power of the
 // `u64`.
-pub fn natural_natural_natural_unsigned_quadruple_gen_var_2(
-) -> Generator<(Natural, Natural, Natural, u64)> {
+pub fn natural_natural_natural_unsigned_quadruple_gen_var_2()
+-> Generator<(Natural, Natural, Natural, u64)> {
     Generator::new(
         &exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_2,
         &random_natural_natural_natural_unsigned_quadruple_gen_var_2,
@@ -1621,8 +1621,8 @@ pub fn natural_natural_natural_unsigned_quadruple_gen_var_2(
 
 // All `(Natural, Natural, Natural, u64)` where the first two `Natural`s are less than 2 to the
 // power of the `u64`.
-pub fn natural_natural_natural_unsigned_quadruple_gen_var_3(
-) -> Generator<(Natural, Natural, Natural, u64)> {
+pub fn natural_natural_natural_unsigned_quadruple_gen_var_3()
+-> Generator<(Natural, Natural, Natural, u64)> {
     Generator::new(
         &exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_3,
         &random_natural_natural_natural_unsigned_quadruple_gen_var_3,
@@ -1632,8 +1632,8 @@ pub fn natural_natural_natural_unsigned_quadruple_gen_var_3(
 
 // All `(Natural, Natural, Natural, u64)` where the first `Natural` is less than 2 to the power of
 // the `u64`.
-pub fn natural_natural_natural_unsigned_quadruple_gen_var_4(
-) -> Generator<(Natural, Natural, Natural, u64)> {
+pub fn natural_natural_natural_unsigned_quadruple_gen_var_4()
+-> Generator<(Natural, Natural, Natural, u64)> {
     Generator::new(
         &exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_4,
         &random_natural_natural_natural_unsigned_quadruple_gen_var_4,
@@ -1643,8 +1643,8 @@ pub fn natural_natural_natural_unsigned_quadruple_gen_var_4(
 
 // -- (Natural, Natural, PrimitiveFloat) --
 
-pub fn natural_natural_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> Generator<(Natural, Natural, T)> {
+pub fn natural_natural_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> Generator<(Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_primitive_float_triple_gen,
         &random_natural_natural_primitive_float_triple_gen,
@@ -1664,8 +1664,8 @@ pub fn natural_natural_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Nat
 
 // All `(Natural, Natural, T)` where the `T` is signed and small, and the first `Natural` is smaller
 // than the second.
-pub fn natural_natural_signed_triple_gen_var_1<T: PrimitiveSigned>(
-) -> Generator<(Natural, Natural, T)> {
+pub fn natural_natural_signed_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_signed_triple_gen_var_1,
         &random_natural_natural_signed_triple_gen_var_1,
@@ -1675,8 +1675,8 @@ pub fn natural_natural_signed_triple_gen_var_1<T: PrimitiveSigned>(
 
 // -- (Natural, Natural, PrimitiveUnsigned) --
 
-pub fn natural_natural_unsigned_triple_gen<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, Natural, T)> {
+pub fn natural_natural_unsigned_triple_gen<T: PrimitiveUnsigned>()
+-> Generator<(Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_unsigned_triple_gen,
         &random_natural_natural_primitive_int_triple_gen,
@@ -1685,8 +1685,8 @@ pub fn natural_natural_unsigned_triple_gen<T: PrimitiveUnsigned>(
 }
 
 // All `(Natural, Natural, T)` where `T` is unsigned and small.
-pub fn natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, Natural, T)> {
+pub fn natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_unsigned_triple_gen_var_1,
         &random_natural_natural_unsigned_triple_gen_var_1,
@@ -1695,8 +1695,8 @@ pub fn natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn natural_natural_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, rug::Integer, T), (Natural, Natural, T))> {
+pub fn natural_natural_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, rug::Integer, T), (Natural, Natural, T))> {
     Generator::new(
         &|| natural_natural_triple_1_2_rm(exhaustive_natural_natural_unsigned_triple_gen_var_1()),
         &|config| {
@@ -1712,8 +1712,8 @@ pub fn natural_natural_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
 
 // All `(Natural, Natural, T)` where `T` is unsigned and small, and the `Natural`s are equal mod 2
 // to the power of the `T`.
-pub fn natural_natural_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, Natural, T)>
+pub fn natural_natural_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(Natural, Natural, T)>
 where
     Natural: Shl<T, Output = Natural>,
 {
@@ -1726,8 +1726,8 @@ where
 
 // All `(Natural, Natural, T)` where `T` is unsigned and small, and the `Natural`s are not equal mod
 // 2 to the power of the `T`.
-pub fn natural_natural_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, Natural, T)> {
+pub fn natural_natural_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>()
+-> Generator<(Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_unsigned_triple_gen_var_3,
         &random_natural_natural_unsigned_triple_gen_var_3,
@@ -1755,8 +1755,8 @@ pub fn natural_natural_unsigned_triple_gen_var_5() -> Generator<(Natural, Natura
 
 // All `(Natural, Natural, T)` where the `T` is unsigned and small, and the first `Natural` is
 // smaller than the second.
-pub fn natural_natural_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, Natural, T)> {
+pub fn natural_natural_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>()
+-> Generator<(Natural, Natural, T)> {
     Generator::new(
         &exhaustive_natural_natural_unsigned_triple_gen_var_6,
         &random_natural_natural_unsigned_triple_gen_var_6,
@@ -1768,8 +1768,8 @@ pub fn natural_natural_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
 
 // All `(Natural, Natural, RoundingMode)` triples where the second `Natural` is positive and if the
 // `RoundingMode` is `Exact`, the first `Natural` is divisible by the second.
-pub fn natural_natural_rounding_mode_triple_gen_var_1(
-) -> Generator<(Natural, Natural, RoundingMode)> {
+pub fn natural_natural_rounding_mode_triple_gen_var_1()
+-> Generator<(Natural, Natural, RoundingMode)> {
     Generator::new(
         &exhaustive_natural_natural_rounding_mode_triple_gen_var_1,
         &random_natural_natural_rounding_mode_triple_gen_var_1,
@@ -1779,8 +1779,8 @@ pub fn natural_natural_rounding_mode_triple_gen_var_1(
 
 // All `(Natural, Natural, RoundingMode)` triples that are a valid input to
 // `Natural::round_to_multiple`.
-pub fn natural_natural_rounding_mode_triple_gen_var_2(
-) -> Generator<(Natural, Natural, RoundingMode)> {
+pub fn natural_natural_rounding_mode_triple_gen_var_2()
+-> Generator<(Natural, Natural, RoundingMode)> {
     Generator::new(
         &exhaustive_natural_natural_rounding_mode_triple_gen_var_2,
         &random_natural_natural_rounding_mode_triple_gen_var_2,
@@ -1798,8 +1798,8 @@ pub fn natural_primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(Natur
     )
 }
 
-pub fn natural_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
-) -> Generator<((rug::Integer, T), (Natural, T))> {
+pub fn natural_primitive_float_pair_gen_rm<T: PrimitiveFloat>()
+-> Generator<((rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_rm(exhaustive_natural_primitive_float_pair_gen()),
         &|config| natural_pair_1_rm(random_natural_primitive_float_pair_gen(config)),
@@ -1809,8 +1809,8 @@ pub fn natural_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
 
 // -- (Natural, PrimitiveFloat, PrimitiveFloat) --
 
-pub fn natural_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
-) -> Generator<(Natural, T, T)> {
+pub fn natural_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>()
+-> Generator<(Natural, T, T)> {
     Generator::new(
         &exhaustive_natural_primitive_float_primitive_float_triple_gen,
         &random_natural_primitive_float_primitive_float_triple_gen,
@@ -1828,8 +1828,8 @@ pub fn natural_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(Natural, T)> 
     )
 }
 
-pub fn natural_signed_pair_gen_rm<T: PrimitiveSigned>(
-) -> Generator<((rug::Integer, T), (Natural, T))> {
+pub fn natural_signed_pair_gen_rm<T: PrimitiveSigned>()
+-> Generator<((rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_rm(exhaustive_natural_signed_pair_gen()),
         &|config| natural_pair_1_rm(random_natural_primitive_int_pair_gen(config)),
@@ -1855,8 +1855,8 @@ pub fn natural_signed_pair_gen_var_2<T: PrimitiveSigned>() -> Generator<(Natural
     )
 }
 
-pub fn natural_signed_pair_gen_var_2_rm<T: PrimitiveSigned>(
-) -> Generator<((rug::Integer, T), (Natural, T))> {
+pub fn natural_signed_pair_gen_var_2_rm<T: PrimitiveSigned>()
+-> Generator<((rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_rm(exhaustive_natural_signed_pair_gen_var_2()),
         &|config| natural_pair_1_rm(random_natural_signed_pair_gen_var_2(config)),
@@ -1907,8 +1907,8 @@ pub fn natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>() -> T2<T> {
 }
 
 // All `(Natural, T, U)` where `T` is signed and small and `U` is unsigned, small, and positive.
-pub fn natural_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, U)> {
+pub fn natural_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>()
+-> Generator<(Natural, T, U)> {
     Generator::new(
         &exhaustive_natural_signed_unsigned_triple_gen_var_2,
         &random_natural_signed_unsigned_triple_gen_var_2,
@@ -1920,8 +1920,8 @@ pub fn natural_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: Primitive
 
 // All `(Natural, T, RoundingMode)` where `T` is signed and the triple is a valid input to
 // `Natural::shl_round`.
-pub fn natural_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
-) -> Generator<(Natural, T, RoundingMode)>
+pub fn natural_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(Natural, T, RoundingMode)>
 where
     Natural: Shr<T, Output = Natural>,
 {
@@ -1934,8 +1934,8 @@ where
 
 // All `(Natural, T, RoundingMode)` where `T` is signed and the triple is a valid input to
 // `Natural::shr_round`.
-pub fn natural_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
-) -> Generator<(Natural, T, RoundingMode)>
+pub fn natural_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> Generator<(Natural, T, RoundingMode)>
 where
     Natural: Shl<T, Output = Natural>,
 {
@@ -1956,8 +1956,8 @@ pub fn natural_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(Natural, 
     )
 }
 
-pub fn natural_unsigned_pair_gen_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_rm(exhaustive_natural_unsigned_pair_gen()),
         &|config| natural_pair_1_rm(random_natural_primitive_int_pair_gen(config)),
@@ -1966,8 +1966,8 @@ pub fn natural_unsigned_pair_gen_rm<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn natural_unsigned_pair_gen_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_nrm(exhaustive_natural_unsigned_pair_gen()),
         &|config| natural_pair_1_nrm(random_natural_primitive_int_pair_gen(config)),
@@ -2006,8 +2006,8 @@ pub fn natural_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Nat
 }
 
 #[allow(clippy::type_complexity)]
-pub fn natural_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_nrm(exhaustive_natural_unsigned_pair_gen_var_1()),
         &|config| natural_pair_1_nrm(random_natural_unsigned_pair_gen_var_3(config)),
@@ -2024,8 +2024,8 @@ pub fn natural_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
-pub fn natural_unsigned_pair_gen_var_4_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_var_4_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_rm(exhaustive_natural_unsigned_pair_gen_var_2()),
         &|config| natural_pair_1_rm(random_natural_unsigned_pair_gen_var_4(config)),
@@ -2033,8 +2033,8 @@ pub fn natural_unsigned_pair_gen_var_4_rm<T: PrimitiveUnsigned>(
     )
 }
 
-pub fn natural_unsigned_pair_gen_var_4_nm<T: PrimitiveUnsigned>(
-) -> Generator<((BigUint, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_var_4_nm<T: PrimitiveUnsigned>()
+-> Generator<((BigUint, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_nm(exhaustive_natural_unsigned_pair_gen_var_2()),
         &|config| natural_pair_1_nm(random_natural_unsigned_pair_gen_var_4(config)),
@@ -2043,8 +2043,8 @@ pub fn natural_unsigned_pair_gen_var_4_nm<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn natural_unsigned_pair_gen_var_4_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_var_4_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_nrm(exhaustive_natural_unsigned_pair_gen_var_2()),
         &|config| natural_pair_1_nrm(random_natural_unsigned_pair_gen_var_4(config)),
@@ -2079,8 +2079,8 @@ pub fn natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
-pub fn natural_unsigned_pair_gen_var_7_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_var_7_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_rm(exhaustive_natural_primitive_int_pair_gen_var_3()),
         &|config| natural_pair_1_rm(random_natural_unsigned_pair_gen_var_7(config)),
@@ -2089,8 +2089,8 @@ pub fn natural_unsigned_pair_gen_var_7_rm<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn natural_unsigned_pair_gen_var_7_nrm<T: PrimitiveUnsigned>(
-) -> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
+pub fn natural_unsigned_pair_gen_var_7_nrm<T: PrimitiveUnsigned>()
+-> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
     Generator::new(
         &|| natural_pair_1_nrm(exhaustive_natural_primitive_int_pair_gen_var_3()),
         &|config| natural_pair_1_nrm(random_natural_unsigned_pair_gen_var_7(config)),
@@ -2166,8 +2166,8 @@ pub fn natural_unsigned_pair_gen_var_14() -> Generator<(Natural, u64)> {
 // -- (Natural, PrimitiveUnsigned, bool) --
 
 // All `(Natural, T, bool)` where `T` is unsigned and small.
-pub fn natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, bool)> {
+pub fn natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Natural, T, bool)> {
     Generator::new(
         &exhaustive_natural_unsigned_bool_triple_gen_var_1,
         &random_natural_unsigned_bool_triple_gen_var_1,
@@ -2176,8 +2176,8 @@ pub fn natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn natural_unsigned_bool_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
-) -> Generator<((rug::Integer, T, bool), (Natural, T, bool))> {
+pub fn natural_unsigned_bool_triple_gen_var_1_rm<T: PrimitiveUnsigned>()
+-> Generator<((rug::Integer, T, bool), (Natural, T, bool))> {
     Generator::new(
         &|| natural_triple_1_rm(exhaustive_natural_unsigned_bool_triple_gen_var_1()),
         &|config| natural_triple_1_rm(random_natural_unsigned_bool_triple_gen_var_1(config)),
@@ -2201,8 +2201,8 @@ pub fn natural_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator
 
 // All `(Natural, T, U)` where `T` and `U` are unsigned, the `T` is between 2 and 36, inclusive, and
 // the `U` is small.
-pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, U)> {
+pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
+-> Generator<(Natural, T, U)> {
     Generator::new(
         &exhaustive_natural_unsigned_unsigned_triple_gen_var_1,
         &random_natural_unsigned_unsigned_triple_gen_var_1,
@@ -2212,8 +2212,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
 
 // All `(Natural, u64, T)` where `T` is unsigned, `U` is a primitive int, the `u64` is between 1 and
 // `U::WIDTH`, inclusive, and the `T` is small.
-pub fn natural_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveInt>(
-) -> Generator<(Natural, u64, T)> {
+pub fn natural_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveInt>()
+-> Generator<(Natural, u64, T)> {
     Generator::new(
         &exhaustive_natural_unsigned_unsigned_triple_gen_var_2::<T, U>,
         &random_natural_unsigned_unsigned_triple_gen_var_2::<T, U>,
@@ -2223,8 +2223,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: Primi
 
 // All `(Natural, T, U)` where `T` and `U` are unsigned, the `T` and the `U` are small, and the `T`
 // is positive.
-pub fn natural_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, U)> {
+pub fn natural_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
+-> Generator<(Natural, T, U)> {
     Generator::new(
         &exhaustive_natural_primitive_int_unsigned_triple_gen_var_3,
         &random_natural_unsigned_unsigned_triple_gen_var_3,
@@ -2234,8 +2234,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: Primi
 
 // All `(Natural, T, T)` where `T` is unsigned, both `T`s are small, and the first `T` is less than
 // or equal to the second.
-pub fn natural_unsigned_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, T)> {
+pub fn natural_unsigned_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>()
+-> Generator<(Natural, T, T)> {
     Generator::new(
         &exhaustive_natural_unsigned_unsigned_triple_gen_var_3,
         &random_natural_unsigned_unsigned_triple_gen_var_4,
@@ -2244,8 +2244,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
 }
 
 // All `(Natural, T, T)` where `T` is unsigned and both `T`s are small.
-pub fn natural_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, T)> {
+pub fn natural_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>()
+-> Generator<(Natural, T, T)> {
     Generator::new(
         &exhaustive_natural_unsigned_unsigned_triple_gen_var_4,
         &random_natural_unsigned_unsigned_triple_gen_var_5,
@@ -2255,8 +2255,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
 
 // All `(Natural, T, u64)` where the `Natural` is less than 2 to the power of the `u64`, and the `T`
 // is small and unsigned.
-pub fn natural_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, u64)> {
+pub fn natural_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>()
+-> Generator<(Natural, T, u64)> {
     Generator::new(
         &exhaustive_natural_unsigned_unsigned_triple_gen_var_5,
         &random_natural_unsigned_unsigned_triple_gen_var_6,
@@ -2268,8 +2268,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
 
 // All `(Natural, T, T, Natural)` where `T` is unsigned and the first `T` is smaller than the
 // second.
-pub fn natural_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, T, Natural)> {
+pub fn natural_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Natural, T, T, Natural)> {
     Generator::new(
         &exhaustive_natural_unsigned_unsigned_natural_quadruple_gen_var_1,
         &random_natural_unsigned_unsigned_natural_triple_gen_var_1,
@@ -2281,8 +2281,8 @@ pub fn natural_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigne
 
 // All `(Natural, T, RoundingMode)` where `T` is unsigned and the triple is a valid input to
 // `Natural::shr_round`.
-pub fn natural_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Natural, T, RoundingMode)>
+pub fn natural_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Natural, T, RoundingMode)>
 where
     Natural: Shl<T, Output = Natural>,
 {
@@ -2310,8 +2310,8 @@ pub fn natural_unsigned_bool_vec_triple_gen_var_1() -> Generator<(Natural, u64, 
 // All `(Natural, u64, Vec<bool>)` where the `u64` is between 1 and `T::WIDTH`, inclusive, and the
 // `Vec<bool>` has as many elements as the `Natural` has digits when expessed in base 2 to the power
 // of the `u64`.
-pub fn natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
-) -> Generator<(Natural, u64, Vec<bool>)> {
+pub fn natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>()
+-> Generator<(Natural, u64, Vec<bool>)> {
     Generator::new(
         &exhaustive_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
         &random_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
@@ -2722,8 +2722,8 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_12() -> Generator<(Vec<Limb
 
 // All `(Vec<Limb>, T, u64)` where `T` is unsigned, the `u64` is small, and the number of
 // significant bits of both the `Vec` and the `Limb` are less than or equal to the `u64`.
-pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_14<T: PrimitiveUnsigned>(
-) -> Generator<(Vec<Limb>, T, u64)> {
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_14<T: PrimitiveUnsigned>()
+-> Generator<(Vec<Limb>, T, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_14,
         &random_unsigned_vec_unsigned_unsigned_triple_gen_var_6,
@@ -2734,8 +2734,8 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_14<T: PrimitiveUnsigned>(
 // All `(Vec<Limb>, T, u64)` where `T` is unsigned, the `Vec` is nonempty, the `u64` is small, and
 // the number of significant bits of both the `Vec` and the `Limb` are less than or equal to the
 // `u64`.
-pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_15<T: PrimitiveUnsigned>(
-) -> Generator<(Vec<Limb>, T, u64)> {
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_15<T: PrimitiveUnsigned>()
+-> Generator<(Vec<Limb>, T, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_15,
         &random_unsigned_vec_unsigned_unsigned_triple_gen_var_7,
@@ -2745,8 +2745,8 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_15<T: PrimitiveUnsigned>(
 
 // All `(Vec<Limb>, T, u64)` where `T` is unsigned, the `u64` is small and positive, and the number
 // of significant bits of both the `Vec` and the `Limb` are less than or equal to the `u64`.
-pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_16<T: PrimitiveUnsigned>(
-) -> Generator<(Vec<Limb>, T, u64)> {
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_16<T: PrimitiveUnsigned>()
+-> Generator<(Vec<Limb>, T, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_16,
         &random_unsigned_vec_unsigned_unsigned_triple_gen_var_8,
@@ -2757,8 +2757,8 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_16<T: PrimitiveUnsigned>(
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
 // All `(Vec<T>, u64, Vec<Limb>)` that are valid inputs to `limbs_to_digits_small_base`.
-pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Vec<T>, u64, Vec<Limb>)> {
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Vec<T>, u64, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1,
@@ -2768,8 +2768,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>
 
 // All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to
 // `limbs_pos_eq_neg_limb_mod`, such that `limbs_pos_eq_neg_limb_mod` would return `true`.
-pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2(
-) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2()
+-> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2,
@@ -2779,8 +2779,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2(
 
 // All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to
 // `limbs_pos_eq_neg_limb_mod`, such that `limbs_pos_eq_neg_limb_mod` would return `false`.
-pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
-) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3()
+-> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3,
@@ -2790,8 +2790,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
 
 // All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to `limbs_eq_limb_mod`, such
 // that `limbs_eq_limb_mod` would return `true`.
-pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
-) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4()
+-> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4,
@@ -2801,8 +2801,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
 
 // All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to `limbs_eq_limb_mod`, such
 // that `limbs_eq_limb_mod` would return `false`.
-pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5(
-) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5()
+-> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5,
@@ -2814,8 +2814,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5(
 
 // All `(Vec<T>, usize, Vec<Limb>, u64)` that are valid inputs to
 // `limbs_to_digits_small_base_basecase`.
-pub fn unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
-) -> Generator<(Vec<T>, usize, Vec<Limb>, u64)> {
+pub fn unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Vec<T>, usize, Vec<Limb>, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1,
         &random_primitive_int_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1,
@@ -2998,8 +2998,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
 
 // All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to
 // `limbs_pos_eq_neg_mod_limb`, such that `limbs_pos_eq_neg_mod_limb` would return `true`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7()
+-> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7,
         &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
@@ -3009,8 +3009,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7(
 
 // All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to
 // `limbs_pos_eq_neg_mod_limb`, such that `limbs_pos_eq_neg_mod_limb` would return `false`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8()
+-> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8,
         &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3,
@@ -3023,8 +3023,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
 // All `(Vec<T>, Vec<T>, T)` where `T` is unsigned and positive, the first `Vec` is at least as long
 // as the second, and the second `Vec` is nonempty and represents a `Natural` divisible by the
 // `Limb`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14()
+-> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14,
         &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4,
@@ -3034,8 +3034,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
 
 // All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to `limbs_eq_limb_mod`, such
 // that `limbs_eq_limb_mod` would return `true`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15()
+-> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15,
         &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5,
@@ -3045,8 +3045,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15(
 
 // All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to `limbs_eq_limb_mod`, such
 // that `limbs_eq_limb_mod` would return `false`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16()
+-> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16,
         &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
@@ -3055,8 +3055,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16(
 }
 
 // All `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to `limbs_mod_schoolbook`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17()
+-> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17,
         &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7,
@@ -3066,8 +3066,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17(
 
 // All `(Vec<Limb>, Vec<Limb>, u64)` where the `u64` is small and the number of significant bits of
 // both `Vec`s are less than or equal to the `u64`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18(
-) -> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
+-> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_7,
@@ -3078,8 +3078,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18(
 // All `(Vec<Limb>, Vec<Limb>, u64)` where the `u64` is small, the first `Vec` is at least as long
 // as the second, and the number of significant bits of both `Vec`s are less than or equal to the
 // `u64`.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19(
-) -> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19()
+-> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_8,
@@ -3089,8 +3089,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19(
 
 // All `(Vec<Limb>, Vec<Limb>, u64)` where the `u64` is small, the number of significant bits of
 // both `Vec`s are less than or equal to the `u64`, and both `Vec`s end with a nonzero value.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20(
-) -> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
+-> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_9,
@@ -3100,8 +3100,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20(
 
 // All `(Vec<Limb>, Vec<Limb>, u64)` that are valid inputs to `limbs_mod_power_of_2_pow`, and where
 // the `u64` is small.
-pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_21(
-) -> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_21()
+-> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_21,
         &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_10,
@@ -3704,8 +3704,8 @@ pub fn large_type_gen_var_19() -> Generator<(Vec<Limb>, usize, Vec<Limb>, Limb, 
 // All `(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)` that are valid inputs to
 // `limbs_div_barrett_large_product`.
 #[allow(clippy::type_complexity)]
-pub fn large_type_gen_var_20(
-) -> Generator<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
+pub fn large_type_gen_var_20()
+-> Generator<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
     Generator::new(
         &exhaustive_large_type_gen_var_20,
         &random_large_type_gen_var_20,

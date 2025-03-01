@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::conversion::traits::ContinuedFraction;
 use crate::Rational;
+use crate::conversion::traits::ContinuedFraction;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{DivMod, Floor};
 use malachite_nz::integer::Integer;

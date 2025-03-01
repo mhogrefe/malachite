@@ -6,16 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::extra_variadic::exhaustive_union3s;
 use crate::extra_variadic::Union3;
+use crate::extra_variadic::exhaustive_union3s;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::options::exhaustive::exhaustive_somes;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
-use malachite_base::unions::exhaustive::exhaustive_union2s;
 use malachite_base::unions::Union2;
+use malachite_base::unions::exhaustive::exhaustive_union2s;
 use std::cmp::Ordering::*;
 use std::fmt::Debug;
 use std::iter::once;

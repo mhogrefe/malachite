@@ -10,8 +10,8 @@ use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
-use malachite_q::exhaustive::exhaustive_rational_range_to_negative_infinity;
 use malachite_q::Rational;
+use malachite_q::exhaustive::exhaustive_rational_range_to_negative_infinity;
 
 fn exhaustive_rational_range_to_negative_infinity_helper(a: Rational, values: &str) {
     let xs = exhaustive_rational_range_to_negative_infinity(a)

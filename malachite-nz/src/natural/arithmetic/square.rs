@@ -26,6 +26,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -45,25 +47,23 @@ use crate::natural::arithmetic::mul::poly_eval::{
     limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
 use crate::natural::arithmetic::mul::poly_interpolate::{
-    limbs_mul_toom_interpolate_12_points, limbs_mul_toom_interpolate_16_points,
     limbs_mul_toom_interpolate_5_points, limbs_mul_toom_interpolate_7_points,
+    limbs_mul_toom_interpolate_12_points, limbs_mul_toom_interpolate_16_points,
 };
 use crate::natural::arithmetic::mul::toom::{
-    limbs_toom_couple_handling, BIT_CORRECTION, TUNE_PROGRAM_BUILD, WANT_FAT_BINARY,
+    BIT_CORRECTION, TUNE_PROGRAM_BUILD, WANT_FAT_BINARY, limbs_toom_couple_handling,
 };
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
     DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
     SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::{max, Ordering::*};
+use core::cmp::{Ordering::*, max};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
@@ -1121,7 +1121,7 @@ impl Square for &Natural {
                     Large(vec![lower, upper])
                 }
             }),
-            Natural(Large(ref xs)) => Natural::from_owned_limbs_asc(limbs_square(xs)),
+            Natural(Large(xs)) => Natural::from_owned_limbs_asc(limbs_square(xs)),
         }
     }
 }
@@ -1165,7 +1165,7 @@ impl SquareAssign for Natural {
                     *self = Natural(Large(vec![lower, upper]));
                 }
             }
-            Natural(Large(ref mut xs)) => {
+            Natural(Large(xs)) => {
                 *xs = limbs_square(xs);
                 self.trim();
             }

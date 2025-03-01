@@ -6,11 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::logic::bit_access::limbs_get_bit;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -273,11 +273,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
     if clear_count >= xs_len {
         let exact = slice_test_zero(xs);
         xs.clear();
-        if exact {
-            Equal
-        } else {
-            Less
-        }
+        if exact { Equal } else { Less }
     } else {
         let (xs_lo, xs_hi) = xs.split_at_mut(clear_count);
         let mut exact = true;
@@ -568,7 +564,7 @@ impl RoundToMultipleOfPowerOf2<u64> for &Natural {
                 let (s, o) = small.shr_round(pow, rm);
                 (Natural::from(s) << pow, o)
             }
-            (Natural(Large(ref limbs)), pow) => {
+            (Natural(Large(limbs)), pow) => {
                 if let Some((result_limbs, o)) =
                     limbs_round_to_multiple_of_power_of_2(limbs, pow, rm)
                 {
@@ -642,12 +638,12 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) -> Ordering {
         match (&mut *self, pow) {
             (_, 0) | (&mut Natural::ZERO, _) => Equal,
-            (Natural(Small(ref mut small)), pow) => {
+            (Natural(Small(small)), pow) => {
                 let o = small.shr_round_assign(pow, rm);
                 *self <<= pow;
                 o
             }
-            (Natural(Large(ref mut limbs)), pow) => {
+            (Natural(Large(limbs)), pow) => {
                 if let Some(o) = limbs_round_to_multiple_of_power_of_2_in_place(limbs, pow, rm) {
                     self.trim();
                     o

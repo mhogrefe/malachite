@@ -13,8 +13,8 @@ use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_pair_gen_var_2;
-use malachite_q::test_util::generators::rational_natural_pair_gen_var_2;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_natural_pair_gen_var_2;
 use std::str::FromStr;
 
 #[test]

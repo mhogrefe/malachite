@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::alloc::string::ToString;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::alloc::string::ToString;
 use crate::{ComparableFloat, ComparableFloatRef, Float};
 use alloc::string::String;
 use core::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};

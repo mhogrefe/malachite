@@ -15,8 +15,8 @@ extern crate rug;
 use criterion::*;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_nz::natural::random::get_random_natural_with_bits;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::get_random_natural_with_bits;
 use num::BigUint;
 use std::str::FromStr;
 

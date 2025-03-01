@@ -230,4 +230,10 @@ echo "Step 107. Formatting malachite-criterion-bench" &&
 bash ../superfmt.sh &&
 cd .. &&
 echo "Step 108. Running additional-lints" &&
-python3 additional-lints.py
+python3 additional-lints.py &&
+echo "Step 109. Testing against FLINT" &&
+cd ../malachite-cpp-test/malachite-test-cpp &&
+cargo run --release &&
+echo "Step 110. Checking links" &&
+cd ../../check-malachite-links &&
+cargo run --release

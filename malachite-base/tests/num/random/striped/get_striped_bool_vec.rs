@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::random::striped::{get_striped_bool_vec, StripedBitSource};
+use malachite_base::num::random::striped::{StripedBitSource, get_striped_bool_vec};
 use malachite_base::random::EXAMPLE_SEED;
 
 pub(crate) fn bool_slice_to_string(bs: &[bool]) -> String {

@@ -10,7 +10,7 @@ use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::float::NiceFloat;
 use crate::test_util::stats::common_values_map::common_values_map;
 use crate::test_util::stats::median;
-use crate::test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
+use crate::test_util::stats::moments::{CheckedToF64, MomentStats, moment_stats};
 use itertools::Itertools;
 
 pub fn random_primitive_floats_helper_helper<

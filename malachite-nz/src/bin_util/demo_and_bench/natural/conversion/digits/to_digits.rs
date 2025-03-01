@@ -13,15 +13,15 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, triple_3_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_to_digits_basecase, limbs_to_digits_small_base, limbs_to_digits_small_base_basecase,
     to_digits_asc_large, to_digits_asc_limb, to_digits_asc_naive, to_digits_asc_naive_primitive,
     to_digits_desc_large, to_digits_desc_limb,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::{
     natural_bit_ratio_bucketer, pair_1_natural_bit_bucketer,

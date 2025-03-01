@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use itertools::repeat_n;
 use itertools::Itertools;
+use itertools::repeat_n;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -16,9 +16,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    unsigned_pair_gen_var_18, unsigned_pair_gen_var_5, unsigned_vec_gen,
-    unsigned_vec_unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_11,
+    unsigned_pair_gen_var_5, unsigned_pair_gen_var_18, unsigned_vec_gen,
     unsigned_vec_unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_3,
+    unsigned_vec_unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_11,
 };
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
@@ -218,11 +218,10 @@ fn test_from_power_of_2_digits_asc_natural() {
     let test_err = |log_base, digits| {
         let digits = vec_from_str(digits).unwrap();
         assert!(Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).is_none());
-        assert!(Natural::from_power_of_2_digits_asc_natural_naive(
-            log_base,
-            digits.iter().cloned()
-        )
-        .is_none());
+        assert!(
+            Natural::from_power_of_2_digits_asc_natural_naive(log_base, digits.iter().cloned())
+                .is_none()
+        );
     };
     test_err(1, "[2]");
 }

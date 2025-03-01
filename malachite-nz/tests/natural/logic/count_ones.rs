@@ -11,8 +11,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::CountOnes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen};
-use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::natural_gen;
 use malachite_nz::test_util::natural::logic::count_ones::{

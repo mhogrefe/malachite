@@ -9,7 +9,7 @@
 use crate::num::arithmetic::traits::Parity;
 use crate::num::random::geometric::SimpleRational;
 use crate::num::random::{
-    random_unsigneds_less_than, RandomUnsignedsLessThan, VariableRangeGenerator,
+    RandomUnsignedsLessThan, VariableRangeGenerator, random_unsigneds_less_than,
 };
 use crate::random::Seed;
 use rand::Rng;
@@ -31,7 +31,7 @@ impl Iterator for RandomBools {
     #[inline]
     fn next(&mut self) -> Option<bool> {
         if self.bits_left == 0 {
-            self.x = self.rng.gen();
+            self.x = self.rng.r#gen();
             self.bits_left = 31;
         } else {
             self.x >>= 1;

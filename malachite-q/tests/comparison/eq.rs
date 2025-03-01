@@ -8,8 +8,8 @@
 
 use malachite_base::test_util::common::test_eq_helper;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use num::BigRational;
 use rug;
 

@@ -34,10 +34,6 @@ impl From<bool> for Rational {
     /// ```
     #[inline]
     fn from(b: bool) -> Rational {
-        if b {
-            Rational::ONE
-        } else {
-            Rational::ZERO
-        }
+        if b { Rational::ONE } else { Rational::ZERO }
     }
 }

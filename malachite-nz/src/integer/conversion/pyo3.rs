@@ -53,7 +53,7 @@ use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
 #[allow(unused_imports)]
 use pyo3::{
-    ffi, intern, types::*, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject,
+    FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject, ffi, intern, types::*,
 };
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]

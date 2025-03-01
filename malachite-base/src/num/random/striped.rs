@@ -6,22 +6,22 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
-use crate::iterators::{nonzero_values, NonzeroValues};
+use crate::bools::random::{RandomBools, WeightedRandomBools, random_bools, weighted_random_bools};
+use crate::iterators::{NonzeroValues, nonzero_values};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::random::geometric::{
-    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds, mean_to_p_with_min,
-    GeometricRandomNaturalValues,
+    GeometricRandomNaturalValues, geometric_random_unsigned_inclusive_range,
+    geometric_random_unsigneds, mean_to_p_with_min,
 };
 use crate::num::random::{
-    random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
-    RandomUnsignedRange,
+    RandomUnsignedInclusiveRange, RandomUnsignedRange, random_unsigned_inclusive_range,
+    random_unsigned_range,
 };
 use crate::random::Seed;
 use itertools::Itertools;
-use std::iter::{repeat, Repeat};
+use std::iter::{Repeat, repeat};
 use std::marker::PhantomData;
 
 /// Generates bits from a striped random sequence.

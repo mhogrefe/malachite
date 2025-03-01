@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::fmt::{Display, Formatter};
-use core::iter::{empty, Empty};
+use core::iter::{Empty, empty};
 use core::str::FromStr;
 
 /// `Never` is a type that cannot be instantiated.

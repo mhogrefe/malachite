@@ -14,7 +14,7 @@ use malachite_base::test_util::bench::bucketers::{
     pair_1_bit_bucketer, pair_primitive_int_bit_u64_max_bucketer, signed_bit_bucketer,
     triple_1_2_primitive_int_bit_u64_max_bucketer, unsigned_bit_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen_var_2, signed_unsigned_pair_gen_var_20, unsigned_gen,
@@ -30,9 +30,9 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloat, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use rug::Assign;
 use rug::float::Round;
 use rug::ops::AssignRound;
-use rug::Assign;
 use std::cmp::Ordering;
 
 pub(crate) fn register(runner: &mut Runner) {

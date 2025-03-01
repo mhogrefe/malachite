@@ -11,6 +11,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::div_mod::limbs_div_mod_to_out;
 use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use crate::natural::arithmetic::kronecker_symbol::{
@@ -18,9 +20,7 @@ use crate::natural::arithmetic::kronecker_symbol::{
 };
 use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, Parity,

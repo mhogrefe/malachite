@@ -8,7 +8,7 @@
 
 use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::bench::bucketers::pair_string_max_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{string_pair_gen, string_pair_gen_var_1};
 use malachite_base::test_util::runner::Runner;

@@ -11,17 +11,18 @@ use malachite_base::test_util::bench::bucketers::{
     triple_1_vec_len_bucketer, triple_2_3_sum_vec_len_bucketer, triple_2_vec_len_bucketer,
     triple_3_vec_len_bucketer, vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_gen_var_6,
     unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1,
-    unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25,
-    unsigned_vec_triple_gen_var_26, unsigned_vec_triple_gen_var_27, unsigned_vec_triple_gen_var_3,
+    unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_3, unsigned_vec_triple_gen_var_24,
+    unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_26, unsigned_vec_triple_gen_var_27,
     unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::fft::{
     limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
     limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
@@ -39,7 +40,11 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
 };
 use malachite_nz::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_greater_to_out_toom_22,
+    limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_32,
     limbs_mul_greater_to_out_toom_32_input_sizes_valid,
     limbs_mul_greater_to_out_toom_32_scratch_len, limbs_mul_greater_to_out_toom_33,
@@ -60,18 +65,13 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_62_input_sizes_valid,
     limbs_mul_greater_to_out_toom_62_scratch_len, limbs_mul_greater_to_out_toom_63,
     limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_63_scratch_len, limbs_mul_greater_to_out_toom_6h,
-    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
-    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_8h_scratch_len,
+    limbs_mul_greater_to_out_toom_63_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_greater_to_out_basecase,
     limbs_mul_greater_to_out_scratch_len, limbs_mul_same_length_to_out,
     limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
     triple_3_pair_natural_max_bit_bucketer, triple_3_vec_natural_sum_bits_bucketer,
@@ -79,14 +79,14 @@ use malachite_nz::test_util::bench::bucketers::{
 };
 use malachite_nz::test_util::generators::{
     natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm, natural_vec_gen,
-    natural_vec_gen_nrm, unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_10,
+    natural_vec_gen_nrm, unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_4,
+    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7,
+    unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9, unsigned_vec_triple_gen_var_10,
     unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13,
     unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16,
     unsigned_vec_triple_gen_var_18, unsigned_vec_triple_gen_var_19, unsigned_vec_triple_gen_var_20,
-    unsigned_vec_triple_gen_var_22, unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_4,
-    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_58, unsigned_vec_triple_gen_var_6,
-    unsigned_vec_triple_gen_var_60, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
-    unsigned_vec_triple_gen_var_9,
+    unsigned_vec_triple_gen_var_22, unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_58,
+    unsigned_vec_triple_gen_var_60,
 };
 use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
 use malachite_nz::test_util::natural::arithmetic::mul::{

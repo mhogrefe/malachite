@@ -14,8 +14,8 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::test_util::arithmetic::add::{
     add_prec_round_naive, add_rational_prec_round_naive, rug_add, rug_add_prec, rug_add_prec_round,
@@ -26,15 +26,15 @@ use malachite_float::test_util::common::{
     emulate_primitive_float_fn_2, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
-    float_float_rounding_mode_triple_gen_var_1, float_float_rounding_mode_triple_gen_var_29,
-    float_float_rounding_mode_triple_gen_var_4, float_float_rounding_mode_triple_gen_var_5,
-    float_float_rounding_mode_triple_gen_var_6, float_float_rounding_mode_triple_gen_var_7,
-    float_float_rounding_mode_triple_gen_var_8, float_float_rounding_mode_triple_gen_var_9,
+    float_float_rounding_mode_triple_gen_var_1, float_float_rounding_mode_triple_gen_var_4,
+    float_float_rounding_mode_triple_gen_var_5, float_float_rounding_mode_triple_gen_var_6,
+    float_float_rounding_mode_triple_gen_var_7, float_float_rounding_mode_triple_gen_var_8,
+    float_float_rounding_mode_triple_gen_var_9, float_float_rounding_mode_triple_gen_var_29,
     float_float_unsigned_rounding_mode_quadruple_gen_var_1,
     float_float_unsigned_rounding_mode_quadruple_gen_var_5, float_float_unsigned_triple_gen_var_1,
-    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_10,
-    float_pair_gen_var_2, float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5,
-    float_pair_gen_var_6, float_pair_gen_var_7, float_rational_pair_gen,
+    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_2,
+    float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5, float_pair_gen_var_6,
+    float_pair_gen_var_7, float_pair_gen_var_10, float_rational_pair_gen,
     float_rational_pair_gen_var_2, float_rational_rounding_mode_triple_gen_var_1,
     float_rational_rounding_mode_triple_gen_var_8,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
@@ -45,11 +45,11 @@ use malachite_float::test_util::generators::{
     rational_unsigned_rounding_mode_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
-use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::cmp::{
-    max,
     Ordering::{self, *},
+    max,
 };
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -4992,23 +4992,39 @@ fn add_round_fail() {
         parse_hex_string("0x1.0#1").add_round_ref_ref(&parse_hex_string("0x0.001#1"), Exact)
     );
 
-    assert_panic!(parse_hex_string("0x1.0000000000000000#64")
-        .add_round(parse_hex_string("0x1.0000000000000002#64"), Exact));
-    assert_panic!(parse_hex_string("0x1.0000000000000000#64")
-        .add_round_val_ref(&parse_hex_string("0x1.0000000000000002#64"), Exact));
-    assert_panic!(parse_hex_string("0x1.0000000000000000#64")
-        .add_round_ref_val(parse_hex_string("0x1.0000000000000002#64"), Exact));
-    assert_panic!(parse_hex_string("0x1.0000000000000000#64")
-        .add_round_ref_ref(&parse_hex_string("0x1.0000000000000002#64"), Exact));
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#64")
+            .add_round(parse_hex_string("0x1.0000000000000002#64"), Exact)
+    );
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#64")
+            .add_round_val_ref(&parse_hex_string("0x1.0000000000000002#64"), Exact)
+    );
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#64")
+            .add_round_ref_val(parse_hex_string("0x1.0000000000000002#64"), Exact)
+    );
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#64")
+            .add_round_ref_ref(&parse_hex_string("0x1.0000000000000002#64"), Exact)
+    );
 
-    assert_panic!(parse_hex_string("0x1.0000000000000000#65")
-        .add_round(parse_hex_string("0x1.0000000000000001#65"), Exact));
-    assert_panic!(parse_hex_string("0x1.0000000000000000#65")
-        .add_round_val_ref(&parse_hex_string("0x1.0000000000000001#65"), Exact));
-    assert_panic!(parse_hex_string("0x1.0000000000000000#65")
-        .add_round_ref_val(parse_hex_string("0x1.0000000000000001#65"), Exact));
-    assert_panic!(parse_hex_string("0x1.0000000000000000#65")
-        .add_round_ref_ref(&parse_hex_string("0x1.0000000000000001#65"), Exact));
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#65")
+            .add_round(parse_hex_string("0x1.0000000000000001#65"), Exact)
+    );
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#65")
+            .add_round_val_ref(&parse_hex_string("0x1.0000000000000001#65"), Exact)
+    );
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#65")
+            .add_round_ref_val(parse_hex_string("0x1.0000000000000001#65"), Exact)
+    );
+    assert_panic!(
+        parse_hex_string("0x1.0000000000000000#65")
+            .add_round_ref_ref(&parse_hex_string("0x1.0000000000000001#65"), Exact)
+    );
 
     assert_panic!(
         parse_hex_string("0x1.00000000000000000000000000000000#128").add_round(

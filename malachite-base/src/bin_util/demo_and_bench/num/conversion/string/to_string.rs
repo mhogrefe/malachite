@@ -10,11 +10,11 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::to_string::{
-    digit_to_display_byte_lower, digit_to_display_byte_upper, BaseFmtWrapper,
+    BaseFmtWrapper, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::test_util::bench::bucketers::{pair_1_bit_bucketer, triple_1_bit_bucketer};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_5, signed_unsigned_unsigned_triple_gen_var_3, unsigned_gen,
@@ -359,10 +359,9 @@ fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [
-            (
-                "to_string",
-                &mut |(x, base)| no_out!(x.to_string_base(base)),
-            ),
+            ("to_string", &mut |(x, base)| {
+                no_out!(x.to_string_base(base))
+            }),
             ("using fmt", &mut |(x, base)| {
                 no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
             }),
@@ -393,10 +392,9 @@ fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [
-            (
-                "to_string",
-                &mut |(x, base)| no_out!(x.to_string_base(base)),
-            ),
+            ("to_string", &mut |(x, base)| {
+                no_out!(x.to_string_base(base))
+            }),
             ("using fmt", &mut |(x, base)| {
                 no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
             }),
@@ -453,10 +451,9 @@ fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [
-            (
-                "to_string",
-                &mut |(x, base)| no_out!(x.to_string_base(base)),
-            ),
+            ("to_string", &mut |(x, base)| {
+                no_out!(x.to_string_base(base))
+            }),
             ("using fmt", &mut |(x, base)| {
                 no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
             }),

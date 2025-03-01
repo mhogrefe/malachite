@@ -31,9 +31,5 @@ pub fn jacobi_symbol_simple(mut a: Natural, mut n: Natural) -> i8 {
         }
         a %= &n;
     }
-    if n == 1u32 {
-        t
-    } else {
-        0
-    }
+    if n == 1u32 { t } else { 0 }
 }

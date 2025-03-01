@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
 use crate::Rational;
+use crate::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{

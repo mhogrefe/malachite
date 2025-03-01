@@ -16,6 +16,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -36,8 +38,6 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -76,18 +76,18 @@ pub fn div_float_significands_in_place(
             *x = Natural::from_owned_limbs_asc(xs);
             result
         }
-        (Natural(Large(ref mut xs)), Natural(Small(small_y))) => {
+        (Natural(Large(xs)), Natural(Small(small_y))) => {
             let result = div_float_significands_long_by_short_in_place(xs, *small_y, out_prec, rm);
             x.demote_if_small();
             result
         }
-        (Natural(Small(small_x)), Natural(Large(ref mut ys))) => {
+        (Natural(Small(small_x)), Natural(Large(ys))) => {
             let (out, exp_offset, o) =
                 div_float_significands_general(&[*small_x], ys, out_prec, rm);
             *x = Natural::from_owned_limbs_asc(out);
             (exp_offset, o)
         }
-        (Natural(Large(xs)), Natural(Large(ref mut ys))) => {
+        (Natural(Large(xs)), Natural(Large(ys))) => {
             let (out, exp_offset, o) = div_float_significands_general(xs, ys, out_prec, rm);
             *x = Natural::from_owned_limbs_asc(out);
             (exp_offset, o)
@@ -119,7 +119,7 @@ pub fn div_float_significands_in_place_ref(
             *x = Natural::from_owned_limbs_asc(xs);
             result
         }
-        (Natural(Large(ref mut xs)), Natural(Small(small_y))) => {
+        (Natural(Large(xs)), Natural(Small(small_y))) => {
             let result = div_float_significands_long_by_short_in_place(xs, *small_y, out_prec, rm);
             x.demote_if_small();
             result
@@ -167,11 +167,11 @@ pub fn div_float_significands_ref_val(
                 div_float_significands_long_by_short(xs, *small_y, out_prec, rm);
             (Natural::from_owned_limbs_asc(qs), exp_offset, o)
         }
-        (Natural(Small(small_x)), Natural(Large(ref mut ys))) => {
+        (Natural(Small(small_x)), Natural(Large(ys))) => {
             let (qs, exp_offset, o) = div_float_significands_general(&[*small_x], ys, out_prec, rm);
             (Natural::from_owned_limbs_asc(qs), exp_offset, o)
         }
-        (Natural(Large(xs)), Natural(Large(ref mut ys))) => {
+        (Natural(Large(xs)), Natural(Large(ys))) => {
             let (qs, exp_offset, o) = div_float_significands_general(xs, ys, out_prec, rm);
             (Natural::from_owned_limbs_asc(qs), exp_offset, o)
         }

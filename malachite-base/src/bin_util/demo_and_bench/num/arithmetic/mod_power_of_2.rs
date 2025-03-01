@@ -11,11 +11,11 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::test_util::bench::bucketers::pair_1_bit_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
-    signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
-    signed_unsigned_pair_gen_var_11, signed_unsigned_pair_gen_var_4, unsigned_pair_gen_var_2,
+    signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_4,
+    signed_unsigned_pair_gen_var_10, signed_unsigned_pair_gen_var_11, unsigned_pair_gen_var_2,
     unsigned_pair_gen_var_20,
 };
 use malachite_base::test_util::runner::Runner;

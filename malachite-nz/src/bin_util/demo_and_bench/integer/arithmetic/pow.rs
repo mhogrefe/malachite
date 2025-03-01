@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::pair_1_bits_times_pair_2_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::triple_3_pair_1_integer_bits_times_pair_2_bucketer;
@@ -113,10 +113,9 @@ fn benchmark_integer_pow_evaluation_strategy(
         &pair_1_bits_times_pair_2_bucketer("n", "pow"),
         &mut [
             ("Integer.pow(u64)", &mut |(x, exp)| no_out!(x.pow(exp))),
-            (
-                "(&Integer).pow(u64)",
-                &mut |(x, exp)| no_out!((&x).pow(exp)),
-            ),
+            ("(&Integer).pow(u64)", &mut |(x, exp)| {
+                no_out!((&x).pow(exp))
+            }),
         ],
     );
 }

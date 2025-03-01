@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::string::String;
 #[cfg(feature = "test_build")]
@@ -22,7 +22,7 @@ use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::to_string::{
-    digit_to_display_byte_lower, digit_to_display_byte_upper, BaseFmtWrapper as BaseBaseFmtWrapper,
+    BaseFmtWrapper as BaseBaseFmtWrapper, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 #[cfg(feature = "test_build")]
 use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
@@ -363,7 +363,7 @@ impl Binary for NaturalAlt2 {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match &self.0 {
             Natural(Small(x)) => Binary::fmt(x, f),
-            Natural(Large(ref xs)) => {
+            Natural(Large(xs)) => {
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let width = if let Some(width) = f.width() {
                     width.saturating_sub(xs_init.len() << Limb::LOG_WIDTH)
@@ -690,7 +690,7 @@ impl LowerHex for NaturalAlt2 {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match &self.0 {
             Natural(Small(x)) => LowerHex::fmt(x, f),
-            Natural(Large(ref xs)) => {
+            Natural(Large(xs)) => {
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let width = if let Some(width) = f.width() {
                     width.saturating_sub(xs_init.len() << Limb::LOG_WIDTH >> 2)

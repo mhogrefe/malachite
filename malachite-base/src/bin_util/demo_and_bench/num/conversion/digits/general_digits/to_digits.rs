@@ -9,7 +9,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{Digits, SaturatingFrom};
 use malachite_base::test_util::bench::bucketers::pair_1_bit_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_6;
 use malachite_base::test_util::runner::Runner;
@@ -80,10 +80,9 @@ fn benchmark_to_digits_asc<
         limit,
         file_name,
         &pair_1_bit_bucketer("x"),
-        &mut [(
-            "Malachite",
-            &mut |(x, base)| no_out!(x.to_digits_asc(&base)),
-        )],
+        &mut [("Malachite", &mut |(x, base)| {
+            no_out!(x.to_digits_asc(&base))
+        })],
     );
 }
 

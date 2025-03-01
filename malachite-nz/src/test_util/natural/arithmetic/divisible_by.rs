@@ -12,7 +12,7 @@
 
 use crate::natural::arithmetic::divisible_by::limbs_divisible_by_limb;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb;
-use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
 use num::{BigUint, Integer, Zero};
 
 pub fn num_divisible_by(x: &BigUint, y: &BigUint) -> bool {

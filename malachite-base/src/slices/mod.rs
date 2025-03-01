@@ -15,7 +15,7 @@ use crate::num::basic::traits::Zero;
 #[cfg(feature = "random")]
 use crate::num::conversion::traits::ExactFrom;
 #[cfg(feature = "random")]
-use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use crate::num::random::{RandomUnsignedsLessThan, random_unsigneds_less_than};
 #[cfg(feature = "random")]
 use crate::random::Seed;
 use alloc::vec::Vec;

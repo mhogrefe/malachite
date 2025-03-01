@@ -11,8 +11,8 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::natural::random::get_random_natural_less_than;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::get_random_natural_less_than;
 use std::str::FromStr;
 
 fn get_random_natural_less_than_helper(limit: &str, out: &str) {

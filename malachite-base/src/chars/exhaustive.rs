@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::chars::crement::increment_char;
 use crate::chars::CharType;
+use crate::chars::crement::increment_char;
 use core::ops::RangeInclusive;
 
 /// Generates all ASCII [`char`]s, in ascending order.

@@ -10,6 +10,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
@@ -19,8 +21,6 @@ use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 #[cfg(feature = "test_build")]
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 #[cfg(feature = "test_build")]
 use crate::platform::DoubleLimb;
 use crate::platform::Limb;
@@ -277,11 +277,7 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
 // Constant time and additional memory.
 #[cfg(feature = "test_build")]
 fn exp_predecessor(exp: u64) -> u64 {
-    if exp.even() {
-        exp >> 1
-    } else {
-        exp - 1
-    }
+    if exp.even() { exp >> 1 } else { exp - 1 }
 }
 
 // # Worst-case complexity
@@ -506,7 +502,7 @@ impl Natural {
                     Natural::from_owned_limbs_asc(limb_pow_alt(*small, exp))
                 }
             }
-            (Natural(Large(ref limbs)), exp) => {
+            (Natural(Large(limbs)), exp) => {
                 Natural::from_owned_limbs_asc(limbs_pow_alt(limbs, exp))
             }
         }
@@ -520,14 +516,14 @@ impl Natural {
             (x, exp) if x.is_power_of_2() => {
                 *x = Natural::power_of_2((x.significant_bits() - 1) * exp);
             }
-            (Natural(Small(ref mut small)), exp) => {
+            (Natural(Small(small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
                     *small = small.checked_pow(u32::wrapping_from(exp)).unwrap();
                 } else {
                     *self = Natural::from_owned_limbs_asc(limb_pow_alt(*small, exp));
                 }
             }
-            (Natural(Large(ref mut limbs)), exp) => {
+            (Natural(Large(limbs)), exp) => {
                 *self = Natural::from_owned_limbs_asc(limbs_pow_alt(limbs, exp));
             }
         }
@@ -622,7 +618,7 @@ impl Pow<u64> for &Natural {
                     out
                 }
             }
-            (Natural(Large(ref limbs)), exp) => {
+            (Natural(Large(limbs)), exp) => {
                 let mut out = Natural(Large(limbs_pow(limbs, exp)));
                 out.demote_if_small();
                 out
@@ -669,7 +665,7 @@ impl PowAssign<u64> for Natural {
             (x, 0) => *x = Natural::ONE,
             (_, 1) | (&mut (Natural::ZERO | Natural::ONE), _) => {}
             (x, 2) => x.square_assign(),
-            (Natural(Small(ref mut small)), exp) => {
+            (Natural(Small(small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
                     *small = small.checked_pow(u32::wrapping_from(exp)).unwrap();
                 } else {
@@ -677,7 +673,7 @@ impl PowAssign<u64> for Natural {
                     self.demote_if_small();
                 }
             }
-            (Natural(Large(ref mut limbs)), exp) => {
+            (Natural(Large(limbs)), exp) => {
                 *self = Natural(Large(limbs_pow(limbs, exp)));
                 self.demote_if_small();
             }

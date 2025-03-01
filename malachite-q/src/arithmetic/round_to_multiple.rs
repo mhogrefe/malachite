@@ -490,11 +490,7 @@ impl RoundToMultipleAssign<Rational> for Rational {
         let (x, o) = Integer::rounding_from(&*self, rm);
         let other_sign = other.sign;
         *self = Rational::from(x) * other;
-        if other_sign {
-            o
-        } else {
-            o.reverse()
-        }
+        if other_sign { o } else { o.reverse() }
     }
 }
 
@@ -571,10 +567,6 @@ impl RoundToMultipleAssign<&Rational> for Rational {
         *self /= other;
         let (x, o) = Integer::rounding_from(&*self, rm);
         *self = Rational::from(x) * other;
-        if other.sign {
-            o
-        } else {
-            o.reverse()
-        }
+        if other.sign { o } else { o.reverse() }
     }
 }

@@ -11,8 +11,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_pair_gen_var_28, unsigned_pair_gen_var_44};
-use malachite_nz::natural::arithmetic::binomial_coefficient::*;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::binomial_coefficient::*;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen_var_15, unsigned_pair_gen_var_45,

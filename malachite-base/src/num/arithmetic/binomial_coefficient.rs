@@ -65,11 +65,7 @@ fn checked_binomial_coefficient_signed<
         } else {
             let (b, overflow) = S::overflowing_from(b);
             if overflow {
-                if b == S::MIN {
-                    Some(S::MIN)
-                } else {
-                    None
-                }
+                if b == S::MIN { Some(S::MIN) } else { None }
             } else {
                 Some(-b)
             }

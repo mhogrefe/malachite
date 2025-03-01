@@ -11,16 +11,16 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::test_util::bench::bucketers::triple_3_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_power_of_2_sub::{
     limbs_mod_power_of_2_limb_sub_limbs, limbs_mod_power_of_2_limb_sub_limbs_in_place,
     limbs_mod_power_of_2_sub, limbs_mod_power_of_2_sub_in_place_either,
     limbs_mod_power_of_2_sub_in_place_left, limbs_mod_power_of_2_sub_in_place_right,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     natural_natural_unsigned_triple_gen_var_4, unsigned_vec_unsigned_unsigned_triple_gen_var_16,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18,

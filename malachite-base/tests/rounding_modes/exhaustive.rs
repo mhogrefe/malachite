@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 
 #[test]
 fn test_exhaustive_rounding_modes() {

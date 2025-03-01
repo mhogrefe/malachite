@@ -12,7 +12,7 @@ use malachite_base::test_util::bench::bucketers::{
     quadruple_3_vec_len_bucketer, triple_2_vec_len_bucketer, unsigned_bit_bucketer,
     vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{unsigned_gen_var_22, unsigned_vec_pair_gen_var_12};
 use malachite_base::test_util::runner::Runner;

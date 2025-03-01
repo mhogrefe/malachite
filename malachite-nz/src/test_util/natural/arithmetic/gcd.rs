@@ -10,11 +10,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::gcd::half_gcd::{
-    limbs_half_gcd_matrix_mul_matrix_1, limbs_half_gcd_matrix_update_q, HalfGcdMatrix,
-    HalfGcdMatrix1,
-};
 use crate::natural::Natural;
+use crate::natural::arithmetic::gcd::half_gcd::{
+    HalfGcdMatrix, HalfGcdMatrix1, limbs_half_gcd_matrix_mul_matrix_1,
+    limbs_half_gcd_matrix_update_q,
+};
 use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::arithmetic::traits::{DivMod, Parity, XXSubYYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;

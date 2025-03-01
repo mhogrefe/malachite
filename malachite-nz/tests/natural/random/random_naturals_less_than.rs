@@ -10,8 +10,8 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
-use malachite_nz::natural::random::random_naturals_less_than;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::random_naturals_less_than;
 use malachite_nz::test_util::natural::random::random_naturals_helper_helper;
 use std::str::FromStr;
 

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use core::iter::{once, Chain, Once, Rev};
+use core::iter::{Chain, Once, Rev, once};
 use itertools::{Interleave, Itertools};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 
@@ -102,9 +102,9 @@ impl Iterator for ExhaustiveIntegerRange {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            ExhaustiveIntegerRange::NonNegative(ref mut xs) => xs.next(),
-            ExhaustiveIntegerRange::NonPositive(ref mut xs) => xs.next(),
-            ExhaustiveIntegerRange::BothSigns(ref mut xs) => xs.next(),
+            ExhaustiveIntegerRange::NonNegative(xs) => xs.next(),
+            ExhaustiveIntegerRange::NonPositive(xs) => xs.next(),
+            ExhaustiveIntegerRange::BothSigns(xs) => xs.next(),
         }
     }
 }
@@ -130,8 +130,8 @@ impl Iterator for ExhaustiveIntegerRangeToInfinity {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            ExhaustiveIntegerRangeToInfinity::NonNegative(ref mut xs) => xs.next(),
-            ExhaustiveIntegerRangeToInfinity::BothSigns(ref mut xs) => xs.next(),
+            ExhaustiveIntegerRangeToInfinity::NonNegative(xs) => xs.next(),
+            ExhaustiveIntegerRangeToInfinity::BothSigns(xs) => xs.next(),
         }
     }
 }
@@ -157,8 +157,8 @@ impl Iterator for ExhaustiveIntegerRangeToNegativeInfinity {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            ExhaustiveIntegerRangeToNegativeInfinity::NonPositive(ref mut xs) => xs.next(),
-            ExhaustiveIntegerRangeToNegativeInfinity::BothSigns(ref mut xs) => xs.next(),
+            ExhaustiveIntegerRangeToNegativeInfinity::NonPositive(xs) => xs.next(),
+            ExhaustiveIntegerRangeToNegativeInfinity::BothSigns(xs) => xs.next(),
         }
     }
 }

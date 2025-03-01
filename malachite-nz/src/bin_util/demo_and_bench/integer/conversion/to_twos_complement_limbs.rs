@@ -9,7 +9,7 @@
 use itertools::Itertools;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::vec_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{unsigned_vec_gen, unsigned_vec_gen_var_2};
 use malachite_base::test_util::runner::Runner;
@@ -364,11 +364,7 @@ fn benchmark_integer_twos_complement_limbs_get_algorithms(
                     let non_negative = n >= 0;
                     let limbs = n.into_twos_complement_limbs_asc();
                     if u >= limbs.len() {
-                        if non_negative {
-                            0
-                        } else {
-                            Limb::MAX
-                        }
+                        if non_negative { 0 } else { Limb::MAX }
                     } else {
                         limbs[u]
                     };
@@ -392,9 +388,8 @@ fn benchmark_integer_twos_complement_limb_count(
         limit,
         file_name,
         &integer_bit_bucketer("n"),
-        &mut [(
-            "Malachite",
-            &mut |n| no_out!(n.twos_complement_limb_count()),
-        )],
+        &mut [("Malachite", &mut |n| {
+            no_out!(n.twos_complement_limb_count())
+        })],
     );
 }

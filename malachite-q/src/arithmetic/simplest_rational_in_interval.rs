@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::arithmetic::traits::SimplestRationalInInterval;
 use crate::conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
 use crate::conversion::traits::ContinuedFraction;
-use crate::Rational;
 use core::cmp::{
-    max, min,
     Ordering::{self, *},
+    max, min,
 };
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMul, Ceiling, Floor, UnsignedAbs};
@@ -339,11 +339,7 @@ impl SimplestRationalInInterval for Rational {
             update_best(&mut best, x, y, candidate);
         }
         let best = best.unwrap();
-        if neg {
-            -best
-        } else {
-            best
-        }
+        if neg { -best } else { best }
     }
 
     /// Finds the simplest [`Rational`] contained in a closed interval.

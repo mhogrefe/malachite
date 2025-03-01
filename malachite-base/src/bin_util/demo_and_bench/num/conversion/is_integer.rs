@@ -13,7 +13,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::bucketers::{
     primitive_float_bucketer, signed_bit_bucketer, unsigned_bit_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 use malachite_base::test_util::runner::Runner;

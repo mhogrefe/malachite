@@ -268,11 +268,7 @@ impl CeilingLogBase<&Rational> for &Rational {
             return self.ceiling_log_base_power_of_2(log_base);
         }
         let (log, exact) = log_base_helper(self, base);
-        if exact {
-            log
-        } else {
-            log + 1
-        }
+        if exact { log } else { log + 1 }
     }
 }
 
@@ -338,10 +334,6 @@ impl CheckedLogBase<&Rational> for &Rational {
             return self.checked_log_base_power_of_2(log_base);
         }
         let (log, exact) = log_base_helper(self, base);
-        if exact {
-            Some(log)
-        } else {
-            None
-        }
+        if exact { Some(log) } else { None }
     }
 }

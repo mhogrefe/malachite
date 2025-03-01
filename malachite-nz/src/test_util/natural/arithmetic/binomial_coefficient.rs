@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::Natural;
 use crate::natural::arithmetic::div_round::double_cmp;
 use crate::natural::exhaustive::exhaustive_natural_inclusive_range;
-use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{DivExact, Factorial, Gcd, Parity};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;

@@ -9,8 +9,8 @@
 use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::integer::exhaustive::integer_increasing_range_to_infinity;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::exhaustive::integer_increasing_range_to_infinity;
 
 fn integer_increasing_range_to_infinity_helper(a: Integer, values: &str) {
     let xs = integer_increasing_range_to_infinity(a)

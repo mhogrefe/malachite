@@ -8,7 +8,7 @@
 
 use crate::orderings::ORDERINGS;
 use crate::random::Seed;
-use crate::slices::{random_values_from_slice, RandomValuesFromSlice};
+use crate::slices::{RandomValuesFromSlice, random_values_from_slice};
 use std::cmp::Ordering;
 use std::iter::Copied;
 

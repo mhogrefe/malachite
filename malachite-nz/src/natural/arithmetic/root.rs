@@ -13,6 +13,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::div::{limbs_div_limb_to_out, limbs_div_to_out};
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
@@ -26,8 +28,6 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_to_out,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
@@ -215,7 +215,7 @@ fn limbs_root_to_out_internal(
         if xs_len != 1 {
             i -= 1;
         }
-        (xs_hi << leading_zeros) | xs[i] >> (Limb::WIDTH - leading_zeros)
+        (xs_hi << leading_zeros) | (xs[i] >> (Limb::WIDTH - leading_zeros))
     };
     assert!(xs_len != 1 || xs[xs_len - 1] >> (Limb::WIDTH - leading_zeros) == 1);
     // - root_bits + 1 is the number of bits of the root R
@@ -622,9 +622,7 @@ impl FloorRoot<u64> for Natural {
             2 => self.floor_sqrt(),
             exp => match self {
                 Natural(Small(x)) => Natural(Small(x.floor_root(exp))),
-                Natural(Large(ref xs)) => {
-                    Natural::from_owned_limbs_asc(limbs_floor_root(xs, exp).0)
-                }
+                Natural(Large(xs)) => Natural::from_owned_limbs_asc(limbs_floor_root(&xs, exp).0),
             },
         }
     }
@@ -664,9 +662,7 @@ impl FloorRoot<u64> for &Natural {
             2 => self.floor_sqrt(),
             exp => match self {
                 Natural(Small(x)) => Natural(Small(x.floor_root(exp))),
-                Natural(Large(ref xs)) => {
-                    Natural::from_owned_limbs_asc(limbs_floor_root(xs, exp).0)
-                }
+                Natural(Large(xs)) => Natural::from_owned_limbs_asc(limbs_floor_root(xs, exp).0),
             },
         }
     }
@@ -748,8 +744,8 @@ impl CeilingRoot<u64> for Natural {
             2 => self.ceiling_sqrt(),
             exp => match self {
                 Natural(Small(x)) => Natural(Small(x.ceiling_root(exp))),
-                Natural(Large(ref xs)) => {
-                    let (floor_root_limbs, inexact) = limbs_floor_root(xs, exp);
+                Natural(Large(xs)) => {
+                    let (floor_root_limbs, inexact) = limbs_floor_root(&xs, exp);
                     let floor_root = Natural::from_owned_limbs_asc(floor_root_limbs);
                     if inexact {
                         floor_root + Natural::ONE
@@ -796,7 +792,7 @@ impl CeilingRoot<u64> for &Natural {
             2 => self.ceiling_sqrt(),
             exp => match self {
                 Natural(Small(x)) => Natural(Small(x.ceiling_root(exp))),
-                Natural(Large(ref xs)) => {
+                Natural(Large(xs)) => {
                     let (floor_root_limbs, inexact) = limbs_floor_root(xs, exp);
                     let floor_root = Natural::from_owned_limbs_asc(floor_root_limbs);
                     if inexact {
@@ -913,14 +909,10 @@ impl CheckedRoot<u64> for Natural {
             2 => self.checked_sqrt(),
             exp => match self {
                 Natural(Small(x)) => x.checked_root(exp).map(|x| Natural(Small(x))),
-                Natural(Large(ref xs)) => {
-                    let (floor_root_limbs, inexact) = limbs_floor_root(xs, exp);
+                Natural(Large(xs)) => {
+                    let (floor_root_limbs, inexact) = limbs_floor_root(&xs, exp);
                     let floor_root = Natural::from_owned_limbs_asc(floor_root_limbs);
-                    if inexact {
-                        None
-                    } else {
-                        Some(floor_root)
-                    }
+                    if inexact { None } else { Some(floor_root) }
                 }
             },
         }
@@ -988,14 +980,10 @@ impl CheckedRoot<u64> for &Natural {
             2 => self.checked_sqrt(),
             exp => match self {
                 Natural(Small(x)) => x.checked_root(exp).map(|x| Natural(Small(x))),
-                Natural(Large(ref xs)) => {
+                Natural(Large(xs)) => {
                     let (floor_root_limbs, inexact) = limbs_floor_root(xs, exp);
                     let floor_root = Natural::from_owned_limbs_asc(floor_root_limbs);
-                    if inexact {
-                        None
-                    } else {
-                        Some(floor_root)
-                    }
+                    if inexact { None } else { Some(floor_root) }
                 }
             },
         }
@@ -1052,8 +1040,8 @@ impl RootRem<u64> for Natural {
                     let (root, rem) = x.root_rem(exp);
                     (Natural(Small(root)), Natural(Small(rem)))
                 }
-                Natural(Large(ref xs)) => {
-                    let (root_limbs, rem_limbs) = limbs_root_rem(xs, exp);
+                Natural(Large(xs)) => {
+                    let (root_limbs, rem_limbs) = limbs_root_rem(&xs, exp);
                     (
                         Natural::from_owned_limbs_asc(root_limbs),
                         Natural::from_owned_limbs_asc(rem_limbs),
@@ -1116,7 +1104,7 @@ impl RootRem<u64> for &Natural {
                     let (root, rem) = x.root_rem(exp);
                     (Natural(Small(root)), Natural(Small(rem)))
                 }
-                Natural(Large(ref xs)) => {
+                Natural(Large(xs)) => {
                     let (root_limbs, rem_limbs) = limbs_root_rem(xs, exp);
                     (
                         Natural::from_owned_limbs_asc(root_limbs),

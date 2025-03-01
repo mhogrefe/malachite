@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::test_util::arithmetic::square::{
@@ -24,11 +24,12 @@ use malachite_float::test_util::bench::bucketers::{
     triple_1_2_float_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_22,
-    float_rounding_mode_pair_gen_var_7, float_rounding_mode_pair_gen_var_7_rm,
+    float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_7,
+    float_rounding_mode_pair_gen_var_7_rm, float_rounding_mode_pair_gen_var_22,
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
-    float_unsigned_rounding_mode_triple_gen_var_11, float_unsigned_rounding_mode_triple_gen_var_2,
+    float_unsigned_rounding_mode_triple_gen_var_2,
     float_unsigned_rounding_mode_triple_gen_var_2_rm,
+    float_unsigned_rounding_mode_triple_gen_var_11,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 

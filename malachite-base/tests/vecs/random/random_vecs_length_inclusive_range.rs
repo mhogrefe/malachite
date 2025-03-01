@@ -10,7 +10,7 @@ use core::hash::Hash;
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::num::random::geometric::geometric_random_unsigneds;
 use malachite_base::num::random::random_primitive_ints;
-use malachite_base::random::{Seed, EXAMPLE_SEED};
+use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::test_util::vecs::random::random_vecs_helper_helper;
 use malachite_base::tuples::random::random_units;
 use malachite_base::vecs::random::random_vecs_length_inclusive_range;

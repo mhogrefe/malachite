@@ -12,10 +12,10 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::test_util::generators::{
-    signed_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
-    signed_unsigned_pair_gen_var_11, signed_unsigned_pair_gen_var_4, unsigned_gen,
-    unsigned_pair_gen_var_2, unsigned_pair_gen_var_20, unsigned_triple_gen_var_13,
-    unsigned_triple_gen_var_4,
+    signed_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_4,
+    signed_unsigned_pair_gen_var_10, signed_unsigned_pair_gen_var_11, unsigned_gen,
+    unsigned_pair_gen_var_2, unsigned_pair_gen_var_20, unsigned_triple_gen_var_4,
+    unsigned_triple_gen_var_13,
 };
 use std::cmp::min;
 use std::fmt::Debug;
@@ -581,9 +581,11 @@ fn neg_mod_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(n.neg_mod_power_of_2(pow), result);
 
         assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
-        assert!(result
-            .wrapping_add(n.mod_power_of_2(pow))
-            .divisible_by_power_of_2(pow));
+        assert!(
+            result
+                .wrapping_add(n.mod_power_of_2(pow))
+                .divisible_by_power_of_2(pow)
+        );
         assert_eq!(result.neg_mod_power_of_2(pow), n.mod_power_of_2(pow));
     });
 

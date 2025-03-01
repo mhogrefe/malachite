@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::num::random::VariableRangeGenerator;
+use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::integer::random::get_striped_random_integer_from_range;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::random::get_striped_random_integer_from_range;
 use std::str::FromStr;
 
 fn get_striped_random_integer_from_range_helper(

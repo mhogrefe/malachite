@@ -11,8 +11,8 @@ use malachite_base::num::comparison::traits::{EqAbs, OrdAbs};
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use std::str::FromStr;
 
 #[test]

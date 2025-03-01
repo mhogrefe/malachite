@@ -12,11 +12,11 @@ use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{bool_vec_gen, bool_vec_gen_var_5, signed_gen};
 use malachite_base::test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
     bits_vec_to_twos_complement_bits_negative,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_nz::test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::iterators::{nonzero_values, NonzeroValues};
+use crate::iterators::{NonzeroValues, nonzero_values};
 use crate::num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -14,16 +14,16 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::float::NiceFloat;
-use crate::num::iterators::{ruler_sequence, RulerSequence};
+use crate::num::iterators::{RulerSequence, ruler_sequence};
 use crate::num::logic::traits::{BitAccess, NotAssign, SignificantBits};
 use crate::rounding_modes::RoundingMode::*;
 use crate::tuples::exhaustive::{
-    exhaustive_dependent_pairs, lex_dependent_pairs, ExhaustiveDependentPairs,
-    ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+    exhaustive_dependent_pairs, lex_dependent_pairs,
 };
 use alloc::vec::IntoIter;
 use alloc::vec::Vec;
-use core::iter::{once, Chain, Once, Rev};
+use core::iter::{Chain, Once, Rev, once};
 use core::marker::PhantomData;
 use itertools::{Interleave, Itertools};
 
@@ -79,9 +79,9 @@ impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            ExhaustiveSignedRange::NonNegative(ref mut xs) => xs.next(),
-            ExhaustiveSignedRange::NonPositive(ref mut xs) => xs.next(),
-            ExhaustiveSignedRange::BothSigns(ref mut xs) => xs.next(),
+            ExhaustiveSignedRange::NonNegative(xs) => xs.next(),
+            ExhaustiveSignedRange::NonPositive(xs) => xs.next(),
+            ExhaustiveSignedRange::BothSigns(xs) => xs.next(),
         }
     }
 }
@@ -632,8 +632,8 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
-) -> PrimitiveFloatIncreasingRange<T> {
+pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>()
+-> PrimitiveFloatIncreasingRange<T> {
     primitive_float_increasing_inclusive_range(T::MIN_POSITIVE_SUBNORMAL, T::MAX_FINITE)
 }
 
@@ -686,8 +686,8 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
-) -> PrimitiveFloatIncreasingRange<T> {
+pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>()
+-> PrimitiveFloatIncreasingRange<T> {
     primitive_float_increasing_inclusive_range(-T::MAX_FINITE, -T::MIN_POSITIVE_SUBNORMAL)
 }
 
@@ -744,8 +744,8 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>(
-) -> NonzeroValues<PrimitiveFloatIncreasingRange<T>> {
+pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>()
+-> NonzeroValues<PrimitiveFloatIncreasingRange<T>> {
     nonzero_values(finite_primitive_floats_increasing())
 }
 
@@ -963,8 +963,8 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// );
 /// ```
 #[inline]
-pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
-) -> NonzeroValues<PrimitiveFloatIncreasingRange<T>> {
+pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>()
+-> NonzeroValues<PrimitiveFloatIncreasingRange<T>> {
     nonzero_values(primitive_floats_increasing())
 }
 
@@ -1286,8 +1286,8 @@ impl<T: PrimitiveFloat>
 }
 
 #[inline]
-fn exhaustive_positive_finite_primitive_floats_helper<T: PrimitiveFloat>(
-) -> ExhaustiveDependentPairs<
+fn exhaustive_positive_finite_primitive_floats_helper<T: PrimitiveFloat>()
+-> ExhaustiveDependentPairs<
     i64,
     T,
     RulerSequence<usize>,
@@ -1361,8 +1361,8 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> 
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_positive_finite_primitive_floats<T: PrimitiveFloat>(
-) -> ExhaustivePositiveFinitePrimitiveFloats<T> {
+pub fn exhaustive_positive_finite_primitive_floats<T: PrimitiveFloat>()
+-> ExhaustivePositiveFinitePrimitiveFloats<T> {
     ExhaustivePositiveFinitePrimitiveFloats(exhaustive_positive_finite_primitive_floats_helper())
 }
 
@@ -1417,8 +1417,8 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> 
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_negative_finite_primitive_floats<T: PrimitiveFloat>(
-) -> ExhaustiveNegativeFinitePrimitiveFloats<T> {
+pub fn exhaustive_negative_finite_primitive_floats<T: PrimitiveFloat>()
+-> ExhaustiveNegativeFinitePrimitiveFloats<T> {
     ExhaustiveNegativeFinitePrimitiveFloats(exhaustive_positive_finite_primitive_floats())
 }
 
@@ -1480,8 +1480,8 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
-) -> ExhaustiveNonzeroFinitePrimitiveFloats<T> {
+pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>()
+-> ExhaustiveNonzeroFinitePrimitiveFloats<T> {
     ExhaustiveNonzeroFinitePrimitiveFloats {
         toggle: false,
         xs: exhaustive_positive_finite_primitive_floats(),
@@ -1524,8 +1524,8 @@ pub type ExhaustiveFinitePrimitiveFloats<T> =
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
-) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
+pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>()
+-> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
     ::alloc::vec![T::ZERO, T::NEGATIVE_ZERO]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
@@ -1564,8 +1564,8 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
-) -> Chain<Once<T>, ExhaustivePositiveFinitePrimitiveFloats<T>> {
+pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>()
+-> Chain<Once<T>, ExhaustivePositiveFinitePrimitiveFloats<T>> {
     once(T::INFINITY).chain(exhaustive_positive_finite_primitive_floats())
 }
 
@@ -1602,8 +1602,8 @@ pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
-) -> Chain<Once<T>, ExhaustiveNegativeFinitePrimitiveFloats<T>> {
+pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>()
+-> Chain<Once<T>, ExhaustiveNegativeFinitePrimitiveFloats<T>> {
     once(T::NEGATIVE_INFINITY).chain(exhaustive_negative_finite_primitive_floats())
 }
 
@@ -1640,8 +1640,8 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
-) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
+pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>()
+-> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
     ::alloc::vec![T::INFINITY, T::NEGATIVE_INFINITY]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
@@ -1676,8 +1676,8 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
-) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
+pub fn exhaustive_primitive_floats<T: PrimitiveFloat>()
+-> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
     ::alloc::vec![T::NAN, T::INFINITY, T::NEGATIVE_INFINITY, T::ZERO, T::NEGATIVE_ZERO]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
@@ -1955,14 +1955,12 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloatsInRan
 
     fn next(&mut self) -> Option<T> {
         match self {
-            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllPositive(ref mut xs) => xs.next(),
-            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllNegative(ref mut xs) => {
-                xs.next().map(T::neg)
-            }
+            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllPositive(xs) => xs.next(),
+            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllNegative(xs) => xs.next().map(T::neg),
             ExhaustiveNonzeroFinitePrimitiveFloatsInRange::PositiveAndNegative(
-                ref mut toggle,
-                ref mut pos_xs,
-                ref mut neg_xs,
+                toggle,
+                pos_xs,
+                neg_xs,
             ) => {
                 toggle.not_assign();
                 if *toggle {
@@ -2019,8 +2017,8 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(ref mut xs) => xs.next(),
-            ExhaustivePrimitiveFloatInclusiveRange::NotJustSpecials(ref mut xs) => xs.next(),
+            ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(xs) => xs.next(),
+            ExhaustivePrimitiveFloatInclusiveRange::NotJustSpecials(xs) => xs.next(),
         }
     }
 }

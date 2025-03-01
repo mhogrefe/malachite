@@ -14,8 +14,8 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::geometric::geometric_random_signed_range;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::{
-    double_truncated_geometric_dist_assertions, negative_truncated_geometric_dist_assertions,
-    truncated_geometric_dist_assertions, CheckedToF64, MomentStats,
+    CheckedToF64, MomentStats, double_truncated_geometric_dist_assertions,
+    negative_truncated_geometric_dist_assertions, truncated_geometric_dist_assertions,
 };
 use std::panic::catch_unwind;
 

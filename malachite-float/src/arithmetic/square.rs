@@ -8,7 +8,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{
-    float_either_infinity, float_either_zero, float_infinity, float_nan, float_zero, Float,
+    Float, float_either_infinity, float_either_zero, float_infinity, float_nan, float_zero,
 };
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
@@ -654,10 +654,10 @@ impl Float {
                 Equal
             }
             Float(Finite {
-                sign: ref mut x_sign,
-                exponent: ref mut x_exp,
-                precision: ref mut x_prec,
-                significand: ref mut x,
+                sign: x_sign,
+                exponent: x_exp,
+                precision: x_prec,
+                significand: x,
             }) => {
                 let twice_exp = *x_exp << 1;
                 if twice_exp - 1 > Float::MAX_EXPONENT {

@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::logic::bit_access::limbs_slice_set_bit;
-use crate::natural::Natural;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, PowerOf2, RoundToMultipleOfPowerOf2, ShrRound,
@@ -20,11 +20,11 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
 use malachite_base::num::random::geometric::{
-    geometric_random_positive_unsigneds, geometric_random_unsigned_inclusive_range,
-    geometric_random_unsigneds, GeometricRandomNaturalValues,
+    GeometricRandomNaturalValues, geometric_random_positive_unsigneds,
+    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
 };
-use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitSource};
-use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
+use malachite_base::num::random::striped::{StripedBitSource, get_striped_unsigned_vec};
+use malachite_base::num::random::{RandomPrimitiveInts, random_primitive_ints};
 use malachite_base::random::Seed;
 use malachite_base::rounding_modes::RoundingMode::*;
 

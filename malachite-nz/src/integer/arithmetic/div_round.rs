@@ -686,11 +686,7 @@ impl DivRoundAssign<Integer> for Integer {
             .abs
             .div_round_assign(other.abs, if q_sign { rm } else { -rm });
         self.sign = q_sign || self.abs == 0;
-        if q_sign {
-            o
-        } else {
-            o.reverse()
-        }
+        if q_sign { o } else { o.reverse() }
     }
 }
 
@@ -797,10 +793,6 @@ impl DivRoundAssign<&Integer> for Integer {
             .abs
             .div_round_assign(&other.abs, if q_sign { rm } else { -rm });
         self.sign = q_sign || self.abs == 0;
-        if q_sign {
-            o
-        } else {
-            o.reverse()
-        }
+        if q_sign { o } else { o.reverse() }
     }
 }

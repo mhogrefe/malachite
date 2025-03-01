@@ -54,8 +54,8 @@ use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
 #[allow(unused_imports)]
 use pyo3::{
-    exceptions::PyValueError, ffi, intern, types::*, Bound, FromPyObject, IntoPy, Py, PyErr,
-    PyObject, PyResult, Python, ToPyObject,
+    Bound, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject,
+    exceptions::PyValueError, ffi, intern, types::*,
 };
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
@@ -445,11 +445,13 @@ mod tests {
             let zero = 0.to_object(py);
             let minus_one = (-1).to_object(py);
             assert_eq!(zero.extract::<Natural>(py).unwrap(), Natural::ZERO);
-            assert!(minus_one
-                .extract::<Natural>(py)
-                .unwrap_err()
-                .get_type_bound(py)
-                .is(&PyType::new_bound::<PyValueError>(py)));
+            assert!(
+                minus_one
+                    .extract::<Natural>(py)
+                    .unwrap_err()
+                    .get_type_bound(py)
+                    .is(&PyType::new_bound::<PyValueError>(py))
+            );
         });
     }
 }

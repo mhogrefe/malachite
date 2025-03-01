@@ -12,8 +12,8 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::string::to_string::BaseFmtWrapper as BaseBaseFmtWrapper;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::strings::{
-    string_is_subset, ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString,
-    ToUpperHexString,
+    ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString, ToUpperHexString,
+    string_is_subset,
 };
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_2, signed_unsigned_pair_gen_var_5, signed_unsigned_pair_gen_var_7,

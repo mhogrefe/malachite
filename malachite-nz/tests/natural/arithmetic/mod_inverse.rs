@@ -25,19 +25,19 @@ fn test_mod_inverse() {
 
         let result = n.clone().mod_inverse(m.clone());
         assert_eq!(result.to_debug_string(), out);
-        assert!(result.map_or(true, |n| n.is_valid()));
+        assert!(result.is_none_or(|n| n.is_valid()));
 
         let result = n.clone().mod_inverse(&m);
         assert_eq!(result.to_debug_string(), out);
-        assert!(result.map_or(true, |n| n.is_valid()));
+        assert!(result.is_none_or(|n| n.is_valid()));
 
         let result = (&n).mod_inverse(m.clone());
         assert_eq!(result.to_debug_string(), out);
-        assert!(result.map_or(true, |n| n.is_valid()));
+        assert!(result.is_none_or(|n| n.is_valid()));
 
         let result = (&n).mod_inverse(&m);
         assert_eq!(result.to_debug_string(), out);
-        assert!(result.map_or(true, |n| n.is_valid()));
+        assert!(result.is_none_or(|n| n.is_valid()));
 
         assert_eq!(mod_inverse_simple(n, m).to_debug_string(), out);
     };
@@ -70,10 +70,10 @@ fn mod_inverse_properties() {
         let result_val_ref = n.clone().mod_inverse(&m);
         let result_ref_val = (&n).mod_inverse(m.clone());
         let result = (&n).mod_inverse(&m);
-        assert!(result.as_ref().map_or(true, Natural::is_valid));
-        assert!(result_val_val.as_ref().map_or(true, Natural::is_valid));
-        assert!(result_val_ref.as_ref().map_or(true, Natural::is_valid));
-        assert!(result_ref_val.as_ref().map_or(true, Natural::is_valid));
+        assert!(result.as_ref().is_none_or(Natural::is_valid));
+        assert!(result_val_val.as_ref().is_none_or(Natural::is_valid));
+        assert!(result_val_ref.as_ref().is_none_or(Natural::is_valid));
+        assert!(result_ref_val.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(result_val_val, result);
         assert_eq!(result_val_ref, result);
         assert_eq!(result_ref_val, result);

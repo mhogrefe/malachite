@@ -8,7 +8,7 @@
 
 use malachite_base::chars::crement::char_to_contiguous_range;
 use malachite_base::test_util::bench::bucketers::char_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::char_gen;
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;

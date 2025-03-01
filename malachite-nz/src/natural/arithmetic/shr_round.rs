@@ -11,14 +11,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::arithmetic::shr::{
     limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
 };
 use crate::natural::logic::bit_access::limbs_get_bit;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -343,11 +343,11 @@ where
     match (x, bits) {
         (&Natural::ZERO, _) => (x.clone(), Equal),
         (_, bits) if bits == T::ZERO => (x.clone(), Equal),
-        (Natural(Small(ref small)), bits) => {
+        (Natural(Small(small)), bits) => {
             let (s, o) = small.shr_round(bits, rm);
             (Natural(Small(s)), o)
         }
-        (Natural(Large(ref limbs)), bits) => {
+        (Natural(Large(limbs)), bits) => {
             if let Some((out, o)) = limbs_shr_round(limbs, u64::exact_from(bits), rm) {
                 (Natural::from_owned_limbs_asc(out), o)
             } else {
@@ -369,8 +369,8 @@ where
     match (&mut *x, bits) {
         (&mut Natural::ZERO, _) => Equal,
         (_, bits) if bits == T::ZERO => Equal,
-        (Natural(Small(ref mut small)), bits) => small.shr_round_assign(bits, rm),
-        (Natural(Large(ref mut limbs)), bits) => {
+        (Natural(Small(small)), bits) => small.shr_round_assign(bits, rm),
+        (Natural(Large(limbs)), bits) => {
             let (b, o) = limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm);
             assert!(b, "Right shift is not exact.");
             x.trim();

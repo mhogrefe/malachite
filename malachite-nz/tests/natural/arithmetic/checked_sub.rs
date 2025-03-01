@@ -27,19 +27,19 @@ fn test_checked_sub_natural() {
 
         let on = u.clone().checked_sub(v.clone());
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = u.clone().checked_sub(&v);
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = (&u).checked_sub(v.clone());
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = (&u).checked_sub(&v);
         assert_eq!(on.to_debug_string(), out);
-        assert!(on.map_or(true, |n| n.is_valid()));
+        assert!(on.is_none_or(|n| n.is_valid()));
 
         let on = checked_sub(BigUint::from_str(s).unwrap(), BigUint::from_str(t).unwrap())
             .map(|x| Natural::from(&x));
@@ -98,19 +98,19 @@ fn checked_sub_properties() {
 
         let diff_alt = x.clone().checked_sub(y.clone());
         assert_eq!(diff_alt, diff);
-        assert!(diff_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(diff_alt.as_ref().is_none_or(Natural::is_valid));
 
         let diff_alt = x.clone().checked_sub(&y);
         assert_eq!(diff_alt, diff);
-        assert!(diff_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(diff_alt.as_ref().is_none_or(Natural::is_valid));
 
         let diff_alt = (&x).checked_sub(y.clone());
         assert_eq!(diff_alt, diff);
-        assert!(diff_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(diff_alt.as_ref().is_none_or(Natural::is_valid));
 
         let diff_alt = (&x).checked_sub(&y);
         assert_eq!(diff_alt, diff);
-        assert!(diff_alt.as_ref().map_or(true, Natural::is_valid));
+        assert!(diff_alt.as_ref().is_none_or(Natural::is_valid));
 
         let reverse_diff = (&y).checked_sub(&x);
         assert_eq!(reverse_diff.is_some(), x == y || diff.is_none());

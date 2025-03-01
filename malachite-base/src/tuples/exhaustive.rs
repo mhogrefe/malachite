@@ -12,13 +12,13 @@ use crate::num::arithmetic::traits::CheckedPow;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
 use crate::vecs::exhaustive::{
-    fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, UniqueIndices,
+    UniqueIndices, fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices,
 };
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::max;
 use core::fmt::Debug;
-use core::iter::{once, Once};
+use core::iter::{Once, once};
 use core::marker::PhantomData;
 use core::mem::take;
 
@@ -1484,12 +1484,12 @@ pub struct LexDependentPairs<
 }
 
 impl<
-        X: Clone,
-        Y,
-        S: ExhaustiveDependentPairsYsGenerator<X, Y, J>,
-        I: Iterator<Item = X>,
-        J: Iterator<Item = Y>,
-    > LexDependentPairs<X, Y, S, I, J>
+    X: Clone,
+    Y,
+    S: ExhaustiveDependentPairsYsGenerator<X, Y, J>,
+    I: Iterator<Item = X>,
+    J: Iterator<Item = Y>,
+> LexDependentPairs<X, Y, S, I, J>
 {
     fn advance_xs(&mut self) -> bool {
         if let Some(next_x) = self.xs.next() {
@@ -1503,12 +1503,12 @@ impl<
 }
 
 impl<
-        X: Clone,
-        Y,
-        S: ExhaustiveDependentPairsYsGenerator<X, Y, J>,
-        I: Iterator<Item = X>,
-        J: Iterator<Item = Y>,
-    > Iterator for LexDependentPairs<X, Y, S, I, J>
+    X: Clone,
+    Y,
+    S: ExhaustiveDependentPairsYsGenerator<X, Y, J>,
+    I: Iterator<Item = X>,
+    J: Iterator<Item = Y>,
+> Iterator for LexDependentPairs<X, Y, S, I, J>
 {
     type Item = (X, Y);
 
@@ -1747,13 +1747,13 @@ pub struct ExhaustiveDependentPairs<
 }
 
 impl<
-        X: Clone,
-        Y,
-        G: Iterator<Item = usize>,
-        S: ExhaustiveDependentPairsYsGenerator<X, Y, J>,
-        I: Iterator<Item = X>,
-        J: Iterator<Item = Y>,
-    > Iterator for ExhaustiveDependentPairs<X, Y, G, S, I, J>
+    X: Clone,
+    Y,
+    G: Iterator<Item = usize>,
+    S: ExhaustiveDependentPairsYsGenerator<X, Y, J>,
+    I: Iterator<Item = X>,
+    J: Iterator<Item = Y>,
+> Iterator for ExhaustiveDependentPairs<X, Y, G, S, I, J>
 {
     type Item = (X, Y);
 

@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
+use crate::bools::random::{WeightedRandomBools, weighted_random_bools};
 use crate::chars::char_is_graphic;
 use crate::chars::crement::{char_to_contiguous_range, contiguous_range_to_char, decrement_char};
-use crate::num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
+use crate::num::random::{RandomUnsignedInclusiveRange, random_unsigned_inclusive_range};
 use crate::random::Seed;
-use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
+use crate::vecs::{RandomValuesFromVec, random_values_from_vec};
 
 /// Uniformly generates random [`char`]s in a closed interval.
 ///

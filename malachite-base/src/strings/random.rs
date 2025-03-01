@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::chars::random::{random_chars, RandomCharRange};
+use crate::chars::random::{RandomCharRange, random_chars};
 use crate::num::random::geometric::GeometricRandomNaturalValues;
 use crate::random::Seed;
 use crate::strings::StringsFromCharVecs;
 use crate::vecs::random::{
-    random_vecs, random_vecs_fixed_length_from_single, RandomFixedLengthVecsFromSingle, RandomVecs,
+    RandomFixedLengthVecsFromSingle, RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
 };
 
 /// Randomly generates [`String`]s of a given length using [`char`]s from a single iterator.

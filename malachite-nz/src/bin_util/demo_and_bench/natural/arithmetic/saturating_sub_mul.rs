@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{
     SaturatingSub, SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::triple_natural_max_bit_bucketer;

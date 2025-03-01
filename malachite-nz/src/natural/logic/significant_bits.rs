@@ -57,9 +57,9 @@ impl SignificantBits for &Natural {
     /// assert_eq!(Natural::from(100u32).significant_bits(), 7);
     /// ```
     fn significant_bits(self) -> u64 {
-        match *self {
+        match self {
             Natural(Small(small)) => small.significant_bits(),
-            Natural(Large(ref limbs)) => limbs_significant_bits(limbs),
+            Natural(Large(limbs)) => limbs_significant_bits(limbs),
         }
     }
 }

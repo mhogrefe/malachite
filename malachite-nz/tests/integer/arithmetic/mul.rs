@@ -21,7 +21,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::integer::arithmetic::mul::integer_product_naive;
 use num::BigInt;
-use std::iter::{once, Product};
+use std::iter::{Product, once};
 use std::str::FromStr;
 
 #[test]

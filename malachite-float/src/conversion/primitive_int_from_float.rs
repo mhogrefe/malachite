@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::is_power_of_2::float_is_signed_min;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{significand_bits, Float};
+use crate::arithmetic::is_power_of_2::float_is_signed_min;
+use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::signeds::PrimitiveSigned;

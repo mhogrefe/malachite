@@ -19,11 +19,7 @@ fn mod_sub<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let diff = x.wrapping_sub(y);
-    if x < y {
-        m.wrapping_add(diff)
-    } else {
-        diff
-    }
+    if x < y { m.wrapping_add(diff) } else { diff }
 }
 
 macro_rules! impl_mod_sub {

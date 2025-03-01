@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{significand_bits, Float};
+use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, IsPowerOf2, ShrRound};
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -91,11 +91,7 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                     }
                 }
             };
-            if sign {
-                (x, o)
-            } else {
-                (-x, o.reverse())
-            }
+            if sign { (x, o) } else { (-x, o.reverse()) }
         }
     }
 }
@@ -176,11 +172,7 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                     }
                 }
             };
-            if *sign {
-                (x, o)
-            } else {
-                (-x, o.reverse())
-            }
+            if *sign { (x, o) } else { (-x, o.reverse()) }
         }
     }
 }

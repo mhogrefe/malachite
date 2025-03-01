@@ -9,25 +9,25 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
 use alloc::vec::IntoIter;
-use core::iter::{once, Chain, Once};
+use core::iter::{Chain, Once, once};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::exhaustive::{
-    exhaustive_signed_inclusive_range, primitive_int_increasing_inclusive_range,
-    ExhaustiveSignedRange, PrimitiveIntIncreasingRange,
+    ExhaustiveSignedRange, PrimitiveIntIncreasingRange, exhaustive_signed_inclusive_range,
+    primitive_int_increasing_inclusive_range,
 };
-use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
+use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
 use malachite_base::num::logic::traits::{LowMask, NotAssign};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, lex_dependent_pairs, ExhaustiveDependentPairs,
-    ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
-};
-use malachite_nz::natural::exhaustive::{
-    exhaustive_natural_inclusive_range, ExhaustiveNaturalRange,
+    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+    exhaustive_dependent_pairs, lex_dependent_pairs,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::exhaustive::{
+    ExhaustiveNaturalRange, exhaustive_natural_inclusive_range,
+};
 use malachite_nz::platform::Limb;
 
 /// Generates all finite positive [`Float`]s with a specified `sci_exponent` (one less than the raw

@@ -8,12 +8,12 @@
 
 use malachite_base::num::arithmetic::traits::{CheckedDiv, Reciprocal};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_q::Rational;
 use malachite_q::test_util::arithmetic::div::div_naive;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_pair_gen, rational_pair_gen_var_1,
     rational_triple_gen_var_1,
 };
-use malachite_q::Rational;
 use num::{BigRational, CheckedDiv as NumCheckedDiv};
 use std::str::FromStr;
 
@@ -305,10 +305,10 @@ fn checked_div_properties() {
         let quotient_val_ref = x.clone().checked_div(&y);
         let quotient_ref_val = (&x).checked_div(y.clone());
         let quotient = (&x).checked_div(&y);
-        assert!(quotient_val_val.as_ref().map_or(true, Rational::is_valid));
-        assert!(quotient_val_ref.as_ref().map_or(true, Rational::is_valid));
-        assert!(quotient_ref_val.as_ref().map_or(true, Rational::is_valid));
-        assert!(quotient.as_ref().map_or(true, Rational::is_valid));
+        assert!(quotient_val_val.as_ref().is_none_or(Rational::is_valid));
+        assert!(quotient_val_ref.as_ref().is_none_or(Rational::is_valid));
+        assert!(quotient_ref_val.as_ref().is_none_or(Rational::is_valid));
+        assert!(quotient.as_ref().is_none_or(Rational::is_valid));
         assert_eq!(quotient_val_val, quotient);
         assert_eq!(quotient_val_ref, quotient);
         assert_eq!(quotient_ref_val, quotient);

@@ -11,14 +11,14 @@ use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_nz::test_util::generators::integer_vec_gen;
+use malachite_q::Rational;
 use malachite_q::test_util::arithmetic::add::add_naive;
 use malachite_q::test_util::arithmetic::add::rational_sum_naive;
 use malachite_q::test_util::generators::{
     rational_gen, rational_pair_gen, rational_triple_gen, rational_vec_gen,
 };
-use malachite_q::Rational;
 use num::BigRational;
-use std::iter::{once, Sum};
+use std::iter::{Sum, once};
 use std::str::FromStr;
 
 #[test]

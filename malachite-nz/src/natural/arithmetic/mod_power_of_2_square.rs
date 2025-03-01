@@ -11,6 +11,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
@@ -25,11 +27,9 @@ use crate::natural::arithmetic::square::{
     limbs_square, limbs_square_diagonal, limbs_square_to_out, limbs_square_to_out_basecase,
     limbs_square_to_out_scratch_len,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQRLO_DC_THRESHOLD,
-    SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
+    DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQR_TOOM2_THRESHOLD,
+    SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD, SQRLO_DC_THRESHOLD,
 };
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
@@ -443,7 +443,7 @@ impl ModPowerOf2Square for &Natural {
                     x_double.square()
                 })
             }
-            Natural(Large(ref xs)) => {
+            Natural(Large(xs)) => {
                 Natural::from_owned_limbs_asc(limbs_mod_power_of_2_square_ref(xs, pow))
             }
         }
@@ -493,7 +493,7 @@ impl ModPowerOf2SquareAssign for Natural {
         );
         match self {
             &mut Natural::ZERO => {}
-            Natural(Small(ref mut x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),
+            Natural(Small(x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),
             Natural(Small(x)) => {
                 let x_double = DoubleLimb::from(*x);
                 *self = Natural::from(if pow <= Limb::WIDTH << 1 {
@@ -502,7 +502,7 @@ impl ModPowerOf2SquareAssign for Natural {
                     x_double.square()
                 });
             }
-            Natural(Large(ref mut xs)) => {
+            Natural(Large(xs)) => {
                 *xs = limbs_mod_power_of_2_square(xs, pow);
                 self.trim();
             }

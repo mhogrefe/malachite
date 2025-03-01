@@ -15,7 +15,7 @@ use malachite_base::test_util::bench::bucketers::{
     quadruple_2_vec_len_bucketer, quadruple_3_vec_len_bucketer, quadruple_4_vec_len_bucketer,
     triple_2_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_24;
 use malachite_base::test_util::generators::{
@@ -907,10 +907,9 @@ fn benchmark_natural_mod_evaluation_strategy(
         file_name,
         &pair_1_natural_bit_bucketer("n"),
         &mut [
-            (
-                "Natural.mod_op(Natural)",
-                &mut |(x, y)| no_out!(x.mod_op(y)),
-            ),
+            ("Natural.mod_op(Natural)", &mut |(x, y)| {
+                no_out!(x.mod_op(y))
+            }),
             ("Natural.mod_op(&Natural)", &mut |(x, y)| {
                 no_out!(x.mod_op(&y))
             }),

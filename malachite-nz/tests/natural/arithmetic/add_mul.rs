@@ -16,13 +16,13 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::add_mul::{
     limbs_add_mul, limbs_add_mul_in_place_left, limbs_add_mul_limb,
     limbs_slice_add_mul_limb_same_length_in_place_left,
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,
     limbs_vec_add_mul_limb_in_place_left, limbs_vec_add_mul_limb_in_place_right,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_pair_gen, natural_triple_gen};
 use std::str::FromStr;

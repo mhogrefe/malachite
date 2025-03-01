@@ -146,9 +146,9 @@ impl BitScan for &Natural {
     /// );
     /// ```
     fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
-        match *self {
+        match self {
             Natural(Small(small)) => small.index_of_next_false_bit(start),
-            Natural(Large(ref limbs)) => Some(limbs_index_of_next_false_bit(limbs, start)),
+            Natural(Large(limbs)) => Some(limbs_index_of_next_false_bit(limbs, start)),
         }
     }
 
@@ -208,9 +208,9 @@ impl BitScan for &Natural {
     /// );
     /// ```
     fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
-        match *self {
+        match self {
             Natural(Small(small)) => small.index_of_next_true_bit(start),
-            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit(limbs, start),
+            Natural(Large(limbs)) => limbs_index_of_next_true_bit(limbs, start),
         }
     }
 }

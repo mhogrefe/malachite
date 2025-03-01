@@ -16,8 +16,8 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{
-    primitive_float_gen, primitive_float_gen_var_14, primitive_float_gen_var_5,
-    primitive_float_gen_var_6, primitive_float_gen_var_7,
+    primitive_float_gen, primitive_float_gen_var_5, primitive_float_gen_var_6,
+    primitive_float_gen_var_7, primitive_float_gen_var_14,
     primitive_float_rounding_mode_pair_gen_var_2, primitive_float_rounding_mode_pair_gen_var_3,
 };
 use malachite_nz::integer::Integer;

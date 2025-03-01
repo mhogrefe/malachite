@@ -20,6 +20,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -48,14 +50,12 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    DoubleLimb, Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD,
+    BINV_NEWTON_THRESHOLD, DC_BDIV_Q_THRESHOLD, DC_BDIV_QR_THRESHOLD, DoubleLimb, Limb,
     MU_BDIV_Q_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering::*};
+use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -1856,7 +1856,7 @@ impl Natural {
             (_, 0) => panic!("division by zero"),
             (x, 1) => x.clone(),
             (Natural(Small(small)), other) => Natural(Small(small / other)),
-            (Natural(Large(ref limbs)), other) => {
+            (Natural(Large(limbs)), other) => {
                 Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, other))
             }
         }
@@ -1866,8 +1866,8 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}
-            (Natural(Small(ref mut small)), other) => *small /= other,
-            (Natural(Large(ref mut limbs)), other) => {
+            (Natural(Small(small)), other) => *small /= other,
+            (Natural(Large(limbs)), other) => {
                 limbs_div_exact_limb_in_place(limbs, other);
                 self.trim();
             }
@@ -2036,7 +2036,7 @@ impl DivExact<Natural> for &Natural {
             (&Natural::ZERO, _) => Natural::ZERO,
             (n, &mut Natural(Small(d))) => n.div_exact_limb_ref(d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
-            (Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
@@ -2106,7 +2106,7 @@ impl DivExact<&Natural> for &Natural {
             (&Natural::ZERO, _) => Natural::ZERO,
             (n, Natural(Small(d))) => n.div_exact_limb_ref(*d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
-            (Natural(Large(ref ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
@@ -2171,7 +2171,7 @@ impl DivExactAssign<Natural> for Natural {
             (_, &mut Natural::ONE) | (&mut Natural::ZERO, _) => {}
             (n, &mut Natural(Small(d))) => n.div_exact_assign_limb(d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
-            (Natural(Large(ref mut ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
@@ -2237,7 +2237,7 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
             (_, &Natural::ONE) | (&mut Natural::ZERO, _) => {}
             (_, Natural(Small(d))) => self.div_exact_assign_limb(*d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
-            (Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {

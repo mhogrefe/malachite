@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Zero};
-use crate::{significand_bits, Float};
+use crate::{Float, significand_bits};
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::integer::Integer;

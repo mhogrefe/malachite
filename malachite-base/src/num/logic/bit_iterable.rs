@@ -10,8 +10,8 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::BitIterable;
-use core::cmp::min;
 use core::cmp::Ordering::*;
+use core::cmp::min;
 use core::marker::PhantomData;
 use core::ops::Index;
 

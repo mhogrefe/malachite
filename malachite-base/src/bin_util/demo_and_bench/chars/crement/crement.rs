@@ -8,7 +8,7 @@
 
 use malachite_base::chars::crement::{decrement_char, increment_char};
 use malachite_base::test_util::bench::bucketers::char_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{char_gen_var_1, char_gen_var_2};
 use malachite_base::test_util::runner::Runner;

@@ -26,9 +26,9 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_q::Rational;
+use rug::Assign;
 use rug::float::Round;
 use rug::ops::AssignRound;
-use rug::Assign;
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
@@ -1113,8 +1113,10 @@ where
         );
         let r_nearest = Rational::exact_from(&nearest.0);
         if r_nearest != T::ZERO {
-            assert!((r_nearest - Rational::from(n))
-                .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
+            assert!(
+                (r_nearest - Rational::from(n))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+            );
         }
     });
 }
@@ -1201,8 +1203,10 @@ where
                     && nearest.1 == ceiling.1
         );
         if r_nearest != T::ZERO {
-            assert!((r_nearest - Rational::from(n))
-                .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
+            assert!(
+                (r_nearest - Rational::from(n))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+            );
         }
     });
 }

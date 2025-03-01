@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Zero};
-use crate::{significand_bits, Float};
+use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};

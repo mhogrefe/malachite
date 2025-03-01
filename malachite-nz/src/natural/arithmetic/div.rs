@@ -20,16 +20,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::div_mod::{
-    div_mod_by_preinversion, limbs_div_barrett_large_product, limbs_div_mod_by_two_limb_normalized,
+    MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD, div_mod_by_preinversion,
+    limbs_div_barrett_large_product, limbs_div_mod_by_two_limb_normalized,
     limbs_div_mod_divide_and_conquer_helper, limbs_div_mod_schoolbook,
     limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx, limbs_invert_approx_scratch_len,
-    limbs_invert_limb, limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD,
-    MUPI_DIV_QR_THRESHOLD,
+    limbs_invert_limb, limbs_two_limb_inverse_helper,
 };
 use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1_next_size, limbs_mul_mod_base_pow_n_minus_1_scratch_len,
@@ -46,10 +48,8 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, FUDGE, MU_DIVAPPR_Q_THRESHOLD,
+    DC_DIV_QR_THRESHOLD, DC_DIVAPPR_Q_THRESHOLD, DoubleLimb, FUDGE, Limb, MU_DIVAPPR_Q_THRESHOLD,
 };
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -1969,7 +1969,7 @@ impl Natural {
             (_, 0) => panic!("division by zero"),
             (n, 1) => n.clone(),
             (Natural(Small(small)), other) => Natural(Small(small / other)),
-            (Natural(Large(ref limbs)), other) => {
+            (Natural(Large(limbs)), other) => {
                 Natural::from_owned_limbs_asc(limbs_div_limb(limbs, other))
             }
         }
@@ -1986,8 +1986,8 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}
-            (Natural(Small(ref mut small)), other) => *small /= other,
-            (Natural(Large(ref mut limbs)), other) => {
+            (Natural(Small(small)), other) => *small /= other,
+            (Natural(Large(limbs)), other) => {
                 limbs_div_limb_in_place(limbs, other);
                 self.trim();
             }
@@ -1999,10 +1999,10 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}
-            (Natural(Small(ref mut small)), other) => {
+            (Natural(Small(small)), other) => {
                 *small /= other;
             }
-            (Natural(Large(ref mut limbs)), other) => {
+            (Natural(Large(limbs)), other) => {
                 limbs_div_in_place_naive(limbs, other);
                 self.trim();
             }
@@ -2131,7 +2131,7 @@ impl Div<Natural> for &Natural {
             (n, &mut Natural::ONE) => n.clone(),
             (n, &mut Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
-            (&Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
@@ -2185,7 +2185,7 @@ impl Div<&Natural> for &Natural {
             (n, &Natural::ONE) => n.clone(),
             (n, &Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
-            (&Natural(Large(ref ns)), &Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() < ds.len() {
                     Natural::ZERO
                 } else {
@@ -2235,14 +2235,14 @@ impl DivAssign<Natural> for Natural {
             (_, Natural::ONE) => {}
             (n, Natural(Small(d))) => n.div_assign_limb(d),
             (Natural(Small(_)), _) => *self = Natural::ZERO,
-            (&mut Natural(Large(ref mut ns)), Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(mut ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
                     *self = Natural::ZERO;
                 } else {
                     let mut qs = vec![0; ns_len - ds_len + 1];
-                    limbs_div_to_out(&mut qs, ns, ds);
+                    limbs_div_to_out(&mut qs, ns, &mut ds);
                     swap(&mut qs, ns);
                     self.trim();
                 }
@@ -2290,7 +2290,7 @@ impl<'a> DivAssign<&'a Natural> for Natural {
             (_, &Natural::ONE) => {}
             (n, &Natural(Small(d))) => n.div_assign_limb(d),
             (Natural(Small(_)), _) => *self = Natural::ZERO,
-            (&mut Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
@@ -2359,7 +2359,7 @@ impl CheckedDiv<Natural> for Natural {
                 Some(n)
             }
             (Natural(Small(_)), _) => Some(Natural::ZERO),
-            (Natural(Large(mut ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(mut ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 Some(if ns_len < ds_len {
@@ -2427,7 +2427,7 @@ impl<'a> CheckedDiv<&'a Natural> for Natural {
                 Some(n)
             }
             (Natural(Small(_)), _) => Some(Natural::ZERO),
-            (Natural(Large(mut ns)), &Natural(Large(ref ds))) => {
+            (Natural(Large(mut ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 Some(if ns_len < ds_len {
@@ -2491,7 +2491,7 @@ impl CheckedDiv<Natural> for &Natural {
             (n, &mut Natural::ONE) => Some(n.clone()),
             (n, &mut Natural(Small(d))) => Some(n.div_limb_ref(d)),
             (Natural(Small(_)), _) => Some(Natural::ZERO),
-            (&Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 Some(if ns_len < ds_len {
@@ -2555,7 +2555,7 @@ impl CheckedDiv<&Natural> for &Natural {
             (n, &Natural::ONE) => Some(n.clone()),
             (n, &Natural(Small(d))) => Some(n.div_limb_ref(d)),
             (Natural(Small(_)), _) => Some(Natural::ZERO),
-            (&Natural(Large(ref ns)), &Natural(Large(ref ds))) => Some(if ns.len() < ds.len() {
+            (Natural(Large(ns)), Natural(Large(ds))) => Some(if ns.len() < ds.len() {
                 Natural::ZERO
             } else {
                 Natural::from_owned_limbs_asc(limbs_div(ns, ds))

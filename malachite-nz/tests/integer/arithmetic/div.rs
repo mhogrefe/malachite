@@ -399,19 +399,19 @@ fn test_checked_div() {
         let v = Integer::from_str(t).unwrap();
 
         let q = u.clone().checked_div(v.clone());
-        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert!(q.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = u.clone().checked_div(&v);
-        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert!(q.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = (&u).checked_div(v.clone());
-        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert!(q.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = (&u).checked_div(&v);
-        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert!(q.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = BigInt::from_str(s)
@@ -571,10 +571,10 @@ fn checked_div_properties() {
         let quotient_val_ref = x.clone().checked_div(&y);
         let quotient_ref_val = (&x).checked_div(y.clone());
         let quotient = (&x).checked_div(&y);
-        assert!(quotient_val_val.as_ref().map_or(true, Integer::is_valid));
-        assert!(quotient_val_ref.as_ref().map_or(true, Integer::is_valid));
-        assert!(quotient_ref_val.as_ref().map_or(true, Integer::is_valid));
-        assert!(quotient.as_ref().map_or(true, Integer::is_valid));
+        assert!(quotient_val_val.as_ref().is_none_or(Integer::is_valid));
+        assert!(quotient_val_ref.as_ref().is_none_or(Integer::is_valid));
+        assert!(quotient_ref_val.as_ref().is_none_or(Integer::is_valid));
+        assert!(quotient.as_ref().is_none_or(Integer::is_valid));
         assert_eq!(quotient_val_val, quotient);
         assert_eq!(quotient_val_ref, quotient);
         assert_eq!(quotient_ref_val, quotient);

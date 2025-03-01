@@ -11,7 +11,7 @@ use malachite_base::test_util::bench::bucketers::{
     abs_pair_usize_convertible_max_bucketer, abs_triple_1_2_usize_convertible_max_bucketer,
     signed_abs_bucketer, unsigned_direct_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     signed_gen_var_5, signed_unsigned_pair_gen_var_19, unsigned_gen_var_5,

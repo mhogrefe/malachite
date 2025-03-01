@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::log_base::{ceiling_log_base_naive, checked_log_base_naive};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::bench::bucketers::pair_1_bit_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_24;
 use malachite_base::test_util::runner::Runner;
@@ -69,10 +69,9 @@ fn benchmark_floor_log_base<T: PrimitiveUnsigned>(
         limit,
         file_name,
         &pair_1_bit_bucketer("n"),
-        &mut [(
-            "Malachite",
-            &mut |(n, base)| no_out!(n.floor_log_base(base)),
-        )],
+        &mut [("Malachite", &mut |(n, base)| {
+            no_out!(n.floor_log_base(base))
+        })],
     );
 }
 
@@ -91,10 +90,9 @@ fn benchmark_ceiling_log_base_algorithms<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [
-            (
-                "default",
-                &mut |(n, base)| no_out!(n.ceiling_log_base(base)),
-            ),
+            ("default", &mut |(n, base)| {
+                no_out!(n.ceiling_log_base(base))
+            }),
             ("naive", &mut |(n, base)| {
                 no_out!(ceiling_log_base_naive(n, base))
             }),
@@ -117,10 +115,9 @@ fn benchmark_checked_log_base_algorithms<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [
-            (
-                "default",
-                &mut |(n, base)| no_out!(n.checked_log_base(base)),
-            ),
+            ("default", &mut |(n, base)| {
+                no_out!(n.checked_log_base(base))
+            }),
             ("naive", &mut |(n, base)| {
                 no_out!(checked_log_base_naive(n, base))
             }),

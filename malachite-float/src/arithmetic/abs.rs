@@ -8,8 +8,8 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{
-    float_either_infinity, float_either_zero, float_infinity, float_nan, float_negative_zero,
-    float_zero, Float,
+    Float, float_either_infinity, float_either_zero, float_infinity, float_nan,
+    float_negative_zero, float_zero,
 };
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
 

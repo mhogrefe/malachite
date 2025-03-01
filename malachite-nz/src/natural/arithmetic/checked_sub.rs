@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::sub::{
     limbs_sub, limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
     limbs_vec_sub_in_place_right,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::traits::Zero;
@@ -29,7 +29,7 @@ impl Natural {
         match (self, other) {
             (_, 0) => Some(self.clone()),
             (Natural(Small(small)), other) => small.checked_sub(other).map(Natural::from),
-            (Natural(Large(ref limbs)), other) => {
+            (Natural(Large(limbs)), other) => {
                 if *self < other {
                     None
                 } else {
@@ -45,14 +45,14 @@ impl Natural {
     fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
         match (&mut *self, other) {
             (_, 0) => false,
-            (Natural(Small(ref mut x)), y) => match x.checked_sub(y) {
+            (Natural(Small(x)), y) => match x.checked_sub(y) {
                 Some(diff) => {
                     *x = diff;
                     false
                 }
                 None => true,
             },
-            (Natural(Large(ref mut xs)), y) => {
+            (Natural(Large(xs)), y) => {
                 let borrow = limbs_sub_limb_in_place(xs, y);
                 if !borrow {
                     self.trim();
@@ -68,8 +68,8 @@ impl Natural {
             (_, Natural::ZERO) => false,
             (x, Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
             (Natural(Small(_)), _) => true,
-            (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
-                let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, ys);
+            (&mut Natural(Large(ref mut xs)), Natural(Large(ys))) => {
+                let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, &ys);
                 if !borrow {
                     self.trim();
                 }
@@ -82,13 +82,13 @@ impl Natural {
     pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
         match (&mut *self, other) {
             (_, &Natural::ZERO) => false,
-            (x, y) if core::ptr::eq(x, y) => {
+            (x, y) if core::ptr::eq(&*x, y) => {
                 *self = Natural::ZERO;
                 false
             }
             (x, &Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
             (Natural(Small(_)), _) => true,
-            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), &Natural(Large(ref ys))) => {
                 let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, ys);
                 if !borrow {
                     self.trim();
@@ -109,12 +109,12 @@ impl Natural {
                 *self = Natural::ZERO;
                 false
             }
-            (Natural(Small(x)), y) => y.checked_sub_limb_ref(*x).map_or(true, |result| {
+            (Natural(Small(x)), y) => y.checked_sub_limb_ref(*x).is_none_or(|result| {
                 *self = result;
                 false
             }),
             (_, Natural(Small(_))) => true,
-            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 let borrow = xs.len() > ys.len() || limbs_vec_sub_in_place_right(ys, xs);
                 if !borrow {
                     self.trim();
@@ -365,8 +365,8 @@ impl CheckedSub<&Natural> for &Natural {
             (x, y) if core::ptr::eq(x, y) => Some(Natural::ZERO),
             (x, &Natural::ZERO) => Some(x.clone()),
             (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
-            (&Natural(Small(_)), _) => None,
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+            (Natural(Small(_)), _) => None,
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 if self < other {
                     None
                 } else {

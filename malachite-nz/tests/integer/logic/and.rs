@@ -17,6 +17,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::and::{
     limbs_and_neg_neg, limbs_and_neg_neg_to_out, limbs_and_pos_neg,
     limbs_and_pos_neg_in_place_left, limbs_and_pos_neg_to_out, limbs_neg_and_limb_neg,
@@ -27,7 +28,6 @@ use malachite_nz::integer::logic::and::{
     limbs_vec_and_neg_neg_in_place_left, limbs_vec_and_pos_neg_in_place_right,
     limbs_vec_neg_and_limb_neg_in_place,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{

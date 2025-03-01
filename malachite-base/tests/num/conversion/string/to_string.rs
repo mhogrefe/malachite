@@ -12,11 +12,11 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::to_string::{
-    digit_to_display_byte_lower, digit_to_display_byte_upper, BaseFmtWrapper,
+    BaseFmtWrapper, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::strings::{
-    string_is_subset, ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString,
+    ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString, string_is_subset,
 };
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_2, signed_unsigned_pair_gen_var_5, signed_unsigned_pair_gen_var_6,

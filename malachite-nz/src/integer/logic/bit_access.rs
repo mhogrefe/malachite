@@ -12,10 +12,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
@@ -176,23 +176,23 @@ pub_test! {limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
 impl Natural {
     // self cannot be zero
     pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
-        match *self {
+        match self {
             Natural(Small(small)) => index >= Limb::WIDTH || small.wrapping_neg().get_bit(index),
-            Natural(Large(ref limbs)) => limbs_get_bit_neg(limbs, index),
+            Natural(Large(limbs)) => limbs_get_bit_neg(limbs, index),
         }
     }
 
     // self cannot be zero
     fn set_bit_neg(&mut self, index: u64) {
-        match *self {
-            Natural(Small(ref mut small)) => {
+        match self {
+            Natural(Small(small)) => {
                 if index < Limb::WIDTH {
                     small.wrapping_neg_assign();
                     small.set_bit(index);
                     small.wrapping_neg_assign();
                 }
             }
-            Natural(Large(ref mut limbs)) => {
+            Natural(Large(limbs)) => {
                 limbs_set_bit_neg(limbs, index);
                 self.trim();
             }
@@ -201,8 +201,8 @@ impl Natural {
 
     // self cannot be zero
     fn clear_bit_neg(&mut self, index: u64) {
-        match *self {
-            Natural(Small(ref mut small)) if index < Limb::WIDTH => {
+        match self {
+            Natural(Small(small)) if index < Limb::WIDTH => {
                 let mut cleared_small = small.wrapping_neg();
                 cleared_small.clear_bit(index);
                 if cleared_small == 0 {
@@ -215,7 +215,7 @@ impl Natural {
                 let limbs = self.promote_in_place();
                 limbs_vec_clear_bit_neg(limbs, index);
             }
-            Natural(Large(ref mut limbs)) => {
+            Natural(Large(limbs)) => {
                 limbs_vec_clear_bit_neg(limbs, index);
             }
         }
@@ -307,15 +307,9 @@ impl BitAccess for Integer {
     /// assert_eq!((-Integer::from(10u32).pow(12)).get_bit(100), true);
     /// ```
     fn get_bit(&self, index: u64) -> bool {
-        match *self {
-            Integer {
-                sign: true,
-                ref abs,
-            } => abs.get_bit(index),
-            Integer {
-                sign: false,
-                ref abs,
-            } => abs.get_bit_neg(index),
+        match self {
+            Integer { sign: true, abs } => abs.get_bit(index),
+            Integer { sign: false, abs } => abs.get_bit_neg(index),
         }
     }
 
@@ -364,15 +358,9 @@ impl BitAccess for Integer {
     /// assert_eq!(x, -156);
     /// ```
     fn set_bit(&mut self, index: u64) {
-        match *self {
-            Integer {
-                sign: true,
-                ref mut abs,
-            } => abs.set_bit(index),
-            Integer {
-                sign: false,
-                ref mut abs,
-            } => abs.set_bit_neg(index),
+        match self {
+            Integer { sign: true, abs } => abs.set_bit(index),
+            Integer { sign: false, abs } => abs.set_bit_neg(index),
         }
     }
 
@@ -421,15 +409,9 @@ impl BitAccess for Integer {
     /// assert_eq!(x, -256);
     /// ```
     fn clear_bit(&mut self, index: u64) {
-        match *self {
-            Integer {
-                sign: true,
-                ref mut abs,
-            } => abs.clear_bit(index),
-            Integer {
-                sign: false,
-                ref mut abs,
-            } => abs.clear_bit_neg(index),
+        match self {
+            Integer { sign: true, abs } => abs.clear_bit(index),
+            Integer { sign: false, abs } => abs.clear_bit_neg(index),
         }
     }
 }

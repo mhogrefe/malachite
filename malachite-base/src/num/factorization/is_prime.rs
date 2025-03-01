@@ -111,11 +111,7 @@ fn mod_preinverted_u32(a: u32, mut n: u32, inverse: u32) -> u32 {
     if r > q0 {
         r += n;
     }
-    if r < n {
-        r >> norm
-    } else {
-        (r - n) >> norm
-    }
+    if r < n { r >> norm } else { (r - n) >> norm }
 }
 
 // This is n_mod2_preinv when FLINT64 is true, from ulong_extras/mod2_preinv.c, FLINT 3.1.2.
@@ -131,11 +127,7 @@ fn mod_preinverted_u64(a: u64, mut n: u64, inverse: u64) -> u64 {
     if r > q0 {
         r += n;
     }
-    if r < n {
-        r >> norm
-    } else {
-        (r - n) >> norm
-    }
+    if r < n { r >> norm } else { (r - n) >> norm }
 }
 
 // This is n_powmod2_ui_preinv when FLINT64 is false, from ulong_extras/powmod2_ui_preinv.c, FLINT
@@ -225,7 +217,7 @@ fn mod_mul_preinverted_float(a: u64, b: u64, n: u64, inverse: f64) -> u64 {
 
 // This is n_powmod_ui_precomp when FLINT64 is true, from ulong_extras/powmod_precomp.c, FLINT
 // 3.1.2.
-fn mod_pow_preinverted_float(a: u64, mut exp: u64, n: u64, inverse: f64) -> u64 {
+pub(crate) fn mod_pow_preinverted_float(a: u64, mut exp: u64, n: u64, inverse: f64) -> u64 {
     if n == 1 {
         return 0;
     }

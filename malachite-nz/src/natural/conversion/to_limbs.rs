@@ -64,9 +64,9 @@ impl Iterator for LimbIterator<'_> {
     /// ```
     fn next(&mut self) -> Option<Limb> {
         if self.remaining != 0 {
-            let limb = match *self.n {
-                Natural(Small(small)) => small,
-                Natural(Large(ref limbs)) => limbs[usize::exact_from(self.i)],
+            let limb = match self.n {
+                Natural(Small(small)) => *small,
+                Natural(Large(limbs)) => limbs[usize::exact_from(self.i)],
             };
             if self.i != self.j {
                 self.i += 1;
@@ -112,9 +112,9 @@ impl DoubleEndedIterator for LimbIterator<'_> {
     /// ```
     fn next_back(&mut self) -> Option<Limb> {
         if self.remaining != 0 {
-            let limb = match *self.n {
-                Natural(Small(small)) => small,
-                Natural(Large(ref limbs)) => limbs[usize::exact_from(self.j)],
+            let limb = match self.n {
+                Natural(Small(small)) => *small,
+                Natural(Large(limbs)) => limbs[usize::exact_from(self.j)],
             };
             if self.j != self.i {
                 self.j -= 1;
@@ -164,9 +164,9 @@ impl Index<usize> for LimbIterator<'_> {
         if index >= self.limb_count {
             &0
         } else {
-            match *self.n {
-                Natural(Small(ref small)) => small,
-                Natural(Large(ref limbs)) => limbs.index(index),
+            match self.n {
+                Natural(Small(small)) => small,
+                Natural(Large(limbs)) => limbs.index(index),
             }
         }
     }
@@ -209,10 +209,10 @@ impl Natural {
     /// }
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<Limb> {
-        match *self {
-            Natural::ZERO => Vec::new(),
-            Natural(Small(small)) => vec![small],
-            Natural(Large(ref limbs)) => limbs.clone(),
+        match self {
+            &Natural::ZERO => Vec::new(),
+            Natural(Small(small)) => vec![*small],
+            Natural(Large(limbs)) => limbs.clone(),
         }
     }
 
@@ -252,10 +252,10 @@ impl Natural {
     /// }
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<Limb> {
-        match *self {
-            Natural::ZERO => Vec::new(),
-            Natural(Small(small)) => vec![small],
-            Natural(Large(ref limbs)) => limbs.iter().copied().rev().collect(),
+        match self {
+            &Natural::ZERO => Vec::new(),
+            Natural(Small(small)) => vec![*small],
+            Natural(Large(limbs)) => limbs.iter().copied().rev().collect(),
         }
     }
 

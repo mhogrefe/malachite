@@ -209,9 +209,9 @@ impl ModPowerOf2 for &Natural {
     /// assert_eq!((&Natural::from(1611u32)).mod_power_of_2(4), 11);
     /// ```
     fn mod_power_of_2(self, pow: u64) -> Natural {
-        match *self {
-            Natural(Small(ref small)) => Natural(Small(small.mod_power_of_2(pow))),
-            Natural(Large(ref limbs)) => {
+        match self {
+            Natural(Small(small)) => Natural(Small(small.mod_power_of_2(pow))),
+            Natural(Large(limbs)) => {
                 Natural::from_owned_limbs_asc(limbs_mod_power_of_2(limbs, pow))
             }
         }
@@ -243,9 +243,9 @@ impl ModPowerOf2Assign for Natural {
     /// assert_eq!(x, 11);
     /// ```
     fn mod_power_of_2_assign(&mut self, pow: u64) {
-        match *self {
-            Natural(Small(ref mut small)) => small.mod_power_of_2_assign(pow),
-            Natural(Large(ref mut limbs)) => {
+        match &mut *self {
+            Natural(Small(small)) => small.mod_power_of_2_assign(pow),
+            Natural(Large(limbs)) => {
                 limbs_vec_mod_power_of_2_in_place(limbs, pow);
                 self.trim();
             }
@@ -442,7 +442,7 @@ impl NegModPowerOf2 for &Natural {
             (Natural(Small(small)), pow) => {
                 Natural::from_owned_limbs_asc(limbs_neg_mod_power_of_2(&[*small], pow))
             }
-            (Natural(Large(ref limbs)), pow) => {
+            (Natural(Large(limbs)), pow) => {
                 Natural::from_owned_limbs_asc(limbs_neg_mod_power_of_2(limbs, pow))
             }
         }

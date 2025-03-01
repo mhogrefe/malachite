@@ -50,7 +50,7 @@ pub(crate) struct SerdeNatural(String);
 impl Natural {
     // If a `Natural` is `Large` but is small enough to be `Small`, make it `Small`.
     fn demote_if_small(&mut self) {
-        if let Natural(Large(ref limbs)) = self {
+        if let Natural(Large(limbs)) = self {
             match limbs.len() {
                 0 => *self = Natural::ZERO,
                 1 => *self = Natural(Small(limbs[0])),
@@ -64,7 +64,7 @@ impl Natural {
         if let Natural(Small(x)) = self {
             *self = Natural(Large(vec![*x]));
         }
-        if let Natural(Large(ref mut xs)) = self {
+        if let Natural(Large(xs)) = self {
             xs
         } else {
             unreachable!();
@@ -72,7 +72,7 @@ impl Natural {
     }
 
     pub(crate) fn trim(&mut self) {
-        if let Natural(Large(ref mut limbs)) = *self {
+        if let Natural(Large(limbs)) = self {
             let trailing_zero_count = slice_trailing_zeros(limbs);
             if trailing_zero_count != 0 {
                 let len = limbs.len();
@@ -88,9 +88,9 @@ impl Natural {
     // `Natural`s must be valid.
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
-        match *self {
+        match self {
             Natural(Small(_)) => true,
-            Natural(Large(ref xs)) => xs.len() > 1 && *xs.last().unwrap() != 0,
+            Natural(Large(xs)) => xs.len() > 1 && *xs.last().unwrap() != 0,
         }
     }
 }

@@ -27,11 +27,11 @@ fn test_mod_power_of_2_inverse() {
 
         let result = n.clone().mod_power_of_2_inverse(pow);
         assert_eq!(result.to_debug_string(), out);
-        assert!(result.map_or(true, |n| n.is_valid()));
+        assert!(result.is_none_or(|n| n.is_valid()));
 
         let result = (&n).mod_power_of_2_inverse(pow);
         assert_eq!(result.to_debug_string(), out);
-        assert!(result.map_or(true, |n| n.is_valid()));
+        assert!(result.is_none_or(|n| n.is_valid()));
 
         assert_eq!(
             n.mod_inverse(Natural::power_of_2(pow)).to_debug_string(),
@@ -60,8 +60,8 @@ fn mod_power_of_2_inverse_properties() {
         assert!(n.mod_power_of_2_is_reduced(pow));
         let result = n.clone().mod_power_of_2_inverse(pow);
         let result_ref = (&n).mod_power_of_2_inverse(pow);
-        assert!(result.as_ref().map_or(true, Natural::is_valid));
-        assert!(result_ref.as_ref().map_or(true, Natural::is_valid));
+        assert!(result.as_ref().is_none_or(Natural::is_valid));
+        assert!(result_ref.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(result_ref, result);
 
         assert_eq!((&n).mod_inverse(Natural::power_of_2(pow)), result);

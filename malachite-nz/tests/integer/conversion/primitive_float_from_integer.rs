@@ -16,8 +16,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_7, signed_rounding_mode_pair_gen_var_4,
 };
-use malachite_nz::integer::conversion::primitive_float_from_integer::PrimitiveFloatFromIntegerError;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::conversion::primitive_float_from_integer::PrimitiveFloatFromIntegerError;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz::test_util::generators::{
@@ -1216,7 +1216,7 @@ where
         let nearest = (NiceFloat(nearest.0), nearest.1);
         assert_eq!(
             nearest,
-            if floor.0 .0.to_bits().even() {
+            if floor.0.0.to_bits().even() {
                 floor
             } else {
                 ceiling

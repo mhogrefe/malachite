@@ -14,10 +14,10 @@ use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_7;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_unsigned_pair_gen_var_2, rational_unsigned_pair_gen_var_3,
 };
-use malachite_q::Rational;
 use std::str::FromStr;
 
 #[test]

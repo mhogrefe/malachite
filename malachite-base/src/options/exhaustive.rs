@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::iter::{once, Chain, Once};
+use core::iter::{Chain, Once, once};
 
 /// Generates all [`Option`]s except `None`, with values from a given iterator.
 ///

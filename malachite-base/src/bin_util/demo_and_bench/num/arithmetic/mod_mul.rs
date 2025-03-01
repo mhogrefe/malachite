@@ -16,7 +16,7 @@ use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::test_util::bench::bucketers::{
     ignore_highest_bit_unsigned_bit_bucketer, quadruple_1_2_bit_bucketer, triple_3_bit_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_12, unsigned_quadruple_gen_var_5, unsigned_triple_gen_var_12,

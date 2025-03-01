@@ -12,9 +12,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::shl::{limbs_shl, limbs_vec_shl_in_place};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::arithmetic::shl::{limbs_shl, limbs_vec_shl_in_place};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::iter::Sum;
@@ -547,7 +547,7 @@ impl Natural {
                 (sum, false) => Natural::from(sum),
                 (sum, true) => Natural(Large(vec![sum, 1])),
             },
-            (Natural(Large(ref limbs)), other) => Natural(Large(limbs_add_limb(limbs, other))),
+            (Natural(Large(limbs)), other) => Natural(Large(limbs_add_limb(limbs, other))),
         }
     }
 

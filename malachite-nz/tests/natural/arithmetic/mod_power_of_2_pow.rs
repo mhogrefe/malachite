@@ -17,10 +17,10 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_16, unsigned_vec_pair_gen_var_3,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_power_of_2_pow::{
     limbs_mod_power_of_2_pow, limbs_pow_low,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_natural_natural_unsigned_quadruple_gen_var_3,

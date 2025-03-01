@@ -9,9 +9,9 @@
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::primitive_float_gen;
-use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::{float_gen, float_gen_var_12, float_gen_var_4};
 use malachite_float::Float;
+use malachite_float::test_util::common::parse_hex_string;
+use malachite_float::test_util::generators::{float_gen, float_gen_var_4, float_gen_var_12};
 use malachite_q::Rational;
 
 #[test]

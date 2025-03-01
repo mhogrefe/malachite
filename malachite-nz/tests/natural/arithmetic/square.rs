@@ -14,6 +14,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::test_util::common::rle_decode;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_gen_var_21;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_basecase, limbs_square_to_out_toom_4,
     limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
@@ -24,7 +25,6 @@ use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_toom_2, limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
     limbs_square_to_out_toom_3_scratch_len,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::SQR_TOOM2_THRESHOLD;

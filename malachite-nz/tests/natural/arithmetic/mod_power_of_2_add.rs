@@ -15,6 +15,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_11;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_power_of_2_add::{
     limbs_mod_power_of_2_add, limbs_mod_power_of_2_add_greater,
     limbs_mod_power_of_2_add_in_place_either, limbs_mod_power_of_2_add_limb,
@@ -22,7 +23,6 @@ use malachite_nz::natural::arithmetic::mod_power_of_2_add::{
     limbs_slice_mod_power_of_2_add_limb_in_place, limbs_vec_mod_power_of_2_add_in_place_left,
     limbs_vec_mod_power_of_2_add_limb_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_natural_natural_unsigned_quadruple_gen_var_2,

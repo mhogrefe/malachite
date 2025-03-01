@@ -43,11 +43,7 @@ fn from_raw_mantissa_and_exponent<T: PrimitiveFloat>(raw_mantissa: u64, raw_expo
     assert!(raw_exponent.significant_bits() <= T::EXPONENT_WIDTH);
     let x = T::from_bits((raw_exponent << T::MANTISSA_WIDTH) | raw_mantissa);
     // Only output the canonical NaN
-    if x.is_nan() {
-        T::NAN
-    } else {
-        x
-    }
+    if x.is_nan() { T::NAN } else { x }
 }
 
 fn integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (u64, i64) {

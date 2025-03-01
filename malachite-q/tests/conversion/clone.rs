@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
 use num::BigRational;
 use rug;
 use std::str::FromStr;

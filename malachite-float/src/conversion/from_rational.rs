@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::InnerFloat::Finite;
 use crate::arithmetic::shl_round::shl_prec_round_assign_helper;
 use crate::arithmetic::shr_round::shr_prec_round_assign_helper;
 use crate::conversion::from_integer::{
@@ -15,10 +16,9 @@ use crate::conversion::from_natural::{
     from_natural_prec_round_zero_exponent, from_natural_prec_round_zero_exponent_ref,
     from_natural_zero_exponent, from_natural_zero_exponent_ref,
 };
-use crate::InnerFloat::Finite;
-use crate::{significand_bits, Float};
-use core::cmp::max;
+use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
+use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, IsPowerOf2, NegAssign, NegModPowerOf2, RoundToMultipleOfPowerOf2, UnsignedAbs,
 };
@@ -31,8 +31,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::Rational;
+use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 
 pub_test! {from_rational_prec_round_direct(
     x: Rational,

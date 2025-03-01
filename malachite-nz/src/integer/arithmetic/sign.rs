@@ -32,11 +32,7 @@ impl Sign for Integer {
     /// ```
     fn sign(&self) -> Ordering {
         if self.sign {
-            if self.abs == 0 {
-                Equal
-            } else {
-                Greater
-            }
+            if self.abs == 0 { Equal } else { Greater }
         } else {
             Less
         }

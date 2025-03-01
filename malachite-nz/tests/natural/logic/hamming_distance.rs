@@ -14,10 +14,10 @@ use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
 use malachite_base::test_util::generators::{
     unsigned_vec_pair_gen_var_6, unsigned_vec_pair_gen_var_7, unsigned_vec_unsigned_pair_gen_var_15,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_limb, limbs_hamming_distance_same_length,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
 use malachite_nz::test_util::natural::logic::hamming_distance::{

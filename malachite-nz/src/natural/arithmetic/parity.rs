@@ -35,7 +35,7 @@ impl Parity for &Natural {
     fn even(self) -> bool {
         match self {
             Natural(Small(small)) => small.even(),
-            Natural(Large(ref limbs)) => limbs[0].even(),
+            Natural(Large(limbs)) => limbs[0].even(),
         }
     }
 
@@ -61,9 +61,9 @@ impl Parity for &Natural {
     /// assert_eq!((Natural::from(10u32).pow(12) + Natural::ONE).odd(), true);
     /// ```
     fn odd(self) -> bool {
-        match *self {
+        match self {
             Natural(Small(small)) => small.odd(),
-            Natural(Large(ref limbs)) => limbs[0].odd(),
+            Natural(Large(limbs)) => limbs[0].odd(),
         }
     }
 }

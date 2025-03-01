@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::random::Seed;
-use crate::rounding_modes::{RoundingMode, ROUNDING_MODES};
-use crate::slices::{random_values_from_slice, RandomValuesFromSlice};
+use crate::rounding_modes::{ROUNDING_MODES, RoundingMode};
+use crate::slices::{RandomValuesFromSlice, random_values_from_slice};
 use std::iter::Copied;
 
 /// Uniformly generates random [`RoundingMode`]s.

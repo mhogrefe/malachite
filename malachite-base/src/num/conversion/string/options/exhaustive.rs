@@ -12,8 +12,8 @@ use crate::num::exhaustive::{
     exhaustive_negative_signeds, primitive_int_increasing_inclusive_range,
 };
 use crate::num::logic::traits::NotAssign;
-use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::rounding_modes::RoundingMode;
+use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::tuples::exhaustive::{exhaustive_triples, lex_pairs, lex_quadruples_from_single};
 use alloc::boxed::Box;
 

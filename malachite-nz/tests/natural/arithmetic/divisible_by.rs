@@ -15,12 +15,12 @@ use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_15, unsigned_vec_pair_gen_var_16,
     unsigned_vec_unsigned_pair_gen_var_22,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_ref_ref,
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_6,

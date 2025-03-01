@@ -11,8 +11,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::natural::Natural;
+use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::platform::Limb;
 use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;

@@ -8,7 +8,7 @@
 
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::bench::bucketers::rational_sequence_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_rational_sequence_gen;
 use malachite_base::test_util::runner::Runner;

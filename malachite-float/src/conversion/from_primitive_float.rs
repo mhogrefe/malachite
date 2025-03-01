@@ -164,11 +164,7 @@ macro_rules! impl_from_primitive_float {
                 } else {
                     let (m, e) = x.integer_mantissa_and_exponent();
                     let abs = Float::from(m) << e;
-                    if x.is_sign_positive() {
-                        abs
-                    } else {
-                        -abs
-                    }
+                    if x.is_sign_positive() { abs } else { -abs }
                 }
             }
         }

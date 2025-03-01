@@ -8,16 +8,16 @@
 
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::ComparableFloatRef;
+use malachite_float::Float;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::{
     float_primitive_float_pair_gen, float_primitive_float_pair_gen_rm,
     float_primitive_float_pair_gen_var_1,
 };
-use malachite_float::ComparableFloatRef;
-use malachite_float::Float;
 use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {

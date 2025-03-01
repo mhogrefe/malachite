@@ -9,24 +9,24 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
 use malachite_base::bools::random::{
-    random_bools, weighted_random_bools, RandomBools, WeightedRandomBools,
+    RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
 };
-use malachite_base::iterators::{with_special_values, WithSpecialValues};
+use malachite_base::iterators::{WithSpecialValues, with_special_values};
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::num::random::geometric::{
-    geometric_random_signed_inclusive_range, GeometricRandomNaturalValues,
-    GeometricRandomSignedRange,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    geometric_random_signed_inclusive_range,
 };
 use malachite_base::random::Seed;
-use malachite_nz::natural::random::{
-    random_positive_naturals, striped_random_natural_inclusive_range,
-    striped_random_positive_naturals, uniform_random_natural_inclusive_range, RandomNaturals,
-    StripedRandomNaturalInclusiveRange, StripedRandomNaturals, UniformRandomNaturalRange,
-};
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::{
+    RandomNaturals, StripedRandomNaturalInclusiveRange, StripedRandomNaturals,
+    UniformRandomNaturalRange, random_positive_naturals, striped_random_natural_inclusive_range,
+    striped_random_positive_naturals, uniform_random_natural_inclusive_range,
+};
 use malachite_nz::platform::Limb;
 
 /// Generates random positive finite [`Float`]s.

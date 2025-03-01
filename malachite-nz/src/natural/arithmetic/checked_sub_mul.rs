@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::sub_mul::{
     limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
     limbs_sub_mul_limb_greater_in_place_left,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 use malachite_base::num::basic::traits::Zero;
@@ -19,17 +19,17 @@ use malachite_base::num::basic::traits::Zero;
 macro_rules! large_left {
     ($a_limbs: ident, $b_limbs: ident, $c_limbs: ident) => {
         (
-            Natural(Large(ref mut $a_limbs)),
-            Natural(Large(ref $b_limbs)),
-            Natural(Large(ref $c_limbs)),
+            Natural(Large($a_limbs)),
+            Natural(Large($b_limbs)),
+            Natural(Large($c_limbs)),
         )
-    }
+    };
 }
 
 macro_rules! large_right {
     ($self: ident, $a_limbs: ident, $b_limbs: ident, $c_limbs: ident) => {{
         let borrow = $a_limbs.len() < $b_limbs.len() + $c_limbs.len() - 1
-            || limbs_sub_mul_in_place_left($a_limbs, $b_limbs, $c_limbs);
+            || limbs_sub_mul_in_place_left($a_limbs, &$b_limbs, &$c_limbs);
         if !borrow {
             $self.trim();
         }
@@ -43,7 +43,7 @@ impl Natural {
             (a, _, 0) | (a, &Natural::ZERO, _) => Some(a.clone()),
             (a, b @ Natural(Small(_)), c) => a.checked_sub(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => None,
-            (&Natural(Large(ref a_limbs)), &Natural(Large(ref b_limbs)), c) => {
+            (Natural(Large(a_limbs)), Natural(Large(b_limbs)), c) => {
                 if a_limbs.len() >= b_limbs.len() {
                     limbs_sub_mul_limb_greater(a_limbs, b_limbs, c)
                         .map(Natural::from_owned_limbs_asc)
@@ -59,9 +59,9 @@ impl Natural {
             (_, _, 0) | (_, Natural::ZERO, _) => false,
             (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => true,
-            (Natural(Large(ref mut a_limbs)), Natural(Large(ref b_limbs)), c) => {
+            (Natural(Large(a_limbs)), Natural(Large(b_limbs)), c) => {
                 let borrow = a_limbs.len() < b_limbs.len()
-                    || limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0;
+                    || limbs_sub_mul_limb_greater_in_place_left(a_limbs, &b_limbs, c) != 0;
                 if !borrow {
                     self.trim();
                 }
@@ -75,7 +75,7 @@ impl Natural {
             (_, _, 0) | (_, &Natural::ZERO, _) => false,
             (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => true,
-            (Natural(Large(ref mut a_limbs)), Natural(Large(ref b_limbs)), c) => {
+            (Natural(Large(a_limbs)), Natural(Large(b_limbs)), c) => {
                 let borrow = a_limbs.len() < b_limbs.len()
                     || limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0;
                 if !borrow {
@@ -97,10 +97,8 @@ impl Natural {
 
     pub(crate) fn sub_mul_assign_val_ref_no_panic(&mut self, b: Natural, c: &Natural) -> bool {
         match (&mut *self, &b, c) {
-            (ref mut a, Natural(Small(small_b)), c) => {
-                a.sub_mul_assign_limb_ref_no_panic(c, *small_b)
-            }
-            (ref mut a, _, Natural(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, *small_c),
+            (a, Natural(Small(small_b)), c) => a.sub_mul_assign_limb_ref_no_panic(c, *small_b),
+            (a, _, Natural(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, *small_c),
             (Natural(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
@@ -108,10 +106,8 @@ impl Natural {
 
     pub(crate) fn sub_mul_assign_ref_val_no_panic(&mut self, b: &Natural, c: Natural) -> bool {
         match (&mut *self, b, &c) {
-            (ref mut a, Natural(Small(small_b)), _) => a.sub_mul_assign_limb_no_panic(c, *small_b),
-            (ref mut a, b, Natural(Small(small_c))) => {
-                a.sub_mul_assign_limb_ref_no_panic(b, *small_c)
-            }
+            (a, Natural(Small(small_b)), _) => a.sub_mul_assign_limb_no_panic(c, *small_b),
+            (a, b, Natural(Small(small_c))) => a.sub_mul_assign_limb_ref_no_panic(b, *small_c),
             (Natural(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
@@ -119,12 +115,8 @@ impl Natural {
 
     pub(crate) fn sub_mul_assign_ref_ref_no_panic(&mut self, b: &Natural, c: &Natural) -> bool {
         match (&mut *self, b, c) {
-            (ref mut a, Natural(Small(small_b)), c) => {
-                a.sub_mul_assign_limb_ref_no_panic(c, *small_b)
-            }
-            (ref mut a, b, Natural(Small(small_c))) => {
-                a.sub_mul_assign_limb_ref_no_panic(b, *small_c)
-            }
+            (a, Natural(Small(small_b)), c) => a.sub_mul_assign_limb_ref_no_panic(c, *small_b),
+            (a, b, Natural(Small(small_c))) => a.sub_mul_assign_limb_ref_no_panic(b, *small_c),
             (Natural(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
@@ -418,11 +410,7 @@ impl CheckedSubMul<&Natural, &Natural> for &Natural {
             (x, Natural(Small(small_y)), z) => x.checked_sub_mul_limb_ref_ref(z, *small_y),
             (x, y, Natural(Small(small_z))) => x.checked_sub_mul_limb_ref_ref(y, *small_z),
             (Natural(Small(_)), _, _) => None,
-            (
-                Natural(Large(ref x_limbs)),
-                Natural(Large(ref y_limbs)),
-                Natural(Large(ref z_limbs)),
-            ) => {
+            (Natural(Large(x_limbs)), Natural(Large(y_limbs)), Natural(Large(z_limbs))) => {
                 if x_limbs.len() >= y_limbs.len() + z_limbs.len() - 1 {
                     limbs_sub_mul(x_limbs, y_limbs, z_limbs).map(Natural::from_owned_limbs_asc)
                 } else {

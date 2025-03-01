@@ -22,12 +22,12 @@ use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_he
 use malachite_float::test_util::generators::primitive_float_unsigned_rounding_mode_triple_gen_var_3;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
+use rug::Assign;
 use rug::float::Round;
 use rug::ops::AssignRound;
-use rug::Assign;
 use std::cmp::{
-    max,
     Ordering::{self, *},
+    max,
 };
 use std::panic::catch_unwind;
 

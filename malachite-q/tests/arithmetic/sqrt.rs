@@ -9,8 +9,8 @@
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, Reciprocal, Square};
 use malachite_base::num::basic::traits::NegativeOne;
 use malachite_nz::test_util::generators::integer_gen_var_4;
-use malachite_q::test_util::generators::rational_gen_var_3;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen_var_3;
 use std::str::FromStr;
 
 #[test]
@@ -47,9 +47,9 @@ fn checked_sqrt_ref_fail() {
 fn checked_sqrt_properties() {
     rational_gen_var_3().test_properties(|n| {
         let sqrt = n.clone().checked_sqrt();
-        assert!(sqrt.as_ref().map_or(true, Rational::is_valid));
+        assert!(sqrt.as_ref().is_none_or(Rational::is_valid));
         let sqrt_alt = (&n).checked_sqrt();
-        assert!(sqrt_alt.as_ref().map_or(true, Rational::is_valid));
+        assert!(sqrt_alt.as_ref().is_none_or(Rational::is_valid));
         assert_eq!(sqrt_alt, sqrt);
         if n != 0 {
             assert_eq!(

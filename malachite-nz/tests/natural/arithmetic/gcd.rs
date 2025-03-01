@@ -17,14 +17,14 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_11,
     unsigned_vec_unsigned_pair_gen_var_23,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::gcd::half_gcd::{
-    limbs_gcd_div, limbs_gcd_reduced, limbs_half_gcd_matrix_1_mul_vector, HalfGcdMatrix,
+    HalfGcdMatrix, limbs_gcd_div, limbs_gcd_reduced, limbs_half_gcd_matrix_1_mul_vector,
 };
 use malachite_nz::natural::arithmetic::gcd::limbs_gcd_limb;
 use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
     limbs_matrix_2_2_mul, limbs_matrix_mul_2_2_scratch_len,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     large_type_gen_var_5, large_type_gen_var_6, large_type_gen_var_7, large_type_gen_var_8,
@@ -34,8 +34,8 @@ use malachite_nz::test_util::generators::{
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::test_util::natural::arithmetic::gcd::half_gcd_matrix_create;
 use malachite_nz::test_util::natural::arithmetic::gcd::{
-    gcd_binary_nz, gcd_euclidean_nz, half_gcd_matrix_1_to_naturals, half_gcd_matrix_to_naturals,
-    limbs_gcd_div_alt, limbs_gcd_div_naive, OwnedHalfGcdMatrix,
+    OwnedHalfGcdMatrix, gcd_binary_nz, gcd_euclidean_nz, half_gcd_matrix_1_to_naturals,
+    half_gcd_matrix_to_naturals, limbs_gcd_div_alt, limbs_gcd_div_naive,
 };
 use num::BigUint;
 use num::Integer as rug_integer;

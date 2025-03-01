@@ -12,7 +12,7 @@ use crate::chars::random::{
     graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
     graphic_weighted_random_char_range, graphic_weighted_random_chars,
 };
-use crate::iterators::{with_special_value, NonzeroValues};
+use crate::iterators::{NonzeroValues, with_special_value};
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -28,50 +28,52 @@ use crate::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom, SplitInHalf,
     WrappingFrom, WrappingInto,
 };
+use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
 use crate::num::random::geometric::{
+    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
     geometric_random_natural_signeds, geometric_random_nonzero_signeds,
     geometric_random_positive_unsigneds, geometric_random_signed_inclusive_range,
     geometric_random_signed_range, geometric_random_signeds,
     geometric_random_unsigned_inclusive_range, geometric_random_unsigned_range,
-    geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
-    GeometricRandomSigneds,
+    geometric_random_unsigneds,
 };
 use crate::num::random::striped::{
-    get_striped_bool_vec, get_striped_unsigned_vec, striped_random_bool_vecs,
-    striped_random_bool_vecs_length_inclusive_range, striped_random_bool_vecs_min_length,
-    striped_random_fixed_length_bool_vecs, striped_random_natural_signeds,
-    striped_random_negative_signeds, striped_random_nonzero_signeds,
-    striped_random_positive_signeds, striped_random_positive_unsigneds,
-    striped_random_signed_inclusive_range, striped_random_signed_range, striped_random_signeds,
-    striped_random_unsigned_bit_chunks, striped_random_unsigned_inclusive_range,
-    striped_random_unsigned_range, striped_random_unsigned_vecs,
-    striped_random_unsigned_vecs_min_length, striped_random_unsigneds, StripedBitSource,
-    StripedRandomSigneds, StripedRandomUnsignedBitChunks, StripedRandomUnsignedInclusiveRange,
+    StripedBitSource, StripedRandomSigneds, StripedRandomUnsignedBitChunks,
+    StripedRandomUnsignedInclusiveRange, get_striped_bool_vec, get_striped_unsigned_vec,
+    striped_random_bool_vecs, striped_random_bool_vecs_length_inclusive_range,
+    striped_random_bool_vecs_min_length, striped_random_fixed_length_bool_vecs,
+    striped_random_natural_signeds, striped_random_negative_signeds,
+    striped_random_nonzero_signeds, striped_random_positive_signeds,
+    striped_random_positive_unsigneds, striped_random_signed_inclusive_range,
+    striped_random_signed_range, striped_random_signeds, striped_random_unsigned_bit_chunks,
+    striped_random_unsigned_inclusive_range, striped_random_unsigned_range,
+    striped_random_unsigned_vecs, striped_random_unsigned_vecs_min_length,
+    striped_random_unsigneds,
 };
 use crate::num::random::{
-    random_finite_primitive_floats, random_nonzero_finite_primitive_floats,
-    random_positive_finite_primitive_floats, random_primitive_float_inclusive_range,
-    random_primitive_float_range, random_primitive_floats, random_unsigneds_less_than,
-    RandomPrimitiveFloatInclusiveRange, VariableRangeGenerator,
+    RandomPrimitiveFloatInclusiveRange, VariableRangeGenerator, random_finite_primitive_floats,
+    random_nonzero_finite_primitive_floats, random_positive_finite_primitive_floats,
+    random_primitive_float_inclusive_range, random_primitive_float_range, random_primitive_floats,
+    random_unsigneds_less_than,
 };
-use crate::random::{Seed, EXAMPLE_SEED};
-use crate::rational_sequences::random::random_rational_sequences;
+use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rational_sequences::RationalSequence;
-use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
+use crate::rational_sequences::random::random_rational_sequences;
 use crate::rounding_modes::RoundingMode::{self, *};
+use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
 use crate::slices::slice_test_zero;
 use crate::strings::random::random_strings_using_chars;
 use crate::test_util::extra_variadic::{
-    random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
-    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyxy, random_quadruples_xyyx,
-    random_quadruples_xyyz, random_quadruples_xyzz, random_sextuples_from_single, random_triples,
-    random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
-    random_union3s, Union3,
+    Union3, random_duodecuples_from_single, random_octuples_from_single,
+    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyx,
+    random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
+    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
+    random_triples_xyx, random_triples_xyy, random_union3s,
 };
 use crate::test_util::generators::common::{
-    reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
+    GenConfig, It, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
 };
 use crate::test_util::generators::{
     digits_valid, float_rounding_mode_filter_var_1, get_two_highest, large_exponent,
@@ -83,11 +85,11 @@ use crate::test_util::generators::{
 };
 use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
-use crate::unions::random::random_union2s;
 use crate::unions::Union2;
-use itertools::repeat_n;
+use crate::unions::random::random_union2s;
 use itertools::Itertools;
-use std::cmp::{max, min, Ordering::*};
+use itertools::repeat_n;
+use std::cmp::{Ordering::*, max, min};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
@@ -3001,6 +3003,19 @@ pub fn special_random_unsigned_gen_var_24<T: PrimitiveUnsigned>(config: &GenConf
         config.get_or("mean_stripe_n", 4),
         config.get_or("mean_stripe_d", 1),
     ))
+}
+
+pub fn special_random_unsigned_gen_var_25<T: PrimitiveUnsigned + IsPrime>(
+    config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 4),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .filter(T::is_prime),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
@@ -7690,7 +7705,7 @@ pub fn special_random_unsigned_vec_pair_gen_var_4<T: PrimitiveUnsigned>(
             config.get_or("mean_length_n", 4),
             config.get_or("mean_length_d", 1),
         ))
-        .filter(|(ref xs, ref es)| {
+        .filter(|(xs, es)| {
             !xs.is_empty()
                 && (es.len() > 1 || es.len() == 1 && es[0] > T::ONE)
                 && *es.last().unwrap() != T::ZERO
@@ -8137,7 +8152,7 @@ pub fn special_random_unsigned_vec_pair_gen_var_33<T: PrimitiveUnsigned>(
                 config.get_or("mean_stripe_d", 1),
             ),
         }
-        .filter(|(ref xs, ref ys): &(Vec<T>, Vec<T>)| {
+        .filter(|(xs, ys): &(Vec<T>, Vec<T>)| {
             (*xs.last().unwrap() != T::ZERO || *ys.last().unwrap() != T::ZERO) && ys[0].odd()
         }),
     )

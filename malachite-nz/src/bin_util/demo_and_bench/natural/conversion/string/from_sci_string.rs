@@ -10,7 +10,7 @@ use malachite_base::num::conversion::traits::FromSciString;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_string_len_bucketer, string_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,

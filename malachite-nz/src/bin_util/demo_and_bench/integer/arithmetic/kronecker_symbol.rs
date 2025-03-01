@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{JacobiSymbol, KroneckerSymbol};
 use malachite_base::test_util::bench::bucketers::quadruple_1_3_vec_max_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::large_type_gen_var_27;
 use malachite_base::test_util::runner::Runner;

@@ -13,6 +13,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_same_length_in_place_left,
@@ -44,11 +46,9 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
 use crate::platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
 use alloc::vec::Vec;
-use core::cmp::{max, min, Ordering::*};
+use core::cmp::{Ordering::*, max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, WrappingNegAssign,

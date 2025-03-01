@@ -6,11 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::is_power_of_2::abs_is_power_of_2;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{float_either_infinity, float_either_zero, float_nan, Float};
-use core::cmp::max;
+use crate::arithmetic::is_power_of_2::abs_is_power_of_2;
+use crate::{Float, float_either_infinity, float_either_zero, float_nan};
 use core::cmp::Ordering::{self, *};
+use core::cmp::max;
 use core::mem::swap;
 use core::ops::{Div, DivAssign};
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, IsPowerOf2, NegAssign, Sign};
@@ -2033,10 +2033,10 @@ impl Float {
             }
             (
                 Float(Finite {
-                    sign: ref mut x_sign,
-                    exponent: ref mut x_exp,
-                    precision: ref mut x_prec,
-                    significand: ref mut x,
+                    sign: x_sign,
+                    exponent: x_exp,
+                    precision: x_prec,
+                    significand: x,
                 }),
                 Float(Finite {
                     sign: y_sign,
@@ -2061,11 +2061,7 @@ impl Float {
                     .checked_add(i32::exact_from(exp_offset))
                     .unwrap();
                 *x_prec = prec;
-                if sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if sign { o } else { o.reverse() }
             }
         }
     }
@@ -2202,10 +2198,10 @@ impl Float {
             }
             (
                 Float(Finite {
-                    sign: ref mut x_sign,
-                    exponent: ref mut x_exp,
-                    precision: ref mut x_prec,
-                    significand: ref mut x,
+                    sign: x_sign,
+                    exponent: x_exp,
+                    precision: x_prec,
+                    significand: x,
                 }),
                 Float(Finite {
                     sign: y_sign,
@@ -2230,11 +2226,7 @@ impl Float {
                     .checked_add(i32::exact_from(exp_offset))
                     .unwrap();
                 *x_prec = prec;
-                if sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if sign { o } else { o.reverse() }
             }
         }
     }

@@ -323,11 +323,7 @@ pub trait PrimitiveFloat:
     /// ```
     #[inline]
     fn abs_negative_zero(self) -> Self {
-        if self == Self::ZERO {
-            Self::ZERO
-        } else {
-            self
-        }
+        if self == Self::ZERO { Self::ZERO } else { self }
     }
 
     /// If `self` is negative zero, replaces it with positive zero; otherwise, leaves `self`

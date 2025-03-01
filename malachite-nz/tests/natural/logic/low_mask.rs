@@ -10,8 +10,8 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::{BitScan, CountOnes, LowMask};
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_9};
-use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]

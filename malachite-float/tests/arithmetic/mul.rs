@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::{
-    max,
     Ordering::{self, *},
+    max,
 };
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -19,8 +19,8 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::arithmetic::mul::{
@@ -43,9 +43,9 @@ use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_22, float_float_rounding_mode_triple_gen_var_31,
     float_float_unsigned_rounding_mode_quadruple_gen_var_3,
     float_float_unsigned_rounding_mode_quadruple_gen_var_7, float_float_unsigned_triple_gen_var_1,
-    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_10,
-    float_pair_gen_var_2, float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5,
-    float_pair_gen_var_6, float_pair_gen_var_7, float_rational_pair_gen,
+    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_2,
+    float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5, float_pair_gen_var_6,
+    float_pair_gen_var_7, float_pair_gen_var_10, float_rational_pair_gen,
     float_rational_rounding_mode_triple_gen_var_4,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_3,
     float_rational_unsigned_triple_gen_var_1, float_rounding_mode_pair_gen,
@@ -54,8 +54,8 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
-use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

@@ -18,7 +18,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::integer::arithmetic::add::integer_sum_alt;
 use num::BigInt;
-use std::iter::{once, Sum};
+use std::iter::{Sum, once};
 use std::str::FromStr;
 
 #[test]

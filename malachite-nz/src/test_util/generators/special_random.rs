@@ -6,12 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer::Integer;
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer::random::{
-    striped_random_integers, striped_random_natural_integers, striped_random_negative_integers,
-    striped_random_nonzero_integers, StripedRandomIntegers,
+    StripedRandomIntegers, striped_random_integers, striped_random_natural_integers,
+    striped_random_negative_integers, striped_random_nonzero_integers,
 };
-use crate::integer::Integer;
+use crate::natural::Natural;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -30,6 +31,8 @@ use crate::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use crate::natural::arithmetic::mul::toom::{
+    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_32_input_sizes_valid,
     limbs_mul_greater_to_out_toom_33_input_sizes_valid,
@@ -41,23 +44,20 @@ use crate::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_54_input_sizes_valid,
     limbs_mul_greater_to_out_toom_62_input_sizes_valid,
     limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
 use crate::natural::arithmetic::square::{
     limbs_square_to_out_toom_3_input_size_valid, limbs_square_to_out_toom_4_input_size_valid,
     limbs_square_to_out_toom_6_input_size_valid, limbs_square_to_out_toom_8_input_size_valid,
 };
 use crate::natural::conversion::digits::general_digits::{
-    limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
+    GET_STR_PRECOMPUTE_THRESHOLD, limbs_digit_count, limbs_per_digit_in_base,
 };
 use crate::natural::random::{
+    StripedRandomNaturalInclusiveRange, StripedRandomNaturalRangeToInfinity, StripedRandomNaturals,
     get_striped_random_natural_with_bits, get_striped_random_natural_with_up_to_bits,
     striped_random_natural_range, striped_random_natural_range_to_infinity,
-    striped_random_naturals, striped_random_positive_naturals, StripedRandomNaturalInclusiveRange,
-    StripedRandomNaturalRangeToInfinity, StripedRandomNaturals,
+    striped_random_naturals, striped_random_positive_naturals,
 };
-use crate::natural::Natural;
 use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
@@ -72,9 +72,9 @@ use crate::test_util::generators::exhaustive::{
     map_helper_1, map_helper_2, map_helper_3, round_to_multiple_integer_filter_map,
     round_to_multiple_natural_filter_map,
 };
-use crate::test_util::generators::{factors_of_limb_max, T8};
-use crate::test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
-use malachite_base::bools::random::{random_bools, RandomBools};
+use crate::test_util::generators::{T8, factors_of_limb_max};
+use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
@@ -85,8 +85,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
+use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, ToSci, WrappingFrom,
 };
@@ -94,45 +94,45 @@ use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
 use malachite_base::num::random::geometric::{
+    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_signeds,
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
-    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
 };
 use malachite_base::num::random::striped::{
+    StripedBitSource, StripedRandomUnsignedBitChunks, StripedRandomUnsignedVecs,
     get_striped_bool_vec, get_striped_unsigned_vec, striped_random_natural_signeds,
     striped_random_positive_unsigneds, striped_random_signeds, striped_random_unsigned_bit_chunks,
     striped_random_unsigned_inclusive_range, striped_random_unsigned_vecs,
     striped_random_unsigned_vecs_length_range, striped_random_unsigned_vecs_min_length,
-    striped_random_unsigneds, StripedBitSource, StripedRandomUnsignedBitChunks,
-    StripedRandomUnsignedVecs,
+    striped_random_unsigneds,
 };
 use malachite_base::num::random::{
-    random_primitive_floats, random_unsigneds_less_than, RandomUnsignedRange,
-    RandomUnsignedsLessThan,
+    RandomUnsignedRange, RandomUnsignedsLessThan, random_primitive_floats,
+    random_unsigneds_less_than,
 };
-use malachite_base::options::random::{random_options, RandomOptions};
-use malachite_base::random::{Seed, EXAMPLE_SEED};
+use malachite_base::options::random::{RandomOptions, random_options};
+use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rational_sequences::RationalSequence;
-use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{
-    permute_1_3_2, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4, GenConfig, It,
+    GenConfig, It, permute_1_3_2, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4,
 };
 use malachite_base::test_util::generators::random::get_two_highest;
 use malachite_base::test_util::generators::special_random::{
-    special_random_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecPairLenGenerator1,
-    UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
+    UnsignedVecPairLenGenerator1, UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
     UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
+    special_random_unsigned_vec_unsigned_pair_gen_var_17,
 };
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
-use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
+use malachite_base::unions::random::random_union2s;
 use malachite_base::vecs::random::random_vecs;
-use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
+use malachite_base::vecs::{RandomValuesFromVec, random_values_from_vec};
 use num::{BigInt, BigUint};
-use std::cmp::{max, Ordering::*};
+use std::cmp::{Ordering::*, max};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};

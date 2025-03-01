@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::{natural_bit_bucketer, natural_bit_ratio_bucketer};

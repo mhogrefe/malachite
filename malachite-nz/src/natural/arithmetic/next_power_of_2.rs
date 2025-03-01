@@ -176,7 +176,7 @@ impl NextPowerOf2 for &Natural {
     /// );
     /// ```
     fn next_power_of_2(self) -> Natural {
-        Natural(match *self {
+        Natural(match self {
             Natural(Small(small)) => {
                 if let Some(result) = small.checked_next_power_of_two() {
                     Small(result)
@@ -184,7 +184,7 @@ impl NextPowerOf2 for &Natural {
                     Large(vec![0, 1])
                 }
             }
-            Natural(Large(ref limbs)) => Large(limbs_next_power_of_2(limbs)),
+            Natural(Large(limbs)) => Large(limbs_next_power_of_2(limbs)),
         })
     }
 }
@@ -220,15 +220,15 @@ impl NextPowerOf2Assign for Natural {
     /// assert_eq!(x, 1099511627776u64);
     /// ```
     fn next_power_of_2_assign(&mut self) {
-        match *self {
-            Natural(Small(ref mut small)) => {
+        match self {
+            Natural(Small(small)) => {
                 if let Some(pow) = small.checked_next_power_of_two() {
                     *small = pow;
                 } else {
                     *self = Natural(Large(vec![0, 1]));
                 }
             }
-            Natural(Large(ref mut limbs)) => {
+            Natural(Large(limbs)) => {
                 limbs_vec_next_power_of_2_in_place(limbs);
             }
         }

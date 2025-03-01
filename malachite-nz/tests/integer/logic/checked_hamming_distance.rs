@@ -13,10 +13,10 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_pair_gen, unsigned_vec_pair_gen_var_8, unsigned_vec_unsigned_pair_gen_var_19,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::checked_hamming_distance::{
     limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{

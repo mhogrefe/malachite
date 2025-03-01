@@ -9,7 +9,7 @@
 use itertools::Itertools;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base::test_util::bench::bucketers::vec_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{bool_vec_gen, bool_vec_gen_var_5};
 use malachite_base::test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};

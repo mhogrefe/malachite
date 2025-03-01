@@ -17,7 +17,7 @@ use malachite_base::test_util::bench::bucketers::{
     pair_1_primitive_float_bucketer, primitive_float_bucketer, triple_1_primitive_float_bucketer,
     unsigned_bit_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, primitive_float_signed_pair_gen_var_1,

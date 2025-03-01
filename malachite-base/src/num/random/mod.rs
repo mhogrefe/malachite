@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{random_bools, RandomBools};
+use crate::bools::random::{RandomBools, random_bools};
 use crate::iterators::{
-    nonzero_values, with_special_value, with_special_values, NonzeroValues, WithSpecialValue,
-    WithSpecialValues,
+    NonzeroValues, WithSpecialValue, WithSpecialValues, nonzero_values, with_special_value,
+    with_special_values,
 };
 use crate::num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
 use crate::num::basic::floats::PrimitiveFloat;
@@ -18,15 +18,16 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::float::NiceFloat;
-use crate::num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
+use crate::num::iterators::{IteratorToBitChunks, iterator_to_bit_chunks};
 use crate::num::logic::traits::{BitAccess, SignificantBits};
 use crate::num::random::geometric::{
+    GeometricRandomNaturalValues, GeometricRandomSignedRange,
     geometric_random_signed_inclusive_range, geometric_random_unsigned_inclusive_range,
-    geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    geometric_random_unsigneds,
 };
-use crate::random::{Seed, EXAMPLE_SEED};
+use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::*;
-use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
+use crate::vecs::{RandomValuesFromVec, random_values_from_vec};
 use itertools::Itertools;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
@@ -62,7 +63,7 @@ macro_rules! impl_trivial_random_primitive_ints {
 
             #[inline]
             fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> $t {
-                rng.gen()
+                rng.r#gen()
             }
         }
     };
@@ -78,7 +79,7 @@ impl_trivial_random_primitive_ints!(isize);
 
 fn get_random<T: PrimitiveInt>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
     if state.bits_left == 0 {
-        state.x = rng.gen();
+        state.x = rng.r#gen();
         state.bits_left = u32::WIDTH - T::WIDTH;
     } else {
         state.x >>= T::WIDTH;
@@ -142,11 +143,11 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
 
     #[inline]
     fn next(&mut self) -> Option<T> {
-        match *self {
+        match self {
             RandomUnsignedsLessThan::One => Some(T::ZERO),
-            RandomUnsignedsLessThan::AtLeastTwo(ref mut xs, limit) => loop {
+            RandomUnsignedsLessThan::AtLeastTwo(xs, limit) => loop {
                 let x = xs.next();
-                if x.unwrap() < limit {
+                if x.unwrap() < *limit {
                     return x;
                 }
             },
@@ -198,7 +199,7 @@ pub trait HasRandomSignedRange: Sized {
     type UnsignedValue: PrimitiveUnsigned;
 
     fn new_unsigned_range(seed: Seed, a: Self, b: Self)
-        -> RandomUnsignedRange<Self::UnsignedValue>;
+    -> RandomUnsignedRange<Self::UnsignedValue>;
 
     fn new_unsigned_inclusive_range(
         seed: Seed,
@@ -2132,15 +2133,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFiniteFloatInclusiveRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            SpecialRandomFiniteFloatInclusiveRange::AllPositive(ref mut xs) => xs.next(),
-            SpecialRandomFiniteFloatInclusiveRange::AllNegative(ref mut xs) => {
-                xs.next().map(|x| -x)
-            }
-            SpecialRandomFiniteFloatInclusiveRange::PositiveAndNegative(
-                ref mut bs,
-                ref mut xs,
-                ref mut ys,
-            ) => {
+            SpecialRandomFiniteFloatInclusiveRange::AllPositive(xs) => xs.next(),
+            SpecialRandomFiniteFloatInclusiveRange::AllNegative(xs) => xs.next().map(|x| -x),
+            SpecialRandomFiniteFloatInclusiveRange::PositiveAndNegative(bs, xs, ys) => {
                 if bs.next().unwrap() {
                     xs.next()
                 } else {
@@ -2231,9 +2226,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            SpecialRandomFloatInclusiveRange::OnlySpecial(ref mut xs) => xs.next(),
-            SpecialRandomFloatInclusiveRange::NoSpecial(ref mut xs) => xs.next(),
-            SpecialRandomFloatInclusiveRange::Special(ref mut xs) => xs.next(),
+            SpecialRandomFloatInclusiveRange::OnlySpecial(xs) => xs.next(),
+            SpecialRandomFloatInclusiveRange::NoSpecial(xs) => xs.next(),
+            SpecialRandomFloatInclusiveRange::Special(xs) => xs.next(),
         }
     }
 }

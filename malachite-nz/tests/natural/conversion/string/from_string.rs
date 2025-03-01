@@ -13,7 +13,7 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::exhaustive::valid_digit_chars;
 use malachite_base::test_util::generators::{
     string_gen, string_gen_var_3, string_gen_var_5, string_gen_var_6, string_gen_var_7,
-    unsigned_gen, unsigned_gen_var_11, unsigned_pair_gen_var_19, unsigned_pair_gen_var_8,
+    unsigned_gen, unsigned_gen_var_11, unsigned_pair_gen_var_8, unsigned_pair_gen_var_19,
     unsigned_string_pair_gen_var_1, unsigned_string_pair_gen_var_2,
 };
 use malachite_nz::natural::Natural;

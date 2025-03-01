@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{significand_bits, Float};
+use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -55,11 +55,7 @@ impl PartialOrd<Rational> for Float {
                 }),
                 y,
             ) => Some(if *y == 0u32 {
-                if *s_x {
-                    Greater
-                } else {
-                    Less
-                }
+                if *s_x { Greater } else { Less }
             } else {
                 let s_cmp = s_x.cmp(&(*y > 0));
                 if s_cmp != Equal {
@@ -87,11 +83,7 @@ impl PartialOrd<Rational> for Float {
                         }
                     }
                 };
-                if *s_x {
-                    prod_cmp
-                } else {
-                    prod_cmp.reverse()
-                }
+                if *s_x { prod_cmp } else { prod_cmp.reverse() }
             }),
         }
     }

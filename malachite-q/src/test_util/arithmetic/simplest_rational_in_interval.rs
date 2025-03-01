@@ -6,16 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::conversion::traits::ContinuedFraction;
 use crate::Rational;
+use crate::conversion::traits::ContinuedFraction;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Reciprocal, RoundToMultiple};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 use malachite_nz::natural::Natural;
-use std::cmp::{min, Ordering::*};
+use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
+use std::cmp::{Ordering::*, min};
 
 // Slow! Only run for rationals with small denominators
 pub fn simplest_rational_in_open_interval_naive(x: &Rational, y: &Rational) -> Rational {
@@ -126,11 +126,7 @@ pub fn simplest_rational_in_open_interval_explicit(x: &Rational, y: &Rational) -
         }
     }
     let best = best.unwrap();
-    if neg {
-        -best
-    } else {
-        best
-    }
+    if neg { -best } else { best }
 }
 
 // Slow! Only run for rationals with small denominators

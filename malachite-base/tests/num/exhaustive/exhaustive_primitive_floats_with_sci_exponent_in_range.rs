@@ -253,34 +253,26 @@ fn exhaustive_primitive_floats_with_sci_exponent_in_range_fail_helper<T: Primiti
         0,
     )
     .for_each(|_| {}));
-    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
-        T::ONE,
-        T::INFINITY,
-        0,
-    )
-    .for_each(|_| {}));
+    assert_panic!(
+        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::ONE, T::INFINITY, 0,)
+            .for_each(|_| {})
+    );
     assert_panic!(
         exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::ONE, T::NAN, 0)
             .for_each(|_| {})
     );
-    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
-        T::from(1.2),
-        T::from(1.1),
-        0,
-    )
-    .for_each(|_| {}));
-    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
-        T::from(1.1),
-        T::from(1.2),
-        1,
-    )
-    .for_each(|_| {}));
-    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
-        T::from(0.1),
-        T::from(1.2),
-        1,
-    )
-    .for_each(|_| {}));
+    assert_panic!(
+        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::from(1.2), T::from(1.1), 0,)
+            .for_each(|_| {})
+    );
+    assert_panic!(
+        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::from(1.1), T::from(1.2), 1,)
+            .for_each(|_| {})
+    );
+    assert_panic!(
+        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::from(0.1), T::from(1.2), 1,)
+            .for_each(|_| {})
+    );
 }
 
 #[test]

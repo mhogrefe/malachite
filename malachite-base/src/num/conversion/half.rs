@@ -11,7 +11,7 @@ use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingF
 
 #[inline]
 fn join_halves<T: From<H> + PrimitiveUnsigned, H: PrimitiveUnsigned>(upper: H, lower: H) -> T {
-    T::from(upper) << H::WIDTH | T::from(lower)
+    (T::from(upper) << H::WIDTH) | T::from(lower)
 }
 
 #[inline]

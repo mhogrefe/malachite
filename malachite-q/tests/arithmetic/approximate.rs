@@ -13,13 +13,13 @@ use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_q::Rational;
 use malachite_q::arithmetic::traits::{Approximate, ApproximateAssign};
 use malachite_q::test_util::arithmetic::approximate::approximate_naive;
 use malachite_q::test_util::generators::{
     rational_gen, rational_natural_natural_triple_gen_var_1, rational_natural_pair_gen_var_3,
     rational_natural_pair_gen_var_4,
 };
-use malachite_q::Rational;
 use std::str::FromStr;
 
 #[test]

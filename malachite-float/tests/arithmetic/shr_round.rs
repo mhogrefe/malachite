@@ -16,8 +16,8 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_rounding_mode_pair_gen_var_5,
     unsigned_rounding_mode_pair_gen, unsigned_rounding_mode_pair_gen_var_5,

@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::itertools::Itertools;
 use crate::Rational;
+use crate::itertools::Itertools;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
+use malachite_base::test_util::stats::moments::{MomentStats, moment_stats};
 
 pub fn random_rationals_helper_helper<I: Clone + Iterator<Item = Rational>>(
     xs: I,

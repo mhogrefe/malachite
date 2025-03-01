@@ -23,11 +23,7 @@ fn index_of_next_true_bit_unsigned<T: PrimitiveUnsigned>(x: T, start: u64) -> Op
         None
     } else {
         let index = TrailingZeros::trailing_zeros(x & !T::low_mask(start));
-        if index == T::WIDTH {
-            None
-        } else {
-            Some(index)
-        }
+        if index == T::WIDTH { None } else { Some(index) }
     }
 }
 
@@ -74,35 +70,19 @@ apply_to_unsigneds!(impl_bit_scan_unsigned);
 
 fn index_of_next_false_bit_signed<T: PrimitiveSigned>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
-        if x >= T::ZERO {
-            Some(start)
-        } else {
-            None
-        }
+        if x >= T::ZERO { Some(start) } else { None }
     } else {
         let index = TrailingZeros::trailing_zeros(!(x | T::low_mask(start)));
-        if index == T::WIDTH {
-            None
-        } else {
-            Some(index)
-        }
+        if index == T::WIDTH { None } else { Some(index) }
     }
 }
 
 fn index_of_next_true_bit_signed<T: PrimitiveSigned>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
-        if x >= T::ZERO {
-            None
-        } else {
-            Some(start)
-        }
+        if x >= T::ZERO { None } else { Some(start) }
     } else {
         let index = TrailingZeros::trailing_zeros(x & !T::low_mask(start));
-        if index == T::WIDTH {
-            None
-        } else {
-            Some(index)
-        }
+        if index == T::WIDTH { None } else { Some(index) }
     }
 }
 

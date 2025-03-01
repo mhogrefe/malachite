@@ -17,11 +17,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_neg<T: PrimitiveUnsigned>(x: T, m: T) -> T {
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
-    if x == T::ZERO {
-        T::ZERO
-    } else {
-        m - x
-    }
+    if x == T::ZERO { T::ZERO } else { m - x }
 }
 
 fn mod_neg_assign<T: PrimitiveUnsigned>(x: &mut T, m: T) {

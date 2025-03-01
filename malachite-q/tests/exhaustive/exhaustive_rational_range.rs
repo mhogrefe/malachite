@@ -9,8 +9,8 @@
 use itertools::Itertools;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::strings::ToDebugString;
-use malachite_q::exhaustive::exhaustive_rational_range;
 use malachite_q::Rational;
+use malachite_q::exhaustive::exhaustive_rational_range;
 use std::str::FromStr;
 
 fn exhaustive_rational_range_helper(a: &str, b: &str, values: &str) {

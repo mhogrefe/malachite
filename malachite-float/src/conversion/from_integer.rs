@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Float;
 use crate::conversion::from_natural::{
     from_natural_prec_round_zero_exponent, from_natural_zero_exponent,
 };
-use crate::Float;
 use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{FloorLogBase2, UnsignedAbs};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom};
@@ -20,11 +20,7 @@ use malachite_q::conversion::primitive_float_from_rational::FloatConversionError
 pub(crate) fn from_integer_zero_exponent(n: Integer) -> Float {
     let sign = n >= 0;
     let f = from_natural_zero_exponent(n.unsigned_abs());
-    if sign {
-        f
-    } else {
-        -f
-    }
+    if sign { f } else { -f }
 }
 
 pub(crate) fn from_integer_prec_round_zero_exponent(
@@ -35,11 +31,7 @@ pub(crate) fn from_integer_prec_round_zero_exponent(
     let sign = x >= 0;
     let (f, o) =
         from_natural_prec_round_zero_exponent(x.unsigned_abs(), prec, if sign { rm } else { -rm });
-    if sign {
-        (f, o)
-    } else {
-        (-f, o.reverse())
-    }
+    if sign { (f, o) } else { (-f, o.reverse()) }
 }
 
 impl Float {
@@ -116,11 +108,7 @@ impl Float {
         let sign = x >= 0;
         let (f, o) =
             Float::from_natural_prec_round(x.unsigned_abs(), prec, if sign { rm } else { -rm });
-        if sign {
-            (f, o)
-        } else {
-            (-f, o.reverse())
-        }
+        if sign { (f, o) } else { (-f, o.reverse()) }
     }
 
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference. If the
@@ -203,11 +191,7 @@ impl Float {
             prec,
             if sign { rm } else { -rm },
         );
-        if sign {
-            (f, o)
-        } else {
-            (-f, o.reverse())
-        }
+        if sign { (f, o) } else { (-f, o.reverse()) }
     }
 
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`] is
@@ -334,11 +318,7 @@ impl Float {
     pub fn from_integer_prec_ref(x: &Integer, prec: u64) -> (Float, Ordering) {
         let sign = *x >= 0;
         let (f, o) = Float::from_natural_prec_ref(x.unsigned_abs_ref(), prec);
-        if sign {
-            (f, o)
-        } else {
-            (-f, o.reverse())
-        }
+        if sign { (f, o) } else { (-f, o.reverse()) }
     }
 }
 

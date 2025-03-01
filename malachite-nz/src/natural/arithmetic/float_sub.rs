@@ -12,8 +12,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use crate::natural::arithmetic::float_extras::{round_helper_even, MPFR_EVEN_INEX};
+use crate::natural::arithmetic::float_extras::{MPFR_EVEN_INEX, round_helper_even};
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
@@ -21,12 +23,10 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, sub_with_carry,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::{
-    max,
     Ordering::{self, *},
+    max,
 };
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
@@ -679,7 +679,7 @@ fn sub_float_significands_in_place_same_prec_ref(
     rm: RoundingMode,
 ) -> (Ordering, bool) {
     match (&mut *x, y) {
-        (Natural(Small(ref mut x)), Natural(Small(y))) => {
+        (Natural(Small(x)), Natural(Small(y))) => {
             let (diff, diff_exp, o, neg) = if prec == Limb::WIDTH {
                 sub_float_significands_same_prec_w(*x, *x_exp, *y, y_exp, rm)
             } else {

@@ -27,11 +27,11 @@ use crate::num::factorization::traits::{Factor, IsPrime, Primes};
 use crate::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use core::mem::swap;
 
-const MAX_FACTORS_IN_U8: usize = 4;
-const MAX_FACTORS_IN_U16: usize = 6;
-const MAX_FACTORS_IN_U32: usize = 9;
-const MAX_FACTORS_IN_U64: usize = 15;
-const MAX_FACTORS_IN_USIZE: usize = 15;
+pub(crate) const MAX_FACTORS_IN_U8: usize = 4;
+pub(crate) const MAX_FACTORS_IN_U16: usize = 6;
+pub(crate) const MAX_FACTORS_IN_U32: usize = 9;
+pub(crate) const MAX_FACTORS_IN_U64: usize = 15;
+pub(crate) const MAX_FACTORS_IN_USIZE: usize = 15;
 
 /// A struct that contains the prime factorization of an integer. See implementations of the
 /// [`Factor`] trait for more information.
@@ -479,11 +479,7 @@ fn pp1_factor_u64(mut n: u64, mut x: u64, norm: u64) -> u64 {
         x >>= norm;
     }
     x.mod_sub_assign(2, n);
-    if x == 0 {
-        0
-    } else {
-        n.gcd(x)
-    }
+    if x == 0 { 0 } else { n.gcd(x) }
 }
 
 // This is n_pp1_find_power when FLINT64 is true, from ulong_extras/factor_pp1.c, FLINT 3.1.2,
@@ -768,11 +764,7 @@ fn factor_squfof_u64(n: u64, iters: usize) -> u64 {
             }
         }
     }
-    if finished_loop {
-        0
-    } else {
-        factor
-    }
+    if finished_loop { 0 } else { factor }
 }
 
 const FACTOR_TRIAL_PRIMES: usize = 3000;
@@ -787,6 +779,9 @@ impl Factor for u8 {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0.
     ///
     /// # Examples
     /// ```
@@ -814,25 +809,25 @@ impl Factor for u8 {
                 return factors;
             }
         }
-        let mut e = 0;
+        let mut e;
         let (q, r) = n.div_mod(3);
         if r == 0 {
-            e += 1;
+            e = 1;
             n = q;
             let (q, r) = n.div_mod(3);
             if r == 0 {
-                e += 1;
+                e = 2;
                 n = q;
                 let (q, r) = n.div_mod(3);
                 if r == 0 {
-                    e += 1;
+                    e = 3;
                     n = q;
                     let (q, r) = n.div_mod(3);
                     if r == 0 {
-                        e += 1;
+                        e = 4;
                         n = q;
                         if n == 3 {
-                            e += 1;
+                            e = 5;
                             n = 1;
                         }
                     }
@@ -843,17 +838,16 @@ impl Factor for u8 {
                 return factors;
             }
         }
-        e = 0;
         let (q, r) = n.div_mod(5);
         if r == 0 {
-            e += 1;
+            e = 1;
             n = q;
             let (q, r) = n.div_mod(5);
             if r == 0 {
-                e += 1;
+                e = 2;
                 n = q;
                 if n == 5 {
-                    e += 1;
+                    e = 3;
                     n = 1;
                 }
             }
@@ -862,13 +856,12 @@ impl Factor for u8 {
                 return factors;
             }
         }
-        e = 0;
         let (q, r) = n.div_mod(7);
         if r == 0 {
-            e += 1;
+            e = 1;
             n = q;
             if n == 7 {
-                e += 1;
+                e = 2;
                 n = 1;
             }
             factors.insert(7, e);
@@ -923,11 +916,14 @@ impl Factor for u16 {
     /// primes are in ascending order.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(e^{n/4})$
+    /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(e^n)$
+    /// $M(n) = O(2^n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0.
     ///
     /// # Examples
     /// ```
@@ -957,11 +953,14 @@ impl Factor for u32 {
     /// primes are in ascending order.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(e^{n/4})$
+    /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(e^n)$
+    /// $M(n) = O(2^n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0.
     ///
     /// # Examples
     /// ```
@@ -1038,11 +1037,14 @@ impl Factor for u64 {
     /// primes are in ascending order.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(e^{n/4})$
+    /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(e^n)$
+    /// $M(n) = O(2^n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0.
     ///
     /// # Examples
     /// ```
@@ -1124,11 +1126,14 @@ impl Factor for usize {
     /// The primes are in ascending order.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(e^{n/4})$
+    /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(e^n)$
+    /// $M(n) = O(2^n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0.
     ///
     /// # Examples
     /// ```

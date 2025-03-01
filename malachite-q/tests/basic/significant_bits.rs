@@ -8,8 +8,8 @@
 
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen;
 use std::str::FromStr;
 
 #[test]

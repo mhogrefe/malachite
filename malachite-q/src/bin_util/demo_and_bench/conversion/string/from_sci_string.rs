@@ -11,7 +11,7 @@ use malachite_base::num::conversion::traits::FromSciString;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_string_len_bucketer, string_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     string_gen_var_14, string_gen_var_15, string_unsigned_pair_gen_var_1,

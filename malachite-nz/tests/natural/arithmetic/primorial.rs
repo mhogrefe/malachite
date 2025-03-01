@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::Primorial;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::{IsPrime, Primes};
 use malachite_base::test_util::generators::{
-    unsigned_gen_var_27, unsigned_gen_var_28, unsigned_gen_var_5,
+    unsigned_gen_var_5, unsigned_gen_var_27, unsigned_gen_var_28,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

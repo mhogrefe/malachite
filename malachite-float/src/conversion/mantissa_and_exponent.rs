@@ -9,8 +9,8 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
 use core::cmp::{
-    min,
     Ordering::{self, *},
+    min,
 };
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;

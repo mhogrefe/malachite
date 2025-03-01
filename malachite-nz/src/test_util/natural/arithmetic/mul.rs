@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
-use crate::natural::Natural;
 use crate::platform::{Limb, MUL_TOOM22_THRESHOLD};
 use malachite_base::num::basic::traits::{One, Zero};
 

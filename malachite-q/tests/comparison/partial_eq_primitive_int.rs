@@ -9,8 +9,8 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
-use malachite_q::test_util::generators::{rational_signed_pair_gen, rational_unsigned_pair_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_signed_pair_gen, rational_unsigned_pair_gen};
 use rug;
 use std::str::FromStr;
 

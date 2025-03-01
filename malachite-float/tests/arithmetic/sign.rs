@@ -10,9 +10,9 @@ use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::NaN;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::primitive_float_gen_var_11;
-use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::{float_gen_var_14, float_gen_var_2, float_gen_var_3};
 use malachite_float::Float;
+use malachite_float::test_util::common::parse_hex_string;
+use malachite_float::test_util::generators::{float_gen_var_2, float_gen_var_3, float_gen_var_14};
 use malachite_q::Rational;
 use std::cmp::Ordering::*;
 

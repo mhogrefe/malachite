@@ -98,11 +98,7 @@ fn shr_round_assign_unsigned_unsigned<
         Down | Floor => {
             let original = *x;
             *x >>= bits;
-            if *x << bits == original {
-                Equal
-            } else {
-                Less
-            }
+            if *x << bits == original { Equal } else { Less }
         }
         Up | Ceiling if bits >= width => {
             *x = T::ONE;
@@ -135,11 +131,7 @@ fn shr_round_assign_unsigned_unsigned<
             *x >>= 1;
             if old_x.even() {
                 // round down
-                if bm1_zeros {
-                    Equal
-                } else {
-                    Less
-                }
+                if bm1_zeros { Equal } else { Less }
             } else if !bm1_zeros {
                 // round up
                 *x += T::ONE;

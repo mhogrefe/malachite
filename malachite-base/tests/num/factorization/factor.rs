@@ -14,6 +14,7 @@ use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 use malachite_base::num::factorization::traits::{Factor, IsPrime};
 use malachite_base::test_util::generators::unsigned_gen_var_1;
 use malachite_base::test_util::num::factorization::factor::factor_naive;
+use std::panic::catch_unwind;
 
 fn factor_helper<T: Factor + PrimitiveUnsigned>()
 where
@@ -714,6 +715,19 @@ fn test_factor() {
     factor_helper::<u32>();
     factor_helper::<u64>();
     factor_helper::<usize>();
+}
+
+fn factor_fail_helper<T: Factor + PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.factor());
+}
+
+#[test]
+pub fn factor_fail() {
+    factor_fail_helper::<u8>();
+    factor_fail_helper::<u16>();
+    factor_fail_helper::<u32>();
+    factor_fail_helper::<u64>();
+    factor_fail_helper::<usize>();
 }
 
 fn factor_properties_helper_helper<T: Factor + IsPrime + PrimitiveUnsigned>(n: T, test_naive: bool)

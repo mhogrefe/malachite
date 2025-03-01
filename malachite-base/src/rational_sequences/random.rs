@@ -9,7 +9,7 @@
 use crate::num::random::geometric::GeometricRandomNaturalValues;
 use crate::random::Seed;
 use crate::rational_sequences::RationalSequence;
-use crate::vecs::random::{random_vecs, RandomVecs};
+use crate::vecs::random::{RandomVecs, random_vecs};
 
 /// Generates random [`RationalSequence`]s, given an iterator of random elements.
 ///

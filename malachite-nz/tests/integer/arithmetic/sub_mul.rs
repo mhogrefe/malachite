@@ -13,12 +13,12 @@ use malachite_base::test_util::generators::{
     signed_triple_gen, signed_triple_gen_var_2, unsigned_vec_triple_gen_var_39,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
     limbs_overflowing_sub_mul_limb_in_place_left, limbs_overflowing_sub_mul_limb_in_place_right,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen, integer_triple_gen};

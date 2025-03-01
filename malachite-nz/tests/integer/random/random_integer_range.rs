@@ -9,8 +9,8 @@
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
-use malachite_nz::integer::random::random_integer_range;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::random::random_integer_range;
 use malachite_nz::test_util::integer::random::random_integers_helper_helper;
 use std::str::FromStr;
 

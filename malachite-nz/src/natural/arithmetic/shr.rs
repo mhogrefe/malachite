@@ -155,7 +155,7 @@ where
         (_, bits) if bits == T::ZERO => x.clone(),
         (Natural(Small(_)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => Natural::ZERO,
         (Natural(Small(small)), bits) => Natural(Small(*small >> bits)),
-        (Natural(Large(ref limbs)), bits) => {
+        (Natural(Large(limbs)), bits) => {
             Natural::from_owned_limbs_asc(limbs_shr(limbs, u64::exact_from(bits)))
         }
     }
@@ -169,13 +169,13 @@ where
     match (&mut *x, bits) {
         (&mut Natural::ZERO, _) => {}
         (_, bits) if bits == T::ZERO => {}
-        (Natural(Small(ref mut small)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => {
+        (Natural(Small(small)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => {
             *small = 0;
         }
-        (Natural(Small(ref mut small)), bits) => {
+        (Natural(Small(small)), bits) => {
             *small >>= bits;
         }
-        (Natural(Large(ref mut limbs)), bits) => {
+        (Natural(Large(limbs)), bits) => {
             limbs_vec_shr_in_place(limbs, u64::exact_from(bits));
             x.trim();
         }

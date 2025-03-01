@@ -18,8 +18,8 @@ use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_unsigned_triple_gen_var_1, integer_unsigned_pair_gen_var_2,
     integer_unsigned_unsigned_triple_gen_var_3, natural_unsigned_pair_gen_var_4,
 };
-use num::traits::Pow as NumPow;
 use num::BigInt;
+use num::traits::Pow as NumPow;
 use rug::ops::Pow as RugPow;
 use std::str::FromStr;
 

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::{
@@ -86,10 +86,9 @@ fn benchmark_integer_divisible_by_library_comparison(
         file_name,
         &triple_3_pair_1_integer_bit_bucketer("x"),
         &mut [
-            (
-                "Malachite",
-                &mut |(_, _, (x, y))| no_out!(x.divisible_by(y)),
-            ),
+            ("Malachite", &mut |(_, _, (x, y))| {
+                no_out!(x.divisible_by(y))
+            }),
             ("num", &mut |((x, y), _, _)| {
                 no_out!(num_divisible_by(&x, &y))
             }),

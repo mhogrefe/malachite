@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::arithmetic::denominators_in_closed_interval::DenominatorsInClosedRationalInterval;
 use crate::arithmetic::traits::DenominatorsInClosedInterval;
 use crate::exhaustive::RationalsWithDenominator;
-use crate::Rational;
 use core::cmp::min;
-use malachite_base::bools::random::{random_bools, RandomBools};
+use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::iterators::iterator_cache::IteratorCache;
 use malachite_base::num::arithmetic::traits::{
     CoprimeWith, Reciprocal, RoundToMultiple, UnsignedAbs,
@@ -20,27 +20,27 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
-    geometric_random_unsigneds, GeometricRandomNaturalValues,
+    GeometricRandomNaturalValues, geometric_random_unsigneds,
 };
 use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::num::random::{
-    random_primitive_ints, RandomPrimitiveInts, VariableRangeGenerator,
+    RandomPrimitiveInts, VariableRangeGenerator, random_primitive_ints,
 };
 use malachite_base::random::Seed;
 use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::{
-    get_random_integer_from_range_to_infinity, get_random_integer_from_range_to_negative_infinity,
+    RandomIntegerRange, RandomIntegerRangeToInfinity, get_random_integer_from_range_to_infinity,
+    get_random_integer_from_range_to_negative_infinity,
     get_striped_random_integer_from_range_to_infinity,
     get_striped_random_integer_from_range_to_negative_infinity, random_integer_range,
     random_integer_range_to_infinity, random_integer_range_to_negative_infinity,
-    RandomIntegerRange, RandomIntegerRangeToInfinity,
-};
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::random::{
-    random_naturals, random_positive_naturals, striped_random_naturals,
-    striped_random_positive_naturals, RandomNaturals, StripedRandomNaturals,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::{
+    RandomNaturals, StripedRandomNaturals, random_naturals, random_positive_naturals,
+    striped_random_naturals, striped_random_positive_naturals,
+};
 use std::collections::HashMap;
 
 /// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`] numerators

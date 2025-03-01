@@ -16,8 +16,8 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
@@ -30,13 +30,13 @@ use malachite_float::test_util::common::{
     emulate_primitive_float_fn, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_var_10, float_gen_var_12, float_gen_var_6, float_gen_var_7,
-    float_gen_var_8, float_gen_var_9, float_rounding_mode_pair_gen_var_10,
-    float_rounding_mode_pair_gen_var_11, float_rounding_mode_pair_gen_var_12,
-    float_rounding_mode_pair_gen_var_22, float_rounding_mode_pair_gen_var_7,
+    float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_9,
+    float_gen_var_10, float_gen_var_12, float_rounding_mode_pair_gen_var_7,
     float_rounding_mode_pair_gen_var_8, float_rounding_mode_pair_gen_var_9,
+    float_rounding_mode_pair_gen_var_10, float_rounding_mode_pair_gen_var_11,
+    float_rounding_mode_pair_gen_var_12, float_rounding_mode_pair_gen_var_22,
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
-    float_unsigned_rounding_mode_triple_gen_var_11, float_unsigned_rounding_mode_triple_gen_var_2,
+    float_unsigned_rounding_mode_triple_gen_var_2, float_unsigned_rounding_mode_triple_gen_var_11,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;

@@ -70,18 +70,12 @@ impl Not for &Integer {
     /// assert_eq!(!&Integer::from(-123), 122);
     /// ```
     fn not(self) -> Integer {
-        match *self {
-            Integer {
-                sign: true,
-                ref abs,
-            } => Integer {
+        match self {
+            Integer { sign: true, abs } => Integer {
                 sign: false,
                 abs: abs.add_limb_ref(1),
             },
-            Integer {
-                sign: false,
-                ref abs,
-            } => Integer {
+            Integer { sign: false, abs } => Integer {
                 sign: true,
                 abs: abs.sub_limb_ref(1),
             },

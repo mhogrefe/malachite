@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::test_util::common::rug_float_significant_bits;
 use crate::Float;
+use crate::test_util::common::rug_float_significant_bits;
 use core::cmp::Ordering;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;

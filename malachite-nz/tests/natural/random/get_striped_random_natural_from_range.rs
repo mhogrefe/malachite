@@ -10,8 +10,8 @@ use itertools::Itertools;
 use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::natural::random::get_striped_random_natural_from_range;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::random::get_striped_random_natural_from_range;
 use std::str::FromStr;
 
 fn get_striped_random_natural_from_range_helper(

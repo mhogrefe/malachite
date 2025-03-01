@@ -12,12 +12,12 @@ use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{integer_pair_gen, natural_pair_gen};
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_rational_signed_triple_gen, rational_rational_unsigned_triple_gen,
     rational_signed_pair_gen, rational_signed_signed_triple_gen, rational_unsigned_pair_gen,
     rational_unsigned_unsigned_triple_gen,
 };
-use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 

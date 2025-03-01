@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
     float_float_integer_triple_gen, float_integer_integer_triple_gen, float_integer_pair_gen,
     float_integer_pair_gen_var_1, float_integer_pair_gen_var_2,
 };
-use malachite_float::Float;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_q::Rational;

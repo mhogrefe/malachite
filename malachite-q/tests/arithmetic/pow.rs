@@ -13,15 +13,15 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_rational_signed_triple_gen_var_1,
     rational_rational_unsigned_triple_gen_var_1, rational_signed_pair_gen_var_2,
     rational_signed_signed_triple_gen_var_1, rational_unsigned_pair_gen_var_1,
     rational_unsigned_unsigned_triple_gen_var_1,
 };
-use malachite_q::Rational;
-use num::traits::Pow as NumPow;
 use num::BigRational;
+use num::traits::Pow as NumPow;
 use rug::ops::Pow as RugPow;
 use std::str::FromStr;
 

@@ -8,7 +8,7 @@
 
 use malachite_base::num::conversion::traits::{ToStringBase, WrappingFrom};
 use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString};
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
@@ -718,10 +718,9 @@ fn benchmark_integer_to_string_base_algorithms(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [
-            (
-                "to_string",
-                &mut |(x, base)| no_out!(x.to_string_base(base)),
-            ),
+            ("to_string", &mut |(x, base)| {
+                no_out!(x.to_string_base(base))
+            }),
             ("using fmt", &mut |(x, base)| {
                 no_out!(format!("{}", BaseFmtWrapper::new(&x, base)))
             }),

@@ -19,15 +19,15 @@ use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_2, unsigned_pair_gen_var_20,
     unsigned_vec_unsigned_pair_gen_var_16,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mod_power_of_2::{
     limbs_mod_power_of_2, limbs_neg_mod_power_of_2, limbs_neg_mod_power_of_2_in_place,
     limbs_slice_mod_power_of_2_in_place, limbs_vec_mod_power_of_2_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
-    natural_gen, natural_natural_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_10,
-    natural_unsigned_pair_gen_var_4, natural_unsigned_pair_gen_var_9,
+    natural_gen, natural_natural_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_pair_gen_var_9, natural_unsigned_pair_gen_var_10,
     natural_unsigned_unsigned_triple_gen_var_5,
 };
 use std::cmp::min;

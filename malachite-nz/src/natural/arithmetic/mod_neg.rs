@@ -115,11 +115,7 @@ impl ModNeg<Natural> for &Natural {
     /// ```
     fn mod_neg(self, m: Natural) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
-        if *self == 0 {
-            Natural::ZERO
-        } else {
-            m - self
-        }
+        if *self == 0 { Natural::ZERO } else { m - self }
     }
 }
 
@@ -154,11 +150,7 @@ impl ModNeg<&Natural> for &Natural {
     /// ```
     fn mod_neg(self, m: &Natural) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
-        if *self == 0 {
-            Natural::ZERO
-        } else {
-            m - self
-        }
+        if *self == 0 { Natural::ZERO } else { m - self }
     }
 }
 

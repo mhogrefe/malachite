@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
+use crate::bools::random::{WeightedRandomBools, weighted_random_bools};
 use crate::random::Seed;
 
 /// Generates random [`Option`]s except `None`, with values from a given random iterator.

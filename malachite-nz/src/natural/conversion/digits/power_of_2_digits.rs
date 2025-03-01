@@ -10,7 +10,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use core::cmp::{min, Ordering::*};
+use core::cmp::{Ordering::*, min};
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivRound, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -86,11 +86,14 @@ where
         T::NAME,
         log_base
     );
-    let limbs = match *x {
-        Natural(Small(ref small)) => {
-            return PowerOf2Digits::<T>::to_power_of_2_digits_asc(small, min(log_base, Limb::WIDTH))
+    let limbs = match x {
+        Natural(Small(small)) => {
+            return PowerOf2Digits::<T>::to_power_of_2_digits_asc(
+                small,
+                min(log_base, Limb::WIDTH),
+            );
         }
-        Natural(Large(ref limbs)) => limbs,
+        Natural(Large(limbs)) => limbs,
     };
     let mut digits = iterator_to_bit_chunks(limbs.iter().copied(), Limb::WIDTH, log_base)
         .map(Option::unwrap)
@@ -348,8 +351,8 @@ impl PowerOf2Digits<Natural> for Natural {
             .map(Natural::from)
             .collect();
         }
-        let limbs = match *self {
-            Natural(Large(ref limbs)) => limbs,
+        let limbs = match self {
+            Natural(Large(limbs)) => limbs,
             _ => unreachable!(),
         };
         let mut digits = Vec::new();

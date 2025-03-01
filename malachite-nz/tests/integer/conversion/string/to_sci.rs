@@ -804,11 +804,7 @@ fn to_sci_with_options_properties() {
                 SciSizeOptions::Complete | SciSizeOptions::Scale(_) => None,
                 SciSizeOptions::Precision(p) => {
                     let log = x.unsigned_abs_ref().floor_log_base(&u_base);
-                    if log >= p {
-                        Some(log - p + 1)
-                    } else {
-                        None
-                    }
+                    if log >= p { Some(log - p + 1) } else { None }
                 }
             };
             if let Some(scale) = scale {

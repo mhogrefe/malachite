@@ -38,8 +38,8 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::platform::{
-    Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
-    AORSMUL_FASTER_AORS_AORSLSH,
+    AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
+    AORSMUL_FASTER_AORS_AORSLSH, Limb,
 };
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
@@ -152,7 +152,7 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
     // result is v_2 >= 0
     let saved = v_inf[0]; // Remember v1's highest byte (will be overwritten).
     v_inf[0] = v_inf_0; // Set the right value for v_inf_0
-                        // Overwrite unused v_neg_1
+    // Overwrite unused v_neg_1
     let mut carry = limbs_shl_to_out(v_neg_1, &v_inf[..two_r], 1);
     if limbs_sub_same_length_in_place_left(&mut v_2[..two_r], &v_neg_1[..two_r]) {
         carry += 1;

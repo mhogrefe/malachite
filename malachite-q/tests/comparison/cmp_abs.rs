@@ -10,8 +10,8 @@ use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::test_util::common::test_custom_cmp_helper;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use rug;
 use std::cmp::Ordering::*;
 

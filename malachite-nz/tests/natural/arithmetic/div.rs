@@ -16,6 +16,7 @@ use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_vec_unsigned_pair_gen_var_22,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_13,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::div::{
     limbs_div, limbs_div_barrett, limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
     limbs_div_barrett_scratch_len, limbs_div_divide_and_conquer,
@@ -28,7 +29,6 @@ use malachite_nz::natural::arithmetic::div::{
     limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     large_type_gen_var_10, large_type_gen_var_11, large_type_gen_var_12, natural_gen,
@@ -31608,19 +31608,19 @@ fn test_checked_div() {
         let v = Natural::from_str(t).unwrap();
 
         let q = u.clone().checked_div(v.clone());
-        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert!(q.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = u.clone().checked_div(&v);
-        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert!(q.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = (&u).checked_div(v.clone());
-        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert!(q.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = (&u).checked_div(&v);
-        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert!(q.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(q.to_debug_string(), quotient);
 
         let q = BigUint::from_str(s)
@@ -31928,10 +31928,10 @@ fn checked_div_properties() {
         let quotient_val_ref = x.clone().checked_div(&y);
         let quotient_ref_val = (&x).checked_div(y.clone());
         let quotient = (&x).checked_div(&y);
-        assert!(quotient_val_val.as_ref().map_or(true, Natural::is_valid));
-        assert!(quotient_val_ref.as_ref().map_or(true, Natural::is_valid));
-        assert!(quotient_ref_val.as_ref().map_or(true, Natural::is_valid));
-        assert!(quotient.as_ref().map_or(true, Natural::is_valid));
+        assert!(quotient_val_val.as_ref().is_none_or(Natural::is_valid));
+        assert!(quotient_val_ref.as_ref().is_none_or(Natural::is_valid));
+        assert!(quotient_ref_val.as_ref().is_none_or(Natural::is_valid));
+        assert!(quotient.as_ref().is_none_or(Natural::is_valid));
         assert_eq!(quotient_val_val, quotient);
         assert_eq!(quotient_val_ref, quotient);
         assert_eq!(quotient_ref_val, quotient);

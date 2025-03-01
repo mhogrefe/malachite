@@ -22,16 +22,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::div_mod::{
-    limbs_div_barrett_large_product, limbs_div_mod_balanced, limbs_div_mod_barrett_helper,
-    limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len,
-    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer_helper,
-    limbs_div_mod_schoolbook, limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx,
-    limbs_invert_limb, limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD,
-    MUPI_DIV_QR_THRESHOLD,
+    MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD, limbs_div_barrett_large_product,
+    limbs_div_mod_balanced, limbs_div_mod_barrett_helper, limbs_div_mod_barrett_is_len,
+    limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
+    limbs_div_mod_divide_and_conquer_helper, limbs_div_mod_schoolbook,
+    limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
 };
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use crate::natural::arithmetic::mul::{
@@ -48,13 +50,11 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::{
-    DoubleLimb, Limb, DC_DIV_QR_THRESHOLD, MOD_1N_TO_MOD_1_1_THRESHOLD,
-    MOD_1U_TO_MOD_1_1_THRESHOLD, MOD_1_1P_METHOD, MOD_1_1_TO_MOD_1_2_THRESHOLD,
+    DC_DIV_QR_THRESHOLD, DoubleLimb, Limb, MOD_1_1_TO_MOD_1_2_THRESHOLD, MOD_1_1P_METHOD,
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,
-    MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
+    MOD_1N_TO_MOD_1_1_THRESHOLD, MOD_1U_TO_MOD_1_1_THRESHOLD, MU_DIV_QR_SKEW_THRESHOLD,
+    MU_DIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
@@ -1468,7 +1468,7 @@ impl Natural {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (Natural(Small(small)), other) => small % other,
-            (Natural(Large(ref limbs)), other) => limbs_rem_naive(limbs, other),
+            (Natural(Large(limbs)), other) => limbs_rem_naive(limbs, other),
         }
     }
 
@@ -1476,15 +1476,15 @@ impl Natural {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (Natural(Small(small)), other) => small % other,
-            (Natural(Large(ref limbs)), other) => limbs_mod_limb(limbs, other),
+            (Natural(Large(limbs)), other) => limbs_mod_limb(limbs, other),
         }
     }
 
     fn rem_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
-            (Natural(Small(ref mut small)), other) => *small %= other,
-            (Natural(Large(ref mut limbs)), other) => {
+            (Natural(Small(small)), other) => *small %= other,
+            (Natural(Large(limbs)), other) => {
                 *self = Natural(Small(limbs_mod_limb(limbs, other)));
             }
         }
@@ -1900,9 +1900,9 @@ impl Rem<Natural> for &Natural {
             (_, Natural::ONE) => Natural::ZERO,
             (n, Natural(Small(d))) => Natural(Small(n.rem_limb_ref(d))),
             (Natural(Small(_)), _) => self.clone(),
-            (&Natural(Large(ref ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() >= ds.len() {
-                    Natural::from_owned_limbs_asc(limbs_mod(ns, ds))
+                    Natural::from_owned_limbs_asc(limbs_mod(ns, &ds))
                 } else {
                     self.clone()
                 }
@@ -1958,7 +1958,7 @@ impl Rem<&Natural> for &Natural {
             (n, d) if core::ptr::eq(n, d) => Natural::ZERO,
             (n, Natural(Small(d))) => Natural(Small(n.rem_limb_ref(*d))),
             (Natural(Small(_)), _) => self.clone(),
-            (&Natural(Large(ref ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() >= ds.len() {
                     Natural::from_owned_limbs_asc(limbs_mod(ns, ds))
                 } else {
@@ -2057,7 +2057,7 @@ impl<'a> RemAssign<&'a Natural> for Natural {
             (_, &Natural::ONE) => *self = Natural::ZERO,
             (_, Natural(Small(d))) => self.rem_assign_limb(*d),
             (Natural(Small(_)), _) => {}
-            (&mut Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {
+            (Natural(Large(ns)), Natural(Large(ds))) => {
                 if ns.len() >= ds.len() {
                     let mut rs = vec![0; ds.len()];
                     limbs_mod_to_out(&mut rs, ns, ds);
@@ -2204,11 +2204,7 @@ impl NegMod<Natural> for &Natural {
     /// ```
     fn neg_mod(self, other: Natural) -> Natural {
         let r = self % &other;
-        if r == 0 {
-            r
-        } else {
-            other - r
-        }
+        if r == 0 { r } else { other - r }
     }
 }
 
@@ -2253,11 +2249,7 @@ impl NegMod<&Natural> for &Natural {
     /// ```
     fn neg_mod(self, other: &Natural) -> Natural {
         let r = self % other;
-        if r == 0 {
-            r
-        } else {
-            other - r
-        }
+        if r == 0 { r } else { other - r }
     }
 }
 

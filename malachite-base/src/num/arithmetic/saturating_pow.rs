@@ -28,11 +28,7 @@ fn saturating_pow_signed<T: PrimitiveSigned>(x: T, exp: u64) -> T {
     } else if x == T::ZERO || x == T::ONE {
         x
     } else if x == T::NEGATIVE_ONE {
-        if exp.even() {
-            T::ONE
-        } else {
-            T::NEGATIVE_ONE
-        }
+        if exp.even() { T::ONE } else { T::NEGATIVE_ONE }
     } else if let Some(p) = x.checked_pow(exp) {
         p
     } else if x > T::ZERO || exp.even() {

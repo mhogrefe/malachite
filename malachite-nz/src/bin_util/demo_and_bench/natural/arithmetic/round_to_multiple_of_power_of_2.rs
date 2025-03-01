@@ -12,15 +12,15 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, triple_1_vec_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_pair_gen_var_16, unsigned_vec_unsigned_pair_gen_var_20,
     unsigned_vec_unsigned_rounding_mode_triple_gen_var_2,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
 use malachite_nz::test_util::bench::bucketers::triple_1_natural_bit_bucketer;
 use malachite_nz::test_util::generators::natural_unsigned_rounding_mode_triple_gen_var_1;
 

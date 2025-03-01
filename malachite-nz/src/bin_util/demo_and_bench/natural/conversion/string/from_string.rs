@@ -10,7 +10,7 @@ use malachite_base::num::conversion::traits::{FromStringBase, WrappingFrom};
 use malachite_base::test_util::bench::bucketers::{
     pair_2_string_len_bucketer, string_len_bucketer,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     string_gen, string_gen_var_3, string_gen_var_5, string_gen_var_6, string_gen_var_7,
@@ -101,10 +101,9 @@ fn benchmark_natural_from_str_library_comparison(
         file_name,
         &string_len_bucketer(),
         &mut [
-            (
-                "Malachite",
-                &mut |s| no_out!(Natural::from_str(&s).unwrap()),
-            ),
+            ("Malachite", &mut |s| {
+                no_out!(Natural::from_str(&s).unwrap())
+            }),
             ("num", &mut |s| no_out!(BigUint::from_str(&s).unwrap())),
             ("rug", &mut |s| no_out!(rug::Integer::from_str(&s).unwrap())),
         ],

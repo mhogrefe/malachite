@@ -6,9 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_q::Rational;
 use malachite_q::test_util::arithmetic::mul::mul_naive;
 use malachite_q::test_util::arithmetic::mul::rational_product_naive;
 use malachite_q::test_util::bench::bucketers::{
@@ -20,7 +21,6 @@ use malachite_q::test_util::generators::{
     rational_pair_gen, rational_pair_gen_nrm, rational_pair_gen_rm, rational_vec_gen,
     rational_vec_gen_nrm,
 };
-use malachite_q::Rational;
 use num::BigRational;
 use std::iter::Product;
 

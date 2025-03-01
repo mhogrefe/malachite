@@ -9,11 +9,11 @@
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::random::{random_primitive_ints, VariableRangeGenerator};
+use malachite_base::num::random::{VariableRangeGenerator, random_primitive_ints};
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::integer::random::get_random_integer_from_range_to_negative_infinity;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::random::get_random_integer_from_range_to_negative_infinity;
 use std::str::FromStr;
 
 fn get_random_integer_from_range_to_negative_infinity_helper(

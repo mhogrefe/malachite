@@ -10,12 +10,12 @@ use itertools::Itertools;
 use malachite_base::iterators::comparison::is_strictly_ascending;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
+use malachite_q::Rational;
 use malachite_q::arithmetic::traits::DenominatorsInClosedInterval;
 use malachite_q::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen_var_3};
-use malachite_q::Rational;
 use std::str::FromStr;
 
 #[test]
@@ -80,24 +80,28 @@ fn simplest_denominators_in_closed_interval_properties() {
             .collect_vec();
         assert!(is_strictly_ascending(ds.iter()));
         for d in &ds {
-            assert!(exhaustive_rationals_with_denominator_inclusive_range(
-                d.clone(),
-                a.clone(),
-                b.clone()
-            )
-            .next()
-            .is_some());
+            assert!(
+                exhaustive_rationals_with_denominator_inclusive_range(
+                    d.clone(),
+                    a.clone(),
+                    b.clone()
+                )
+                .next()
+                .is_some()
+            );
         }
         for d in 1u32..=20 {
             let d = Natural::from(d);
             if !ds.contains(&d) {
-                assert!(exhaustive_rationals_with_denominator_inclusive_range(
-                    d.clone(),
-                    a.clone(),
-                    b.clone(),
-                )
-                .next()
-                .is_none());
+                assert!(
+                    exhaustive_rationals_with_denominator_inclusive_range(
+                        d.clone(),
+                        a.clone(),
+                        b.clone(),
+                    )
+                    .next()
+                    .is_none()
+                );
             }
         }
     });

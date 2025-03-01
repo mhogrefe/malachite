@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::ExtendedGcd;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::{
@@ -89,10 +89,9 @@ fn benchmark_integer_extended_gcd_library_comparison(
         file_name,
         &triple_3_pair_integer_max_bit_bucketer("x", "y"),
         &mut [
-            (
-                "Malachite",
-                &mut |(_, _, (x, y))| no_out!(x.extended_gcd(y)),
-            ),
+            ("Malachite", &mut |(_, _, (x, y))| {
+                no_out!(x.extended_gcd(y))
+            }),
             ("num", &mut |((x, y), _, _)| no_out!(x.extended_gcd(&y))),
             ("rug", &mut |(_, (x, y), _)| {
                 no_out!(x.extended_gcd(y, rug::Integer::new()))

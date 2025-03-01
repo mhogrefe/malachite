@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::traits::{Approximate, ApproximateAssign};
 use crate::Rational;
+use crate::arithmetic::traits::{Approximate, ApproximateAssign};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, DivMod, Floor, Parity, Reciprocal, ShrRound, UnsignedAbs,

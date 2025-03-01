@@ -25,12 +25,12 @@ use malachite_base::test_util::generators::{
     large_type_gen_var_2, unsigned_gen, unsigned_pair_gen_var_31, unsigned_vec_gen_var_1,
     unsigned_vec_pair_gen_var_4, unsigned_vec_pair_gen_var_5, unsigned_vec_triple_gen_var_28,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::sqrt::{
     limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_helper, limbs_sqrt_rem,
     limbs_sqrt_rem_helper, limbs_sqrt_rem_helper_scratch_len, limbs_sqrt_rem_to_out,
     limbs_sqrt_to_out,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb, SignedLimb};
 use malachite_nz::test_util::generators::natural_gen;
 use malachite_nz::test_util::natural::arithmetic::sqrt::{

@@ -13,10 +13,10 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen_var_1};
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::next_power_of_2::{
     limbs_next_power_of_2, limbs_slice_next_power_of_2_in_place, limbs_vec_next_power_of_2_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::natural_gen;
 use rug;

@@ -8,11 +8,11 @@
 
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
+use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_rational_natural_natural_quadruple_gen_var_1, rational_rational_natural_triple_gen,
     rational_rational_natural_triple_gen_var_1,
 };
-use malachite_q::Rational;
 use std::str::FromStr;
 
 #[test]

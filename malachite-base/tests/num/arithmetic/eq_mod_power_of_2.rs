@@ -15,7 +15,7 @@ use malachite_base::test_util::generators::{
     signed_signed_unsigned_triple_gen_var_1, signed_signed_unsigned_triple_gen_var_2,
     signed_signed_unsigned_triple_gen_var_3, signed_unsigned_pair_gen_var_1,
     unsigned_pair_gen_var_2, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_2,
-    unsigned_triple_gen_var_10, unsigned_triple_gen_var_4, unsigned_triple_gen_var_9,
+    unsigned_triple_gen_var_4, unsigned_triple_gen_var_9, unsigned_triple_gen_var_10,
 };
 
 fn eq_mod_power_of_2_primitive_helper<T: PrimitiveInt>() {

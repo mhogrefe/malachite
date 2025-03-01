@@ -48,9 +48,9 @@ impl CountOnes for &Natural {
     /// assert_eq!(Natural::from(10u32).pow(12).count_ones(), 13);
     /// ```
     fn count_ones(self) -> u64 {
-        match *self {
-            Natural(Small(small)) => CountOnes::count_ones(small),
-            Natural(Large(ref limbs)) => limbs_count_ones(limbs),
+        match self {
+            Natural(Small(small)) => CountOnes::count_ones(*small),
+            Natural(Large(limbs)) => limbs_count_ones(limbs),
         }
     }
 }

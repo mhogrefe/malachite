@@ -246,16 +246,16 @@ impl Natural {
     }
 
     fn xor_limb_ref(&self, other: Limb) -> Natural {
-        Natural(match *self {
+        Natural(match self {
             Natural(Small(small)) => Small(small ^ other),
-            Natural(Large(ref limbs)) => Large(limbs_xor_limb(limbs, other)),
+            Natural(Large(limbs)) => Large(limbs_xor_limb(limbs, other)),
         })
     }
 
     fn xor_assign_limb(&mut self, other: Limb) {
-        match *self {
-            Natural(Small(ref mut small)) => *small ^= other,
-            Natural(Large(ref mut limbs)) => limbs_xor_limb_in_place(limbs, other),
+        match self {
+            Natural(Small(small)) => *small ^= other,
+            Natural(Large(limbs)) => limbs_xor_limb_in_place(limbs, other),
         }
     }
 }
@@ -401,7 +401,7 @@ impl BitXor<&Natural> for &Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.xor_limb_ref(y),
             (&Natural(Small(x)), y) => y.xor_limb_ref(x),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 Natural::from_owned_limbs_asc(limbs_xor(xs, ys))
             }
         }
@@ -439,8 +439,8 @@ impl BitXorAssign<Natural> for Natural {
     fn bitxor_assign(&mut self, mut other: Natural) {
         match (&mut *self, &mut other) {
             (_, Natural(Small(y))) => self.xor_assign_limb(*y),
-            (Natural(Small(ref mut x)), _) => *self = other.xor_limb(*x),
-            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+            (Natural(Small(x)), _) => *self = other.xor_limb(*x),
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 if limbs_xor_in_place_either(xs, ys) {
                     swap(xs, ys);
                 }
@@ -480,8 +480,8 @@ impl<'a> BitXorAssign<&'a Natural> for Natural {
     fn bitxor_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {
             (_, Natural(Small(y))) => self.xor_assign_limb(*y),
-            (Natural(Small(ref mut x)), _) => *self = other.xor_limb_ref(*x),
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+            (Natural(Small(x)), _) => *self = other.xor_limb_ref(*x),
+            (Natural(Large(xs)), Natural(Large(ys))) => {
                 limbs_xor_in_place_left(xs, ys);
                 self.trim();
             }

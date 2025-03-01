@@ -17,11 +17,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 const fn from_other_type_slice_ident<T: PrimitiveUnsigned>(xs: &[T]) -> T {
-    if xs.is_empty() {
-        T::ZERO
-    } else {
-        xs[0]
-    }
+    if xs.is_empty() { T::ZERO } else { xs[0] }
 }
 
 macro_rules! impl_slice_traits_ident {

@@ -190,9 +190,7 @@ where
                 Large(limbs_shl(&[*small], u64::exact_from(bits)))
             })
         }
-        (Natural(Large(ref limbs)), bits) => {
-            Natural(Large(limbs_shl(limbs, u64::exact_from(bits))))
-        }
+        (Natural(Large(limbs)), bits) => Natural(Large(limbs_shl(limbs, u64::exact_from(bits)))),
     }
 }
 
@@ -204,14 +202,14 @@ where
     match (&mut *x, bits) {
         (&mut Natural::ZERO, _) => {}
         (_, bits) if bits == T::ZERO => {}
-        (Natural(Small(ref mut small)), bits) => {
+        (Natural(Small(small)), bits) => {
             if let Some(shifted) = small.arithmetic_checked_shl(bits) {
                 *small = shifted;
             } else {
                 *x = Natural(Large(limbs_shl(&[*small], u64::exact_from(bits))));
             }
         }
-        (Natural(Large(ref mut limbs)), bits) => {
+        (Natural(Large(limbs)), bits) => {
             limbs_vec_shl_in_place(limbs, u64::exact_from(bits));
         }
     }

@@ -13,12 +13,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::Natural;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
-use crate::natural::Natural;
 use crate::platform::{
     Limb, NTH_ROOT_NUMB_MASK_TABLE, ODD_DOUBLEFACTORIAL_TABLE_LIMIT, ODD_DOUBLEFACTORIAL_TABLE_MAX,
     ODD_FACTORIAL_TABLE_LIMIT, ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_TABLE,

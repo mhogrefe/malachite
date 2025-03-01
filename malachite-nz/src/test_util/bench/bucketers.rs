@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::Natural;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::platform::Limb;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::max;
@@ -624,17 +624,17 @@ pub fn limbs_div_to_out_balancing_bucketer<'a>() -> Bucketer<'a, (Vec<Limb>, Vec
 }
 
 #[allow(clippy::type_complexity)]
-pub fn limbs_div_mod_extra_bucketer<'a>(
-) -> Bucketer<'a, (Vec<Limb>, usize, Vec<Limb>, Limb, Limb, u64)> {
+pub fn limbs_div_mod_extra_bucketer<'a>()
+-> Bucketer<'a, (Vec<Limb>, usize, Vec<Limb>, Limb, Limb, u64)> {
     Bucketer {
-        bucketing_function: &|(_, fraction_len, ref ns, _, _, _)| ns.len() + fraction_len,
+        bucketing_function: &|(_, fraction_len, ns, _, _, _)| ns.len() + fraction_len,
         bucketing_label: "ns.len() + fraction_len".to_string(),
     }
 }
 
 #[allow(clippy::type_complexity)]
-pub fn limbs_div_mod_barrett_product_bucketer<'a>(
-) -> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
+pub fn limbs_div_mod_barrett_product_bucketer<'a>()
+-> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
     Bucketer {
         bucketing_function: &|(_, _, _, _, _, i_len)| i_len << 1,
         bucketing_label: "2 * i_len".to_string(),
@@ -642,8 +642,8 @@ pub fn limbs_div_mod_barrett_product_bucketer<'a>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn limbs_div_mod_barrett_helper_bucketer<'a>(
-) -> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+pub fn limbs_div_mod_barrett_helper_bucketer<'a>()
+-> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Bucketer {
         bucketing_function: &|(_, _, ns, ds)| (ds.len() << 1).saturating_sub(ns.len()),
         bucketing_label: "max(0, 2 * ds.len() - ns.len())".to_string(),
@@ -658,8 +658,8 @@ pub fn limb_pair_significant_bits_bucketer(var_name: &str) -> Bucketer<(Limb, Li
 }
 
 #[allow(clippy::type_complexity)]
-pub fn limbs_mod_mul_two_limbs_bucketer<'a>(
-) -> Bucketer<'a, (Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
+pub fn limbs_mod_mul_two_limbs_bucketer<'a>()
+-> Bucketer<'a, (Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
     Bucketer {
         bucketing_function: &|&(x_1, x_0, y_1, y_0, _, _, _, _, _)| {
             usize::exact_from(max(
@@ -684,8 +684,8 @@ pub fn limbs_mod_limb_small_unnormalized_bucketer<'a>() -> Bucketer<'a, (Vec<Lim
     }
 }
 
-pub fn rational_from_power_of_2_digits_bucketer<'a>(
-) -> Bucketer<'a, (u64, Vec<Natural>, RationalSequence<Natural>)> {
+pub fn rational_from_power_of_2_digits_bucketer<'a>()
+-> Bucketer<'a, (u64, Vec<Natural>, RationalSequence<Natural>)> {
     Bucketer {
         bucketing_function: &|(log_base, xs, ys)| {
             usize::exact_from(*log_base) * max(xs.len(), ys.component_len())
@@ -695,8 +695,8 @@ pub fn rational_from_power_of_2_digits_bucketer<'a>(
     }
 }
 
-pub fn rational_from_digits_bucketer<'a>(
-) -> Bucketer<'a, (Natural, Vec<Natural>, RationalSequence<Natural>)> {
+pub fn rational_from_digits_bucketer<'a>()
+-> Bucketer<'a, (Natural, Vec<Natural>, RationalSequence<Natural>)> {
     Bucketer {
         bucketing_function: &|(base, xs, ys)| {
             usize::exact_from(base.significant_bits()) * max(xs.len(), ys.component_len())

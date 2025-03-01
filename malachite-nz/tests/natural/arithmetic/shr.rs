@@ -18,10 +18,10 @@ use malachite_base::test_util::generators::{
     signed_gen, unsigned_gen, unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_16,
     unsigned_vec_unsigned_pair_gen_var_33, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::shr::{
     limbs_shr, limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_signed_pair_gen_var_2, natural_unsigned_pair_gen_var_4,

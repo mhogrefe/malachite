@@ -12,6 +12,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out_aliased_2,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -19,8 +21,6 @@ use crate::natural::arithmetic::add::{
 use crate::natural::arithmetic::float_add::RoundBit::*;
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
@@ -732,7 +732,7 @@ fn add_float_significands_in_place_same_prec_ref(
     rm: RoundingMode,
 ) -> Ordering {
     match (x, y) {
-        (Natural(Small(ref mut x)), Natural(Small(y))) => {
+        (Natural(Small(x)), Natural(Small(y))) => {
             let (sum, sum_exp, o) = if prec == Limb::WIDTH {
                 add_float_significands_same_prec_w(*x, *x_exp, *y, y_exp, rm)
             } else {
@@ -2248,11 +2248,7 @@ impl RoundBit {
 impl From<bool> for RoundBit {
     #[inline]
     fn from(b: bool) -> RoundBit {
-        if b {
-            True
-        } else {
-            False
-        }
+        if b { True } else { False }
     }
 }
 

@@ -14,8 +14,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_vec_unsigned_pair_gen_var_20,
 };
-use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{

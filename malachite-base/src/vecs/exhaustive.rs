@@ -11,28 +11,28 @@ use crate::iterators::iterator_cache::IteratorCache;
 use crate::num::arithmetic::traits::CheckedPow;
 use crate::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use crate::num::exhaustive::{
-    exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
-    PrimitiveIntIncreasingRange,
+    PrimitiveIntIncreasingRange, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
+    primitive_int_increasing_range,
 };
-use crate::num::iterators::{ruler_sequence, RulerSequence};
+use crate::num::iterators::{RulerSequence, ruler_sequence};
 use crate::num::logic::traits::SignificantBits;
 use crate::tuples::exhaustive::{
+    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
     exhaustive_dependent_pairs, exhaustive_dependent_pairs_stop_after_empty_ys,
-    lex_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairs,
-    ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+    lex_dependent_pairs_stop_after_empty_ys,
 };
-use crate::vecs::{exhaustive_vec_permutations, ExhaustiveVecPermutations};
+use crate::vecs::{ExhaustiveVecPermutations, exhaustive_vec_permutations};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::{
-    max, min,
     Ordering::{self, *},
+    max, min,
 };
-use core::iter::{empty, once, FromIterator, Once, Zip};
+use core::iter::{FromIterator, Once, Zip, empty, once};
 use core::marker::PhantomData;
 use core::mem::take;
 use core::ops::RangeFrom;
-use itertools::{repeat_n, Itertools};
+use itertools::{Itertools, repeat_n};
 
 #[doc(hidden)]
 pub fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
@@ -428,9 +428,9 @@ where
 
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
-            LexFixedLengthVecsFromSingle::Zero(ref mut xs) => xs.next(),
-            LexFixedLengthVecsFromSingle::One(ref mut xs) => xs.next().map(|x| vec![x]),
-            LexFixedLengthVecsFromSingle::GreaterThanOne(ref mut xs) => xs.next(),
+            LexFixedLengthVecsFromSingle::Zero(xs) => xs.next(),
+            LexFixedLengthVecsFromSingle::One(xs) => xs.next().map(|x| vec![x]),
+            LexFixedLengthVecsFromSingle::GreaterThanOne(xs) => xs.next(),
         }
     }
 }
@@ -898,9 +898,9 @@ where
 
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
-            ExhaustiveFixedLengthVecs1Input::Zero(ref mut xs) => xs.next(),
-            ExhaustiveFixedLengthVecs1Input::One(ref mut xs) => xs.next().map(|x| vec![x]),
-            ExhaustiveFixedLengthVecs1Input::GreaterThanOne(ref mut xs) => xs.next(),
+            ExhaustiveFixedLengthVecs1Input::Zero(xs) => xs.next(),
+            ExhaustiveFixedLengthVecs1Input::One(xs) => xs.next().map(|x| vec![x]),
+            ExhaustiveFixedLengthVecs1Input::GreaterThanOne(xs) => xs.next(),
         }
     }
 }
@@ -2768,7 +2768,7 @@ where
     fn next(&mut self) -> Option<C> {
         match self {
             ExhaustiveOrderedUniqueCollections::None => None,
-            ExhaustiveOrderedUniqueCollections::Zero(ref mut done) => {
+            ExhaustiveOrderedUniqueCollections::Zero(done) => {
                 if *done {
                     None
                 } else {
@@ -2776,7 +2776,7 @@ where
                     Some(empty().collect())
                 }
             }
-            ExhaustiveOrderedUniqueCollections::ZeroOne(ref mut first, ref mut xs) => {
+            ExhaustiveOrderedUniqueCollections::ZeroOne(first, xs) => {
                 if *first {
                     *first = false;
                     Some(empty().collect())
@@ -2784,10 +2784,8 @@ where
                     xs.next().map(|x| once(x).collect())
                 }
             }
-            ExhaustiveOrderedUniqueCollections::One(ref mut xs) => {
-                xs.next().map(|x| once(x).collect())
-            }
-            ExhaustiveOrderedUniqueCollections::GreaterThanOne(ref mut xs) => xs.next(),
+            ExhaustiveOrderedUniqueCollections::One(xs) => xs.next().map(|x| once(x).collect()),
+            ExhaustiveOrderedUniqueCollections::GreaterThanOne(xs) => xs.next(),
         }
     }
 }

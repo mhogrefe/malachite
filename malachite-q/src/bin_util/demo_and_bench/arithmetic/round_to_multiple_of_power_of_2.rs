@@ -9,12 +9,12 @@
 use malachite_base::num::arithmetic::traits::{
     PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_q::Rational;
 use malachite_q::test_util::bench::bucketers::triple_1_2_rational_bit_i64_max_bucketer;
 use malachite_q::test_util::generators::rational_signed_rounding_mode_triple_gen_var_1;
-use malachite_q::Rational;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_round_to_multiple_of_power_of_2_assign);

@@ -8,12 +8,12 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{
-    float_either_infinity, float_either_zero, float_infinity, float_nan, float_negative_infinity,
-    float_negative_zero, float_zero, Float,
+    Float, float_either_infinity, float_either_zero, float_infinity, float_nan,
+    float_negative_infinity, float_negative_zero, float_zero,
 };
 use core::cmp::{
-    max,
     Ordering::{self, *},
+    max,
 };
 use core::mem::swap;
 use core::ops::{Mul, MulAssign};
@@ -1766,10 +1766,10 @@ impl Float {
             }
             (
                 Float(Finite {
-                    sign: ref mut x_sign,
-                    exponent: ref mut x_exp,
-                    precision: ref mut x_prec,
-                    significand: ref mut x,
+                    sign: x_sign,
+                    exponent: x_exp,
+                    precision: x_prec,
+                    significand: x,
                 }),
                 Float(Finite {
                     sign: y_sign,
@@ -1894,11 +1894,7 @@ impl Float {
                 }
                 *x_sign = sign;
                 *x_prec = prec;
-                if sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if sign { o } else { o.reverse() }
             }
         }
     }
@@ -2029,10 +2025,10 @@ impl Float {
             }
             (
                 Float(Finite {
-                    sign: ref mut x_sign,
-                    exponent: ref mut x_exp,
-                    precision: ref mut x_prec,
-                    significand: ref mut x,
+                    sign: x_sign,
+                    exponent: x_exp,
+                    precision: x_prec,
+                    significand: x,
                 }),
                 Float(Finite {
                     sign: y_sign,
@@ -2157,11 +2153,7 @@ impl Float {
                 }
                 *x_sign = sign;
                 *x_prec = prec;
-                if sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if sign { o } else { o.reverse() }
             }
         }
     }

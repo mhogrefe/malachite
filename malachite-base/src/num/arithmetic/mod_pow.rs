@@ -59,11 +59,7 @@ pub(crate) fn mul_mod_helper<
     if r > q_0 {
         r.wrapping_add_assign(m);
     }
-    if r < m {
-        r
-    } else {
-        r.wrapping_sub(m)
-    }
+    if r < m { r } else { r.wrapping_sub(m) }
 }
 
 // m.get_highest_bit(), x < m
@@ -82,11 +78,7 @@ pub(crate) fn fast_mod_pow<
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     if exp == 0 {
         let x = T::power_of_2(shift);
-        if x == m {
-            T::ZERO
-        } else {
-            x
-        }
+        if x == m { T::ZERO } else { x }
     } else if x == T::ZERO {
         T::ZERO
     } else {

@@ -8,7 +8,7 @@
 
 use crate::integer::Integer;
 use crate::natural::conversion::string::from_sci_string::{
-    from_sci_string_with_options_helper, FromSciStringHelper,
+    FromSciStringHelper, from_sci_string_with_options_helper,
 };
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;

@@ -14,11 +14,11 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{
-    float_either_zero, float_infinity, float_nan, float_negative_infinity, float_negative_zero,
-    float_zero, Float,
+    Float, float_either_zero, float_infinity, float_nan, float_negative_infinity,
+    float_negative_zero, float_zero,
 };
-use core::cmp::max;
 use core::cmp::Ordering::{self, *};
+use core::cmp::max;
 use core::mem::swap;
 use core::ops::{Add, AddAssign};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, IsPowerOf2, NegAssign};
@@ -193,10 +193,10 @@ impl Float {
             (z, float_either_zero!(), _) => z.set_prec_round(prec, rm),
             (
                 Float(Finite {
-                    sign: ref mut x_sign,
-                    exponent: ref mut x_exp,
-                    precision: ref mut x_prec,
-                    significand: ref mut x,
+                    sign: x_sign,
+                    exponent: x_exp,
+                    precision: x_prec,
+                    significand: x,
                 }),
                 Float(Finite {
                     sign: mut y_sign,
@@ -324,11 +324,7 @@ impl Float {
                     swap(x, &mut y);
                 }
                 *x_prec = prec;
-                if *x_sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if *x_sign { o } else { o.reverse() }
             }
         }
     }
@@ -386,20 +382,21 @@ impl Float {
             }
             (z, float_either_zero!(), _) => z.set_prec_round(prec, rm),
             (
-                &mut Float(Finite {
-                    sign: ref mut x_sign,
-                    exponent: ref mut x_exp,
-                    precision: ref mut x_prec,
-                    significand: ref mut x,
+                Float(Finite {
+                    sign: x_sign,
+                    exponent: x_exp,
+                    precision: x_prec,
+                    significand: x,
                 }),
                 Float(Finite {
-                    sign: mut y_sign,
+                    sign: y_sign,
                     exponent: y_exp,
                     precision: y_prec,
                     significand: y,
                 }),
                 subtract,
             ) => {
+                let mut y_sign = *y_sign;
                 if subtract {
                     y_sign.not_assign();
                 }
@@ -415,7 +412,7 @@ impl Float {
                         if *x_sign { rm } else { -rm },
                     );
                     if *x_exp > Float::MAX_EXPONENT {
-                        return match (*x_sign, rm) {
+                        return match (x_sign, rm) {
                             (_, Exact) => panic!("Inexact float addition"),
                             (true, Ceiling | Up | Nearest) => {
                                 *self = float_infinity!();
@@ -510,11 +507,7 @@ impl Float {
                     o
                 };
                 *x_prec = prec;
-                if *x_sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if *x_sign { o } else { o.reverse() }
             }
         }
     }
@@ -571,13 +564,14 @@ impl Float {
                     significand: x,
                 }),
                 Float(Finite {
-                    sign: mut y_sign,
+                    sign: y_sign,
                     exponent: y_exp,
                     precision: y_prec,
                     significand: y,
                 }),
                 subtract,
             ) => {
+                let mut y_sign = *y_sign;
                 if subtract {
                     y_sign.not_assign();
                 }

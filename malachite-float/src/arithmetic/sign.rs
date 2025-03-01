@@ -42,11 +42,7 @@ impl Sign for Float {
     /// ```
     fn sign(&self) -> Ordering {
         if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
-            if *sign {
-                Greater
-            } else {
-                Less
-            }
+            if *sign { Greater } else { Less }
         } else {
             panic!()
         }

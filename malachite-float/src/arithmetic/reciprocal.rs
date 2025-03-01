@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{float_nan, Float};
+use crate::{Float, float_nan};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, NegAssign, Reciprocal, ReciprocalAssign,
@@ -566,11 +566,7 @@ impl Float {
                     .unwrap();
                 *x_prec = prec;
                 *x = reciprocal;
-                if sign {
-                    o
-                } else {
-                    o.reverse()
-                }
+                if sign { o } else { o.reverse() }
             }
         }
     }

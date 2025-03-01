@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::pair_1_vec_len_bucketer;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_pair_gen_var_20, unsigned_vec_unsigned_pair_gen_var_22,
@@ -128,7 +128,7 @@ fn benchmark_natural_divisible_by_power_of_2_algorithms(
             }),
             (
                 "Natural.trailing_zeros().map_or(true, |z| z >= u64)",
-                &mut |(n, pow)| no_out!(n.trailing_zeros().map_or(true, |z| z >= pow)),
+                &mut |(n, pow)| no_out!(n.trailing_zeros().is_none_or(|z| z >= pow)),
             ),
         ],
     );

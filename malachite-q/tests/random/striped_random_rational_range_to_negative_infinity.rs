@@ -10,9 +10,9 @@ use core::f64;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
+use malachite_q::Rational;
 use malachite_q::random::striped_random_rational_range_to_negative_infinity;
 use malachite_q::test_util::random::random_rationals_helper_helper;
-use malachite_q::Rational;
 use std::str::FromStr;
 
 fn striped_random_rational_range_to_negative_infinity_helper(

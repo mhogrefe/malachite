@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::chars::exhaustive::{exhaustive_chars, ExhaustiveChars};
+use crate::chars::exhaustive::{ExhaustiveChars, exhaustive_chars};
 use crate::num::exhaustive::PrimitiveIntIncreasingRange;
-use crate::strings::{strings_from_char_vecs, StringsFromCharVecs};
+use crate::strings::{StringsFromCharVecs, strings_from_char_vecs};
 use crate::vecs::exhaustive::{
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle, ShortlexVecs,
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single, lex_vecs_fixed_length_from_single,
-    shortlex_vecs, ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle,
-    ShortlexVecs,
+    shortlex_vecs,
 };
 
 /// Generates all [`String`]s of a given length with [`char`]s from a single iterator, in
@@ -218,8 +218,8 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// );
 /// ```
 #[inline]
-pub fn shortlex_strings(
-) -> StringsFromCharVecs<ShortlexVecs<char, PrimitiveIntIncreasingRange<u64>, ExhaustiveChars>> {
+pub fn shortlex_strings()
+-> StringsFromCharVecs<ShortlexVecs<char, PrimitiveIntIncreasingRange<u64>, ExhaustiveChars>> {
     shortlex_strings_using_chars(exhaustive_chars())
 }
 
@@ -285,7 +285,7 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_strings(
-) -> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, ExhaustiveChars>> {
+pub fn exhaustive_strings()
+-> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, ExhaustiveChars>> {
     exhaustive_strings_using_chars(exhaustive_chars())
 }
