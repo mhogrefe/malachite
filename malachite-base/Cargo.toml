@@ -22,7 +22,7 @@ path = "src/bin.rs"
 test = false
 
 [dependencies]
-itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
+itertools = { version = "0.14.0", default-features = false, features = ["use_alloc"] }
 ryu = { version = "1.0.15", default-features = false }
 hashbrown = { version = "0.15", default-features = false, features = ["default-hasher", "inline-more"] }
 libm = { version = "0.2.8", default-features = false }
