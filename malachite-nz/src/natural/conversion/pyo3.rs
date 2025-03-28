@@ -52,11 +52,14 @@
 use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
+use core::convert::Infallible;
 #[allow(unused_imports)]
 use pyo3::{
-    Bound, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject,
-    exceptions::PyValueError, ffi, intern, types::*,
+    Bound, FromPyObject, IntoPyObject, Py, PyErr, PyObject, PyResult, Python,
+    exceptions::PyValueError, ffi, types::*,
 };
+#[cfg(Py_LIMITED_API)]
+use pyo3::intern;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Natural {
@@ -130,10 +133,26 @@ impl<'source> FromPyObject<'source> for Natural {
 }
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl ToPyObject for Natural {
-    fn to_object(&self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for Natural {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        (&self).into_pyobject(py)
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
+impl<'py> IntoPyObject<'py> for &Natural {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         if self == &Natural::ZERO {
-            return 0.to_object(py);
+            let zero_obj: Bound<PyInt> = 0i32.into_pyobject(py).unwrap();
+            return Ok(zero_obj.into_any());
         }
 
         let bytes = limbs_to_bytes(self.limbs(), self.limb_count());
@@ -146,27 +165,21 @@ impl ToPyObject for Natural {
                 1,            // little endian
                 false.into(), // unsigned
             );
-            PyObject::from_owned_ptr(py, obj)
+            Ok(Bound::from_owned_ptr(py, obj))
         }
 
         #[cfg(Py_LIMITED_API)]
         {
             let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = None;
-            py.get_type::<PyInt>()
+            let result: Bound<'py, PyAny> = py.get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), kwargs)
-                .expect("int.from_bytes() failed during to_object()")
-                .into()
+                .expect("int.from_bytes() failed during into_pyobject()");
+            Ok(result)
         }
     }
 }
 
-#[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl IntoPy<PyObject> for Natural {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        self.to_object(py)
-    }
-}
 
 /// Convert 32-bit limbs (little endian) used by malachite to bytes (little endian)
 #[cfg(feature = "32_bit_limbs")]
@@ -230,7 +243,7 @@ fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResul
 /// complement is returned.
 #[cfg(all(not(Py_LIMITED_API), not(feature = "32_bit_limbs")))]
 #[inline]
-fn int_to_limbs(long: Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u64>> {
+fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u64>> {
     let mut buffer = Vec::with_capacity(n_bytes);
     unsafe {
         let error_code = ffi::_PyLong_AsByteArray(

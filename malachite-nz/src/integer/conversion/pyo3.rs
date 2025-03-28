@@ -51,10 +51,14 @@
 use crate::integer::Integer;
 use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
+use core::convert::Infallible;
 #[allow(unused_imports)]
 use pyo3::{
-    Bound, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject, ffi, intern, types::*,
+    Bound, FromPyObject, IntoPyObject, Py, PyErr, PyObject, PyResult, Python,
+    ffi, types::*,
 };
+#[cfg(Py_LIMITED_API)]
+use pyo3::intern;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Integer {
@@ -121,10 +125,26 @@ impl<'source> FromPyObject<'source> for Integer {
 }
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl ToPyObject for Integer {
-    fn to_object(&self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for Integer {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        (&self).into_pyobject(py)
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
+impl<'a, 'py> IntoPyObject<'py> for &'a Integer {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         if self == &Integer::ZERO {
-            return 0.to_object(py);
+            let zero_obj: Bound<PyInt> = 0i32.into_pyobject(py).unwrap();
+            return Ok(zero_obj.into_any());
         }
 
         let bytes = limbs_to_bytes(
@@ -140,7 +160,7 @@ impl ToPyObject for Integer {
                 1,           // little endian
                 true.into(), // signed
             );
-            PyObject::from_owned_ptr(py, obj)
+            Ok(Bound::from_owned_ptr(py, obj))
         }
 
         #[cfg(Py_LIMITED_API)]
@@ -148,18 +168,11 @@ impl ToPyObject for Integer {
             let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = PyDict::new(py);
             kwargs.set_item(intern!(py, "signed"), true).unwrap();
-            py.get_type::<PyInt>()
+            let result: Bound<'py, PyAny> = py.get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), Some(&kwargs))
-                .expect("int.from_bytes() failed during to_object()")
-                .into()
+                .expect("int.from_bytes() failed during into_pyobject()");
+            Ok(result)
         }
-    }
-}
-
-#[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl IntoPy<PyObject> for Integer {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        self.to_object(py)
     }
 }
 
