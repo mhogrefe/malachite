@@ -21,7 +21,7 @@ name = "malachite_q_main"
 path = "src/bin.rs"
 
 [dependencies]
-itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
+itertools = { version = "0.14.0", default-features = false, features = ["use_alloc"] }
 malachite-base = { version = "0.5.1", default-features = false, path = "../malachite-base" }
 malachite-nz = { version = "0.5.1", default-features = false, path = "../malachite-nz" }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }

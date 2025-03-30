@@ -15,8 +15,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_gen, unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
@@ -380,19 +380,19 @@ fn twos_complement_limbs_properties() {
     integer_unsigned_pair_gen_var_2().test_properties(|(n, u)| {
         if u < n.unsigned_abs_ref().limb_count() {
             assert_eq!(
-                n.twos_complement_limbs().get(u),
+                (&n.twos_complement_limbs()).get(u),
                 n.to_twos_complement_limbs_asc()[usize::exact_from(u)]
             );
         } else {
             assert_eq!(
-                n.twos_complement_limbs().get(u),
+                (&n.twos_complement_limbs()).get(u),
                 if n >= 0 { 0 } else { Limb::MAX }
             );
         }
     });
 
     unsigned_gen_var_5().test_properties(|u| {
-        assert_eq!(Integer::ZERO.twos_complement_limbs().get(u), 0);
+        assert_eq!((&Integer::ZERO.twos_complement_limbs()).get(u), 0);
     });
 }
 

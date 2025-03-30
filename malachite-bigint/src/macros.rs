@@ -447,3 +447,41 @@ macro_rules! impl_to_primitive_fn_float {
         }
     };
 }
+
+macro_rules! forward_fmt {
+    ($t:ty, $($trait:ident),*) => {
+        $(impl core::fmt::$trait for $t {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                core::fmt::$trait::fmt(&self.0, f)
+            }
+        })*
+    }
+}
+
+macro_rules! impl_from {
+    ($wrapper:ty, $inner: ty) => {
+        impl From<$inner> for $wrapper {
+            fn from(value: $inner) -> Self {
+                Self(value)
+            }
+        }
+        impl From<$wrapper> for $inner {
+            #[inline]
+            fn from(value: $wrapper) -> Self {
+                value.0
+            }
+        }
+        impl<'a> From<&'a $wrapper> for &'a $inner {
+            #[inline]
+            fn from(value: &'a $wrapper) -> Self {
+                &value.0
+            }
+        }
+        impl<'a> From<&'a mut $wrapper> for &'a mut $inner {
+            #[inline]
+            fn from(value: &'a mut $wrapper) -> Self {
+                &mut value.0
+            }
+        }
+    };
+}

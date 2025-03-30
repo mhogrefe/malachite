@@ -21,7 +21,7 @@ name = "malachite_float_main"
 path = "src/bin.rs"
 
 [dependencies]
-itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
+itertools = { version = "0.14.0", default-features = false, features = ["use_alloc"] }
 malachite-base = { version = "0.5.1", default-features = false, path = "../malachite-base" }
 malachite-nz = { version = "0.5.1", default-features = false, features = ["float_helpers"], path = "../malachite-nz" }
 malachite-q = { version = "0.5.1", default-features = false, path = "../malachite-q" }

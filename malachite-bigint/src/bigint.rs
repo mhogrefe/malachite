@@ -1,4 +1,3 @@
-use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
 use malachite_base::{
     num::{
         arithmetic::traits::{
@@ -63,28 +62,13 @@ impl Neg for Sign {
 }
 
 #[repr(transparent)]
-#[derive(
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Default,
-    Display,
-    Binary,
-    Octal,
-    LowerHex,
-    UpperHex,
-    From,
-    Into,
-)]
-#[display("{}", self.0)]
-#[into(owned, ref, ref_mut)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct BigInt(Integer);
 
 apply_to_primitives!(forward_from{BigInt, _});
 apply_to_primitives!(forward_try_into{BigInt, _});
+
+impl_from!(BigInt, Integer);
 
 forward_unary_op!(BigInt, Not, not);
 forward_unary_op!(BigInt, Neg, neg);
@@ -138,11 +122,7 @@ apply_to_unsigneds!(forward_pow_primitive{BigInt, _});
 impl_product_iter_type!(BigInt);
 impl_sum_iter_type!(BigInt);
 
-impl std::fmt::Debug for BigInt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        Debug::fmt(&self.0, f)
-    }
-}
+forward_fmt!(BigInt, Debug, Display, Binary, Octal, LowerHex, UpperHex);
 
 impl CheckedAdd for BigInt {
     #[inline]
