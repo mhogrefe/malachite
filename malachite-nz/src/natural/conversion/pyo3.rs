@@ -52,25 +52,28 @@
 use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
+use core::convert::Infallible;
 #[allow(unused_imports)]
 use pyo3::{
-    Bound, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject,
-    exceptions::PyValueError, ffi, intern, types::*,
+    Bound, FromPyObject, IntoPyObject, Py, PyErr, PyObject, PyResult, Python,
+    exceptions::PyValueError, ffi, types::*,
 };
+#[cfg(Py_LIMITED_API)]
+use pyo3::intern;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Natural {
-    fn extract(ob: &'source PyAny) -> PyResult<Natural> {
+    fn extract_bound(ob: &Bound<'source, PyAny>) -> PyResult<Natural> {
         // get the Python interpreter
         let py = ob.py();
 
-        // get PyLong object
-        let num_owned: Py<PyLong>;
-        let num = if let Ok(long) = ob.downcast::<PyLong>() {
+        // get PyInt object
+        let num_owned: Py<PyInt>;
+        let num = if let Ok(long) = ob.downcast::<PyInt>() {
             long
         } else {
             num_owned = unsafe { Py::from_owned_ptr_or_err(py, ffi::PyNumber_Index(ob.as_ptr()))? };
-            num_owned.bind(py).as_gil_ref()
+            num_owned.bind(py)
         };
 
         // check if number is negative, and if so, raise TypeError
@@ -107,7 +110,8 @@ impl<'source> FromPyObject<'source> for Natural {
         }
         #[cfg(all(Py_LIMITED_API, feature = "32_bit_limbs"))]
         {
-            let bytes = int_to_py_bytes(num, n_bytes, false)?.as_bytes();
+            let py_bytes = int_to_py_bytes(num, n_bytes, false)?;
+            let bytes = py_bytes.as_bytes();
             let n_limbs_32 = n_bytes >> 2; // the number of 32-bit limbs needed to store the integer
             let mut limbs_32 = Vec::with_capacity(n_limbs_32);
             for i in (0..n_bytes).step_by(4) {
@@ -129,10 +133,26 @@ impl<'source> FromPyObject<'source> for Natural {
 }
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl ToPyObject for Natural {
-    fn to_object(&self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for Natural {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        (&self).into_pyobject(py)
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
+impl<'py> IntoPyObject<'py> for &Natural {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         if self == &Natural::ZERO {
-            return 0.to_object(py);
+            let zero_obj: Bound<PyInt> = 0i32.into_pyobject(py).unwrap();
+            return Ok(zero_obj.into_any());
         }
 
         let bytes = limbs_to_bytes(self.limbs(), self.limb_count());
@@ -145,27 +165,21 @@ impl ToPyObject for Natural {
                 1,            // little endian
                 false.into(), // unsigned
             );
-            PyObject::from_owned_ptr(py, obj)
+            Ok(Bound::from_owned_ptr(py, obj))
         }
 
         #[cfg(Py_LIMITED_API)]
         {
-            let bytes_obj = PyBytes::new_bound(py, &bytes);
+            let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = None;
-            py.get_type_bound::<PyLong>()
+            let result: Bound<'py, PyAny> = py.get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), kwargs)
-                .expect("int.from_bytes() failed during to_object()")
-                .into()
+                .expect("int.from_bytes() failed during into_pyobject()");
+            Ok(result)
         }
     }
 }
 
-#[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl IntoPy<PyObject> for Natural {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        self.to_object(py)
-    }
-}
 
 /// Convert 32-bit limbs (little endian) used by malachite to bytes (little endian)
 #[cfg(feature = "32_bit_limbs")]
@@ -202,11 +216,11 @@ fn limbs_to_bytes(limbs: impl Iterator<Item = u64>, limb_count: u64) -> Vec<u8> 
 /// complement is returned.
 #[cfg(all(not(Py_LIMITED_API), feature = "32_bit_limbs"))]
 #[inline]
-fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u32>> {
+fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u32>> {
     let mut buffer = Vec::with_capacity(n_bytes);
     unsafe {
         let error_code = ffi::_PyLong_AsByteArray(
-            long.as_ptr().cast(),           // ptr to PyLong object
+            long.as_ptr().cast(),           // ptr to PyInt object
             buffer.as_mut_ptr() as *mut u8, // ptr to first byte of buffer
             n_bytes << 2,                   // 4 bytes per u32
             1,                              // little endian
@@ -229,7 +243,7 @@ fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<
 /// complement is returned.
 #[cfg(all(not(Py_LIMITED_API), not(feature = "32_bit_limbs")))]
 #[inline]
-fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u64>> {
+fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u64>> {
     let mut buffer = Vec::with_capacity(n_bytes);
     unsafe {
         let error_code = ffi::_PyLong_AsByteArray(
@@ -256,15 +270,15 @@ fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<
 /// `is_signed` is true, the integer is treated as signed, and two's complement is returned.
 #[cfg(Py_LIMITED_API)]
 #[inline]
-fn int_to_py_bytes(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<&PyBytes> {
+fn int_to_py_bytes<'py>(long: &Bound<'py, PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Bound<'py, PyBytes>> {
     // get the Python interpreter
     let py = long.py();
 
     // setup kwargs for to_bytes (only if signed)
+    let kwargs_dict = PyDict::new(py);
     let kwargs = if is_signed {
-        let kwargs = PyDict::new_bound(py);
-        kwargs.set_item(intern!(py, "signed"), true)?;
-        Some(kwargs.into_gil_ref())
+        kwargs_dict.set_item(intern!(py, "signed"), true)?;
+        Some(&kwargs_dict)
     } else {
         None
     };
@@ -277,14 +291,14 @@ fn int_to_py_bytes(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<&
     )?;
 
     // downcast to PyBytes
-    Ok(bytes.downcast()?)
+    Ok(bytes.downcast_into()?)
 }
 
 /// Returns the number of bits in the absolute value of the given integer. The number of bits
 /// returned is the smallest number of bits that can represent the integer, not the multiple of 8
 /// (bytes) that it would take up in memory.
 #[inline]
-fn int_n_bits(long: &PyLong) -> PyResult<usize> {
+fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
     let py = long.py();
 
     #[cfg(not(Py_LIMITED_API))]
@@ -301,7 +315,7 @@ fn int_n_bits(long: &PyLong) -> PyResult<usize> {
     {
         // slow path
         long.call_method0(intern!(py, "bit_length"))
-            .and_then(PyAny::extract)
+            .and_then(|l| l.extract::<usize>())
     }
 }
 
