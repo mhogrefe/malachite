@@ -318,6 +318,9 @@ fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
 mod tests {
     use super::*;
     use indoc::indoc;
+    use std::ffi::CStr;
+    use pyo3::IntoPy;
+    use pyo3::FromPyObject;
 
     /// Prepare Python
     fn prepare_python() {
@@ -340,8 +343,8 @@ mod tests {
 
     /// Fibonacci sequence iterator (Python)
     fn python_fib(py: Python<'_>) -> impl Iterator<Item = PyObject> + '_ {
-        let mut f0 = 1.to_object(py);
-        let mut f1 = 1.to_object(py);
+        let mut f0 = 1i32.into_py(py);
+        let mut f1 = 1i32.into_py(py);
         std::iter::from_fn(move || {
             let f2 = f0.call_method1(py, "__add__", (f1.bind(py),)).unwrap();
             Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)))
@@ -349,19 +352,20 @@ mod tests {
     }
 
     /// Generate test python class
-    fn python_index_class(py: Python<'_>) -> &PyModule {
-        let index_code = indoc!(
+    fn python_index_class<'py>(py: Python<'py>) -> Bound<'py, PyModule> {
+        let index_code = std::ffi::CStr::from_bytes_with_nul(concat!(
             r#"
                 class C:
                     def __init__(self, x):
                         self.x = x
                     def __index__(self):
                         return self.x
-                "#
-        );
-        PyModule::from_code_bound(py, index_code, "index.py", "index")
-            .unwrap()
-            .into_gil_ref()
+                "#,
+            "\0"
+        ).as_bytes()).unwrap();
+        let filename = std::ffi::CStr::from_bytes_with_nul(b"index.py\0").unwrap();
+        let modulename = std::ffi::CStr::from_bytes_with_nul(b"index\0").unwrap();
+        PyModule::from_code(py, &index_code, &filename, &modulename).unwrap()
     }
 
     /// - Test conversion to and from Integer
@@ -384,7 +388,7 @@ mod tests {
                 // Python -> Rust
                 assert_eq!(py_result.extract::<Integer>(py).unwrap(), rs_result);
                 // Rust -> Python
-                assert!(py_result.bind(py).eq(rs_result).unwrap());
+                assert!(py_result.bind(py).eq(&rs_result).unwrap());
             }
         });
     }
@@ -395,21 +399,21 @@ mod tests {
         prepare_python();
         Python::with_gil(|py| {
             let index = python_index_class(py);
-            let locals = PyDict::new_bound(py);
-            locals.set_item("index", index).unwrap();
+            let locals = PyDict::new(py);
+            locals.set_item("index", &index).unwrap();
+            let expr = CStr::from_bytes_with_nul(b"index.C(10)\0").unwrap();
             let ob = py
-                .eval_bound("index.C(10)", None, Some(&locals))
-                .unwrap()
-                .into_gil_ref();
-            let integer: Integer = FromPyObject::extract(ob).unwrap();
+                .eval(expr, None, Some(&locals))
+                .unwrap();
+            let integer: Integer = <Integer as FromPyObject>::extract_bound(&ob).unwrap();
 
             assert_eq!(integer, Integer::from(10));
 
+            let expr2 = CStr::from_bytes_with_nul(b"index.C(-10)\0").unwrap();
             let ob2 = py
-                .eval_bound("index.C(-10)", None, Some(&locals))
-                .unwrap()
-                .into_gil_ref();
-            let integer2: Integer = FromPyObject::extract(ob2).unwrap();
+                .eval(expr2, None, Some(&locals))
+                .unwrap();
+            let integer2: Integer = <Integer as FromPyObject>::extract_bound(&ob2).unwrap();
 
             assert_eq!(integer2, Integer::from(-10));
         });
@@ -421,12 +425,12 @@ mod tests {
         prepare_python();
         Python::with_gil(|py| {
             // Python -> Rust
-            let zero_integer: Integer = 0.to_object(py).extract(py).unwrap();
+            let zero_integer: Integer = 0i32.into_py(py).extract(py).unwrap();
             assert_eq!(zero_integer, Integer::from(0));
 
             // Rust -> Python
-            let zero_integer = zero_integer.to_object(py);
-            assert!(zero_integer.bind(py).eq(Integer::from(0)).unwrap());
+            let zero_integer = zero_integer.into_pyobject(py).unwrap();
+            assert!(zero_integer.eq(&Integer::from(0)).unwrap());
         })
     }
 
@@ -439,8 +443,8 @@ mod tests {
                 ($T:ty, $value:expr, $py:expr) => {
                     let value = $value;
                     println!("{}: {}", stringify!($T), value);
-                    let python_value = value.clone().into_py(py);
-                    let roundtrip_value = python_value.extract::<$T>(py).unwrap();
+                    let python_value = value.clone().into_pyobject(py).unwrap();
+                    let roundtrip_value = <$T as FromPyObject>::extract_bound(&python_value).unwrap();
                     assert_eq!(value, roundtrip_value);
                 };
             }
