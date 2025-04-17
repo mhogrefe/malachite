@@ -134,7 +134,7 @@ impl<'source> FromPyObject<'source> for Natural {
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'py> IntoPyObject<'py> for Natural {
-    type Target = PyAny;
+    type Target = PyInt;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;
 
@@ -145,14 +145,13 @@ impl<'py> IntoPyObject<'py> for Natural {
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'py> IntoPyObject<'py> for &Natural {
-    type Target = PyAny;
+    type Target = PyInt;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;
 
     fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         if self == &Natural::ZERO {
-            let zero_obj: Bound<PyInt> = 0i32.into_pyobject(py).unwrap();
-            return Ok(zero_obj.into_any());
+            return 0i32.into_pyobject(py);
         }
 
         let bytes = limbs_to_bytes(self.limbs(), self.limb_count());
@@ -165,7 +164,7 @@ impl<'py> IntoPyObject<'py> for &Natural {
                 1,            // little endian
                 false.into(), // unsigned
             );
-            Ok(Bound::from_owned_ptr(py, obj))
+            Ok(Bound::from_owned_ptr(py, obj).downcast_into_unchecked())
         }
 
         #[cfg(Py_LIMITED_API)]
@@ -322,7 +321,7 @@ fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pyo3::FromPyObject;
+    use pyo3::{FromPyObject, IntoPyObjectExt};
 
     /// Prepare Python
     fn prepare_python() {
@@ -412,7 +411,7 @@ mod tests {
 
             // Rust -> Python
             let zero_natural = zero_natural.into_pyobject(py).unwrap();
-            assert!(zero_natural.eq(Natural::from(0_u8)).unwrap());
+            assert!(zero_natural.as_any().eq(0u8.into_py_any(py).unwrap()).unwrap());
         });
     }
 

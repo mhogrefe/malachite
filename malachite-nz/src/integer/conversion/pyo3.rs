@@ -126,7 +126,7 @@ impl<'source> FromPyObject<'source> for Integer {
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'py> IntoPyObject<'py> for Integer {
-    type Target = PyAny;
+    type Target = PyInt;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;
 
@@ -137,14 +137,13 @@ impl<'py> IntoPyObject<'py> for Integer {
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'py> IntoPyObject<'py> for &Integer {
-    type Target = PyAny;
+    type Target = PyInt;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;
 
     fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         if self == &Integer::ZERO {
-            let zero_obj: Bound<PyInt> = 0i32.into_pyobject(py).unwrap();
-            return Ok(zero_obj.into_any());
+            return Ok(0i32.into_pyobject(py).unwrap());
         }
 
         let bytes = limbs_to_bytes(
@@ -160,7 +159,7 @@ impl<'py> IntoPyObject<'py> for &Integer {
                 1,           // little endian
                 true.into(), // signed
             );
-            Ok(Bound::from_owned_ptr(py, obj))
+            Ok(Bound::from_owned_ptr(py, obj).downcast_into_unchecked::<PyInt>())
         }
 
         #[cfg(Py_LIMITED_API)]
@@ -319,6 +318,7 @@ mod tests {
     use super::*;
     use pyo3::IntoPyObject;
     use pyo3::FromPyObject;
+    use pyo3::IntoPyObjectExt;
 
     /// Prepare Python
     fn prepare_python() {
@@ -423,12 +423,12 @@ mod tests {
         prepare_python();
         Python::with_gil(|py| {
             // Python -> Rust
-            let zero_integer: Integer = 0i32.into_pyobject(py).unwrap().extract().unwrap();
+            let zero_integer: Integer = 0u8.into_pyobject(py).unwrap().extract().unwrap();
             assert_eq!(zero_integer, Integer::from(0));
 
             // Rust -> Python
             let zero_integer = zero_integer.into_pyobject(py).unwrap();
-            assert!(zero_integer.eq(Integer::from(0)).unwrap());
+            assert!(zero_integer.as_any().eq(0u8.into_py_any(py).unwrap()).unwrap());
         });
     }
 
