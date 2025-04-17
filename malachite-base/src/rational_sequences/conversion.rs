@@ -111,6 +111,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     (&[1u8, 2][..], &[3u8, 4][..])
     /// );
     /// ```
+    #[allow(clippy::missing_const_for_fn)]
     pub fn slices_ref(&self) -> (&[T], &[T]) {
         (&self.non_repeating, &self.repeating)
     }

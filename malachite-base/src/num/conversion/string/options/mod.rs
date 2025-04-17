@@ -160,14 +160,14 @@ impl ToSciOptions {
 
     /// Sets the rounding mode to be used in the conversion.
     #[inline]
-    pub fn set_rounding_mode(&mut self, rm: RoundingMode) {
+    pub const fn set_rounding_mode(&mut self, rm: RoundingMode) {
         self.rounding_mode = rm;
     }
 
     /// Sets the size options to the "Complete" mode, indicating that the number should be converted
     /// using its full precision.
     #[inline]
-    pub fn set_size_complete(&mut self) {
+    pub const fn set_size_complete(&mut self) {
         self.size_options = SciSizeOptions::Complete;
     }
 
@@ -184,7 +184,7 @@ impl ToSciOptions {
     /// Sets the size options to some scale, or number of digits after the decimal (or other-base)
     /// point.
     #[inline]
-    pub fn set_scale(&mut self, scale: u64) {
+    pub const fn set_scale(&mut self, scale: u64) {
         self.size_options = SciSizeOptions::Scale(scale);
     }
 
@@ -198,25 +198,25 @@ impl ToSciOptions {
 
     /// Specifies that digits in bases greater than ten should be output with lowercase letters.
     #[inline]
-    pub fn set_lowercase(&mut self) {
+    pub const fn set_lowercase(&mut self) {
         self.lowercase = true;
     }
 
     /// Specifies that digits in bases greater than ten should be output with uppercase letters.
     #[inline]
-    pub fn set_uppercase(&mut self) {
+    pub const fn set_uppercase(&mut self) {
         self.lowercase = false;
     }
 
     /// Specifies that the exponent-indicating character should be `'e'`.
     #[inline]
-    pub fn set_e_lowercase(&mut self) {
+    pub const fn set_e_lowercase(&mut self) {
         self.e_lowercase = true;
     }
 
     /// Specifies that the exponent-indicating character should be `'E'`.
     #[inline]
-    pub fn set_e_uppercase(&mut self) {
+    pub const fn set_e_uppercase(&mut self) {
         self.e_lowercase = false;
     }
 
@@ -225,13 +225,13 @@ impl ToSciOptions {
     /// If the base is 15 or greater, an explicit plus sign will be used regardless, in order to
     /// differentiate the exponent-indicating character from the digit `'e'`.
     #[inline]
-    pub fn set_force_exponent_plus_sign(&mut self, force_exponent_plus_sign: bool) {
+    pub const fn set_force_exponent_plus_sign(&mut self, force_exponent_plus_sign: bool) {
         self.force_exponent_plus_sign = force_exponent_plus_sign;
     }
 
     /// Sets whether trailing zeros after the decimal (or other-base) point should be included.
     #[inline]
-    pub fn set_include_trailing_zeros(&mut self, include_trailing_zeros: bool) {
+    pub const fn set_include_trailing_zeros(&mut self, include_trailing_zeros: bool) {
         self.include_trailing_zeros = include_trailing_zeros;
     }
 
@@ -290,7 +290,7 @@ impl FromSciStringOptions {
 
     /// Sets the rounding mode to be used in the conversion.
     #[inline]
-    pub fn set_rounding_mode(&mut self, rm: RoundingMode) {
+    pub const fn set_rounding_mode(&mut self, rm: RoundingMode) {
         self.rounding_mode = rm;
     }
 

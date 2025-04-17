@@ -138,7 +138,7 @@ impl StripedBitSource {
     ///     ]
     /// );
     /// ```
-    pub fn end_block(&mut self) {
+    pub const fn end_block(&mut self) {
         self.first_bit_of_block = true;
     }
 
@@ -183,7 +183,7 @@ impl StripedBitSource {
     ///     ]
     /// );
     /// ```
-    pub fn set_previous_bit(&mut self, bit: bool) {
+    pub const fn set_previous_bit(&mut self, bit: bool) {
         self.previous_bit = bit;
     }
 }

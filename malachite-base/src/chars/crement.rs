@@ -90,7 +90,7 @@ pub const fn contiguous_range_to_char(u: u32) -> Option<char> {
 /// assert_eq!(c, 'b');
 /// ```
 #[inline]
-pub fn increment_char(c: &mut char) {
+pub const fn increment_char(c: &mut char) {
     *c = contiguous_range_to_char(char_to_contiguous_range(*c) + 1)
         .expect("Cannot increment char::MAX");
 }
