@@ -1,4 +1,3 @@
-use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
 use malachite_base::{
     num::{
         arithmetic::traits::{
@@ -18,7 +17,6 @@ use num_traits::{
 use paste::paste;
 use std::{
     cmp::Ordering::{Equal, Greater, Less},
-    fmt::Debug,
     iter::{Product, Sum},
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
@@ -38,29 +36,14 @@ impl_primitive_convert!(BigUint, f32);
 impl_primitive_convert!(BigUint, f64);
 
 #[repr(transparent)]
-#[derive(
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Default,
-    Display,
-    Binary,
-    Octal,
-    LowerHex,
-    UpperHex,
-    From,
-    Into,
-)]
-#[display("{}", self.0)]
-#[into(owned, ref, ref_mut)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct BigUint(pub(crate) Natural);
 
 apply_to_unsigneds!(forward_from{BigUint, _});
 apply_to_signeds!(forward_try_from{BigUint, _});
 apply_to_primitives!(forward_try_into{BigUint, _});
+
+impl_from!(BigUint, Natural);
 
 forward_binary_self!(BigUint, Add, add);
 forward_binary_self!(BigUint, Sub, sub);
@@ -111,11 +94,7 @@ apply_to_unsigneds!(forward_pow_primitive{BigUint, _});
 impl_product_iter_type!(BigUint);
 impl_sum_iter_type!(BigUint);
 
-impl std::fmt::Debug for BigUint {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        Debug::fmt(&self.0, f)
-    }
-}
+forward_fmt!(BigUint, Debug, Display, Binary, Octal, LowerHex, UpperHex);
 
 impl CheckedAdd for BigUint {
     #[inline]
