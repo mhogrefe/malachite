@@ -54,8 +54,8 @@ use malachite_base::num::basic::traits::Zero;
 use core::convert::Infallible;
 #[allow(unused_imports)]
 use pyo3::{
-    Bound, FromPyObject, IntoPyObject, Py, PyErr, PyObject, PyResult, Python,
-    ffi, types::*,
+    Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyObject,
+    PyResult, Python, ffi, types::*,
 };
 #[cfg(Py_LIMITED_API)]
 use pyo3::intern;
@@ -316,9 +316,6 @@ fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pyo3::IntoPyObject;
-    use pyo3::FromPyObject;
-    use pyo3::IntoPyObjectExt;
 
     /// Prepare Python
     fn prepare_python() {
