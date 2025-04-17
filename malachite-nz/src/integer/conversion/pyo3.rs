@@ -136,7 +136,7 @@ impl<'py> IntoPyObject<'py> for Integer {
 }
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl<'a, 'py> IntoPyObject<'py> for &'a Integer {
+impl<'py> IntoPyObject<'py> for &Integer {
     type Target = PyAny;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;
@@ -224,7 +224,7 @@ fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResul
         if error_code == -1 {
             return Err(PyErr::fetch(long.py()));
         }
-        buffer.set_len(n_bytes) // set buffer length to the number of bytes
+        buffer.set_len(n_bytes); // set buffer length to the number of bytes
     };
     buffer
         .iter_mut()
@@ -317,9 +317,7 @@ fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use indoc::indoc;
-    use std::ffi::CStr;
-    use pyo3::IntoPy;
+    use pyo3::IntoPyObject;
     use pyo3::FromPyObject;
 
     /// Prepare Python
@@ -342,17 +340,17 @@ mod tests {
     }
 
     /// Fibonacci sequence iterator (Python)
-    fn python_fib(py: Python<'_>) -> impl Iterator<Item = PyObject> + '_ {
-        let mut f0 = 1i32.into_py(py);
-        let mut f1 = 1i32.into_py(py);
+    fn python_fib(py: Python<'_>) -> impl Iterator<Item = Py<PyInt>> {
+        let mut f0 = 1i32.into_pyobject(py).unwrap();
+        let mut f1 = 1i32.into_pyobject(py).unwrap();
         std::iter::from_fn(move || {
-            let f2 = f0.call_method1(py, "__add__", (f1.bind(py),)).unwrap();
-            Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)))
+            let f2 = f0.call_method1("__add__", (&f1,)).unwrap().downcast_into::<PyInt>().unwrap();
+            Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)).unbind())
         })
     }
 
     /// Generate test python class
-    fn python_index_class<'py>(py: Python<'py>) -> Bound<'py, PyModule> {
+    fn python_index_class(py: Python<'_>) -> Bound<'_, PyModule> {
         let index_code = std::ffi::CStr::from_bytes_with_nul(concat!(
             r#"
                 class C:
@@ -363,9 +361,9 @@ mod tests {
                 "#,
             "\0"
         ).as_bytes()).unwrap();
-        let filename = std::ffi::CStr::from_bytes_with_nul(b"index.py\0").unwrap();
-        let modulename = std::ffi::CStr::from_bytes_with_nul(b"index\0").unwrap();
-        PyModule::from_code(py, &index_code, &filename, &modulename).unwrap()
+        let filename = c"index.py";
+        let modulename = c"index";
+        PyModule::from_code(py, index_code, filename, modulename).unwrap()
     }
 
     /// - Test conversion to and from Integer
@@ -379,7 +377,7 @@ mod tests {
                 // Python -> Rust
                 assert_eq!(py_result.extract::<Integer>(py).unwrap(), rs_result);
                 // Rust -> Python
-                assert!(py_result.bind(py).eq(&rs_result).unwrap());
+                assert!(py_result.bind(py).as_any().eq(rs_result.clone().into_pyobject(py).unwrap()).unwrap());
 
                 // negate
                 let rs_result = rs_result * Integer::from(-1);
@@ -401,7 +399,7 @@ mod tests {
             let index = python_index_class(py);
             let locals = PyDict::new(py);
             locals.set_item("index", &index).unwrap();
-            let expr = CStr::from_bytes_with_nul(b"index.C(10)\0").unwrap();
+            let expr = c"index.C(10)";
             let ob = py
                 .eval(expr, None, Some(&locals))
                 .unwrap();
@@ -409,7 +407,7 @@ mod tests {
 
             assert_eq!(integer, Integer::from(10));
 
-            let expr2 = CStr::from_bytes_with_nul(b"index.C(-10)\0").unwrap();
+            let expr2 = c"index.C(-10)";
             let ob2 = py
                 .eval(expr2, None, Some(&locals))
                 .unwrap();
@@ -425,13 +423,13 @@ mod tests {
         prepare_python();
         Python::with_gil(|py| {
             // Python -> Rust
-            let zero_integer: Integer = 0i32.into_py(py).extract(py).unwrap();
+            let zero_integer: Integer = 0i32.into_pyobject(py).unwrap().extract().unwrap();
             assert_eq!(zero_integer, Integer::from(0));
 
             // Rust -> Python
             let zero_integer = zero_integer.into_pyobject(py).unwrap();
-            assert!(zero_integer.eq(&Integer::from(0)).unwrap());
-        })
+            assert!(zero_integer.eq(Integer::from(0)).unwrap());
+        });
     }
 
     /// Test for possible overflows

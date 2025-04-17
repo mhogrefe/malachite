@@ -229,7 +229,7 @@ fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResul
         if error_code == -1 {
             return Err(PyErr::fetch(long.py()));
         }
-        buffer.set_len(n_bytes) // set buffer length to the number of bytes
+        buffer.set_len(n_bytes); // set buffer length to the number of bytes
     };
     buffer
         .iter_mut()
@@ -322,9 +322,6 @@ fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use indoc::indoc;
-    use std::ffi::CStr;
-    use pyo3::IntoPy;
     use pyo3::FromPyObject;
 
     /// Prepare Python
@@ -347,30 +344,27 @@ mod tests {
     }
 
     /// Fibonacci sequence iterator (Python)
-    fn python_fib(py: Python<'_>) -> impl Iterator<Item = PyObject> + '_ {
-        let mut f0 = 1u32.into_py(py);
-        let mut f1 = 1u32.into_py(py);
+    fn python_fib(py: Python<'_>) -> impl Iterator<Item = Py<PyInt>> {
+        let mut f0 = 1u32.into_pyobject(py).unwrap();
+        let mut f1 = 1u32.into_pyobject(py).unwrap();
         std::iter::from_fn(move || {
-            let f2 = f0.call_method1(py, "__add__", (f1.bind(py),)).unwrap();
-            Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)))
+            let f2 = f0.call_method1("__add__", (&f1,)).unwrap().downcast_into::<PyInt>().unwrap();
+            Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)).unbind())
         })
     }
 
     /// Generate test python class
-    fn python_index_class<'py>(py: Python<'py>) -> Bound<'py, PyModule> {
-        let index_code = std::ffi::CStr::from_bytes_with_nul(concat!(
-            r#"
-                class C:
-                    def __init__(self, x):
-                        self.x = x
-                    def __index__(self):
-                        return self.x
-                "#,
-            "\0"
-        ).as_bytes()).unwrap();
-        let filename = std::ffi::CStr::from_bytes_with_nul(b"index.py\0").unwrap();
-        let modulename = std::ffi::CStr::from_bytes_with_nul(b"index\0").unwrap();
-        PyModule::from_code(py, &index_code, &filename, &modulename).unwrap()
+    fn python_index_class(py: Python<'_>) -> Bound<'_, PyModule> {
+        let index_code = c"
+            class C:
+                def __init__(self, x):
+                    self.x = x
+                def __index__(self):
+                    return self.x
+            ";
+        let filename = c"index.py";
+        let modulename = c"index";
+        PyModule::from_code(py, index_code, filename, modulename).unwrap()
     }
 
     /// - Test conversion to and from Natural
@@ -384,7 +378,7 @@ mod tests {
                 // Python -> Rust
                 assert_eq!(py_result.extract::<Natural>(py).unwrap(), rs_result);
                 // Rust -> Python
-                assert!(py_result.bind(py).eq(&rs_result).unwrap());
+                assert!(py_result.bind(py).as_any().eq(rs_result.into_pyobject(py).unwrap()).unwrap());
             }
         });
     }
@@ -397,7 +391,7 @@ mod tests {
             let index = python_index_class(py);
             let locals = PyDict::new(py);
             locals.set_item("index", &index).unwrap();
-            let expr = CStr::from_bytes_with_nul(b"index.C(10)\0").unwrap();
+            let expr = c"index.C(10)";
             let ob = py
                 .eval(expr, None, Some(&locals))
                 .unwrap();
@@ -413,13 +407,13 @@ mod tests {
         prepare_python();
         Python::with_gil(|py| {
             // Python -> Rust
-            let zero_natural: Natural = 0u32.into_py(py).extract(py).unwrap();
+            let zero_natural: Natural = 0u32.into_pyobject(py).unwrap().extract().unwrap();
             assert_eq!(zero_natural, Natural::from(0_u8));
 
             // Rust -> Python
             let zero_natural = zero_natural.into_pyobject(py).unwrap();
-            assert!(zero_natural.eq(&Natural::from(0_u8)).unwrap());
-        })
+            assert!(zero_natural.eq(Natural::from(0_u8)).unwrap());
+        });
     }
 
     /// Test for possible overflows
@@ -460,12 +454,12 @@ mod tests {
     fn negative_natural() {
         prepare_python();
         Python::with_gil(|py| {
-            let zero = 0u32.into_py(py);
-            let minus_one = (-1i32).into_py(py);
-            assert_eq!(zero.extract::<Natural>(py).unwrap(), Natural::ZERO);
+            let zero = 0u32.into_pyobject(py).unwrap();
+            let minus_one = (-1i32).into_pyobject(py).unwrap();
+            assert_eq!(zero.extract::<Natural>().unwrap(), Natural::ZERO);
             assert!(
                 minus_one
-                    .extract::<Natural>(py)
+                    .extract::<Natural>()
                     .unwrap_err()
                     .get_type(py)
                     .is(&PyType::new::<PyValueError>(py))
