@@ -28,21 +28,24 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_natural_power_of_2_digits);
     register_unsigned_demos!(runner, demo_natural_power_of_2_digits_rev);
     register_unsigned_demos!(runner, demo_natural_power_of_2_digits_size_hint);
-    register_unsigned_demos!(runner, demo_natural_power_of_2_digits_get);
+    register_unsigned_demos!(runner, demo_natural_power_of_2_digits_get_digit);
     register_demo!(runner, demo_natural_power_of_2_digits_natural);
     register_demo!(runner, demo_natural_power_of_2_digits_rev_natural);
     register_demo!(runner, demo_natural_power_of_2_digits_size_hint_natural);
-    register_demo!(runner, demo_natural_power_of_2_digits_get_natural);
+    register_demo!(runner, demo_natural_power_of_2_digits_get_digit_natural);
 
     register_unsigned_benches!(runner, benchmark_natural_power_of_2_digits_size_hint);
-    register_unsigned_benches!(runner, benchmark_natural_power_of_2_digits_get_algorithms);
+    register_unsigned_benches!(
+        runner,
+        benchmark_natural_power_of_2_digits_get_digit_algorithms
+    );
     register_bench!(
         runner,
         benchmark_natural_power_of_2_digits_size_hint_natural
     );
     register_bench!(
         runner,
-        benchmark_natural_power_of_2_digits_get_natural_algorithms
+        benchmark_natural_power_of_2_digits_get_digit_natural_algorithms
     );
 }
 
@@ -108,7 +111,7 @@ fn demo_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_natural_power_of_2_digits_get<T: PrimitiveUnsigned>(
+fn demo_natural_power_of_2_digits_get_digit<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -120,11 +123,11 @@ fn demo_natural_power_of_2_digits_get<T: PrimitiveUnsigned>(
         .take(limit)
     {
         println!(
-            "power_of_2_digits({}, {}).get({}) = {:?}",
+            "power_of_2_digits({}, {}).get_digit({}) = {:?}",
             n,
             log_base,
             i,
-            PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).get(i)
+            PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).get_digit(i)
         );
     }
 }
@@ -173,17 +176,17 @@ fn demo_natural_power_of_2_digits_size_hint_natural(gm: GenMode, config: &GenCon
     }
 }
 
-fn demo_natural_power_of_2_digits_get_natural(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_natural_power_of_2_digits_get_digit_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base, i) in natural_unsigned_unsigned_triple_gen_var_3()
         .get(gm, config)
         .take(limit)
     {
         println!(
-            "power_of_2_digits({}, {}).get({}) = {:?}",
+            "power_of_2_digits({}, {}).get_digit({}) = {:?}",
             n,
             log_base,
             i,
-            PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base).get(i)
+            PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base).get_digit(i)
         );
     }
 }
@@ -219,7 +222,7 @@ fn benchmark_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_natural_power_of_2_digits_get_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_natural_power_of_2_digits_get_digit_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -230,7 +233,7 @@ fn benchmark_natural_power_of_2_digits_get_algorithms<T: PrimitiveUnsigned>(
 {
     run_benchmark(
         &format!(
-            "PowerOf2DigitIterable::<{}>::power_of_2_digits(&Natural, u64).get(u64)",
+            "PowerOf2DigitIterable::<{}>::power_of_2_digits(&Natural, u64).get_digit(u64)",
             T::NAME
         ),
         BenchmarkType::Algorithms,
@@ -241,9 +244,11 @@ fn benchmark_natural_power_of_2_digits_get_algorithms<T: PrimitiveUnsigned>(
         &triple_1_natural_bit_bucketer("n"),
         &mut [
             (
-                "power_of_2_digits(&Natural, u64).get(u64)",
+                "power_of_2_digits(&Natural, u64).get_digit(u64)",
                 &mut |(n, log_base, i)| {
-                    no_out!(PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).get(i))
+                    no_out!(
+                        PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).get_digit(i)
+                    )
                 },
             ),
             (
@@ -288,14 +293,14 @@ fn benchmark_natural_power_of_2_digits_size_hint_natural(
 }
 
 #[allow(clippy::let_unit_value)]
-fn benchmark_natural_power_of_2_digits_get_natural_algorithms(
+fn benchmark_natural_power_of_2_digits_get_digit_natural_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "PowerOf2DigitIterable::<Natural>::power_of_2_digits(&Natural, u64).get(u64)",
+        "PowerOf2DigitIterable::<Natural>::power_of_2_digits(&Natural, u64).get_digit(u64)",
         BenchmarkType::Algorithms,
         natural_unsigned_unsigned_triple_gen_var_3().get(gm, config),
         gm.name(),
@@ -304,10 +309,11 @@ fn benchmark_natural_power_of_2_digits_get_natural_algorithms(
         &triple_1_natural_bit_bucketer("n"),
         &mut [
             (
-                "power_of_2_digits(&Natural, u64).get(u64)",
+                "power_of_2_digits(&Natural, u64).get_digit(u64)",
                 &mut |(n, log_base, i)| {
                     no_out!(
-                        PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base).get(i)
+                        PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base)
+                            .get_digit(i)
                     )
                 },
             ),

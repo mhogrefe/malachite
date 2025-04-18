@@ -650,9 +650,7 @@ pub_test! {limbs_div_barrett(
             // Since the partial remainder fed to limbs_div_barrett_approx_preinverted was
             // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
             // the largest possible value.
-            for s in &mut scratch_2 {
-                *s = Limb::MAX;
-            }
+            scratch_2.fill(Limb::MAX);
         }
         // The max error of limbs_div_barrett_approx is +4. If the low quotient limb is smaller than
         // the max error, we cannot trust the quotient.

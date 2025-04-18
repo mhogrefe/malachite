@@ -15,8 +15,8 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     signed_gen, unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
 };
-use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
@@ -146,12 +146,12 @@ fn test_twos_complement_limbs_asc() {
     assert_eq!(None, limbs.next_back());
 
     let limbs = n.twos_complement_limbs();
-    assert_eq!(limbs.get(0), u32::MAX);
-    assert_eq!(limbs.get(1), u32::MAX - 2);
-    assert_eq!(limbs.get(2), u32::MAX - 3);
-    assert_eq!(limbs.get(3), u32::MAX - 4);
-    assert_eq!(limbs.get(4), u32::MAX - 5);
-    assert_eq!(limbs.get(5), u32::MAX);
+    assert_eq!(limbs.get_limb(0), u32::MAX);
+    assert_eq!(limbs.get_limb(1), u32::MAX - 2);
+    assert_eq!(limbs.get_limb(2), u32::MAX - 3);
+    assert_eq!(limbs.get_limb(3), u32::MAX - 4);
+    assert_eq!(limbs.get_limb(4), u32::MAX - 5);
+    assert_eq!(limbs.get_limb(5), u32::MAX);
 
     let mut limbs = n.twos_complement_limbs();
     assert_eq!(Some(u32::MAX), limbs.next());
@@ -380,19 +380,19 @@ fn twos_complement_limbs_properties() {
     integer_unsigned_pair_gen_var_2().test_properties(|(n, u)| {
         if u < n.unsigned_abs_ref().limb_count() {
             assert_eq!(
-                (&n.twos_complement_limbs()).get(u),
+                n.twos_complement_limbs().get_limb(u),
                 n.to_twos_complement_limbs_asc()[usize::exact_from(u)]
             );
         } else {
             assert_eq!(
-                (&n.twos_complement_limbs()).get(u),
+                n.twos_complement_limbs().get_limb(u),
                 if n >= 0 { 0 } else { Limb::MAX }
             );
         }
     });
 
     unsigned_gen_var_5().test_properties(|u| {
-        assert_eq!((&Integer::ZERO.twos_complement_limbs()).get(u), 0);
+        assert_eq!(Integer::ZERO.twos_complement_limbs().get_limb(u), 0);
     });
 }
 

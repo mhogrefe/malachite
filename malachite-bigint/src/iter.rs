@@ -57,7 +57,7 @@ impl Iterator for U32Digits<'_> {
 
     #[inline]
     fn last(self) -> Option<Self::Item> {
-        self.iter.last().map(|limb| {
+        self.iter.most_significant().map(|limb| {
             if self.last_hi_is_zero {
                 limb as u32
             } else {
@@ -109,7 +109,7 @@ impl Iterator for U64Digits<'_> {
 
     #[inline]
     fn last(self) -> Option<u64> {
-        self.iter.last()
+        self.iter.most_significant()
     }
 
     #[inline]

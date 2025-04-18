@@ -51,15 +51,15 @@
 
 use crate::natural::Natural;
 use alloc::vec::Vec;
-use malachite_base::num::basic::traits::Zero;
 use core::convert::Infallible;
-#[allow(unused_imports)]
-use pyo3::{
-    Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyObject,
-    PyResult, Python, exceptions::PyValueError, ffi, types::*,
-};
+use malachite_base::num::basic::traits::Zero;
 #[cfg(Py_LIMITED_API)]
 use pyo3::intern;
+#[allow(unused_imports)]
+use pyo3::{
+    Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyObject, PyResult, Python,
+    exceptions::PyValueError, ffi, types::*,
+};
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Natural {
@@ -171,14 +171,14 @@ impl<'py> IntoPyObject<'py> for &Natural {
         {
             let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = None;
-            let result: Bound<'py, PyAny> = py.get_type::<PyInt>()
+            let result: Bound<'py, PyAny> = py
+                .get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), kwargs)
                 .expect("int.from_bytes() failed during into_pyobject()");
             Ok(result)
         }
     }
 }
-
 
 /// Convert 32-bit limbs (little endian) used by malachite to bytes (little endian)
 #[cfg(feature = "32_bit_limbs")]
@@ -269,7 +269,11 @@ fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResul
 /// `is_signed` is true, the integer is treated as signed, and two's complement is returned.
 #[cfg(Py_LIMITED_API)]
 #[inline]
-fn int_to_py_bytes<'py>(long: &Bound<'py, PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Bound<'py, PyBytes>> {
+fn int_to_py_bytes<'py>(
+    long: &Bound<'py, PyInt>,
+    n_bytes: usize,
+    is_signed: bool,
+) -> PyResult<Bound<'py, PyBytes>> {
     // get the Python interpreter
     let py = long.py();
 
@@ -346,7 +350,11 @@ mod tests {
         let mut f0 = 1u32.into_pyobject(py).unwrap();
         let mut f1 = 1u32.into_pyobject(py).unwrap();
         std::iter::from_fn(move || {
-            let f2 = f0.call_method1("__add__", (&f1,)).unwrap().downcast_into::<PyInt>().unwrap();
+            let f2 = f0
+                .call_method1("__add__", (&f1,))
+                .unwrap()
+                .downcast_into::<PyInt>()
+                .unwrap();
             Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)).unbind())
         })
     }
@@ -376,7 +384,13 @@ mod tests {
                 // Python -> Rust
                 assert_eq!(py_result.extract::<Natural>(py).unwrap(), rs_result);
                 // Rust -> Python
-                assert!(py_result.bind(py).as_any().eq(rs_result.into_pyobject(py).unwrap()).unwrap());
+                assert!(
+                    py_result
+                        .bind(py)
+                        .as_any()
+                        .eq(rs_result.into_pyobject(py).unwrap())
+                        .unwrap()
+                );
             }
         });
     }
@@ -390,9 +404,7 @@ mod tests {
             let locals = PyDict::new(py);
             locals.set_item("index", &index).unwrap();
             let expr = c"index.C(10)";
-            let ob = py
-                .eval(expr, None, Some(&locals))
-                .unwrap();
+            let ob = py.eval(expr, None, Some(&locals)).unwrap();
             let natural: Natural = <Natural as FromPyObject>::extract_bound(&ob).unwrap();
 
             assert_eq!(natural, Natural::from(10_u8));
@@ -410,7 +422,12 @@ mod tests {
 
             // Rust -> Python
             let zero_natural = zero_natural.into_pyobject(py).unwrap();
-            assert!(zero_natural.as_any().eq(0u8.into_py_any(py).unwrap()).unwrap());
+            assert!(
+                zero_natural
+                    .as_any()
+                    .eq(0u8.into_py_any(py).unwrap())
+                    .unwrap()
+            );
         });
     }
 
@@ -424,7 +441,8 @@ mod tests {
                     let value = $value;
                     println!("{}: {}", stringify!($T), value);
                     let python_value = value.clone().into_pyobject(py).unwrap();
-                    let roundtrip_value = <$T as FromPyObject>::extract_bound(&python_value).unwrap();
+                    let roundtrip_value =
+                        <$T as FromPyObject>::extract_bound(&python_value).unwrap();
                     assert_eq!(value, roundtrip_value);
                 };
             }

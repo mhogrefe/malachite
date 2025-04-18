@@ -68,6 +68,7 @@ pub struct OwnedHalfGcdMatrix {
     pub n: usize,
 }
 
+#[allow(clippy::missing_const_for_fn)]
 fn from_owned(m: &mut OwnedHalfGcdMatrix) -> HalfGcdMatrix {
     HalfGcdMatrix {
         s: m.s,

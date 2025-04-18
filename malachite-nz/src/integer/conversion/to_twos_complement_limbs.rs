@@ -108,7 +108,7 @@ struct NLIterator<'a> {
 }
 
 impl NLIterator<'_> {
-    fn get(&self, index: u64) -> Limb {
+    fn get_limb(&self, index: u64) -> Limb {
         let index = usize::exact_from(index);
         if index >= self.limbs.len() {
             // We're indexing into the infinite suffix of Limb::MAXs
@@ -290,22 +290,22 @@ impl TwosComplementLimbIterator<'_> {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().get(0), 0);
+    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().get_limb(0), 0);
     ///
     ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
     ///     let negative_trillion = -Integer::from(10u32).pow(12);
     ///     let limbs = negative_trillion.twos_complement_limbs();
-    ///     assert_eq!(limbs.get(0), 727379968);
-    ///     assert_eq!(limbs.get(1), 4294967063);
-    ///     assert_eq!(limbs.get(2), 4294967295);
-    ///     assert_eq!(limbs.get(100), 4294967295);
+    ///     assert_eq!(limbs.get_limb(0), 727379968);
+    ///     assert_eq!(limbs.get_limb(1), 4294967063);
+    ///     assert_eq!(limbs.get_limb(2), 4294967295);
+    ///     assert_eq!(limbs.get_limb(100), 4294967295);
     /// }
     /// ```
-    pub fn get(&self, index: u64) -> Limb {
+    pub fn get_limb(&self, index: u64) -> Limb {
         match self {
             TwosComplementLimbIterator::Zero => 0,
             TwosComplementLimbIterator::Positive(limbs, _) => limbs[usize::exact_from(index)],
-            TwosComplementLimbIterator::Negative(limbs, _) => limbs.0.get(index),
+            TwosComplementLimbIterator::Negative(limbs, _) => limbs.0.get_limb(index),
         }
     }
 }

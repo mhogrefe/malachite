@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Step 1. Checking for updates" &&
-rustup update &&
+rustup update ||
 cd malachite-base &&
 echo "Step 2. Formatting malachite-base" &&
 bash ../superfmt.sh &&

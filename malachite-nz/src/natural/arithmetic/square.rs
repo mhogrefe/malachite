@@ -620,7 +620,7 @@ pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
 // TODO tune
 
 /// This is equivalent to `SQR_TOOM6_MAX` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
-const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1 + 5) / 6;
+const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1).div_ceil(6);
 
 // TODO tune
 
@@ -793,7 +793,7 @@ pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
 
 /// This is equivalent to `SQR_TOOM8_MAX` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
-    (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
+    (SQR_FFT_THRESHOLD + 8 * 2 - 1).div_ceil(8)
 } else {
     usize::MAX
 };

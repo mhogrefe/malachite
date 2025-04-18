@@ -732,6 +732,7 @@ impl Natural {
         *self = self.or_neg_limb_neg(other);
     }
 
+    #[allow(clippy::missing_const_for_fn)]
     fn or_neg_limb_neg(&self, other: Limb) -> Natural {
         Natural(Small(match self {
             Natural(Small(small)) => (small.wrapping_neg() | other).wrapping_neg(),

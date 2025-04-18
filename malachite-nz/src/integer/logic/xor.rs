@@ -329,7 +329,7 @@ pub_test! {limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
     }
 }}
 
-fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
+const fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
     if *boundary_seen {
         !x
     } else if x == 0 {

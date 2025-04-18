@@ -66,7 +66,7 @@ struct ExtendedGcdContext<'a> {
 }
 
 impl<'a> ExtendedGcdContext<'a> {
-    fn new(
+    const fn new(
         gs: &'a mut [Limb],
         ss: &'a mut [Limb],
         us_len: usize,

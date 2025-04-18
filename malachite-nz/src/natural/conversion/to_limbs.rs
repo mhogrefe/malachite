@@ -172,6 +172,18 @@ impl Index<usize> for LimbIterator<'_> {
     }
 }
 
+impl LimbIterator<'_> {
+    // TODO document and test
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn most_significant(&self) -> Option<Limb> {
+        match self.n {
+            Natural(Small(0)) => None,
+            Natural(Small(small)) => Some(*small),
+            Natural(Large(limbs)) => limbs.last().copied(),
+        }
+    }
+}
+
 impl Natural {
     /// Returns the [limbs](crate#limbs) of a [`Natural`], in ascending order, so that
     /// less-significant limbs have lower indices in the output vector.

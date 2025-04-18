@@ -21,9 +21,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_unsigned_demos!(runner, demo_power_of_2_digits);
     register_unsigned_unsigned_demos!(runner, demo_power_of_2_digits_rev);
     register_unsigned_unsigned_demos!(runner, demo_power_of_2_digits_size_hint);
-    register_unsigned_unsigned_demos!(runner, demo_power_of_2_digits_get);
+    register_unsigned_unsigned_demos!(runner, demo_power_of_2_digits_get_digit);
     register_unsigned_unsigned_benches!(runner, benchmark_power_of_2_digits_size_hint);
-    register_unsigned_unsigned_benches!(runner, benchmark_power_of_2_digits_get_algorithms);
+    register_unsigned_unsigned_benches!(runner, benchmark_power_of_2_digits_get_digit_algorithms);
 }
 
 fn demo_power_of_2_digits<T: PowerOf2DigitIterable<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
@@ -88,7 +88,7 @@ fn demo_power_of_2_digits_size_hint<
     }
 }
 
-fn demo_power_of_2_digits_get<
+fn demo_power_of_2_digits_get_digit<
     T: PowerOf2DigitIterable<U> + PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >(
@@ -101,11 +101,11 @@ fn demo_power_of_2_digits_get<
         .take(limit)
     {
         println!(
-            "power_of_2_digits({}, {}).get({}) = {:?}",
+            "power_of_2_digits({}, {}).get_digit({}) = {:?}",
             x,
             log_base,
             i,
-            PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base).get(i)
+            PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base).get_digit(i)
         );
     }
 }
@@ -137,7 +137,7 @@ fn benchmark_power_of_2_digits_size_hint<
     );
 }
 
-fn benchmark_power_of_2_digits_get_algorithms<
+fn benchmark_power_of_2_digits_get_digit_algorithms<
     T: PowerOf2DigitIterable<U> + PowerOf2Digits<U> + PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >(
@@ -160,9 +160,9 @@ fn benchmark_power_of_2_digits_get_algorithms<
         &triple_1_bit_bucketer("x"),
         &mut [
             (
-                &format!("power_of_2_digits({}, u64).get(u64)", T::NAME),
+                &format!("power_of_2_digits({}, u64).get_digit(u64)", T::NAME),
                 &mut |(u, log_base, i)| {
-                    no_out!(PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base).get(i))
+                    no_out!(PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base).get_digit(i))
                 },
             ),
             (

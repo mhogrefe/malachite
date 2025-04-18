@@ -39,7 +39,7 @@ pub trait Digits<T>: Sized {
 
 /// An iterator over a value's base-$2^k$ digits.
 pub trait PowerOf2DigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
-    fn get(&self, index: u64) -> T;
+    fn get_digit(&self, index: u64) -> T;
 }
 
 /// Creates an iterator over a value's base-$2^k$ digits.

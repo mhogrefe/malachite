@@ -50,15 +50,15 @@
 
 use crate::integer::Integer;
 use alloc::vec::Vec;
-use malachite_base::num::basic::traits::Zero;
 use core::convert::Infallible;
-#[allow(unused_imports)]
-use pyo3::{
-    Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyObject,
-    PyResult, Python, ffi, types::*,
-};
+use malachite_base::num::basic::traits::Zero;
 #[cfg(Py_LIMITED_API)]
 use pyo3::intern;
+#[allow(unused_imports)]
+use pyo3::{
+    Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyObject, PyResult, Python, ffi,
+    types::*,
+};
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Integer {
@@ -167,7 +167,8 @@ impl<'py> IntoPyObject<'py> for &Integer {
             let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = PyDict::new(py);
             kwargs.set_item(intern!(py, "signed"), true).unwrap();
-            let result: Bound<'py, PyAny> = py.get_type::<PyInt>()
+            let result: Bound<'py, PyAny> = py
+                .get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), Some(&kwargs))
                 .expect("int.from_bytes() failed during into_pyobject()");
             Ok(result)
@@ -264,7 +265,11 @@ fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResul
 /// `is_signed` is true, the integer is treated as signed, and two's complement is returned.
 #[cfg(Py_LIMITED_API)]
 #[inline]
-fn int_to_py_bytes<'py>(long: &Bound<'py, PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Bound<'py, PyBytes>> {
+fn int_to_py_bytes<'py>(
+    long: &Bound<'py, PyInt>,
+    n_bytes: usize,
+    is_signed: bool,
+) -> PyResult<Bound<'py, PyBytes>> {
     // get the Python interpreter
     let py = long.py();
 
@@ -341,23 +346,31 @@ mod tests {
         let mut f0 = 1i32.into_pyobject(py).unwrap();
         let mut f1 = 1i32.into_pyobject(py).unwrap();
         std::iter::from_fn(move || {
-            let f2 = f0.call_method1("__add__", (&f1,)).unwrap().downcast_into::<PyInt>().unwrap();
+            let f2 = f0
+                .call_method1("__add__", (&f1,))
+                .unwrap()
+                .downcast_into::<PyInt>()
+                .unwrap();
             Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)).unbind())
         })
     }
 
     /// Generate test python class
     fn python_index_class(py: Python<'_>) -> Bound<'_, PyModule> {
-        let index_code = std::ffi::CStr::from_bytes_with_nul(concat!(
-            r#"
+        let index_code = std::ffi::CStr::from_bytes_with_nul(
+            concat!(
+                r#"
                 class C:
                     def __init__(self, x):
                         self.x = x
                     def __index__(self):
                         return self.x
                 "#,
-            "\0"
-        ).as_bytes()).unwrap();
+                "\0"
+            )
+            .as_bytes(),
+        )
+        .unwrap();
         let filename = c"index.py";
         let modulename = c"index";
         PyModule::from_code(py, index_code, filename, modulename).unwrap()
@@ -374,7 +387,13 @@ mod tests {
                 // Python -> Rust
                 assert_eq!(py_result.extract::<Integer>(py).unwrap(), rs_result);
                 // Rust -> Python
-                assert!(py_result.bind(py).as_any().eq(rs_result.clone().into_pyobject(py).unwrap()).unwrap());
+                assert!(
+                    py_result
+                        .bind(py)
+                        .as_any()
+                        .eq(rs_result.clone().into_pyobject(py).unwrap())
+                        .unwrap()
+                );
 
                 // negate
                 let rs_result = rs_result * Integer::from(-1);
@@ -397,17 +416,13 @@ mod tests {
             let locals = PyDict::new(py);
             locals.set_item("index", &index).unwrap();
             let expr = c"index.C(10)";
-            let ob = py
-                .eval(expr, None, Some(&locals))
-                .unwrap();
+            let ob = py.eval(expr, None, Some(&locals)).unwrap();
             let integer: Integer = <Integer as FromPyObject>::extract_bound(&ob).unwrap();
 
             assert_eq!(integer, Integer::from(10));
 
             let expr2 = c"index.C(-10)";
-            let ob2 = py
-                .eval(expr2, None, Some(&locals))
-                .unwrap();
+            let ob2 = py.eval(expr2, None, Some(&locals)).unwrap();
             let integer2: Integer = <Integer as FromPyObject>::extract_bound(&ob2).unwrap();
 
             assert_eq!(integer2, Integer::from(-10));
@@ -425,7 +440,12 @@ mod tests {
 
             // Rust -> Python
             let zero_integer = zero_integer.into_pyobject(py).unwrap();
-            assert!(zero_integer.as_any().eq(0u8.into_py_any(py).unwrap()).unwrap());
+            assert!(
+                zero_integer
+                    .as_any()
+                    .eq(0u8.into_py_any(py).unwrap())
+                    .unwrap()
+            );
         });
     }
 
@@ -439,7 +459,8 @@ mod tests {
                     let value = $value;
                     println!("{}: {}", stringify!($T), value);
                     let python_value = value.clone().into_pyobject(py).unwrap();
-                    let roundtrip_value = <$T as FromPyObject>::extract_bound(&python_value).unwrap();
+                    let roundtrip_value =
+                        <$T as FromPyObject>::extract_bound(&python_value).unwrap();
                     assert_eq!(value, roundtrip_value);
                 };
             }

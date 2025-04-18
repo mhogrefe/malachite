@@ -50,7 +50,7 @@ impl Float {
     /// assert_eq!(Float::NEGATIVE_ONE.abs_negative_zero(), Float::NEGATIVE_ONE);
     /// ```
     #[inline]
-    pub fn abs_negative_zero(mut self) -> Float {
+    pub const fn abs_negative_zero(mut self) -> Float {
         self.abs_negative_zero_assign();
         self
     }
@@ -146,7 +146,7 @@ impl Float {
     /// x.abs_negative_zero_assign();
     /// assert_eq!(x, Float::NEGATIVE_ONE);
     /// ```
-    pub fn abs_negative_zero_assign(&mut self) {
+    pub const fn abs_negative_zero_assign(&mut self) {
         if let Float(Zero { sign }) = self {
             *sign = true;
         }

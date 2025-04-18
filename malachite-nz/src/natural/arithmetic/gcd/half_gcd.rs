@@ -180,7 +180,7 @@ impl HalfGcdMatrix<'_> {
     // This is equivalent to `mpn_hgcd_matrix_init` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1,
     // where the matrix is returned.
     pub_crate_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix {
-        let s = (n + 1) / 2 + 1;
+        let s = n.div_ceil(2) + 1;
         let two_s = s << 1;
         let three_s = two_s + s;
         slice_set_zero(&mut p[..s << 2]);

@@ -690,7 +690,7 @@ impl Float {
     ///
     /// Special cases:
     /// - $f(\text{NaN},x,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
-    ///     \text{NaN}$
+    ///   \text{NaN}$
     /// - $f(\infty,x,p,m)=f(x,\infty,p,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,p,m)=f(x,-\infty,p,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,p,m)=0.0$
@@ -801,7 +801,7 @@ impl Float {
     ///
     /// Special cases:
     /// - $f(\text{NaN},x,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
-    ///     \text{NaN}$
+    ///   \text{NaN}$
     /// - $f(\infty,x,p,m)=f(x,\infty,p,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,p,m)=f(x,-\infty,p,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,p,m)=0.0$
@@ -912,7 +912,7 @@ impl Float {
     ///
     /// Special cases:
     /// - $f(\text{NaN},x,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
-    ///     \text{NaN}$
+    ///   \text{NaN}$
     /// - $f(\infty,x,p,m)=f(x,\infty,p,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,p,m)=f(x,-\infty,p,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,p,m)=0.0$
@@ -1023,7 +1023,7 @@ impl Float {
     ///
     /// Special cases:
     /// - $f(\text{NaN},x,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
-    ///     \text{NaN}$
+    ///   \text{NaN}$
     /// - $f(\infty,x,p,m)=f(x,\infty,p,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,p,m)=f(x,-\infty,p,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,p,m)=0.0$
@@ -1391,8 +1391,7 @@ impl Float {
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)=
-    ///     \text{NaN}$
+    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)= \text{NaN}$
     /// - $f(\infty,x,m)=f(x,\infty,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,m)=f(x,-\infty,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,m)=0.0$
@@ -1487,8 +1486,7 @@ impl Float {
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)=
-    ///     \text{NaN}$
+    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)= \text{NaN}$
     /// - $f(\infty,x,m)=f(x,\infty,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,m)=f(x,-\infty,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,m)=0.0$
@@ -1583,8 +1581,7 @@ impl Float {
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)=
-    ///     \text{NaN}$
+    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)= \text{NaN}$
     /// - $f(\infty,x,m)=f(x,\infty,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,m)=f(x,-\infty,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,m)=0.0$
@@ -1678,8 +1675,7 @@ impl Float {
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)=
-    ///     \text{NaN}$
+    /// - $f(\text{NaN},x,m)=f(x,\text{NaN},m)=f(\infty,-\infty,m)=f(-\infty,\infty,m)= \text{NaN}$
     /// - $f(\infty,x,m)=f(x,\infty,m)=\infty$ if $x$ is not NaN or $-\infty$
     /// - $f(-\infty,x,m)=f(x,-\infty,m)=-\infty$ if $x$ is not NaN or $\infty$
     /// - $f(0.0,0.0,m)=0.0$

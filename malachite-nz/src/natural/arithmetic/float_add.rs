@@ -2236,7 +2236,7 @@ enum RoundBit {
 
 impl RoundBit {
     #[inline]
-    fn flip_assign(&mut self) {
+    const fn flip_assign(&mut self) {
         match self {
             False => *self = True,
             True => *self = False,

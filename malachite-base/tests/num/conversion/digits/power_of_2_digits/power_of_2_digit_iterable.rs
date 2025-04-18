@@ -33,12 +33,12 @@ pub fn test_power_of_2_digits() {
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 3);
-    assert_eq!(digits.get(1), 2);
-    assert_eq!(digits.get(2), 2);
-    assert_eq!(digits.get(3), 1);
-    assert_eq!(digits.get(4), 0);
-    assert_eq!(digits.get(5), 0);
+    assert_eq!(digits.get_digit(0), 3);
+    assert_eq!(digits.get_digit(1), 2);
+    assert_eq!(digits.get_digit(2), 2);
+    assert_eq!(digits.get_digit(3), 1);
+    assert_eq!(digits.get_digit(4), 0);
+    assert_eq!(digits.get_digit(5), 0);
 
     let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
     assert_eq!(digits.next_back(), Some(1));
@@ -67,15 +67,15 @@ pub fn test_power_of_2_digits() {
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 1);
-    assert_eq!(digits.get(1), 0);
-    assert_eq!(digits.get(2), 0);
-    assert_eq!(digits.get(3), 1);
-    assert_eq!(digits.get(4), 0);
-    assert_eq!(digits.get(5), 1);
-    assert_eq!(digits.get(6), 1);
-    assert_eq!(digits.get(7), 0);
-    assert_eq!(digits.get(8), 0);
+    assert_eq!(digits.get_digit(0), 1);
+    assert_eq!(digits.get_digit(1), 0);
+    assert_eq!(digits.get_digit(2), 0);
+    assert_eq!(digits.get_digit(3), 1);
+    assert_eq!(digits.get_digit(4), 0);
+    assert_eq!(digits.get_digit(5), 1);
+    assert_eq!(digits.get_digit(6), 1);
+    assert_eq!(digits.get_digit(7), 0);
+    assert_eq!(digits.get_digit(8), 0);
 
     let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(105u32, 1);
     assert_eq!(digits.next_back(), Some(1));
@@ -148,17 +148,17 @@ where
         let digits = PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base);
         if i < u.significant_bits().div_round(log_base, Ceiling).0 {
             assert_eq!(
-                digits.get(i),
+                digits.get_digit(i),
                 PowerOf2Digits::<U>::to_power_of_2_digits_asc(&u, log_base)[usize::exact_from(i)]
             );
         } else {
-            assert_eq!(digits.get(i), U::ZERO);
+            assert_eq!(digits.get_digit(i), U::ZERO);
         }
     });
 
     unsigned_pair_gen_var_5::<u64, U>().test_properties(|(i, log_base)| {
         let digits = PowerOf2DigitIterable::<U>::power_of_2_digits(T::ZERO, log_base);
-        assert_eq!(digits.get(i), U::ZERO);
+        assert_eq!(digits.get_digit(i), U::ZERO);
     });
 }
 

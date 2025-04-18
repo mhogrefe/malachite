@@ -98,16 +98,16 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     /// };
     ///
     /// let digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
-    /// assert_eq!(digits.get(0), 0);
+    /// assert_eq!(digits.get_digit(0), 0);
     ///
     /// // 107 = 1101011b
     /// let digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
-    /// assert_eq!(digits.get(0), 3);
-    /// assert_eq!(digits.get(1), 2);
-    /// assert_eq!(digits.get(2), 2);
-    /// assert_eq!(digits.get(100), 0);
+    /// assert_eq!(digits.get_digit(0), 3);
+    /// assert_eq!(digits.get_digit(1), 2);
+    /// assert_eq!(digits.get_digit(2), 2);
+    /// assert_eq!(digits.get_digit(100), 0);
     /// ```
-    fn get(&self, index: u64) -> U {
+    fn get_digit(&self, index: u64) -> U {
         let i = index * self.log_base;
         U::wrapping_from(self.value.get_bits(i, i + self.log_base))
     }

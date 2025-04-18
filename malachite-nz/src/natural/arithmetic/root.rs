@@ -532,7 +532,7 @@ pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64)
     assert!(exp > 2);
     // (xs_len - 1) / exp > 2 <=> xs_len > 3 * exp <=> (xs_len + 2) / 3 > exp
     let u_exp = usize::exact_from(exp);
-    if (xs_len + 2) / 3 > u_exp {
+    if xs_len.div_ceil(3) > u_exp {
         // Pad xs with exp zero limbs. This will produce an approximate root with one more limb,
         // allowing us to compute the exact integral result.
         let ws_len = xs_len + u_exp;
