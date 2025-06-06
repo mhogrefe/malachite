@@ -24,6 +24,7 @@ fn is_constant_helper(xs: &[u8], result: bool) {
 #[test]
 fn test_is_constant() {
     is_constant_helper(&[], true);
+
     is_constant_helper(&[5], true);
     is_constant_helper(&[5, 6], false);
     is_constant_helper(&[5, 5], true);
@@ -33,5 +34,5 @@ fn test_is_constant() {
     is_constant_helper(&[1, 2, 2, 4], false);
     is_constant_helper(&[4; 100], true);
 
-    assert_eq!(is_constant([1, 2].iter().cycle()), false);
+    assert_eq!(is_constant([1, 2].into_iter().cycle()), false);
 }

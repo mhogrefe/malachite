@@ -9,7 +9,7 @@
 use crate::num::arithmetic::traits::PowerOf2;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::IntegerMantissaAndExponent;
+use crate::num::conversion::traits::{IntegerMantissaAndExponent, SaturatingFrom};
 
 fn power_of_2_unsigned<T: PrimitiveUnsigned>(pow: u64) -> T {
     assert!(pow < T::WIDTH);
@@ -71,6 +71,25 @@ apply_to_signeds!(impl_power_of_2_signed);
 
 macro_rules! impl_power_of_2_primitive_float {
     ($t:ident) => {
+        impl PowerOf2<u64> for $t {
+            /// Raises 2 to an integer power.
+            ///
+            /// $f(k) = 2^k$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if the power is greater than `Self::MAX_EXPONENT`.
+            ///
+            /// # Examples
+            /// See [here](super::power_of_2#power_of_2).
+            #[inline]
+            fn power_of_2(pow: u64) -> $t {
+                $t::from_integer_mantissa_and_exponent(1, i64::saturating_from(pow)).unwrap()
+            }
+        }
+
         impl PowerOf2<i64> for $t {
             /// Raises 2 to an integer power.
             ///

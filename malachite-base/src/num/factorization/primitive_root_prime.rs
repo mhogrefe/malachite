@@ -21,7 +21,7 @@ use crate::num::factorization::factor::{
 use crate::num::factorization::traits::{Factor, IsPrime, PrimitiveRootPrime};
 
 // This is n_primitive_root_prime from ulong_extras/primitive_root_prime.c, FLINT 3.3.0-dev.
-pub fn primitive_root_prime<T: PrimitiveUnsigned + IsPrime + Factor, const N: usize>(p: T) -> T
+fn primitive_root_prime<T: PrimitiveUnsigned + IsPrime + Factor, const N: usize>(p: T) -> T
 where
     <T as Factor>::FACTORS: Clone + IntoIterator<Item = (T, u8)>,
 {

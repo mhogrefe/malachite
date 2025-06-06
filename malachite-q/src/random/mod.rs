@@ -1352,6 +1352,7 @@ impl Iterator for RandomRationalInclusiveRangeInner {
 
 /// Generates random [`Rational`]s in a closed interval $\[a,b\]$. See
 /// [`random_rational_inclusive_range`] for more details.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum RandomRationalInclusiveRange {
     Single(Rational),

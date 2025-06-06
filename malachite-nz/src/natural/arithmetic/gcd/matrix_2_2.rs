@@ -277,14 +277,15 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     let mut mul_scratch = vec![
         0;
         max!(
-            limbs_mul_to_out_scratch_len(sum_len + 1, ys_len + 1),
-            limbs_mul_to_out_scratch_len(xs_len + 1, ys_len),
+            limbs_mul_to_out_scratch_len(xs_len, ys_len),
             limbs_mul_to_out_scratch_len(xs_len, ys_len + 1),
+            limbs_mul_to_out_scratch_len(xs_len + 1, ys_len),
             limbs_mul_to_out_scratch_len(xs_len + 1, ys_len + 1)
         )
     ];
     assert!(xs01_lo_init.len() <= sum_len + 1);
     assert!(ys10.len() <= ys_len + 1);
+    // size: xs_len, ys_len
     limbs_mul_to_out(u0, xs01_lo_init, ys10, &mut mul_scratch);
     // xs11 - xs10
     let mut x11_sign = limbs_sub_abs_same_length_in_place_left(xs11_lo, xs10_lo);
@@ -314,6 +315,8 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
         limbs_sub_abs_same_length_to_out(s0_init, xs00_lo, xs01_lo_init)
     };
     // u0 = s0 * t0
+    //
+    // size: xs_len, ys_len
     limbs_mul_to_out(u1, xs00_lo, ys00, &mut mul_scratch);
     let (u0_last, u0_init) = u0.split_last_mut().unwrap();
     xs00[sum_len] = Limb::from(limbs_add_same_length_to_out(xs00, u0_init, &u1[..sum_len]));
@@ -323,6 +326,8 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // Reverse sign!
     let u1_sign = x11_sign == t0_sign;
     // u2 = s2 * t2
+    //
+    // size: xs_len, ys_len
     limbs_mul_to_out(u1, xs11_lo, t0_init, &mut mul_scratch);
     u1[sum_len] = 0;
     *t0_last = if t0_sign {
@@ -333,12 +338,15 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     };
     if *t0_last != 0 {
         // u3 = s3 * t3
+        //
+        // size: xs_len, ys_len + 1
         limbs_mul_to_out(xs11, xs01_lo_init, t0, &mut mul_scratch);
         assert!(*xs01_lo_last < 2);
         if *xs01_lo_last != 0 {
             limbs_slice_add_same_length_in_place_left(&mut xs11[xs_len..], t0);
         }
     } else {
+        // size: xs_len + 1, ys_len
         limbs_mul_to_out(xs11, xs01_lo, t0_init, &mut mul_scratch);
     }
     assert!(xs11[sum_len] < 4);
@@ -361,6 +369,8 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
         t0_sign = limbs_sub_abs_same_length_in_place_left(t0_init, ys00);
     }
     // u6 = s6 * t4
+    //
+    // size: xs_len, ys_len + 1
     limbs_mul_to_out(u0, xs10_lo, t0, &mut mul_scratch);
     assert!(u0[sum_len] < 2);
     let (xs01_lo_last, xs01_lo_init) = xs01_lo.split_last_mut().unwrap();
@@ -377,10 +387,14 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // -u2 + u3 + u5
     assert!(xs11[sum_len] < 3);
     // u4 = s4 * t5
+    //
+    // size: xs_len + 1, ys_len
     limbs_mul_to_out(u0, s0, ys01, &mut mul_scratch);
     assert!(u0[sum_len] < 2);
     t0[ys_len] = Limb::from(limbs_add_same_length_to_out(t0, ys11, ys01));
     // u1 = s1 * t1
+    //
+    // size: xs_len + 1, ys_len + 1
     limbs_mul_to_out(u1, xs01_lo, t0, &mut mul_scratch);
     assert!(u1[sum_len] < 4);
     let (u1_last, u1_init) = u1.split_last_mut().unwrap();

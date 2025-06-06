@@ -2462,9 +2462,9 @@ pub mod pow;
 /// assert_eq!(i8::power_of_2(3), 8);
 /// assert_eq!(i64::power_of_2(40), 1 << 40);
 ///
-/// assert_eq!(f32::power_of_2(0), 1.0);
-/// assert_eq!(f32::power_of_2(3), 8.0);
-/// assert_eq!(f32::power_of_2(-3), 0.125);
+/// assert_eq!(f32::power_of_2(0u64), 1.0);
+/// assert_eq!(f32::power_of_2(3u64), 8.0);
+/// assert_eq!(f32::power_of_2(-3i64), 0.125);
 /// ```
 pub mod power_of_2;
 /// Traits for computing the primorial and the product of the first $n$ primes. There is a trait

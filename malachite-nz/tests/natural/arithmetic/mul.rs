@@ -12259,7 +12259,7 @@ fn test_mul() {
         assert_eq!(n, product);
 
         let n = rug::Integer::from(&u) * rug::Integer::from(&v);
-        assert_eq!(Natural::exact_from(&n), product);
+        assert!(Natural::exact_from(&n) == product);
     };
     big_test(Natural::power_of_2(100_000), Natural::power_of_2(100_000));
     // - limbs_fft_mulmod_2expp1_helper, out[j] != 0

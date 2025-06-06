@@ -97,7 +97,7 @@ fn main() {
 }
 
 #[cfg(not(feature = "bin_build"))]
-fn main() {}
+const fn main() {}
 
 #[cfg(feature = "bin_build")]
 pub mod bin_util {

@@ -809,7 +809,7 @@ fn exhaustive_rational_range_helper(
 /// Generates all [`Natural`]s in an interval of the form $[a,b)$.
 ///
 /// This `struct` is created by [`exhaustive_rational_range`]; see its documentation for more.
-#[allow(private_interfaces)]
+#[allow(private_interfaces, clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ExhaustiveRationalRange {
     Empty,
@@ -929,7 +929,7 @@ fn exhaustive_rational_inclusive_range_helper(
 ///
 /// This `struct` is created by [`exhaustive_rational_inclusive_range`]; see its documentation for
 /// more.
-#[allow(private_interfaces)]
+#[allow(private_interfaces, clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ExhaustiveRationalInclusiveRange {
     Single(bool, Rational),

@@ -13,6 +13,6 @@ functions. The current floating-point string conversion functions are incomplete
 
 Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, shekohex, and skycloudd for additional contributions.
 
-<https://www.malachite.rs/>
+<https://malachite.rs/>
 
 Copyright © 2025 Mikhail Hogrefe

@@ -354,7 +354,7 @@ pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
-pub_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
+pub_crate_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_to_out(out, ns);
     } else {

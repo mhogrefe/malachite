@@ -1215,7 +1215,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     limbs_mul_same_length_to_out(v_2, as2, bs2, mul_scratch);
     // size: s, t
     limbs_mul_to_out(v_inf, xs_3, ys_1, mul_scratch);
-    // size: n + 1
+    // size: n
     limbs_mul_same_length_to_out(v_1, as1_init, bs1_init, mul_scratch);
     let v_1 = &mut v_1[n..];
     let mut carry = match *as1_last {

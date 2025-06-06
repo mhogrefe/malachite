@@ -62,8 +62,8 @@ fn power_of_2_signed_fail_helper<T: PrimitiveSigned>() {
 fn power_of_2_primitive_float_fail_helper<T: PrimitiveFloat>() {
     assert_panic!(T::power_of_2(T::MAX_EXPONENT + 1));
     assert_panic!(T::power_of_2(T::MIN_EXPONENT - 1));
-    assert_panic!(T::power_of_2(10000));
-    assert_panic!(T::power_of_2(-10000));
+    assert_panic!(T::power_of_2(10000u64));
+    assert_panic!(T::power_of_2(-10000i64));
 }
 
 #[test]

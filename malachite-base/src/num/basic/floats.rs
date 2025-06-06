@@ -163,6 +163,7 @@ pub trait PrimitiveFloat:
     + PowAssign<i64>
     + PowAssign<Self>
     + PowerOf2<i64>
+    + PowerOf2<u64>
     + PrimeConstant
     + Product
     + RawMantissaAndExponent<u64, u64>
