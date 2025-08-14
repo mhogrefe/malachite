@@ -23,7 +23,7 @@ use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::factorization::primes::SMALL_PRIMES;
-use crate::num::factorization::traits::{Factor, IsPrime, Primes};
+use crate::num::factorization::traits::{Factor, IsPrime, IsSquare, Primes};
 use crate::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use core::mem::swap;
 
@@ -323,38 +323,6 @@ fn factor_power23_u64(n: u64) -> (u64, u8) {
     (0, 0)
 }
 
-const IS_SQUARE_MOD64: [bool; 64] = [
-    true, true, false, false, true, false, false, false, false, true, false, false, false, false,
-    false, false, true, true, false, false, false, false, false, false, false, true, false, false,
-    false, false, false, false, false, true, false, false, true, false, false, false, false, true,
-    false, false, false, false, false, false, false, true, false, false, false, false, false,
-    false, false, true, false, false, false, false, false, false,
-];
-
-const IS_SQUARE_MOD65: [bool; 65] = [
-    true, true, false, false, true, false, false, false, false, true, true, false, false, false,
-    true, false, true, false, false, false, false, false, false, false, false, true, true, false,
-    false, true, true, false, false, false, false, true, true, false, false, true, true, false,
-    false, false, false, false, false, false, false, true, false, true, false, false, false, true,
-    true, false, false, false, false, true, false, false, true,
-];
-
-const IS_SQUARE_MOD63: [bool; 63] = [
-    true, true, false, false, true, false, false, true, false, true, false, false, false, false,
-    true, false, true, false, true, false, false, false, true, false, false, true, false, false,
-    true, false, false, false, false, false, false, true, true, true, false, false, false, false,
-    false, true, false, false, true, false, false, true, false, false, false, false, false, false,
-    true, false, true, false, false, false, false,
-];
-
-// This is n_is_square when FLINT64 is false, from ulong_extras/is_square.c, FLINT 3.1.2.
-fn is_square_u64(x: u64) -> bool {
-    IS_SQUARE_MOD64[(x % 64) as usize]
-        && IS_SQUARE_MOD63[(x % 63) as usize]
-        && IS_SQUARE_MOD65[(x % 65) as usize]
-        && x.floor_sqrt().square() == x
-}
-
 const FLINT_ONE_LINE_MULTIPLIER: u32 = 480;
 
 // This is n_factor_one_line when FLINT64 is true, from ulong_extras/factor_one_line.c, FLINT 3.1.2.
@@ -370,7 +338,7 @@ fn factor_one_line_u64(mut n: u64, iters: usize) -> u64 {
         let mut sqrti = inn.floor_sqrt() + 1;
         let square = sqrti.square();
         let mmod = square - inn;
-        if is_square_u64(mmod) {
+        if mmod.is_square() {
             sqrti -= mmod.floor_sqrt();
             let factor = orig_n.gcd(sqrti);
             if factor != 1 {
@@ -677,7 +645,7 @@ fn ll_factor_squfof_u64(n_hi: u64, n_lo: u64, max_iters: usize) -> u64 {
         qlast = q;
         q = t;
         p = pnext;
-        if i.odd() || !is_square_u64(q) {
+        if i.odd() || !q.is_square() {
             continue;
         }
         r = q.floor_sqrt();
