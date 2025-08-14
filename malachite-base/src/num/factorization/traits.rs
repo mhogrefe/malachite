@@ -11,6 +11,11 @@ pub trait IsPrime {
     fn is_prime(&self) -> bool;
 }
 
+/// A trait for testing whether a number is a square.
+pub trait IsSquare {
+    fn is_square(&self) -> bool;
+}
+
 /// A trait for finding the prime factorization of a number.
 pub trait Factor {
     type FACTORS;
