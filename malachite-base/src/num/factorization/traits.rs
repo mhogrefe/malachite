@@ -16,6 +16,12 @@ pub trait IsSquare {
     fn is_square(&self) -> bool;
 }
 
+/// A trait for testing whether a number is a perfect power.
+pub trait IsPerfectPower {
+    type Output;
+    fn is_perfect_power(&self) -> Self::Output;
+}
+
 /// A trait for finding the prime factorization of a number.
 pub trait Factor {
     type FACTORS;

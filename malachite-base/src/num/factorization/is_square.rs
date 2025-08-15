@@ -11,6 +11,7 @@
 // 3 of the License, or (at your option any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{FloorSqrt, Square};
+use crate::num::conversion::traits::ExactFrom;
 use crate::num::factorization::traits::IsSquare;
 
 const IS_SQUARE_MOD64: [bool; 64] = [
@@ -50,7 +51,7 @@ macro_rules! impl_unsigned {
         impl IsSquare for $t {
             #[inline]
             fn is_square(&self) -> bool {
-                is_square_u64(*self as u64)
+                is_square_u64(u64::exact_from(*self))
             }
         }
     };
