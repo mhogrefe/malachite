@@ -8,8 +8,12 @@
 
 /// [`Factor`](traits::Factor), a trait for computing the prime factorization of a number.
 pub mod factor;
+/// [`IsPerfectPower`](traits::IsPerfectPower), a trait for testing if a number if a perfect power.
+pub mod is_perfect_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
+/// [`IsSquare`](traits::IsSquare), a trait for testing if a number if a perfect square.
+pub mod is_square;
 /// An efficient prime sieve.
 pub mod prime_sieve;
 /// [`Primes`](traits::Primes), a trait for generating prime numbers.

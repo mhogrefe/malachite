@@ -396,7 +396,9 @@ pub mod num {
     }
     pub mod factorization {
         pub mod factor;
+        pub mod is_perfect_power;
         pub mod is_prime;
+        pub mod is_square;
         pub mod prime_indicator_sequence;
         pub mod prime_indicator_sequence_less_than;
         pub mod prime_sieve;
