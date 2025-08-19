@@ -1,9 +1,5 @@
 // Copyright © 2025 William Youmans
 //
-// Uses code adopted from the FLINT Library.
-//
-//      Copyright © 2009 William Hart
-//
 // This file is part of Malachite.
 //
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -11,26 +7,57 @@
 // 3 of the License, or (at your option any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::factorization::traits::IsSquare;
-use malachite_base::num::random::random_unsigned_bit_chunks;
-use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::test_util::generators::{signed_gen_var_4, unsigned_pair_gen_var_6};
 
-const NUM_TESTS: usize = 1000;
+#[test]
+fn is_square_properties() {
+    // test negative signed integers are non square and positive signed
+    // integer squares are squares.
+    signed_gen_var_4::<i32>().test_properties(|x| {
+        let x = i64::from(x);
+        assert!(!x.is_square());
+        assert!((x * x).is_square());
+    });
+
+    // 1 < x < 2^32 avoids overflow and consecutive squares (0, 1).
+    unsigned_pair_gen_var_6::<u32, u64>().test_properties(|(y, x)| {
+        // test unsigned squares
+        let sqr = x * x;
+        assert!(sqr.is_square());
+
+        // test non squares in interval (x^2, (x+1)^2)
+        let non_sqr = sqr + (u64::from(y) % (2 * x)) + 1;
+        assert!(!non_sqr.is_square());
+    });
+}
 
 #[test]
 fn test_is_square() {
-    // Randomly generate integers in the range (a^2, (a+1)^2) which are guaranteed
-    // to not be square.
-    let iter_a = random_unsigned_bit_chunks::<u64>(EXAMPLE_SEED, 32).take(NUM_TESTS);
-    let iter_b = random_unsigned_bit_chunks::<u64>(EXAMPLE_SEED, 32).take(NUM_TESTS);
-    for (a, b) in iter_a.zip(iter_b) {
-        let s = a * a + (b % (2 * a)) + 1;
-        assert!(!s.is_square());
-    }
+    assert!(0u8.is_square());
+    assert!(0u16.is_square());
+    assert!(0u32.is_square());
+    assert!(0u64.is_square());
 
-    // Randomly generate squares
-    let iter_a = random_unsigned_bit_chunks::<u64>(EXAMPLE_SEED, 32).take(NUM_TESTS);
-    for a in iter_a {
-        let s = a * a;
-        assert!(s.is_square());
-    }
+    assert!(1u64.is_square());
+    assert!(4u64.is_square());
+    assert!(9u64.is_square());
+    assert!(16u64.is_square());
+    assert!(25u64.is_square());
+
+    assert!(0i8.is_square());
+    assert!(0i16.is_square());
+    assert!(0i32.is_square());
+    assert!(0i64.is_square());
+
+    assert!(1i64.is_square());
+    assert!(4i64.is_square());
+    assert!(9i64.is_square());
+    assert!(16i64.is_square());
+    assert!(25i64.is_square());
+
+    assert!(!(-1i64).is_square());
+    assert!(!(-4i64).is_square());
+    assert!(!(-9i64).is_square());
+    assert!(!(-16i64).is_square());
+    assert!(!(-25i64).is_square());
 }
