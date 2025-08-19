@@ -13,6 +13,21 @@ pub mod is_perfect_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
 /// [`IsSquare`](traits::IsSquare), a trait for testing if a number if a perfect square.
+///
+/// # is_square
+/// ```
+/// use malachite_base::num::factorization::traits::IsSquare;
+///
+/// assert!(0u8.is_square());
+/// assert!(1u16.is_square());
+/// assert!(4u32.is_square());
+/// assert!(256u64.is_square());
+///
+/// assert!(!2u8.is_square());
+/// assert!(!5u16.is_square());
+/// assert!(!8u32.is_square());
+/// assert!(!128u64.is_square());
+/// ```
 pub mod is_square;
 /// An efficient prime sieve.
 pub mod prime_sieve;
