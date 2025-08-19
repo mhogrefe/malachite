@@ -64,15 +64,7 @@ const MOD79: [u8; 79] = [
 ];
 
 // This is n_is_perfect_power when FLINT64 is false, from ulong_extras/is_power.c, FLINT 3.1.2.
-fn is_perfect_power_u32(n: u32) -> Option<(u32, u32)> {
-    if n == 0 {
-        return Some((0, 2));
-    }
-
-    if n == 1 {
-        return Some((1, 2));
-    }
-
+fn get_perfect_power_u32(n: u32) -> Option<(u32, u32)> {
     // Check for powers 2, 3, 5
     let mut t = MOD31[(n % 31) as usize];
     t &= MOD44[(n % 44) as usize];
@@ -166,15 +158,7 @@ fn is_perfect_power_u32(n: u32) -> Option<(u32, u32)> {
 }
 
 // This is n_is_perfect_power when FLINT64 is true, from ulong_extras/is_power.c, FLINT 3.1.2.
-fn is_perfect_power_u64(n: u64) -> Option<(u64, u32)> {
-    if n == 0 {
-        return Some((0, 2));
-    }
-
-    if n == 1 {
-        return Some((1, 2));
-    }
-
+fn get_perfect_power_u64(n: u64) -> Option<(u64, u32)> {
     // Check for powers 2, 3, 5
     let mut t = MOD31[(n % 31) as usize];
     t &= MOD44[(n % 44) as usize];
@@ -323,6 +307,62 @@ fn is_perfect_power_u64(n: u64) -> Option<(u64, u32)> {
             return Some((13, exp));
         }
         return None;
+    }
+
+    None
+}
+
+fn is_perfect_power_u32(n: u32) -> Option<(u32, u32)> {
+    if n == 0 {
+        return Some((0, 2));
+    }
+
+    if n == 1 {
+        return Some((1, 2));
+    }
+
+    // continue until we have largest possible exponent
+    if let Some((mut base, mut exp)) = get_perfect_power_u32(n) {
+        while base > 3 {
+            match get_perfect_power_u32(base) {
+                Some((base2, exp2)) => {
+                    base = base2;
+                    exp *= exp2;
+                }
+                None => {
+                    return Some((base, exp));
+                }
+            }
+        }
+        return Some((base, exp));
+    }
+
+    None
+}
+
+fn is_perfect_power_u64(n: u64) -> Option<(u64, u32)> {
+    if n == 0 {
+        return Some((0, 2));
+    }
+
+    if n == 1 {
+        return Some((1, 2));
+    }
+
+    // continue until we have largest possible exponent
+    if let Some((mut base, mut exp)) = get_perfect_power_u64(n) {
+        while base > 3 {
+            match get_perfect_power_u64(base) {
+                Some((base2, exp2)) => {
+                    base = base2;
+                    exp *= exp2;
+                }
+                None => {
+                    return Some((base, exp));
+                }
+            }
+        }
+        return Some((base, exp));
     }
 
     None
