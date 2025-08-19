@@ -576,7 +576,7 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
+pub_crate_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
     let mut out_rem = vec![0; xs_len];
