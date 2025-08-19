@@ -14,6 +14,7 @@ use malachite_base::random::EXAMPLE_SEED;
 const NUM_TESTS: usize = 1000;
 const BITS: u64 = 64;
 
+#[test]
 fn test_perfect_squares() {
     // Test that squares pass the test
     let iter = random_unsigned_bit_chunks::<u64>(EXAMPLE_SEED, BITS / 2).take(NUM_TESTS);
@@ -28,6 +29,7 @@ fn test_perfect_squares() {
     }
 }
 
+#[test]
 fn test_perfect_cubes() {
     let iter = random_unsigned_bit_chunks::<u32>(EXAMPLE_SEED, BITS / 3).take(NUM_TESTS);
     for d in iter {
@@ -41,6 +43,7 @@ fn test_perfect_cubes() {
     }
 }
 
+#[test]
 fn test_perfect_fifth_powers() {
     let iter = random_unsigned_bit_chunks::<u32>(EXAMPLE_SEED, BITS / 5).take(NUM_TESTS);
     for d in iter {
@@ -54,6 +57,7 @@ fn test_perfect_fifth_powers() {
     }
 }
 
+#[test]
 fn test_exhaustive_other_powers() {
     // Exhaustively test all other powers
     // This tests all bases from 2 up to 2^(WORD_BITS/5) and all their powers
@@ -79,6 +83,7 @@ fn test_exhaustive_other_powers() {
     }
 }
 
+#[test]
 fn test_non_perfect_powers() {
     let iter = random_unsigned_bit_chunks::<u64>(EXAMPLE_SEED, 64).take(NUM_TESTS);
     for d in iter {
@@ -89,6 +94,7 @@ fn test_non_perfect_powers() {
     }
 }
 
+#[test]
 fn test_edge_cases() {
     // non-perfect powers
     let non_pows: [u64; 5] = [2, 3, 6, 11, 15];
@@ -104,11 +110,15 @@ fn test_edge_cases() {
 }
 
 #[test]
-fn test_is_perfect_power() {
-    test_perfect_squares();
-    test_perfect_cubes();
-    test_perfect_fifth_powers();
-    test_exhaustive_other_powers();
-    test_non_perfect_powers();
-    test_edge_cases();
+fn test_signed() {
+    assert_eq!(0i8.is_perfect_power().unwrap(), (0, 2));
+    assert_eq!(1i16.is_perfect_power().unwrap(), (1, 2));
+    assert_eq!(4i32.is_perfect_power().unwrap(), (2, 2));
+    assert_eq!(8i64.is_perfect_power().unwrap(), (2, 3));
+
+    // 64 = 2^6 = 4^3 but 3 is the largest odd exponent, so -64 = (-4)^3
+    // where in the unsigned case we expect 2^6. etc.
+    assert_eq!((-64i32).is_perfect_power().unwrap(), (-4, 3));
+    assert_eq!((-4096i64).is_perfect_power().unwrap(), (-16, 3));
+    assert_eq!((-3486784401i64).is_perfect_power().unwrap(), (-81, 5));
 }

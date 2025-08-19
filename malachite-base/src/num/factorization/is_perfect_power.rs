@@ -368,6 +368,84 @@ fn is_perfect_power_u64(n: u64) -> Option<(u64, u32)> {
     None
 }
 
+fn is_perfect_power_signed_u32(n: i32) -> Option<(i32, u32)> {
+    if n == 0 {
+        return Some((0, 2));
+    }
+
+    if n == 1 {
+        return Some((1, 2));
+    }
+
+    // continue until we have largest possible exponent
+    if let Some((mut base, mut exp)) = get_perfect_power_u32(n.unsigned_abs()) {
+        while base > 3 {
+            match get_perfect_power_u32(base) {
+                Some((base2, exp2)) => {
+                    base = base2;
+                    exp *= exp2;
+                }
+                None => break,
+            }
+        }
+        // handle negative input
+        if n < 0 && (exp & 1) == 0 {
+            while (exp & 1) == 0 {
+                base *= base;
+                exp >>= 1;
+            }
+            if exp == 1 {
+                return None;
+            }
+        }
+        if n < 0 {
+            return Some((-i32::exact_from(base), exp));
+        }
+        return Some((i32::exact_from(base), exp));
+    }
+
+    None
+}
+
+fn is_perfect_power_signed_u64(n: i64) -> Option<(i64, u32)> {
+    if n == 0 {
+        return Some((0, 2));
+    }
+
+    if n == 1 {
+        return Some((1, 2));
+    }
+
+    // continue until we have largest possible exponent
+    if let Some((mut base, mut exp)) = get_perfect_power_u64(n.unsigned_abs()) {
+        while base > 3 {
+            match get_perfect_power_u64(base) {
+                Some((base2, exp2)) => {
+                    base = base2;
+                    exp *= exp2;
+                }
+                None => break,
+            }
+        }
+        // handle negative input
+        if n < 0 && (exp & 1) == 0 {
+            while (exp & 1) == 0 {
+                base *= base;
+                exp >>= 1;
+            }
+            if exp == 1 {
+                return None;
+            }
+        }
+        if n < 0 {
+            return Some((-i64::exact_from(base), exp));
+        }
+        return Some((i64::exact_from(base), exp));
+    }
+
+    None
+}
+
 impl IsPerfectPower for u64 {
     type Output = Option<(u64, u32)>;
     /// Determine whether an integer is a perfect power. For consistency, we define
@@ -455,3 +533,91 @@ macro_rules! impl_unsigned_32 {
 impl_unsigned_32!(u8);
 impl_unsigned_32!(u16);
 impl_unsigned_32!(u32);
+
+impl IsPerfectPower for i64 {
+    type Output = Option<(i64, u32)>;
+    /// Determine whether an integer is a perfect power. For consistency, we define
+    /// a perfect power as any number of the form $a^x$ where $x > 1$, with $a$ and
+    /// $x$ both integers. In particular $0$ and $1$ are considered perfect powers.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See [here](super::is_perfect_power#is_perfect_power).
+    ///
+    /// # Notes
+    ///  - This returns an [`Option`] which is either `Some((base, exp))` if the input
+    ///    is a perfect power equal to $base^exp$, otherwise `None`.
+    ///  - Based on the above, for $0$ this returns `Some((0, 2))` and for $1$ this
+    ///    returns `Some((1, 2))`.
+    #[inline]
+    fn is_perfect_power(&self) -> Self::Output {
+        is_perfect_power_signed_u64(*self)
+    }
+}
+
+impl IsPerfectPower for isize {
+    type Output = Option<(isize, u32)>;
+    /// Determine whether an integer is a perfect power. For consistency, we define
+    /// a perfect power as any number of the form $a^x$ where $x > 1$, with $a$ and
+    /// $x$ both integers. In particular $0$ and $1$ are considered perfect powers.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See [here](super::is_perfect_power#is_perfect_power).
+    ///
+    /// # Notes
+    ///  - This returns an [`Option`] which is either `Some((base, exp))` if the input
+    ///    is a perfect power equal to $base^exp$, otherwise `None`.
+    ///  - Based on the above, for $0$ this returns `Some((0, 2))` and for $1$ this
+    ///    returns `Some((1, 2))`.
+    fn is_perfect_power(&self) -> Self::Output {
+        if USIZE_IS_U32 {
+            match is_perfect_power_signed_u32(i32::exact_from(*self)) {
+                Some((base, exp)) => Some((isize::exact_from(base), exp)),
+                _ => None,
+            }
+        } else {
+            match is_perfect_power_signed_u64(i64::exact_from(*self)) {
+                Some((base, exp)) => Some((isize::exact_from(base), exp)),
+                _ => None,
+            }
+        }
+    }
+}
+
+macro_rules! impl_signed_32 {
+    ($t: ident) => {
+        impl IsPerfectPower for $t {
+            type Output = Option<($t, u32)>;
+            /// Determine whether an integer is a perfect power. For consistency, we define
+            /// a perfect power as any number of the form $a^x$ where $x > 1$, with $a$ and
+            /// $x$ both integers. In particular $0$ and $1$ are considered perfect powers.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::is_perfect_power#is_perfect_power).
+            ///
+            /// # Notes
+            ///  - This returns an [`Option`] which is either `Some((base, exp))` if the input
+            ///    is a perfect power equal to $base^exp$, otherwise `None`.
+            ///  - Based on the above, for $0$ this returns `Some((0, 2))` and for $1$ this
+            ///    returns `Some((1, 2))`.
+            fn is_perfect_power(&self) -> Self::Output {
+                match is_perfect_power_signed_u32(i32::from(*self)) {
+                    Some((base, exp)) => Some(($t::exact_from(base), exp)),
+                    _ => None,
+                }
+            }
+        }
+    };
+}
+
+impl_signed_32!(i8);
+impl_signed_32!(i16);
+impl_signed_32!(i32);
