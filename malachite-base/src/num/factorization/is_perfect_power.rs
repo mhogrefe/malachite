@@ -322,6 +322,17 @@ fn is_perfect_power_u64(n: u64) -> Option<(u64, u32)> {
 
 impl IsPerfectPower for u64 {
     type Output = Option<(u64, u32)>;
+    /// Determine whether an integer is a perfect power.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See [here](super::is_perfect_power#is_perfect_power).
+    ///
+    /// # Notes
+    /// This returns an [`Option`] which is either `Some((base, exp))` if the input
+    /// is a perfect power equal to $base^exp$, otherwise `None`.
     #[inline]
     fn is_perfect_power(&self) -> Self::Output {
         is_perfect_power_u64(*self)
@@ -330,6 +341,17 @@ impl IsPerfectPower for u64 {
 
 impl IsPerfectPower for usize {
     type Output = Option<(usize, u32)>;
+    /// Determine whether an integer is a perfect power.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See [here](super::is_perfect_power#is_perfect_power).
+    ///
+    /// # Notes
+    /// This returns an [`Option`] which is either `Some((base, exp))` if the input
+    /// is a perfect power equal to $base^exp$, otherwise `None`.
     fn is_perfect_power(&self) -> Self::Output {
         if USIZE_IS_U32 {
             match is_perfect_power_u32(u32::exact_from(*self)) {
@@ -349,6 +371,17 @@ macro_rules! impl_unsigned_32 {
     ($t: ident) => {
         impl IsPerfectPower for $t {
             type Output = Option<($t, u32)>;
+            /// Determine whether an integer is a perfect power.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::is_perfect_power#is_perfect_power).
+            ///
+            /// # Notes
+            /// This returns an [`Option`] which is either `Some((base, exp))` if the input
+            /// is a perfect power equal to $base^exp$, otherwise `None`.
             fn is_perfect_power(&self) -> Self::Output {
                 match is_perfect_power_u32(u32::from(*self)) {
                     Some((base, exp)) => Some(($t::exact_from(base), exp)),
