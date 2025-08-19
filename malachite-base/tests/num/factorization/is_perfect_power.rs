@@ -91,12 +91,12 @@ fn test_non_perfect_powers() {
 
 fn test_edge_cases() {
     // non-perfect powers
-    let non_pows: [u64; 5] = [0, 1, 2, 3, 6];
+    let non_pows: [u64; 5] = [2, 3, 6, 11, 15];
     for x in non_pows {
         assert_eq!(x.is_perfect_power(), None);
     }
 
-    let pows: [u64; 10] = [4, 8, 9, 16, 25, 32, 64, 81, 100, 128];
+    let pows: [u64; 12] = [0, 1, 4, 8, 9, 16, 25, 32, 64, 81, 100, 128];
     for x in pows {
         let (base, exp) = x.is_perfect_power().unwrap();
         assert_eq!(x, base.pow(exp));
