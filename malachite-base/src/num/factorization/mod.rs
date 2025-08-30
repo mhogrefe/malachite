@@ -8,11 +8,42 @@
 
 /// [`Factor`](traits::Factor), a trait for computing the prime factorization of a number.
 pub mod factor;
-/// [`IsPerfectPower`](traits::IsPerfectPower), a trait for testing if a number if a perfect power.
+/// [`IsPerfectPower`](traits::IsPerfectPower), a trait for testing if a number is a perfect power.
+///
+/// # is_perfect_power
+/// ```
+/// use malachite_base::num::factorization::traits::IsPerfectPower;
+///
+/// assert_eq!(0u8.is_perfect_power().unwrap(), (0, 2));
+/// assert_eq!(1u16.is_perfect_power().unwrap(), (1, 2));
+/// assert_eq!(36u32.is_perfect_power().unwrap(), (6, 2));
+/// assert_eq!(100u64.is_perfect_power().unwrap(), (10, 2));
+/// assert_eq!(1728u64.is_perfect_power().unwrap(), (12, 3));
+///
+/// assert!(0u8.is_perfect_power().is_some());
+/// assert!(1u16.is_perfect_power().is_some());
+/// assert!(2u64.is_perfect_power().is_none());
+/// assert!(3u64.is_perfect_power().is_none());
+/// ```
 pub mod is_perfect_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
 /// [`IsSquare`](traits::IsSquare), a trait for testing if a number if a perfect square.
+///
+/// # is_square
+/// ```
+/// use malachite_base::num::factorization::traits::IsSquare;
+///
+/// assert!(0u8.is_square());
+/// assert!(1u16.is_square());
+/// assert!(4u32.is_square());
+/// assert!(256u64.is_square());
+///
+/// assert!(!2u8.is_square());
+/// assert!(!5u16.is_square());
+/// assert!(!8u32.is_square());
+/// assert!(!128u64.is_square());
+/// ```
 pub mod is_square;
 /// An efficient prime sieve.
 pub mod prime_sieve;

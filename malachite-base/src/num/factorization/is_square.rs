@@ -49,6 +49,15 @@ fn is_square_u64(x: u64) -> bool {
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl IsSquare for $t {
+            /// Determine whether an integer is a perfect square.
+            ///
+            /// $f(x) = (\exists b \in \Z : b^2 = x)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::is_square#is_square).
             #[inline]
             fn is_square(&self) -> bool {
                 is_square_u64(u64::exact_from(*self))
@@ -61,9 +70,22 @@ apply_to_unsigneds!(impl_unsigned);
 macro_rules! impl_signed {
     ($t: ident) => {
         impl IsSquare for $t {
+            /// Determine whether an integer is a perfect square.
+            ///
+            /// $f(x) = (\exists b \in \Z : b^2 = x)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::is_square#is_square).
             #[inline]
             fn is_square(&self) -> bool {
-                false
+                if *self < 0 {
+                    false
+                } else {
+                    is_square_u64(u64::exact_from(*self))
+                }
             }
         }
     };
