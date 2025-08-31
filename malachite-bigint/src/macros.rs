@@ -438,9 +438,9 @@ macro_rules! impl_to_primitive_fn_float {
             fn [<to_ $t>](&self) -> Option<$t> {
                 match (&self.0).rounding_into(RoundingMode::Nearest) {
                     // returned value is $t::MAX but still less than the original
-                    (val, std::cmp::Ordering::Less) if val == $t::MAX => None,
+                    (val, core::cmp::Ordering::Less) if val == $t::MAX => None,
                     // returned value is $t::MIN but still greater than the original
-                    (val, std::cmp::Ordering::Greater) if val == $t::MIN => None,
+                    (val, core::cmp::Ordering::Greater) if val == $t::MIN => None,
                     (val, _) => Some(val),
                 }
             }

@@ -31,13 +31,13 @@ impl ParseBigIntError {
     }
 }
 
-impl std::fmt::Display for ParseBigIntError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ParseBigIntError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.__description().fmt(f)
     }
 }
 
-impl std::error::Error for ParseBigIntError {
+impl core::error::Error for ParseBigIntError {
     fn description(&self) -> &str {
         self.__description()
     }
@@ -62,17 +62,17 @@ impl<T> TryFromBigIntError<T> {
     }
 }
 
-impl<T> std::error::Error for TryFromBigIntError<T>
+impl<T> core::error::Error for TryFromBigIntError<T>
 where
-    T: std::fmt::Debug,
+    T: core::fmt::Debug,
 {
     fn description(&self) -> &str {
         self.__description()
     }
 }
 
-impl<T> std::fmt::Display for TryFromBigIntError<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<T> core::fmt::Display for TryFromBigIntError<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.__description().fmt(f)
     }
 }

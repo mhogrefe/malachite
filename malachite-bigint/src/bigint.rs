@@ -15,7 +15,7 @@ use num_traits::{
     ToPrimitive, Zero,
 };
 use paste::paste;
-use std::{
+use core::{
     cmp::Ordering,
     fmt::Debug,
     iter::{Product, Sum},
@@ -26,6 +26,8 @@ use std::{
     },
     str::FromStr,
 };
+use alloc::vec::Vec;
+use alloc::string::String;
 
 use crate::{
     BigUint, ParseBigIntError,
@@ -399,7 +401,7 @@ impl BigInt {
 
     #[inline]
     pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<Self> {
-        let s = std::str::from_utf8(bytes).ok()?;
+        let s = core::str::from_utf8(bytes).ok()?;
         Self::from_str_radix(s, radix).ok()
     }
 
@@ -503,7 +505,7 @@ impl BigInt {
 
     #[inline]
     pub fn magnitude(&self) -> &BigUint {
-        unsafe { std::mem::transmute(self.0.unsigned_abs_ref()) }
+        unsafe { core::mem::transmute(self.0.unsigned_abs_ref()) }
     }
 
     #[inline]

@@ -15,7 +15,7 @@ use num_traits::{
     Unsigned, Zero,
 };
 use paste::paste;
-use std::{
+use core::{
     cmp::Ordering::{Equal, Greater, Less},
     iter::{Product, Sum},
     ops::{
@@ -24,6 +24,8 @@ use std::{
     },
     str::FromStr,
 };
+use alloc::vec::Vec;
+use alloc::string::String;
 
 use crate::{ParseBigIntError, ToBigInt, TryFromBigIntError, U32Digits, U64Digits};
 
@@ -215,7 +217,7 @@ impl Num for BigUint {
         }
 
         let v: Vec<u8> = s.bytes().filter(|&x| x != b'_').collect();
-        let s = std::str::from_utf8(v.as_slice()).map_err(|_| ParseBigIntError::invalid())?;
+        let s = core::str::from_utf8(v.as_slice()).map_err(|_| ParseBigIntError::invalid())?;
         Natural::from_string_base(radix as u8, s)
             .map(Self)
             .ok_or_else(ParseBigIntError::invalid)
@@ -325,7 +327,7 @@ impl BigUint {
 
     #[inline]
     pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<Self> {
-        let s = std::str::from_utf8(bytes).ok()?;
+        let s = core::str::from_utf8(bytes).ok()?;
         Self::from_str_radix(s, radix).ok()
     }
 

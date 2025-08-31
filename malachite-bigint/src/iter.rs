@@ -1,4 +1,4 @@
-use std::iter::FusedIterator;
+use core::iter::FusedIterator;
 
 use malachite_nz::natural::conversion::to_limbs::LimbIterator;
 

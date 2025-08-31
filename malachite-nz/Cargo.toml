@@ -25,7 +25,7 @@ itertools = { version = "0.14.0", default-features = false, features = ["use_all
 libm = { version = "0.2.8", default-features = false }
 malachite-base = { version = "0.6.1", default-features = false, path = "../malachite-base" }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
-wide = { version = "0.7.32" }
+wide = { version = "0.7.32", default-features = false }
 
 indoc = { version = "2.0.4", optional = true}
 pyo3 = { version = "0.24.1", optional = true }
