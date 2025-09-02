@@ -78,6 +78,6 @@ fn num_bigint_conversion_test() {
     tester(50723.into());
     tester(BigInt::from(-52321));
     tester(0.into());
-    tester(BigInt::from(std::u64::MAX).pow(1000u32));
-    tester(BigInt::from(std::i64::MIN).pow(1000u32));
+    tester(BigInt::from(core::u64::MAX).pow(1000u32));
+    tester(BigInt::from(core::i64::MIN).pow(1000u32));
 }

@@ -15,7 +15,7 @@ use num_traits::{
     ToPrimitive, Zero,
 };
 use paste::paste;
-use std::{
+use core::{
     cmp::Ordering,
     fmt::Debug,
     iter::{Product, Sum},
@@ -26,6 +26,8 @@ use std::{
     },
     str::FromStr,
 };
+use alloc::vec::Vec;
+use alloc::string::String;
 
 use crate::{
     BigUint, ParseBigIntError,
@@ -399,7 +401,7 @@ impl BigInt {
 
     #[inline]
     pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<Self> {
-        let s = std::str::from_utf8(bytes).ok()?;
+        let s = core::str::from_utf8(bytes).ok()?;
         Self::from_str_radix(s, radix).ok()
     }
 
@@ -503,7 +505,7 @@ impl BigInt {
 
     #[inline]
     pub fn magnitude(&self) -> &BigUint {
-        unsafe { std::mem::transmute(self.0.unsigned_abs_ref()) }
+        unsafe { core::mem::transmute(self.0.unsigned_abs_ref()) }
     }
 
     #[inline]
@@ -643,25 +645,31 @@ where
     }
 }
 
-#[test]
-fn test_float_convert_nearest() {
-    let n25 = "10000000000000000000000000";
-    let val = BigInt::from_str(n25).unwrap();
-    let f = val.to_f64().unwrap();
-    assert_eq!(f.to_string(), n25);
-}
+#[cfg(test)]
+mod test {
+    use super::*;
+    use alloc::{string::ToString, format};
 
-#[test]
-fn test_to_signed_bytes() {
-    let sysmax = i64::MAX;
-    let i = BigInt::from(sysmax);
-    let b = i.to_signed_bytes_le();
-    let i2 = BigInt::from_signed_bytes_le(&b);
-    assert_eq!(i, i2);
-}
+    #[test]
+    fn test_float_convert_nearest() {
+        let n25 = "10000000000000000000000000";
+        let val = BigInt::from_str(n25).unwrap();
+        let f = val.to_f64().unwrap();
+        assert_eq!(f.to_string(), n25);
+    }
 
-#[test]
-fn test_display_bigint() {
-    let n = BigInt::from_str("1234567890").unwrap();
-    assert_eq!(format!("{}", n), "1234567890");
+    #[test]
+    fn test_to_signed_bytes() {
+        let sysmax = i64::MAX;
+        let i = BigInt::from(sysmax);
+        let b = i.to_signed_bytes_le();
+        let i2 = BigInt::from_signed_bytes_le(&b);
+        assert_eq!(i, i2);
+    }
+
+    #[test]
+    fn test_display_bigint() {
+        let n = BigInt::from_str("1234567890").unwrap();
+        assert_eq!(format!("{}", n), "1234567890");
+    }
 }
