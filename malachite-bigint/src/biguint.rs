@@ -464,13 +464,20 @@ impl BigUint {
     }
 }
 
-#[test]
-fn test_from_string_base() {
-    assert!(BigUint::from_str_radix("1000000000000000111111100112abcdefg", 16).is_err());
-}
 
-#[test]
-fn test_display_biguint() {
-    let x = BigUint::from_str_radix("1234567890", 10).unwrap();
-    assert_eq!(format!("{}", x), "1234567890");
+#[cfg(test)]
+mod test {
+    use super::*;
+    use alloc::format;
+
+    #[test]
+    fn test_from_string_base() {
+        assert!(BigUint::from_str_radix("1000000000000000111111100112abcdefg", 16).is_err());
+    }
+
+    #[test]
+    fn test_display_biguint() {
+        let x = BigUint::from_str_radix("1234567890", 10).unwrap();
+        assert_eq!(format!("{}", x), "1234567890");
+    }
 }

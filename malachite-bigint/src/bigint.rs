@@ -645,25 +645,31 @@ where
     }
 }
 
-#[test]
-fn test_float_convert_nearest() {
-    let n25 = "10000000000000000000000000";
-    let val = BigInt::from_str(n25).unwrap();
-    let f = val.to_f64().unwrap();
-    assert_eq!(f.to_string(), n25);
-}
+#[cfg(test)]
+mod test {
+    use super::*;
+    use alloc::{string::ToString, format};
 
-#[test]
-fn test_to_signed_bytes() {
-    let sysmax = i64::MAX;
-    let i = BigInt::from(sysmax);
-    let b = i.to_signed_bytes_le();
-    let i2 = BigInt::from_signed_bytes_le(&b);
-    assert_eq!(i, i2);
-}
+    #[test]
+    fn test_float_convert_nearest() {
+        let n25 = "10000000000000000000000000";
+        let val = BigInt::from_str(n25).unwrap();
+        let f = val.to_f64().unwrap();
+        assert_eq!(f.to_string(), n25);
+    }
 
-#[test]
-fn test_display_bigint() {
-    let n = BigInt::from_str("1234567890").unwrap();
-    assert_eq!(format!("{}", n), "1234567890");
+    #[test]
+    fn test_to_signed_bytes() {
+        let sysmax = i64::MAX;
+        let i = BigInt::from(sysmax);
+        let b = i.to_signed_bytes_le();
+        let i2 = BigInt::from_signed_bytes_le(&b);
+        assert_eq!(i, i2);
+    }
+
+    #[test]
+    fn test_display_bigint() {
+        let n = BigInt::from_str("1234567890").unwrap();
+        assert_eq!(format!("{}", n), "1234567890");
+    }
 }
