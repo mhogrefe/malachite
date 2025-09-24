@@ -24,7 +24,7 @@ impl Rational {
     /// For example, `0.1f32` is converted to $1/10$ rather than to the exact value of the float,
     /// which is $13421773/134217728$. If you want the exact value, use `Rational::from` instead.
     ///
-    /// If the floating point value cannot be NaN or infinite, and error is returned.
+    /// If the floating point value is `NaN` or infinite, an error is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2 \log n \log\log n)$
