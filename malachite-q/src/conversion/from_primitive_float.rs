@@ -19,7 +19,7 @@ macro_rules! float_impls {
             type Error = RationalFromPrimitiveFloatError;
 
             /// Converts a primitive float to the equivalent [`Rational`]. If the floating point
-            /// value is `NaN` or infinite, and error is returned.
+            /// value is `NaN` or infinite, an error is returned.
             ///
             /// This conversion is literal. For example, `Rational::try_from(0.1f32)` evaluates to
             /// Some($13421773/134217728$). If you want $1/10$ instead, use
