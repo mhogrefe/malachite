@@ -16,7 +16,7 @@ use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
     MUL_TOOM22_THRESHOLD, limbs_mul_limb_to_out, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
-use crate::platform::Limb;
+use crate::platform::{DoubleLimb, Limb};
 
 const RECURSIVE_PROD_THRESHOLD: usize = MUL_TOOM22_THRESHOLD;
 
@@ -45,7 +45,8 @@ pub fn limbs_product(out: &mut [Limb], factors: &mut [Limb]) -> usize {
             }
         }
         assert!(out.len() > size);
-        let carry = limbs_mul_limb_to_out(out, &factors[..size], factors[factors_len]);
+        let carry =
+            limbs_mul_limb_to_out::<DoubleLimb, Limb>(out, &factors[..size], factors[factors_len]);
         out[size] = carry;
         if carry != 0 {
             size += 1;

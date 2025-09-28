@@ -54,6 +54,7 @@ use crate::platform::{
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
+use core::cmp::max;
 use core::iter::once;
 use core::mem::swap;
 use core::ops::{Div, DivAssign};
@@ -65,7 +66,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 
@@ -82,22 +84,25 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 // Panics if `out` is shorter than `ns`.
 //
 // This is equivalent to `mpn_bdiv_dbm1c` from `mpn/generic/bdiv_dbm1c.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_to_out(
-    out: &mut [Limb],
-    ns: &[Limb],
-    d: Limb,
-    mut carry: Limb,
-) -> Limb {
+pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_to_out<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    out: &mut [T],
+    ns: &[T],
+    d: T,
+    mut carry: T,
+) -> T {
     assert!(out.len() >= ns.len());
-    let d = DoubleLimb::from(d);
+    let d = DT::from(d);
     for (q, &n) in out.iter_mut().zip(ns.iter()) {
-        let (hi, lo) = (DoubleLimb::from(n) * d).split_in_half();
+        let (hi, lo) = (DT::from(n) * d).split_in_half();
         let inner_carry = carry < lo;
         carry.wrapping_sub_assign(lo);
         *q = carry;
         carry.wrapping_sub_assign(hi);
         if inner_carry {
-            carry.wrapping_sub_assign(1);
+            carry.wrapping_sub_assign(T::ONE);
         }
     }
     carry
@@ -209,7 +214,7 @@ pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
         }
         *out_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         for (out_q, &n) in out_init.iter_mut().zip(ns_init.iter()).rev() {
             (*out_q, r) = div_mod_by_preinversion(r, n, d, d_inv);
         }
@@ -225,7 +230,7 @@ pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
         };
         let d = d << bits;
         r <<= bits;
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let (previous_n, ns_init) = ns.split_last().unwrap();
         let mut previous_n = *previous_n;
         let cobits = Limb::WIDTH - bits;
@@ -271,7 +276,7 @@ pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
         }
         *ns_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         for n in ns_init.iter_mut().rev() {
             (*n, r) = div_mod_by_preinversion(r, *n, d, d_inv);
         }
@@ -287,7 +292,7 @@ pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
         };
         let d = d << bits;
         r <<= bits;
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let last_index = ns.len() - 1;
         let mut previous_n = ns[last_index];
         let cobits = Limb::WIDTH - bits;
@@ -1255,7 +1260,13 @@ fn limbs_div_barrett_approx_preinverted(
     } else {
         Box::new(ns_lo.rchunks(i_len))
     };
-    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(i_len)];
+    let mut mul_scratch = vec![
+        0;
+        max(
+            limbs_mul_same_length_to_out_scratch_len(q_len % i_len),
+            limbs_mul_same_length_to_out_scratch_len(i_len)
+        )
+    ];
     for (ns, qs) in ns_iter.zip(qs.rchunks_mut(i_len)) {
         let chunk_len = qs.len();
         if i_len != chunk_len {
@@ -1396,10 +1407,10 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_Q_THRESHOLD
         || n_len < MU_DIV_Q_THRESHOLD << 1
-        || libm::fma(
+        || fma!(
             ((MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD) << 1) as f64,
             d_64,
-            MUPI_DIV_Q_THRESHOLD as f64 * n_64,
+            MUPI_DIV_Q_THRESHOLD as f64 * n_64
         ) > d_64 * n_64
 }
 

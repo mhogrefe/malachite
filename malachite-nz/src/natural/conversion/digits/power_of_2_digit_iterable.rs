@@ -471,7 +471,7 @@ fn irregular_iterator<T: PrimitiveUnsigned>(
 fn power_of_2_digits<T: PrimitiveUnsigned>(
     x: &Natural,
     log_base: u64,
-) -> NaturalPowerOf2DigitPrimitiveIterator<T>
+) -> NaturalPowerOf2DigitPrimitiveIterator<'_, T>
 where
     Limb: PowerOf2DigitIterable<T, PowerOf2DigitIterator = PrimitivePowerOf2DigitIterator<Limb, T>>,
 {

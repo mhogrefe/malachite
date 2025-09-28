@@ -402,7 +402,7 @@ impl Natural {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
-    fn negative_limbs(&self) -> NegativeLimbIterator {
+    fn negative_limbs(&self) -> NegativeLimbIterator<'_> {
         assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
         NegativeLimbIterator(NLIterator {
             limbs: self.limbs(),
@@ -758,7 +758,7 @@ impl Integer {
     ///     );
     /// }
     /// ```
-    pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {
+    pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator<'_> {
         if *self == 0 {
             TwosComplementLimbIterator::Zero
         } else if self.sign {

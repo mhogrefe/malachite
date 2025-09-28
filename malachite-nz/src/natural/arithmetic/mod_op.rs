@@ -61,12 +61,12 @@ use core::cmp::Ordering::*;
 use core::mem::swap;
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, OverflowingAddAssign, Parity, PowerOf2,
-    WrappingAddAssign, WrappingMulAssign, WrappingSubAssign,
+    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 
@@ -75,9 +75,17 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 //
 // This is equivalent to `udiv_qrnnd_preinv` from `gmp-impl.h`, GMP 6.2.1, but not computing the
 // quotient.
-pub_test! {mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
-    let (q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
-        .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
+pub_test! {mod_by_preinversion<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half=T>,
+    T: PrimitiveUnsigned,
+>(
+    n_high: T,
+    n_low: T,
+    d: T,
+    d_inv: T,
+) -> T {
+    let (q_high, q_low) = (DT::from(n_high) * DT::from(d_inv))
+        .wrapping_add(DT::join_halves(n_high.wrapping_add(T::ONE), n_low))
         .split_in_half();
     let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
     if r > q_low {
@@ -106,25 +114,49 @@ pub_test! {mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
 #[cfg(feature = "32_bit_limbs")]
 #[cfg(feature = "test_build")]
 #[inline]
-pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
-    limbs_mod_limb_alt_2(ns, d)
+pub fn limbs_mod_limb<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
+    limbs_mod_limb_alt_2::<DT, T>(ns, d)
 }
 #[cfg(feature = "32_bit_limbs")]
 #[cfg(not(feature = "test_build"))]
 #[inline]
-pub(crate) fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
-    limbs_mod_limb_alt_2(ns, d)
+pub(crate) fn limbs_mod_limb<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
+    limbs_mod_limb_alt_2::<DT, T>(ns, d)
 }
 #[cfg(not(feature = "32_bit_limbs"))]
 #[cfg(feature = "test_build")]
 #[inline]
-pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
-    limbs_mod_limb_alt_1(ns, d)
+pub fn limbs_mod_limb<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[Limb],
+    d: Limb,
+) -> Limb {
+    limbs_mod_limb_alt_1::<DoubleLimb, Limb>(ns, d)
 }
 #[cfg(not(feature = "32_bit_limbs"))]
 #[cfg(not(feature = "test_build"))]
-pub(crate) fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
-    limbs_mod_limb_alt_1(ns, d)
+pub(crate) fn limbs_mod_limb<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
+    limbs_mod_limb_alt_1::<DT, T>(ns, d)
 }
 
 // Computes the remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest bit of `d_1` to
@@ -759,10 +791,10 @@ fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < MU_DIV_QR_THRESHOLD << 1
-        || libm::fma(
+        || fma!(
             ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64,
             d_64,
-            MUPI_DIV_QR_THRESHOLD as f64 * n_64,
+            MUPI_DIV_QR_THRESHOLD as f64 * n_64
         ) > d_64 * n_64
 }
 
@@ -921,22 +953,30 @@ fn limbs_rem_naive(ns: &[Limb], d: Limb) -> Limb {
 //
 // This is equivalent to `mpn_div_qr_1n_pi1` from `mpn/generic/div_qr_1n_pi1.c`, GMP 6.2.1, with
 // `DIV_QR_1N_METHOD == 2`, but not computing the quotient.
-pub_test! {limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -> Limb {
+pub fn limbs_mod_limb_normalized<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    ns_high: T,
+    d: T,
+    d_inv: T,
+) -> T {
     let len = ns.len();
     if len == 1 {
-        return mod_by_preinversion(ns_high, ns[0], d, d_inv);
+        return mod_by_preinversion::<DT, T>(ns_high, ns[0], d, d_inv);
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
-    let (sum, mut big_carry) = DoubleLimb::join_halves(ns[len - 1], ns[len - 2])
-        .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
+    let (sum, mut big_carry) = DT::join_halves(ns[len - 1], ns[len - 2])
+        .overflowing_add(DT::from(power_of_2) * DT::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for &n in ns[..len - 2].iter().rev() {
         if big_carry && sum_low.overflowing_add_assign(power_of_2) {
             sum_low.wrapping_sub_assign(d);
         }
         let sum;
-        (sum, big_carry) = DoubleLimb::join_halves(sum_low, n)
-            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
+        (sum, big_carry) =
+            DT::join_halves(sum_low, n).overflowing_add(DT::from(sum_high) * DT::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
     }
@@ -946,8 +986,8 @@ pub_test! {limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv:
     if sum_high >= d {
         sum_high.wrapping_sub_assign(d);
     }
-    mod_by_preinversion(sum_high, sum_low, d, d_inv)
-}}
+    mod_by_preinversion::<DT, T>(sum_high, sum_low, d, d_inv)
+}
 
 // The high bit of `d` must be set.
 //
@@ -961,27 +1001,30 @@ pub_test! {limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv:
 // This is equivalent to `mpn_div_qr_1n_pi1` from `mpn/generic/div_qr_1n_pi1.c`, GMP 6.2.1, with
 // `DIV_QR_1N_METHOD == 2`, but not computing the quotient, and where the input is left-shifted by
 // `bits`.
-pub_test! {limbs_mod_limb_normalized_shl(
-    ns: &[Limb],
-    ns_high: Limb,
-    d: Limb,
-    d_inv: Limb,
+pub_test! {limbs_mod_limb_normalized_shl<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    ns_high: T,
+    d: T,
+    d_inv: T,
     bits: u64,
-) -> Limb {
+) -> T {
     let len = ns.len();
     if len == 1 {
-        return mod_by_preinversion(ns_high, ns[0] << bits, d, d_inv);
+        return mod_by_preinversion::<DT, T>(ns_high, ns[0] << bits, d, d_inv);
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
-    let cobits = Limb::WIDTH - bits;
+    let cobits = T::WIDTH - bits;
     let second_highest = ns[len - 2];
     let highest_after_shl = (ns[len - 1] << bits) | (second_highest >> cobits);
     let mut second_highest_after_shl = second_highest << bits;
     if len > 2 {
         second_highest_after_shl |= ns[len - 3] >> cobits;
     }
-    let (sum, mut big_carry) = DoubleLimb::join_halves(highest_after_shl, second_highest_after_shl)
-        .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
+    let (sum, mut big_carry) = DT::join_halves(highest_after_shl, second_highest_after_shl)
+        .overflowing_add(DT::from(power_of_2) * DT::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
         if big_carry && sum_low.overflowing_add_assign(power_of_2) {
@@ -992,8 +1035,8 @@ pub_test! {limbs_mod_limb_normalized_shl(
             n |= ns[j - 1] >> cobits;
         }
         let sum;
-        (sum, big_carry) = DoubleLimb::join_halves(sum_low, n)
-            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
+        (sum, big_carry) =
+            DT::join_halves(sum_low, n).overflowing_add(DT::from(sum_high) * DT::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
     }
@@ -1003,7 +1046,7 @@ pub_test! {limbs_mod_limb_normalized_shl(
     if sum_high >= d {
         sum_high.wrapping_sub_assign(d);
     }
-    mod_by_preinversion(sum_high, sum_low, d, d_inv)
+    mod_by_preinversion::<DT, T>(sum_high, sum_low, d, d_inv)
 }}
 
 // # Worst-case complexity
@@ -1016,8 +1059,11 @@ pub_test! {limbs_mod_limb_normalized_shl(
 // This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the quotient
 // is not computed and the remainder is returned. Experiments show that this is always slower than
 // `limbs_mod_limb`.
-pub_test! {limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
-    assert_ne!(d, 0);
+pub_test! {limbs_mod_limb_alt_1<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
+    T: PrimitiveUnsigned,
+>(ns: &[T], d: T) -> T {
+    assert_ne!(d, T::ZERO);
     let len = ns.len();
     assert!(len > 1);
     let len_minus_1 = len - 1;
@@ -1027,19 +1073,19 @@ pub_test! {limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
         if ns_high >= d {
             ns_high -= d;
         }
-        let d_inv = limbs_invert_limb(d);
-        limbs_mod_limb_normalized(&ns[..len_minus_1], ns_high, d, d_inv)
+        let d_inv = limbs_invert_limb::<DT, T>(d);
+        limbs_mod_limb_normalized::<DT, T>(&ns[..len_minus_1], ns_high, d, d_inv)
     } else {
         let d = d << bits;
-        let cobits = Limb::WIDTH - bits;
-        let d_inv = limbs_invert_limb(d);
-        let r = mod_by_preinversion(
+        let cobits = T::WIDTH - bits;
+        let d_inv = limbs_invert_limb::<DT, T>(d);
+        let r = mod_by_preinversion::<DT, T>(
             ns_high >> cobits,
             (ns_high << bits) | (ns[len - 2] >> cobits),
             d,
             d_inv,
         );
-        limbs_mod_limb_normalized_shl(&ns[..len_minus_1], r, d, d_inv, bits) >> bits
+        limbs_mod_limb_normalized_shl::<DT, T>(&ns[..len_minus_1], r, d, d_inv, bits) >> bits
     }
 }}
 
@@ -1050,9 +1096,17 @@ pub_test! {limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
 // Constant time and additional memory.
 //
 // This is equivalent to `udiv_rnnd_preinv` from `gmp-impl.h`, GMP 6.2.1.
-fn mod_by_preinversion_special(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
-    let (q_high, q_low) = ((DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
-        .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low)))
+fn mod_by_preinversion_special<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    n_high: T,
+    n_low: T,
+    d: T,
+    d_inv: T,
+) -> T {
+    let (q_high, q_low) = ((DT::from(n_high) * DT::from(d_inv))
+        .wrapping_add(DT::join_halves(n_high.wrapping_add(T::ONE), n_low)))
     .split_in_half();
     let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
     // both > and >= are OK
@@ -1071,10 +1125,13 @@ fn mod_by_preinversion_special(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_small_small(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
-    let d = DoubleLimb::from(d);
+pub_test! {limbs_mod_limb_small_small<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(ns: &[T], d: T, mut r: T) -> T {
+    let d = DT::from(d);
     for &n in ns.iter().rev() {
-        r = (DoubleLimb::join_halves(r, n) % d).lower_half();
+        r = (DT::join_halves(r, n) % d).lower_half();
     }
     r
 }}
@@ -1085,10 +1142,17 @@ pub_test! {limbs_mod_limb_small_small(ns: &[Limb], d: Limb, mut r: Limb) -> Limb
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_small_normalized_large(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
-    let d_inv = limbs_invert_limb(d);
+pub_test! {limbs_mod_limb_small_normalized_large<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+    mut r: T,
+) -> T {
+    let d_inv = limbs_invert_limb::<DT, T>(d);
     for &n in ns.iter().rev() {
-        r = mod_by_preinversion_special(r, n, d, d_inv);
+        r = mod_by_preinversion_special::<DT, T>(r, n, d, d_inv);
     }
     r
 }}
@@ -1103,7 +1167,13 @@ pub_test! {limbs_mod_limb_small_normalized_large(ns: &[Limb], d: Limb, mut r: Li
 // This is equivalent to `mpn_mod_1_norm` from `mpn/generic/mod_1.c`, GMP 6.2.1.
 pub_test! {
 #[allow(clippy::absurd_extreme_comparisons)]
-limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
+limbs_mod_limb_small_normalized<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     let mut len = ns.len();
     assert_ne!(len, 0);
     assert!(d.get_highest_bit());
@@ -1118,9 +1188,9 @@ limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
     } else {
         let ns = &ns[..len];
         if len < MOD_1_NORM_THRESHOLD {
-            limbs_mod_limb_small_small(ns, d, r)
+            limbs_mod_limb_small_small::<DT, T>(ns, d, r)
         } else {
-            limbs_mod_limb_small_normalized_large(ns, d, r)
+            limbs_mod_limb_small_normalized_large::<DT, T>(ns, d, r)
         }
     }
 }}
@@ -1131,20 +1201,27 @@ limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_small_unnormalized_large(ns: &[Limb], mut d: Limb, mut r: Limb) -> Limb {
+pub_test! {limbs_mod_limb_small_unnormalized_large<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    mut d: T,
+    mut r: T,
+) -> T {
     let shift = LeadingZeros::leading_zeros(d);
     d <<= shift;
     let (ns_last, ns_init) = ns.split_last().unwrap();
     let mut previous_n = *ns_last;
-    let co_shift = Limb::WIDTH - shift;
+    let co_shift = T::WIDTH - shift;
     r = (r << shift) | (previous_n >> co_shift);
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DT, T>(d);
     for &n in ns_init.iter().rev() {
         let shifted_n = (previous_n << shift) | (n >> co_shift);
-        r = mod_by_preinversion_special(r, shifted_n, d, d_inv);
+        r = mod_by_preinversion_special::<DT, T>(r, shifted_n, d, d_inv);
         previous_n = n;
     }
-    mod_by_preinversion_special(r, previous_n << shift, d, d_inv) >> shift
+    mod_by_preinversion_special::<DT, T>(r, previous_n << shift, d, d_inv) >> shift
 }}
 
 // # Worst-case complexity
@@ -1158,10 +1235,13 @@ pub_test! {limbs_mod_limb_small_unnormalized_large(ns: &[Limb], mut d: Limb, mut
 // `UDIV_NEEDS_NORMALIZATION` is `false`.
 pub_test! {
 #[allow(clippy::absurd_extreme_comparisons)]
-limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
+limbs_mod_limb_small_unnormalized<
+DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+T: PrimitiveUnsigned,
+>(ns: &[T], d: T) -> T {
     let mut len = ns.len();
     assert_ne!(len, 0);
-    assert_ne!(d, 0);
+    assert_ne!(d, T::ZERO);
     assert!(!d.get_highest_bit());
     // Skip a division if high < divisor. Having the test here before normalizing will still skip as
     // often as possible.
@@ -1172,13 +1252,13 @@ limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
             return r;
         }
     } else {
-        r = 0;
+        r = T::ZERO;
     }
     let ns = &ns[..len];
     if len < MOD_1_UNNORM_THRESHOLD {
-        limbs_mod_limb_small_small(ns, d, r)
+        limbs_mod_limb_small_small::<DT, T>(ns, d, r)
     } else {
-        limbs_mod_limb_small_unnormalized_large(ns, d, r)
+        limbs_mod_limb_small_unnormalized_large::<DT, T>(ns, d, r)
     }
 }}
 
@@ -1188,11 +1268,17 @@ limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_any_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
+pub_test! {limbs_mod_limb_any_leading_zeros<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     if MOD_1_1P_METHOD {
-        limbs_mod_limb_any_leading_zeros_1(ns, d)
+        limbs_mod_limb_any_leading_zeros_1::<DT, T>(ns, d)
     } else {
-        limbs_mod_limb_any_leading_zeros_2(ns, d)
+        limbs_mod_limb_any_leading_zeros_2::<DT, T>(ns, d)
     }
 }}
 
@@ -1205,36 +1291,42 @@ pub_test! {limbs_mod_limb_any_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
 //
 // This is equivalent to `mpn_mod_1_1p_cps_1` combined with `mpn_mod_1_1p_1` from
 // `mpn/generic/mod_1.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
+pub_test! {limbs_mod_limb_any_leading_zeros_1<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     let len = ns.len();
     assert!(len >= 2);
-    let shift = u64::from(d.leading_zeros());
+    let shift = d.leading_zeros();
     let d = d << shift;
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DT, T>(d);
     let mut base_mod_d = d.wrapping_neg();
     if shift != 0 {
-        base_mod_d.wrapping_mul_assign((d_inv >> (Limb::WIDTH - shift)) | Limb::power_of_2(shift));
+        base_mod_d.wrapping_mul_assign((d_inv >> (T::WIDTH - shift)) | T::power_of_2(shift));
     }
     assert!(base_mod_d <= d); // not fully reduced mod divisor
     let base_pow_2_mod_d =
-        DoubleLimb::from(mod_by_preinversion_special(base_mod_d, 0, d, d_inv) >> shift);
-    let base_mod_d = DoubleLimb::from(base_mod_d >> shift);
-    let (mut r_hi, mut r_lo) = (DoubleLimb::from(ns[len - 1]) * base_mod_d)
-        .wrapping_add(DoubleLimb::from(ns[len - 2]))
+        DT::from(mod_by_preinversion_special::<DT, T>(base_mod_d, T::ZERO, d, d_inv) >> shift);
+    let base_mod_d = DT::from(base_mod_d >> shift);
+    let (mut r_hi, mut r_lo) = (DT::from(ns[len - 1]) * base_mod_d)
+        .wrapping_add(DT::from(ns[len - 2]))
         .split_in_half();
     for &n in ns[..len - 2].iter().rev() {
-        (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_pow_2_mod_d)
-            .wrapping_add(DoubleLimb::from(r_lo) * base_mod_d)
-            .wrapping_add(DoubleLimb::from(n))
+        (r_hi, r_lo) = (DT::from(r_hi) * base_pow_2_mod_d)
+            .wrapping_add(DT::from(r_lo) * base_mod_d)
+            .wrapping_add(DT::from(n))
             .split_in_half();
     }
     if shift != 0 {
-        r_hi = (r_hi << shift) | (r_lo >> (Limb::WIDTH - shift));
+        r_hi = (r_hi << shift) | (r_lo >> (T::WIDTH - shift));
     }
     if r_hi >= d {
         r_hi.wrapping_sub_assign(d);
     }
-    mod_by_preinversion_special(r_hi, r_lo << shift, d, d_inv) >> shift
+    mod_by_preinversion_special::<DT, T>(r_hi, r_lo << shift, d, d_inv) >> shift
 }}
 
 // # Worst-case complexity
@@ -1246,38 +1338,44 @@ pub_test! {limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
 //
 // This is equivalent to `mpn_mod_1_1p_cps_2` combined with `mpn_mod_1_1p_2` from
 // `mpn/generic/mod_1.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
+pub_test! {limbs_mod_limb_any_leading_zeros_2<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     let len = ns.len();
     assert!(len >= 2);
     let shift = LeadingZeros::leading_zeros(d);
     let d = d << shift;
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DT, T>(d);
     let base_mod_d = if shift == 0 {
-        0
+        DT::ZERO
     } else {
         let base_mod_d = d
             .wrapping_neg()
-            .wrapping_mul((d_inv >> (Limb::WIDTH - shift)) | Limb::power_of_2(shift));
+            .wrapping_mul((d_inv >> (T::WIDTH - shift)) | T::power_of_2(shift));
         assert!(base_mod_d <= d); // not fully reduced mod divisor
-        DoubleLimb::from(base_mod_d >> shift)
+        DT::from(base_mod_d >> shift)
     };
     let small_base_pow_2_mod_d = d.wrapping_neg().wrapping_mul(d_inv);
     // equality iff divisor = 2 ^ (Limb::WIDTH - 1)
     assert!(small_base_pow_2_mod_d <= d);
-    let base_pow_2_mod_d = DoubleLimb::from(small_base_pow_2_mod_d);
+    let base_pow_2_mod_d = DT::from(small_base_pow_2_mod_d);
     let mut r_lo = ns[len - 2];
     let mut r_hi = ns[len - 1];
     if len > 2 {
-        let (r, mut carry) = DoubleLimb::join_halves(r_lo, ns[len - 3])
-            .overflowing_add(DoubleLimb::from(r_hi) * base_pow_2_mod_d);
+        let (r, mut carry) =
+            DT::join_halves(r_lo, ns[len - 3]).overflowing_add(DT::from(r_hi) * base_pow_2_mod_d);
         (r_hi, r_lo) = r.split_in_half();
         for &n in ns[..len - 3].iter().rev() {
             if carry && r_lo.overflowing_add_assign(small_base_pow_2_mod_d) {
                 r_lo.wrapping_sub_assign(d);
             }
             let r;
-            (r, carry) = DoubleLimb::join_halves(r_lo, n)
-                .overflowing_add(DoubleLimb::from(r_hi) * base_pow_2_mod_d);
+            (r, carry) =
+                DT::join_halves(r_lo, n).overflowing_add(DT::from(r_hi) * base_pow_2_mod_d);
             (r_hi, r_lo) = r.split_in_half();
         }
         if carry {
@@ -1285,15 +1383,14 @@ pub_test! {limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
         }
     }
     if shift != 0 {
-        let (new_r_hi, t) = (DoubleLimb::from(r_hi) * base_mod_d).split_in_half();
-        (r_hi, r_lo) = (DoubleLimb::join_halves(new_r_hi, r_lo).wrapping_add(DoubleLimb::from(t))
-            << shift)
-            .split_in_half();
+        let (new_r_hi, t) = (DT::from(r_hi) * base_mod_d).split_in_half();
+        (r_hi, r_lo) =
+            (DT::join_halves(new_r_hi, r_lo).wrapping_add(DT::from(t)) << shift).split_in_half();
     } else if r_hi >= d {
         // might get r_hi == divisor here, but `mod_by_preinversion_special` allows that.
         r_hi.wrapping_sub_assign(d);
     }
-    mod_by_preinversion_special(r_hi, r_lo, d, d_inv) >> shift
+    mod_by_preinversion_special::<DT, T>(r_hi, r_lo, d, d_inv) >> shift
 }}
 
 // # Worst-case complexity
@@ -1305,47 +1402,55 @@ pub_test! {limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
 //
 // This is equivalent to `mpn_mod_1s_2p_cps` combined with `mpn_mod_1s_2p` from
 // `mpn/generic/mod_1_2.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
+pub_test! {limbs_mod_limb_at_least_1_leading_zero<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     let mut len = ns.len();
     assert_ne!(len, 0);
     let shift = LeadingZeros::leading_zeros(d);
     assert_ne!(shift, 0);
-    let co_shift = Limb::WIDTH - shift;
+    let co_shift = T::WIDTH - shift;
     let d = d << shift;
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DT, T>(d);
     let base_mod_d = d
         .wrapping_neg()
-        .wrapping_mul((d_inv >> co_shift) | Limb::power_of_2(shift));
+        .wrapping_mul((d_inv >> co_shift) | T::power_of_2(shift));
     assert!(base_mod_d <= d); // not fully reduced mod divisor
-    let base_pow_2_mod_d = mod_by_preinversion_special(base_mod_d, 0, d, d_inv);
-    let base_mod_d = DoubleLimb::from(base_mod_d >> shift);
-    let base_pow_3_mod_d =
-        DoubleLimb::from(mod_by_preinversion_special(base_pow_2_mod_d, 0, d, d_inv) >> shift);
-    let base_pow_2_mod_d = DoubleLimb::from(base_pow_2_mod_d >> shift);
+    let base_pow_2_mod_d = mod_by_preinversion_special::<DT, T>(base_mod_d, T::ZERO, d, d_inv);
+    let base_mod_d = DT::from(base_mod_d >> shift);
+    let base_pow_3_mod_d = DT::from(
+        mod_by_preinversion_special::<DT, T>(base_pow_2_mod_d, T::ZERO, d, d_inv) >> shift,
+    );
+    let base_pow_2_mod_d = DT::from(base_pow_2_mod_d >> shift);
     let (mut r_hi, mut r_lo) = if len.odd() {
         len -= 1;
         if len == 0 {
             let rl = ns[len];
-            return mod_by_preinversion_special(rl >> co_shift, rl << shift, d, d_inv) >> shift;
+            return mod_by_preinversion_special::<DT, T>(rl >> co_shift, rl << shift, d, d_inv)
+                >> shift;
         }
-        (DoubleLimb::from(ns[len]) * base_pow_2_mod_d)
-            .wrapping_add(DoubleLimb::from(ns[len - 1]) * base_mod_d)
-            .wrapping_add(DoubleLimb::from(ns[len - 2]))
+        (DT::from(ns[len]) * base_pow_2_mod_d)
+            .wrapping_add(DT::from(ns[len - 1]) * base_mod_d)
+            .wrapping_add(DT::from(ns[len - 2]))
             .split_in_half()
     } else {
         (ns[len - 1], ns[len - 2])
     };
     for chunk in ns[..len - 2].rchunks_exact(2) {
-        (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_pow_3_mod_d)
-            .wrapping_add(DoubleLimb::from(r_lo) * base_pow_2_mod_d)
-            .wrapping_add(DoubleLimb::from(chunk[1]) * base_mod_d)
-            .wrapping_add(DoubleLimb::from(chunk[0]))
+        (r_hi, r_lo) = (DT::from(r_hi) * base_pow_3_mod_d)
+            .wrapping_add(DT::from(r_lo) * base_pow_2_mod_d)
+            .wrapping_add(DT::from(chunk[1]) * base_mod_d)
+            .wrapping_add(DT::from(chunk[0]))
             .split_in_half();
     }
-    let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_mod_d)
-        .wrapping_add(DoubleLimb::from(r_lo))
+    let (r_hi, r_lo) = (DT::from(r_hi) * base_mod_d)
+        .wrapping_add(DT::from(r_lo))
         .split_in_half();
-    mod_by_preinversion_special(
+    mod_by_preinversion_special::<DT, T>(
         (r_hi << shift) | (r_lo >> co_shift),
         r_lo << shift,
         d,
@@ -1362,39 +1467,48 @@ pub_test! {limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb 
 //
 // This is equivalent to `mpn_mod_1s_4p_cps` combined with `mpn_mod_1s_4p` from
 // `mpn/generic/mod_1_4.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
+pub_test! {limbs_mod_limb_at_least_2_leading_zeros<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     let mut len = ns.len();
     assert_ne!(len, 0);
     let shift = LeadingZeros::leading_zeros(d);
     assert!(shift >= 2);
-    let co_shift = Limb::WIDTH - shift;
+    let co_shift = T::WIDTH - shift;
     let d = d << shift;
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DT, T>(d);
     let base_mod_d = d
         .wrapping_neg()
-        .wrapping_mul((d_inv >> co_shift) | Limb::power_of_2(shift));
+        .wrapping_mul((d_inv >> co_shift) | T::power_of_2(shift));
     assert!(base_mod_d <= d); // not fully reduced mod divisor
-    let base_pow_2_mod_d = mod_by_preinversion_special(base_mod_d, 0, d, d_inv);
-    let base_mod_d = DoubleLimb::from(base_mod_d >> shift);
-    let base_pow_3_mod_d = mod_by_preinversion_special(base_pow_2_mod_d, 0, d, d_inv);
-    let base_pow_2_mod_d = DoubleLimb::from(base_pow_2_mod_d >> shift);
-    let base_pow_4_mod_d = mod_by_preinversion_special(base_pow_3_mod_d, 0, d, d_inv);
-    let base_pow_3_mod_d = DoubleLimb::from(base_pow_3_mod_d >> shift);
-    let base_pow_5_mod_d =
-        DoubleLimb::from(mod_by_preinversion_special(base_pow_4_mod_d, 0, d, d_inv) >> shift);
-    let base_pow_4_mod_d = DoubleLimb::from(base_pow_4_mod_d >> shift);
+    let base_pow_2_mod_d = mod_by_preinversion_special::<DT, T>(base_mod_d, T::ZERO, d, d_inv);
+    let base_mod_d = DT::from(base_mod_d >> shift);
+    let base_pow_3_mod_d =
+        mod_by_preinversion_special::<DT, T>(base_pow_2_mod_d, T::ZERO, d, d_inv);
+    let base_pow_2_mod_d = DT::from(base_pow_2_mod_d >> shift);
+    let base_pow_4_mod_d =
+        mod_by_preinversion_special::<DT, T>(base_pow_3_mod_d, T::ZERO, d, d_inv);
+    let base_pow_3_mod_d = DT::from(base_pow_3_mod_d >> shift);
+    let base_pow_5_mod_d = DT::from(
+        mod_by_preinversion_special::<DT, T>(base_pow_4_mod_d, T::ZERO, d, d_inv) >> shift,
+    );
+    let base_pow_4_mod_d = DT::from(base_pow_4_mod_d >> shift);
     let (mut r_hi, mut r_lo) = match len.mod_power_of_2(2) {
         0 => {
             len -= 4;
-            (DoubleLimb::from(ns[len + 3]) * base_pow_3_mod_d)
-                .wrapping_add(DoubleLimb::from(ns[len + 2]) * base_pow_2_mod_d)
-                .wrapping_add(DoubleLimb::from(ns[len + 1]) * base_mod_d)
-                .wrapping_add(DoubleLimb::from(ns[len]))
+            (DT::from(ns[len + 3]) * base_pow_3_mod_d)
+                .wrapping_add(DT::from(ns[len + 2]) * base_pow_2_mod_d)
+                .wrapping_add(DT::from(ns[len + 1]) * base_mod_d)
+                .wrapping_add(DT::from(ns[len]))
                 .split_in_half()
         }
         1 => {
             len -= 1;
-            (0, ns[len])
+            (T::ZERO, ns[len])
         }
         2 => {
             len -= 2;
@@ -1402,34 +1516,32 @@ pub_test! {limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb
         }
         3 => {
             len -= 3;
-            (DoubleLimb::from(ns[len + 2]) * base_pow_2_mod_d)
-                .wrapping_add(DoubleLimb::from(ns[len + 1]) * base_mod_d)
-                .wrapping_add(DoubleLimb::from(ns[len]))
+            (DT::from(ns[len + 2]) * base_pow_2_mod_d)
+                .wrapping_add(DT::from(ns[len + 1]) * base_mod_d)
+                .wrapping_add(DT::from(ns[len]))
                 .split_in_half()
         }
         _ => unreachable!(),
     };
     for chunk in ns[..len].rchunks_exact(4) {
-        (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_pow_5_mod_d)
-            .wrapping_add(DoubleLimb::from(r_lo) * base_pow_4_mod_d)
-            .wrapping_add(DoubleLimb::from(chunk[3]) * base_pow_3_mod_d)
-            .wrapping_add(DoubleLimb::from(chunk[2]) * base_pow_2_mod_d)
-            .wrapping_add(DoubleLimb::from(chunk[1]) * base_mod_d)
-            .wrapping_add(DoubleLimb::from(chunk[0]))
+        (r_hi, r_lo) = (DT::from(r_hi) * base_pow_5_mod_d)
+            .wrapping_add(DT::from(r_lo) * base_pow_4_mod_d)
+            .wrapping_add(DT::from(chunk[3]) * base_pow_3_mod_d)
+            .wrapping_add(DT::from(chunk[2]) * base_pow_2_mod_d)
+            .wrapping_add(DT::from(chunk[1]) * base_mod_d)
+            .wrapping_add(DT::from(chunk[0]))
             .split_in_half();
     }
-    let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_mod_d)
-        .wrapping_add(DoubleLimb::from(r_lo))
+    let (r_hi, r_lo) = (DT::from(r_hi) * base_mod_d)
+        .wrapping_add(DT::from(r_lo))
         .split_in_half();
-    mod_by_preinversion_special(
+    mod_by_preinversion_special::<DT, T>(
         (r_hi << shift) | (r_lo >> co_shift),
         r_lo << shift,
         d,
         d_inv,
     ) >> shift
 }}
-
-const HIGHEST_TWO_BITS_MASK: Limb = !(Limb::MAX >> 2);
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -1441,24 +1553,30 @@ const HIGHEST_TWO_BITS_MASK: Limb = !(Limb::MAX >> 2);
 // This is equivalent to `mpn_mod_1` from `mpn/generic/mod_1.c`, GMP 6.2.1, where `n > 1`.
 pub_crate_test! {
 #[allow(clippy::absurd_extreme_comparisons)]
-limbs_mod_limb_alt_2(ns: &[Limb], d: Limb) -> Limb {
+limbs_mod_limb_alt_2<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    ns: &[T],
+    d: T,
+) -> T {
     let len = ns.len();
     assert!(len > 1);
-    assert_ne!(d, 0);
+    assert_ne!(d, T::ZERO);
     if d.get_highest_bit() {
         if len < MOD_1N_TO_MOD_1_1_THRESHOLD {
-            limbs_mod_limb_small_normalized(ns, d)
+            limbs_mod_limb_small_normalized::<DT, T>(ns, d)
         } else {
-            limbs_mod_limb_any_leading_zeros(ns, d)
+            limbs_mod_limb_any_leading_zeros::<DT, T>(ns, d)
         }
     } else if len < MOD_1U_TO_MOD_1_1_THRESHOLD {
-        limbs_mod_limb_small_unnormalized(ns, d)
+        limbs_mod_limb_small_unnormalized::<DT, T>(ns, d)
     } else if len < MOD_1_1_TO_MOD_1_2_THRESHOLD {
-        limbs_mod_limb_any_leading_zeros(ns, d)
-    } else if len < MOD_1_2_TO_MOD_1_4_THRESHOLD || d & HIGHEST_TWO_BITS_MASK != 0 {
-        limbs_mod_limb_at_least_1_leading_zero(ns, d)
+        limbs_mod_limb_any_leading_zeros::<DT, T>(ns, d)
+    } else if len < MOD_1_2_TO_MOD_1_4_THRESHOLD || d & !(T::MAX >> 2u32) != T::ZERO {
+        limbs_mod_limb_at_least_1_leading_zero::<DT, T>(ns, d)
     } else {
-        limbs_mod_limb_at_least_2_leading_zeros(ns, d)
+        limbs_mod_limb_at_least_2_leading_zeros::<DT, T>(ns, d)
     }
 }}
 
@@ -1476,7 +1594,7 @@ impl Natural {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (Natural(Small(small)), other) => small % other,
-            (Natural(Large(limbs)), other) => limbs_mod_limb(limbs, other),
+            (Natural(Large(limbs)), other) => limbs_mod_limb::<DoubleLimb, Limb>(limbs, other),
         }
     }
 
@@ -1485,7 +1603,7 @@ impl Natural {
             (_, 0) => panic!("division by zero"),
             (Natural(Small(small)), other) => *small %= other,
             (Natural(Large(limbs)), other) => {
-                *self = Natural(Small(limbs_mod_limb(limbs, other)));
+                *self = Natural(Small(limbs_mod_limb::<DoubleLimb, Limb>(limbs, other)));
             }
         }
     }

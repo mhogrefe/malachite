@@ -21,7 +21,7 @@ pub fn limbs_square_to_out_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) 
         let two_n = n << 1;
         let mut scratch = vec![0; two_n - 2];
         let (scratch_last, scratch_init) = scratch[..n].split_last_mut().unwrap();
-        *scratch_last = limbs_mul_limb_to_out(scratch_init, xs_tail, *xs_head);
+        *scratch_last = limbs_mul_limb_to_out::<DoubleLimb, Limb>(scratch_init, xs_tail, *xs_head);
         for i in 1..n - 1 {
             let (scratch_last, scratch_init) = scratch[i..][i..n].split_last_mut().unwrap();
             let (xs_head, xs_tail) = xs[i..].split_first().unwrap();

@@ -21,7 +21,7 @@ use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_6,
     natural_pair_gen_var_7, unsigned_vec_pair_gen_var_17,
@@ -37,7 +37,7 @@ use std::str::FromStr;
 fn test_limbs_divisible_by_limb() {
     let test = |ns: &[Limb], d: Limb, divisible: bool| {
         assert_eq!(limbs_divisible_by_limb(ns, d), divisible);
-        assert_eq!(limbs_mod_limb(ns, d) == 0, divisible);
+        assert_eq!(limbs_mod_limb::<DoubleLimb, Limb>(ns, d) == 0, divisible);
         assert_eq!(combined_limbs_divisible_by_limb(ns, d), divisible);
     };
     test(&[0, 0], 2, true);
@@ -912,7 +912,7 @@ fn limbs_divisible_by_limb_properties() {
             (&Natural::from_limbs_asc(&xs)).divisible_by(Natural::from(y)),
             divisible
         );
-        assert_eq!(limbs_mod_limb(&xs, y) == 0, divisible);
+        assert_eq!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, y) == 0, divisible);
         assert_eq!(combined_limbs_divisible_by_limb(&xs, y), divisible);
     });
 }

@@ -1674,7 +1674,7 @@ pub fn striped_random_integer_inclusive_range(
 ///
 /// assert_eq!(
 ///     get_striped_random_integer_from_range(
-///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1),
 ///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
 ///         Integer::from(-4),
 ///         Integer::from(7),
@@ -1722,7 +1722,7 @@ pub fn get_striped_random_integer_from_range(
 ///
 /// assert_eq!(
 ///     get_striped_random_integer_from_inclusive_range(
-///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1),
 ///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
 ///         Integer::from(-4),
 ///         Integer::from(7),
@@ -1965,7 +1965,7 @@ pub fn striped_random_integer_range_to_infinity(
 ///
 /// assert_eq!(
 ///     get_striped_random_integer_from_range_to_infinity(
-///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1),
 ///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
 ///         Integer::from(-1000),
 ///         20,
@@ -2042,7 +2042,7 @@ pub fn get_striped_random_integer_from_range_to_infinity(
 ///
 /// assert_eq!(
 ///     get_striped_random_integer_from_range_to_negative_infinity(
-///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1,),
+///         &mut StripedBitSource::new(EXAMPLE_SEED.fork("bs"), 10, 1),
 ///         &mut VariableRangeGenerator::new(EXAMPLE_SEED.fork("rg")),
 ///         Integer::from(-1000),
 ///         20,

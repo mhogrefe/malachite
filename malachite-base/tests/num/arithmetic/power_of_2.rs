@@ -11,7 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
-    signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16,
+    signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16, unsigned_gen_var_30,
 };
 use std::panic::catch_unwind;
 
@@ -93,6 +93,12 @@ fn power_of_2_properties_helper_signed<U: TryFrom<S> + PrimitiveUnsigned, S: Pri
 }
 
 fn power_of_2_properties_helper_primitive_float<T: PrimitiveFloat>() {
+    unsigned_gen_var_30::<T>().test_properties(|pow| {
+        let n = T::power_of_2(pow);
+        assert!(n > T::ZERO);
+        assert!(n.is_power_of_2());
+    });
+
     signed_gen_var_11::<T>().test_properties(|pow| {
         let n = T::power_of_2(pow);
         assert!(n > T::ZERO);

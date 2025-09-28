@@ -49,6 +49,46 @@ macro_rules! pub_crate_test {
 #[doc(hidden)]
 #[cfg(feature = "test_build")]
 #[macro_export]
+macro_rules! pub_test_struct {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub struct $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(not(feature = "test_build"))]
+#[macro_export]
+macro_rules! pub_test_struct {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub struct $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(feature = "test_build")]
+#[macro_export]
+macro_rules! pub_crate_test_struct {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub struct $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(not(feature = "test_build"))]
+#[macro_export]
+macro_rules! pub_crate_test_struct {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub(crate) struct $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(feature = "test_build")]
+#[macro_export]
 macro_rules! pub_const_test {
     ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
         $( #[$meta] )*
@@ -83,5 +123,25 @@ macro_rules! pub_const_crate_test {
     ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
         $( #[$meta] )*
         pub(crate) const fn $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(feature = "test_build")]
+#[macro_export]
+macro_rules! pub_const_crate_test_const {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub const $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(not(feature = "test_build"))]
+#[macro_export]
+macro_rules! pub_const_crate_test_const {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub(crate) const $name $( $body )*
     };
 }

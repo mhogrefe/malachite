@@ -39,7 +39,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     limbs_div_mod_barrett_helper_bucketer, limbs_div_mod_barrett_product_bucketer,
     limbs_div_mod_extra_bucketer, pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer,
@@ -142,7 +142,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_limbs_invert_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in unsigned_gen_var_12().get(gm, config).take(limit) {
-        println!("limbs_invert_limb({}) = {}", x, limbs_invert_limb(x));
+        println!(
+            "limbs_invert_limb({}) = {}",
+            x,
+            limbs_invert_limb::<DoubleLimb, Limb>(x)
+        );
     }
 }
 
@@ -532,7 +536,9 @@ fn benchmark_limbs_invert_limb(gm: GenMode, config: &GenConfig, limit: usize, fi
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut |x| no_out!(limbs_invert_limb(x)))],
+        &mut [("Malachite", &mut |x| {
+            no_out!(limbs_invert_limb::<DoubleLimb, Limb>(x))
+        })],
     );
 }
 
@@ -907,7 +913,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
                     &mut scratch,
                     &ds,
                     &qs,
-                    &mut mul_scratch
+                    &mut mul_scratch,
                 ))
             }),
             ("limbs_div_barrett_large_product", &mut |(

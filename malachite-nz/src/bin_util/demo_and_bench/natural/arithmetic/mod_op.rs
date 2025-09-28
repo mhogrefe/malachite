@@ -39,6 +39,7 @@ use malachite_nz::natural::arithmetic::mod_op::{
     limbs_mod_limb_small_unnormalized_large, limbs_mod_schoolbook,
     limbs_mod_three_limb_by_two_limb, limbs_mod_to_out,
 };
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     limbs_mod_limb_small_unnormalized_bucketer, pair_1_natural_bit_bucketer,
     pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
@@ -140,7 +141,7 @@ fn demo_limbs_mod_limb(gm: GenMode, config: &GenConfig, limit: usize) {
             "limbs_mod_limb({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb(&ns, d)
+            limbs_mod_limb::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -154,7 +155,7 @@ fn demo_limbs_mod_limb_small_normalized(gm: GenMode, config: &GenConfig, limit: 
             "limbs_mod_limb_small_normalized({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb_small_normalized(&ns, d)
+            limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -168,7 +169,7 @@ fn demo_limbs_mod_limb_small_unnormalized(gm: GenMode, config: &GenConfig, limit
             "limbs_mod_limb_small_unnormalized({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb_small_unnormalized(&ns, d)
+            limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -182,7 +183,7 @@ fn demo_limbs_mod_limb_any_leading_zeros_1(gm: GenMode, config: &GenConfig, limi
             "limbs_mod_limb_any_leading_zeros_1({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb_any_leading_zeros_1(&ns, d)
+            limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -196,7 +197,7 @@ fn demo_limbs_mod_limb_any_leading_zeros_2(gm: GenMode, config: &GenConfig, limi
             "limbs_mod_limb_any_leading_zeros_2({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb_any_leading_zeros_2(&ns, d)
+            limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -210,7 +211,7 @@ fn demo_limbs_mod_limb_at_least_1_leading_zero(gm: GenMode, config: &GenConfig, 
             "limbs_mod_limb_at_least_1_leading_zero({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb_at_least_1_leading_zero(&ns, d)
+            limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -224,7 +225,7 @@ fn demo_limbs_mod_limb_at_least_2_leading_zeros(gm: GenMode, config: &GenConfig,
             "limbs_mod_limb_at_least_2_leading_zeros({:?}, {}) = {}",
             ns,
             d,
-            limbs_mod_limb_at_least_2_leading_zeros(&ns, d)
+            limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(&ns, d)
         );
     }
 }
@@ -459,19 +460,23 @@ fn benchmark_limbs_mod_limb_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("alt 1", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_alt_1(&ns, d))
+                no_out!(limbs_mod_limb_alt_1::<DoubleLimb, Limb>(&ns, d))
             }),
             ("alt 2", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_alt_2(&ns, d))
+                no_out!(limbs_mod_limb_alt_2::<DoubleLimb, Limb>(&ns, d))
             }),
             ("alt 3", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_alt_3(&ns, d))
             }),
             ("limbs_mod_limb_any_leading_zeros_1", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros_1(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(
+                    &ns, d
+                ))
             }),
             ("limbs_mod_limb_any_leading_zeros_2", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros_2(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(
+                    &ns, d
+                ))
             }),
         ],
     );
@@ -502,7 +507,7 @@ fn benchmark_limbs_mod_limb_small_normalized_algorithms(
                 if len == 0 {
                     return;
                 }
-                limbs_mod_limb_small_small(&ns[..len], d, r);
+                limbs_mod_limb_small_small::<DoubleLimb, Limb>(&ns[..len], d, r);
             }),
             ("large", &mut |(ns, d)| {
                 let mut len = ns.len();
@@ -514,7 +519,7 @@ fn benchmark_limbs_mod_limb_small_normalized_algorithms(
                 if len == 0 {
                     return;
                 }
-                limbs_mod_limb_small_normalized_large(&ns[..len], d, r);
+                limbs_mod_limb_small_normalized_large::<DoubleLimb, Limb>(&ns[..len], d, r);
             }),
         ],
     );
@@ -546,7 +551,7 @@ fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
                 } else {
                     r = 0;
                 }
-                limbs_mod_limb_small_small(&ns[..len], d, r);
+                limbs_mod_limb_small_small::<DoubleLimb, Limb>(&ns[..len], d, r);
             }),
             ("large", &mut |(ns, d)| {
                 let mut len = ns.len();
@@ -559,7 +564,7 @@ fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
                 } else {
                     r = 0;
                 }
-                limbs_mod_limb_small_unnormalized_large(&ns[..len], d, r);
+                limbs_mod_limb_small_unnormalized_large::<DoubleLimb, Limb>(&ns[..len], d, r);
             }),
         ],
     );
@@ -581,10 +586,10 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("limbs_mod_limb_small_normalized", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_small_normalized(&ns, d))
+                no_out!(limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&ns, d))
             }),
             ("limbs_mod_limb_any_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d))
             }),
         ],
     );
@@ -606,10 +611,12 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("limbs_mod_limb_small_unnormalized", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_small_unnormalized(&ns, d))
+                no_out!(limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(
+                    &ns, d
+                ))
             }),
             ("limbs_mod_limb_any_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d))
             }),
         ],
     );
@@ -631,10 +638,12 @@ fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("limbs_mod_limb_any_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d))
             }),
             ("limbs_mod_limb_at_least_1_leading_zero", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_at_least_1_leading_zero(&ns, d))
+                no_out!(limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(
+                    &ns, d
+                ))
             }),
         ],
     );
@@ -656,10 +665,14 @@ fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("Malachite", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_at_least_1_leading_zero(&ns, d))
+                no_out!(limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(
+                    &ns, d
+                ))
             }),
             ("limbs_mod_limb_at_least_2_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_at_least_2_leading_zeros(&ns, d))
+                no_out!(limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(
+                    &ns, d
+                ))
             }),
         ],
     );

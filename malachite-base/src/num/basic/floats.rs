@@ -514,8 +514,8 @@ pub trait PrimitiveFloat:
     /// Returns the precision of a nonzero finite floating-point number.
     ///
     /// The precision is the number of significant bits of the integer mantissa. For example, the
-    /// floats with precision 1 are the powers of 2, those with precision 2 are 3 times a power of
-    /// 2, those with precision 3 are 5 or 7 times a power of 2, and so on.
+    /// positive floats with precision 1 are the powers of 2, those with precision 2 are 3 times a
+    /// power of 2, those with precision 3 are 5 or 7 times a power of 2, and so on.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

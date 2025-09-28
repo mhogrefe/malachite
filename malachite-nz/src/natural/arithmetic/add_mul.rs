@@ -177,7 +177,7 @@ pub_test! {limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
         xs.resize(ys.len(), 0);
         let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
         let (ys_lo, ys_hi) = ys.split_at(xs_len);
-        let mut carry = limbs_mul_limb_to_out(xs_hi, ys_hi, z);
+        let mut carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(xs_hi, ys_hi, z);
         let inner_carry = limbs_slice_add_mul_limb_same_length_in_place_left(xs_lo, ys_lo, z);
         if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
             carry += 1;

@@ -1,6 +1,6 @@
 [package]
 name = "malachite-base"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
@@ -38,6 +38,8 @@ time = { version = "0.3.28", optional = true }
 walkdir = { version = "2.3.3", optional = true }
 
 [features]
+default = ["std"]
+std = ["itertools/use_std"]
 random = ["sha3", "rand", "rand_chacha", "getrandom"]
 test_build = ["gnuplot", "time", "clap", "random", "itertools/use_std"]
 bin_build = ["walkdir", "test_build"]

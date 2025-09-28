@@ -169,8 +169,8 @@ impl FromStringBase for Natural {
     ///
     /// If the string does not represent a valid [`Natural`], an `Err` is returned. To be valid, the
     /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'` through
-    /// `'z'`, and `'A'` through `'Z'`; and only characters that represent digits smaller than the
-    /// base are allowed. Leading zeros are always allowed.
+    /// `'z'`, and `'A'` through `'Z'`, with an optional single leading `'+'`; and only characters
+    /// that represent digits smaller than the base are allowed. Leading zeros are always allowed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

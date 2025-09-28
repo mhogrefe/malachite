@@ -19,28 +19,30 @@ use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use std::cmp::max;
 
-pub fn pair_1_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<(Float, T)> {
+pub fn pair_1_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<'_, (Float, T)> {
     Bucketer {
         bucketing_function: &|(x, _)| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),
     }
 }
 
-pub fn pair_2_pair_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer<(T, (Float, U))> {
+pub fn pair_2_pair_1_float_complexity_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (T, (Float, U))> {
     Bucketer {
         bucketing_function: &|(_, (x, _))| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),
     }
 }
 
-pub fn pair_2_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<(T, Float)> {
+pub fn pair_2_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<'_, (T, Float)> {
     Bucketer {
         bucketing_function: &|(_, x)| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),
     }
 }
 
-pub fn triple_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer<(Float, T, U)> {
+pub fn triple_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer<'_, (Float, T, U)> {
     Bucketer {
         bucketing_function: &|(x, _, _)| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),
@@ -49,14 +51,14 @@ pub fn triple_1_float_complexity_bucketer<T, U>(var_name: &str) -> Bucketer<(Flo
 
 pub fn pair_2_triple_1_float_complexity_bucketer<T, U, V>(
     var_name: &str,
-) -> Bucketer<(V, (Float, T, U))> {
+) -> Bucketer<'_, (V, (Float, T, U))> {
     Bucketer {
         bucketing_function: &|(_, (x, _, _))| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),
     }
 }
 
-pub fn float_complexity_bucketer(var_name: &str) -> Bucketer<Float> {
+pub fn float_complexity_bucketer(var_name: &str) -> Bucketer<'_, Float> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.complexity()),
         bucketing_label: format!("{var_name}.complexity()"),

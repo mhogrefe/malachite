@@ -29,7 +29,7 @@ use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{
-    BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, Limb, MP_BASES_BIG_BASE_10,
+    BASES, DoubleLimb, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, Limb, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };
 use alloc::vec::Vec;
@@ -445,7 +445,7 @@ pub_test! {limbs_compute_power_table_using_mul<'a>(
             // a = 3, sometimes adjusted to 4.
             let power;
             (power, remainder) = remainder[shift..].split_at_mut(len);
-            let carry = limbs_mul_limb_to_out(remainder, power, big_base);
+            let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(remainder, power, big_base);
             remainder[len] = carry;
             if carry != 0 {
                 len += 1;
@@ -660,7 +660,7 @@ pub_test! {limbs_compute_power_table(
     xs_len: usize,
     base: u64,
     forced_algorithm: Option<PowerTableAlgorithm>,
-) -> (usize, Vec<PowerTableRow>) {
+) -> (usize, Vec<PowerTableRow<'_>>) {
     let mut exponents = [0; Limb::WIDTH as usize];
     let (power_len, auto_algorithm) =
         limbs_choose_power_table_algorithm(&mut exponents, xs_len, base);

@@ -14,17 +14,19 @@ use malachite_base::test_util::bench::bucketers::{signed_abs_bucketer, unsigned_
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
-    signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16,
+    signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16, unsigned_gen_var_30,
 };
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_power_of_2_unsigned);
     register_signed_demos!(runner, demo_power_of_2_signed);
-    register_primitive_float_demos!(runner, demo_power_of_2_primitive_float);
+    register_primitive_float_demos!(runner, demo_power_of_2_primitive_float_unsigned);
+    register_primitive_float_demos!(runner, demo_power_of_2_primitive_float_signed);
     register_unsigned_benches!(runner, benchmark_power_of_2_unsigned);
     register_signed_benches!(runner, benchmark_power_of_2_signed);
-    register_primitive_float_benches!(runner, benchmark_power_of_2_primitive_float);
+    register_primitive_float_benches!(runner, benchmark_power_of_2_primitive_float_unsigned);
+    register_primitive_float_benches!(runner, benchmark_power_of_2_primitive_float_signed);
 }
 
 fn demo_power_of_2_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -39,7 +41,17 @@ fn demo_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, l
     }
 }
 
-fn demo_power_of_2_primitive_float<T: PrimitiveFloat>(
+fn demo_power_of_2_primitive_float_unsigned<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for pow in unsigned_gen_var_30::<T>().get(gm, config).take(limit) {
+        println!("2^({}) = {}", pow, NiceFloat(T::power_of_2(pow)));
+    }
+}
+
+fn demo_power_of_2_primitive_float_signed<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -85,7 +97,25 @@ fn benchmark_power_of_2_signed<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_power_of_2_primitive_float<T: PrimitiveFloat>(
+fn benchmark_power_of_2_primitive_float_unsigned<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.power_of_2(i64)", T::NAME),
+        BenchmarkType::Single,
+        unsigned_gen_var_30::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_direct_bucketer(),
+        &mut [("Malachite", &mut |pow| no_out!(T::power_of_2(pow)))],
+    );
+}
+
+fn benchmark_power_of_2_primitive_float_signed<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

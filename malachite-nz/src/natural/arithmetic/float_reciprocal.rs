@@ -174,7 +174,7 @@ fn reciprocal_float_significand_same_prec_lt_w(
     let half_shift_bit = shift_bit >> 1;
     let mask = shift_bit - 1;
     // First try with an approximate reciprocal.
-    let q = HIGH_BIT | (limbs_invert_limb(x) >> 1);
+    let q = HIGH_BIT | (limbs_invert_limb::<DoubleLimb, Limb>(x) >> 1);
     // round_bit does not exceed the true reciprocal floor(HIGH_BIT * 2 ^ WIDTH / x), with error at
     // most 2, which means the rational reciprocal q satisfies round_bit <= q < round_bit + 3. We
     // can round correctly except when the last shift - 1 bits of q0 are 000..000 or 111..111 or
@@ -208,7 +208,7 @@ fn reciprocal_float_significand_same_prec_lt_w(
 // x cannot be equal to `2 ^ (WIDTH - 1)`.
 fn reciprocal_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, bool, Ordering) {
     // First compute an approximate reciprocal.
-    let q = HIGH_BIT | (limbs_invert_limb(x) >> 1);
+    let q = HIGH_BIT | (limbs_invert_limb::<DoubleLimb, Limb>(x) >> 1);
     // round_bit does not exceed the true reciprocal floor(2 ^ WIDTH / x), with error at most 2,
     // which means the rational reciprocal q satisfies round_bit <= q < round_bit + 3, thus the true
     // reciprocal is round_bit, round_bit + 1 or round_bit + 2.
@@ -262,7 +262,7 @@ fn reciprocal_float_2_approx(x_1: Limb, x_0: Limb) -> (Limb, Limb) {
     let inv = if x_1 == Limb::MAX {
         0
     } else {
-        limbs_invert_limb(x_1 + 1)
+        limbs_invert_limb::<DoubleLimb, Limb>(x_1 + 1)
     };
     // Now inv <= B ^ 2 / (x_1 + 1) - B.
     let mut q_1 = HIGH_BIT | (inv >> 1);
@@ -422,7 +422,7 @@ fn limbs_reciprocal_limb_to_out_mod_with_fraction(
     let (out_last, out_init) = out.split_last_mut().unwrap();
     *out_last = 0;
     // Multiply-by-inverse, divisor already normalized.
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
     let mut r = HIGH_BIT;
     for out_q in out_init[..fraction_len].iter_mut().rev() {
         (*out_q, r) = div_mod_by_preinversion(r, 0, d, d_inv);

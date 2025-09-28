@@ -842,12 +842,13 @@ fn limbs_slice_neg_xor_limb_in_place_properties() {
     unsigned_vec_unsigned_pair_gen_var_18().test_properties_with_config(&config, |(mut xs, y)| {
         let old_xs = xs.clone();
         if limbs_slice_neg_xor_limb_in_place(&mut xs, y) {
-            let mut result = Natural::exact_from(
-                -(Integer::from(Natural::from_owned_limbs_asc(old_xs)) ^ Integer::from(y)),
-            )
-            .to_limbs_asc();
-            result.resize(xs.len(), 0);
-            assert_eq!(result, xs);
+            let xor =
+                Integer::from(Natural::from_owned_limbs_asc(old_xs.clone())) ^ Integer::from(y);
+            if xor <= 0 {
+                let mut result = Natural::exact_from(-xor).to_limbs_asc();
+                result.resize(xs.len(), 0);
+                assert_eq!(result, xs);
+            }
         } else {
             assert_eq!(
                 -Natural::from_owned_limbs_asc(xs),

@@ -125,13 +125,11 @@ impl Iterator for DenominatorsInClosedRationalInterval {
             let min_interior_denominator = min_interior_denominator.unwrap();
             assert!(min_interior_denominator > self.current);
             let mut min_denominator = min_interior_denominator;
-            let ad = self.a.denominator_ref();
-            if *ad > self.current && *ad < min_denominator {
-                min_denominator = ad.clone();
-            }
-            let bd = self.b.denominator_ref();
-            if *bd > self.current && *bd < min_denominator {
-                min_denominator = bd.clone();
+            for p in &self.points {
+                let pd = p.denominator_ref();
+                if *pd > self.current && *pd < min_denominator {
+                    min_denominator = pd.clone();
+                }
             }
             self.current = min_denominator;
             for p in exhaustive_rationals_with_denominator_range(
@@ -202,9 +200,9 @@ impl DenominatorsInClosedInterval for Rational {
     ///         ),
     ///         20
     ///     ),
-    ///     "[1000000, 1000001, 3000001, 3000002, 4000001, 4000003, 5000001, 5000002, 5000003, \
-    ///     5000004, 6000001, 6000005, 7000001, 7000002, 7000003, 7000004, 7000005, 7000006, \
-    ///     8000001, 8000003, ...]"
+    ///     "[1000000, 1000001, 2000001, 3000001, 3000002, 4000001, 4000003, 5000001, 5000002, \
+    ///     5000003, 5000004, 6000001, 6000005, 7000001, 7000002, 7000003, 7000004, 7000005, \
+    ///     7000006, 8000001, ...]"
     /// );
     /// ```
     fn denominators_in_closed_interval(

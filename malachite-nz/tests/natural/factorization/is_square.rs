@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::Square;
+use malachite_base::num::arithmetic::traits::{CheckedSqrt, Square};
 use malachite_base::num::factorization::traits::IsSquare;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::generators::natural_pair_gen_var_3;
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen_var_3};
 use std::str::FromStr;
 
 #[test]
@@ -64,10 +64,13 @@ fn test_is_square_edge_cases() {
 
 #[test]
 fn is_square_properties() {
-    natural_pair_gen_var_3().test_properties(|(a, b)| {
-        let sq = a.clone().square();
-        assert!(sq.is_square());
+    natural_gen().test_properties(|x| {
+        assert_eq!(x.is_square(), (&x).checked_sqrt().is_some());
+        assert!(x.square().is_square());
+    });
 
+    natural_pair_gen_var_3().test_properties(|(a, b)| {
+        let sq = (&a).square();
         // test non-square in range (a^2, (a+1)^2)
         let non_sq = sq + (b % (Natural::from(2u64) * a)) + Natural::from(1u64);
         assert!(!non_sq.is_square());

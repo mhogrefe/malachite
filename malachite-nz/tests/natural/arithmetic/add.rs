@@ -456,7 +456,7 @@ fn test_limbs_slice_add_same_length_in_place_left() {
 #[should_panic]
 fn limbs_slice_add_same_length_in_place_left_fail() {
     let mut out = vec![6, 7];
-    limbs_slice_add_same_length_in_place_left(&mut out, &[1, 2, 3]);
+    limbs_slice_add_same_length_in_place_left::<Limb>(&mut out, &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]

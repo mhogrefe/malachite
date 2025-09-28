@@ -27,7 +27,7 @@ use crate::natural::arithmetic::sub_mul::{
 };
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::logic::not::limbs_not_in_place;
-use crate::platform::Limb;
+use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
@@ -110,7 +110,8 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_left(
         xs.resize(ys_len + 1, 0);
         let xs_hi = &mut xs[xs_len..];
         let (xs_hi_last, xs_hi_init) = xs_hi.split_last_mut().unwrap();
-        *xs_hi_last = limbs_mul_limb_with_carry_to_out(xs_hi_init, ys_hi, z, borrow);
+        *xs_hi_last =
+            limbs_mul_limb_with_carry_to_out::<DoubleLimb, Limb>(xs_hi_init, ys_hi, z, borrow);
         // Apply any -1 from above. The value at xs_hi is non-zero because z != 0 and the high limb
         // of ys will be non-zero.
         if negative_one {

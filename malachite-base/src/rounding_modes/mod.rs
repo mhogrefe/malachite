@@ -40,10 +40,10 @@ use crate::rounding_modes::RoundingMode::*;
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum RoundingMode {
     /// Applies the function $x \mapsto \operatorname{sgn}(x) \lfloor |x| \rfloor$. In other words,
-    /// the value is rounded towards $0$.
+    /// the value is rounded towards 0.
     Down,
     /// Applies the function $x \mapsto \operatorname{sgn}(x) \lceil |x| \rceil$. In other words,
-    /// the value is rounded away from $0$.
+    /// the value is rounded away from 0.
     Up,
     /// Applies the floor function: $x \mapsto \lfloor x \rfloor$. In other words, the value is
     /// rounded towards $-\infty$.

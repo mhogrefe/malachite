@@ -107,14 +107,14 @@ pub trait ToSci: Sized {
     fn fmt_sci_valid(&self, options: ToSciOptions) -> bool;
 
     /// Converts a number to a string, possibly in scientific notation.
-    fn to_sci_with_options(&self, options: ToSciOptions) -> SciWrapper<Self> {
+    fn to_sci_with_options(&self, options: ToSciOptions) -> SciWrapper<'_, Self> {
         SciWrapper { x: self, options }
     }
 
     /// Converts a number to a string, possibly in scientific notation, using the default
     /// [`ToSciOptions`].
     #[inline]
-    fn to_sci(&self) -> SciWrapper<Self> {
+    fn to_sci(&self) -> SciWrapper<'_, Self> {
         SciWrapper {
             x: self,
             options: ToSciOptions::default(),

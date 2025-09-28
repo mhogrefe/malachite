@@ -617,26 +617,23 @@ fn test_binomial_coefficient() {
         13934942403111281665464675315630857236685237472673845588842782932266933122933085560371660",
     );
 
-    #[cfg(feature = "32_bit_limbs")]
-    {
-        fn test_large(n: &str, k: &str) {
-            let n = Natural::from_str(n).unwrap();
-            let k = Natural::from_str(k).unwrap();
-            let b = Natural::binomial_coefficient(n.clone(), k.clone());
-            assert!(b.is_valid());
+    fn test_large(n: &str, k: &str) {
+        let n = Natural::from_str(n).unwrap();
+        let k = Natural::from_str(k).unwrap();
+        let b = Natural::binomial_coefficient(n.clone(), k.clone());
+        assert!(b.is_valid());
 
-            let b_alt = Natural::binomial_coefficient(&n, &k);
-            assert!(b_alt.is_valid());
-            assert_eq!(b_alt, b);
+        let b_alt = Natural::binomial_coefficient(&n, &k);
+        assert!(b_alt.is_valid());
+        assert_eq!(b_alt, b);
 
-            assert_eq!(binomial_coefficient_naive_2(n.clone(), k.clone()), b);
-            if let Ok(k) = u32::try_from(&k) {
-                assert_eq!(Natural::exact_from(&rug::Integer::from(&n).binomial(k)), b);
-            }
+        assert_eq!(binomial_coefficient_naive_2(n.clone(), k.clone()), b);
+        if let Ok(k) = u32::try_from(&k) {
+            assert_eq!(Natural::exact_from(&rug::Integer::from(&n).binomial(k)), b);
         }
-        // - k > Limb::power_of_2(Limb::WIDTH >> 1) in binomial_coefficient_hmul_nbnpk
-        test_large("4294967296", "131076");
     }
+    // - k > Limb::power_of_2(Limb::WIDTH >> 1) in binomial_coefficient_hmul_nbnpk
+    test_large("4294967296", "131076");
 }
 
 #[test]

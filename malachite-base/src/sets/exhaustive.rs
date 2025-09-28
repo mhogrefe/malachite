@@ -10,12 +10,12 @@ use crate::vecs::exhaustive::{
     ExhaustiveOrderedUniqueCollections, LexFixedLengthOrderedUniqueCollections,
     LexOrderedUniqueCollections, ShortlexOrderedUniqueCollections,
 };
-#[cfg(not(feature = "test_build"))]
+#[cfg(not(feature = "std"))]
 use alloc::collections::BTreeSet;
 use core::hash::Hash;
-#[cfg(not(feature = "test_build"))]
+#[cfg(not(feature = "std"))]
 use hashbrown::HashSet;
-#[cfg(feature = "test_build")]
+#[cfg(feature = "std")]
 use std::collections::{BTreeSet, HashSet};
 
 /// Generates [`HashSet`]s of a given size with elements from a single iterator.

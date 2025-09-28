@@ -223,7 +223,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     &[1, 2, 3, 4, 3, 4, 3, 4, 3, 4]
     /// );
     /// ```
-    pub fn iter(&self) -> Chain<core::slice::Iter<T>, Cycle<core::slice::Iter<T>>> {
+    pub fn iter(&self) -> Chain<core::slice::Iter<'_, T>, Cycle<core::slice::Iter<'_, T>>> {
         self.non_repeating
             .iter()
             .chain(self.repeating.iter().cycle())

@@ -229,6 +229,7 @@ impl Ord for ComparableFloat {
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for ComparableFloat {
     /// Compares two [`ComparableFloat`]s.
     ///

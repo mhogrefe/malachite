@@ -21,7 +21,7 @@ use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::platform::{
-    BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, Limb, MU_BDIV_QR_THRESHOLD,
+    BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, DoubleLimb, Limb, MU_BDIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
@@ -58,7 +58,7 @@ fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_mod_exact_odd_limb(ns, d_low, 0)
     } else {
-        limbs_mod_limb(ns, d_low)
+        limbs_mod_limb::<DoubleLimb, Limb>(ns, d_low)
     }
 }
 
@@ -109,7 +109,7 @@ limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     }
     if d_len == 1 {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-            limbs_mod_limb(ns, d_0) == 0
+            limbs_mod_limb::<DoubleLimb, Limb>(ns, d_0) == 0
         } else {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
@@ -206,7 +206,7 @@ limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     }
     if d_len == 1 {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-            limbs_mod_limb(ns, d_0) == 0
+            limbs_mod_limb::<DoubleLimb, Limb>(ns, d_0) == 0
         } else {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
@@ -304,7 +304,7 @@ limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     }
     if d_len == 1 {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-            limbs_mod_limb(ns, d_0) == 0
+            limbs_mod_limb::<DoubleLimb, Limb>(ns, d_0) == 0
         } else {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
@@ -399,7 +399,7 @@ limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     }
     if d_len == 1 {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-            limbs_mod_limb(ns, d_0) == 0
+            limbs_mod_limb::<DoubleLimb, Limb>(ns, d_0) == 0
         } else {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };

@@ -17,7 +17,8 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::fmt::Display;
 use core::ops::{Sub, SubAssign};
-use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
+use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
 // `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether
@@ -95,15 +96,15 @@ pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Lim
 //
 // This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
 // input slice.
-pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
+pub_crate_test! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
     for x in &mut *xs {
         if x.overflowing_sub_assign(y) {
-            y = 1;
+            y = T::ONE;
         } else {
             return false;
         }
     }
-    y != 0
+    y != T::ZERO
 }}
 
 #[inline]

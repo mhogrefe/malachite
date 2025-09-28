@@ -28,8 +28,10 @@ fn test_from_str() {
         assert_eq!(rug::Integer::from_str(s).unwrap().to_string(), n);
     };
     test_ok("0", "0");
+    test_ok("+0", "0");
     test_ok("-0", "0");
     test_ok("123456", "123456");
+    test_ok("+123456", "123456");
     test_ok("1000000000000000000000000", "1000000000000000000000000");
     test_ok("-123456", "-123456");
     test_ok("-1000000000000000000000000", "-1000000000000000000000000");
@@ -62,6 +64,7 @@ fn from_str_properties() {
     config.insert("mean_length_n", 64);
     string_gen().test_properties_with_config(&config, |s| {
         let trimmed = s.strip_prefix('-').unwrap_or(&s);
+        let trimmed = trimmed.strip_prefix('+').unwrap_or(trimmed);
         assert_eq!(
             Integer::from_str(&s).is_ok(),
             !trimmed.is_empty() && trimmed.chars().all(|c| c.is_ascii_digit()),

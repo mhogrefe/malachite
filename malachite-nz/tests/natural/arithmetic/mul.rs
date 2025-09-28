@@ -21,12 +21,7 @@ use malachite_base::test_util::generators::{
 };
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::mul::fft::{
-    limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
-    limbs_mul_greater_to_out_fft_with_cutoff, limbs_mul_greater_to_out_fft_with_cutoff_scratch_len,
-    limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
-    limbs_square_to_out_fft_with_cutoff, limbs_square_to_out_fft_with_cutoff_scratch_len,
-};
+use malachite_nz::natural::arithmetic::mul::context::CONTEXT;
 use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
     limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
@@ -43,17 +38,20 @@ use malachite_nz::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_scratch_len,
     limbs_mul_greater_to_out_toom_8h, limbs_mul_greater_to_out_toom_8h_scratch_len,
-    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
-    limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
-    limbs_mul_greater_to_out_toom_33, limbs_mul_greater_to_out_toom_33_scratch_len,
-    limbs_mul_greater_to_out_toom_42, limbs_mul_greater_to_out_toom_42_scratch_len,
     limbs_mul_greater_to_out_toom_43, limbs_mul_greater_to_out_toom_43_scratch_len,
     limbs_mul_greater_to_out_toom_44, limbs_mul_greater_to_out_toom_44_scratch_len,
     limbs_mul_greater_to_out_toom_52, limbs_mul_greater_to_out_toom_52_scratch_len,
     limbs_mul_greater_to_out_toom_53, limbs_mul_greater_to_out_toom_53_scratch_len,
+    limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
+};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::natural::arithmetic::mul::toom::{
+    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
+    limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
+    limbs_mul_greater_to_out_toom_33, limbs_mul_greater_to_out_toom_33_scratch_len,
+    limbs_mul_greater_to_out_toom_42, limbs_mul_greater_to_out_toom_42_scratch_len,
     limbs_mul_greater_to_out_toom_54, limbs_mul_greater_to_out_toom_54_scratch_len,
     limbs_mul_greater_to_out_toom_62, limbs_mul_greater_to_out_toom_62_scratch_len,
-    limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_greater_to_out_basecase,
@@ -63,13 +61,9 @@ use malachite_nz::natural::arithmetic::mul::{
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, natural_triple_gen, natural_vec_gen,
-    unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5,
-    unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
-    unsigned_vec_triple_gen_var_9, unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11,
-    unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14,
-    unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_60,
 };
 use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
+use malachite_nz::test_util::natural::arithmetic::mul::{initialize_context, mul_slow_fft};
 use malachite_nz::test_util::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
 };
@@ -166,7 +160,7 @@ fn test_limbs_mul_limb_with_carry_to_out() {
                 out_after: &[Limb]| {
         let mut out = out_before.to_vec();
         assert_eq!(
-            limbs_mul_limb_with_carry_to_out(&mut out, xs, y, carry),
+            limbs_mul_limb_with_carry_to_out::<DoubleLimb, Limb>(&mut out, xs, y, carry),
             carry_out
         );
         assert_eq!(out, out_after);
@@ -186,7 +180,7 @@ fn test_limbs_mul_limb_with_carry_to_out() {
 #[test]
 #[should_panic]
 fn limbs_mul_limb_with_carry_to_out_fail() {
-    limbs_mul_limb_with_carry_to_out(&mut [10], &[10, 10], 10, 2);
+    limbs_mul_limb_with_carry_to_out::<DoubleLimb, Limb>(&mut [10], &[10, 10], 10, 2);
 }
 
 #[test]
@@ -196,7 +190,8 @@ fn limbs_mul_limb_with_carry_to_out_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     large_type_gen_var_1().test_properties_with_config(&config, |(mut out, xs, y, carry)| {
         let old_out = out.clone();
-        let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, &xs, y, carry);
+        let carry_out =
+            limbs_mul_limb_with_carry_to_out::<DoubleLimb, Limb>(&mut out, &xs, y, carry);
         let len = xs.len();
         let n = Natural::from_owned_limbs_asc(xs) * Natural::from(y) + Natural::from(carry);
         let mut xs_out = n.into_limbs_asc();
@@ -215,7 +210,10 @@ fn limbs_mul_limb_with_carry_to_out_properties() {
 fn test_limbs_mul_limb_to_out() {
     let test = |out_before: &[Limb], xs: &[Limb], y: Limb, carry: Limb, out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        assert_eq!(limbs_mul_limb_to_out(&mut out, xs, y), carry);
+        assert_eq!(
+            limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut out, xs, y),
+            carry
+        );
         assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[], 0, 0, &[10, 10, 10, 10]);
@@ -262,7 +260,7 @@ fn test_limbs_mul_limb_to_out() {
 #[test]
 #[should_panic]
 fn limbs_mul_limb_to_out_fail() {
-    limbs_mul_limb_to_out(&mut [10], &[10, 10], 10);
+    limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut [10], &[10, 10], 10);
 }
 
 #[test]
@@ -274,7 +272,7 @@ fn limbs_mul_limb_to_out_properties() {
         &config,
         |(mut out, xs, y)| {
             let old_out = out.clone();
-            let carry = limbs_mul_limb_to_out(&mut out, &xs, y);
+            let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y);
             let len = xs.len();
             let n = Natural::from_owned_limbs_asc(xs) * Natural::from(y);
             let mut limbs = n.into_limbs_asc();
@@ -1429,7 +1427,8 @@ fn limbs_mul_greater_to_out_properties() {
         let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs.len(), ys.len())];
         let highest_result_limb = limbs_mul_greater_to_out(&mut out, &xs, &ys, &mut mul_scratch);
         assert_eq!(highest_result_limb, out[xs.len() + ys.len() - 1]);
-        assert_eq!(out, expected_out);
+        let out_len = xs.len() + ys.len();
+        assert_eq!(&out[..out_len], &expected_out[..out_len]);
         let mut out = old_out;
         limbs_mul_greater_to_out_basecase_mem_opt(&mut out, &xs, &ys);
         assert_eq!(out, expected_out);
@@ -1678,101 +1677,6 @@ fn limbs_mul_greater_to_out_toom_22_fail_7() {
     let ys = series(1, 4);
     limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
 }
-
-macro_rules! mul_properties_helper {
-    ($properties: ident, $mul: ident, $scratch: ident, $gen: ident) => {
-        #[test]
-        fn $properties() {
-            let mut config = GenConfig::new();
-            config.insert("mean_length_n", 2048);
-            config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
-            $gen().test_properties_with_config(&config, |(mut out, xs, ys)| {
-                let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
-                let mut scratch = vec![0; $scratch(xs.len(), ys.len())];
-                $mul(&mut out, &xs, &ys, &mut scratch);
-                assert_eq!(out, expected_out);
-            });
-        }
-    };
-}
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_22_properties,
-    limbs_mul_greater_to_out_toom_22,
-    limbs_mul_greater_to_out_toom_22_scratch_len,
-    unsigned_vec_triple_gen_var_4
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_32_properties,
-    limbs_mul_greater_to_out_toom_32,
-    limbs_mul_greater_to_out_toom_32_scratch_len,
-    unsigned_vec_triple_gen_var_5
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_33_properties,
-    limbs_mul_greater_to_out_toom_33,
-    limbs_mul_greater_to_out_toom_33_scratch_len,
-    unsigned_vec_triple_gen_var_6
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_42_properties,
-    limbs_mul_greater_to_out_toom_42,
-    limbs_mul_greater_to_out_toom_42_scratch_len,
-    unsigned_vec_triple_gen_var_7
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_43_properties,
-    limbs_mul_greater_to_out_toom_43,
-    limbs_mul_greater_to_out_toom_43_scratch_len,
-    unsigned_vec_triple_gen_var_8
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_44_properties,
-    limbs_mul_greater_to_out_toom_44,
-    limbs_mul_greater_to_out_toom_44_scratch_len,
-    unsigned_vec_triple_gen_var_9
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_52_properties,
-    limbs_mul_greater_to_out_toom_52,
-    limbs_mul_greater_to_out_toom_52_scratch_len,
-    unsigned_vec_triple_gen_var_10
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_53_properties,
-    limbs_mul_greater_to_out_toom_53,
-    limbs_mul_greater_to_out_toom_53_scratch_len,
-    unsigned_vec_triple_gen_var_11
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_54_properties,
-    limbs_mul_greater_to_out_toom_54,
-    limbs_mul_greater_to_out_toom_54_scratch_len,
-    unsigned_vec_triple_gen_var_12
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_62_properties,
-    limbs_mul_greater_to_out_toom_62,
-    limbs_mul_greater_to_out_toom_62_scratch_len,
-    unsigned_vec_triple_gen_var_13
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_63_properties,
-    limbs_mul_greater_to_out_toom_63,
-    limbs_mul_greater_to_out_toom_63_scratch_len,
-    unsigned_vec_triple_gen_var_14
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_6h_properties,
-    limbs_mul_greater_to_out_toom_6h,
-    limbs_mul_greater_to_out_toom_6h_scratch_len,
-    unsigned_vec_triple_gen_var_15
-);
-mul_properties_helper!(
-    limbs_mul_greater_to_out_toom_8h_properties,
-    limbs_mul_greater_to_out_toom_8h,
-    limbs_mul_greater_to_out_toom_8h_scratch_len,
-    unsigned_vec_triple_gen_var_16
-);
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -11620,519 +11524,6 @@ fn test_limbs_product() {
     }
 }
 
-fn verify_limbs_mul_greater_to_out_fft(
-    out_before: &[Limb],
-    xs: &[Limb],
-    ys: &[Limb],
-    out_after: &[Limb],
-) {
-    let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
-    let mut ns = n.into_limbs_asc();
-    let len = xs.len() + ys.len();
-    ns.resize(len, 0);
-    assert_eq!(ns, &out_after[..len]);
-    assert_eq!(&out_after[len..], &out_before[len..]);
-}
-
-#[test]
-fn test_limbs_mul_greater_to_out_fft() {
-    let test = |xs: &[Limb], ys: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        let mut out = out_before.to_vec();
-        let mut scratch = vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
-        limbs_mul_greater_to_out_fft(&mut out, xs, ys, &mut scratch);
-        assert_eq!(out, out_after);
-        let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; limbs_mul_greater_to_out_fft_with_cutoff_scratch_len(xs.len(), ys.len(), 50)];
-        limbs_mul_greater_to_out_fft_with_cutoff(&mut out, xs, ys, 50, &mut scratch);
-        assert_eq!(out, out_after);
-
-        verify_limbs_mul_greater_to_out_fft(out_before, xs, ys, out_after);
-    };
-    let test_big = |xs: &[Limb], ys: &[Limb]| {
-        let mut out = vec![0; xs.len() + ys.len()];
-        let out_before = out.clone();
-        let mut scratch = vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
-        limbs_mul_greater_to_out_fft(&mut out, xs, ys, &mut scratch);
-        let out_after = out;
-        let mut out = out_before.clone();
-        let mut scratch =
-            vec![0; limbs_mul_greater_to_out_fft_with_cutoff_scratch_len(xs.len(), ys.len(), 50)];
-        limbs_mul_greater_to_out_fft_with_cutoff(&mut out, xs, ys, 50, &mut scratch);
-        assert_eq!(out, out_after);
-
-        verify_limbs_mul_greater_to_out_fft(&out_before, xs, ys, &out);
-    };
-    #[cfg(not(feature = "32_bit_limbs"))]
-    {
-        // - depth < 11
-        // - depth < 6
-        // - j1 + j2 - 1 <= 4 * n || w <= wadj
-        // - j1 + j2 - 1 > 4 * n || w <= wadj
-        // - trunc > n << 1 in limbs_mul_truncate_sqrt2
-        // - top_bits != 0 in limbs_fft_split_bits
-        // - i < length - 1 in limbs_split_bits_worker
-        // - shift_bits == 0 in limbs_split_bits_worker
-        // - shift_bits != 0 in limbs_split_bits_worker
-        // - shift_bits >= Limb::WIDTH in limbs_split_bits_worker
-        // - i >= length - 1 in limbs_split_bits_worker
-        // - shift_bits != 0 in limbs_fft_split_bits
-        // - w.even() in limbs_fft_truncate_sqrt2
-        // - trunc == n << 1 in limbs_fft_truncate
-        // - n != 1 in limbs_fft_radix2
-        // - x == 0 in limbs_butterfly_lsh_b
-        // - x == 0 && y == 0 in limbs_butterfly_lsh_b
-        // - !xs.is_empty() in limbs_fft_sumdiff
-        // - d == 0 in limbs_fft_mul_2expmod_2expp1_in_place
-        // - x == 0 && y == 0 in limbs_butterfly_lsh_b
-        // - !(sum ^ *x_lo).get_highest_bit() in limbs_fft_addmod_2expp1_1
-        // - n == 1 in limbs_fft_radix2
-        // - (sum ^ *x_lo).get_highest_bit() && c.get_highest_bit() in limbs_fft_addmod_2expp1_1
-        // - h == 0 in limbs_fft_normmod_2expp1
-        // - cy == 0 in limbs_fft_mulmod_2expp1_basecase_same
-        // - cy == 0 && cz == 0 in limbs_fft_mulmod_2expp1_basecase_same
-        // - h != 0 in limbs_fft_normmod_2expp1
-        // - hi == 0 in limbs_fft_normmod_2expp1
-        // - !(sum ^ *x_lo).get_highest_bit() && !c.get_highest_bit() in limbs_fft_addmod_2expp1_1
-        // - w.even() in limbs_ifft_truncate_sqrt2
-        // - trunc == n << 1 in limbs_ifft_truncate
-        // - n != 1 in limbs_ifft_radix2
-        // - n == 1 in limbs_ifft_radix2
-        // - d == 0 in limbs_fft_div_2expmod_2expp1_in_place
-        // - x == 0 in limbs_butterfly_rsh_b
-        // - x == 0 && y == 0 in limbs_butterfly_rsh_b
-        // - x == 0 && y != 0 in limbs_butterfly_rsh_b
-        // - d != 0 in limbs_fft_div_2expmod_2expp1_in_place
-        // - hi != 0 in limbs_fft_normmod_2expp1
-        // - t[limbs] != Limb::MAX in limbs_fft_normmod_2expp1
-        // - top_bits != 0 in limbs_fft_combine_bits
-        // - shift_bits == 0 first time in limbs_fft_combine_bits
-        // - shift_bits < Limb::WIDTH first time in limbs_fft_combine_bits
-        // - shift_bits != 0 first time in limbs_fft_combine_bits
-        // - shift_bits >= Limb::WIDTH first time in limbs_fft_combine_bits
-        // - shift_bits != 0 second time in limbs_fft_combine_bits
-        // - shift_bits >= Limb::WIDTH second time in limbs_fft_combine_bits
-        test(
-            &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            &[
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1,
-            ],
-            &[10; 57],
-            &[
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-                0,
-            ],
-        );
-        test(
-            &[10; 25],
-            &[10; 32],
-            &[100; 57],
-            &[
-                100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
-                1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2500, 2500, 2500, 2500,
-                2500, 2500, 2500, 2400, 2300, 2200, 2100, 2000, 1900, 1800, 1700, 1600, 1500, 1400,
-                1300, 1200, 1100, 1000, 900, 800, 700, 600, 500, 400, 300, 200, 100, 0,
-            ],
-        );
-        test(
-            &[u64::MAX; 25],
-            &[u64::MAX; 32],
-            &[100; 57],
-            &rle_decode(&[
-                (1, 1),
-                (0, 24),
-                (u64::MAX, 7),
-                (18446744073709551614, 1),
-                (u64::MAX, 24),
-            ]),
-        );
-        // - trunc != n << 1 && trunc > n in limbs_fft_truncate
-        // - d != 0 in limbs_fft_mul_2expmod_2expp1_in_place
-        // - x != 0 in limbs_fft_adjust
-        // - offset != n in limbs_fft_neg
-        // - zeros != n in limbs_fft_neg
-        // - zeros == n in limbs_fft_neg
-        // - trunc != n << 1 && trunc > n in limbs_fft_truncate1
-        // - trunc != n << 1 && trunc <= n in limbs_fft_truncate1
-        // - trunc == n << 1 in limbs_fft_truncate1
-        // - trunc != n << 1 && trunc > n in limbs_ifft_truncate
-        // - trunc != n << 1 && trunc > n in limbs_ifft_truncate1
-        // - trunc != n << 1 && trunc <= n in limbs_ifft_truncate1
-        // - trunc == n << 1 in limbs_ifft_truncate1
-        test_big(&[10; 1000], &[10; 1000]);
-        test_big(&[Limb::MAX; 1000], &[u64::MAX; 1000]);
-        // - trunc > n << 1 in limbs_mul_mfa_truncate_sqrt2
-        // - shift_bits < Limb::WIDTH in limbs_split_bits_worker
-        // - i < n1 in limbs_fft_outer1_worker
-        // - w.odd() in limbs_fft_outer1_worker
-        // - j.even() in limbs_fft_outer1_worker
-        // - i.even() in limbs_fft_outer1_worker
-        // - n != 1 in limbs_fft_radix2_twiddle
-        // - n == 1 in limbs_fft_radix2_twiddle
-        // - b1 < nw in limbs_fft_butterfly_twiddle
-        // - b2 < nw in limbs_fft_butterfly_twiddle
-        // - j >= s in limbs_fft_outer1_worker;
-        // - j < s in limbs_fft_outer1_worker
-        // - j.odd() in limbs_fft_outer1_worker
-        // - b1 < wn in limbs_fft_butterfly_sqrt2
-        // - y != 0 in limbs_fft_butterfly_sqrt2
-        // - limbs.even() in limbs_fft_butterfly_sqrt2
-        // - !negate in limbs_fft_butterfly_sqrt2
-        // - i.odd() in limbs_fft_outer1_worker
-        // - b1 < wn in limbs_fft_adjust_sqrt2
-        // - y != 0 first time in limbs_fft_adjust_sqrt2
-        // - d != 0 in limbs_fft_mul_2expmod_2expp1
-        // - y != 0 second time in limbs_fft_adjust_sqrt2
-        // - limbs.even() in limbs_fft_adjust_sqrt2
-        // - !negate in limbs_fft_adjust_sqrt2
-        // - b1 >= wn in limbs_fft_adjust_sqrt2
-        // - y == 0 first time in limbs_fft_adjust_sqrt2
-        // - negate in limbs_fft_adjust_sqrt2
-        // - x != 0 && y != 0 && x < y in limbs_butterfly_lsh_b
-        // - offset == n in limbs_fft_neg_in_place
-        // - offset != n in limbs_fft_neg_in_place
-        // - zeros == n in limbs_fft_neg_in_place
-        // - zeros != n in limbs_fft_neg_in_place
-        // - d == 0 in limbs_fft_mul_2expmod_2expp1
-        // - b2 >= nw in limbs_fft_butterfly_twiddle
-        // - x != 0 && y != 0 && x > y in limbs_butterfly_lsh_b
-        // - x != 0 && y == 0 in limbs_butterfly_lsh_b
-        // - i >= n1 in limbs_fft_outer1_worker
-        // - i < n1 in limbs_fft_outer2_worker
-        // - trunc != n << 1 && trunc <= n in limbs_fft_truncate1_twiddle
-        // - trunc == n << 1 in limbs_fft_truncate1_twiddle
-        // - j >= s in limbs_fft_outer2_worker
-        // - j < s in limbs_fft_outer2_worker
-        // - i >= n1 in limbs_fft_outer2_worker
-        // - s < trunc in limbs_fft_inner1_worker
-        // - c.even() && c & 2 == 0 in limbs_fft_mulmod_2expp1
-        // - limbs <= FFT_MULMOD_2EXPP1_CUTOFF in limbs_fft_mulmod_2expp1
-        // - s >= trunc in limbs_fft_inner1_worker
-        // - i < n2 in limbs_fft_inner2_worker
-        // - i >= n2 in limbs_fft_inner2_worker
-        // - i < n1 in limbs_ifft_outer1_worker
-        // - j >= s in limbs_ifft_outer1_worker
-        // - j < s in limbs_ifft_outer1_worker
-        // - n != 1 in limbs_ifft_radix2_twiddle
-        // - n == 1 in limbs_ifft_radix2_twiddle
-        // - b1 < nw in limbs_ifft_butterfly_twiddle
-        // - b2 < nw in limbs_ifft_butterfly_twiddle
-        // - !negate1 in limbs_ifft_butterfly_twiddle
-        // - !negate2 in limbs_ifft_butterfly_twiddle
-        // - x != 0 && y != 0 && x < y in limbs_butterfly_rsh_b
-        // - b2 >= nw in limbs_ifft_butterfly_twiddle
-        // - negate2 in limbs_ifft_butterfly_twiddle
-        // - x != 0 && y != 0 && x > y in limbs_butterfly_rsh_b
-        // - x != 0 && y == 0 in limbs_butterfly_rsh_b
-        // - i >= n1 in limbs_ifft_outer1_worker
-        // - i < n1 in limbs_ifft_outer2_worker
-        // - j >= s in limbs_ifft_outer2_worker
-        // - j < s in limbs_ifft_outer2_worker
-        // - w.odd() first time in limbs_ifft_outer2_worker
-        // - i.even() in limbs_ifft_outer2_worker
-        // - trunc != n << 1 && trunc <= n in limbs_ifft_truncate1_twiddle
-        // - trunc == n << 1 in limbs_ifft_truncate1_twiddle
-        // - w.odd() second time in limbs_ifft_outer2_worker
-        // - j.even() in limbs_ifft_outer2_worker
-        // - i.odd() in limbs_ifft_outer2_worker
-        // - offset == n in limbs_fft_neg
-        // - j.odd() in limbs_ifft_outer2_worker
-        // - b1 >= wn in limbs_ifft_butterfly_sqrt2
-        // - b1 != 0 in limbs_ifft_butterfly_sqrt2
-        // - y != 0 in limbs_ifft_butterfly_sqrt2
-        // - limbs.even() in limbs_ifft_butterfly_sqrt2
-        // - !negate in limbs_ifft_butterfly_sqrt2
-        // - xs.is_empty() in limbs_fft_sumdiff
-        // - b1 < wn in limbs_ifft_butterfly_sqrt2
-        // - negate in limbs_ifft_butterfly_sqrt2
-        // - b1 == 0 in limbs_ifft_butterfly_sqrt2
-        // - i >= n1 in limbs_ifft_outer2_worker
-        // - shift_bits < Limb::WIDTH second time in limbs_fft_combine_bits
-        // - j1 + j2 - 1 <= 3 * n
-        test_big(&[10; 69569], &[10; 2591]);
-        // - trunc != n << 1 && trunc > n in limbs_fft_truncate1_twiddle
-        // - trunc != n << 1 && trunc > n in limbs_ifft_truncate1_twiddle
-        test_big(&[10; 44636], &[10; 25927]);
-        // - w.even() in limbs_fft_outer1_worker
-        // - w.even() first time in limbs_ifft_outer2_worker
-        // - w.even() second time in limbs_ifft_outer2_worker
-        // - 50 cutoff: limbs > cutoff in limbs_fft_mulmod_2expp1
-        // - 50 cutoff: depth >= 12 in limbs_fft_mulmod_2expp1
-        // - 50 cutoff: top_bits == 0 in limbs_fft_split_bits
-        // - 50 cutoff: i < num in limbs_split_limbs_worke
-        // - 50 cutoff: i >= num in limbs_split_limbs_worker
-        // - 50 cutoff: i >= length in limbs_fft_split_limbs
-        // - 50 cutoff: total_limbs <= skip in limbs_fft_split_limbs
-        // - 50 cutoff: w.even() in limbs_fft_negacyclic
-        // - 50 cutoff: top_bits == 0 in limbs_fft_combine_bits
-        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 first time in
-        //   limbs_fft_mulmod_2expp1_helper
-        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
-        //   limbs_fft_mulmod_2expp1_helper
-        // - 50 cutoff: r[j] != 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
-        //   limbs_fft_mulmod_2expp1_helper
-        // - 50 cutoff: limb_add != 0 in limbs_fft_mulmod_2expp1_helper
-        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 second time in
-        //   limbs_fft_mulmod_2expp1_helper
-        test_big(&[10; 178940], &[10; 21015]);
-        // - w.odd() in limbs_fft_truncate_sqrt2
-        // - b1 >= wn in limbs_fft_butterfly_sqrt2
-        // - negate in limbs_fft_butterfly_sqrt2
-        // - w.odd() in limbs_ifft_truncate_sqrt2
-        test_big(&[10; 10758], &[10; 14125]);
-        // - depth >= 6
-        test_big(&[10; 10000], &[10; 10000]);
-        // - w == 1
-        // - w != 1
-        // - depth >= 11
-        // - j1 + j2 - 1 > 3 * n
-        test_big(&[10; 100000], &[10; 100000]);
-        // - limbs.odd() in limbs_fft_butterfly_sqrt2
-        // - limbs.odd() in limbs_fft_adjust_sqrt2
-        // - limbs.odd() in limbs_ifft_butterfly_sqrt2
-        test_big(&[10; 188], &[10; 3231]);
-        test_big(&[Limb::MAX; 27300], &[Limb::MAX; 49384]);
-        let xs = &[
-            (0, 3772),
-            (18446743936270598144, 1),
-            (u64::MAX, 12730),
-            (9223372036854775807, 1),
-            (0, 10796),
-        ];
-        let ys = &[
-            (0, 1181),
-            (18446744073709486080, 1),
-            (u64::MAX, 2874),
-            (1048575, 1),
-            (0, 14962),
-            (18410715276690587648, 1),
-            (u64::MAX, 10211),
-            (4611686018427387903, 1),
-            (0, 111),
-            (18410715276690587648, 1),
-            (u64::MAX, 1566),
-            (9007199254740991, 1),
-            (0, 468),
-            (18442240474082181120, 1),
-            (u64::MAX, 3062),
-            (35184372088831, 1),
-            (0, 830),
-            (18446181123756130304, 1),
-            (u64::MAX, 11736),
-            (63, 1),
-            (0, 2373),
-        ];
-        test_big(&rle_decode(xs), &rle_decode(ys));
-    }
-    #[cfg(feature = "32_bit_limbs")]
-    {
-        // - shift_bits == 0 in limbs_fft_split_bits
-        test(&[0; 49], &[0; 64], &[10; 113], &[0; 113]);
-        // - t[limbs] == Limb::MAX in limbs_fft_normmod_2expp1
-        // - cy == 0 && cz != 0 in limbs_fft_mulmod_2expp1_basecase_same
-        test(
-            &[0; 49],
-            &[
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 1,
-            ],
-            &[10; 113],
-            &[0; 113],
-        );
-        // - shift_bits == 0 second time in limbs_fft_combine_bits
-        test_big(&[10; 8284], &[10; 23341]);
-        // - x == 0 in limbs_fft_adjust
-        test_big(&[10; 17027], &[10; 15816]);
-        // - trunc <= n << 1 in limbs_mul_truncate_sqrt2
-        test_big(&[10; 32127], &[10; 32870]);
-        // - 50 cutoff: depth < 12 in limbs_fft_mulmod_2expp1
-        test_big(&[10; 178940], &[10; 21015]);
-    }
-}
-
-fn verify_limbs_square_to_out_fft(out_before: &[Limb], xs: &[Limb], out_after: &[Limb]) {
-    let n = Natural::from_limbs_asc(xs).square();
-    let mut ns = n.into_limbs_asc();
-    let len = xs.len() << 1;
-    ns.resize(len, 0);
-    assert_eq!(ns, &out_after[..len]);
-    assert_eq!(&out_after[len..], &out_before[len..]);
-}
-
-#[test]
-fn test_limbs_square_to_out_fft() {
-    #[cfg(not(feature = "32_bit_limbs"))]
-    let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        let mut out = out_before.to_vec();
-        let mut scratch = vec![0; limbs_square_to_out_fft_scratch_len(xs.len())];
-        limbs_square_to_out_fft(&mut out, xs, &mut scratch);
-        assert_eq!(out, out_after);
-        let mut out = out_before.to_vec();
-        let mut scratch = vec![0; limbs_square_to_out_fft_with_cutoff_scratch_len(xs.len(), 50)];
-        limbs_square_to_out_fft_with_cutoff(&mut out, xs, 50, &mut scratch);
-        assert_eq!(out, out_after);
-
-        verify_limbs_square_to_out_fft(out_before, xs, out_after);
-    };
-    let test_big = |xs: &[Limb]| {
-        let mut out = vec![0; xs.len() << 1];
-        let out_before = out.clone();
-        let mut scratch = vec![0; limbs_square_to_out_fft_scratch_len(xs.len())];
-        limbs_square_to_out_fft(&mut out, xs, &mut scratch);
-        let out_after = out;
-        let mut out = out_before.clone();
-        let mut scratch = vec![0; limbs_square_to_out_fft_with_cutoff_scratch_len(xs.len(), 50)];
-        limbs_square_to_out_fft_with_cutoff(&mut out, xs, 50, &mut scratch);
-        assert_eq!(out, out_after);
-
-        verify_limbs_square_to_out_fft(&out_before, xs, &out);
-    };
-    #[cfg(not(feature = "32_bit_limbs"))]
-    {
-        // - depth < 11
-        // - depth < 6
-        // - w > wadj
-        // - (j1 << 1) - 1 <= n << 2 || w <= wadj
-        // - (j1 << 1) - 1 > n << 2 && w > wadj
-        // - trunc > n << 1 in limbs_mul_truncate_sqrt2_same
-        // - cy == 0 in limbs_fft_mulmod_2expp1_basecase_same2
-        // - cy == 0 && cz == 0 in limbs_fft_mulmod_2expp1_basecase_same2
-        // - k == 0 in limbs_fft_mulmod_2expp1_internal_same2
-        test(
-            &[
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                1,
-            ],
-            &[10; 58],
-            &[
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                1, 0,
-            ],
-        );
-        // - w == 1
-        test_big(&[10; 100]);
-        // - w != 1
-        // - depth >= 6
-        test_big(&[10; 1000]);
-        // - depth >= 11
-        // - (j1 << 1) - 1 > 3 * n
-        // - trunc > n << 1 in limbs_mul_mfa_truncate_sqrt2_same
-        // - s < trunc in limbs_fft_inner1_worker_same
-        // - c.even() && c & 2 == 0 in limbs_fft_mulmod_2expp1_same
-        // - limbs <= FFT_MULMOD_2EXPP1_CUTOFF in limbs_fft_mulmod_2expp1_same
-        // - s >= trunc in limbs_fft_inner1_worker_same
-        // - i < n2 in limbs_fft_inner2_worker_same
-        // - i >= n2 in limbs_fft_inner2_worker_same
-        // - 50 cutoff: limbs > cutoff in limbs_fft_mulmod_2expp1_same
-        // - 50 cutoff: depth >= 12 in limbs_fft_mulmod_2expp1_same
-        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 first time in
-        //   limbs_fft_mulmod_2expp1_helper_same
-        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
-        //   limbs_fft_mulmod_2expp1_helper_same
-        // - 50 cutoff: r[j] != 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
-        //   limbs_fft_mulmod_2expp1_helper_same
-        // - 50 cutoff: limb_add != 0 in limbs_fft_mulmod_2expp1_helper_same
-        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 second time in
-        //   limbs_fft_mulmod_2expp1_helper_same
-        test_big(&[10; 100000]);
-        // - (j1 << 1) - 1 <= 3 * n
-        test_big(&[10; 38424]);
-        test_big(&[10; 5354]);
-        let xs = rle_decode(&[
-            (0, 9249),
-            (18410715276690587648, 1),
-            (u64::MAX, 11159),
-            (134217727, 1),
-            (0, 2780),
-            (18446726481523507200, 1),
-            (u64::MAX, 1972),
-            (8796093022207, 1),
-            (0, 2972),
-            (18446742974197923840, 1),
-            (u64::MAX, 1456),
-            (255, 1),
-            (0, 1446),
-            (16140901064495857664, 1),
-            (u64::MAX, 534),
-            (2047, 1),
-            (0, 4901),
-            (18446603336221196288, 1),
-            (u64::MAX, 1262),
-            (2251799813685247, 1),
-            (0, 802),
-            (18446726481523507200, 1),
-            (u64::MAX, 131),
-            (137438953471, 1),
-            (0, 1394),
-            (18446744073709551614, 1),
-            (u64::MAX, 3007),
-            (8589934591, 1),
-            (0, 960),
-            (18446726481523507200, 1),
-            (u64::MAX, 2902),
-            (288230376151711743, 1),
-            (0, 7719),
-        ]);
-        test_big(&xs);
-    }
-    #[cfg(feature = "32_bit_limbs")]
-    {
-        // - w <= wadj
-        test_big(&[10; 25186]);
-        // - trunc <= n << 1 in limbs_mul_truncate_sqrt2_same
-        test_big(&[10; 32562]);
-        // - depth < 12 in limbs_fft_mulmod_2expp1_same
-        test_big(&[10; 103030]);
-    }
-}
-
-#[test]
-fn limbs_mul_greater_to_out_fft_properties() {
-    let mut config = GenConfig::new();
-    config.insert("mean_length_n", 32768);
-    config.insert("mean_stripe_n", 4096 << Limb::LOG_WIDTH);
-    unsigned_vec_triple_gen_var_60().test_properties_with_config(
-        &config,
-        |(out_before, xs, ys)| {
-            let mut out = out_before.to_vec();
-            let mut scratch = vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
-            limbs_mul_greater_to_out_fft(&mut out, &xs, &ys, &mut scratch);
-            verify_limbs_mul_greater_to_out_fft(&out_before, &xs, &ys, &out);
-            let out_after = out;
-            let mut out = out_before.to_vec();
-            let mut scratch =
-                vec![
-                    0;
-                    limbs_mul_greater_to_out_fft_with_cutoff_scratch_len(xs.len(), ys.len(), 50)
-                ];
-            limbs_mul_greater_to_out_fft_with_cutoff(&mut out, &xs, &ys, 50, &mut scratch);
-            assert_eq!(out, out_after);
-        },
-    );
-}
-
-#[test]
-fn limbs_square_to_out_fft_properties() {
-    let mut config = GenConfig::new();
-    config.insert("mean_length_n", 32768);
-    config.insert("mean_stripe_n", 4096 << Limb::LOG_WIDTH);
-    unsigned_vec_pair_gen_var_33().test_properties_with_config(&config, |(out_before, xs)| {
-        let mut out = out_before.to_vec();
-        let mut scratch = vec![0; limbs_square_to_out_fft_scratch_len(xs.len())];
-        limbs_square_to_out_fft(&mut out, &xs, &mut scratch);
-        verify_limbs_square_to_out_fft(&out_before, &xs, &out);
-        let out_after = out;
-        let mut out = out_before.to_vec();
-        let mut scratch = vec![0; limbs_square_to_out_fft_with_cutoff_scratch_len(xs.len(), 50)];
-        limbs_square_to_out_fft_with_cutoff(&mut out, &xs, 50, &mut scratch);
-        assert_eq!(out, out_after);
-    });
-}
-
 #[test]
 fn limbs_mul_low_same_length_properties() {
     let mut config = GenConfig::new();
@@ -12143,6 +11534,13 @@ fn limbs_mul_low_same_length_properties() {
         limbs_mul_low_same_length(&mut out, &xs, &ys);
         verify_mul_low_1(&out_before, &xs, &ys, &out);
     });
+}
+
+#[test]
+fn test_mul_context() {
+    let context = initialize_context();
+    assert_eq!(context.clone().serialize(), CONTEXT);
+    assert_eq!(context, CONTEXT.deserialize());
 }
 
 #[test]
@@ -12174,6 +11572,10 @@ fn test_mul() {
         assert!(n.is_valid());
 
         let n = &u * &v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = mul_slow_fft(&u, &v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
@@ -12260,9 +11662,334 @@ fn test_mul() {
 
         let n = rug::Integer::from(&u) * rug::Integer::from(&v);
         assert!(Natural::exact_from(&n) == product);
+
+        let n = mul_slow_fft(&u, &v);
+        assert!(n.is_valid());
+        assert_eq!(n, product);
     };
+    // - in mpn_ctx_init
+    // - i == 0 first time in mpn_ctx_init
+    // - in sd_fft_ctx_init_prime
+    // - in fft_small_mulmod_satisfies_bounds
+    // - n2hi != 0 in fft_small_mulmod_satisfies_bounds
+    // - b >= 2 in fft_small_mulmod_satisfies_bounds
+    // - in reduce_0n_to_pmhn
+    // - a > halfn in reduce_0n_to_pmhn
+    // - in f64_reduce_pm1n_to_pmhn
+    // - a <= halfn <= t in f64_reduce_pm1n_to_pmhn
+    // - i >= l in sd_fft_ctx_init_prime
+    // - i < l in sd_fft_ctx_init_prime
+    // - a > halfn in f64_reduce_pm1n_to_pmhn
+    // - a <= halfn in reduce_0n_to_pmhn
+    // - a <= halfn && t < halfn in f64_reduce_pm1n_to_pmhn
+    // - i == 0 second time in mpn_ctx_init
+    // - i != 0 first time in mpn_ctx_init
+    // - in next_fft_number
+    // - q.significant_bits() == bits in next_fft_number
+    // - q.significant_bits() != bits && l >= 5 in next_fft_number
+    // - i != 0 second time in mpn_ctx_init
+    // - in push_profile
+    // - in crt_data_find_bn_bound
+    // - q < n + 1 in crt_data_find_bn_bound
+    // - r > 0 in crt_data_find_bn_bound
+    // - !borrow in crt_data_find_bn_bound
+    // - x[i] == 0 in crt_data_find_bn_bound
+    // - r = 0 in crt_data_find_bn_bound
+    // - in mpn_ctx_mpn_mul
+    // - in mpn_ctx_best_profile
+    // - bn <= r.profiles[i].bn_bound in mpn_ctx_best_profile
+    // - score < best_score in mpn_ctx_best_profile
+    // - i < r.profiles_size in mpn_ctx_best_profile
+    // - bn <= r.profiles[i].bn_bound in mpn_ctx_best_profile
+    // - bn > r.profiles[i].bn_bound in mpn_ctx_best_profile
+    // - score >= best_score in mpn_ctx_best_profile
+    // - i >= r.profiles_size in mpn_ctx_best_profile
+    // - in flint_mpn_cmp_ui_2exp
+    // - an != 0 in flint_mpn_cmp_ui_2exp
+    // - r != 0 in flint_mpn_cmp_ui_2exp
+    // - an <= q + 2 in flint_mpn_cmp_ui_2exp
+    // - x == b1 in flint_mpn_cmp_ui_2exp
+    // - x != b0 in flint_mpn_cmp_ui_2exp
+    // - p.to_ffts != None in mpn_ctx_mpn_mul
+    // - bits % 8 != 0 in mpn_ctx_mpn_mul
+    // - in mpn_ctx_fit_buffer
+    // - n > r.buffer_alloc in mpn_ctx_fit_buffer
+    // - in mod_worker_func
+    // - in MPNToFFTFunc::apply
+    // - self.bits % 8 != 0 && self.bits % 4 == 0 in MPNToFFTFunc::apply
+    // - in code
+    // - bits - j != 0 in code
+    // - bits - j == 0 in code
+    // - in mpn_to_ffts_hard
+    // - bits - j != 0 in mpn_to_ffts_hard
+    // - in fft_worker_func
+    // - in sd_fft_trunc
+    // - l_u64 > LG_BLK_SZ in sd_fft_trunc
+    // - in sd_fft_ctx_fit_depth
+    // - tdepth >= depth in sd_fft_ctx_fit_depth
+    // - in sd_fft_trunc_internal
+    // - otrunc >= 1 in sd_fft_trunc_internal
+    // - itrunc >= 1 in sd_fft_trunc_internal
+    // - itrunc != otrunc || otrunc != usize::power_of_2(k) in sd_fft_trunc_internal
+    // - k > 2 in sd_fft_trunc_internal
+    // - in sd_fft_trunc_block
+    // - otrunc >= 1 in sd_fft_trunc_block
+    // - itrunc <= 1 in sd_fft_trunc_block
+    // - itrunc >= 1 in sd_fft_trunc_block
+    // - itrunc >= 1 && i < BLK_SZ in sd_fft_trunc_block
+    // - itrunc >= 1 && i >= BLK_SZ in sd_fft_trunc_block
+    // - itrunc == otrunc && otrunc == usize::power_of_2(k) in sd_fft_trunc_internal
+    // - in sd_fft_no_trunc_internal
+    // - k == 2 in sd_fft_no_trunc_internal
+    // - in sd_fft_no_trunc_block
+    // - k <= 4 in sd_fft_no_trunc_block
+    // - in set_j_bits_and_j_r
+    // - j == 0 in set_j_bits_and_j_r
+    // - k >= 2 in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits == 0 in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits == 0 && i < BLK_SZ in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits == 0 && i >= BLK_SZ in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits == 0 && a >= l2 in sd_fft_no_trunc_block
+    // - k >= 2 && l2 == 1 in sd_fft_no_trunc_block
+    // - in sd_fft_base_8_1
+    // - j == 0 in sd_fft_base_8_1
+    // - in sd_fft_basecase_8_1
+    // - i < l in sd_fft_basecase_8_1
+    // - i >= l in sd_fft_basecase_8_1
+    // - in sd_fft_basecase_6_1
+    // - i < l in sd_fft_basecase_6_1
+    // - i >= l in sd_fft_basecase_6_1
+    // - in sd_fft_basecase_6_0
+    // - i < l in sd_fft_basecase_6_0
+    // - i >= l in sd_fft_basecase_6_0
+    // - in sd_fft_base_8_0
+    // - j != 0 in set_j_bits_and_j_r
+    // - in sd_fft_basecase_8_0
+    // - i < l in sd_fft_basecase_8_0
+    // - i >= l in sd_fft_basecase_8_0
+    // - k == 2 in sd_fft_trunc_internal
+    // - itrunc > 1 in sd_fft_trunc_block
+    // - itrunc != otrunc || otrunc != usize::power_of_2(k) in sd_fft_trunc_block
+    // - k <= 2 in sd_fft_trunc_block
+    // - k == 2 in sd_fft_trunc_block
+    // - in sd_fft_moth_trunc_block_0
+    // - 0 < ITRUNC in sd_fft_moth_trunc_block_0
+    // - 1 < ITRUNC in sd_fft_moth_trunc_block_0
+    // - 2 < ITRUNC in sd_fft_moth_trunc_block_0
+    // - 3 < ITRUNC in sd_fft_moth_trunc_block_0
+    // - 0 < OTRUNC in sd_fft_moth_trunc_block_0
+    // - 1 < OTRUNC in sd_fft_moth_trunc_block_0
+    // - 2 < OTRUNC in sd_fft_moth_trunc_block_0
+    // - 3 >= OTRUNC in sd_fft_moth_trunc_block_0
+    // - i < BLK_SZ in sd_fft_moth_trunc_block_0
+    // - i >= BLK_SZ in sd_fft_moth_trunc_block_0
+    // - j != 0 in sd_fft_base_8_1
+    // - k == 2 && otrunc > 1 in sd_fft_trunc_internal
+    // - k == 2 && otrunc > 2 in sd_fft_trunc_internal
+    // - k == 2 && otrunc <= 3 in sd_fft_trunc_internal
+    // - in nmod_red2
+    // - r1xx > q0xx in nmod_red2
+    // - r1xx < nxx in nmod_red2
+    // - !x.squaring in fft_worker_func
+    // - in sd_fft_ctx_point_mul
+    // - in f64_reduce_0n_to_pmhn
+    // - a > halfn in f64_reduce_0n_to_pmhn
+    // - j < BLK_SZ in sd_fft_ctx_point_mul
+    // - j >= BLK_SZ in sd_fft_ctx_point_mul
+    // - in sd_ifft_trunc
+    // - l_u64 > LG_BLK_SZ in sd_ifft_trunc
+    // - in sd_ifft_trunc_internal
+    // - f != 0 || z != n || n != usize::power_of_2(k) in sd_ifft_trunc_internal
+    // - k > 2 in sd_ifft_trunc_internal
+    // - in sd_ifft_no_trunc_internal
+    // - k == 2 in sd_ifft_no_trunc_internal
+    // - in sd_ifft_base_8_1
+    // - in set_j_bits_and_j_mr
+    // - j == 0 in set_j_bits_and_j_mr
+    // - j == 0 in sd_ifft_base_8_1
+    // - in sd_ifft_basecase_8_1
+    // - in sd_ifft_basecase_6_1
+    // - i < l in sd_ifft_basecase_6_1
+    // - i >= l in sd_ifft_basecase_6_1
+    // - sd_ifft_basecase_6_0
+    // - i < l in sd_ifft_basecase_6_0
+    // - i >= l in sd_ifft_basecase_6_0
+    // - i < l in sd_ifft_basecase_8_1
+    // - i >= l in sd_ifft_basecase_8_1
+    // - in sd_ifft_base_8_0
+    // - j != 0 in set_j_bits_and_j_mr
+    // - in d_ifft_basecase_8_0
+    // - i < l in d_ifft_basecase_8_0
+    // - i >= l in d_ifft_basecase_8_0
+    // - in sd_ifft_no_trunc_block
+    // - k <= 2 in sd_ifft_no_trunc_block
+    // - k == 2 in sd_ifft_no_trunc_block
+    // - k == 2 && j_bits == 0 in sd_ifft_no_trunc_block
+    // - k == 2 && j_bits == 0 && i < BLK_SZ in sd_ifft_no_trunc_block
+    // - k == 2 && j_bits == 0 && i >= BLK_SZ in sd_ifft_no_trunc_block
+    // - in sd_ifft_trunc_block
+    // - f != 0 || z != n || n != usize::power_of_2(k) in sd_ifft_trunc_block
+    // - k != 2 in sd_ifft_trunc_block
+    // - k == 1 in sd_ifft_trunc_block
+    // - in radix_2_moth_inv_trunc_block_1_1_1
+    // - i < BLK_SZ in radix_2_moth_inv_trunc_block_1_1_1
+    // - i >= BLK_SZ in radix_2_moth_inv_trunc_block_1_1_1
+    // - k == 2 in sd_ifft_trunc_internal
+    // - j != 0 in sd_ifft_base_8_1
+    // - k == 2 && n > 1 in sd_ifft_trunc_internal
+    // - k == 2 && n > 2 in sd_ifft_trunc_internal
+    // - k == 2 && n <= 3 in sd_ifft_trunc_internal
+    // - k == 2 in sd_ifft_trunc_block
+    // - in radix_4_moth_inv_trunc_block_3_4_0
+    // - j != 0 in radix_4_moth_inv_trunc_block_3_4_0
+    // - in f64x4_reduce_pm1n_to_pmhn
+    // - ai <= hi <= ti in f64x4_reduce_pm1n_to_pmhn
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_3_4_0
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_3_4_0
+    // - k == 2 && f == 0 in sd_ifft_trunc_internal
+    // - f == 0 && z == n && n == usize::power_of_2(k) in sd_ifft_trunc_block
+    // - k == 1 in sd_ifft_no_trunc_block
+    // - k == 1 && j_bits == 0 in sd_ifft_no_trunc_block
+    // - k == 1 && j_bits == 0 && i < BLK_SZ in sd_ifft_no_trunc_block
+    // - k == 1 && j_bits == 0 && i >= BLK_SZ in sd_ifft_no_trunc_block
+    // - r1xx <= q0xx in nmod_red2
+    // - a <= halfn in f64_reduce_0n_to_pmhn
+    // - in crt_worker_func
+    // - in MPNFromFFTs::apply
+    // - overhang.is_empty() in MPNFromFFTs::apply
+    // - self.n != self.m + 1 in MPNFromFFTs::apply
+    // - in convert_block
+    // - in f64x4_reduce_to_0n
+    // - in f64x4_reduce_pm1no_to_0n
+    // - in f64_reduce_pm1no_to_0n
+    // - a >= 0.0 in f64_reduce_pm1no_to_0n
+    // - j < BLK_SZ in convert_block
+    // - j >= BLK_SZ in convert_block
+    // - in big_mul
+    // - k + 1 < n in big_mul
+    // - k + 2 < n in big_mul
+    // - n == k + 2 in big_mul
+    // - n == k + 2 && k + 1 < m in big_mul
+    // - in big_addmul
+    // - k + 1 < n in big_addmul
+    // - k + 2 < n in big_addmul
+    // - n == k + 2 in big_addmul
+    // - n == k + 2 && k + 1 < m in big_addmul
+    // - in reduce_big_sum
+    // - in multi_add
+    // - n == 3 in multi_add
+    // - r[k - 1] <= limit[k - 1] in reduce_big_sum
+    // - r[k - 1] < limit[k - 1] in reduce_big_sum
+    // - in add_to_answer_easy
+    // - tshift == 0 in add_to_answer_easy
+    // - n == 4 in multi_add
+    // - tshift != 0 in add_to_answer_easy
+    // - n == 5 in multi_add
+    // - in f64_reduce_to_0n
+    // - toff < z.len() in MPNFromFFTs::apply
+    // - in add_to_answer_hard
+    // - tshift == 0 in add_to_answer_hard
+    // - tshift == 0 && z.len() - toff >= n in add_to_answer_hard
+    // - tshift != 0 in add_to_answer_hard
+    // - tshift != 0 && z.len() - toff > n in add_to_answer_hard
+    // - tshift != 0 && z.len() - toff <= n in add_to_answer_hard
+    // - a < 0.0 in f64_reduce_pm1no_to_0n
+    // - r[k - 1] > limit[k - 1] in reduce_big_sum
+    // - goto_sub in reduce_big_sum
+    // - in multi_sub
+    // - n == 4 in multi_sub
+    // - r[k - 1] >= limit[k - 1] in reduce_big_sum
+    // - !goto_sub in reduce_big_sum
+    // - r[0] >= limit[0] in reduce_big_sum
+    // - slow_fft: in mod_fft_worker_func
+    // - slow_fft: !x.squaring in mod_fft_worker_func
+    // - slow_fft: in slow_mpn_to_fft
+    // - slow_fft: in slow_mpn_to_fft_easy
+    // - slow_fft: bits - j != 0 in slow_mpn_to_fft_easy
+    // - slow_fft: bits - j == 0 in slow_mpn_to_fft_easy
+    // - slow_fft: bits - j != 0 in slow_mpn_to_fft
+    // - slow_fft: bits - j == 0 in slow_mpn_to_fft
     big_test(Natural::power_of_2(100_000), Natural::power_of_2(100_000));
-    // - limbs_fft_mulmod_2expp1_helper, out[j] != 0
+    // - bits % 8 == 0 in mpn_ctx_mpn_mul
+    // - self.bits % 8 == 0 in MPNToFFTFunc::apply
+    // - tdepth < depth in sd_fft_ctx_fit_depth
+    // - in sd_fft_ctx_fit_depth_with_lock
+    // - ai > hi in f64x4_reduce_pm1n_to_pmhn
+    // - i < l in sd_fft_ctx_fit_depth_with_lock
+    // - ai <= hi && ti < hi in f64x4_reduce_pm1n_to_pmhn
+    // - i >= l in sd_fft_ctx_fit_depth_with_lock
+    // - k > 2 in sd_fft_trunc_block
+    // - in sd_fft_moth_trunc_block_1
+    // - 0 < ITRUNC in sd_fft_moth_trunc_block_1
+    // - 1 < ITRUNC in sd_fft_moth_trunc_block_1
+    // - 2 >= ITRUNC in sd_fft_moth_trunc_block_1
+    // - 3 >= ITRUNC in sd_fft_moth_trunc_block_1
+    // - 0 < OTRUNC in sd_fft_moth_trunc_block_1
+    // - 1 < OTRUNC in sd_fft_moth_trunc_block_1
+    // - 2 < OTRUNC in sd_fft_moth_trunc_block_1
+    // - 3 < OTRUNC in sd_fft_moth_trunc_block_1
+    // - i < BLK_SZ in sd_fft_moth_trunc_block_1
+    // - i >= BLK_SZ in sd_fft_moth_trunc_block_1
+    // - itrunc == otrunc && otrunc == usize::power_of_2(k) in sd_fft_trunc_block
+    // - k >= 2 && j_bits != 0 in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits != 0 && i < BLK_SZ in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits != 0 && i >= BLK_SZ in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits != 0 && a >= l2 in sd_fft_no_trunc_block
+    // - n2 == 0 in sd_fft_trunc_block
+    // - k >= 2 && j_bits == 0 && a < l2 in sd_fft_no_trunc_block
+    // - k >= 2 && l2 != 1 in sd_fft_no_trunc_block
+    // - k >= 2 && b < l1 in sd_fft_no_trunc_block
+    // - k >= 2 && b >= l1 in sd_fft_no_trunc_block
+    // - k >= 2 && j_bits != 0 && a < l2 in sd_fft_no_trunc_block
+    // - n2 > 0 in sd_fft_trunc_block
+    // - 1 >= OTRUNC in sd_fft_moth_trunc_block_0
+    // - 2 >= OTRUNC in sd_fft_moth_trunc_block_0
+    // - k > 2 in sd_fft_no_trunc_internal
+    // - a < l2 in sd_fft_no_trunc_internal
+    // - a >= l2 in sd_fft_no_trunc_internal
+    // - b < l1 in sd_fft_no_trunc_internal
+    // - b >= l1 in sd_fft_no_trunc_internal
+    // - k == 2 && otrunc <= 1 in sd_fft_trunc_internal
+    // - k == 2 && otrunc <= 2 in sd_fft_trunc_internal
+    // - k > 2 in sd_ifft_no_trunc_internal
+    // - b < l1 in sd_ifft_no_trunc_internal
+    // - k == 2 && j_bits != 0 in sd_ifft_no_trunc_block
+    // - k == 2 && j_bits != 0 && i >= BLK_SZ in sd_ifft_no_trunc_block
+    // - b >= l1 in sd_ifft_no_trunc_internal
+    // - a < l2 in sd_ifft_no_trunc_internal
+    // - a >= l2 in sd_ifft_no_trunc_internal
+    // - k > 2 in sd_ifft_no_trunc_block
+    // - k > 2 && b < l1 in sd_ifft_no_trunc_block
+    // - k > 2 && b >= l1 in sd_ifft_no_trunc_block
+    // - k > 2 && a < l2 in sd_ifft_no_trunc_block
+    // - k > 2 && a >= l2 in sd_ifft_no_trunc_block
+    // - k > 1 in sd_ifft_trunc_block
+    // - in radix_4_moth_inv_trunc_block_3_3_1
+    // - j == 0 in radix_4_moth_inv_trunc_block_3_3_1
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_3_3_1
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_3_3_1
+    // - in radix_4_moth_inv_trunc_block_3_4_1
+    // - j != 0 in radix_4_moth_inv_trunc_block_3_4_1
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_3_4_1
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_3_4_1
+    // - in radix_4_moth_inv_trunc_block_0_4_1
+    // - j != 0 in radix_4_moth_inv_trunc_block_0_4_1
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_0_4_1
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_0_4_1
+    // - k == 2 && n <= 1 in sd_ifft_trunc_internal
+    // - k == 2 && n <= 2 in sd_ifft_trunc_internal
+    // - in radix_4_moth_inv_trunc_block_1_4_0
+    // - j != 0 in radix_4_moth_inv_trunc_block_1_4_0
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_1_4_0
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_1_4_0
+    // - self.n == self.m + 1 in MPNFromFFTs::apply
+    // - k + 1 >= n in big_mul
+    // - k >= m in big_mul
+    // - k + 1 >= n in big_addmul
+    // - k + 1 < n && k >= m in big_addmul
+    // - n == 6 in multi_add
+    // - n == 5 in multi_sub
+    // - tshift == 0 && z.len() - toff < n in add_to_answer_hard
     big_test(
         Natural::power_of_2(0x3fff_fffe),
         Natural::power_of_2(0x4000_0000),
@@ -12271,8 +11998,815 @@ fn test_mul() {
         Natural::from(0x3d500b05e209u64) << 0x3fffffbc,
         Natural::power_of_2(0x4000_0028),
     );
+    // - k == 1 in sd_fft_no_trunc_block
+    // - k == 1 && j_bits == 0 in sd_fft_no_trunc_block
+    // - k == 1 && j_bits == 0 && i < BLK_SZ in sd_fft_no_trunc_block
+    // - k == 1 && j_bits == 0 && i >= BLK_SZ in sd_fft_no_trunc_block
+    // - k == 1 && j_bits != 0 in sd_fft_no_trunc_block
+    // - k == 1 && j_bits != 0 && i < BLK_SZ in sd_fft_no_trunc_block
+    // - k == 1 && j_bits != 0 && i >= BLK_SZ in sd_fft_no_trunc_block
+    // - k == 1 in sd_fft_trunc_block
+    // - j_bits != 0 in sd_fft_trunc_block
+    // - j_bits != 0 && i < BLK_SZ in sd_fft_trunc_block
+    // - j_bits != 0 && i >= BLK_SZ in sd_fft_trunc_block
+    // - k == 1 && j_bits != 0 in sd_ifft_no_trunc_block
+    // - k == 1 && j_bits != 0 && i < BLK_SZ in sd_ifft_no_trunc_block
+    // - k == 1 && j_bits != 0 && i >= BLK_SZ in sd_ifft_no_trunc_block
+    // - in radix_2_moth_inv_trunc_block_1_2_1
+    // - i <= BLK_SZ in radix_2_moth_inv_trunc_block_1_2_1
+    // - i >= BLK_SZ in radix_2_moth_inv_trunc_block_1_2_1
+    // - in radix_4_moth_inv_trunc_block_1_4_1
+    // - j != 0 in radix_4_moth_inv_trunc_block_1_4_1
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_1_4_1
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_1_4_1
+    // - in radix_2_moth_inv_trunc_block_0_2_1
+    // - i < BLK_SZ in radix_2_moth_inv_trunc_block_0_2_1
+    // - i >= BLK_SZ in radix_2_moth_inv_trunc_block_0_2_1
+    // - in radix_4_moth_inv_trunc_block_2_4_1
+    // - j != 0 in radix_4_moth_inv_trunc_block_2_4_1
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_2_4_1
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_2_4_1
+    // - in radix_2_moth_inv_trunc_block_1_2_0
+    // - i < BLK_SZ in radix_2_moth_inv_trunc_block_1_2_0
+    // - i >= BLK_SZ in radix_2_moth_inv_trunc_block_1_2_0
+    // - in radix_4_moth_inv_trunc_block_2_4_0
+    // - j != 0 in radix_4_moth_inv_trunc_block_2_4_0
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_2_4_0
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_2_4_0
     let p = Natural::power_of_2(33554432);
     big_test(p.clone(), p);
+    // - bits - j == 0 in mpn_to_ffts_hard
+    big_test(
+        Natural::from(0x16fb3b96u32) << 0x3fffff34,
+        Natural::power_of_2(0x4000_0100),
+    );
+    // - 3 >= OTRUNC in sd_fft_moth_trunc_block_1
+    // - in radix_4_moth_inv_trunc_block_3_3_0
+    // - j == 0 in radix_4_moth_inv_trunc_block_3_3_0
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_3_3_0
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_3_3_0
+    // - n == k + 2 && k + 1 >= m in big_mul
+    // - n == k + 2 && k + 1 >= m in big_addmul
+    // - n == 7 in multi_add
+    // - n == 6 in multi_sub
+    big_test(Natural::power_of_2(63936), Natural::power_of_2(63936));
+    // - k == 2 && otrunc > 3 in sd_fft_trunc_internal
+    // - f == 0 && z == n && n == usize::power_of_2(k) in sd_ifft_trunc_internal
+    big_test(Natural::power_of_2(64512), Natural::power_of_2(64512));
+    // - r == 0 in flint_mpn_cmp_ui_2exp
+    // - n == 7 in multi_sub
+    big_test(Natural::power_of_2(86016), Natural::power_of_2(86016));
+    // - 2 < ITRUNC in sd_fft_moth_trunc_block_1
+    // - 3 >= ITRUNC in sd_fft_moth_trunc_block_0
+    big_test(Natural::power_of_2(103936), Natural::power_of_2(103936));
+    // - in radix_4_moth_inv_trunc_block_2_2_1
+    // - j == 0 in radix_4_moth_inv_trunc_block_2_2_1
+    // - i < BLK_SZ in radix_4_moth_inv_trunc_block_2_2_1
+    // - i >= BLK_SZ in radix_4_moth_inv_trunc_block_2_2_1
+    big_test(Natural::power_of_2(196608), Natural::power_of_2(196608));
+    // - 3 < OTRUNC in sd_fft_moth_trunc_block_0
+    big_test(Natural::power_of_2(831488), Natural::power_of_2(831488));
+    // - 2 >= ITRUNC in sd_fft_moth_trunc_block_0
+    let xss = "24332291938350038903987086117452297484640131355471951974855407437218461662995085424\
+    1860343418803581980657405626860254652890061074767469192047813813799932319718522304171962256525\
+    7568055010500751693801073277207915783608062444476635234859794533294164960300047032518429869718\
+    0052375107888369790876137797913656159503367175950921134284892262945719972924783600113662790091\
+    7723137030730717109700031076462319946729252039277677223053596049990468731493768134267546652245\
+    9447539562895196690291348300229856993968834050493144473459087214855851757452241695990617787853\
+    5199110900136732650745267977111595354409876835104545902940816295224847190897196586187642185942\
+    7115084845311162640011317079975305649053712739504852532939021059106632665478282767934276018468\
+    3772465062808400010091575582223455939006711157609546345615881921362719919601326216561019357404\
+    1307776016479445080199091132571997412545060655069163981698127006802628570553632609577780538500\
+    3707180977422074551828555726659024662683193823385532498118408491723608092599551772313009613576\
+    9202093170363335286917554623386262649548756047946587691518367947774996520656284075670983115064\
+    1575561983250471453563242494332027835434592225708375455816732666820644708164077370144244709924\
+    2886492316681462424687403046620621334999846710010915455227140598754811069666079446786776250465\
+    1158391318965589187497341988747157410814695119596376070806690317808127211429138816443900046579\
+    1713504851157547960393907525383172895098955573889994108135487994839225140144512698339040295307\
+    4983198507370789525216254751572115706023212347379274683752751119359793048368824363371149895523\
+    6708716721566125659384073633508318562863418191074523407590701176579663244163366170416731471042\
+    0881494463153749413765094325829460446318165910401791976980543893866068276302268063932544653016\
+    5446401851712336229001129440172467672330551520402075974514581592122579944576588625658770872147\
+    3814466924989513800849277908506132844631331613100121400327222682060783945131182176703570032858\
+    1694191759633514739449029442304916719067359422626377238687968978008224643603240938590144618019\
+    5974470266383166442744450178377455275616015689358085839578524704077624355704288991739128107030\
+    7944356865755249007269951629748947739853589497099489959849775244527083957050938890967276078321\
+    7234404421413669718730038426475200271735571020287092847099289050730297264949167253932526806757\
+    5761574850542650689403252780749160325307909643026214138555913283748651923074985778370994249224\
+    0538100363691026775023717853871551279871815549992695845552242809187014152149852925091682826897\
+    0100250490120849350712930590565284560396151845148609154567900261991659015189427805827613513840\
+    2170254890548213557921865008034436480864143142943575002317883943975921600818662788252456195796\
+    9447581468425720833225730520539264714015417324821258134938643521929335724439553850668221566620\
+    9653372789560194862201973172518669820406209880954310599408074691560758794196569253974787849604\
+    0774806073544962056857697166426572919998961349923037111540287606972184621706891929894655664837\
+    7299630550611392558865110193262321196476727501877710107986226105792040010118482608036131448182\
+    0117942605612310576811461708465035885447882695924553186493804383583383296673755075165009425413\
+    7902911985641095285650983114630215230812593379260105786492476324242972811986138247168152651256\
+    1657597868369438065816705013956080825126024961539665573062075205110450571733109317102657929184\
+    5392136845155953496969869518778271324578196626603171710776025271793126614077090441609966141249\
+    7564550738269080462472436036602779169468412236753684502462987305092434452135040410366722125314\
+    2121092955111992583432284424064604710829455130399212898733562868981102772481600659980518115186\
+    8941956481181061336467477352250281585781890099852282348615063663284636964073977423518637726988\
+    1882455638952079577385262849303256253047928272821306192874241480405083194569987960280849589197\
+    9041502642441824495701127000226367651264029302468437554790510342503980748137332892679198508283\
+    2745785497776645520349039567530649346901888256310592138908124191299572459222799154644000700887\
+    5493273958509265831183039516557237163741608869141769472683318845718901198903429866035439036703\
+    1660739118209863418959025889435705192584893889664911545868560854311859470957036057997797971494\
+    9594620952627927226895665205135051298929237955012336474516638364366879602654222749489576920140\
+    1318979413859115848991007818030170744198159538630775848274453280720838340018046108312511173154\
+    1188508107938930293795518178576635436138460554498353633963905882970277705168749377789845155952\
+    4046716501223496052457375457150747483247403948712634771689237194996834184555628278768787640661\
+    2372930326732128380641801437674515050015102288649901511810982723595351594068392716225599079089\
+    7141248147850585347340347757078749027234015237390954477920785794414160228011889578891858827269\
+    4508081089273025619651528529620265738787963624424963422805984686902171986907635940163516673467\
+    1155594542959710450739107283869735164216439962843577553460754034992131140408553869374139050671\
+    8450114951382241887892041208648008140979233339479046369051440737102608072264939682976419595968\
+    3413896931667290581888677992785581066829903256901254436110000731831303537790270657076522229890\
+    9754224348408990685592550990298278035179012217735194179912617357301891964389443682832716913065\
+    5919450467625243008402724262864414724869527161380535200659835132577737473843355193862226646260\
+    5917441484316297436589404142390177228546728707107334838679844265630396267767368973104829422596\
+    4841863445594624523412084728039594631547587966918797170352167897829291584959443989673299826182\
+    8176064493225754295777402784264651240473071834468650888202279832376595199290014151001790898088\
+    8058661551199293778280650366579556501013484442751446773728015384143389787231217456258934188739\
+    5896429594127218742822188813069161682965414824040997384010926995603056099487738813358316336237\
+    2734428969066095632539853611968820662320319907498725771573336282476197704351509672049102759380\
+    1044103415660565643697738457112577215858363311385328752890557311941900303869448413209818047617\
+    2161153309772547939099075533202437403831740157362321227529471592353138031815867815519584071649\
+    0075624207080493141540692388138745915962336493655092425288749464092167701822102541814916477264\
+    3225692001069823029594562785625284238026849939613336498119461792246559953436606295049089119377\
+    4141880555871541099485841865699217690368990323296714388728658411576310723412148324894713183283\
+    4801500365755458165963393555761451023119653317501067666748424009917402509388520284485265783859\
+    4511326665481049662430681317565668801625733953464868640523431972011024627186538495185957786882\
+    9978407950806799105487884906168404211352484266994537079818819955059544683145533593154717193045\
+    5690117445417170001831918307910549744284542110192258349795624756723502659770683585718793894280\
+    2618016103430682458503045911456259958793713838831389358734769335617062903694409579189685200809\
+    3962764608923109615152818499046008749652174640992925750313000312436473383850032668149986379348\
+    3052059498095257336376699231032337021048693681952251198585124389201819206230457935652529344909\
+    7032725206275909927921260089910589468718979227475505269422145304016465491141881920960641536301\
+    9140778639285252843615315347803978849851275461130830082552705990112742076614360383648416456541\
+    2620740441101005039101955780389522613136336610613941329477210480185426325439358233001773297660\
+    9163306882983187966915074460848060626898018842789705866023645418113336930855359551069826565004\
+    0921102721631559172518354921016090739304963047991219849191894350293960817841734486950376870017\
+    0076890631341409067384852676671730509374135458737119463320500805149470712740494774765551306005\
+    7497065504745979610060646071615547125076512272991200851098787288526656035043802369734788537676\
+    5999527227307243709948931238288328361709198802167306871854810710240003118830094819219292506636\
+    5177957833829982816610132430867293318027373604707422789037821690540765963683896618187295645179\
+    1465465910620464203666009275003558490179921077930931841015356629871206543956889840135639950613\
+    7943153152975279122303869038568618475611119099638012260534125935003687543282958757834514274329\
+    8029540976704570219566860682432822482158902375283592902784329782496305851046570054193792219427\
+    9485151146259777609149738244956435012404750481510259192922058659329097228841369921119338248144\
+    5144990924670230925806613274253511654078353750986815191334361655047686458006940103554742338844\
+    2996477697587180518909174341201833718921101902191805699329999642546038418439738974037767934139\
+    4743240993941394237299681520300292915929157415122041138714963094923702569798082717524956709263\
+    7469162139345324717625587072860337921223986281051880784176277686207708498055728109949736823705\
+    7245406404338640127150902630698793282752353626567738257348054787636152150919474556424556416085\
+    9242324913557076550403003463354315260332742839134901122827265128935344664134760590658232898313\
+    4749297924337839102130389030256770756058101552976916312109473278623132414203960858313527050774\
+    8416019492226068732568542682794600052262279127731494596591717964985920066225626223198223796413\
+    1784081307061487078712109666514043915684890820934517841584866232599220848561086080433302064635\
+    2818636241118301134711714478472109195521641030791287959152500316191060632930686770715396136911\
+    6145212472889552306439006284375931483070640164268382500190346782914018049417391064347247556582\
+    9413442538635109096759187010332782147239059430531857250909638754562430988011098753736861604897\
+    8472333444845034550062549828954661268433024332114249123455785180064689320176371932182264176035\
+    8294482591531728830671400138343351662388507919381384945834162923650554738532233248236905717208\
+    4371458846779017274596261199191657039553147558727987908937446203014783299434908856942547391898\
+    2927501875542627249407163335088990877365710910999693654933279772003198350572004741962455931775\
+    7171123129267098877971493113576729981547769942560816700917696252793245955639009321078227773329\
+    7851130748491137795432271895769808348131521593099235911758726082604043978287828511366498366272\
+    7946332260722583996941431178344";
+    let yss = "49986023021671159338234958176162840952750418022066456297978552959263821471149534290\
+    1697813271825404512098259628101645631265382807342205907557504103916359976160073306946293880698\
+    1662074805927546804336458708253892368556595356275551333432939856763403440056846017507376179154\
+    6130070689002887720179755066181472399803996205313588880667402355892709408877039008165376155611\
+    8833053299304919241773521395447464574914194618709827505030318572684286207139960048221916106759\
+    7388136957593182004515327723852486922779902882315701756480152829849481353729417070316130463012\
+    4915620377469778282378671900319212800220341585503454020200498048551225521991137349961355639059\
+    9045683055121749029430429913783794621627008689181999482845317945110832673932889057461313419591\
+    7366856121415704241159870644369868436539309674069236834052704360730458108482806016773495335956\
+    4528677611065085068374102907023639986197979487152880688132523807643407387541681699574051916707\
+    0856611470229956834194648266355010747625653820905927618097314765243765600873978740755411521339\
+    2343489348696429854679396160063333561928973571320460657290371523206395514385969450772655908356\
+    3946349652553436962781388799395105657256079392649940276869323151880453779456303906669618884418\
+    4748213872919853121921649700464759290793856659707061350368861694158357035539960829806629938765\
+    8524059543868212074822662384543242523137785846616894644999628024338373327335670240422427532490\
+    4976957556832131150797694352637314063419871686706121808418852137774685433345853146152737466053\
+    9027847096902811897278891837763549141081018305350099606428686972075414535727837623589103289889\
+    2653033906922683170983111487034653245661901683224583717438274009780766663932952889867173872216\
+    3528834042840064974161831805467075423358308345791666657282483731621589611702692621655620635132\
+    4647383475600294778328782760149901051783697552634983886672165494284112212226996408909260092172\
+    1209515365523076697613793195345034249576286829616236018833516540275239929095595320728790483468\
+    5952567115663448293467918755035112907283582981180892655910365086569310851994903995611331244083\
+    0759101920816860006762328287625653148732441277373752651290948147078399895543658282424602680512\
+    4450319258670159177503948997092473091634337478435841649565395552198228515220026631361038515989\
+    6008909655674643454636534859266174227862769005497970812712788786438416933181370095915134881593\
+    7453823784993350480816235445230899481282835134853215069171296466903952486563572719247905311627\
+    0496670286299027705582613627110949955544857867258854710759283897123655985161413141553463266669\
+    5284086972851941120003596474309921298102521418698713818004812560079034519833169906858085634879\
+    8492549066845639204143632742452049096507871475616729113428720350859433409227252203624555741060\
+    3196352280527701042841089345637124435223914874828124802748560281881681799439537320633256056580\
+    4156026787910778438508277249005521534630639301441732364023551715928961017459736841352186138801\
+    1337148412994518373489133794679517322318365623247353057252452496661753255047570675115957301860\
+    9112177772566247230223009000540616912993224490975694174266633020622987721635236329911120466456\
+    5418407900957106349110150601850739989712518415082040797557572247929861269033908150734384968110\
+    8932455850426214452112011729709324456960260108601691062738149082220832267730898589815279434890\
+    8731367664671689830915200543507814253666591232649680025848675839428814036938186706298556028019\
+    8340087240686784933163060071736151475110131245549108127116529261607596945172302196135332469182\
+    2458607332485123957028751177656722291448808792368654264327261281014154853457778969261777340559\
+    7820944059397018304265075538641167817892288619991267263371281902098303123446276145187692893714\
+    9519477717893540354124457356479560755692246865603374437898985061206835197663878005596126352779\
+    8973735718985742351606661813037929337194407431390752136954074249275422986339524417693143549802\
+    0335270164598612214223957762794369560852351531305033791198149794138338640587678243218831296244\
+    9252352565142214912078307808513477954279768798278928482294453975202584186089232485657574888185\
+    6031763044216088151481252369367292673988611669575689475800498206137106305998068313746955957820\
+    0898959943715624581680437628483422508930020239888595530624411360849877220442056634888338116460\
+    5796781702339175060718767743806961654069186864640928091912320604237499435818315873883177549731\
+    4438904608176247944489768409828794492539633534990683608905894741058481841707656906146599397796\
+    6768259361077203430956669648441598210464782762231903192060859166679745206592863086434524406080\
+    5061755086355357462714581875611743718074941956885489546796755461792504837987295794891172817287\
+    0724068070496151658738717629278041508299657508683362051771745956810759194283451521508725826963\
+    9728920379968574843966573614659163753591890794499691092061855684094434397565281152388322750830\
+    2936562287627323018853086396258713256975769929020698380563560822565434548344902010781581961113\
+    6846799702142004544498000369221380175772227843670470877051624358052371815798951337768390510076\
+    9409832265531426982386129993248366541262908912775394898991260470179640239850971572873576639146\
+    0766023953632563710626344216028593861078092260436139150339410472941227133577975903169047261355\
+    1286160605974435750779172103351483297148795491707834283345653811958446520751210104929605906463\
+    8185475917883307983337605285498406960425765658701147677389858761447063612138035885880248764418\
+    0748709518703251644755843442465444670908671645745260888437535662991793184515770447143003193711\
+    9812800905926079799287254740538420618385578908149484836090770265514044030253609447874025119272\
+    3480780734335681961228953453625209470164376934899598331663140871406504756470067958176602840891\
+    3436442573858116115859927570931711479720756600147839785260298044727713113502175161458254976961\
+    5193984435343121159688571749401128857212741047738499804621155554862904838772869693286169394915\
+    1312799926015215198733037480015574027711692265262920774454728864910483477543058234197233693982\
+    9854575761867426951614210435618496028943715087175509224607105302432211645050050014916735867955\
+    8103623297355427518046543928487982692762907797960498528428131138612102741202908788346397760320\
+    2524143378401628287662841125571954135057948368738774757969643636714767963407417162659302685512\
+    8078751656882349980792598629587459818756718355995492110337091777094448215056286946305420952348\
+    7907976968085868385719164309501356100989128621029393183784698027409528502198678395311126499017\
+    5184078585187462463126390818095767355613741195752813402056469274433803969542775165270549682738\
+    2994221189144324375616529121968065193153698977889390489529063408255321227994387793667565786248\
+    0808528776367839679631291070375207236929445733454058666648248477769134783729050011898234448139\
+    8993349590845032746041683821367673923688025810664386525049996592462264181990263339376525654153\
+    4688151621726091616535727805714892825811298471657355668420402131840889243871828391480349478084\
+    1213765438943540133044085760161534161208789357410256539569977329485151326150253004654954138455\
+    9528722792944814364403837930363539896602600983699004042866687632353453663526069531834494269643\
+    6624147575765331407694382297848351919166320173044864770828732883439182068060588130882501033804\
+    0426743547448560272270992151301010517288598482787736061847035042543408941070253189852377368236\
+    5819285727707133621429682730553395262311383860592921007748108439490439695147542072175642494720\
+    9186868357355874856321966099953420439063924992162849756038603496112175054259539095438866582976\
+    6448034908908817431100755042166004224252366973363571941886452859732159244757259171690567663609\
+    7820964546827311588907206586044315551261101653299643794653053921049546419022858313716515856016\
+    9161352282239091485605774765418891283015609612161818811141756563412398965270446850439762930727\
+    1265075579650826465228364126253295503805755667305256326858589301862775090627315862498749476466\
+    5428979346350682598783408400338865960837778435472824084279088177330330924438375832485050622689\
+    1845171136765480273513707659451547470995294048552664487099071040377185268342654442566810830732\
+    4273513559219196205203596252617697591102969064233059094243908088488693919507934017774058038965\
+    6263477430311466323204338900688790511716430260269131263610162536382141534419239598123834721535\
+    7844592966593264252037726111804716954810757673132330127022598731762031385743976596172355813665\
+    8480585852428547059110495615340614682950702555357034774448527842527146113799842996037197304714\
+    7511095490017614974885494779593205520787632249896540560961973768456316308007702563131577489302\
+    4561823195237759568667232432027224183051859663362951333169612156464887803455625542942599160437\
+    5624552818074522769402266855047645311091525988788806372446915533919508544950989012353064267814\
+    8722029063631900541826014930971405994493634820662854594679957921971967269769680442274246327486\
+    9746371794640241061632031872872053100078737421077754432648654919104914170154435065760826466975\
+    7169377910522567372804407001292614259638626753514507271966727696261573427794915793151679539763\
+    4989425490891894541416149446530840365758986362872467856074888391102749796306735242750309946782\
+    7579284241115079618442310878308488366619100287557690496233096974073161139330022873310171282850\
+    4635571065857423603544509499047009712504115889494586205527905746183195858773353311783193070505\
+    9428691781371137736515083221254304729786933875723962919401362205138045992360794107715696913012\
+    2363634336555761019688771513854347236745591124597977931405047860990814058116324491611973808078\
+    8746960293563921321195150193375644913386886152791398578015232715295689691142604068424501220707\
+    7788613749364152338025022822664609020596184735818260271093787518347711368354620419591342960229\
+    4934671771673075601901855504491624212792968594327756267651515758730103152919533027139889964288\
+    6292506703401688639837384652257978255734467511755799544669144610945157888358221232087883623303\
+    7336755369954272851540923633879586178859053839517598591994009903776871896539495808824221515299\
+    9619928149403248241048135646994567076173140201129595245173866036775948723989175231691600687146\
+    2371427211437232442634762429962042736305968547125977281297596069746748020754875733965108044186\
+    3763137353813976688054206726402967783171906947227503091923172924009664820220071663450524990481\
+    1945104599860297464777237922614956378065063679948653629951460111041261464500508663182414576795\
+    4000719678894140937974409070550812074001499406734602910143851047307308360678796014677323567818\
+    0450168089940330290360709389098366611796682858811124857036910846797801916334077428533361491667\
+    5845136113084514958652880145099929905918630443588356653224719499124763809124211973358004517696\
+    8706425654805403429023865013160069207660629615239426877230724212687859465529115217627878556897\
+    1638150738123832518092554735755792320495355998230714470444854106602427967029384193253867491473\
+    7437146125337596900140389709103055161683821547785426150170598626093352210883309022624155459005\
+    7023874273453933333145549786552126218329698096093321915695210032747749195700141202903866023274\
+    0376633417085953345929177515640194608571280489382840834700778870646340564131039840486762803387\
+    8662602815513501875838289244070743971820590656831867856198960478033876196228477483069329209006\
+    6776885868466994131646489834529037463487506421343322355100757225755441259884596858232828982843\
+    4651649119628632304969902774966388158308632803045338660094941692386732432017110234780880092628\
+    3649392078388188822343673570603295943980920810074101483329113978921981993197172306955792863870\
+    0670904292434515529343533958764853200311790341334890613459290566779335199536065037960295448113\
+    7925935086611484850281668515785944773203170743155592727715467609268423284205942098901179664537\
+    3404417709386817738463277133698265088091414301653009565806991377858914014096157420849022539503\
+    7005978994395410100409901622576780438723136932658434089792158053603100876816330760350084907612\
+    8364007449447019604977244808931089296625313671915025405830000848017458187191803647966668368091\
+    5375491728096552655673108940550343585304244886521802832130426211912860269555074832924115409645\
+    385085658742611904956365491830224265423778799183469243527078852296914873108660775012984921";
+    big_test(
+        Natural::from_str(xss).unwrap(),
+        Natural::from_str(yss).unwrap(),
+    );
+    // - k == 1 in sd_fft_trunc_internal
+    // - k == 1 && otrunc > 1 in sd_fft_trunc_internal
+    // - k == 1 in sd_ifft_no_trunc_internal
+    // - in sd_ifft_base_9_1
+    // - j == 0 in sd_ifft_base_9_1
+    // - in sd_ifft_basecase_9_1
+    // - in sd_ifft_basecase_7_1
+    // - i < l in sd_ifft_basecase_7_1
+    // - in sd_ifft_basecase_7_0
+    // - i < l in sd_ifft_basecase_7_0
+    // - i < l in sd_ifft_basecase_9_1
+    // - i >= l in sd_ifft_basecase_9_1
+    let xss = "92178880216095181211666676829145138370840306649787951361975829268163297384165754808\
+    4756063405654098801011060930436693280675742944960017098004214801917753316815018149158787859165\
+    9395300322111008817206410403503222862298862158402706092516171953423073235157842305744193289276\
+    0199823879480276467262088886778607308395525062932232880604136063041439063365460112144872325877\
+    7811437625627573820240086261266117827231674835705510157352288567620759933922883923925467129485\
+    0814639434022945267787254298597769652760997261721274518217329594058447021665620310437095357991\
+    5175605696860846854327832301621757698220417241976755189345968350443138036702177163804669879333\
+    1749587961567883818459754867867584245313746514165087972856312186120232022411062835757426550707\
+    4622170384289216212403163481519739652983828591245806571451382580470001509986746550375107141829\
+    5041192502748258698046492665731973650404141610257237221869777201853847126201629101101256979663\
+    4215522985230416617064181229401998214577283162762452604574976316076929257476979465101831676820\
+    1407487941066549241059843831269982406703297048975397272372445630568821339462845327127639496465\
+    9576066224901105931725511863239462309019409925105346234004749589849409525460428465344371928686\
+    0219899854178944512710338988282872909796497905006394284092127080626764661241393784661494717501\
+    9664612685452361581265902721321729281560792834146225698198834679678903863930368756204253548447\
+    6428237547963380775849781198163880820474234887408515810717626954294464140037086445325925419546\
+    9226360044515838714915264740444059908780715895432857870662394025378890373067951136803185216007\
+    3267164960283497260307420569343262172781570488027068806082866923981856952745381456929132034376\
+    9175300241163200578334333305706617719059873705842235195056271069666326205208928369404251271893\
+    3679946274464722744915581527296637624266349680128155611492841157104585722091143836374221805531\
+    9983693380210475132545075682573465444552559118913610843383605974999247732100246151434575077175\
+    2324345777747697049984956782474383557955569367286883667999795201706433344171377686149604990073\
+    1167006658978867618711730400636322091203486501669277691054842914826267934941319910773704032237\
+    6901035670205399259609811903617317317239598548068552258882943496440422231759832082385172579673\
+    3331969546275022130006965080924395968485228901579436785320618998984653205155824603155427127186\
+    9640843127394901649965498579948667455013615081255964805120103800401047094561889908057163200952\
+    1485704879293795487658072678397606334516804146599466551451609053119103475485952130347173420542\
+    5212275039559539681798308537856842558661070023438378480938524659311644882052743234093728450377\
+    0904737018473044412897568594028401352439121564448346666005199157182859046003456230628252461646\
+    2711568894086127552365778510467688968662691174905311846804723311446774142560531887766216309336\
+    3547191766862995534545173810101282955215815803628507655257102184911633402387766068877259795064\
+    0321509419156026324303710620592463147900840578444449323728803668303265138630374806617203187939\
+    9906449865725064523851265717887390715157466783059933912068354503772214431979866290078579445355\
+    8311261036030403472816783125699826576008508857219508442253238585849562016110478170452653797356\
+    6212208509721134378400928511072078679723080003929731897593219180380830579686828918716120845148\
+    6175127225958344843950193844481292801585339136308436578596447853517992043624639728347006509853\
+    7645007548083913941726649541874597481305636803050913189875829007224207317847021339958173233400\
+    1712685939213407698422779479008460565279512703710259903749612358081689590389622906948233869256\
+    0012492063107507109701774650303553632653740676976306821294715531656243033116599516349942536341\
+    1093295657027473445688838148738744167833015407259539432581571029579904480644793185529659263176\
+    5214500159261834752730651400287945044066099866450175911882657673457747672971994979835331469088\
+    6761756186808135204119248623596175993310510418285026467753122760968111744956741234929794049670\
+    5347673696159738183626721683311243235707795942817994465680764248391615160785062871842558451083\
+    1339698690300490733834377921936270367617110035127089791814903617335372758323457766221713419774\
+    6472792448605921707551485285461428583031592169673278783263213185912619450164367624776936642465\
+    6273519820033037165002205826158934743920822502599592958620667050196380246628072166942635791625\
+    0922384490346589214339776581366735557200699008501068658383639384490006927079512613289497434799\
+    7461417696179680119649742194484780658648709021116240165383841901768276933995680531932803451677\
+    2447215854056207524129671519115954026224280023981715172583589454751572892059637735557709314675\
+    9614367552876651272478352620179235530014789180213278962452283157832712698082010993439068008188\
+    9918857932694844622179284416754675467795584192049455977283167136406717372964723938937208182768\
+    5013915564058594855936357150037519065095240454959489333829960212039617372399785804850638592188\
+    1185636078604139805634314419412614234307685798822297347406108521092686215255734286770089882515\
+    7923825125232165876477739927411833999162006648812432004052451946583874661334023073014089427850\
+    8270338200972791935823864684587008940485166174868624369837127938577060779240011871830292449034\
+    9128796331002290445091235824592283208919864702368255151420802886504733241071514413608377719259\
+    7198960031560678408230290799222850549952463000372910229453782197060823813481495920742856040949\
+    7477679686839921356630705779326050698559706152469704731173114624819858779789982073668503103812\
+    9116139263689468007613564657598234720953327366346996966571186943350899797174365121222246896863\
+    7221351940925426761264036759509345626928829972437883257644837430451542927850371310080746857069\
+    4800477439955286688087534532390434950304131990936170409201041302784336144783741045897124986181\
+    7334541620866082164232368178079141456696355950280346752700365855026890326851869018925993980945\
+    1190398024697946844904047475581875749782560261287746650868841791259036261039200278782135931030\
+    0782131174092977580699020263995105441271759555505011693918241151765887128720623241116404293610\
+    1923292627085870867393548182007796021866852695922195275342465144379196649770459440766917386302\
+    6776005956027991392409937269932473435933713822539166656743979553036761912815753035316276329577\
+    0874510146987681799168986373420735204084919646712157014201805783078949291062908206747304756492\
+    7879397124771964413717240397812305084259508141255101875179348611567144285618735656540711900949\
+    7029001937983346923401736988902323695457290889631609533075610484926462009936704929818182704705\
+    8017655821021066290136112935595028217940069910677671936094814910441564321522026892491234918570\
+    8564621687485001351047337465401912169742334534779661485341751949685743634811315985698254376754\
+    3025790786443561684835833702412315988839780478980899429408336125534480930044846763776106091769\
+    0514823143670562542683319031611585067129161098222491599546168502744910015925610633633425675706\
+    1066993949981678958362797543858063359037543865440014070132996477175185936440787126529924315529\
+    4943454294093710429576747545278679922236959930892657575870089340248831082862229067209622919093\
+    4073445691747142356696308086296039653967907619641863124834095617354055141122506921883702374793\
+    7109303134178596140013601097991116052670307286704679250315187855735837101339266761102834044362\
+    9303093023778163671874243749720377212970476095974737364896496380605464028704558991946533842833\
+    9675365260521430209441760297960803535730934864497055331435491989520478327770564128276045994846\
+    9520777291062084817263598711916719643081904490517722416950189009691734051927166097118544194905\
+    1393312546522471137952144538483991829403692987889358362777668013850475701384826297874021966349\
+    2141368666127198930874118380051061562324568468459954404893756398602674524285726602451929789469\
+    9607817327896692112984377078996768713609103857368623105625257549732775905043227777179586178886\
+    2553846355994126446820221615432282713214522203090800626070215103384442011757697813596755235172\
+    9170131915564003672213847841292872567985677685250510477430433638890916808364576735879602462105\
+    8986988619059094347209036156373594367071492556747985018304845427381072727888644194216874474808\
+    8002474539202324865830757812839432952248221832182632495937656020758736436065506614095216024687\
+    3755468924199344491382168137938162666620026291859121756933375384637822543685095224097607130638\
+    2256493867669553916340062843739469201199065709174989531891176805035467679915871057087966252767\
+    3825307885682391581477145504978341477808964137229447268541761194949442317984843665891711271844\
+    6045786396262528404655592311101367364533066524720336308550453506747417774194941731095499942885\
+    5408255870806070478469005046854416474664785183942399923759946384881611490673104810076244599024\
+    2954328861110032039173248286117862758787175389607707457077352698015602790544545883276477818583\
+    8316975077058488887087959578842226393372459869627513326675195048780942841174563111767424798284\
+    0072432721697650949712793829692100232539401570436241381870852007034950568517733580827434129761\
+    2027193817931433171784653188732875786064634307330295753504279262531072437063447213799853453300\
+    8670505926285718232498839256736996425605106569715727088357300687295961375438686109216505880093\
+    9191846493588711974825465549087725749140853506509967866011545230350632829065800789139904175257\
+    7607665730530077281835939808102166168493504330911328053282537057899630209099651294982555339798\
+    6174280526767447718403961619678780253118784055508834839675969196623243660910509260597024743878\
+    3399548982518117300470741917819568590000541917666596121452911108556361144138702974254970861988\
+    0816278176086358329239799052105949841651706001615453133929056862168843497683744777278859388176\
+    1300556882918954099021980521521939477824608074039639482408729761163255533162206943512971563858\
+    2361653253510440392367424484901792810423457799195686065902526236770682045627023782714860114863\
+    9656665262576788651234623753158992296294440902126267293241565329022130465342457341462436816012\
+    6135489496594888610327802655738344162066708992458789307819397797541260600282181022670716361373\
+    7959819721372150824083678527700638740242279188874524974239900377814862814934300663909597527852\
+    5737463709791950249849471636896555808186577642133671133810924204537378310684134725318345372422\
+    6914397584149954068197310260368660455315809614334287298973364483663549973369146776416268869236\
+    6056564157942658083517747717265601444988852047794375949408923235515024269379015050989523380551\
+    5083786505576022733067029969698976479152155690199875958796333312070749464883892084395256842444\
+    8872109742397972063089113758997640245753247124989104603946453090879950000000000000000000000000\
+    00000000000000000000";
+    let yss = "10908414505912971054286609488569140565924687687245433094058547648020905598778587205\
+    8800917601340102783279566646405229412956270860607348480697253321586425043921831743478345047346\
+    1620612167756704235757660325826576703080825391458174158824924439376273566916427171725586252750\
+    1135740201145208707398808419246609478468381871915273365995060747114547363636609791355017672900\
+    8201140785708890745884659007022718348185215707899394766286151497972902968283000616696870152162\
+    6162746788372883461620816411110712443880711195642228057093182653022326335575815190841233133154\
+    5901983170623957734740229277533918089178781604188333617309668081763114384234809933223105723238\
+    2175980988120314742525716865267570025262654047389794738086985999544779709382195868988972881105\
+    6010758553679552998640915723718648168439102943931156658884682882398526699741823504320497280006\
+    2233172072338982693697909214335376944537728610357916775549830616691045001061464613851455530681\
+    7308539191939806478658138509922120292951164960952328660597685734370646072651479086911688862304\
+    8875301954852916676396233885137710320297960219852527443598828696170773054985131164421008908505\
+    3863320417453851138667430234873894787171599955890314482164675353481585980639187279213966221796\
+    5362854604657325895421198321632027418186827123198514863665841105714406474704034591180228164014\
+    9642956321822921088252308223918014534841857789241869742606068706996171891615174190123403219662\
+    4694777160422452994177062670048758669388437663096069386059959441677724612434597345905683766946\
+    1055057117676803358353474491892699413028718796396868804108014150403709112074360823885178794866\
+    0785781288305878033552932547631853463898395521590933426651792614798049763342694458280504145140\
+    3665748723657073979003591739560756591025818772766505732418704785362503865781294271883673261323\
+    8244310518890045378127654157707367854319493666203793894105229571079353714855333982629786090302\
+    7837491606132504951123941719242813218185035978434220621999879772544538748463376634367636346508\
+    1602702528148162734659676974892864958359681301046175079633314001005611690725163396287513515288\
+    3913279769534748341225675859384140633636338791936452232302173386906100814004098359573142396051\
+    2661247624312379688078919444292950874768630849279644346459184541173730046172095511638612531426\
+    9097219216661743675715333301559833797427427400745112255170583174289673187024018839000100563387\
+    0719703750355234035408650091288610610877203832740320899874680869756323084625747379551103669190\
+    3505324008472502629432601921885954615996411873404669472296378620842382069900579982304023036153\
+    8123648137367394386593544688596486540220469963815141357683091871241851080033949208733040110554\
+    1247051934233870718046700620778161164989796368301384044131797998491403133195259242819167115518\
+    5816517529457503351254593461559001785254210897236276080828714411364793978007086569379444315193\
+    9377500275308573034484218489554587387541686908462623901390499232968430606711226431616434521316\
+    0284053164954588847174493425863191549299393592782815842128911091193645749088411535603155371794\
+    4129304261364706080036780428805260606767981809574091259695762789767948001862905416437261575234\
+    3954265321713528294798414220654911320027000477838099979500193309165189979860417585807753068976\
+    0281061990971476228263978656980855648031088030251672499225498688104513509977731408862969394218\
+    6386276357582152634076041568118285410386441075195995867767651149290882464625916250443969492322\
+    5628927486455555369152293014491362015298191531222392373609267504874575559889774034926000489817\
+    7334526861246181296845240134439620809897213746151667196619762607144020565237882575905537158634\
+    3056054908893766595565270533152466052621846730797010667794912760319148461367888763432494033935\
+    5770908233084550614579340756425880254606922896741720944365354373570553150827983181717626088237\
+    9679468449439034129602017212159637115118265619492837063365788805219766122886118308676712391088\
+    2324009989002058473353246079357784966236956727583834236773508377892013589638618125956187698984\
+    3218483425259650845473870067046846051070702708381555436098035065316030560047619978075283136359\
+    1219954452355538322062830035691454022290392542169743502327894299079400545580507355600786959793\
+    9624701048378670711329960655592220917609724764842751610959942400606275938014051504230616140018\
+    8879857896133032555293577263952648116925997705012329620620478256895448504324988771177759067797\
+    9685926970825616654420691303155998809303438108623562246344595620487486685244575306209274563310\
+    7303293543641811601614726641573107460829422811372172890261193401813784507634222106872343021755\
+    8127223627217096368595505709005031678375575598517602520348491607448326383707762981243032536559\
+    3625470197795113179542059984449403386721653734312880344083479538140623113438676899891035543956\
+    0664089922352971148605047798328160271308209156897724820444922468937965894673531797498394142966\
+    5857758936934390567120174052381161197241040596063882603749888839987952737678329885160229153197\
+    3627482762117122991618207578170408102438153153261452366598098158243494465335493266945931886503\
+    7903632842945111926728497738954208614098685611308083801899501366844644166267205140021620509734\
+    8119955316842219810323715020900743528885943317665844308800167109679826577826108793697366801259\
+    9081950467644628725893320857214120101376808632600359292866050987057452844302263617517906040576\
+    5674887917985848237034070626149611228942663426325618923801045134789861474439009174710508480712\
+    9894947335611031852610712285062172997459722763304847889730406437698498538694439638506771442247\
+    4013481175348438524054192463564520454684118442597736403817854257772505310904724584854983989424\
+    6273392368489356350002740521466119702121244888833208570062627308059658535546618618071475020847\
+    6538160445315044447183564159680838145314807302681804945432318617824529984672714412766283349082\
+    8407764907677913142630759364135717912139478554699048433046548009120622646311513936889849742005\
+    1938417026585665195612967816256378569952519374000705346481080979656465412008908001891724511486\
+    7640475429657981337674015944960532535501275691386076519906518480574604299315242594098005752731\
+    4610901359392893551453521631112599200679457441857234352392720829022312219594847781134060134022\
+    5235887458839044674409526779369062271419980932798621256026580865555413161303206785178305013445\
+    2107159169710346185816180019959032636468139243857857588840330896418995161477668537012309811973\
+    8294955663531293331130842946474929058168065491370658446322353288277527314175541070198181380258\
+    5627326641228849308615217633455100949833458755735234728716629977114313043320267519024787537552\
+    8555367407369345421631652421147888603456834809450748094823338604001218330848719666149313133233\
+    0445623926214710486202012606270751008405873956167696089035019409843543396007380423406687466711\
+    5232957625014826761610980527654739998859355453107419625880750871523919862469169853312492661186\
+    9156740625756599779007148665171341208602089316522574306147186910710107485456688199733465277268\
+    3393843865910427446792056897036338271401645263300543021899378928692066622697555508071100595666\
+    1062215349114300910067438992756623927928016286120836042817703179688342075786600949254291750343\
+    4750708506791204286311694404039771923099598305448092718740229873101908407957959733461551894492\
+    1579356861293670935808137300698040600029078991154342700019287757204762318287041884091377923485\
+    9013869981431557475619089641076646856902263659910192569696542041864420136272478708376655545551\
+    9694802937758276476716416124793122039529318497748797935926710835530513956653980932496720195731\
+    7863287800670097466375178866915404746844093936887901349854870947952754083626896575654244798278\
+    5547704673589024994641144633673598532770836586690680765954828440204432314708331719061335590092\
+    5098305594752790298805162335119615401677163849881114073460850657617030727422896736632519036392\
+    2396421114817113186996471689857069210863649088866902911367277105114485752092310382681885586395\
+    0557321841363516785550317383323531005761838734758410902748665143631225356098342510730339116700\
+    4597502421978797921420130259346353389184048227417312961873358648793515851822657953530446529010\
+    1921359266179061947464407216576883723070344846453309743546494248461538434465836728331111890678\
+    7484360607577953793591859647377034714660500658601875268665404207814136388746945006570499607305\
+    3912343943109777726072396255467966538286469487763984952121160856740333021560313166067636040640\
+    4068763872735011006347765984195289456857762332379863692759538215794872957829767381599380828854\
+    8443921951661519963100664342118118921219279515021185683158420124115882452249863439341643403614\
+    6843677143694611514956957708817871493504199114073996635054666124076303336350879973720797542833\
+    1697896521973131000604974199398266640485651830616668487905027012056207944523621716307696523667\
+    3597104482223882886396000021941104793645669267397640541092898382866348761241388125840939420329\
+    6532973581791194802847453568931481369344088975705699191689777654605119514346049437056288513498\
+    7155592258519997246357561935326410564448361888670687962434733967023291889623448244314471808428\
+    0196297795384611407015967995341036410237700416482276236892954314658618411182119637254165850533\
+    4834073094907220770590906009066257259843924005632996808671009557797497167816984186567799661537\
+    9780444732450365222591119710142165851813076664677375451651931168621254677451224008508782113496\
+    4657512249549200288871452406908900398381042331882093417629266387252953255550505590845527881944\
+    3110570104904927958043433168286770189478960615851176655127496333090691158707959561438394682032\
+    5160929459708430095164135070071862512042596426249742795916444624439930350748025991581576680533\
+    0341203235303899496900614261068923708664991316508518279778113430335835816638507476873470089783\
+    6406780902558393821806547923053076179756975407588471246852634330682522594299832621823244274276\
+    2274716983155299679950862020920180917945648878066432712692620308077426320341626218768578222373\
+    2490917291430934357043048072772336865408717182113482257697207277942785802382211345454198422846\
+    1007845402204507486797907417524150799426920895214057215895835400250840948613772715502311132351\
+    1934442519919659248801091067532724916094212111299747251719833940498490882506561273622516955130\
+    1430592598460273648638553585105165838859847053014167740762963441840459950884493067041229592675\
+    7653346192027629855391471262594734312745968333924246485847967214784158400263364747001747254132\
+    0139438345777136098540487695554612468049173310114717790707949801028382729062408344786764000130\
+    07974072283267003978025920705373933996414576872881250000000000000000000000000000000000000000";
+    big_test(
+        Natural::from_str(xss).unwrap(),
+        Natural::from_str(yss).unwrap(),
+    );
+    // - k == 1 in sd_fft_no_trunc_internal
+    // - in sd_fft_base_9_1
+    // - j == 0 in sd_fft_base_9_1
+    // - in sd_fft_basecase_9_1
+    // - i < l in sd_fft_basecase_9_1
+    // - i >= l in sd_fft_basecase_9_1
+    // - in sd_fft_basecase_7_1
+    // - i < l in sd_fft_basecase_7_1
+    // - i >= l in sd_fft_basecase_7_1
+    // - in sd_fft_basecase_7_0
+    // - i < l in sd_fft_basecase_7_0
+    // - i >= l in sd_fft_basecase_7_0
+    let xss = "24801620217142871826036343153479407090126215259762287367249892345144118932702489936\
+    5363795589499546396403673519051026819105518787067224323769279116349709420907345437632156864434\
+    1719712090266415333143863606208648709524053891659568275087027717316930121389635764688470706597\
+    5260238307434514511330927574432874399626586191130779511802671364838622423411286055789129948098\
+    1178265409083662423394531391028173462050869303104169627336623271406627770919091188225928618106\
+    4713114322277663317786276493528845775041485729411472335540726817499202367094531882398266179399\
+    4396123199097972358415306093494701595919658308909864070872958276339824332368025541875747517955\
+    0899020335121913751781769393281419548313186141224281866222012670740306330841714185544970277499\
+    7949646249056294601039141509289643343708985818923998032269079309261400551966043601217975239719\
+    6408889320846199985860655489911830005831615385224440166840984579520679211193021083123485314369\
+    5654066547783370223020878934081204581414986655885449097842755766133888136018219565557242540726\
+    5149373712403684852662663716434216575760780363589455906851052886649070163670814395905012848524\
+    4242446267154335678308664419312848891987762791830981878424250015822257117004102272186632736917\
+    9119679587348750698230120795953015381310613636951425019385198418188130147785129853747860449234\
+    3111593352621318851953556826045146645506734114753703218105594390418926678577158352422807088775\
+    2294185104092084009892063231523664183304785969283813134062463766512484317120364377393743390461\
+    7422318544650418272783852547540328086475483046207595884076650062484568680142887118125740802001\
+    1814422290022771494661379479722402142512462424259935181298667972646258965369426797145671601257\
+    3456521213190961189225857134212433306204489198779714698241234900344161098963055902202240618376\
+    9859668829973054610485982170521059702403944522913905969195277084459959400945830814455349634822\
+    9514379583336225546808973914755774851896024752453243312275750967605016793833577168949111969922\
+    1907556733307217551726415777621331521130598612920650632078403806727568767037952526679260811030\
+    3751944137922537483270468977224977663485606368449211798925361810577737747375779407305305797428\
+    2798253152332705802507373425809672687526986389941353946219403222120876199384802007872586787954\
+    3697311325196500009654804240131348410347962800948264924279749965697761666401503469206406970743\
+    8428366818045726327737929159783769117170914719089362105850626389743263054399450295811591554080\
+    7866704302075305818706148358975826976113852522594096030427305055000951804161946861461022304989\
+    2419920771607345334113662668454683137585429733510875327902484229103740799048128043423506760030\
+    2963281620016317883915659767991397362369018982599615304051419212606802922909786900535895747331\
+    5850274174048535453057467436067472601602376470305447160532146404859814335250724164139148444374\
+    6273711713481819274612781628279689923981360515542013840617865093890122773088283535124247431995\
+    6278074512061077876204760704155585044660127457477584271708662019950243758769785861925054225390\
+    3414228018582814161813904023987793337002492901628562277946366602498318204677429605568916355194\
+    9922124903907265853520495365260260616644641378401667408962281710099264689674030943933048440007\
+    9774804881510104193426113210360088414879358106752293165686220032973225342542719050078434180185\
+    2876767154128684802221973838015033946039851470380862592934296543873926498565961575661536309661\
+    8485617719450532875384580304901130164237074848423225970067408533947704611471300380290324886160\
+    1420615374930656205328913687104424509502847298886945958892993595437295580461677094798620912683\
+    5959686935295316360139914618858258964686796340164171229162409225936142589627081116905572179317\
+    8987080640050856431852999281897326723181251400563560560719771158181122142749359267857628353127\
+    2196475905839201276924105027608964192651513010566218469744909171849066603999656785804745205505\
+    1533559630336373496852631024536451792161172485586823390786287789598561652394134561137700882814\
+    4994958269714667017225870865420984668478510922459011353495855686566713219487882014673374524750\
+    6235449276055414278628998329186247791138201201786653714825490430774041309330234612266548796570\
+    1558891582121302852462763559806987239277805004952044818099594071200253555384139052201037968268\
+    0609396058166355507215613145892733846964827406809673844645141552760397635623841703098607202245\
+    9628950185193994563125602014923027324506137588055673291810163281685018307705677977440755847878\
+    5916277604830640254277898054605868201480668282810669100843355030953924632782394406885199531302\
+    9343850555141955613317143511145358709825213063147220964913196258670378761061675258475965304642\
+    4192069588637880395926581575815697288541128198691089251603619035327243368691695264021892295986\
+    5889780966484746478395779290871875154688400185519128100216558450122245181891309207793010508303\
+    6416857414355256318673035757621581622270794416594254177960159813429502907716713481236081448433\
+    5167183445843846781174087267465133510937494388536466915186437288464113268982714919312370144418\
+    5478118813752301023415966772621669096071573453729479198778763149124753526673825318149686437086\
+    6430721201377401591984353850172840752574345765648391553975200336875117065968969717110090662659\
+    0799325923454101045113718139506724517777981054216414936798353994664901640816953202708983427805\
+    7913481961715995518115460075505375435320367594989130696360686409592902662627062564233683144235\
+    3306352299952553611761999078760977422528843600754441682703049692885047251010003815883800160366\
+    5280641527944325699017622403517549590923183930533283278529086207291192425364579604314935588585\
+    1693519596840077770781952778109101537766725608978732632299214969888918463879848802761171950265\
+    2398813285115692323045579373085393415838292883198244036459469673824726479066609543567049594886\
+    2935208113075265099882566482211744719826130334433041673694056499364820677631886831328118016218\
+    2611205570546607670772197454938016083495983113422792221646066252988843272419764722174051225648\
+    1507195634970844024198117675858775719352197272161411525807766192873933283667941194109812233923\
+    4334263398373019117809710855445579706185608943172670305216268869651041992025999116220318287536\
+    0423688260665409896126529997567152348551532346969279305939977406229419529446540470805374053761\
+    9744921601874214230978961900286172051665806923356388029991929410183503405737171343250092109344\
+    1018200066087752813802222361379807317429558062818368473686275437801009254140036872958848355740\
+    2158023808166868059068643274484472339252480597717238171933729169413630278779545692332602615882\
+    5324816019394496988274403337442788641965946488732848302646563463683015530959148266655802504723\
+    4677998225420757728274262679001829294681204262349568644240806135129346668538289966443734777148\
+    7211742754145623950843032634798050811942614376805226907932826219830363978816270284226953255503\
+    5132192956546677916303937883010930501219830342114926410501187312657755659868108929184945899160\
+    8862905381082072422327449678693945378837416796328928892017232982368760300152911970187567088488\
+    8097947167659620858700222018612285946652891622226294886056360184451943518037946918114820724400\
+    0429198311126509366214329687970631381794063097888578616881955118004758106571366185986414256977\
+    1545560189127902188261632692703550990312712272839510166399109501916003979918101116071382820165\
+    3446973089768128042015712151763822886214185958989147339539935866157045125209972350947292199651\
+    4259742057342693534491154260236292285417640325594116041571041564942102248647573573647884547511\
+    7927255769718870091118053075433084403832946528725884272467905657778487139561464352416470291030\
+    2427158826406118478410699528201546213130172513604601018165691033855911428137879851841789833619\
+    9779931779172451229767533782653146679926707039058446897926139634612541382291024451194484049102\
+    0348913898927032847202815428368696072513337467195829811548665133822009164641881251586467067224\
+    0964321378840420780217477999530460642523083012164077627539763204174768242867227854830328954921\
+    7981666810065286274945627556154803188195753990286753666419846739125189127009813177667668239807\
+    9424575676331594419861212128780125361574019822615548084169716668189221832110353012860158916947\
+    5827510211193336763368742226324664581013245906834314840457381465961932539437863097237795753280\
+    1661941586455185014947171137236101248267786335931819609193050437761716093483101514718237405202\
+    7479497435087476658239039539063751145149561944449333360970515488978120316059885587826030336866\
+    2188730335673068409747996575099733869985243532001758864333332530346177681011603409119293655822\
+    8893886929078673772413715762007967874898132314483333034476602521803484968813572856526496682146\
+    8221586472111562832599731582793942461939560928095638102889425554429230004204077753546874138138\
+    0764442380412951852178947461992146606850486405096319219459727741079990440468721505715754388667\
+    4118133454983515240334943784479894247614641095638315034977297914742463950610247253497752692007\
+    6730479586638718683611576252110583793610787347736095598359562861436880697949555023614431860514\
+    8357314779405315475401981574515799145365987236477149342960167141069596759769629211766877333385\
+    5407163672399332224852034723283298474204385218239662868225611612294312993851280320940883558539\
+    8580005571505321113524087260373784519780495864927629034321722748179924380062999280878882162735\
+    5283051076015877174230202216012277715275992738776540554935875809789509568896060386462295143434\
+    7877590551286685086675498692452942892144752175759451106662646977672876231646732973482354621948\
+    9277585817243118533225841329319406216059150820257932243760688523140709174083272705506157402668\
+    5992682298721836236657489955597525585488444164365276000738884409745287210528931447311897748916\
+    7450593470801502928938576387339485766248306067294156419272751014756065662304678931390271952620\
+    3959013850455520419402155064233049792369143875043797623932686120817778457456585514982451826028\
+    8789435115686272407357789290361785396395536198452116277773665642963680357095740509614359557039\
+    7441832856177332383313605277250112357787228532743058978808882704171148969993469338822310750511\
+    4942868847881585122066906914895879995389295937345589112036978208548496367330729758507212990828\
+    1228030926825131401274879075771071263284119766835855851658228338891772217626087589429251134492\
+    3500024228635210964941925743185476880268833789086585218226987988338155646982943209964788887840\
+    5553096865337058954646790774765686373985677941724432335210764876153282287234984853472126533922\
+    9473068686802760890054601903725571898116268020979065140463821048274659873386718101013530934541\
+    3647545154140939552075151573395533545400331296578991110975407867994610126346288535292425511495\
+    1624551904972797209552795049463608181258840004171045569338881308597788465681460245499949456384\
+    4120872114017229564841935889576120783825467303833769104609799824778138395312378928231281528261\
+    6078794045498349679661993581597613566357329368786386219239869784113833079447627832849056597725\
+    3995215643904955403203380583558657416160722240993588532547592610142221646539649478263522350000\
+    1952880080691371341336716288449425960123314946510423908943585507358338677082153457709236158457\
+    2551978452710466699582086341653802603727429433993853707467652045144374492838724249066303540055\
+    000000000000000000000000";
+    let yss = "12589013916460106277897858542056322488000094675856038864646344558907306049281511809\
+    3614136473331758487033647545863565888296791844990366713538746685954428656201293778129225358841\
+    7353863078097156371331389396993279517446187182494637469283466377460580501065673665435598840206\
+    7142251990868317617561579410148930145591214360541256125925993641360336618423521594488521058481\
+    1109899988306120162541408553945745351720597119378160518192449498440188780985585537647431021968\
+    8110671180958675457849815485891061836525309239860886863961315717167721978071934857201612867766\
+    8543767461173340378350887499166155076683685125902584892511373819988521816900192183182339280275\
+    1482744980662742669748521682570253532711665349160344575879370522782059930077176386245541198579\
+    3798400317650318004189313061972576676273465035043255600045494116932709242182501732769680538148\
+    5099556686399958248166710269752554388376742485921374544193100340790114044640017730004677743890\
+    1641647335308537912257025798264834155552412583943243046337517914751639422517260488407611185645\
+    1730619934401959425302421172362775105944233136904439633848435635846777646375790028619032927471\
+    2019801480514034142177189099392380741088500843010959280891017888481869335028508904437940756241\
+    4546481877549870422936979705567193763651239836671431992799139430207382743790568467181259455857\
+    2537982542196470615094253109736505511904177145527402473142627553430867471258204334734353007474\
+    9340133594144542561926521439528835243422125771887951940513126216237839752399914304915379096334\
+    3522265892037530846209019108970923475160288516251073580364734709155418377580354465277601146816\
+    8618137357816163963169988675501838350458426103138395279925524535977657129263446890650409261593\
+    9812895789722633350234460877451524069695112720707390486618079038153928199167931340042669103554\
+    5105445688058063298659688780458262753196362871200273574519795726160816757036237710528906867457\
+    4770079751625132809375536926770169830292897920513074075512111334200651273622499815832497410060\
+    0190008935269325977350196281860238594923514357147602539474824350893668720099396394956973569888\
+    3853743567236663702416144891850857854103839114308314238346701530127080675807942825452815860343\
+    1453248670268604803082205448053749443877556826778448038157598886077430045570366045778733481240\
+    5559761415354934815192157872590816386301017469878076709132405304502202976996810053062214111761\
+    3683293987653845361693494701211475476889236212653277406394381060320481527005517041197308837677\
+    2964509726843699281857743271686770247486726899265947978969459705007844330001093453089819744305\
+    3372168474590060759203310510900315004763325776477399635804696939396802899102399443178760977495\
+    5269021478676321306641542242490081984902627007643733459356437362648529356870268953499568851827\
+    8993191062323659633666618340618744418228923927761649436448495338509381124461427047169334715974\
+    4201578033359942262570823049846229161990018993165697683021812397482322435520314552211860320783\
+    2855492916989369856974670766814204739558583408511834353874162893083530139959882033001480193034\
+    7685795651651810705239982604805321646908529202721583394569320280801137417613565370089661646081\
+    6228739874453998238272728212666348202358362664051060557411110264246742561904274054537861377304\
+    9576198698426550098960364240338901002104466221634474935116308314280105844241072526575579864349\
+    4425540270319371619718024964051418605541961453788836812214934860525645226168635875017599100567\
+    8411370147729668061827209213548126409459764273182851594452853417872307326229393337098897968136\
+    5377063330667435895234325001344831298676808194669482523446052933258820409219447130674392163326\
+    2082975934686253351694363235158923019419140012831771442092833791515988608113442990374486413959\
+    7300411124089411534022656455717079496022901023145121791504586285756480438733819992612620266044\
+    4508928253870513173628509025625479831245902190565253903837333992139262402927244896189927511304\
+    6015355971134307127532745646911229172799497031118695438155116685869392486459174954625467216829\
+    6139914776531061459245432019683916310131096402322825617216858819953487413642252808664007370113\
+    5130097927839211213703618643600921442853592282519207838345872683150366457709248888709812305872\
+    0029961121795751169708850803536613732415754586541158724977017852055722636519561544321864924737\
+    5729555942502259129241300117325778441223140558408708588127871216478851667867027641810903022393\
+    5026279552540069634984608661141902490594861040385134045301870985868381762867745315703165705848\
+    8741539079298928101255947801722324349147240427796708732299443729960956696665969019743856226784\
+    1158106555297521401973061713721294415390319416824497089718721319260930153497019211032189753833\
+    3524757752041208539454524254191530204587978267794107277313119835122104408780507106860855053432\
+    6715989201509918081324709356266150887454766869419534319269582933416447397362562523951965586576\
+    4831584826593399486108570617002771071336494297564163153529531520685660419677199438433441044737\
+    2847443382173195912174417438075173315823025629475165381478134649511343243037904838787690053816\
+    1448304859110512660315869110216207500306748016638564074983211432091239558029436864970311201013\
+    9494204663451931447003852648629167327901026967817174517123762233469206554169502522631768779019\
+    6574760572729599494752710165846986105206751360431814385187378977204437044390896146215317658828\
+    5934603009271073563597032886566322116787071789139727488326970091444490126827295067012933821962\
+    1554754332569543237304472483359184936142988429812850308417562272727104297326786153398324275574\
+    5155518426198816509252895265227065999950375286440313834470432544665229750181021510109369574752\
+    3356743532958194280997267115053157799138739193732065092158146615765660215610507254884871133791\
+    1698218461062736695547742573390984523443030770645318395967518545333476901051694382928011857621\
+    4861580709678692048640464956124881032637709917322830810929926863905737922495824338348617134831\
+    6314749492263784807017615497731340611368142443865631703125557977215256653947164477889267069355\
+    0721207438162105024465587381551162027875192714674519224641045938831803031008877074458359164697\
+    7769244276944282245715425148104107693701637684140087117033308856452097048733781522061306259197\
+    6709836700234923180916761040773082826569884302957513147799259219185565324882675590765307866712\
+    6015769131049789691940099626992191545891474462776846187883153534302839641384655701574144237436\
+    7769077386181999313015029561230765611767744161714772985591890471981679710399252311545198227971\
+    1663782961179770785790224606401624161861715111784750295368007295732593525566603789022076628804\
+    8527661256713043958604316033970981497744866983597919553507025043650842329592485811439638375310\
+    0609906019629269586733970151806216941155151610224001113041582772445794841512626172140741919316\
+    8802979545222635406623764116165125367944926276816354414368612714584815365795736574803755307099\
+    6452056234794680246031135120551613425648163024369763768999062128512834773075976966796909186811\
+    6780561202941750407809414299089100142690218458444776551938846499876353427650825949459549435343\
+    3932692400561339061059747834789286348238882330400198769344338775274912804452941503441465759007\
+    4602799801217437772641049936726626347294647100583535416780422440084362064239940902266909492293\
+    4405688983447180996873076613708418605659134527663969190831327685081461214556778853732555576823\
+    4990338599017039376114987542929273098206308364715535827638305721948012233312271810174647085529\
+    2277684236204894820725532708344438205860758888068636734833382932466235420832510604744873850096\
+    9282611370707354542652016812425185882217727416968621933780020111039992008016696671959153814041\
+    4316674523809170176165664411006219334346748795389918179082831172957466870498039550283432266454\
+    9529543420692277213789018843024164290569450635030907914447146188443173383043062919961045271561\
+    7929668549172376815356944264330717421180960969485664114635780047634627977048629938156558500603\
+    3921592421689134629228739721072796713746140401486141278138384689894423080154113785779029068807\
+    1330308362597265783414518880121147171683550973428807789715720035181817986760006812853184805566\
+    3785340220057799903883713709429081894094007883906813541431379032059433956095001119523041099601\
+    6839788703071835426735250764828966760377489390861353034238509692213776825289155748118892852493\
+    5637171565811661303195202467420591310963472679145339785689609953794186286443227923216652631277\
+    3788447542393494415437088181226420410106957407522481752168712138008194374277529483239799590139\
+    9298990645494535426228995661442278904865179613379566733737728911421044644137297947182107348820\
+    2525787819027913151256735340221837708712039570106141436639126142561390083199792785805374415495\
+    1022755644811179056160950054045817133229585793735694826907423502685382504565944253095448659814\
+    4808274930441626005413799153931517381712891019978042126613521037556183391817965550385735061177\
+    9163449653877143552562190397607785113032971003564036121765482082842404669534010182444712706294\
+    3141958700831346145451221092417417138575079645510457430481608322647953559194816721831783859721\
+    4151621676205166904770089938502438614169265103111833294017362898396088188896132098887610683480\
+    2898322845387201832250138459093671963069739618350027540454891198833790835932411903674111449254\
+    2419439905077199123214719032891959817826230728737015620259791224209531828279826710851775647355\
+    1285617312949168800369774113761607720006799553427389688984990286591434956700614820259704779412\
+    0872401006900523223325454594460509510390907494592159646406340918870929843130647412621697397004\
+    1798552049735509610309462063444838111088940175802141790427562995223848783965027874749159346332\
+    6990640333039827022607006580373414160850100543843323448046531039447253576046043436630175355397\
+    3299289722260075024807344047612826849175942636796884646906477088720839757937044126660733071672\
+    6925103862410468103254723758901355044069368732319544861647206735503116923764564332268824973377\
+    2525266171983647738196072458532465538970240268893897579295277262629385586566443454845338874096\
+    1351003127840180356377574155035064592797909407262204358484869515362222205335327978022954209337\
+    5173159447777345124762301117968347303285073220801082812082941668952725507872054852067060598323\
+    8633045336762278736339343240446216041436312543472033782088489115934263312317441758715321621398\
+    2893694194507118735687348357481382982660963131067599585703851061893564997542800492382150704628\
+    8481176839747118963671849143035732883999547117376084206648565334776978440262738559060670092448\
+    0786099302872817568083523212549328513305277274217424197340898405157721222283929814492126885251\
+    1412961325059061297265782609785280838720240520453470040992326233839897606285487471747003140410\
+    0057877074406960533508202301549079492579415741980786293828443271085764094023220276789143263683\
+    5287092293953276312654493149679934771905531087755559871059281077739977789296394659915457026295\
+    6908735121264889427252659177584494256490080250572666745152641320167197309221519742810756902908\
+    9298173985278772765903268833981114666803657906117584700148956974562696779322051091961792870409\
+    1017421869683431439216634457883170152430698818565631810772094980586613656344000000000000000000\
+    000";
+    big_test(
+        Natural::from_str(xss).unwrap(),
+        Natural::from_str(yss).unwrap(),
+    );
+    // (large test case starting with 1093184750055110... generated by setting LARGE_LIMIT = 1000000
+    // and running Integer pow properties)
+    //
+    // - k > 4 in sd_fft_no_trunc_block
+    // - a < l2 in sd_fft_no_trunc_block
+    // - a >= l2 in sd_fft_no_trunc_block
+    // - b < l1 in sd_fft_no_trunc_block
+    // - b >= l1 in sd_fft_no_trunc_block
 }
 
 #[test]
@@ -12333,6 +12867,10 @@ fn mul_properties() {
         mut_x *= &y;
         assert_eq!(mut_x, product);
         assert!(mut_x.is_valid());
+
+        let product_slow = mul_slow_fft(&x, &y);
+        assert!(product_slow.is_valid());
+        assert_eq!(product_slow, product);
 
         assert_eq!(
             Natural::from(&(BigUint::from(&x) * BigUint::from(&y))),

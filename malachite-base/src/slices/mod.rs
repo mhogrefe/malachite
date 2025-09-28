@@ -291,7 +291,7 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 /// );
 /// ```
 #[inline]
-pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlice<T> {
+pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlice<'_, T> {
     assert!(!xs.is_empty(), "empty slice");
     RandomValuesFromSlice {
         xs,
@@ -388,7 +388,7 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 ///     ]
 /// );
 /// ```
-pub fn exhaustive_slice_permutations<T>(xs: &[T]) -> ExhaustiveSlicePermutations<T> {
+pub fn exhaustive_slice_permutations<T>(xs: &[T]) -> ExhaustiveSlicePermutations<'_, T> {
     ExhaustiveSlicePermutations {
         xs,
         indices: (0..xs.len()).collect(),
@@ -453,7 +453,7 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
 ///     ]
 /// );
 /// ```
-pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutations<T> {
+pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutations<'_, T> {
     RandomSlicePermutations {
         xs,
         indices: (0..xs.len()).collect(),

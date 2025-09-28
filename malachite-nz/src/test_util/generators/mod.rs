@@ -2954,16 +2954,6 @@ pub fn unsigned_vec_pair_gen_var_28<T: PrimitiveUnsigned>() -> Generator<(Vec<T>
 
 // vars 31 to 32 are in malachite-base.
 
-// All `(Vec<T>, Vec<T>)` where `T` is unsigned and `out` and `xs` are valid inputs to
-// `limbs_square_fft_alt`.
-pub fn unsigned_vec_pair_gen_var_33<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
-    Generator::new(
-        &exhaustive_unsigned_vec_pair_gen_var_34,
-        &random_primitive_int_vec_pair_gen_var_28,
-        &special_random_unsigned_vec_pair_gen_var_34,
-    )
-}
-
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // var 1 is in malachite-base
@@ -3445,16 +3435,6 @@ pub fn unsigned_vec_triple_gen_var_58<T: PrimitiveUnsigned>() -> Generator<(Vec<
 }
 
 // var 59 is in malachite-base.
-
-// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to both `limbs_mul_fft_alt`.
-pub fn unsigned_vec_triple_gen_var_60<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
-{
-    Generator::new(
-        &exhaustive_unsigned_vec_triple_gen_var_60,
-        &random_primitive_int_vec_triple_gen_var_47,
-        &special_random_unsigned_vec_triple_gen_var_60,
-    )
-}
 
 // -- (Vec<PrimitiveUnsigned> * 4) --
 

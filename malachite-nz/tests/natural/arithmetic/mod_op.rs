@@ -47,11 +47,17 @@ use std::str::FromStr;
 #[test]
 fn test_limbs_mod_limb() {
     let test = |ns: &[Limb], d: Limb, r: Limb| {
-        assert_eq!(limbs_mod_limb(ns, d), r);
-        assert_eq!(limbs_mod_limb_any_leading_zeros_1(ns, d), r);
-        assert_eq!(limbs_mod_limb_any_leading_zeros_2(ns, d), r);
-        assert_eq!(limbs_mod_limb_alt_1(ns, d), r);
-        assert_eq!(limbs_mod_limb_alt_2(ns, d), r);
+        assert_eq!(limbs_mod_limb::<DoubleLimb, Limb>(ns, d), r);
+        assert_eq!(
+            limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(ns, d),
+            r
+        );
+        assert_eq!(
+            limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(ns, d),
+            r
+        );
+        assert_eq!(limbs_mod_limb_alt_1::<DoubleLimb, Limb>(ns, d), r);
+        assert_eq!(limbs_mod_limb_alt_2::<DoubleLimb, Limb>(ns, d), r);
         assert_eq!(limbs_mod_limb_alt_3(ns, d), r);
     };
     test(&[0, 0], 2, 0);
@@ -111,49 +117,52 @@ fn test_limbs_mod_limb() {
 #[test]
 #[should_panic]
 fn limbs_mod_limb_fail_1() {
-    limbs_mod_limb(&[10], 10);
+    limbs_mod_limb::<DoubleLimb, Limb>(&[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_fail_2() {
-    limbs_mod_limb(&[10, 10], 0);
+    limbs_mod_limb::<DoubleLimb, Limb>(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_any_leading_zeros_1_fail_1() {
-    limbs_mod_limb_any_leading_zeros_1(&[10], 10);
+    limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(&[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_any_leading_zeros_1_fail_2() {
-    limbs_mod_limb_any_leading_zeros_1(&[10, 10], 0);
+    limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_any_leading_zeros_2_fail_1() {
-    limbs_mod_limb_any_leading_zeros_2(&[10], 10);
+    limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(&[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_any_leading_zeros_2_fail_2() {
-    limbs_mod_limb_any_leading_zeros_2(&[10, 10], 0);
+    limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_limb_small_normalized() {
     let test = |ns: &[Limb], d: Limb, r: Limb| {
-        assert_eq!(limbs_mod_limb_small_normalized(ns, d), r);
+        assert_eq!(
+            limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(ns, d),
+            r
+        );
     };
     test(&[0x80000123], 0x80000000, 0x123);
     test(&[0, 0], 0xa0000000, 0);
@@ -169,22 +178,28 @@ fn test_limbs_mod_limb_small_normalized() {
 #[test]
 #[should_panic]
 fn limbs_mod_limb_small_normalized_fail_1() {
-    limbs_mod_limb_small_normalized(&[], u32::MAX);
+    limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&[], u32::MAX);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_small_normalized_fail_2() {
-    limbs_mod_limb_small_normalized(&[10, 10], 0);
+    limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_limb_small_unnormalized() {
     let test = |ns: &[Limb], d: Limb, r: Limb| {
-        assert_eq!(limbs_mod_limb_small_unnormalized(ns, d), r);
-        assert_eq!(limbs_mod_limb_at_least_1_leading_zero(ns, d), r);
+        assert_eq!(
+            limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(ns, d),
+            r
+        );
+        assert_eq!(
+            limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(ns, d),
+            r
+        );
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
@@ -212,35 +227,38 @@ fn test_limbs_mod_limb_small_unnormalized() {
 #[test]
 #[should_panic]
 fn limbs_mod_limb_small_unnormalized_fail_1() {
-    limbs_mod_limb_small_unnormalized(&[], 10);
+    limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_small_unnormalized_fail_2() {
-    limbs_mod_limb_small_unnormalized(&[10, 10], u32::MAX);
+    limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(&[10, 10], u32::MAX);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_at_least_1_leading_zero_fail_1() {
-    limbs_mod_limb_at_least_1_leading_zero(&[], 10);
+    limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_at_least_1_leading_zero_fail_2() {
-    limbs_mod_limb_at_least_1_leading_zero(&[10, 10], u32::MAX);
+    limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(&[10, 10], u32::MAX);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_limb_at_least_2_leading_zeros() {
     let test = |ns: &[Limb], d: Limb, r: Limb| {
-        assert_eq!(limbs_mod_limb_at_least_2_leading_zeros(ns, d), r);
+        assert_eq!(
+            limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(ns, d),
+            r
+        );
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
@@ -266,14 +284,14 @@ fn test_limbs_mod_limb_at_least_2_leading_zeros() {
 #[test]
 #[should_panic]
 fn limbs_mod_limb_at_least_2_leading_zeros_fail_1() {
-    limbs_mod_limb_at_least_2_leading_zeros(&[], 10);
+    limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mod_limb_at_least_2_leading_zeros_fail_2() {
-    limbs_mod_limb_at_least_2_leading_zeros(&[10, 10], 0x7fffffff);
+    limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(&[10, 10], 0x7fffffff);
 }
 
 fn verify_limbs_mod_three_limb_by_two_limb(
@@ -12725,12 +12743,18 @@ fn limbs_mod_limb_properties() {
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_unsigned_pair_gen_var_22().test_properties_with_config(&config, |(ns, d)| {
-        let r = limbs_mod_limb(&ns, d);
+        let r = limbs_mod_limb::<DoubleLimb, Limb>(&ns, d);
         assert_eq!(Natural::from_limbs_asc(&ns) % Natural::from(d), r);
-        assert_eq!(limbs_mod_limb_any_leading_zeros_1(&ns, d), r);
-        assert_eq!(limbs_mod_limb_any_leading_zeros_2(&ns, d), r);
-        assert_eq!(limbs_mod_limb_alt_1(&ns, d), r);
-        assert_eq!(limbs_mod_limb_alt_2(&ns, d), r);
+        assert_eq!(
+            limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(&ns, d),
+            r
+        );
+        assert_eq!(
+            limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(&ns, d),
+            r
+        );
+        assert_eq!(limbs_mod_limb_alt_1::<DoubleLimb, Limb>(&ns, d), r);
+        assert_eq!(limbs_mod_limb_alt_2::<DoubleLimb, Limb>(&ns, d), r);
         assert_eq!(limbs_mod_limb_alt_3(&ns, d), r);
     });
 }
@@ -12741,12 +12765,12 @@ fn limbs_mod_limb_small_normalized_properties() {
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_unsigned_pair_gen_var_26().test_properties_with_config(&config, |(ns, d)| {
-        let r = limbs_mod_limb_small_normalized(&ns, d);
+        let r = limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&ns, d);
         assert_eq!(r, Natural::from_limbs_asc(&ns) % Natural::from(d));
         if ns.len() == 1 {
             assert_eq!(r, ns[0] % d);
         } else {
-            assert_eq!(r, limbs_mod_limb(&ns, d));
+            assert_eq!(r, limbs_mod_limb::<DoubleLimb, Limb>(&ns, d));
         }
     });
 }
@@ -12757,13 +12781,16 @@ fn limbs_mod_limb_small_unnormalized_properties() {
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_unsigned_pair_gen_var_27().test_properties_with_config(&config, |(ns, d)| {
-        let r = limbs_mod_limb_small_unnormalized(&ns, d);
-        assert_eq!(r, limbs_mod_limb_at_least_1_leading_zero(&ns, d));
+        let r = limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(&ns, d);
+        assert_eq!(
+            r,
+            limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(&ns, d)
+        );
         assert_eq!(r, Natural::from_limbs_asc(&ns) % Natural::from(d));
         if ns.len() == 1 {
             assert_eq!(r, ns[0] % d);
         } else {
-            assert_eq!(r, limbs_mod_limb(&ns, d));
+            assert_eq!(r, limbs_mod_limb::<DoubleLimb, Limb>(&ns, d));
         }
     });
 }
@@ -12774,12 +12801,12 @@ fn limbs_mod_limb_at_least_2_leading_zeros_properties() {
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_unsigned_pair_gen_var_28().test_properties_with_config(&config, |(ns, d)| {
-        let r = limbs_mod_limb_at_least_2_leading_zeros(&ns, d);
+        let r = limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(&ns, d);
         assert_eq!(r, Natural::from_limbs_asc(&ns) % Natural::from(d));
         if ns.len() == 1 {
             assert_eq!(r, ns[0] % d);
         } else {
-            assert_eq!(r, limbs_mod_limb(&ns, d));
+            assert_eq!(r, limbs_mod_limb::<DoubleLimb, Limb>(&ns, d));
         }
     });
 }

@@ -2022,6 +2022,17 @@ fn test_double_factorial() {
         884362743953738057721709446884608434913698856509684431470876923079372190040412643076525278\
         35572579953211852767587427960391216326823983495675207677777507342398166656494140625",
     );
+    fn big_test(n: u64) {
+        let f = Natural::double_factorial(n);
+        assert!(f.is_valid());
+        assert_eq!(double_factorial_naive(n), f);
+        assert_eq!(
+            Natural::exact_from(&rug::Integer::factorial_2(u32::exact_from(n)).complete()),
+            f
+        );
+    }
+    // - prod > max_prod for prime == 3 in limbs_2_multiswing_odd
+    big_test(65539);
 }
 
 #[test]

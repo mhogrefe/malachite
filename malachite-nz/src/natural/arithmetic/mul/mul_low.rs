@@ -23,10 +23,9 @@ use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
     limbs_mul_same_length_to_out_scratch_len,
 };
-use crate::platform::Limb;
 use crate::platform::{
-    MUL_TOOM8H_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
-    MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD,
+    DoubleLimb, Limb, MUL_TOOM8H_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
+    MUL_TOOM44_THRESHOLD, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD,
 };
 use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 
@@ -51,7 +50,7 @@ pub_crate_test! {limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb
         let (xs_last, xs_init) = xs.split_last().unwrap();
         let product = xs_last
             .wrapping_mul(y)
-            .wrapping_add(limbs_mul_limb_to_out(out_init, xs_init, y));
+            .wrapping_add(limbs_mul_limb_to_out::<DoubleLimb, Limb>(out_init, xs_init, y));
         p.wrapping_add_assign(product);
         let m = n - 1;
         for i in 1..m {
@@ -350,7 +349,7 @@ pub_crate_test! {limbs_mul_low_same_length_basecase_alt(
     assert_ne!(n, 0);
     assert_eq!(ys.len(), n);
     let out = &mut out[..n];
-    limbs_mul_limb_to_out(out, xs, ys[0]);
+    limbs_mul_limb_to_out::<DoubleLimb, Limb>(out, xs, ys[0]);
     for i in 1..n {
         limbs_slice_add_mul_limb_same_length_in_place_left(&mut out[i..], &xs[..n - i], ys[i]);
     }

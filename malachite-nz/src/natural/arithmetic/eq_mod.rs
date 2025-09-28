@@ -171,7 +171,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
         if m_1 < Limb::power_of_2(m_0_trailing_zeros) {
             let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-                let r = limbs_mod_limb(xs, m_0);
+                let r = limbs_mod_limb::<DoubleLimb, Limb>(xs, m_0);
                 if y < m_0 { r == y } else { r == y % m_0 }
             } else {
                 let r = limbs_mod_exact_odd_limb(xs, m_0, y);

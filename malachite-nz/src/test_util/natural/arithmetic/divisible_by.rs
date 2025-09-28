@@ -12,7 +12,7 @@
 
 use crate::natural::arithmetic::divisible_by::limbs_divisible_by_limb;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb;
-use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, DoubleLimb, Limb};
 use num::{BigUint, Integer, Zero};
 
 pub fn num_divisible_by(x: &BigUint, y: &BigUint) -> bool {
@@ -30,6 +30,6 @@ pub fn combined_limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     if ns.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_divisible_by_limb(ns, d)
     } else {
-        limbs_mod_limb(ns, d) == 0
+        limbs_mod_limb::<DoubleLimb, Limb>(ns, d) == 0
     }
 }

@@ -11,9 +11,6 @@ use malachite_base::test_util::bench::bucketers::pair_2_vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::mul::fft::{
-    limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
-};
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
@@ -43,7 +40,6 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_limbs_square_to_out_toom_4_algorithms);
     register_bench!(runner, benchmark_limbs_square_to_out_toom_6_algorithms);
     register_bench!(runner, benchmark_limbs_square_to_out_toom_8_algorithms);
-    register_bench!(runner, benchmark_limbs_square_to_out_fft_algorithms);
     register_bench!(runner, benchmark_natural_square_assign);
     register_bench!(runner, benchmark_natural_square_algorithms);
     register_bench!(runner, benchmark_natural_square_evaluation_strategy);
@@ -234,33 +230,6 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
             ("Toom8", &mut |(mut out, xs)| {
                 let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(xs.len())];
                 limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
-            }),
-        ],
-    );
-}
-
-fn benchmark_limbs_square_to_out_fft_algorithms(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        "limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb]) for squaring",
-        BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_28().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &pair_2_vec_len_bucketer("xs"),
-        &mut [
-            ("Toom8", &mut |(mut out, xs)| {
-                let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(xs.len())];
-                limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
-            }),
-            ("FFT", &mut |(mut out, xs)| {
-                let mut scratch = vec![0; limbs_square_to_out_fft_scratch_len(xs.len())];
-                limbs_square_to_out_fft(&mut out, &xs, &mut scratch)
             }),
         ],
     );

@@ -23,10 +23,6 @@ use malachite_base::test_util::generators::{
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::mul::fft::{
-    limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
-    limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
-};
 use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
     limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
@@ -72,6 +68,7 @@ use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_scratch_len, limbs_mul_same_length_to_out,
     limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
     triple_3_pair_natural_max_bit_bucketer, triple_3_vec_natural_sum_bits_bucketer,
@@ -79,14 +76,13 @@ use malachite_nz::test_util::bench::bucketers::{
 };
 use malachite_nz::test_util::generators::{
     natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm, natural_vec_gen,
-    natural_vec_gen_nrm, unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_4,
-    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7,
-    unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9, unsigned_vec_triple_gen_var_10,
-    unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13,
-    unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16,
-    unsigned_vec_triple_gen_var_18, unsigned_vec_triple_gen_var_19, unsigned_vec_triple_gen_var_20,
-    unsigned_vec_triple_gen_var_22, unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_58,
-    unsigned_vec_triple_gen_var_60,
+    natural_vec_gen_nrm, unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5,
+    unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
+    unsigned_vec_triple_gen_var_9, unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11,
+    unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14,
+    unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_18,
+    unsigned_vec_triple_gen_var_19, unsigned_vec_triple_gen_var_20, unsigned_vec_triple_gen_var_22,
+    unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_58,
 };
 use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
 use malachite_nz::test_util::natural::arithmetic::mul::{
@@ -96,8 +92,6 @@ use num::BigUint;
 use std::iter::Product;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_limbs_mul_greater_to_out_fft);
-    register_demo!(runner, demo_limbs_square_to_out_fft);
     register_demo!(runner, demo_limbs_mul_limb);
     register_demo!(runner, demo_limbs_mul_limb_with_carry_to_out);
     register_demo!(runner, demo_limbs_mul_limb_to_out);
@@ -265,7 +259,6 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_limbs_mul_greater_to_out_toom_8h_same_length_algorithms
     );
-    register_bench!(runner, benchmark_limbs_mul_greater_to_out_fft_algorithms);
     register_bench!(
         runner,
         benchmark_limbs_mul_greater_to_out_toom_32_to_43_algorithms
@@ -274,7 +267,6 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_limbs_mul_greater_to_out_toom_42_to_53_algorithms
     );
-    register_bench!(runner, benchmark_limbs_mul_fft_alt_algorithms);
     register_bench!(
         runner,
         benchmark_limbs_mul_low_same_length_basecase_algorithms
@@ -303,27 +295,6 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_product_evaluation_strategy);
 }
 
-fn demo_limbs_mul_greater_to_out_fft(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_60().get(gm, config).take(limit) {
-        let out_old = out.clone();
-        let mut scratch = vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
-        limbs_mul_greater_to_out_fft(&mut out, &xs, &ys, &mut scratch);
-        println!(
-            "out := {out_old:?}; \
-            limbs_mul_greater_to_out_fft(&mut out, {xs:?}, {ys:?}); out = {out:?}",
-        );
-    }
-}
-
-fn demo_limbs_square_to_out_fft(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_33().get(gm, config).take(limit) {
-        let out_old = out.clone();
-        let mut scratch = vec![0; limbs_square_to_out_fft_scratch_len(xs.len())];
-        limbs_square_to_out_fft(&mut out, &xs, &mut scratch);
-        println!("out := {out_old:?}; limbs_square_to_out_fft(&mut out, {xs:?}); out = {out:?}");
-    }
-}
-
 fn demo_limbs_mul_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y) in unsigned_vec_unsigned_pair_gen().get(gm, config).take(limit) {
         println!(
@@ -338,7 +309,8 @@ fn demo_limbs_mul_limb(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_limbs_mul_limb_with_carry_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut out, xs, y, carry) in large_type_gen_var_1().get(gm, config).take(limit) {
         let out_old = out.clone();
-        let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, &xs, y, carry);
+        let carry_out =
+            limbs_mul_limb_with_carry_to_out::<DoubleLimb, Limb>(&mut out, &xs, y, carry);
         println!(
             "out := {out_old:?}; \
             limbs_mul_limb_with_carry_to_out(&mut out, {xs:?}, {y}, {carry}) = {carry_out}; \
@@ -353,7 +325,7 @@ fn demo_limbs_mul_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
         .take(limit)
     {
         let out_old = out.clone();
-        let carry = limbs_mul_limb_to_out(&mut out, &xs, y);
+        let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y);
         println!(
             "out := {out_old:?}; \
             limbs_mul_limb_to_out(&mut out, {xs:?}, {y}) = {carry}; out = {out:?}",
@@ -522,7 +494,7 @@ fn demo_limbs_mul_greater_to_out_toom_33_and_toom_44_input_sizes_valid(
 ) {
     for (x, y) in unsigned_pair_gen_var_27().get(gm, config).take(limit) {
         println!(
-            concat!("Toom-33 and Toom-44 ({}, {}) = {}"),
+            "Toom-33 and Toom-44 ({}, {}) = {}",
             x,
             y,
             limbs_mul_greater_to_out_toom_33_input_sizes_valid(x, y)
@@ -685,7 +657,9 @@ fn benchmark_limbs_mul_limb_with_carry_to_out(
         file_name,
         &quadruple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, y, carry)| {
-            no_out!(limbs_mul_limb_with_carry_to_out(&mut out, &xs, y, carry))
+            no_out!(limbs_mul_limb_with_carry_to_out::<DoubleLimb, Limb>(
+                &mut out, &xs, y, carry
+            ))
         })],
     );
 }
@@ -700,7 +674,7 @@ fn benchmark_limbs_mul_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, y)| {
-            no_out!(limbs_mul_limb_to_out(&mut out, &xs, y))
+            no_out!(limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y))
         })],
     );
 }
@@ -839,7 +813,7 @@ fn benchmark_limbs_mul_greater_to_out_algorithms(
                     &mut out,
                     &xs,
                     &ys,
-                    &mut mul_scratch
+                    &mut mul_scratch,
                 ))
             }),
         ],
@@ -1065,33 +1039,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
     );
 }
 
-fn benchmark_limbs_mul_greater_to_out_fft_algorithms(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        "limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        unsigned_vec_triple_gen_var_2().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &triple_2_vec_len_bucketer("xs"),
-        &mut [
-            ("basecase", &mut |(mut out, xs, ys)| {
-                limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)
-            }),
-            ("FFT", &mut |(mut out, xs, ys)| {
-                let mut scratch =
-                    vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
-                limbs_mul_greater_to_out_fft(&mut out, &xs, &ys, &mut scratch)
-            }),
-        ],
-    );
-}
-
 fn benchmark_limbs_mul_greater_to_out_toom_33_same_length_algorithms(
     gm: GenMode,
     config: &GenConfig,
@@ -1269,35 +1216,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_42_to_53_algorithms(
                 let mut scratch =
                     vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
                 limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch)
-            }),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_fft_alt_algorithms(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        "limbs_mul_fft_alt(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        unsigned_vec_triple_gen_var_20().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &triple_2_vec_len_bucketer("xs"),
-        &mut [
-            ("Toom8h", &mut |(mut out, xs, ys)| {
-                let mut scratch =
-                    vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
-                limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
-            }),
-            ("FFT", &mut |(mut out, xs, ys)| {
-                let mut scratch =
-                    vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
-                limbs_mul_greater_to_out_fft(&mut out, &xs, &ys, &mut scratch)
             }),
         ],
     );

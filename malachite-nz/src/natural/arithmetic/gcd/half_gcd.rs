@@ -179,7 +179,7 @@ impl HalfGcdMatrix<'_> {
     //
     // This is equivalent to `mpn_hgcd_matrix_init` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1,
     // where the matrix is returned.
-    pub_crate_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix {
+    pub_crate_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix<'_> {
         let s = n.div_ceil(2) + 1;
         let two_s = s << 1;
         let three_s = two_s + s;
@@ -666,7 +666,7 @@ pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
     assert!(out.len() > n);
     let (out_lo, out_hi) = out.split_at_mut(n);
     let (ys_lo, ys_hi) = ys.split_at_mut(n);
-    let mut x_high = limbs_mul_limb_to_out(out_lo, xs, m.data[0][0]);
+    let mut x_high = limbs_mul_limb_to_out::<DoubleLimb, Limb>(out_lo, xs, m.data[0][0]);
     x_high.wrapping_add_assign(
         limbs_slice_add_mul_limb_same_length_in_place_left(out_lo, ys_lo, m.data[1][0])
     );
@@ -709,7 +709,7 @@ pub(crate) fn limbs_half_gcd_matrix_1_mul_inverse_vector(
     let n = xs.len();
     assert_eq!(ys.len(), n);
     assert_eq!(out.len(), n);
-    let h0 = limbs_mul_limb_to_out(out, xs, m.data[1][1]);
+    let h0 = limbs_mul_limb_to_out::<DoubleLimb, Limb>(out, xs, m.data[1][1]);
     let h1 = limbs_sub_mul_limb_same_length_in_place_left(out, ys, m.data[0][1]);
     assert_eq!(h0, h1);
     let h0 = limbs_slice_mul_limb_in_place(ys, m.data[0][0]);

@@ -16,7 +16,8 @@ use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::XMulYToZZ;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{HasHalf, SplitInHalf};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the product of the `Natural` and a `Limb`.
@@ -60,15 +61,18 @@ pub_test! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mul_1c` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_limb_with_carry_to_out(
-    out: &mut [Limb],
-    xs: &[Limb],
-    y: Limb,
-    mut carry: Limb,
-) -> Limb {
-    let y = DoubleLimb::from(y);
+pub_crate_test! {limbs_mul_limb_with_carry_to_out<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    out: &mut [T],
+    xs: &[T],
+    y: T,
+    mut carry: T,
+) -> T {
+    let y = DT::from(y);
     for (out, x) in out[..xs.len()].iter_mut().zip(xs.iter()) {
-        let product = DoubleLimb::from(*x) * y + DoubleLimb::from(carry);
+        let product = DT::from(*x) * y + DT::from(carry);
         (carry, *out) = product.split_in_half();
     }
     carry
@@ -89,8 +93,15 @@ pub_crate_test! {limbs_mul_limb_with_carry_to_out(
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
-    limbs_mul_limb_with_carry_to_out(out, xs, y, 0)
+pub_crate_test! {limbs_mul_limb_to_out<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    out: &mut [T],
+    xs: &[T],
+    y: T,
+) -> T {
+    limbs_mul_limb_with_carry_to_out::<DT, T>(out, xs, y, T::ZERO)
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the

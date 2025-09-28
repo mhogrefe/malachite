@@ -1761,6 +1761,15 @@ pub fn unsigned_gen_var_29<T: PrimitiveUnsigned + IsPrime>() -> Generator<T> {
     )
 }
 
+// All `u64`s that are equal to valid scientific exponents for the float type `T`.
+pub fn unsigned_gen_var_30<T: PrimitiveFloat>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_29::<T>,
+        &random_signed_gen_var_29::<T>,
+        &special_random_unsigned_gen_var_26::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

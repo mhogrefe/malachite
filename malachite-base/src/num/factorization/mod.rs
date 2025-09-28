@@ -8,24 +8,43 @@
 
 /// [`Factor`](traits::Factor), a trait for computing the prime factorization of a number.
 pub mod factor;
-/// [`IsPerfectPower`](traits::IsPerfectPower), a trait for testing if a number is a perfect power.
+/// [`IsPower`](traits::IsPower) and [`ExpressAsPower`](traits::ExpressAsPower), traits for testing
+/// if a number is a perfect power and, if it is, expressing it as such.
 ///
-/// # is_perfect_power
+/// # is_power
 /// ```
-/// use malachite_base::num::factorization::traits::IsPerfectPower;
+/// use malachite_base::num::factorization::traits::IsPower;
 ///
-/// assert_eq!(0u8.is_perfect_power().unwrap(), (0, 2));
-/// assert_eq!(1u16.is_perfect_power().unwrap(), (1, 2));
-/// assert_eq!(36u32.is_perfect_power().unwrap(), (6, 2));
-/// assert_eq!(100u64.is_perfect_power().unwrap(), (10, 2));
-/// assert_eq!(1728u64.is_perfect_power().unwrap(), (12, 3));
+/// assert!(0u8.is_power());
+/// assert!(1u16.is_power());
+/// assert!(36u32.is_power());
+/// assert!(64u32.is_power());
+/// assert!(100u64.is_power());
+/// assert!(1728u64.is_power());
 ///
-/// assert!(0u8.is_perfect_power().is_some());
-/// assert!(1u16.is_perfect_power().is_some());
-/// assert!(2u64.is_perfect_power().is_none());
-/// assert!(3u64.is_perfect_power().is_none());
+/// assert!(0u8.is_power());
+/// assert!(1u16.is_power());
+/// assert!(!2u64.is_power());
+/// assert!(!3u64.is_power());
 /// ```
-pub mod is_perfect_power;
+///
+/// # express_as_power
+/// ```
+/// use malachite_base::num::factorization::traits::ExpressAsPower;
+///
+/// assert_eq!(0u8.express_as_power().unwrap(), (0, 2));
+/// assert_eq!(1u16.express_as_power().unwrap(), (1, 2));
+/// assert_eq!(36u32.express_as_power().unwrap(), (6, 2));
+/// assert_eq!(64u32.express_as_power().unwrap(), (2, 6));
+/// assert_eq!(100u64.express_as_power().unwrap(), (10, 2));
+/// assert_eq!(1728u64.express_as_power().unwrap(), (12, 3));
+///
+/// assert!(0u8.express_as_power().is_some());
+/// assert!(1u16.express_as_power().is_some());
+/// assert!(2u64.express_as_power().is_none());
+/// assert!(3u64.express_as_power().is_none());
+/// ```
+pub mod is_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
 /// [`IsSquare`](traits::IsSquare), a trait for testing if a number if a perfect square.
@@ -102,6 +121,17 @@ pub mod prime_sieve;
 /// );
 /// ```
 pub mod primes;
+/// [`PrimitiveRootPrime`](traits::PrimitiveRootPrime), a trait for finding a primitive root modulo
+/// a prime number.
+///
+/// # primitive_root_prime
+/// ```
+/// use malachite_base::num::factorization::traits::PrimitiveRootPrime;
+///
+/// assert_eq!(5u32.primitive_root_prime(), 2);
+/// assert_eq!(191u32.primitive_root_prime(), 19);
+/// assert_eq!(4294967291u32.primitive_root_prime(), 2);
+/// ```
 pub mod primitive_root_prime;
 /// Various traits for generating primes, primality testing, and factorization.
 pub mod traits;

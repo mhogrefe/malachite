@@ -212,12 +212,12 @@ pub fn limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) -> 
         } else {
             0
         };
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         limbs_div_limb_normalized_to_out_mod(out_init, ns_init, ns_last, d, d_inv)
     } else {
         let d = d << bits;
         let ns_last = limbs_shl_to_out(out, ns, bits);
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let (out_last, out_init) = out.split_last_mut().unwrap();
         let (q, r) = div_mod_by_preinversion(ns_last, *out_last, d, d_inv);
         *out_last = q;
@@ -241,12 +241,12 @@ pub fn limbs_div_limb_in_place_mod_alt(ns: &mut [Limb], d: Limb) -> Limb {
         } else {
             0
         };
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         limbs_div_limb_normalized_in_place_mod(&mut ns[..len_minus_1], ns_last, d, d_inv)
     } else {
         let d = d << bits;
         let ns_last = limbs_slice_shl_in_place(ns, bits);
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let (q, r) = div_mod_by_preinversion(ns_last, ns[len_minus_1], d, d_inv);
         ns[len_minus_1] = q;
         limbs_div_limb_normalized_in_place_mod(&mut ns[..len_minus_1], r, d, d_inv) >> bits

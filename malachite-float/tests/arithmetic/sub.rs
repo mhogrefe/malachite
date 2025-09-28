@@ -11491,14 +11491,20 @@ fn sub_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
         diff_alt.neg_assign();
         diff_alt.abs_negative_zero_assign();
         o_alt = o_alt.reverse();
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(
+            ComparableFloatRef(&diff_alt),
+            ComparableFloatRef(&diff.abs_negative_zero_ref())
+        );
         assert_eq!(o_alt, o);
 
         let (mut diff_alt, mut o_alt) = (-x).sub_prec(-y, prec);
         diff_alt.neg_assign();
         diff_alt.abs_negative_zero_assign();
         o_alt = o_alt.reverse();
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(
+            ComparableFloatRef(&diff_alt),
+            ComparableFloatRef(&diff.abs_negative_zero())
+        );
         assert_eq!(o_alt, o);
     }
 }

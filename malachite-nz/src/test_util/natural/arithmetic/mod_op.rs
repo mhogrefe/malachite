@@ -12,7 +12,7 @@
 
 use crate::natural::arithmetic::div_mod::limbs_invert_limb;
 use crate::natural::arithmetic::mod_op::mod_by_preinversion;
-use crate::platform::Limb;
+use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
 use rug::ops::RemRounding;
@@ -43,9 +43,9 @@ pub fn limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
             r -= d;
         }
         // Multiply-by-inverse, divisor already normalized.
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         for n in ns_init.iter().rev() {
-            r = mod_by_preinversion(r, *n, d, d_inv);
+            r = mod_by_preinversion::<DoubleLimb, Limb>(r, *n, d, d_inv);
         }
         r
     } else {
@@ -58,16 +58,16 @@ pub fn limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
         };
         let d = d << bits;
         r <<= bits;
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let (ns_last, ns_init) = ns.split_last().unwrap();
         let mut previous_n = *ns_last;
         let cobits = Limb::WIDTH - bits;
         r |= previous_n >> cobits;
         for &n in ns_init.iter().rev() {
             let shifted_n = (previous_n << bits) | (n >> cobits);
-            r = mod_by_preinversion(r, shifted_n, d, d_inv);
+            r = mod_by_preinversion::<DoubleLimb, Limb>(r, shifted_n, d, d_inv);
             previous_n = n;
         }
-        mod_by_preinversion(r, previous_n << bits, d, d_inv) >> bits
+        mod_by_preinversion::<DoubleLimb, Limb>(r, previous_n << bits, d, d_inv) >> bits
     }
 }

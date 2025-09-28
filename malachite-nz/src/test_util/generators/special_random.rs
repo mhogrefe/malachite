@@ -24,9 +24,6 @@ use crate::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use crate::natural::arithmetic::mul::fft::{
-    limbs_mul_greater_to_out_fft_is_valid, limbs_square_to_out_fft_is_valid,
-};
 use crate::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
@@ -58,7 +55,7 @@ use crate::natural::random::{
     striped_random_natural_range, striped_random_natural_range_to_infinity,
     striped_random_naturals, striped_random_positive_naturals,
 };
-use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
+use crate::platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
     random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
@@ -5733,16 +5730,6 @@ pub fn special_random_unsigned_vec_pair_gen_var_29<T: PrimitiveUnsigned>(
 
 // vars 32 to 33 are in malachite-base.
 
-pub fn special_random_unsigned_vec_pair_gen_var_34<T: PrimitiveUnsigned>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>)> {
-    #[cfg(feature = "32_bit_limbs")]
-    let limit = 56;
-    #[cfg(not(feature = "32_bit_limbs"))]
-    let limit = 28;
-    special_random_square_helper(config, &limbs_square_to_out_fft_is_valid, limit)
-}
-
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // var 1 is in malachite-base
@@ -6962,44 +6949,6 @@ pub fn special_random_unsigned_vec_triple_gen_var_58<T: PrimitiveUnsigned>(
 
 // var 59 is in malachite-base.
 
-pub fn special_random_unsigned_vec_triple_gen_var_60<T: PrimitiveUnsigned>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    #[cfg(feature = "32_bit_limbs")]
-    let limit = 112;
-    #[cfg(not(feature = "32_bit_limbs"))]
-    let limit = 56;
-    Box::new(UnsignedVecTripleLenGenerator1 {
-        phantom: PhantomData,
-        lengths: random_triples_from_single(geometric_random_positive_unsigneds::<u64>(
-            EXAMPLE_SEED.fork("lengths"),
-            config.get_or("mean_length_n", 4),
-            config.get_or("mean_length_d", 1),
-        ))
-        .filter_map(move |(o, mut x, mut y)| {
-            let sum = x + y;
-            if sum <= limit {
-                if o.odd() {
-                    x += limit - sum + 1;
-                } else {
-                    y += limit - sum + 1;
-                }
-            }
-            if limbs_mul_greater_to_out_fft_is_valid(usize::exact_from(x), usize::exact_from(y)) {
-                let o = x.checked_add(y)?.checked_add(o)?;
-                Some((o, x, y))
-            } else {
-                None
-            }
-        }),
-        striped_bit_source: StripedBitSource::new(
-            EXAMPLE_SEED.fork("striped_bit_source"),
-            config.get_or("mean_stripe_n", T::WIDTH >> 1),
-            config.get_or("mean_stripe_d", 1),
-        ),
-    })
-}
-
 // -- (Vec<PrimitiveUnsigned> * 4) --
 
 #[allow(clippy::type_complexity)]
@@ -7618,7 +7567,7 @@ pub fn special_random_large_type_gen_var_13(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -7653,7 +7602,7 @@ pub fn special_random_large_type_gen_var_14(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -7690,7 +7639,7 @@ pub fn special_random_large_type_gen_var_15(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -7719,7 +7668,7 @@ pub fn special_random_large_type_gen_var_16(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -7740,7 +7689,7 @@ pub fn special_random_large_type_gen_var_17(
         )
         .map(|mut d| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             let is = vec![0; d.len()];
             let scratch = vec![0; limbs_modular_invert_scratch_len(d.len())];
             (is, scratch, d, inverse)
@@ -7783,7 +7732,7 @@ pub fn special_random_large_type_gen_var_18(
                 None
             } else {
                 let shift = LeadingZeros::leading_zeros(d);
-                let d_inv = limbs_invert_limb(d << shift);
+                let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
                 Some((ns, fraction_len, d, d_inv, shift))
             }
         }),
@@ -7826,7 +7775,7 @@ pub fn special_random_large_type_gen_var_19(
                 None
             } else {
                 let shift = LeadingZeros::leading_zeros(d);
-                let d_inv = limbs_invert_limb(d << shift);
+                let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
                 Some((out, fraction_len, ns, d, d_inv, shift))
             }
         }),

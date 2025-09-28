@@ -229,7 +229,7 @@ impl Natural {
     //
     // # Worst-case complexity
     // Constant time and additional memory.
-    fn negative_bits(&self) -> NegativeBitIterator {
+    fn negative_bits(&self) -> NegativeBitIterator<'_> {
         assert_ne!(*self, 0, "Cannot get negative bits of 0.");
         let bits = self.bits();
         NegativeBitIterator {

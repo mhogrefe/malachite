@@ -31,7 +31,9 @@ fn test_from_str() {
         assert_eq!(rug::Integer::from_str(s).unwrap().to_string(), n);
     };
     test_ok("0", "0");
+    test_ok("+0", "0");
     test_ok("123456", "123456");
+    test_ok("+123456", "123456");
     test_ok("1000000000000000000000000", "1000000000000000000000000");
 
     let test_err = |s, rug_err| {
@@ -47,6 +49,7 @@ fn test_from_str() {
     test_err("$%^", true);
     test_err("", true);
     test_err("-", true);
+    test_err("-0", false);
     test_err("--0", true);
     test_err("-+0", true);
     test_err("+-0", true);

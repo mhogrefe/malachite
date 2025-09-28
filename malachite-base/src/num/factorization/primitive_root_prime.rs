@@ -80,13 +80,7 @@ macro_rules! impl_primitive_root_prime {
             /// Panics if `self` is 0, and possibly panics if `self` is not prime.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::factorization::traits::PrimitiveRootPrime;
-            ///
-            /// assert_eq!(5u32.primitive_root_prime(), 2);
-            /// assert_eq!(191u32.primitive_root_prime(), 19);
-            /// assert_eq!(4294967291u32.primitive_root_prime(), 2);
-            /// ```
+            /// See [here](super::primitive_root_prime#primitive_root_prime).
             #[inline]
             fn primitive_root_prime(&self) -> $t {
                 primitive_root_prime::<$t, $n>(*self)

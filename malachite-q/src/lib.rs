@@ -110,7 +110,10 @@
     clippy::unnested_or_patterns,
     clippy::trivially_copy_pass_by_ref
 )]
-#![cfg_attr(not(any(feature = "test_build", feature = "random")), no_std)]
+#![cfg_attr(
+    not(any(feature = "test_build", feature = "random", feature = "std")),
+    no_std
+)]
 
 extern crate alloc;
 

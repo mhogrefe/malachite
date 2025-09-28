@@ -39,6 +39,8 @@ use crate::num::conversion::traits::{
     OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
     ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
+#[cfg(feature = "random")]
+use crate::num::factorization::traits::IsSquare;
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -201,6 +203,7 @@ pub trait PrimitiveInt:
     + HasRandomPrimitiveInts
     + Hash
     + IsInteger
+    + IsSquare
     + JacobiSymbol<Self>
     + KroneckerSymbol<Self>
     + LeadingZeros

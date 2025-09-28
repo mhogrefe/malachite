@@ -52,7 +52,7 @@ use std::str::FromStr;
 #[test]
 fn test_limbs_invert_limb() {
     let test = |x: Limb, inv: Limb| {
-        assert_eq!(limbs_invert_limb(x), inv);
+        assert_eq!(limbs_invert_limb::<DoubleLimb, Limb>(x), inv);
     };
     test(0x80000000, u32::MAX);
     test(0x80000001, 0xfffffffc);
@@ -224,7 +224,7 @@ fn test_limbs_div_mod_extra() {
                 out_after: &[Limb]| {
         let mut out = out_before.to_vec();
         let shift = LeadingZeros::leading_zeros(d);
-        let d_inv = limbs_invert_limb(d << shift);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
         assert_eq!(
             limbs_div_mod_extra(&mut out, fraction_len, ns, d, d_inv, shift),
             r
@@ -292,7 +292,7 @@ fn test_limbs_div_mod_extra() {
 fn limbs_div_mod_extra_fail_1() {
     let d = 7;
     let shift = LeadingZeros::leading_zeros(d);
-    let d_inv = limbs_invert_limb(d << shift);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
     limbs_div_mod_extra(&mut [10; 2], 1, &[123, 456], d, d_inv, shift);
 }
 
@@ -309,7 +309,7 @@ fn limbs_div_mod_extra_fail_2() {
 fn limbs_div_mod_extra_fail_3() {
     let d = 7;
     let shift = LeadingZeros::leading_zeros(d);
-    let d_inv = limbs_invert_limb(d << shift);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
     limbs_div_mod_extra(&mut [10; 4], 1, &[], d, d_inv, shift);
 }
 
@@ -338,7 +338,7 @@ fn test_limbs_div_mod_extra_in_place() {
     let test = |ns_before: &[Limb], fraction_len: usize, d: Limb, r: Limb, ns_after: &[Limb]| {
         let mut ns = ns_before.to_vec();
         let shift = LeadingZeros::leading_zeros(d);
-        let d_inv = limbs_invert_limb(d << shift);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
         assert_eq!(
             limbs_div_mod_extra_in_place(&mut ns, fraction_len, d, d_inv, shift),
             r
@@ -381,7 +381,7 @@ fn limbs_div_mod_extra_in_place_fail_1() {
 fn limbs_div_mod_extra_in_place_fail_2() {
     let d = 7;
     let shift = LeadingZeros::leading_zeros(d);
-    let d_inv = limbs_invert_limb(d << shift);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
     limbs_div_mod_extra_in_place(&mut [], 0, d, d_inv, shift);
 }
 
@@ -391,7 +391,7 @@ fn limbs_div_mod_extra_in_place_fail_2() {
 fn limbs_div_mod_extra_in_place_fail_3() {
     let d = 7;
     let shift = LeadingZeros::leading_zeros(d);
-    let d_inv = limbs_invert_limb(d << shift);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
     limbs_div_mod_extra_in_place(&mut [123, 456], 2, d, d_inv, shift);
 }
 
@@ -23655,7 +23655,7 @@ fn ceiling_div_neg_mod_ref_ref_fail() {
 #[test]
 fn limbs_invert_limb_properties() {
     unsigned_gen_var_12().test_properties(|x| {
-        limbs_invert_limb(x);
+        limbs_invert_limb::<DoubleLimb, Limb>(x);
     });
 }
 

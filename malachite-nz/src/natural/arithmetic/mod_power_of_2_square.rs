@@ -114,7 +114,7 @@ pub_test! {limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
             // must fit n - 1 limbs in scratch
             assert!(n <= SQRLO_DC_THRESHOLD_LIMIT);
             let scratch = &mut scratch[..n - 1];
-            limbs_mul_limb_to_out(scratch, &xs[1..], xs_0);
+            limbs_mul_limb_to_out::<DoubleLimb, Limb>(scratch, &xs[1..], xs_0);
             for i in 1.. {
                 let two_i = i << 1;
                 if two_i >= n - 1 {

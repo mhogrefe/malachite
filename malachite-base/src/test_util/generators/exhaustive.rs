@@ -1938,6 +1938,13 @@ pub fn exhaustive_unsigned_gen_var_28<T: PrimitiveUnsigned>() -> It<T> {
     Box::new(T::primes())
 }
 
+pub fn exhaustive_unsigned_gen_var_29<T: PrimitiveFloat>() -> It<u64> {
+    Box::new(primitive_int_increasing_inclusive_range(
+        0,
+        u64::exact_from(T::MAX_EXPONENT),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn exhaustive_unsigned_primitive_int_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>()

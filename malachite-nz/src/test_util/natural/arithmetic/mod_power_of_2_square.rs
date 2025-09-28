@@ -27,7 +27,7 @@ pub fn limbs_square_low_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
         }
         _ => {
             let mut scratch = vec![0; n - 1];
-            limbs_mul_limb_to_out(&mut scratch, &xs[1..], xs_0);
+            limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut scratch, &xs[1..], xs_0);
             for i in 1.. {
                 let two_i = i << 1;
                 if two_i >= n - 1 {

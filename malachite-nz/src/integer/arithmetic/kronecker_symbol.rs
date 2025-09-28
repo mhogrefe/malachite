@@ -20,7 +20,7 @@ use crate::natural::arithmetic::kronecker_symbol::{
 };
 use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
-use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, DoubleLimb, Limb};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, Parity,
@@ -152,7 +152,7 @@ pub_crate_test! {
         if xs_len > 1 {
             assert!(y_lo.odd());
             x_lo = if xs.len() >= BMOD_1_TO_MOD_1_THRESHOLD {
-                limbs_mod_limb_alt_2(xs, y_lo)
+                limbs_mod_limb_alt_2::<DoubleLimb, Limb>(xs, y_lo)
             } else {
                 if y_lo.get_bit(1) {
                     negate.not_assign();

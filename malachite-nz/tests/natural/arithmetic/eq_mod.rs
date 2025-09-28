@@ -27,7 +27,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_limb_mod_exact_odd_limb, limbs_mod_exact_odd_limb,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     natural_pair_gen, natural_triple_gen, natural_triple_gen_var_1, natural_triple_gen_var_2,
     unsigned_vec_triple_gen_var_54, unsigned_vec_triple_gen_var_55,
@@ -50,7 +50,7 @@ use std::str::FromStr;
 fn test_limbs_eq_limb_mod_limb() {
     let test = |xs: &[Limb], y: Limb, m: Limb, equal: bool| {
         assert_eq!(limbs_eq_limb_mod_limb(xs, y, m), equal);
-        assert_eq!(limbs_mod_limb(xs, m) == y % m, equal);
+        assert_eq!(limbs_mod_limb::<DoubleLimb, Limb>(xs, m) == y % m, equal);
         assert_eq!(combined_limbs_eq_limb_mod_limb(xs, y, m), equal);
     };
     test(&[6, 7], 4, 2, true);
@@ -756,7 +756,7 @@ fn limbs_eq_limb_mod_limb_properties() {
                 Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from(m)),
                 equal
             );
-            assert_eq!(limbs_mod_limb(&xs, m) == y % m, equal);
+            assert_eq!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, m) == y % m, equal);
             assert_eq!(combined_limbs_eq_limb_mod_limb(&xs, y, m), equal);
         },
     );
@@ -766,7 +766,7 @@ fn limbs_eq_limb_mod_limb_properties() {
         |(xs, y, m)| {
             assert!(limbs_eq_limb_mod_limb(&xs, y, m));
             assert!(Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from(m)));
-            assert_eq!(limbs_mod_limb(&xs, m), y % m);
+            assert_eq!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, m), y % m);
             assert!(combined_limbs_eq_limb_mod_limb(&xs, y, m));
         },
     );
@@ -776,7 +776,7 @@ fn limbs_eq_limb_mod_limb_properties() {
         |(xs, y, m)| {
             assert!(!limbs_eq_limb_mod_limb(&xs, y, m));
             assert!(!Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from(m)));
-            assert_ne!(limbs_mod_limb(&xs, m), y % m);
+            assert_ne!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, m), y % m);
             assert!(!combined_limbs_eq_limb_mod_limb(&xs, y, m));
         },
     );

@@ -246,7 +246,9 @@ where
 
     rational_gen_var_7().test_properties(|q| {
         // This only works for simple `Rational`s, i.e. those `Rational`s q that round to a float x
-        // such that no simpler `Rational` rounds to x.
+        // such that no simpler `Rational` rounds to x. This test will eventually fail, e.g. for
+        // 3571/5778, which is very close to 1/phi. But as long as only the first 10,000 inputs in
+        // each generation mode are tested, it will succeed.
         assert_eq!(
             Rational::try_from_float_simplest(T::rounding_from(&q, Nearest).0),
             Ok(q)

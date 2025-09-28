@@ -361,7 +361,8 @@ fn div_float_significands_same_prec_lt_w(
     }
     // First try with an approximate quotient.
     let mut round_bit = Limb::wrapping_from(
-        (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb(y))) >> Limb::WIDTH,
+        (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
+            >> Limb::WIDTH,
     );
     round_bit.wrapping_add_assign(x);
     let mut q = if increment_exp {
@@ -439,7 +440,8 @@ fn div_float_significands_same_prec_w(
     }
     // First compute an approximate quotient.
     let mut q = x.wrapping_add(Limb::wrapping_from(
-        (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb(y))) >> Limb::WIDTH,
+        (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
+            >> Limb::WIDTH,
     ));
     // round_bit does not exceed the true quotient floor(x * 2 ^ WIDTH / y), with error at most 2,
     // which means the rational quotient q satisfies round_bit <= q < round_bit + 3, thus the true
@@ -515,7 +517,7 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
     let inv = if y_1 == Limb::MAX {
         0
     } else {
-        limbs_invert_limb(y_1 + 1)
+        limbs_invert_limb::<DoubleLimb, Limb>(y_1 + 1)
     };
     // Now inv <= B ^ 2 / (y_1 + 1) - B.
     let mut q_1 =
@@ -685,7 +687,7 @@ fn limbs_div_limb_to_out_mod_with_fraction(
     }
     *out_last = Limb::from(adjust);
     // Multiply-by-inverse, divisor already normalized.
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
     let (out_lo, out_hi) = out_init.split_at_mut(fraction_len);
     for (out_q, &n) in out_hi.iter_mut().zip(ns_init.iter()).rev() {
         (*out_q, r) = div_mod_by_preinversion(r, n, d, d_inv);
@@ -719,7 +721,7 @@ fn limbs_div_limb_in_place_mod_with_fraction(
     let (ns_high, ns_init) = ns.split_last_mut().unwrap();
     *ns_high = Limb::from(adjust);
     // Multiply-by-inverse, divisor already normalized.
-    let d_inv = limbs_invert_limb(d);
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
     let (ns_lo, ns_hi) = ns_init.split_at_mut(fraction_len);
     for n in ns_hi.iter_mut().rev() {
         (*n, r) = div_mod_by_preinversion(r, *n, d, d_inv);

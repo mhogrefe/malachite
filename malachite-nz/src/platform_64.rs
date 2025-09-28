@@ -2103,10 +2103,6 @@ pub(crate) const TABLE_2N_MINUS_POPC_2N: [u8; 40] = [
 
 pub(crate) const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;
 
-pub(crate) const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
-
-pub(crate) const MULMOD_TAB: [u8; 19] = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1];
-
 // Use these tables to match FLINT for debugging
 // ```
 // pub(crate) const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];

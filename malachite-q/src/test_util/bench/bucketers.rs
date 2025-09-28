@@ -14,49 +14,53 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::max;
 
-pub fn rational_bit_bucketer(var_name: &str) -> Bucketer<Rational> {
+pub fn rational_bit_bucketer(var_name: &str) -> Bucketer<'_, Rational> {
     Bucketer {
         bucketing_function: &|q| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
-pub fn pair_2_pair_1_rational_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, (Rational, U))> {
+pub fn pair_2_pair_1_rational_bit_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (T, (Rational, U))> {
     Bucketer {
         bucketing_function: &|(_, (q, _))| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
-pub fn pair_1_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<(Rational, T)> {
+pub fn pair_1_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (Rational, T)> {
     Bucketer {
         bucketing_function: &|(q, _)| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
-pub fn pair_2_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Rational)> {
+pub fn pair_2_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (T, Rational)> {
     Bucketer {
         bucketing_function: &|(_, q)| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
-pub fn triple_1_rational_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Rational, T, U)> {
+pub fn triple_1_rational_bit_bucketer<T, U>(var_name: &str) -> Bucketer<'_, (Rational, T, U)> {
     Bucketer {
         bucketing_function: &|(q, _, _)| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
-pub fn triple_3_rational_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, U, Rational)> {
+pub fn triple_3_rational_bit_bucketer<T, U>(var_name: &str) -> Bucketer<'_, (T, U, Rational)> {
     Bucketer {
         bucketing_function: &|(_, _, q)| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
-pub fn quadruple_1_rational_bit_bucketer<T, U, V>(var_name: &str) -> Bucketer<(Rational, T, U, V)> {
+pub fn quadruple_1_rational_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (Rational, T, U, V)> {
     Bucketer {
         bucketing_function: &|(q, _, _, _)| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),

@@ -12,8 +12,6 @@
 
 use crate::Rational;
 use core::cmp::Ordering::*;
-#[cfg(not(any(feature = "test_build", feature = "random")))]
-use malachite_base::num::arithmetic::traits::Ln;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, FloorLogBase, FloorLogBasePowerOf2, Pow,

@@ -32,6 +32,7 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_schoolbook, limbs_modular_div_scratch_len, limbs_modular_invert,
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len, limbs_modular_invert_small,
 };
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
 };
@@ -116,7 +117,7 @@ fn demo_limbs_modular_invert_limb(gm: GenMode, config: &GenConfig, limit: usize)
         println!(
             "limbs_modular_invert_limb({}) = {}",
             x,
-            limbs_modular_invert_limb(x)
+            limbs_modular_invert_limb::<Limb>(x)
         );
     }
 }
@@ -141,7 +142,7 @@ fn demo_limbs_div_exact_limb_to_out(gm: GenMode, config: &GenConfig, limit: usiz
         .take(limit)
     {
         let out_old = out.clone();
-        limbs_div_exact_limb_to_out(&mut out, &xs, y);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y);
         println!(
             "out := {out_old:?}; limbs_exact_div_limb_to_out(&mut out, {xs:?}, {y}); \
              out = {out:?}",
@@ -169,7 +170,7 @@ fn demo_limbs_div_exact_3(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_limbs_div_exact_3_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut out, xs) in unsigned_vec_pair_gen_var_13().get(gm, config).take(limit) {
         let out_old = out.clone();
-        limbs_div_exact_3_to_out(&mut out, &xs);
+        limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut out, &xs);
         println!("out := {out_old:?}; limbs_exact_div_3_to_out(&mut out, {xs:?}); out = {out:?}");
     }
 }
@@ -416,7 +417,9 @@ fn benchmark_limbs_modular_invert_limb(
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut |x| no_out!(limbs_modular_invert_limb(x)))],
+        &mut [("Malachite", &mut |x| {
+            no_out!(limbs_modular_invert_limb::<Limb>(x))
+        })],
     );
 }
 
@@ -459,7 +462,7 @@ fn benchmark_limbs_div_exact_limb_to_out_algorithms(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("div_exact", &mut |(mut out, xs, y)| {
-                limbs_div_exact_limb_to_out(&mut out, &xs, y)
+                limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y)
             }),
             ("div", &mut |(mut out, xs, y)| {
                 limbs_div_limb_to_out(&mut out, &xs, y)
@@ -535,10 +538,12 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
         &mut [
             (
                 "limbs_div_exact_limb_to_out_no_special_3",
-                &mut |(mut out, xs)| limbs_div_exact_limb_to_out_no_special_3(&mut out, &xs, 3),
+                &mut |(mut out, xs)| {
+                    limbs_div_exact_limb_to_out_no_special_3::<DoubleLimb, Limb>(&mut out, &xs, 3)
+                },
             ),
             ("limbs_div_exact_3_to_out", &mut |(mut out, xs)| {
-                limbs_div_exact_3_to_out(&mut out, &xs)
+                limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut out, &xs)
             }),
             ("limbs_div_exact_3_to_out_alt", &mut |(mut out, xs)| {
                 limbs_div_exact_3_to_out_alt(&mut out, &xs)

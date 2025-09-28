@@ -120,7 +120,7 @@ fn benchmark_natural_try_from_signed<T: PrimitiveSigned>(
     Natural: TryFrom<T>,
 {
     run_benchmark(
-        &format!(concat!("Natural::try_from({})"), T::NAME),
+        &format!("Natural::try_from({})", T::NAME),
         BenchmarkType::Single,
         signed_gen::<T>().get(gm, config),
         gm.name(),

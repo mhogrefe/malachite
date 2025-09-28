@@ -64,7 +64,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 
@@ -77,8 +78,13 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 // Panics if `d` is zero.
 //
 // This is equivalent to `mpn_invert_limb`, or `invert_limb`, from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_invert_limb(d: Limb) -> Limb {
-    (DoubleLimb::join_halves(!d, Limb::MAX) / DoubleLimb::from(d)).lower_half()
+pub_crate_test! {limbs_invert_limb<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    d: T,
+) -> T {
+    (DT::join_halves(!d, T::MAX) / DT::from(d)).lower_half()
 }}
 
 // # Worst-case complexity
@@ -166,7 +172,7 @@ pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Lim
         }
         *out_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         for (out_q, &n) in out_init.iter_mut().zip(ns_init.iter()).rev() {
             (*out_q, r) = div_mod_by_preinversion(r, n, d, d_inv);
         }
@@ -183,7 +189,7 @@ pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Lim
         };
         let d = d << bits;
         r <<= bits;
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let (previous_n, ns_init) = ns.split_last().unwrap();
         let mut previous_n = *previous_n;
         let cobits = Limb::WIDTH - bits;
@@ -232,7 +238,7 @@ pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
         }
         *ns_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         for n in ns_init.iter_mut().rev() {
             (*n, r) = div_mod_by_preinversion(r, *n, d, d_inv);
         }
@@ -249,7 +255,7 @@ pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
         };
         let d = d << bits;
         r <<= bits;
-        let d_inv = limbs_invert_limb(d);
+        let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
         let last_index = ns.len() - 1;
         let mut previous_n = ns[last_index];
         let cobits = Limb::WIDTH - bits;
@@ -432,7 +438,7 @@ pub_crate_test! {limbs_div_mod_extra_in_place(
 // This is equivalent to `invert_pi1` from `gmp-impl.h`, GMP 6.2.1, where the result is returned
 // instead of being written to `dinv`.
 pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
-    let mut d_inv = limbs_invert_limb(hi);
+    let mut d_inv = limbs_invert_limb::<DoubleLimb, Limb>(hi);
     let mut hi_product = hi.wrapping_mul(d_inv);
     hi_product.wrapping_add_assign(lo);
     if hi_product < lo {
@@ -910,7 +916,7 @@ pub_test! {limbs_invert_basecase_approx(
     assert!(highest_d.get_highest_bit());
     if d_len == 1 {
         let d = ds[0];
-        is[0] = limbs_invert_limb(d);
+        is[0] = limbs_invert_limb::<DoubleLimb, Limb>(d);
     } else {
         let scratch = &mut scratch[..d_len << 1];
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
@@ -1541,10 +1547,10 @@ fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < MU_DIV_QR_THRESHOLD << 1
-        || libm::fma(
+        || fma!(
             ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64,
             d_64,
-            MUPI_DIV_QR_THRESHOLD as f64 * n_64,
+            MUPI_DIV_QR_THRESHOLD as f64 * n_64
         ) > d_64 * n_64
 }
 

@@ -34,9 +34,7 @@ use crate::natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use crate::natural::arithmetic::mul::fft::{
-    limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
-};
+use crate::natural::arithmetic::mul::fft::mpn_square_default_mpn_ctx;
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use crate::natural::arithmetic::mul::poly_eval::{
@@ -138,7 +136,7 @@ pub_crate_test! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
         let two_n = n << 1;
         let scratch = &mut scratch[..two_n - 2];
         let (scratch_last, scratch_init) = scratch[..n].split_last_mut().unwrap();
-        *scratch_last = limbs_mul_limb_to_out(scratch_init, xs_tail, *xs_head);
+        *scratch_last = limbs_mul_limb_to_out::<DoubleLimb, Limb>(scratch_init, xs_tail, *xs_head);
         for i in 1..n - 1 {
             let (scratch_last, scratch_init) = scratch[i..][i..n].split_last_mut().unwrap();
             let (xs_head, xs_tail) = xs[i..].split_first().unwrap();
@@ -1007,7 +1005,7 @@ limbs_square_to_out_scratch_len(n: usize) -> usize {
     } else if n < SQR_FFT_THRESHOLD {
         limbs_square_to_out_toom_8_scratch_len(n)
     } else {
-        limbs_square_to_out_fft_scratch_len(n)
+        0
     }
 }}
 
@@ -1041,7 +1039,7 @@ limbs_square_to_out(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     } else if n < SQR_FFT_THRESHOLD {
         limbs_square_to_out_toom_8(out, xs, scratch);
     } else {
-        limbs_square_to_out_fft(out, xs, scratch);
+        mpn_square_default_mpn_ctx(out, xs);
     }
 }}
 

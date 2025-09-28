@@ -21,6 +21,7 @@ use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
 };
@@ -176,7 +177,7 @@ fn benchmark_limbs_divisible_by_limb_algorithms(
                 no_out!(limbs_divisible_by_limb(&xs, y))
             }),
             ("divisibility using limbs_mod_limb", &mut |(xs, y)| {
-                no_out!(limbs_mod_limb(&xs, y) == 0)
+                no_out!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, y) == 0)
             }),
             ("combined_limbs_divisible_by_limb", &mut |(xs, y)| {
                 no_out!(combined_limbs_divisible_by_limb(&xs, y))

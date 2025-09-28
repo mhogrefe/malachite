@@ -1,6 +1,6 @@
 [package]
 name = "malachite-bigint"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Steve Shi <shikangzhi@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true
@@ -9,10 +9,14 @@ description = "A drop-in num-bigint replacement based on malachite"
 repository = "https://github.com/mhogrefe/malachite"
 
 [dependencies]
-malachite-base = { version = "0.6.1", path = "../malachite-base" }
-malachite-nz = { version = "0.6.1", path = "../malachite-nz" }
+malachite-base = { version = "0.7.0", path = "../malachite-base", default-features = false }
+malachite-nz = { version = "0.7.0", path = "../malachite-nz", default-features = false }
 
 num-traits = { version = "0.2.19", default-features = false, features = ["i128"] }
 num-integer = { version = "0.1.46", default-features = false, features = ["i128"] }
 paste = "1.0.15"
 num-bigint = { version = "0.4", default-features = false, optional = true }
+
+[features]
+default = ["std"]
+std = ["malachite-base/std", "malachite-nz/std"]

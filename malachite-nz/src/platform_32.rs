@@ -485,7 +485,3 @@ pub(crate) const TABLE_2N_MINUS_POPC_2N: [u8; 24] =
 pub(crate) const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 49;
 
 // end of auto-generated code
-
-pub(crate) const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];
-
-pub(crate) const MULMOD_TAB: [u8; 15] = [4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 2, 1, 1];

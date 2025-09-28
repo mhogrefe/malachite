@@ -17,7 +17,7 @@ use crate::natural::arithmetic::gcd::half_gcd::limbs_gcd_reduced;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::comparison::cmp::limbs_cmp;
-use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, Limb};
+use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, DoubleLimb, Limb};
 use core::cmp::{Ordering::*, min};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
@@ -39,7 +39,7 @@ fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_mod_exact_odd_limb(ns, d, 0)
     } else {
-        limbs_mod_limb_alt_2(ns, d)
+        limbs_mod_limb_alt_2::<DoubleLimb, Limb>(ns, d)
     }
 }
 

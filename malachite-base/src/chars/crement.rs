@@ -43,7 +43,7 @@ pub const fn char_to_contiguous_range(c: char) -> u32 {
 /// Converts a [`u32`] to a [`char`]; if all [`char`]s were arranged in ascending order, passing $u$
 /// to this function would return the $u$th [`char`].
 ///
-/// This function is the inverse of [`char_to_contiguous_range`]. Every [`u32`] between $0$ and
+/// This function is the inverse of [`char_to_contiguous_range`]. Every [`u32`] between 0 and
 /// $\mathrm{NUMBER\\_OF\\_CHARS} - 1$, inclusive, is mapped to a distinct [`char`]. Passing a
 /// larger [`u32`] yields `None`.
 ///

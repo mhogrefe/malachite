@@ -681,33 +681,34 @@ pub(crate) fn limbs_float_mul_high_same_length(
         },
     );
     assert!(k.is_none() || k == Some(0) || (k.unwrap() >= (len + 4) >> 1 && k.unwrap() < len));
-    if k.is_none() {
+    if let Some(k) = k {
+        if k == 0 {
+            // basecase error < len ulps
+            limbs_float_mul_high_same_length_basecase(out, xs, ys);
+        } else if len > MUL_FFT_THRESHOLD {
+            // result is exact, no error
+            limbs_mul_same_length_to_out(out, xs, ys, scratch);
+        } else {
+            let l = len - k;
+            let out = &mut out[..len << 1];
+            let (out_lo, out_hi) = out.split_at_mut(l << 1);
+            let (ys_lo, ys_hi) = ys.split_at(l);
+            limbs_mul_same_length_to_out(out_hi, &xs[l..], ys_hi, scratch);
+            limbs_float_mul_high_same_length(out_lo, &xs[k..], ys_lo, scratch);
+            let out_hi = &mut out_hi[k - l - 1..k];
+            let mut carry = Limb::from(limbs_slice_add_same_length_in_place_left(
+                out_hi,
+                &out_lo[l - 1..],
+            ));
+            limbs_float_mul_high_same_length(out_lo, &xs[..l], &ys[k..], scratch);
+            if limbs_slice_add_same_length_in_place_left(out_hi, &out_lo[l - 1..]) {
+                carry += 1;
+            }
+            limbs_slice_add_limb_in_place(&mut out[len + l..], carry);
+        }
+    } else {
         // result is exact, no error
         limbs_mul_greater_to_out_basecase(out, xs, ys);
-    } else if k == Some(0) {
-        // basecase error < len ulps
-        limbs_float_mul_high_same_length_basecase(out, xs, ys);
-    } else if len > MUL_FFT_THRESHOLD {
-        // result is exact, no error
-        limbs_mul_same_length_to_out(out, xs, ys, scratch);
-    } else {
-        let k = k.unwrap();
-        let l = len - k;
-        let out = &mut out[..len << 1];
-        let (out_lo, out_hi) = out.split_at_mut(l << 1);
-        let (ys_lo, ys_hi) = ys.split_at(l);
-        limbs_mul_same_length_to_out(out_hi, &xs[l..], ys_hi, scratch);
-        limbs_float_mul_high_same_length(out_lo, &xs[k..], ys_lo, scratch);
-        let out_hi = &mut out_hi[k - l - 1..k];
-        let mut carry = Limb::from(limbs_slice_add_same_length_in_place_left(
-            out_hi,
-            &out_lo[l - 1..],
-        ));
-        limbs_float_mul_high_same_length(out_lo, &xs[..l], &ys[k..], scratch);
-        if limbs_slice_add_same_length_in_place_left(out_hi, &out_lo[l - 1..]) {
-            carry += 1;
-        }
-        limbs_slice_add_limb_in_place(&mut out[len + l..], carry);
     }
 }
 

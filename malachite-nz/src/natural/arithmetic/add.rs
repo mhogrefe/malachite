@@ -136,10 +136,10 @@ pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 }}
 
 #[inline]
-fn add_with_carry_limb(x: Limb, y: Limb, carry: Limb) -> (Limb, Limb) {
+pub(crate) fn add_with_carry_limb<T: PrimitiveUnsigned>(x: T, y: T, carry: T) -> (T, T) {
     let result_no_carry = x.wrapping_add(y);
     let result = result_no_carry.wrapping_add(carry);
-    let carry = Limb::from((result_no_carry < x) || (result < result_no_carry));
+    let carry = T::from((result_no_carry < x) || (result < result_no_carry));
     (result, carry)
 }
 
@@ -348,14 +348,17 @@ pub_crate_test! {
 //
 // This is equivalent to `mpn_add_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input.
-pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+pub_crate_test! {limbs_slice_add_same_length_in_place_left<T: PrimitiveUnsigned>(
+    xs: &mut [T],
+    ys: &[T],
+) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
-    let mut carry = 0;
+    let mut carry = T::ZERO;
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         (*x, carry) = add_with_carry_limb(*x, y, carry);
     }
-    carry != 0
+    carry != T::ZERO
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the

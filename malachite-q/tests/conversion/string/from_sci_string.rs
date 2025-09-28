@@ -1058,6 +1058,7 @@ fn from_sci_string_simplest_with_options_properties() {
         from_sci_string_simplest_with_options_helper(&s, options);
     });
 
+    // This fails for rationals with sufficiently large numerator and denominator
     rational_unsigned_pair_gen_var_6().test_properties(|(q, base)| {
         let mut to_options = ToSciOptions::default();
         to_options.set_include_trailing_zeros(true);

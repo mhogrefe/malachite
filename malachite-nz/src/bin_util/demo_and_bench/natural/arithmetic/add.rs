@@ -206,7 +206,7 @@ fn demo_limbs_add_to_out_aliased(gm: GenMode, config: &GenConfig, limit: usize) 
 fn demo_limbs_slice_add_same_length_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, config).take(limit) {
         let xs_old = xs.clone();
-        let carry = limbs_slice_add_same_length_in_place_left(&mut xs, &ys);
+        let carry = limbs_slice_add_same_length_in_place_left::<Limb>(&mut xs, &ys);
         println!(
             "xs := {xs_old:?}; \
             limbs_slice_add_same_length_in_place_left(&mut xs, {ys:?}) = {carry}; xs = {xs:?}",
@@ -501,7 +501,9 @@ fn benchmark_limbs_slice_add_same_length_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            no_out!(limbs_slice_add_same_length_in_place_left(&mut xs, &ys))
+            no_out!(limbs_slice_add_same_length_in_place_left::<Limb>(
+                &mut xs, &ys
+            ))
         })],
     );
 }

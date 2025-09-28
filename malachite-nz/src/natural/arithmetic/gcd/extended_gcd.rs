@@ -37,7 +37,7 @@ use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::sub::limbs_sub_greater_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::platform::Limb;
+use crate::platform::{DoubleLimb, Limb};
 use core::cmp::{Ordering::*, max};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
@@ -297,7 +297,8 @@ fn limbs_extended_gcd_same_length_lehmer<'a>(
             assert!(v > 0);
             u.neg_assign();
         }
-        let mut u_high = limbs_mul_limb_to_out(ss, &us1[..us_len], Limb::exact_from(u));
+        let mut u_high =
+            limbs_mul_limb_to_out::<DoubleLimb, Limb>(ss, &us1[..us_len], Limb::exact_from(u));
         let v_high = limbs_slice_add_mul_limb_same_length_in_place_left(
             &mut ss[..us_len],
             &us0[..us_len],

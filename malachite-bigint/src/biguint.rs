@@ -1,3 +1,14 @@
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::{
+    cmp::Ordering::{Equal, Greater, Less},
+    iter::{Product, Sum},
+    ops::{
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+        DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+    },
+    str::FromStr,
+};
 use malachite_base::{
     num::{
         arithmetic::traits::{
@@ -15,17 +26,6 @@ use num_traits::{
     Unsigned, Zero,
 };
 use paste::paste;
-use core::{
-    cmp::Ordering::{Equal, Greater, Less},
-    iter::{Product, Sum},
-    ops::{
-        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
-    },
-    str::FromStr,
-};
-use alloc::vec::Vec;
-use alloc::string::String;
 
 use crate::{ParseBigIntError, ToBigInt, TryFromBigIntError, U32Digits, U64Digits};
 
@@ -370,12 +370,12 @@ impl BigUint {
     }
 
     #[inline]
-    pub fn iter_u32_digits(&self) -> U32Digits {
+    pub fn iter_u32_digits(&self) -> U32Digits<'_> {
         U32Digits::new(self.0.limbs())
     }
 
     #[inline]
-    pub fn iter_u64_digits(&self) -> U64Digits {
+    pub fn iter_u64_digits(&self) -> U64Digits<'_> {
         U64Digits::new(self.0.limbs())
     }
 
@@ -463,7 +463,6 @@ impl BigUint {
         }
     }
 }
-
 
 #[cfg(test)]
 mod test {

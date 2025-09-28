@@ -374,7 +374,7 @@ lex_tuples!(
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_custom_tuples;
 ///
-/// fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
+/// fn _unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
 ///     (a.unwrap(), b.unwrap(), c.unwrap())
 /// }
 ///
@@ -383,7 +383,7 @@ lex_tuples!(
 ///     LexTriplesXXY,
 ///     (X, X, Y),
 ///     (None, None, None),
-///     unwrap_triple,
+///     _unwrap_triple,
 ///     lex_triples_xxy,
 ///     [X, I, xs, [0, x_0], [1, x_1]],
 ///     [Y, J, ys, [2, y_2]]
@@ -393,7 +393,7 @@ lex_tuples!(
 ///     LexTriplesXYX,
 ///     (X, Y, X),
 ///     (None, None, None),
-///     unwrap_triple,
+///     _unwrap_triple,
 ///     lex_triples_xyx,
 ///     [X, I, xs, [0, x_0], [2, x_2]],
 ///     [Y, J, ys, [1, y_1]]
@@ -403,7 +403,7 @@ lex_tuples!(
 ///     LexTriplesXYY,
 ///     (X, Y, Y),
 ///     (None, None, None),
-///     unwrap_triple,
+///     _unwrap_triple,
 ///     lex_triples_xyy,
 ///     [X, I, xs, [0, x_0]],
 ///     [Y, J, ys, [1, y_1], [2, y_2]]
@@ -1836,7 +1836,7 @@ impl<
 /// use std::slice::Iter;
 ///
 /// #[derive(Clone, Debug)]
-/// pub struct MultiplesGeneratorHelper {
+/// struct MultiplesGeneratorHelper {
 ///     u: u64,
 ///     step: u64,
 /// }
@@ -2005,22 +2005,6 @@ pub const fn exhaustive_dependent_pairs<
 /// use std::hash::Hash;
 /// use std::iter::Cloned;
 /// use std::slice::Iter;
-///
-/// #[derive(Clone, Debug)]
-/// pub struct MultiplesGeneratorHelper {
-///     u: u64,
-///     step: u64,
-/// }
-///
-/// impl Iterator for MultiplesGeneratorHelper {
-///     type Item = u64;
-///
-///     fn next(&mut self) -> Option<u64> {
-///         let next = self.u;
-///         self.u += self.step;
-///         Some(next)
-///     }
-/// }
 ///
 /// #[derive(Clone, Debug)]
 /// struct DPGeneratorFromMap<X: Clone + Eq + Hash, Y: 'static + Clone> {

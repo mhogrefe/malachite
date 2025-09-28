@@ -59,12 +59,13 @@ use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingAddAssign,
+    DivExact, DivExactAssign, Parity, ShrRound, ShrRoundAssign, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{ExactFrom, HasHalf, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
@@ -108,14 +109,18 @@ pub fn test_invert_limb_table() {
 // Panics if `x` is even.
 //
 // This is equivalent to `binvert_limb` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_invert_limb(x: Limb) -> Limb {
+pub_crate_test! {limbs_modular_invert_limb<T: PrimitiveUnsigned>(x: T) -> T
+where
+    usize: ExactFrom<T>,
+{
     assert!(x.odd());
-    let index = (x >> 1).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
-    let mut inv = Limb::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
-    inv = (inv << 1).wrapping_sub((inv * inv).wrapping_mul(x));
-    inv = (inv << 1).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
-    if !cfg!(feature = "32_bit_limbs") {
-        inv = (inv << 1).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
+    let index = (x >> 1u32).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
+    let mut inv = T::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
+    inv = (inv << 1u32).wrapping_sub((inv * inv).wrapping_mul(x));
+    inv = (inv << 1u32).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
+    if T::WIDTH != u32::WIDTH {
+        assert_eq!(T::WIDTH, u64::WIDTH);
+        inv = (inv << 1u32).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
     }
     inv
 }}
@@ -139,7 +144,7 @@ pub_crate_test! {limbs_modular_invert_limb(x: Limb) -> Limb {
 // is returned.
 pub_test! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
-    limbs_div_exact_limb_to_out(&mut q, ns, d);
+    limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut q, ns, d);
     q
 }}
 
@@ -154,29 +159,38 @@ pub_test! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> 
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
-pub_test! {limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
-    assert_ne!(d, 0);
+pub_test! {limbs_div_exact_limb_to_out_no_special_3<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    out: &mut [T],
+    ns: &[T],
+    d: T,
+) where
+    usize: ExactFrom<T>,
+{
+    assert_ne!(d, T::ZERO);
     let len = ns.len();
     assert_ne!(len, 0);
     let out = &mut out[..len];
     let (ns_head, ns_tail) = ns.split_first().unwrap();
     if d.even() {
         let shift = TrailingZeros::trailing_zeros(d);
-        let shift_complement = Limb::WIDTH - shift;
+        let shift_complement = T::WIDTH - shift;
         let shifted_d = d >> shift;
         let d_inv = limbs_modular_invert_limb(shifted_d);
         let (out_last, out_init) = out.split_last_mut().unwrap();
-        let mut upper_half = 0;
+        let mut upper_half = T::ZERO;
         let mut previous_n = *ns_head;
         for (out_q, n) in out_init.iter_mut().zip(ns_tail.iter()) {
-            let shifted_n = (previous_n >> shift) | (n << shift_complement);
+            let shifted_n = (previous_n >> shift) | (*n << shift_complement);
             previous_n = *n;
             let (diff, carry) = shifted_n.overflowing_sub(upper_half);
             let q = diff.wrapping_mul(d_inv);
             *out_q = q;
-            upper_half = (DoubleLimb::from(q) * DoubleLimb::from(shifted_d)).upper_half();
+            upper_half = (DT::from(q) * DT::from(shifted_d)).upper_half();
             if carry {
-                upper_half += 1;
+                upper_half += T::ONE;
             }
         }
         *out_last = (previous_n >> shift)
@@ -189,9 +203,9 @@ pub_test! {limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb
         *out_head = q;
         let mut previous_carry = false;
         for (out_q, n) in out_tail.iter_mut().zip(ns_tail.iter()) {
-            let mut upper_half = (DoubleLimb::from(q) * DoubleLimb::from(d)).upper_half();
+            let mut upper_half = (DT::from(q) * DT::from(d)).upper_half();
             if previous_carry {
-                upper_half += 1;
+                upper_half += T::ONE;
             }
             let diff;
             (diff, previous_carry) = n.overflowing_sub(upper_half);
@@ -284,7 +298,7 @@ const MAX_OVER_3: Limb = Limb::MAX / 3;
 // `DIVEXACT_BY3_METHOD == 0` and no carry-in, where the result is returned.
 pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
-    limbs_div_exact_3_to_out(&mut q, ns);
+    limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut q, ns);
     q
 }}
 
@@ -305,11 +319,23 @@ pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
 // `DIVEXACT_BY3_METHOD == 0`, no carry-in, and no return value.
-pub_test! {limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
+pub_test! {limbs_div_exact_3_to_out<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    out: &mut [T],
+    ns: &[T],
+) {
     let (out_last, out_init) = out[..ns.len()].split_last_mut().unwrap();
     let (ns_last, ns_init) = ns.split_last().unwrap();
-    let q = limbs_div_divisor_of_limb_max_with_carry_to_out(out_init, ns_init, MAX_OVER_3, 0);
-    let lower = (DoubleLimb::from(*ns_last) * DoubleLimb::from(MAX_OVER_3)).lower_half();
+    let max_over_3 = T::MAX / T::from(3u8);
+    let q = limbs_div_divisor_of_limb_max_with_carry_to_out::<DT, T>(
+        out_init,
+        ns_init,
+        max_over_3,
+        T::ZERO,
+    );
+    let lower = (DT::from(*ns_last) * DT::from(max_over_3)).lower_half();
     *out_last = q.wrapping_sub(lower);
 }}
 
@@ -354,11 +380,20 @@ pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
-    if d == 3 {
-        limbs_div_exact_3_to_out(out, ns);
+pub_crate_test! {limbs_div_exact_limb_to_out<
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
+    T: PrimitiveUnsigned,
+>(
+    out: &mut [T],
+    ns: &[T],
+    d: T,
+) where
+    usize: ExactFrom<T>,
+{
+    if d == T::from(3u8) {
+        limbs_div_exact_3_to_out::<DT, T>(out, ns);
     } else {
-        limbs_div_exact_limb_to_out_no_special_3(out, ns, d);
+        limbs_div_exact_limb_to_out_no_special_3::<DT, T>(out, ns, d);
     }
 }}
 
@@ -1077,7 +1112,9 @@ pub_crate_test! {limbs_modular_div_schoolbook(
         qs = &mut qs[limit..];
         let q = d_inv.wrapping_mul(ns[0]);
         let (ns_lo, ns_hi) = ns.split_at_mut(d_len);
-        let hi = carry + limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
+        let hi = carry.wrapping_add(limbs_slice_add_mul_limb_same_length_in_place_left(
+            ns_lo, ds, q,
+        ));
         qs[0] = q;
         ns_hi[0].wrapping_add_assign(hi);
         ns = &mut ns[1..];
@@ -1657,7 +1694,7 @@ pub_crate_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &m
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len == 1 {
-        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(qs, ns, ds[0]);
         return;
     }
     let q_len = n_len - d_len + 1;
@@ -1712,7 +1749,7 @@ pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: 
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len == 1 {
-        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(qs, ns, ds[0]);
         return;
     }
     let q_len = n_len - d_len + 1;
@@ -1770,7 +1807,7 @@ pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len == 1 {
-        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(qs, ns, ds[0]);
         return;
     }
     let q_len = n_len - d_len + 1;
@@ -1828,7 +1865,7 @@ pub_test! {limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Li
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len == 1 {
-        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(qs, ns, ds[0]);
         return;
     }
     let q_len = n_len - d_len + 1;

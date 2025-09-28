@@ -396,7 +396,7 @@ pub mod num {
     }
     pub mod factorization {
         pub mod factor;
-        pub mod is_perfect_power;
+        pub mod is_power;
         pub mod is_prime;
         pub mod is_square;
         pub mod prime_indicator_sequence;
@@ -612,28 +612,42 @@ pub mod sets {
         pub mod exhaustive_b_tree_sets_length_inclusive_range;
         pub mod exhaustive_b_tree_sets_length_range;
         pub mod exhaustive_b_tree_sets_min_length;
+        #[cfg(feature = "std")]
         pub mod exhaustive_hash_sets;
+        #[cfg(feature = "std")]
         pub mod exhaustive_hash_sets_fixed_length;
+        #[cfg(feature = "std")]
         pub mod exhaustive_hash_sets_length_inclusive_range;
+        #[cfg(feature = "std")]
         pub mod exhaustive_hash_sets_length_range;
+        #[cfg(feature = "std")]
         pub mod exhaustive_hash_sets_min_length;
         pub mod lex_b_tree_sets;
         pub mod lex_b_tree_sets_fixed_length;
         pub mod lex_b_tree_sets_length_inclusive_range;
         pub mod lex_b_tree_sets_length_range;
         pub mod lex_b_tree_sets_min_length;
+        #[cfg(feature = "std")]
         pub mod lex_hash_sets;
+        #[cfg(feature = "std")]
         pub mod lex_hash_sets_fixed_length;
+        #[cfg(feature = "std")]
         pub mod lex_hash_sets_length_inclusive_range;
+        #[cfg(feature = "std")]
         pub mod lex_hash_sets_length_range;
+        #[cfg(feature = "std")]
         pub mod lex_hash_sets_min_length;
         pub mod shortlex_b_tree_sets;
         pub mod shortlex_b_tree_sets_length_inclusive_range;
         pub mod shortlex_b_tree_sets_length_range;
         pub mod shortlex_b_tree_sets_min_length;
+        #[cfg(feature = "std")]
         pub mod shortlex_hash_sets;
+        #[cfg(feature = "std")]
         pub mod shortlex_hash_sets_length_inclusive_range;
+        #[cfg(feature = "std")]
         pub mod shortlex_hash_sets_length_range;
+        #[cfg(feature = "std")]
         pub mod shortlex_hash_sets_min_length;
     }
     pub mod random {

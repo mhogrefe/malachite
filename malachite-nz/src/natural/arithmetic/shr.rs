@@ -102,12 +102,12 @@ pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
 // Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up`.
-pub_crate_test! {limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
+pub_crate_test! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bits: u64) -> T {
     assert_ne!(bits, 0);
-    assert!(bits < Limb::WIDTH);
+    assert!(bits < T::WIDTH);
     let len = xs.len();
     assert_ne!(len, 0);
-    let cobits = Limb::WIDTH - bits;
+    let cobits = T::WIDTH - bits;
     let mut x = xs[0];
     let remaining_bits = x << cobits;
     let mut previous_x = x >> bits;

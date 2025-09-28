@@ -166,21 +166,21 @@ fn test_limbs_slice_shr_in_place() {
 #[test]
 #[should_panic]
 fn limbs_slice_shr_in_place_fail_1() {
-    limbs_slice_shr_in_place(&mut [], 1);
+    limbs_slice_shr_in_place::<Limb>(&mut [], 1);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_slice_shr_in_place_fail_2() {
-    limbs_slice_shr_in_place(&mut [123, 456], 0);
+    limbs_slice_shr_in_place::<Limb>(&mut [123, 456], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_slice_shr_in_place_fail_3() {
-    limbs_slice_shr_in_place(&mut [123, 456], 100);
+    limbs_slice_shr_in_place::<Limb>(&mut [123, 456], 100);
 }
 
 fn test_shr_unsigned_helper<T: PrimitiveUnsigned, F: Fn(&str, T, &str)>(f: F)

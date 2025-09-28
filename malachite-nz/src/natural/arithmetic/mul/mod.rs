@@ -22,9 +22,7 @@ use crate::natural::arithmetic::add_mul::{
     limbs_slice_add_mul_limb_same_length_in_place_left,
     limbs_slice_add_mul_two_limbs_matching_length_in_place_left,
 };
-use crate::natural::arithmetic::mul::fft::{
-    limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
-};
+use crate::natural::arithmetic::mul::fft::mpn_mul_default_mpn_ctx;
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
 use crate::natural::arithmetic::mul::toom::{
@@ -40,9 +38,10 @@ use crate::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
 };
 use crate::platform::{
-    Limb, MUL_FFT_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD, MUL_TOOM22_THRESHOLD,
-    MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
-    MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD,
+    DoubleLimb, Limb, MUL_FFT_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
+    MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD,
+    MUL_TOOM33_THRESHOLD, MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD,
+    MUL_TOOM44_THRESHOLD,
 };
 use alloc::vec::Vec;
 use core::cmp::max;
@@ -104,7 +103,6 @@ pub_crate_test! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 }}
 
 pub_crate_test! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize {
-    assert_ne!(len, 0);
     if len < MUL_TOOM22_THRESHOLD {
         0
     } else if len < MUL_TOOM33_THRESHOLD {
@@ -118,10 +116,10 @@ pub_crate_test! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize 
         limbs_mul_greater_to_out_toom_44_scratch_len(len, len)
     } else if len < MUL_TOOM8H_THRESHOLD {
         limbs_mul_greater_to_out_toom_6h_scratch_len(len, len)
-    } else if len < MUL_FFT_THRESHOLD {
+    } else if len < FFT_MUL_THRESHOLD {
         limbs_mul_greater_to_out_toom_8h_scratch_len(len, len)
     } else {
-        limbs_mul_greater_to_out_fft_scratch_len(len, len)
+        0
     }
 }}
 
@@ -161,17 +159,17 @@ pub_crate_test! {limbs_mul_same_length_to_out(
         limbs_mul_greater_to_out_toom_44(out, xs, ys, scratch);
     } else if len < MUL_TOOM8H_THRESHOLD {
         limbs_mul_greater_to_out_toom_6h(out, xs, ys, scratch);
-    } else if len < MUL_FFT_THRESHOLD {
+    } else if len < FFT_MUL_THRESHOLD {
         limbs_mul_greater_to_out_toom_8h(out, xs, ys, scratch);
     } else {
-        limbs_mul_greater_to_out_fft(out, xs, ys, scratch);
+        mpn_mul_default_mpn_ctx(out, xs, ys, false);
     }
 }}
 
 // This is equivalent to `TOOM44_OK` from `mpn/generic/mul.c`, GMP 6.2.1.
-const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
+pub_const_crate_test! {toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
-}
+}}
 
 pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     assert!(xs_len >= ys_len);
@@ -257,9 +255,11 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
             limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)
         }
     } else {
-        limbs_mul_greater_to_out_fft_scratch_len(xs_len, ys_len)
+        0
     }
 }}
+
+pub_const_crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
@@ -277,8 +277,28 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
 // # Panics
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 //
-// This is equivalent to `mpn_mul` from `mpn/generic/mul.c`, GMP 6.2.1.
+// This is _flint_mpn_mul from mpn_extras/mul.c, FLINT 3.3.0-dev.
 pub_crate_test! {limbs_mul_greater_to_out(
+    r: &mut [Limb],
+    x: &[Limb],
+    y: &[Limb],
+    scratch: &mut [Limb],
+) -> Limb {
+    let xs_len = x.len();
+    let ys_len = y.len();
+    assert!(xs_len >= ys_len);
+    if xs_len == ys_len {
+        limbs_mul_same_length_to_out(r, x, y, scratch);
+    } else if ys_len < FFT_MUL_THRESHOLD {
+        let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
+        limbs_mul_greater_to_out_old(r, x, y, &mut scratch);
+    } else {
+        mpn_mul_default_mpn_ctx(r, x, y, false);
+    }
+    r[xs_len + ys_len - 1]
+}}
+
+pub_crate_test! {limbs_mul_greater_to_out_old(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -289,9 +309,7 @@ pub_crate_test! {limbs_mul_greater_to_out(
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
     assert!(out.len() >= xs_len + ys_len);
-    if xs_len == ys_len {
-        limbs_mul_same_length_to_out(out, xs, ys, scratch);
-    } else if ys_len < MUL_TOOM22_THRESHOLD {
+    if ys_len < MUL_TOOM22_THRESHOLD {
         // Plain schoolbook multiplication. Unless xs_len is very large, or else if
         // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
         limbs_mul_greater_to_out_basecase(out, xs, ys);
@@ -407,7 +425,7 @@ pub_crate_test! {limbs_mul_greater_to_out(
             limbs_mul_greater_to_out_toom_8h(out, xs, ys, scratch);
         }
     } else {
-        limbs_mul_greater_to_out_fft(out, xs, ys, scratch);
+        mpn_mul_default_mpn_ctx(out, xs, ys, false);
     }
     out[xs_len + ys_len - 1]
 }}
@@ -480,7 +498,7 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
     assert!(out.len() >= xs_len + ys_len);
     let out = &mut out[..(xs_len + ys_len)];
     // We first multiply by the low order limb. This result can be stored, not added, to out.
-    out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
+    out[xs_len] = limbs_mul_limb_to_out::<DoubleLimb, Limb>(out, xs, ys[0]);
     // Now accumulate the product of xs and the next higher limb from ys.
     let window_size = xs_len + 1;
     let mut i = 1;
@@ -847,7 +865,10 @@ impl<'a> Product<&'a Natural> for Natural {
     }
 }
 
-/// Code for the Schönhage-Strassen (FFT) multiplication algorithm.
+/// A precomputed object used by FFT code.
+pub mod context;
+/// Code for multiplying large integers. Derived from Daniel Schultz's small-prime FFT
+/// implementation for FLINT.
 pub mod fft;
 /// Code for multiplying a many-limbed [`Natural`] by a single [limb](crate#limbs).
 pub mod limb;

@@ -54,9 +54,9 @@ impl FromStringBase for Integer {
     ///
     /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid, the
     /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'` through
-    /// `'z'`, and `'A'` through `'Z'`, with an optional leading `'-'`; and only characters that
-    /// represent digits smaller than the base are allowed. Leading zeros are allowed, as is the
-    /// string `"-0"`. The string `"-"` is not.
+    /// `'z'`, and `'A'` through `'Z'`, with an optional single leading `'-'` or `'+'`; and only
+    /// characters that represent digits smaller than the base are allowed. Leading zeros are
+    /// allowed, as is the string `"-0"`. The string `"-"` is not.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

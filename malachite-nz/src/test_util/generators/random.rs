@@ -26,9 +26,6 @@ use crate::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use crate::natural::arithmetic::mul::fft::{
-    limbs_mul_greater_to_out_fft_is_valid, limbs_square_to_out_fft_is_valid,
-};
 use crate::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
@@ -61,7 +58,7 @@ use crate::natural::random::{
     random_positive_naturals,
 };
 use crate::platform::{
-    Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
+    DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
 };
 use crate::test_util::extra_variadic::{
@@ -4492,16 +4489,6 @@ pub fn random_primitive_int_vec_pair_gen_var_23<T: PrimitiveInt>(
 
 // vars 26 to 27 are in malachite-base.
 
-pub fn random_primitive_int_vec_pair_gen_var_28<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>)> {
-    #[cfg(feature = "32_bit_limbs")]
-    let limit = 56;
-    #[cfg(not(feature = "32_bit_limbs"))]
-    let limit = 28;
-    random_square_helper(config, &limbs_square_to_out_fft_is_valid, limit)
-}
-
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, Vec<PrimitiveInt>) --
 
 // vars 1 through 3 are in malachite-base
@@ -4815,40 +4802,6 @@ pub fn random_primitive_int_vec_triple_gen_var_45<T: PrimitiveInt>(
 }
 
 // var 46 is in malachite-base.
-
-pub fn random_primitive_int_vec_triple_gen_var_47<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    #[cfg(feature = "32_bit_limbs")]
-    let limit = 112;
-    #[cfg(not(feature = "32_bit_limbs"))]
-    let limit = 56;
-    Box::new(PrimitiveIntVecTripleLenGenerator1 {
-        phantom: PhantomData,
-        lengths: random_triples_from_single(geometric_random_positive_unsigneds::<usize>(
-            EXAMPLE_SEED.fork("lengths"),
-            config.get_or("mean_length_n", 4),
-            config.get_or("mean_length_d", 1),
-        ))
-        .filter_map(move |(o, mut x, mut y)| {
-            let sum = x + y;
-            if sum <= limit {
-                if o.odd() {
-                    x += limit - sum + 1;
-                } else {
-                    y += limit - sum + 1;
-                }
-            }
-            if limbs_mul_greater_to_out_fft_is_valid(usize::exact_from(x), usize::exact_from(y)) {
-                let o = x.checked_add(y)?.checked_add(o)?;
-                Some((o, x, y))
-            } else {
-                None
-            }
-        }),
-        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
-    })
-}
 
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
@@ -6584,7 +6537,7 @@ pub fn random_large_type_gen_var_13(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -6615,7 +6568,7 @@ pub fn random_large_type_gen_var_14(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -6648,7 +6601,7 @@ pub fn random_large_type_gen_var_15(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -6673,7 +6626,7 @@ pub fn random_large_type_gen_var_16(
         }
         .map(|(q, n, mut d)| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             (q, n, d, inverse)
         }),
     )
@@ -6693,7 +6646,7 @@ pub fn random_large_type_gen_var_17(
         )
         .map(|mut d| {
             d[0] |= 1;
-            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let inverse = limbs_modular_invert_limb::<Limb>(d[0]).wrapping_neg();
             let is = vec![0; d.len()];
             let scratch = vec![0; limbs_modular_invert_scratch_len(d.len())];
             (is, scratch, d, inverse)
@@ -6727,7 +6680,7 @@ pub fn random_large_type_gen_var_18(config: &GenConfig) -> It<(Vec<Limb>, usize,
                 None
             } else {
                 let shift = LeadingZeros::leading_zeros(d);
-                let d_inv = limbs_invert_limb(d << shift);
+                let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
                 Some((ns, fraction_len, d, d_inv, shift))
             }
         }),
@@ -6763,7 +6716,7 @@ pub fn random_large_type_gen_var_19(
                 None
             } else {
                 let shift = LeadingZeros::leading_zeros(d);
-                let d_inv = limbs_invert_limb(d << shift);
+                let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
                 Some((out, fraction_len, ns, d, d_inv, shift))
             }
         }),

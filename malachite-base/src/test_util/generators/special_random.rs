@@ -3018,6 +3018,16 @@ pub fn special_random_unsigned_gen_var_25<T: PrimitiveUnsigned + IsPrime>(
     )
 }
 
+pub fn special_random_unsigned_gen_var_26<T: PrimitiveFloat>(config: &GenConfig) -> It<u64> {
+    Box::new(striped_random_unsigned_inclusive_range::<u64>(
+        EXAMPLE_SEED,
+        0,
+        u64::exact_from(T::MAX_EXPONENT),
+        config.get_or("mean_stripe_n", T::WIDTH >> 1),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn special_random_unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>(
@@ -9265,7 +9275,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_53<T: PrimitiveUnsigned>(
                     config.get_or("mean_length_n", 4),
                     config.get_or("mean_length_d", 1),
                 ))
-                .filter(|&(x, y)| x >= y - 2),
+                .filter(|&(x, y)| y >= 2 && x >= y - 2),
                 striped_bit_source: StripedBitSource::new(
                     seed.fork("striped_bit_source"),
                     config.get_or("mean_stripe_n", T::WIDTH >> 1),

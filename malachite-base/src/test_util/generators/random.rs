@@ -3114,6 +3114,14 @@ pub fn random_unsigned_gen_var_28<T: PrimitiveUnsigned + IsPrime>(_config: &GenC
     Box::new(random_primitive_ints(EXAMPLE_SEED).filter(T::is_prime))
 }
 
+pub fn random_signed_gen_var_29<T: PrimitiveFloat>(_config: &GenConfig) -> It<u64> {
+    Box::new(random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        0,
+        u64::exact_from(T::MAX_EXPONENT),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_unsigned_primitive_int_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
@@ -7918,12 +7926,12 @@ pub fn random_unsigned_vec_triple_gen_var_10<T: PrimitiveUnsigned>(
             EXAMPLE_SEED,
             &|seed| PrimitiveIntVecPairLenGenerator1 {
                 phantom: PhantomData,
-                lengths: random_pairs_from_single(geometric_random_positive_unsigneds(
+                lengths: random_pairs_from_single(geometric_random_positive_unsigneds::<usize>(
                     seed.fork("lengths"),
                     config.get_or("mean_length_n", 4),
                     config.get_or("mean_length_d", 1),
                 ))
-                .filter(|&(x, y)| x >= y - 2),
+                .filter(|&(x, y)| y >= 2 && x >= y - 2),
                 xs: random_primitive_ints(seed.fork("xs")),
             },
             &|seed| {

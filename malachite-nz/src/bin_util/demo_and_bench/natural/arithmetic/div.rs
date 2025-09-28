@@ -32,6 +32,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_divide_and_conquer, limbs_div_mod_schoolbook, limbs_div_mod_to_out,
     limbs_two_limb_inverse_helper,
 };
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     limbs_div_to_out_balancing_bucketer, pair_1_natural_bit_bucketer,
     pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
@@ -154,8 +155,9 @@ fn demo_limbs_div_divisor_of_limb_max_with_carry_to_out(
 ) {
     for (mut out, xs, divisor, carry) in large_type_gen_var_10().get(gm, config).take(limit) {
         let out_old = out.clone();
-        let carry_out =
-            limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, &xs, divisor, carry);
+        let carry_out = limbs_div_divisor_of_limb_max_with_carry_to_out::<DoubleLimb, Limb>(
+            &mut out, &xs, divisor, carry,
+        );
         println!(
             "out := {out_old:?}; \
             limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, {xs:?}, {divisor}, {carry}) \
@@ -474,9 +476,10 @@ fn benchmark_limbs_div_divisor_of_limb_max_with_carry_to_out(
         file_name,
         &quadruple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, divisor, carry)| {
-            no_out!(limbs_div_divisor_of_limb_max_with_carry_to_out(
-                &mut out, &xs, divisor, carry
-            ))
+            no_out!(limbs_div_divisor_of_limb_max_with_carry_to_out::<
+                DoubleLimb,
+                Limb,
+            >(&mut out, &xs, divisor, carry))
         })],
     );
 }

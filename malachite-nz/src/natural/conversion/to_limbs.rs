@@ -396,7 +396,7 @@ impl Natural {
     ///     );
     /// }
     /// ```
-    pub fn limbs(&self) -> LimbIterator {
+    pub fn limbs(&self) -> LimbIterator<'_> {
         let limb_count = self.limb_count();
         let limb_count_usize = usize::exact_from(limb_count);
         LimbIterator {

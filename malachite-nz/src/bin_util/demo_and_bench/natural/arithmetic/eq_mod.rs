@@ -28,6 +28,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_limb_mod_exact_odd_limb, limbs_mod_exact_odd_limb,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_triple_1_2_natural_max_bit_bucketer, triple_1_2_natural_max_bit_bucketer,
 };
@@ -434,7 +435,7 @@ fn benchmark_limbs_eq_limb_mod_limb_algorithms(
                 no_out!(limbs_eq_limb_mod_limb(xs, y, m))
             }),
             ("limbs_mod_limb", &mut |(ref xs, y, m)| {
-                no_out!(limbs_mod_limb(xs, m) == y % m)
+                no_out!(limbs_mod_limb::<DoubleLimb, Limb>(xs, m) == y % m)
             }),
             ("combined_limbs_eq_limb_mod_limb", &mut |(ref xs, y, m)| {
                 no_out!(combined_limbs_eq_limb_mod_limb(xs, y, m))

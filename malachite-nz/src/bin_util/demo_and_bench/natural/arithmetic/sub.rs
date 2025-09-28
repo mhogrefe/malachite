@@ -26,6 +26,7 @@ use malachite_nz::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
     limbs_sub_same_length_to_out_with_overlap, limbs_vec_sub_in_place_right,
 };
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
     triple_3_pair_natural_max_bit_bucketer,
@@ -109,7 +110,7 @@ fn demo_limbs_sub_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_limbs_sub_limb_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, y) in unsigned_vec_unsigned_pair_gen().get(gm, config).take(limit) {
         let xs_old = xs.clone();
-        let borrow = limbs_sub_limb_in_place(&mut xs, y);
+        let borrow = limbs_sub_limb_in_place::<Limb>(&mut xs, y);
         println!(
             "xs := {xs_old:?}; \
             limbs_sub_limb_in_place(&mut xs, {y}) = {borrow}; xs = {xs:?}"
@@ -316,7 +317,7 @@ fn benchmark_limbs_sub_limb_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y)| {
-            no_out!(limbs_sub_limb_in_place(&mut xs, y))
+            no_out!(limbs_sub_limb_in_place::<Limb>(&mut xs, y))
         })],
     );
 }

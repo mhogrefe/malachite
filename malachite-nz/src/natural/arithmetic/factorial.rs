@@ -108,8 +108,6 @@ fn limbs_2_multiswing_odd(
     // Handle prime = 3 separately
     let mut j = 0;
     if prod > max_prod {
-        // not triggered by the first billion inputs
-        fail_on_untested_path("limbs_2_multiswing_odd, prod > max_prod for prime == 3");
         factors[j] = prod;
         j += 1;
         prod = 1;
@@ -331,7 +329,7 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                     &mut swing_and_sieve,
                     sieve_offset,
                     Limb::exact_from(n >> i),
-                    &mut factors,
+                    &mut factors
                 );
                 let mut square;
                 if double && i == 0 {

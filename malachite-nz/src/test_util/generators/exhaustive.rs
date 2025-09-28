@@ -32,9 +32,6 @@ use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::arithmetic::mod_mul::limbs_precompute_mod_mul_two_limbs;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use crate::natural::arithmetic::mul::fft::{
-    limbs_mul_greater_to_out_fft_is_valid, limbs_square_to_out_fft_is_valid,
-};
 use crate::natural::arithmetic::mul::limb::{
     limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
 };
@@ -70,7 +67,7 @@ use crate::natural::exhaustive::{
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::platform::{
-    Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
+    DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
 };
 use crate::test_util::extra_variadic::{
@@ -2895,14 +2892,6 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_29<T: PrimitiveUnsigned>() -> It<(Ve
 
 // vars 32 to 33 are in malachite-base.
 
-pub fn exhaustive_unsigned_vec_pair_gen_var_34<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
-    #[cfg(feature = "32_bit_limbs")]
-    let limit = 56;
-    #[cfg(not(feature = "32_bit_limbs"))]
-    let limit = 28;
-    exhaustive_square_helper(&limbs_square_to_out_fft_is_valid, limit)
-}
-
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 struct ValidDigitsGenerator1<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
@@ -3789,11 +3778,6 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_58<T: PrimitiveUnsigned>()
 
 // var 59 is in malachite-base.
 
-pub fn exhaustive_unsigned_vec_triple_gen_var_60<T: PrimitiveUnsigned>()
--> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    exhaustive_mul_helper(&limbs_mul_greater_to_out_fft_is_valid, 1, 1)
-}
-
 // -- (Vec<PrimitiveUnsigned> * 4) --
 
 #[allow(clippy::type_complexity)]
@@ -4455,7 +4439,7 @@ pub fn exhaustive_large_type_gen_var_18() -> It<(Vec<Limb>, usize, Limb, Limb, u
                 None
             } else {
                 let shift = LeadingZeros::leading_zeros(d);
-                let d_inv = limbs_invert_limb(d << shift);
+                let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
                 Some((ns, fraction_len, d, d_inv, shift))
             }
         }),
@@ -4475,7 +4459,7 @@ pub fn exhaustive_large_type_gen_var_19() -> It<(Vec<Limb>, usize, Vec<Limb>, Li
                 None
             } else {
                 let shift = LeadingZeros::leading_zeros(d);
-                let d_inv = limbs_invert_limb(d << shift);
+                let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d << shift);
                 Some((out, fraction_len, ns, d, d_inv, shift))
             }
         }),

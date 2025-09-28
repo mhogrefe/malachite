@@ -12,27 +12,11 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
-use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
+use crate::natural::logic::not::limbs_not_in_place;
 use crate::platform::Limb;
 use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
-use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-
-// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1.
-pub(crate) fn limbs_neg(out: &mut [Limb], xs: &[Limb]) -> bool {
-    let n = xs.len();
-    let zeros = slice_leading_zeros(xs);
-    slice_set_zero(&mut out[..zeros]);
-    if zeros == n {
-        return false;
-    }
-    out[zeros] = xs[zeros].wrapping_neg();
-    let offset = zeros + 1;
-    if offset != n {
-        limbs_not_to_out(&mut out[offset..], &xs[offset..]);
-    }
-    true
-}
+use malachite_base::slices::slice_leading_zeros;
 
 // This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1, where rp == up.
 pub(crate) fn limbs_neg_in_place(xs: &mut [Limb]) -> bool {
@@ -45,22 +29,6 @@ pub(crate) fn limbs_neg_in_place(xs: &mut [Limb]) -> bool {
     let offset = zeros + 1;
     if offset != n {
         limbs_not_in_place(&mut xs[offset..]);
-    }
-    true
-}
-
-// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1, where rp != up.
-pub(crate) fn limbs_neg_to_out(out: &mut [Limb], xs: &[Limb]) -> bool {
-    let n = xs.len();
-    let zeros = slice_leading_zeros(xs);
-    if zeros == n {
-        return false;
-    }
-    slice_set_zero(&mut out[..zeros]);
-    out[zeros] = xs[zeros].wrapping_neg();
-    let offset = zeros + 1;
-    if offset != n {
-        limbs_not_to_out(&mut out[offset..], &xs[offset..]);
     }
     true
 }

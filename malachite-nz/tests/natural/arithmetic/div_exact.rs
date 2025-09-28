@@ -35,7 +35,7 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_scratch_len, limbs_modular_invert, limbs_modular_invert_limb,
     limbs_modular_invert_scratch_len, test_invert_limb_table,
 };
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,
     natural_gen, natural_gen_var_2, natural_pair_gen_var_6, unsigned_vec_gen_var_5,
@@ -74,14 +74,14 @@ fn test_limbs_modular_invert_limb() {
 #[test]
 #[should_panic]
 fn limbs_modular_invert_limb_fail_1() {
-    limbs_modular_invert_limb(0);
+    limbs_modular_invert_limb::<Limb>(0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_modular_invert_limb_fail_2() {
-    limbs_modular_invert_limb(2);
+    limbs_modular_invert_limb::<Limb>(2);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -145,11 +145,11 @@ fn limbs_div_exact_limb_in_place_fail_2() {
 fn test_limbs_div_exact_limb_to_out() {
     let test = |out_before: &[Limb], ns: &[Limb], d: Limb, out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        limbs_div_exact_limb_to_out(&mut out, ns, d);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, ns, d);
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
-        limbs_div_exact_limb_to_out_no_special_3(&mut out, ns, d);
+        limbs_div_exact_limb_to_out_no_special_3::<DoubleLimb, Limb>(&mut out, ns, d);
         assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[0], 2, &[0, 10, 10, 10]);
@@ -187,21 +187,21 @@ fn test_limbs_div_exact_limb_to_out() {
 #[test]
 #[should_panic]
 fn limbs_div_exact_limb_to_out_fail_1() {
-    limbs_div_exact_limb_to_out(&mut [10, 10], &[], 10);
+    limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut [10, 10], &[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_div_exact_limb_to_out_fail_2() {
-    limbs_div_exact_limb_to_out(&mut [10, 10], &[10, 10], 0);
+    limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut [10, 10], &[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_div_exact_limb_to_out_fail_3() {
-    limbs_div_exact_limb_to_out(&mut [10], &[10, 10], 10);
+    limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut [10], &[10, 10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -252,7 +252,7 @@ fn limbs_div_exact_3_in_place_fail() {
 fn test_limbs_div_exact_3_to_out() {
     let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        limbs_div_exact_3_to_out(&mut out, xs);
+        limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut out, xs);
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
@@ -260,7 +260,7 @@ fn test_limbs_div_exact_3_to_out() {
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
-        limbs_div_exact_limb_to_out(&mut out, xs, 3);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, xs, 3);
         assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[0], &[0, 10, 10, 10]);
@@ -283,14 +283,14 @@ fn test_limbs_div_exact_3_to_out() {
 #[test]
 #[should_panic]
 fn limbs_div_exact_3_to_out_fail_1() {
-    limbs_div_exact_3_to_out(&mut [10, 10], &[]);
+    limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut [10, 10], &[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_div_exact_3_to_out_fail_2() {
-    limbs_div_exact_3_to_out(&mut [10], &[10, 10]);
+    limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut [10], &[10, 10]);
 }
 
 fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
@@ -922,7 +922,7 @@ fn limbs_modular_div_mod_schoolbook_fail_1() {
 #[should_panic]
 fn limbs_modular_div_mod_schoolbook_fail_2() {
     let ds = &[1, 2, 3];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_mod_schoolbook(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -931,7 +931,7 @@ fn limbs_modular_div_mod_schoolbook_fail_2() {
 #[should_panic]
 fn limbs_modular_div_mod_schoolbook_fail_3() {
     let ds = &[1, 2];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_mod_schoolbook(&mut [], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -940,7 +940,7 @@ fn limbs_modular_div_mod_schoolbook_fail_3() {
 #[should_panic]
 fn limbs_modular_div_mod_schoolbook_fail_4() {
     let ds = &[4, 5];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_mod_schoolbook(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -1271,7 +1271,7 @@ fn limbs_modular_div_mod_divide_and_conquer_fail_1() {
 #[should_panic]
 fn limbs_modular_div_mod_divide_and_conquer_fail_2() {
     let ds = &[1, 2, 3];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_mod_divide_and_conquer(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -1280,7 +1280,7 @@ fn limbs_modular_div_mod_divide_and_conquer_fail_2() {
 #[should_panic]
 fn limbs_modular_div_mod_divide_and_conquer_fail_3() {
     let ds = &[1, 2];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_mod_divide_and_conquer(&mut [], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -1289,7 +1289,7 @@ fn limbs_modular_div_mod_divide_and_conquer_fail_3() {
 #[should_panic]
 fn limbs_modular_div_mod_divide_and_conquer_fail_4() {
     let ds = &[4, 5];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_mod_divide_and_conquer(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2233,7 +2233,7 @@ fn limbs_modular_div_schoolbook_fail_1() {
 #[should_panic]
 fn limbs_modular_div_schoolbook_fail_2() {
     let ds = &[1, 2, 3, 4];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_schoolbook(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2242,7 +2242,7 @@ fn limbs_modular_div_schoolbook_fail_2() {
 #[should_panic]
 fn limbs_modular_div_schoolbook_fail_3() {
     let ds = &[1, 2];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_schoolbook(&mut [10, 10], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2251,7 +2251,7 @@ fn limbs_modular_div_schoolbook_fail_3() {
 #[should_panic]
 fn limbs_modular_div_schoolbook_fail_4() {
     let ds = &[4, 5];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_schoolbook(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2267,7 +2267,7 @@ fn limbs_modular_div_schoolbook_in_place_fail_1() {
 #[should_panic]
 fn limbs_modular_div_schoolbook_in_place_fail_2() {
     let ds = &[1, 2, 3, 4];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_schoolbook_in_place(&mut [1, 2, 3], ds, inverse);
 }
 
@@ -2276,7 +2276,7 @@ fn limbs_modular_div_schoolbook_in_place_fail_2() {
 #[should_panic]
 fn limbs_modular_div_schoolbook_in_place_fail_3() {
     let ds = &[4, 5];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_schoolbook_in_place(&mut [1, 2, 3], ds, inverse);
 }
 
@@ -2286,7 +2286,7 @@ fn test_limbs_modular_div_divide_and_conquer() {
     let test = |qs_in: &[Limb], ns_in: &[Limb], ds: &[Limb], qs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut ns = ns_in.to_vec();
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
         limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, ds, inverse);
         assert_eq!(&qs[..ns.len()], qs_out);
         verify_limbs_modular_div(ns_in, ds, qs_out);
@@ -2650,7 +2650,7 @@ fn test_limbs_modular_div_divide_and_conquer() {
 #[should_panic]
 fn limbs_modular_div_divide_and_conquer_fail_1() {
     let ds = &[4];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_divide_and_conquer(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2659,7 +2659,7 @@ fn limbs_modular_div_divide_and_conquer_fail_1() {
 #[should_panic]
 fn limbs_modular_div_divide_and_conquer_fail_2() {
     let ds = &[1, 2, 3, 4];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_divide_and_conquer(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2668,7 +2668,7 @@ fn limbs_modular_div_divide_and_conquer_fail_2() {
 #[should_panic]
 fn limbs_modular_div_divide_and_conquer_fail_3() {
     let ds = &[1, 2];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_divide_and_conquer(&mut [10, 10], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -2677,7 +2677,7 @@ fn limbs_modular_div_divide_and_conquer_fail_3() {
 #[should_panic]
 fn limbs_modular_div_divide_and_conquer_fail_4() {
     let ds = &[4, 5];
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    let inverse = limbs_modular_invert_limb::<Limb>(ds[0]).wrapping_neg();
     limbs_modular_div_divide_and_conquer(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
 }
 
@@ -4553,9 +4553,9 @@ fn div_exact_ref_ref_fail() {
 #[test]
 fn limbs_modular_invert_limb_properties() {
     unsigned_gen_var_22().test_properties(|x| {
-        let inverse = limbs_modular_invert_limb(x);
+        let inverse = limbs_modular_invert_limb::<Limb>(x);
         assert_eq!(x.wrapping_mul(inverse), 1);
-        assert_eq!(limbs_modular_invert_limb(inverse), x);
+        assert_eq!(limbs_modular_invert_limb::<Limb>(inverse), x);
     });
 }
 
@@ -4586,14 +4586,14 @@ fn limbs_div_exact_limb_to_out_properties() {
         &config,
         |(mut out, xs, y)| {
             let old_out = out.clone();
-            limbs_div_exact_limb_to_out(&mut out, &xs, y);
+            limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y);
             let len = xs.len();
             let expected_result = Natural::from_limbs_asc(&xs).div_exact(Natural::from(y));
             assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
             assert_eq!(&out[len..], &old_out[len..]);
 
             let mut out = old_out.to_vec();
-            limbs_div_exact_limb_to_out_no_special_3(&mut out, &xs, y);
+            limbs_div_exact_limb_to_out_no_special_3::<DoubleLimb, Limb>(&mut out, &xs, y);
             let len = xs.len();
             let expected_result = Natural::from_owned_limbs_asc(xs).div_exact(Natural::from(y));
             assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
@@ -4645,7 +4645,7 @@ fn limbs_div_exact_3_to_out_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_pair_gen_var_13().test_properties_with_config(&config, |(mut out, xs)| {
         let old_out = out.clone();
-        limbs_div_exact_3_to_out(&mut out, &xs);
+        limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut out, &xs);
         let len = xs.len();
         assert_eq!(
             Natural::from_limbs_asc(&out[..len]),
@@ -4654,7 +4654,7 @@ fn limbs_div_exact_3_to_out_properties() {
         assert_eq!(&out[len..], &old_out[len..]);
 
         let mut out_alt = old_out.clone();
-        limbs_div_exact_limb_to_out(&mut out_alt, &xs, 3);
+        limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out_alt, &xs, 3);
         assert_eq!(out_alt, out);
 
         let mut out_alt = old_out;

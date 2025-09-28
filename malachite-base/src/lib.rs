@@ -119,7 +119,10 @@
     clippy::upper_case_acronyms,
     unstable_name_collisions
 )]
-#![cfg_attr(not(any(feature = "test_build", feature = "random")), no_std)]
+#![cfg_attr(
+    not(any(feature = "test_build", feature = "random", feature = "std")),
+    no_std
+)]
 
 #[macro_use]
 extern crate alloc;
@@ -275,3 +278,5 @@ pub mod vecs;
 
 #[cfg(feature = "test_build")]
 pub mod test_util;
+
+pub mod platform;

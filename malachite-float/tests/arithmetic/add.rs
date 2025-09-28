@@ -9705,14 +9705,20 @@ fn add_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
         sum_alt.neg_assign();
         sum_alt.abs_negative_zero_assign();
         o_alt = o_alt.reverse();
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
+        assert_eq!(
+            ComparableFloatRef(&sum_alt),
+            ComparableFloatRef(&sum.abs_negative_zero_ref())
+        );
         assert_eq!(o_alt, o);
 
         let (mut sum_alt, mut o_alt) = (-x).add_prec(-y, prec);
         sum_alt.neg_assign();
         sum_alt.abs_negative_zero_assign();
         o_alt = o_alt.reverse();
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
+        assert_eq!(
+            ComparableFloatRef(&sum_alt),
+            ComparableFloatRef(&sum.abs_negative_zero())
+        );
         assert_eq!(o_alt, o);
     }
 }
@@ -10103,10 +10109,16 @@ fn add_properties_helper_2(x: Float, y: Float, extreme: bool) {
 
     if (x != 0u32 && y != 0u32) || (x.is_sign_positive() && y.is_sign_positive()) {
         let sum_alt = (-(-&x - &y)).abs_negative_zero();
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
+        assert_eq!(
+            ComparableFloatRef(&sum_alt),
+            ComparableFloatRef(&sum.abs_negative_zero_ref())
+        );
 
         let sum_alt = (-(-&x + -&y)).abs_negative_zero();
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
+        assert_eq!(
+            ComparableFloatRef(&sum_alt),
+            ComparableFloatRef(&sum.abs_negative_zero())
+        );
     }
 
     // example of associativity failure: 0x1.0#1 0x2.0#1 -0x1.0#1
