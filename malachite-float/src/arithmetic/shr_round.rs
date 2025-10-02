@@ -102,6 +102,40 @@ where
     }
 }
 
+pub(crate) fn shr_prec_round_assign<T: PrimitiveInt>(
+    x: &mut Float,
+    bits: T,
+    prec: u64,
+    rm: RoundingMode,
+) -> Ordering
+where
+    i32: WrappingFrom<T>,
+{
+    if let Float(Finite { exponent, .. }) = x {
+        let old_exponent = *exponent;
+        *exponent = 0;
+        let o = x.set_prec_round(prec, rm);
+        let bits: i32 = bits.saturating_into();
+        shr_prec_round_assign_helper::<i32>(x, bits.saturating_sub(old_exponent), prec, rm, o)
+    } else {
+        Equal
+    }
+}
+
+pub(crate) fn shr_prec_round<T: PrimitiveInt>(
+    x: &Float,
+    bits: T,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering)
+where
+    i32: WrappingFrom<T>,
+{
+    let mut x = x.clone();
+    let o = shr_prec_round_assign(&mut x, bits, prec, rm);
+    (x, o)
+}
+
 fn shr_round_primitive_int_ref<T: PrimitiveInt>(
     x: &Float,
     bits: T,

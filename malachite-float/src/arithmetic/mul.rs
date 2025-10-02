@@ -920,16 +920,16 @@ impl Float {
                 let sign = x_sign == y_sign;
                 let exp_sum = x_exp + y_exp;
                 if exp_sum - 1 > Float::MAX_EXPONENT {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
                         (true, _) => (Float::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
                         (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
                     };
                 } else if exp_sum < Float::MIN_EXPONENT - 1 {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Floor | Down | Nearest) => (float_zero!(), Less),
                         (true, _) => (Float::min_positive_value_prec(prec), Greater),
                         (false, Ceiling | Down | Nearest) => (float_negative_zero!(), Greater),
@@ -944,14 +944,10 @@ impl Float {
                     prec,
                     if sign { rm } else { -rm },
                 );
-                let exp = x_exp
-                    .checked_add(*y_exp)
-                    .unwrap()
-                    .checked_add(exp_offset)
-                    .unwrap();
+                let exp = exp_sum.checked_add(exp_offset).unwrap();
                 if exp > Float::MAX_EXPONENT {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
                         (true, _) => (Float::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
@@ -969,7 +965,7 @@ impl Float {
                         }
                     } else {
                         match (sign, rm) {
-                            (_, Exact) => panic!("Inexact float multiplication"),
+                            (_, Exact) => panic!("Inexact Float multiplication"),
                             (true, Ceiling | Up) => (Float::min_positive_value_prec(prec), Greater),
                             (true, _) => (float_zero!(), Less),
                             (false, Floor | Up) => (-Float::min_positive_value_prec(prec), Less),
@@ -1781,8 +1777,8 @@ impl Float {
                 let sign = *x_sign == y_sign;
                 let exp_sum = *x_exp + y_exp;
                 if exp_sum - 1 > Float::MAX_EXPONENT {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Ceiling | Up | Nearest) => {
                             *self = float_infinity!();
                             Greater
@@ -1801,8 +1797,8 @@ impl Float {
                         }
                     };
                 } else if exp_sum < Float::MIN_EXPONENT - 1 {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Floor | Down | Nearest) => {
                             *self = float_zero!();
                             Less
@@ -1829,14 +1825,10 @@ impl Float {
                     prec,
                     if sign { rm } else { -rm },
                 );
-                *x_exp = x_exp
-                    .checked_add(y_exp)
-                    .unwrap()
-                    .checked_add(exp_offset)
-                    .unwrap();
+                *x_exp = exp_sum.checked_add(exp_offset).unwrap();
                 if *x_exp > Float::MAX_EXPONENT {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Ceiling | Up | Nearest) => {
                             *self = float_infinity!();
                             Greater
@@ -1860,19 +1852,15 @@ impl Float {
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {
-                            {
-                                *self = Float::min_positive_value_prec(prec);
-                                Greater
-                            }
+                            *self = Float::min_positive_value_prec(prec);
+                            Greater
                         } else {
-                            {
-                                *self = -Float::min_positive_value_prec(prec);
-                                Less
-                            }
+                            *self = -Float::min_positive_value_prec(prec);
+                            Less
                         }
                     } else {
                         match (sign, rm) {
-                            (_, Exact) => panic!("Inexact float multiplication"),
+                            (_, Exact) => panic!("Inexact Float multiplication"),
                             (true, Ceiling | Up) => {
                                 *self = Float::min_positive_value_prec(prec);
                                 Greater
@@ -2040,8 +2028,8 @@ impl Float {
                 let sign = x_sign == y_sign;
                 let exp_sum = *x_exp + y_exp;
                 if exp_sum - 1 > Float::MAX_EXPONENT {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Ceiling | Up | Nearest) => {
                             *self = float_infinity!();
                             Greater
@@ -2060,8 +2048,8 @@ impl Float {
                         }
                     };
                 } else if exp_sum < Float::MIN_EXPONENT - 1 {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Floor | Down | Nearest) => {
                             *self = float_zero!();
                             Less
@@ -2088,14 +2076,10 @@ impl Float {
                     prec,
                     if sign { rm } else { -rm },
                 );
-                *x_exp = x_exp
-                    .checked_add(*y_exp)
-                    .unwrap()
-                    .checked_add(exp_offset)
-                    .unwrap();
+                *x_exp = exp_sum.checked_add(exp_offset).unwrap();
                 if *x_exp > Float::MAX_EXPONENT {
-                    assert!(rm != Exact, "Inexact Float multiplication");
                     return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Ceiling | Up | Nearest) => {
                             *self = float_infinity!();
                             Greater
@@ -2119,19 +2103,15 @@ impl Float {
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {
-                            {
-                                *self = Float::min_positive_value_prec(prec);
-                                Greater
-                            }
+                            *self = Float::min_positive_value_prec(prec);
+                            Greater
                         } else {
-                            {
-                                *self = -Float::min_positive_value_prec(prec);
-                                Less
-                            }
+                            *self = -Float::min_positive_value_prec(prec);
+                            Less
                         }
                     } else {
                         match (sign, rm) {
-                            (_, Exact) => panic!("Inexact float multiplication"),
+                            (_, Exact) => panic!("Inexact Float multiplication"),
                             (true, Ceiling | Up) => {
                                 *self = Float::min_positive_value_prec(prec);
                                 Greater

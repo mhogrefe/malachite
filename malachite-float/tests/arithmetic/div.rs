@@ -44,10 +44,13 @@ use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_23, float_float_rounding_mode_triple_gen_var_24,
     float_float_rounding_mode_triple_gen_var_25, float_float_rounding_mode_triple_gen_var_26,
     float_float_rounding_mode_triple_gen_var_27, float_float_rounding_mode_triple_gen_var_28,
-    float_float_unsigned_rounding_mode_quadruple_gen_var_4, float_float_unsigned_triple_gen_var_1,
-    float_gen, float_pair_gen, float_pair_gen_var_2, float_pair_gen_var_3, float_pair_gen_var_4,
-    float_pair_gen_var_8, float_pair_gen_var_9, float_rational_pair_gen,
-    float_rational_rounding_mode_triple_gen_var_5, float_rational_rounding_mode_triple_gen_var_6,
+    float_float_rounding_mode_triple_gen_var_32,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_4,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_8, float_float_unsigned_triple_gen_var_1,
+    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_2,
+    float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_8, float_pair_gen_var_9,
+    float_pair_gen_var_10, float_rational_pair_gen, float_rational_rounding_mode_triple_gen_var_5,
+    float_rational_rounding_mode_triple_gen_var_6,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_4,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_5,
     float_rational_unsigned_triple_gen_var_1, float_rounding_mode_pair_gen,
@@ -2652,6 +2655,123 @@ fn test_div_prec() {
         000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
         0000000000000000000000000000000000000000000000000E-74#2337",
         Greater,
+    );
+    // - x_exp < Float::MIN_EXPONENT
+    // - x_exp < Float::MIN_EXPONENT special
+    // - x_exp < Float::MIN_EXPONENT special && sign
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "1.5",
+        "0x1.8#2",
+        2,
+        "too_small",
+        "0x1.0E-268435456#2",
+        Greater,
+    );
+    // - x_exp < Float::MIN_EXPONENT special && !sign
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "-1.5",
+        "-0x1.8#2",
+        2,
+        "-too_small",
+        "-0x1.0E-268435456#2",
+        Less,
+    );
+    // - x_exp < Float::MIN_EXPONENT not special
+    // - x_exp < Float::MIN_EXPONENT not special && sign && rm == Floor | Down | Nearest
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "3.0",
+        "0x3.0#2",
+        2,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - x_exp < Float::MIN_EXPONENT not special && !sign && rm == Ceiling | Down | Nearest
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "-3.0",
+        "-0x3.0#2",
+        2,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    // - exp_diff + 2 < Float::MIN_EXPONENT
+    // - exp_diff + 2 < Float::MIN_EXPONENT && sign && rm == Floor | Down | Nearest
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "too_big",
+        "0x6.0E+268435455#2",
+        2,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - exp_diff + 2 < Float::MIN_EXPONENT && !sign && rm == Ceiling | Down | Nearest
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        2,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    // - x_exp > Float::MAX_EXPONENT
+    // - x_exp > Float::MAX_EXPONENT
+    // - x_exp > Float::MAX_EXPONENT && sign && rm == Ceiling | Up | Nearest
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "0.8",
+        "0x0.c#2",
+        2,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - x_exp > Float::MAX_EXPONENT && !sign && rm == Floor | Up | Nearest
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "-0.8",
+        "-0x0.c#2",
+        2,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    // - exp_diff > Float::MAX_EXPONENT
+    // - exp_diff > Float::MAX_EXPONENT && sign && Ceiling | Up | Nearest
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "too_small",
+        "0x1.8E-268435456#2",
+        2,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - exp_diff > Float::MAX_EXPONENT && !sign && Ceiling | Up | Nearest
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "-too_small",
+        "-0x1.8E-268435456#2",
+        2,
+        "-Infinity",
+        "-Infinity",
+        Less,
     );
 }
 
@@ -5821,6 +5941,94 @@ fn test_div_round() {
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\
         ffffffffe0000002#2567",
         Less,
+    );
+    // - x_exp < Float::MIN_EXPONENT not special && sign && rm == Ceiling | Up
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "3.0",
+        "0x3.0#2",
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#2",
+        Greater,
+    );
+    // - x_exp < Float::MIN_EXPONENT not special && !sign && rm == Floor | Up
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "-3.0",
+        "-0x3.0#2",
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#2",
+        Less,
+    );
+    // - exp_diff + 2 < Float::MIN_EXPONENT && sign && rm == Ceiling | Up
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "too_big",
+        "0x6.0E+268435455#2",
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#2",
+        Greater,
+    );
+    // - exp_diff + 2 < Float::MIN_EXPONENT && !sign && rm == Floor | Up
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#2",
+        Less,
+    );
+    // - x_exp > Float::MAX_EXPONENT && sign && rm == Floor | Down
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "0.8",
+        "0x0.c#2",
+        Floor,
+        "too_big",
+        "0x6.0E+268435455#2",
+        Less,
+    );
+    // - x_exp > Float::MAX_EXPONENT && !sign && rm == Ceiling | Down
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "-0.8",
+        "-0x0.c#2",
+        Ceiling,
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Greater,
+    );
+    // - exp_diff > Float::MAX_EXPONENT && sign && Floor | Down
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "too_small",
+        "0x1.8E-268435456#2",
+        Floor,
+        "too_big",
+        "0x6.0E+268435455#2",
+        Less,
+    );
+    // - exp_diff > Float::MAX_EXPONENT && !sign && Floor | Down
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        "-too_small",
+        "-0x1.8E-268435456#2",
+        Ceiling,
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Greater,
     );
 }
 
@@ -13521,7 +13729,13 @@ fn rational_div_float_prec_round_fail() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn div_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) {
+fn div_prec_round_properties_helper(
+    x: Float,
+    y: Float,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
     let (quotient, o) = x.clone().div_prec_round(y.clone(), prec, rm);
     assert!(quotient.is_valid());
     let (quotient_alt, o_alt) = x.clone().div_prec_round_val_ref(&y, prec, rm);
@@ -13558,12 +13772,14 @@ fn div_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingM
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
     assert_eq!(o_alt, o);
 
-    let (quotient_alt, o_alt) = div_prec_round_naive(x.clone(), y.clone(), prec, rm);
-    assert_eq!(
-        ComparableFloatRef(&quotient_alt),
-        ComparableFloatRef(&quotient)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (quotient_alt, o_alt) = div_prec_round_naive(x.clone(), y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_quotient, rug_o) = rug_div_prec_round(
@@ -13597,39 +13813,34 @@ fn div_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingM
         );
     }
 
-    let r_quotient = if quotient.is_finite() && y.is_finite() {
+    if quotient.is_finite() && y.is_finite() {
         if quotient.is_normal() {
             assert_eq!(quotient.get_prec(), Some(prec));
         }
-        let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
-        assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
-        if o == Less {
-            let mut next = quotient.clone();
-            next.increment();
-            assert!(next > r_quotient);
-        } else if o == Greater {
-            let mut next = quotient.clone();
-            next.decrement();
-            assert!(next < r_quotient);
+        if !extreme {
+            // TODO
+            let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
+            assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
+            if o == Less {
+                let mut next = quotient.clone();
+                next.increment();
+                assert!(next > r_quotient);
+            } else if o == Greater {
+                let mut next = quotient.clone();
+                next.decrement();
+                assert!(next < r_quotient);
+            }
+            match (r_quotient >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
+            }
         }
-        Some(r_quotient)
-    } else {
-        assert_eq!(o, Equal);
-        None
-    };
-
-    match (
-        r_quotient.is_some() && *r_quotient.as_ref().unwrap() >= 0u32,
-        rm,
-    ) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
     }
 
     let (mut quotient_alt, mut o_alt) = x.div_prec_round_ref_val(-&y, prec, -rm);
@@ -13674,7 +13885,11 @@ fn div_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingM
 #[test]
 fn div_prec_round_properties() {
     float_float_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(|(x, y, prec, rm)| {
-        div_prec_round_properties_helper(x, y, prec, rm);
+        div_prec_round_properties_helper(x, y, prec, rm, false);
+    });
+
+    float_float_unsigned_rounding_mode_quadruple_gen_var_8().test_properties(|(x, y, prec, rm)| {
+        div_prec_round_properties_helper(x, y, prec, rm, true);
     });
 
     let mut config = GenConfig::new();
@@ -13683,7 +13898,7 @@ fn div_prec_round_properties() {
     float_float_unsigned_rounding_mode_quadruple_gen_var_4().test_properties_with_config(
         &config,
         |(x, y, prec, rm)| {
-            div_prec_round_properties_helper(x, y, prec, rm);
+            div_prec_round_properties_helper(x, y, prec, rm, false);
         },
     );
 
@@ -13694,7 +13909,7 @@ fn div_prec_round_properties() {
     float_float_unsigned_rounding_mode_quadruple_gen_var_4().test_properties_with_config(
         &config,
         |(x, y, prec, rm)| {
-            div_prec_round_properties_helper(x, y, prec, rm);
+            div_prec_round_properties_helper(x, y, prec, rm, false);
         },
     );
 
@@ -13818,7 +14033,7 @@ fn div_prec_round_properties() {
     });
 }
 
-fn div_prec_properties_helper(x: Float, y: Float, prec: u64) {
+fn div_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     let (quotient, o) = x.clone().div_prec(y.clone(), prec);
     assert!(quotient.is_valid());
     let (quotient_alt, o_alt) = x.clone().div_prec_val_ref(&y, prec);
@@ -13855,12 +14070,14 @@ fn div_prec_properties_helper(x: Float, y: Float, prec: u64) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
     assert_eq!(o_alt, o);
 
-    let (quotient_alt, o_alt) = div_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-    assert_eq!(
-        ComparableFloatRef(&quotient_alt),
-        ComparableFloatRef(&quotient)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (quotient_alt, o_alt) = div_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
 
     if o == Equal && quotient.is_finite() && quotient != 0 {
         assert_eq!(
@@ -13884,19 +14101,19 @@ fn div_prec_properties_helper(x: Float, y: Float, prec: u64) {
         if quotient.is_normal() {
             assert_eq!(quotient.get_prec(), Some(prec));
         }
-        let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
-        assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
-        if o == Less {
-            let mut next = quotient.clone();
-            next.increment();
-            assert!(next > r_quotient);
-        } else if o == Greater {
-            let mut next = quotient.clone();
-            next.decrement();
-            assert!(next < r_quotient);
+        if !extreme {
+            let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
+            assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
+            if o == Less {
+                let mut next = quotient.clone();
+                next.increment();
+                assert!(next > r_quotient);
+            } else if o == Greater {
+                let mut next = quotient.clone();
+                next.decrement();
+                assert!(next < r_quotient);
+            }
         }
-    } else {
-        assert_eq!(o, Equal);
     }
 
     if (x != 0u32 && y != 0u32) || (x.is_sign_positive() && y.is_sign_positive()) {
@@ -13930,14 +14147,18 @@ fn div_prec_properties_helper(x: Float, y: Float, prec: u64) {
 #[test]
 fn div_prec_properties() {
     float_float_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
-        div_prec_properties_helper(x, y, prec);
+        div_prec_properties_helper(x, y, prec, false);
+    });
+
+    float_float_unsigned_triple_gen_var_2().test_properties(|(x, y, prec)| {
+        div_prec_properties_helper(x, y, prec, true);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_float_unsigned_triple_gen_var_1().test_properties_with_config(&config, |(x, y, prec)| {
-        div_prec_properties_helper(x, y, prec);
+        div_prec_properties_helper(x, y, prec, false);
     });
 
     let mut config = GenConfig::new();
@@ -13945,7 +14166,7 @@ fn div_prec_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     config.insert("mean_small_n", 2048);
     float_float_unsigned_triple_gen_var_1().test_properties_with_config(&config, |(x, y, prec)| {
-        div_prec_properties_helper(x, y, prec);
+        div_prec_properties_helper(x, y, prec, false);
     });
 
     float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
@@ -14062,7 +14283,7 @@ fn div_prec_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
+fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bool) {
     let (quotient, o) = x.clone().div_round(y.clone(), rm);
     assert!(quotient.is_valid());
     let (quotient_alt, o_alt) = x.clone().div_round_val_ref(&y, rm);
@@ -14099,17 +14320,20 @@ fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
     assert_eq!(o_alt, o);
 
-    let (quotient_alt, o_alt) = div_prec_round_naive(
-        x.clone(),
-        y.clone(),
-        max(x.significant_bits(), y.significant_bits()),
-        rm,
-    );
-    assert_eq!(
-        ComparableFloatRef(&quotient_alt),
-        ComparableFloatRef(&quotient)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (quotient_alt, o_alt) = div_prec_round_naive(
+            x.clone(),
+            y.clone(),
+            max(x.significant_bits(), y.significant_bits()),
+            rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
+
     let (quotient_alt, o_alt) =
         x.div_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), rm);
     assert_eq!(
@@ -14123,42 +14347,36 @@ fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
         assert_eq!(x.div_round_ref_ref(&quotient, Exact).0, y);
     }
 
-    let r_quotient = if quotient.is_finite() && y.is_finite() {
+    if quotient.is_finite() && y.is_finite() {
         if x.is_normal() && y.is_normal() && quotient.is_normal() {
             assert_eq!(
                 quotient.get_prec(),
                 Some(max(x.get_prec().unwrap(), y.get_prec().unwrap()))
             );
         }
-        let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
-        assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
-        if o == Less {
-            let mut next = quotient.clone();
-            next.increment();
-            assert!(next > r_quotient);
-        } else if o == Greater {
-            let mut next = quotient.clone();
-            next.decrement();
-            assert!(next < r_quotient);
+        if !extreme {
+            let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
+            assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
+            if o == Less {
+                let mut next = quotient.clone();
+                next.increment();
+                assert!(next > r_quotient);
+            } else if o == Greater {
+                let mut next = quotient.clone();
+                next.decrement();
+                assert!(next < r_quotient);
+            }
+            match (r_quotient >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
+            }
         }
-        Some(r_quotient)
-    } else {
-        assert_eq!(o, Equal);
-        None
-    };
-
-    match (
-        r_quotient.is_some() && *r_quotient.as_ref().unwrap() >= 0u32,
-        rm,
-    ) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
     }
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
@@ -14213,7 +14431,11 @@ fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
 #[test]
 fn div_round_properties() {
     float_float_rounding_mode_triple_gen_var_23().test_properties(|(x, y, rm)| {
-        div_round_properties_helper(x, y, rm);
+        div_round_properties_helper(x, y, rm, false);
+    });
+
+    float_float_rounding_mode_triple_gen_var_32().test_properties(|(x, y, rm)| {
+        div_round_properties_helper(x, y, rm, true);
     });
 
     let mut config = GenConfig::new();
@@ -14222,28 +14444,28 @@ fn div_round_properties() {
     float_float_rounding_mode_triple_gen_var_23().test_properties_with_config(
         &config,
         |(x, y, rm)| {
-            div_round_properties_helper(x, y, rm);
+            div_round_properties_helper(x, y, rm, false);
         },
     );
 
     float_float_rounding_mode_triple_gen_var_24().test_properties(|(x, y, rm)| {
-        div_round_properties_helper(x, y, rm);
+        div_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_25().test_properties(|(x, y, rm)| {
-        div_round_properties_helper(x, y, rm);
+        div_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_26().test_properties(|(x, y, rm)| {
-        div_round_properties_helper(x, y, rm);
+        div_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_27().test_properties(|(x, y, rm)| {
-        div_round_properties_helper(x, y, rm);
+        div_round_properties_helper(x, y, rm, false);
     });
 
     float_float_rounding_mode_triple_gen_var_28().test_properties(|(x, y, rm)| {
-        div_round_properties_helper(x, y, rm);
+        div_round_properties_helper(x, y, rm, false);
     });
 
     float_rounding_mode_pair_gen().test_properties(|(x, rm)| {
@@ -14358,7 +14580,7 @@ fn div_round_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn div_properties_helper_1(x: Float, y: Float) {
+fn div_properties_helper_1(x: Float, y: Float, extreme: bool) {
     let quotient = x.clone() / y.clone();
     assert!(quotient.is_valid());
     let quotient_alt = x.clone() / &y;
@@ -14390,17 +14612,19 @@ fn div_properties_helper_1(x: Float, y: Float) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
 
-    let quotient_alt = div_prec_round_naive(
-        x.clone(),
-        y.clone(),
-        max(x.significant_bits(), y.significant_bits()),
-        Nearest,
-    )
-    .0;
-    assert_eq!(
-        ComparableFloatRef(&quotient_alt),
-        ComparableFloatRef(&quotient)
-    );
+    if !extreme {
+        let quotient_alt = div_prec_round_naive(
+            x.clone(),
+            y.clone(),
+            max(x.significant_bits(), y.significant_bits()),
+            Nearest,
+        )
+        .0;
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+    }
     let quotient_alt = x
         .div_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), Nearest)
         .0;
@@ -14431,15 +14655,17 @@ fn div_properties_helper_1(x: Float, y: Float) {
             quotient.get_prec(),
             Some(max(x.get_prec().unwrap(), y.get_prec().unwrap()))
         );
-        let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
-        if quotient < r_quotient {
-            let mut next = quotient.clone();
-            next.increment();
-            assert!(next > r_quotient);
-        } else if quotient > r_quotient {
-            let mut next = quotient.clone();
-            next.decrement();
-            assert!(next < r_quotient);
+        if !extreme {
+            let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
+            if quotient < r_quotient {
+                let mut next = quotient.clone();
+                next.increment();
+                assert!(next > r_quotient);
+            } else if quotient > r_quotient {
+                let mut next = quotient.clone();
+                next.decrement();
+                assert!(next < r_quotient);
+            }
         }
     }
 
@@ -14481,34 +14707,38 @@ where
 #[test]
 fn div_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
+    });
+
+    float_pair_gen_var_10().test_properties(|(x, y)| {
+        div_properties_helper_1(x, y, true);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_pair_gen().test_properties_with_config(&config, |(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_2().test_properties(|(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_3().test_properties(|(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_4().test_properties(|(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_8().test_properties(|(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
     });
 
     float_pair_gen_var_9().test_properties(|(x, y)| {
-        div_properties_helper_1(x, y);
+        div_properties_helper_1(x, y, false);
     });
 
     apply_fn_to_primitive_floats!(div_properties_helper_2);

@@ -890,7 +890,7 @@ fn div_float_significands_long_by_short_to_out(
     }
 }
 
-// y cannot be a power of 2.
+// y cannot be a power of 2. The returned offset is in [0, Limb::WIDTH + 1].
 //
 // This is mpfr_div_ui from div_ui.c, MPFR 4.3.0.
 fn div_float_significands_long_by_short_in_place(

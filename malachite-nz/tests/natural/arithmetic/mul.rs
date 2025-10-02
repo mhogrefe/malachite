@@ -12807,6 +12807,12 @@ fn test_mul() {
     // - a >= l2 in sd_fft_no_trunc_block
     // - b < l1 in sd_fft_no_trunc_block
     // - b >= l1 in sd_fft_no_trunc_block
+
+    // This used to cause a stack overflow
+    big_test(
+        Natural::power_of_2(1073741820) * Natural::from(6u32),
+        Natural::power_of_2(1073741824),
+    );
 }
 
 #[test]

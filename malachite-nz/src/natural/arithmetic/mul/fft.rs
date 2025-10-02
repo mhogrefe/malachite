@@ -967,6 +967,7 @@ fn mpn_ctx_best_profile(r: &Context, p: &mut ProfileEntry, an: usize, bn: usize)
     // We can also fill in p.to_ffts = None any time to not use the fast mod function and use the
     // slow generic one instead.
     const BIGGEST_BOUND: usize = CONTEXT.profiles[0].bn_bound;
+    const PROFILES_SIZE: usize = CONTEXT.profiles_size;
     if bn > BIGGEST_BOUND {
         p.np = 4;
         p.bits = crt_data_find_bits(&r.crts[p.np - 1], bn);
@@ -978,16 +979,16 @@ fn mpn_ctx_best_profile(r: &Context, p: &mut ProfileEntry, an: usize, bn: usize)
     let mut best_score = 100000000.0 * (an.checked_add(bn).unwrap() as f64);
     loop {
         // maximize r.profiles[i].bits
-        assert!(i < CONTEXT.profiles_size);
-        assert!(bn <= CONTEXT.profiles[i].bn_bound);
-        while i + 1 < CONTEXT.profiles_size
-            && bn <= CONTEXT.profiles[i + 1].bn_bound
-            && CONTEXT.profiles[i + 1].np == CONTEXT.profiles[i].np
+        assert!(i < PROFILES_SIZE);
+        assert!(bn <= r.profiles[i].bn_bound);
+        while i + 1 < PROFILES_SIZE
+            && bn <= r.profiles[i + 1].bn_bound
+            && r.profiles[i + 1].np == r.profiles[i].np
         {
             i += 1;
         }
-        let np = CONTEXT.profiles[i].np;
-        let bits = CONTEXT.profiles[i].bits as usize;
+        let np = r.profiles[i].np;
+        let bits = r.profiles[i].bits as usize;
         let alen = (an << 6).div_round(bits, Ceiling).0;
         let blen = (bn << 6).div_round(bits, Ceiling).0;
         let zlen = alen + blen - 1;
@@ -1003,13 +1004,13 @@ fn mpn_ctx_best_profile(r: &Context, p: &mut ProfileEntry, an: usize, bn: usize)
         }
         loop {
             i += 1;
-            if i >= CONTEXT.profiles_size {
-                p.np = CONTEXT.profiles[best_i].np;
-                p.bits = CONTEXT.profiles[best_i].bits;
-                p.to_ffts = CONTEXT.profiles[best_i].to_ffts;
+            if i >= PROFILES_SIZE {
+                p.np = r.profiles[best_i].np;
+                p.bits = r.profiles[best_i].bits;
+                p.to_ffts = r.profiles[best_i].to_ffts;
                 return;
             }
-            if bn <= CONTEXT.profiles[i].bn_bound {
+            if bn <= r.profiles[i].bn_bound {
                 break;
             }
         }
