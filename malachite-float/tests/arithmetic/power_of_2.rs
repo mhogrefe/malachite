@@ -19,7 +19,7 @@ use malachite_base::test_util::generators::{
 use malachite_float::test_util::arithmetic::power_of_2::{
     power_of_2_i64_naive, power_of_2_prec_naive, power_of_2_prec_round_naive, power_of_2_u64_naive,
 };
-use malachite_float::test_util::arithmetic::shl_round::rug_shl_prec_round;
+use malachite_float::test_util::arithmetic::shl_round::rug_shl_prec_round_signed;
 use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::{
     signed_unsigned_rounding_mode_triple_gen_var_5, signed_unsigned_rounding_mode_triple_gen_var_6,
@@ -44,7 +44,12 @@ fn test_power_of_2_prec_round() {
         assert_eq!(o_alt, o_out);
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_p, o) = rug_shl_prec_round(&rug::Float::with_val(1, 1), i, prec, rm);
+            let (rug_p, o) = rug_shl_prec_round_signed(
+                &rug::Float::with_val(1, 1),
+                i32::exact_from(i),
+                prec,
+                rm,
+            );
             let p = Float::exact_from(&rug_p);
             assert_eq!(p.to_string(), out);
             assert_eq!(to_hex_string(&p), out_hex);
@@ -541,7 +546,12 @@ fn power_of_2_prec_round_properties_helper(i: i64, prec: u64, rm: RoundingMode) 
     } else {
         let rm = rug_round_try_from_rounding_mode(rm).unwrap();
         if i32::convertible_from(i) {
-            let (rug_p, rug_o) = rug_shl_prec_round(&rug::Float::with_val(1, 1), i, prec, rm);
+            let (rug_p, rug_o) = rug_shl_prec_round_signed(
+                &rug::Float::with_val(1, 1),
+                i32::exact_from(i),
+                prec,
+                rm,
+            );
             assert_eq!(
                 ComparableFloat(Float::exact_from(&rug_p)),
                 ComparableFloat(p)

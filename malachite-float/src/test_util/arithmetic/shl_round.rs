@@ -10,12 +10,39 @@ use crate::Float;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
 use std::cmp::Ordering::{self, *};
 use std::ops::Shl;
+
+pub fn shl_prec_round_naive<T: PrimitiveInt>(
+    x: Float,
+    bits: T,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering)
+where
+    Rational: Shl<T, Output = Rational>,
+{
+    if x.is_normal() {
+        Float::from_rational_prec_round(Rational::exact_from(x) << bits, prec, rm)
+    } else {
+        (x, Equal)
+    }
+}
+
+pub fn shl_prec_naive<T: PrimitiveInt>(x: Float, bits: T, prec: u64) -> (Float, Ordering)
+where
+    Rational: Shl<T, Output = Rational>,
+{
+    if x.is_normal() {
+        Float::from_rational_prec_round(Rational::exact_from(x) << bits, prec, Nearest)
+    } else {
+        (x, Equal)
+    }
+}
 
 pub fn shl_round_naive<T: PrimitiveInt>(x: Float, bits: T, rm: RoundingMode) -> (Float, Ordering)
 where
@@ -29,9 +56,37 @@ where
     }
 }
 
-pub fn rug_shl_prec_round(x: &rug::Float, i: i64, prec: u64, rm: Round) -> (rug::Float, Ordering) {
+pub fn rug_shl_prec_round_unsigned(
+    x: &rug::Float,
+    u: u32,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
     let mut shifted = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = shifted.assign_round(x << i32::exact_from(i), rm);
+    let o = shifted.assign_round(x << u, rm);
+    (shifted, o)
+}
+
+pub fn rug_shl_prec_round_signed(
+    x: &rug::Float,
+    i: i32,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut shifted = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = shifted.assign_round(x << i, rm);
+    (shifted, o)
+}
+
+pub fn rug_shl_prec_unsigned(x: &rug::Float, u: u32, prec: u64) -> (rug::Float, Ordering) {
+    let mut shifted = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = shifted.assign_round(x << u, Round::Nearest);
+    (shifted, o)
+}
+
+pub fn rug_shl_prec_signed(x: &rug::Float, i: i32, prec: u64) -> (rug::Float, Ordering) {
+    let mut shifted = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = shifted.assign_round(x << i, Round::Nearest);
     (shifted, o)
 }
 

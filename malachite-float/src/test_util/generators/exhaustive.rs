@@ -1431,6 +1431,92 @@ pub fn exhaustive_float_signed_signed_triple_gen<T: PrimitiveSigned>() -> It<(Fl
     ))
 }
 
+// -- (Float, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_float_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Float, T, U)> {
+    Box::new(exhaustive_triples(
+        exhaustive_floats(),
+        exhaustive_signeds(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+pub fn exhaustive_float_signed_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Float, T, U)> {
+    Box::new(exhaustive_triples(
+        exhaustive_extreme_floats(),
+        exhaustive_signeds(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+// -- (Float, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_1<T: PrimitiveSigned>()
+-> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shl_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_2<T: PrimitiveSigned>()
+-> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shl_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_3<T: PrimitiveSigned>()
+-> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shr_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_4<T: PrimitiveSigned>()
+-> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shr_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
 // -- (Float, PrimitiveSigned, RoundingMode) --
 
 pub fn exhaustive_float_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
@@ -1552,6 +1638,94 @@ pub fn exhaustive_float_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> 
     ))
 }
 
+pub fn exhaustive_float_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Float, T, U)> {
+    Box::new(exhaustive_triples(
+        exhaustive_floats(),
+        exhaustive_unsigneds(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Float, T, U)> {
+    Box::new(exhaustive_triples(
+        exhaustive_extreme_floats(),
+        exhaustive_unsigneds(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+// -- (Float, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shl_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shl_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>() -> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shr_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4<
+    T: PrimitiveUnsigned,
+>() -> It<(Float, T, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, bits, prec), rm)| shr_prec_round_valid(x, bits, prec, rm)),
+    ))
+}
+
 // -- (Float, PrimitiveUnsigned, RoundingMode) --
 
 pub fn set_prec_round_valid(x: &Float, p: u64, rm: RoundingMode) -> bool {
@@ -1655,6 +1829,15 @@ pub fn shl_round_valid<T: PrimitiveInt>(x: &Float, bits: T, rm: RoundingMode) ->
     }
 }
 
+pub fn shl_prec_round_valid<T: PrimitiveInt>(
+    x: &Float,
+    bits: T,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || !x.is_normal() || x.shl_prec_round_ref(bits, prec, Floor).1 == Equal
+}
+
 pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>()
 -> It<(Float, T, RoundingMode)> {
     reshape_2_1_to_3(Box::new(
@@ -1698,6 +1881,15 @@ pub fn shr_round_valid<T: PrimitiveInt>(x: &Float, bits: T, rm: RoundingMode) ->
         }
         false
     }
+}
+
+pub fn shr_prec_round_valid<T: PrimitiveInt>(
+    x: &Float,
+    bits: T,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || !x.is_normal() || x.shr_prec_round_ref(bits, prec, Floor).1 == Equal
 }
 
 pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>()

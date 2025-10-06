@@ -12,138 +12,159 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, NegativeZero, Zero};
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::SaturatingInto;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
-pub(crate) fn shr_prec_round_assign_helper<T: PrimitiveInt>(
-    x: &mut Float,
-    bits: T,
-    prec: u64,
-    rm: RoundingMode,
-    previous_o: Ordering,
-) -> Ordering
-where
-    i32: WrappingFrom<T>,
-{
-    if let Float(Finite {
-        significand,
-        exponent,
-        sign,
-        precision,
-    }) = x
-    {
-        let mut possibly_just_under_min = false;
-        if let Ok(bits) = bits.try_into() {
-            if let Some(new_exponent) = exponent.checked_sub(bits) {
-                possibly_just_under_min = true;
-                if (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent) {
-                    *exponent = new_exponent;
-                    return previous_o;
-                }
-            }
-        }
-        assert!(rm != Exact, "Inexact Float right-shift");
-        if bits < T::ZERO {
-            match (*sign, rm) {
-                (true, Up | Ceiling | Nearest) => {
-                    *x = Float::INFINITY;
-                    Greater
-                }
-                (true, Floor | Down) => {
-                    *x = Float::max_finite_value_with_prec(prec);
-                    Less
-                }
-                (false, Up | Floor | Nearest) => {
-                    *x = Float::NEGATIVE_INFINITY;
-                    Less
-                }
-                (false, Ceiling | Down) => {
-                    *x = -Float::max_finite_value_with_prec(prec);
-                    Greater
-                }
-                (_, Exact) => unreachable!(),
-            }
-        } else if rm == Nearest
-            && possibly_just_under_min
-            && *exponent - i32::wrapping_from(bits) == Float::MIN_EXPONENT - 1
-            && (previous_o == if *sign { Less } else { Greater } || !significand.is_power_of_2())
+impl Float {
+    pub(crate) fn shr_prec_round_assign_helper<T: PrimitiveInt>(
+        &mut self,
+        bits: T,
+        prec: u64,
+        rm: RoundingMode,
+        previous_o: Ordering,
+    ) -> Ordering {
+        if let Float(Finite {
+            significand,
+            exponent,
+            sign,
+            precision,
+        }) = self
         {
-            if *sign {
-                *x = Float::min_positive_value_prec(*precision);
-                Greater
+            let mut possibly_just_under_min = false;
+            if let Ok(bits) = bits.try_into() {
+                if let Some(new_exponent) = exponent.checked_sub(bits) {
+                    possibly_just_under_min = true;
+                    if (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent) {
+                        *exponent = new_exponent;
+                        return previous_o;
+                    }
+                }
+            }
+            assert!(rm != Exact, "Inexact Float right-shift");
+            if bits < T::ZERO {
+                match (*sign, rm) {
+                    (true, Up | Ceiling | Nearest) => {
+                        *self = Float::INFINITY;
+                        Greater
+                    }
+                    (true, Floor | Down) => {
+                        *self = Float::max_finite_value_with_prec(prec);
+                        Less
+                    }
+                    (false, Up | Floor | Nearest) => {
+                        *self = Float::NEGATIVE_INFINITY;
+                        Less
+                    }
+                    (false, Ceiling | Down) => {
+                        *self = -Float::max_finite_value_with_prec(prec);
+                        Greater
+                    }
+                    (_, Exact) => unreachable!(),
+                }
+            } else if rm == Nearest
+                && possibly_just_under_min
+                && *exponent - <T as SaturatingInto<i32>>::saturating_into(bits)
+                    == Float::MIN_EXPONENT - 1
+                && (previous_o == if *sign { Less } else { Greater }
+                    || !significand.is_power_of_2())
+            {
+                if *sign {
+                    *self = Float::min_positive_value_prec(*precision);
+                    Greater
+                } else {
+                    *self = -Float::min_positive_value_prec(*precision);
+                    Less
+                }
             } else {
-                *x = -Float::min_positive_value_prec(*precision);
-                Less
+                match (*sign, rm) {
+                    (true, Up | Ceiling) => {
+                        *self = Float::min_positive_value_prec(prec);
+                        Greater
+                    }
+                    (true, Floor | Down | Nearest) => {
+                        *self = Float::ZERO;
+                        Less
+                    }
+                    (false, Up | Floor) => {
+                        *self = -Float::min_positive_value_prec(prec);
+                        Less
+                    }
+                    (false, Ceiling | Down | Nearest) => {
+                        *self = Float::NEGATIVE_ZERO;
+                        Greater
+                    }
+                    (_, Exact) => unreachable!(),
+                }
             }
         } else {
-            match (*sign, rm) {
-                (true, Up | Ceiling) => {
-                    *x = Float::min_positive_value_prec(prec);
-                    Greater
-                }
-                (true, Floor | Down | Nearest) => {
-                    *x = Float::ZERO;
-                    Less
-                }
-                (false, Up | Floor) => {
-                    *x = -Float::min_positive_value_prec(prec);
-                    Less
-                }
-                (false, Ceiling | Down | Nearest) => {
-                    *x = Float::NEGATIVE_ZERO;
-                    Greater
-                }
-                (_, Exact) => unreachable!(),
-            }
+            Equal
         }
-    } else {
-        Equal
     }
-}
 
-pub(crate) fn shr_prec_round_assign<T: PrimitiveInt>(
-    x: &mut Float,
-    bits: T,
-    prec: u64,
-    rm: RoundingMode,
-) -> Ordering
-where
-    i32: WrappingFrom<T>,
-{
-    if let Float(Finite { exponent, .. }) = x {
-        let old_exponent = *exponent;
-        *exponent = 0;
-        let o = x.set_prec_round(prec, rm);
-        let bits: i32 = bits.saturating_into();
-        shr_prec_round_assign_helper::<i32>(x, bits.saturating_sub(old_exponent), prec, rm, o)
-    } else {
-        Equal
+    pub fn shr_prec_round<T: PrimitiveInt>(
+        mut self,
+        bits: T,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Float, Ordering) {
+        let o = self.shr_prec_round_assign(bits, prec, rm);
+        (self, o)
     }
-}
 
-pub(crate) fn shr_prec_round<T: PrimitiveInt>(
-    x: &Float,
-    bits: T,
-    prec: u64,
-    rm: RoundingMode,
-) -> (Float, Ordering)
-where
-    i32: WrappingFrom<T>,
-{
-    let mut x = x.clone();
-    let o = shr_prec_round_assign(&mut x, bits, prec, rm);
-    (x, o)
+    pub fn shr_prec_round_ref<T: PrimitiveInt>(
+        &self,
+        bits: T,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Float, Ordering) {
+        let mut x = self.clone();
+        let o = x.shr_prec_round_assign(bits, prec, rm);
+        (x, o)
+    }
+
+    pub fn shr_prec_round_assign<T: PrimitiveInt>(
+        &mut self,
+        bits: T,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        if let Float(Finite { exponent, .. }) = self {
+            let old_exponent = *exponent;
+            *exponent = 0;
+            let o = self.set_prec_round(prec, rm);
+            self.shr_prec_round_assign_helper(
+                <T as SaturatingInto<i32>>::saturating_into(bits).saturating_sub(old_exponent),
+                prec,
+                rm,
+                o,
+            )
+        } else {
+            Equal
+        }
+    }
+
+    #[inline]
+    pub fn shr_prec<T: PrimitiveInt>(self, bits: T, prec: u64) -> (Float, Ordering) {
+        self.shr_prec_round(bits, prec, Nearest)
+    }
+
+    #[inline]
+    pub fn shr_prec_ref<T: PrimitiveInt>(&self, bits: T, prec: u64) -> (Float, Ordering) {
+        self.shr_prec_round_ref(bits, prec, Nearest)
+    }
+
+    #[inline]
+    pub fn shr_prec_assign<T: PrimitiveInt>(&mut self, bits: T, prec: u64) -> Ordering {
+        self.shr_prec_round_assign(bits, prec, Nearest)
+    }
 }
 
 fn shr_round_primitive_int_ref<T: PrimitiveInt>(
     x: &Float,
     bits: T,
     rm: RoundingMode,
-) -> (Float, Ordering)
-where
-    i32: WrappingFrom<T>,
-{
+) -> (Float, Ordering) {
     if let Float(Finite {
         significand,
         exponent,
@@ -181,7 +202,8 @@ where
             }
         } else if rm == Nearest
             && possibly_just_under_min
-            && *exponent - i32::wrapping_from(bits) == Float::MIN_EXPONENT - 1
+            && *exponent - <T as SaturatingInto<i32>>::saturating_into(bits)
+                == Float::MIN_EXPONENT - 1
             && !significand.is_power_of_2()
         {
             if *sign {
@@ -207,11 +229,8 @@ fn shr_round_assign_primitive_int<T: PrimitiveInt>(
     x: &mut Float,
     bits: T,
     rm: RoundingMode,
-) -> Ordering
-where
-    i32: WrappingFrom<T>,
-{
-    shr_prec_round_assign_helper(x, bits, x.significant_bits(), rm, Equal)
+) -> Ordering {
+    x.shr_prec_round_assign_helper(bits, x.significant_bits(), rm, Equal)
 }
 
 macro_rules! impl_natural_shr_round {

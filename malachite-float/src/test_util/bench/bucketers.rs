@@ -58,6 +58,24 @@ pub fn pair_2_triple_1_float_complexity_bucketer<T, U, V>(
     }
 }
 
+pub fn quadruple_1_float_complexity_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (Float, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(x, _, _, _)| usize::exact_from(x.complexity()),
+        bucketing_label: format!("{var_name}.complexity()"),
+    }
+}
+
+pub fn pair_2_quadruple_1_float_complexity_bucketer<T, U, V, W>(
+    var_name: &str,
+) -> Bucketer<'_, (W, (Float, T, U, V))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, _, _, _))| usize::exact_from(x.complexity()),
+        bucketing_label: format!("{var_name}.complexity()"),
+    }
+}
+
 pub fn float_complexity_bucketer(var_name: &str) -> Bucketer<'_, Float> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.complexity()),

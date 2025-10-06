@@ -15,7 +15,7 @@ use crate::natural::arithmetic::mul::fft::{
     CRTData, Context, FFTContext, MAX_NPROFILES, MPN_CTX_NCRTS, MPN_CTX_TWO_POWER_TAB_SIZE,
     MPNToFFTFunc, ModData, SD_FFT_CTX_W2TAB_INIT, SerializedCRTData, SerializedContext,
     SerializedFFTContext, VEC_SZ, crt_data_find_bn_bound, f64_mulmod, f64_reduce_0n_to_pmhn,
-    f64_reduce_pm1n_to_pmhn, f64x4_mul_add, f64x4_round_alt, mpn_mul_default_mpn_ctx,
+    f64_reduce_pm1n_to_pmhn, f64x4_mul_add, mpn_mul_default_mpn_ctx,
 };
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::toom::{
@@ -276,7 +276,7 @@ fn fill_vec_two_pow_tab(xs: &mut [f64x4], rffts: &mut [FFTContext], len: usize, 
             let xs = &mut xs[k + l..];
             let t = xs[0];
             let p = &ps[l << 1..];
-            xs[nvs] = f64x4_mul_add!(-f64x4_round_alt!(t * p[1]), p[0], t * f64x4::splat(2.0));
+            xs[nvs] = f64x4_mul_add!(-(t * p[1]).round(), p[0], t * f64x4::splat(2.0));
         }
         k += nvs;
     }

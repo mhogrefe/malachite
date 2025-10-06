@@ -90,6 +90,36 @@ pub fn float_t_rounding_mode_triple_rm<T: Clone + 'static>(
     }))
 }
 
+pub fn float_t_u_triple_rm<T: Clone + 'static, U: Clone + 'static>(
+    xs: It<(Float, T, U)>,
+) -> It<((rug::Float, T, U), (Float, T, U))> {
+    Box::new(xs.map(|(x, p, q)| {
+        (
+            (rug::Float::exact_from(&x), p.clone(), q.clone()),
+            (x, p, q),
+        )
+    }))
+}
+
+pub fn float_t_u_rounding_mode_quadruple_rm<T: Clone + 'static, U: Clone + 'static>(
+    xs: It<(Float, T, U, RoundingMode)>,
+) -> It<(
+    (rug::Float, T, U, rug::float::Round),
+    (Float, T, U, RoundingMode),
+)> {
+    Box::new(xs.map(|(x, p, q, rm)| {
+        (
+            (
+                rug::Float::exact_from(&x),
+                p.clone(),
+                q.clone(),
+                rug_round_exact_from_rounding_mode(rm),
+            ),
+            (x, p, q, rm),
+        )
+    }))
+}
+
 pub fn float_rounding_mode_pair_rm(
     xs: It<(Float, RoundingMode)>,
 ) -> It<((rug::Float, rug::float::Round), (Float, RoundingMode))> {

@@ -7,8 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::Finite;
-use crate::arithmetic::shl_round::shl_prec_round_assign_helper;
-use crate::arithmetic::shr_round::shr_prec_round_assign_helper;
 use crate::conversion::from_integer::{
     from_integer_prec_round_zero_exponent, from_integer_zero_exponent,
 };
@@ -46,7 +44,7 @@ pub_test! {from_rational_prec_round_direct(
         let n_bits = n.significant_bits();
         let (mut y, mut o) =
             from_integer_prec_round_zero_exponent(Integer::from_sign_and_abs(sign, n), prec, rm);
-        o = shr_prec_round_assign_helper(&mut y, i128::from(pow) - i128::from(n_bits), prec, rm, o);
+        o = y.shr_prec_round_assign_helper(i128::from(pow) - i128::from(n_bits), prec, rm, o);
         assert!(rm != Exact || o == Equal, "Inexact conversion from Rational to Float");
         (y, o)
     } else {
@@ -146,8 +144,7 @@ pub_test! {from_rational_prec_round_using_div(
         (None, Some(log_d)) => {
             let bits = n.significant_bits();
             let (mut f, mut o) = from_natural_prec_round_zero_exponent(n, prec, rm);
-            o = shr_prec_round_assign_helper(
-                &mut f,
+            o = f.shr_prec_round_assign_helper(
                 i128::from(log_d) - i128::from(bits),
                 prec,
                 rm,
@@ -159,8 +156,7 @@ pub_test! {from_rational_prec_round_using_div(
             let bits = d.significant_bits();
             let (mut f, mut o) =
                 from_natural_zero_exponent(d).reciprocal_prec_round(prec, rm);
-            o = shl_prec_round_assign_helper(
-                &mut f,
+            o = f.shl_prec_round_assign_helper(
                 i128::from(log_n) - i128::from(bits),
                 prec,
                 rm,
@@ -176,8 +172,7 @@ pub_test! {from_rational_prec_round_using_div(
                 prec,
                 rm,
             );
-            o = shl_prec_round_assign_helper(
-                &mut f,
+            o = f.shl_prec_round_assign_helper(
                 i128::from(n_bits) - i128::from(d_bits),
                 prec,
                 rm,
@@ -205,8 +200,7 @@ pub_test! {from_rational_prec_round_ref_direct(
         let n_bits = n.significant_bits();
         let (mut y, mut o) =
             from_natural_prec_round_zero_exponent_ref(n, prec, if sign { rm } else { -rm });
-        o = shr_prec_round_assign_helper(
-            &mut y,
+        o = y.shr_prec_round_assign_helper(
             i128::from(pow) - i128::from(n_bits),
             prec,
             if sign { rm } else { -rm },
@@ -314,8 +308,7 @@ pub_test! {from_rational_prec_round_ref_using_div(
         ),
         (None, Some(log_d)) => {
             let (mut f, mut o) = from_natural_prec_round_zero_exponent_ref(n, prec, rm);
-            o = shr_prec_round_assign_helper(
-                &mut f,
+            o = f.shr_prec_round_assign_helper(
                 i128::from(log_d) - i128::from(n.significant_bits()),
                 prec,
                 rm,
@@ -326,8 +319,7 @@ pub_test! {from_rational_prec_round_ref_using_div(
         (Some(log_n), None) => {
             let (mut f, mut o) =
                 from_natural_zero_exponent_ref(d).reciprocal_prec_round(prec, rm);
-            o = shl_prec_round_assign_helper(
-                &mut f,
+            o = f.shl_prec_round_assign_helper(
                 i128::from(log_n) - i128::from(d.significant_bits()),
                 prec,
                 rm,
@@ -341,8 +333,7 @@ pub_test! {from_rational_prec_round_ref_using_div(
                 prec,
                 rm,
             );
-            o = shl_prec_round_assign_helper(
-                &mut f,
+            o = f.shl_prec_round_assign_helper(
                 i128::from(n.significant_bits()) - i128::from(d.significant_bits()),
                 prec,
                 rm,

@@ -8,7 +8,6 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::arithmetic::is_power_of_2::abs_is_power_of_2;
-use crate::arithmetic::shr_round::{shr_prec_round, shr_prec_round_assign};
 use crate::{
     Float, float_either_infinity, float_either_zero, float_infinity, float_nan,
     float_negative_infinity, float_negative_zero, float_zero,
@@ -1173,7 +1172,7 @@ impl Float {
             ) => {
                 if y.is_power_of_2() {
                     let (mut quotient, mut o) =
-                        shr_prec_round(self, y_exp - 1, prec, if y_sign { rm } else { -rm });
+                        self.shr_prec_round_ref(y_exp - 1, prec, if y_sign { rm } else { -rm });
                     if !y_sign {
                         quotient.neg_assign();
                         o = o.reverse();
@@ -1407,7 +1406,7 @@ impl Float {
             ) => {
                 if y.is_power_of_2() {
                     let (mut quotient, mut o) =
-                        shr_prec_round(self, y_exp - 1, prec, if *y_sign { rm } else { -rm });
+                        self.shr_prec_round_ref(y_exp - 1, prec, if *y_sign { rm } else { -rm });
                     if !*y_sign {
                         quotient.neg_assign();
                         o = o.reverse();
@@ -2323,8 +2322,7 @@ impl Float {
             }
             (_, y) if abs_is_power_of_2(&y) => {
                 let sign = y >= 0;
-                let mut o = shr_prec_round_assign(
-                    self,
+                let mut o = self.shr_prec_round_assign(
                     y.get_exponent().unwrap() - 1,
                     prec,
                     if sign { rm } else { -rm },
@@ -2587,8 +2585,7 @@ impl Float {
             }
             (_, y) if abs_is_power_of_2(y) => {
                 let sign = *y >= 0;
-                let mut o = shr_prec_round_assign(
-                    self,
+                let mut o = self.shr_prec_round_assign(
                     y.get_exponent().unwrap() - 1,
                     prec,
                     if sign { rm } else { -rm },
