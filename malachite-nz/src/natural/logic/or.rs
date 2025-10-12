@@ -238,28 +238,28 @@ pub_test! {limbs_or_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
 
 impl Natural {
     #[inline]
-    fn or_limb(mut self, other: Limb) -> Natural {
+    fn or_limb(mut self, other: Limb) -> Self {
         self.or_assign_limb(other);
         self
     }
 
-    fn or_limb_ref(&self, other: Limb) -> Natural {
-        Natural(match self {
-            Natural(Small(small)) => Small(small | other),
-            Natural(Large(limbs)) => Large(limbs_or_limb(limbs, other)),
+    fn or_limb_ref(&self, other: Limb) -> Self {
+        Self(match self {
+            Self(Small(small)) => Small(small | other),
+            Self(Large(limbs)) => Large(limbs_or_limb(limbs, other)),
         })
     }
 
     fn or_assign_limb(&mut self, other: Limb) {
         match self {
-            Natural(Small(small)) => *small |= other,
-            Natural(Large(limbs)) => limbs_or_limb_in_place(limbs, other),
+            Self(Small(small)) => *small |= other,
+            Self(Large(limbs)) => limbs_or_limb_in_place(limbs, other),
         }
     }
 }
 
-impl BitOr<Natural> for Natural {
-    type Output = Natural;
+impl BitOr<Self> for Natural {
+    type Output = Self;
 
     /// Takes the bitwise or of two [`Natural`]s, taking both by value.
     ///
@@ -288,14 +288,14 @@ impl BitOr<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn bitor(mut self, other: Natural) -> Natural {
+    fn bitor(mut self, other: Self) -> Self {
         self |= other;
         self
     }
 }
 
-impl<'a> BitOr<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> BitOr<&'a Self> for Natural {
+    type Output = Self;
 
     /// Takes the bitwise or of two [`Natural`]s, taking the first by value and the second by
     /// reference.
@@ -324,7 +324,7 @@ impl<'a> BitOr<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn bitor(mut self, other: &'a Natural) -> Natural {
+    fn bitor(mut self, other: &'a Self) -> Self {
         self |= other;
         self
     }
@@ -404,7 +404,7 @@ impl BitOr<&Natural> for &Natural {
     }
 }
 
-impl BitOrAssign<Natural> for Natural {
+impl BitOrAssign<Self> for Natural {
     /// Bitwise-ors a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value.
     ///
@@ -428,11 +428,11 @@ impl BitOrAssign<Natural> for Natural {
     /// x |= Natural::from(0x0f000000u32);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitor_assign(&mut self, mut other: Natural) {
+    fn bitor_assign(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (_, Natural(Small(y))) => self.or_assign_limb(*y),
-            (Natural(Small(x)), _) => *self = other.or_limb(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.or_assign_limb(*y),
+            (Self(Small(x)), _) => *self = other.or_limb(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 if limbs_or_in_place_either(xs, ys) {
                     swap(xs, ys);
                 }
@@ -441,7 +441,7 @@ impl BitOrAssign<Natural> for Natural {
     }
 }
 
-impl<'a> BitOrAssign<&'a Natural> for Natural {
+impl<'a> BitOrAssign<&'a Self> for Natural {
     /// Bitwise-ors a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
     ///
@@ -464,11 +464,11 @@ impl<'a> BitOrAssign<&'a Natural> for Natural {
     /// x |= &Natural::from(0x0f000000u32);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitor_assign(&mut self, other: &'a Natural) {
+    fn bitor_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (_, Natural(Small(y))) => self.or_assign_limb(*y),
-            (Natural(Small(x)), _) => *self = other.or_limb_ref(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.or_assign_limb(*y),
+            (Self(Small(x)), _) => *self = other.or_limb_ref(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_or_in_place_left(xs, ys);
             }
         }

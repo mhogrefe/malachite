@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 
 impl Pow<u64> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Raises a [`Rational`] to a power, taking the [`Rational`] by value.
     ///
@@ -45,7 +45,7 @@ impl Pow<u64> for Rational {
     /// );
     /// ```
     #[inline]
-    fn pow(mut self, exp: u64) -> Rational {
+    fn pow(mut self, exp: u64) -> Self {
         self.pow_assign(exp);
         self
     }
@@ -132,7 +132,7 @@ impl PowAssign<u64> for Rational {
 }
 
 impl Pow<i64> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Raises a [`Rational`] to a power, taking the [`Rational`] by value.
     ///
@@ -180,7 +180,7 @@ impl Pow<i64> for Rational {
     /// );
     /// ```
     #[inline]
-    fn pow(mut self, exp: i64) -> Rational {
+    fn pow(mut self, exp: i64) -> Self {
         self.pow_assign(exp);
         self
     }

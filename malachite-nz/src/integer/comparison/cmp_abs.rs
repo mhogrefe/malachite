@@ -15,7 +15,7 @@ impl PartialOrdAbs for Integer {
     ///
     /// See the documentation for the [`OrdAbs`] implementation.
     #[inline]
-    fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
+    fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp_abs(other))
     }
 }
@@ -41,7 +41,7 @@ impl OrdAbs for Integer {
     /// assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
     /// assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
     /// ```
-    fn cmp_abs(&self, other: &Integer) -> Ordering {
+    fn cmp_abs(&self, other: &Self) -> Ordering {
         self.abs.cmp(&other.abs)
     }
 }

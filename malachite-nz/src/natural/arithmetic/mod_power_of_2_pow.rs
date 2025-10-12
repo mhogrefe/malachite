@@ -124,8 +124,8 @@ pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
     limbs_vec_mod_power_of_2_in_place(xs, pow);
 }}
 
-impl ModPowerOf2Pow<Natural> for Natural {
-    type Output = Natural;
+impl ModPowerOf2Pow<Self> for Natural {
+    type Output = Self;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
     /// modulo $2^k$. Both [`Natural`]s are taken by value.
@@ -158,14 +158,14 @@ impl ModPowerOf2Pow<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_pow(mut self, exp: Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_pow(mut self, exp: Self, pow: u64) -> Self {
         self.mod_power_of_2_pow_assign(exp, pow);
         self
     }
 }
 
-impl ModPowerOf2Pow<&Natural> for Natural {
-    type Output = Natural;
+impl ModPowerOf2Pow<&Self> for Natural {
+    type Output = Self;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
     /// modulo $2^k$. The first [`Natural`] is taken by value and the second by reference.
@@ -198,7 +198,7 @@ impl ModPowerOf2Pow<&Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_pow(mut self, exp: &Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_pow(mut self, exp: &Self, pow: u64) -> Self {
         self.mod_power_of_2_pow_assign(exp, pow);
         self
     }
@@ -303,7 +303,7 @@ impl ModPowerOf2Pow<&Natural> for &Natural {
     }
 }
 
-impl ModPowerOf2PowAssign<Natural> for Natural {
+impl ModPowerOf2PowAssign<Self> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be already
     /// reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
@@ -334,12 +334,12 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
     /// assert_eq!(x, 289109473);
     /// ```
     #[inline]
-    fn mod_power_of_2_pow_assign(&mut self, exp: Natural, pow: u64) {
+    fn mod_power_of_2_pow_assign(&mut self, exp: Self, pow: u64) {
         self.mod_power_of_2_pow_assign(&exp, pow);
     }
 }
 
-impl ModPowerOf2PowAssign<&Natural> for Natural {
+impl ModPowerOf2PowAssign<&Self> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be already
     /// reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
@@ -369,26 +369,26 @@ impl ModPowerOf2PowAssign<&Natural> for Natural {
     /// x.mod_power_of_2_pow_assign(&Natural::from(1000u32), 30);
     /// assert_eq!(x, 289109473);
     /// ```
-    fn mod_power_of_2_pow_assign(&mut self, exp: &Natural, pow: u64) {
+    fn mod_power_of_2_pow_assign(&mut self, exp: &Self, pow: u64) {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
         );
         match (&mut *self, exp) {
-            _ if pow == 0 => *self = Natural::ZERO,
-            (_, &Natural::ZERO) => *self = Natural::ONE,
-            (&mut (Natural::ZERO | Natural::ONE), _) | (_, &Natural::ONE) => {}
-            (Natural(Small(x)), Natural(Small(e)))
+            _ if pow == 0 => *self = Self::ZERO,
+            (_, &Self::ZERO) => *self = Self::ONE,
+            (&mut (Self::ZERO | Self::ONE), _) | (_, &Self::ONE) => {}
+            (Self(Small(x)), Self(Small(e)))
                 if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
             {
                 x.mod_power_of_2_pow_assign(u64::wrapping_from(*e), pow);
             }
-            (_, Natural(Small(e))) => {
+            (_, Self(Small(e))) => {
                 let xs = self.promote_in_place();
                 limbs_mod_power_of_2_pow(xs, &[*e], pow);
                 self.trim();
             }
-            (_, Natural(Large(es))) => {
+            (_, Self(Large(es))) => {
                 let xs = self.promote_in_place();
                 limbs_mod_power_of_2_pow(xs, es, pow);
                 self.trim();

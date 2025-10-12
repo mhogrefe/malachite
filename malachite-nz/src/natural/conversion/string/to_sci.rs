@@ -74,7 +74,7 @@ impl ToSci for Natural {
         match options.get_size_options() {
             SciSizeOptions::Complete | SciSizeOptions::Scale(_) => true,
             SciSizeOptions::Precision(precision) => {
-                let n_base = Natural::from(options.get_base());
+                let n_base = Self::from(options.get_base());
                 let log = self.floor_log_base(&n_base);
                 if log < precision {
                     return true;
@@ -168,16 +168,16 @@ impl ToSci for Natural {
                 Ok(())
             }
             SciSizeOptions::Precision(precision) => {
-                let n_base = Natural::from(options.get_base());
+                let n_base = Self::from(options.get_base());
                 let (base_log, log, power, p) = if *self == 0u32 {
                     // power and p unused
-                    (None, 0, Natural::ZERO, 0)
+                    (None, 0, Self::ZERO, 0)
                 } else if let Some(base_log) = options.get_base().checked_log_base_2() {
                     // power and p unused
                     (
                         Some(base_log),
                         self.floor_log_base_power_of_2(base_log),
-                        Natural::ZERO,
+                        Self::ZERO,
                         0,
                     )
                 } else {

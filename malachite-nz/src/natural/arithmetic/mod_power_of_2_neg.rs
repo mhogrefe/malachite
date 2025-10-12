@@ -13,7 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 
 impl ModPowerOf2Neg for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Negates a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The
     /// [`Natural`] is taken by value.
@@ -45,7 +45,7 @@ impl ModPowerOf2Neg for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_neg(mut self, pow: u64) -> Natural {
+    fn mod_power_of_2_neg(mut self, pow: u64) -> Self {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"

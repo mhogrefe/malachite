@@ -102,7 +102,7 @@ impl XXAddYYToZZ for usize {
     ///
     /// This is equivalent to `add_ssaaaa` from `longlong.h`, GMP 6.2.1, where `(sh, sl)` is
     /// returned.
-    fn xx_add_yy_to_zz(x_1: usize, x_0: usize, y_1: usize, y_0: usize) -> (usize, usize) {
+    fn xx_add_yy_to_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self) {
         if USIZE_IS_U32 {
             let (z_1, z_0) = u32::xx_add_yy_to_zz(
                 u32::wrapping_from(x_1),
@@ -110,7 +110,7 @@ impl XXAddYYToZZ for usize {
                 u32::wrapping_from(y_1),
                 u32::wrapping_from(y_0),
             );
-            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+            (Self::wrapping_from(z_1), Self::wrapping_from(z_0))
         } else {
             let (z_1, z_0) = u64::xx_add_yy_to_zz(
                 u64::wrapping_from(x_1),
@@ -118,7 +118,7 @@ impl XXAddYYToZZ for usize {
                 u64::wrapping_from(y_1),
                 u64::wrapping_from(y_0),
             );
-            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+            (Self::wrapping_from(z_1), Self::wrapping_from(z_0))
         }
     }
 }
@@ -149,7 +149,7 @@ impl XXAddYYToZZ for u128 {
     /// This is equivalent to `add_ssaaaa` from `longlong.h`, GMP 6.2.1, where `(sh, sl)` is
     /// returned.
     #[inline]
-    fn xx_add_yy_to_zz(x_1: u128, x_0: u128, y_1: u128, y_0: u128) -> (u128, u128) {
+    fn xx_add_yy_to_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self) {
         explicit_xx_add_yy_to_zz(x_1, x_0, y_1, y_0)
     }
 }

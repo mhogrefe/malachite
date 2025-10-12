@@ -13,8 +13,8 @@ use core::mem::swap;
 use core::ops::{Add, AddAssign};
 use malachite_base::num::basic::traits::Zero;
 
-impl Add<Integer> for Integer {
-    type Output = Integer;
+impl Add<Self> for Integer {
+    type Output = Self;
 
     /// Adds two [`Integer`]s, taking both by value.
     ///
@@ -44,7 +44,7 @@ impl Add<Integer> for Integer {
     ///     1000000000000u64
     /// );
     /// ```
-    fn add(mut self, mut other: Integer) -> Integer {
+    fn add(mut self, mut other: Self) -> Self {
         if self.abs.limb_count() >= other.abs.limb_count() {
             self += other;
             self
@@ -55,8 +55,8 @@ impl Add<Integer> for Integer {
     }
 }
 
-impl Add<&Integer> for Integer {
-    type Output = Integer;
+impl Add<&Self> for Integer {
+    type Output = Self;
 
     /// Adds two [`Integer`]s, taking the first by reference and the second by value.
     ///
@@ -87,7 +87,7 @@ impl Add<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn add(mut self, other: &Integer) -> Integer {
+    fn add(mut self, other: &Self) -> Self {
         self += other;
         self
     }
@@ -207,7 +207,7 @@ impl Add<&Integer> for &Integer {
     }
 }
 
-impl AddAssign<Integer> for Integer {
+impl AddAssign<Self> for Integer {
     /// Adds an [`Integer`] to an [`Integer`] in place, taking the [`Integer`] on the right-hand
     /// side by value.
     ///
@@ -236,7 +236,7 @@ impl AddAssign<Integer> for Integer {
     /// x += Integer::from(10u32).pow(12) * Integer::from(4u32);
     /// assert_eq!(x, 2000000000000u64);
     /// ```
-    fn add_assign(&mut self, mut other: Integer) {
+    fn add_assign(&mut self, mut other: Self) {
         match (&mut *self, &other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
@@ -244,22 +244,22 @@ impl AddAssign<Integer> for Integer {
             }
             // e.g. 10 += 5 or -10 += -5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer {
+                &Self {
                     sign: sy,
                     abs: ref ay,
                 },
             ) if sx == (sy && *ay != 0) => *ax += ay,
             // e.g. 10 += -5, -10 += 5, or 5 += -5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                Integer { abs: ay, .. },
+                Self { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 += -10, -5 += 10, or -5 += 5; sign of self is flipped
             _ => {
@@ -270,7 +270,7 @@ impl AddAssign<Integer> for Integer {
     }
 }
 
-impl AddAssign<&Integer> for Integer {
+impl AddAssign<&Self> for Integer {
     /// Adds an [`Integer`] to an [`Integer`] in place, taking the [`Integer`] on the right-hand
     /// side by reference.
     ///
@@ -299,7 +299,7 @@ impl AddAssign<&Integer> for Integer {
     /// x += &(Integer::from(10u32).pow(12) * Integer::from(4u32));
     /// assert_eq!(x, 2000000000000u64);
     /// ```
-    fn add_assign(&mut self, other: &Integer) {
+    fn add_assign(&mut self, other: &Self) {
         match (&mut *self, other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
@@ -307,30 +307,30 @@ impl AddAssign<&Integer> for Integer {
             }
             // e.g. 10 += 5 or -10 += -5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer {
+                &Self {
                     sign: sy,
                     abs: ref ay,
                 },
             ) if sx == (sy && *ay != 0) => *ax += ay,
             // e.g. 10 += -5, -10 += 5, or 5 += -5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                Integer { abs: ay, .. },
+                Self { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 += -10, -5 += 10, or -5 += 5; sign of self is flipped
             (
-                &mut Integer {
+                &mut Self {
                     sign: ref mut sx,
                     abs: ref mut ax,
                 },
-                &Integer {
+                &Self {
                     sign: sy,
                     abs: ref ay,
                 },
@@ -372,11 +372,11 @@ impl Sum for Integer {
     ///     11
     /// );
     /// ```
-    fn sum<I>(xs: I) -> Integer
+    fn sum<I>(xs: I) -> Self
     where
-        I: Iterator<Item = Integer>,
+        I: Iterator<Item = Self>,
     {
-        let mut s = Integer::ZERO;
+        let mut s = Self::ZERO;
         for x in xs {
             s += x;
         }
@@ -384,7 +384,7 @@ impl Sum for Integer {
     }
 }
 
-impl<'a> Sum<&'a Integer> for Integer {
+impl<'a> Sum<&'a Self> for Integer {
     /// Adds up all the [`Integer`]s in an iterator of [`Integer`] references.
     ///
     /// $$
@@ -410,11 +410,11 @@ impl<'a> Sum<&'a Integer> for Integer {
     ///     11
     /// );
     /// ```
-    fn sum<I>(xs: I) -> Integer
+    fn sum<I>(xs: I) -> Self
     where
-        I: Iterator<Item = &'a Integer>,
+        I: Iterator<Item = &'a Self>,
     {
-        let mut s = Integer::ZERO;
+        let mut s = Self::ZERO;
         for x in xs {
             s += x;
         }

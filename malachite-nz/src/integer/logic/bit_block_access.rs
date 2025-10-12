@@ -198,27 +198,27 @@ pub_test! {limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits:
 }}
 
 impl Natural {
-    fn neg_get_bits(&self, start: u64, end: u64) -> Natural {
-        Natural::from_owned_limbs_asc(match self {
-            Natural(Small(small)) => limbs_neg_limb_get_bits(*small, start, end),
-            Natural(Large(limbs)) => limbs_slice_neg_get_bits(limbs, start, end),
+    fn neg_get_bits(&self, start: u64, end: u64) -> Self {
+        Self::from_owned_limbs_asc(match self {
+            Self(Small(small)) => limbs_neg_limb_get_bits(*small, start, end),
+            Self(Large(limbs)) => limbs_slice_neg_get_bits(limbs, start, end),
         })
     }
 
-    fn neg_get_bits_owned(self, start: u64, end: u64) -> Natural {
-        Natural::from_owned_limbs_asc(match self {
-            Natural(Small(small)) => limbs_neg_limb_get_bits(small, start, end),
-            Natural(Large(limbs)) => limbs_vec_neg_get_bits(limbs, start, end),
+    fn neg_get_bits_owned(self, start: u64, end: u64) -> Self {
+        Self::from_owned_limbs_asc(match self {
+            Self(Small(small)) => limbs_neg_limb_get_bits(small, start, end),
+            Self(Large(limbs)) => limbs_vec_neg_get_bits(limbs, start, end),
         })
     }
 
-    fn neg_assign_bits(&mut self, start: u64, end: u64, bits: &Natural) {
+    fn neg_assign_bits(&mut self, start: u64, end: u64, bits: &Self) {
         if start == end {
             return;
         }
         let bits_width = end - start;
         if bits_width <= Limb::WIDTH {
-            if let (&mut Natural(Small(ref mut small_self)), &Natural(Small(small_bits))) =
+            if let (&mut Self(Small(ref mut small_self)), &Self(Small(small_bits))) =
                 (&mut *self, bits)
             {
                 let small_bits = (!small_bits).mod_power_of_2(bits_width);
@@ -235,8 +235,8 @@ impl Natural {
         }
         let limbs = self.promote_in_place();
         match bits {
-            Natural(Small(small_bits)) => limbs_neg_assign_bits(limbs, start, end, &[*small_bits]),
-            Natural(Large(bits_limbs)) => limbs_neg_assign_bits(limbs, start, end, bits_limbs),
+            Self(Small(small_bits)) => limbs_neg_assign_bits(limbs, start, end, &[*small_bits]),
+            Self(Large(bits_limbs)) => limbs_neg_assign_bits(limbs, start, end, bits_limbs),
         }
         self.trim();
     }

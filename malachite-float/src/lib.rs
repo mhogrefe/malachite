@@ -197,7 +197,7 @@ impl Float {
     /// with $1\leq m<2$ and $e$ an integer, we must have $e\geq -2^{30}$. If the result of a
     /// calculation would produce a [`Float`] with an exponent smaller than this, $\pm0.0$ is
     /// returned instead.
-    pub const MIN_EXPONENT: i32 = -Float::MAX_EXPONENT;
+    pub const MIN_EXPONENT: i32 = -Self::MAX_EXPONENT;
 
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {

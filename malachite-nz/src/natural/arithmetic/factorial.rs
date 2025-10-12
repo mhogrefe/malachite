@@ -411,10 +411,10 @@ impl Factorial for Natural {
     ///
     /// This is equivalent to `mpz_fac_ui` from `mpz/fac_ui.c`, GMP 6.2.1.
     #[allow(clippy::useless_conversion)]
-    fn factorial(n: u64) -> Natural {
+    fn factorial(n: u64) -> Self {
         assert!(Limb::convertible_from(n));
         if n < SMALL_FACTORIAL_LIMIT {
-            Natural::from(Limb::factorial(n))
+            Self::from(Limb::factorial(n))
         } else if n < u64::from(FAC_ODD_THRESHOLD) {
             let mut factors =
                 vec![0; usize::wrapping_from(n - SMALL_FACTORIAL_LIMIT) / FACTORS_PER_LIMB + 2];
@@ -438,14 +438,14 @@ impl Factorial for Natural {
             let mut xs = vec![0; j];
             let size = limbs_product(&mut xs, &mut factors[..j]);
             xs.truncate(size);
-            Natural::from_owned_limbs_asc(xs)
+            Self::from_owned_limbs_asc(xs)
         } else {
             let count = if n <= TABLE_LIMIT_2N_MINUS_POPC_2N {
                 u64::from(TABLE_2N_MINUS_POPC_2N[usize::exact_from((n >> 1) - 1)])
             } else {
                 n - CountOnes::count_ones(n)
             };
-            Natural::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), false)) << count
+            Self::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), false)) << count
         }
     }
 }
@@ -491,7 +491,7 @@ impl DoubleFactorial for Natural {
     /// ```
     ///
     /// This is equivalent to `mpz_2fac_ui` from `mpz/2fac_ui.c`, GMP 6.2.1.
-    fn double_factorial(n: u64) -> Natural {
+    fn double_factorial(n: u64) -> Self {
         assert!(Limb::convertible_from(n));
         if n.even() {
             // n is even, n = 2k, (2k)!! = k! 2^k
@@ -501,9 +501,9 @@ impl DoubleFactorial for Natural {
             } else {
                 n - CountOnes::count_ones(n)
             };
-            Natural::from_owned_limbs_asc(limbs_odd_factorial(half_n, false)) << count
+            Self::from_owned_limbs_asc(limbs_odd_factorial(half_n, false)) << count
         } else if n <= u64::wrapping_from(ODD_DOUBLEFACTORIAL_TABLE_LIMIT) {
-            Natural::from(ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[usize::wrapping_from(n >> 1)])
+            Self::from(ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[usize::wrapping_from(n >> 1)])
         } else if n < u64::wrapping_from(FAC_2DSC_THRESHOLD) {
             let mut factors = vec![0; usize::exact_from(n) / (FACTORS_PER_LIMB << 1) + 1];
             factors[0] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
@@ -527,9 +527,9 @@ impl DoubleFactorial for Natural {
             let mut xs = vec![0; j];
             let size = limbs_product(&mut xs, &mut factors[..j]);
             xs.truncate(size);
-            Natural::from_owned_limbs_asc(xs)
+            Self::from_owned_limbs_asc(xs)
         } else {
-            Natural::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), true))
+            Self::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), true))
         }
     }
 }
@@ -587,16 +587,16 @@ impl Multifactorial for Natural {
     ///     "174548867015437739741494347897360069928419328000000000"
     /// );
     /// ```
-    fn multifactorial(mut n: u64, mut m: u64) -> Natural {
+    fn multifactorial(mut n: u64, mut m: u64) -> Self {
         assert_ne!(m, 0);
         assert!(Limb::convertible_from(n));
         assert!(Limb::convertible_from(m));
         if n < 3 || n - 3 < m - 1 {
             // n < 3 || n - 1 <= m
             if n == 0 {
-                Natural::ONE
+                Self::ONE
             } else {
-                Natural::from(n)
+                Self::from(n)
             }
         } else {
             // 0 < m < n - 1 < Limb::MAX
@@ -609,15 +609,15 @@ impl Multifactorial for Natural {
                 // fac or 2fac
                 if m == 1 {
                     match gcd {
-                        gcd if gcd > 2 => Natural::from(gcd).pow(n) * Natural::factorial(n),
-                        2 => Natural::double_factorial(n << 1),
-                        _ => Natural::factorial(n),
+                        gcd if gcd > 2 => Self::from(gcd).pow(n) * Self::factorial(n),
+                        2 => Self::double_factorial(n << 1),
+                        _ => Self::factorial(n),
                     }
                 } else if gcd > 1 {
                     // m == 2
-                    Natural::from(gcd).pow((n >> 1) + 1) * Natural::double_factorial(n)
+                    Self::from(gcd).pow((n >> 1) + 1) * Self::double_factorial(n)
                 } else {
-                    Natural::double_factorial(n)
+                    Self::double_factorial(n)
                 }
             } else {
                 // m >= 3, gcd(n,m) = 1
@@ -646,11 +646,11 @@ impl Multifactorial for Natural {
                 let mut xs = vec![0; j];
                 let size = limbs_product(&mut xs, &mut factors[..j]);
                 xs.truncate(size);
-                let x = Natural::from_owned_limbs_asc(xs);
+                let x = Self::from_owned_limbs_asc(xs);
                 if gcd == 1 {
                     x
                 } else {
-                    Natural::from(gcd).pow(reduced_n) * x
+                    Self::from(gcd).pow(reduced_n) * x
                 }
             }
         }
@@ -692,7 +692,7 @@ impl Subfactorial for Natural {
     /// );
     /// ```
     #[inline]
-    fn subfactorial(n: u64) -> Natural {
+    fn subfactorial(n: u64) -> Self {
         subfactorial_naive(n)
     }
 }

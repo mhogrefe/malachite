@@ -59,7 +59,7 @@ impl Float {
     #[inline]
     pub fn to_significand(&self) -> Option<Natural> {
         match self {
-            Float(Finite { significand, .. }) => Some(significand.clone()),
+            Self(Finite { significand, .. }) => Some(significand.clone()),
             _ => None,
         }
     }
@@ -103,7 +103,7 @@ impl Float {
     #[inline]
     pub fn into_significand(self) -> Option<Natural> {
         match self {
-            Float(Finite { significand, .. }) => Some(significand),
+            Self(Finite { significand, .. }) => Some(significand),
             _ => None,
         }
     }
@@ -147,7 +147,7 @@ impl Float {
     #[inline]
     pub const fn significand_ref(&self) -> Option<&Natural> {
         match self {
-            Float(Finite { significand, .. }) => Some(significand),
+            Self(Finite { significand, .. }) => Some(significand),
             _ => None,
         }
     }
@@ -187,7 +187,7 @@ impl Float {
     #[inline]
     pub const fn get_exponent(&self) -> Option<i32> {
         match self {
-            Float(Finite { exponent, .. }) => Some(*exponent),
+            Self(Finite { exponent, .. }) => Some(*exponent),
             _ => None,
         }
     }
@@ -217,7 +217,7 @@ impl Float {
     #[inline]
     pub const fn get_prec(&self) -> Option<u64> {
         match self {
-            Float(Finite { precision, .. }) => Some(*precision),
+            Self(Finite { precision, .. }) => Some(*precision),
             _ => None,
         }
     }
@@ -250,7 +250,7 @@ impl Float {
     /// ```
     pub fn get_min_prec(&self) -> Option<u64> {
         match self {
-            Float(Finite { significand, .. }) => {
+            Self(Finite { significand, .. }) => {
                 Some(significand_bits(significand) - significand.trailing_zeros().unwrap())
             }
             _ => None,
@@ -308,7 +308,7 @@ impl Float {
     pub fn set_prec_round(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
         assert_ne!(prec, 0);
         match self {
-            Float(Finite {
+            Self(Finite {
                 sign,
                 exponent,
                 precision,
@@ -328,12 +328,12 @@ impl Float {
                     o = significand
                         .round_to_multiple_of_power_of_2_assign(significant_bits - prec, abs_rm);
                     if significand.limb_count() > limb_count {
-                        if *exponent == Float::MAX_EXPONENT {
+                        if *exponent == Self::MAX_EXPONENT {
                             return if *sign {
-                                *self = Float::INFINITY;
+                                *self = Self::INFINITY;
                                 Greater
                             } else {
-                                *self = Float::NEGATIVE_INFINITY;
+                                *self = Self::NEGATIVE_INFINITY;
                                 Less
                             };
                         }
@@ -444,7 +444,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_float_prec_round(mut x: Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn from_float_prec_round(mut x: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let o = x.set_prec_round(prec, rm);
         (x, o)
     }
@@ -498,20 +498,20 @@ impl Float {
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     /// ```
-    pub fn from_float_prec_round_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn from_float_prec_round_ref(x: &Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         if x.significant_bits() < PREC_ROUND_THRESHOLD {
             let mut x = x.clone();
             let o = x.set_prec_round(prec, rm);
             return (x, o);
         }
         match x {
-            Float(Finite {
+            Self(Finite {
                 sign,
                 exponent,
                 significand,
                 ..
             }) => {
-                let (mut y, mut o) = Float::from_natural_prec_round_ref(
+                let (mut y, mut o) = Self::from_natural_prec_round_ref(
                     significand,
                     prec,
                     if *sign { rm } else { -rm },
@@ -574,7 +574,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_float_prec(mut x: Float, prec: u64) -> (Float, Ordering) {
+    pub fn from_float_prec(mut x: Self, prec: u64) -> (Self, Ordering) {
         let o = x.set_prec(prec);
         (x, o)
     }
@@ -624,7 +624,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_float_prec_ref(x: &Float, prec: u64) -> (Float, Ordering) {
-        Float::from_float_prec_round_ref(x, prec, Nearest)
+    pub fn from_float_prec_ref(x: &Self, prec: u64) -> (Self, Ordering) {
+        Self::from_float_prec_round_ref(x, prec, Nearest)
     }
 }

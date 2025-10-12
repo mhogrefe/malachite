@@ -20,7 +20,7 @@ impl EqAbs<Rational> for Float {
     fn eq_abs(&self, other: &Rational) -> bool {
         match self {
             float_either_zero!() => *other == 0u32,
-            Float(Finite {
+            Self(Finite {
                 exponent,
                 significand,
                 ..

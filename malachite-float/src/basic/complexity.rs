@@ -49,7 +49,7 @@ impl Float {
     /// ```
     pub fn complexity(&self) -> u64 {
         match self {
-            Float(Finite {
+            Self(Finite {
                 exponent,
                 precision,
                 ..

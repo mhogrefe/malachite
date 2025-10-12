@@ -44,7 +44,7 @@ impl PartialOrd for Float {
     /// assert!(Float::ONE_HALF < Float::ONE);
     /// assert!(Float::ONE_HALF > Float::NEGATIVE_ONE);
     /// ```
-    fn partial_cmp(&self, other: &Float) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) | (_, float_nan!()) => None,
             (float_infinity!(), float_infinity!())
@@ -52,20 +52,20 @@ impl PartialOrd for Float {
             | (float_either_zero!(), float_either_zero!()) => Some(Equal),
             (float_infinity!(), _) | (_, float_negative_infinity!()) => Some(Greater),
             (float_negative_infinity!(), _) | (_, float_infinity!()) => Some(Less),
-            (Float(Finite { sign, .. }), float_either_zero!()) => {
+            (Self(Finite { sign, .. }), float_either_zero!()) => {
                 Some(if *sign { Greater } else { Less })
             }
-            (float_either_zero!(), Float(Finite { sign, .. })) => {
+            (float_either_zero!(), Self(Finite { sign, .. })) => {
                 Some(if *sign { Less } else { Greater })
             }
             (
-                Float(Finite {
+                Self(Finite {
                     sign: s_x,
                     exponent: e_x,
                     significand: x,
                     ..
                 }),
-                Float(Finite {
+                Self(Finite {
                     sign: s_y,
                     exponent: e_y,
                     significand: y,
@@ -122,7 +122,7 @@ impl<'a> Ord for ComparableFloatRef<'a> {
     /// assert!(ComparableFloatRef(&Float::ONE_HALF) < ComparableFloatRef(&Float::ONE));
     /// assert!(ComparableFloatRef(&Float::ONE_HALF) > ComparableFloatRef(&Float::NEGATIVE_ONE));
     /// ```
-    fn cmp(&self, other: &ComparableFloatRef<'a>) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         match (&self.0, &other.0) {
             (float_nan!(), float_nan!())
             | (float_infinity!(), float_infinity!())
@@ -224,7 +224,7 @@ impl Ord for ComparableFloat {
     /// assert!(ComparableFloat(Float::ONE_HALF) > ComparableFloat(Float::NEGATIVE_ONE));
     /// ```
     #[inline]
-    fn cmp(&self, other: &ComparableFloat) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         self.as_ref().cmp(&other.as_ref())
     }
 }
@@ -235,7 +235,7 @@ impl PartialOrd for ComparableFloat {
     ///
     /// See the documentation for the [`Ord`] implementation.
     #[inline]
-    fn partial_cmp(&self, other: &ComparableFloat) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.as_ref().cmp(&other.as_ref()))
     }
 }

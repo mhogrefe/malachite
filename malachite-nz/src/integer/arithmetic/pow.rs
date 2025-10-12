@@ -10,7 +10,7 @@ use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign};
 
 impl Pow<u64> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Raises an [`Integer`] to a power, taking the [`Integer`] by value.
     ///
@@ -43,7 +43,7 @@ impl Pow<u64> for Integer {
     /// );
     /// ```
     #[inline]
-    fn pow(mut self, exp: u64) -> Integer {
+    fn pow(mut self, exp: u64) -> Self {
         self.pow_assign(exp);
         self
     }

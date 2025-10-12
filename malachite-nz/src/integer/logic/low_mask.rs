@@ -36,7 +36,7 @@ impl LowMask for Integer {
     /// );
     /// ```
     #[inline]
-    fn low_mask(bits: u64) -> Integer {
-        Integer::from(Natural::low_mask(bits))
+    fn low_mask(bits: u64) -> Self {
+        Self::from(Natural::low_mask(bits))
     }
 }

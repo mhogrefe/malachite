@@ -59,11 +59,11 @@ impl LowMask for Natural {
     ///     "1267650600228229401496703205375"
     /// );
     /// ```
-    fn low_mask(bits: u64) -> Natural {
+    fn low_mask(bits: u64) -> Self {
         if bits <= Limb::WIDTH {
-            Natural(Small(Limb::low_mask(bits)))
+            Self(Small(Limb::low_mask(bits)))
         } else {
-            Natural(Large(limbs_low_mask(bits)))
+            Self(Large(limbs_low_mask(bits)))
         }
     }
 }

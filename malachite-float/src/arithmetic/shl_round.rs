@@ -24,7 +24,7 @@ impl Float {
         rm: RoundingMode,
         previous_o: Ordering,
     ) -> Ordering {
-        if let Float(Finite {
+        if let Self(Finite {
             significand,
             exponent,
             sign,
@@ -35,7 +35,7 @@ impl Float {
             if let Ok(bits) = bits.try_into() {
                 if let Some(new_exponent) = exponent.checked_add(bits) {
                     possibly_just_under_min = true;
-                    if (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent) {
+                    if (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&new_exponent) {
                         *exponent = new_exponent;
                         return previous_o;
                     }
@@ -45,19 +45,19 @@ impl Float {
             if bits > T::ZERO {
                 match (*sign, rm) {
                     (true, Up | Ceiling | Nearest) => {
-                        *self = Float::INFINITY;
+                        *self = Self::INFINITY;
                         Greater
                     }
                     (true, Floor | Down) => {
-                        *self = Float::max_finite_value_with_prec(prec);
+                        *self = Self::max_finite_value_with_prec(prec);
                         Less
                     }
                     (false, Up | Floor | Nearest) => {
-                        *self = Float::NEGATIVE_INFINITY;
+                        *self = Self::NEGATIVE_INFINITY;
                         Less
                     }
                     (false, Ceiling | Down) => {
-                        *self = -Float::max_finite_value_with_prec(prec);
+                        *self = -Self::max_finite_value_with_prec(prec);
                         Greater
                     }
                     (_, Exact) => unreachable!(),
@@ -65,33 +65,33 @@ impl Float {
             } else if rm == Nearest
                 && possibly_just_under_min
                 && *exponent + <T as SaturatingInto<i32>>::saturating_into(bits)
-                    == Float::MIN_EXPONENT - 1
+                    == Self::MIN_EXPONENT - 1
                 && (previous_o == if *sign { Less } else { Greater }
                     || !significand.is_power_of_2())
             {
                 if *sign {
-                    *self = Float::min_positive_value_prec(*precision);
+                    *self = Self::min_positive_value_prec(*precision);
                     Greater
                 } else {
-                    *self = -Float::min_positive_value_prec(*precision);
+                    *self = -Self::min_positive_value_prec(*precision);
                     Less
                 }
             } else {
                 match (*sign, rm) {
                     (true, Up | Ceiling) => {
-                        *self = Float::min_positive_value_prec(prec);
+                        *self = Self::min_positive_value_prec(prec);
                         Greater
                     }
                     (true, Floor | Down | Nearest) => {
-                        *self = Float::ZERO;
+                        *self = Self::ZERO;
                         Less
                     }
                     (false, Up | Floor) => {
-                        *self = -Float::min_positive_value_prec(prec);
+                        *self = -Self::min_positive_value_prec(prec);
                         Less
                     }
                     (false, Ceiling | Down | Nearest) => {
-                        *self = Float::NEGATIVE_ZERO;
+                        *self = Self::NEGATIVE_ZERO;
                         Greater
                     }
                     (_, Exact) => unreachable!(),
@@ -107,7 +107,7 @@ impl Float {
         bits: T,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.shl_prec_round_assign(bits, prec, rm);
         (self, o)
     }
@@ -117,7 +117,7 @@ impl Float {
         bits: T,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let mut x = self.clone();
         let o = x.shl_prec_round_assign(bits, prec, rm);
         (x, o)
@@ -129,7 +129,7 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
-        if let Float(Finite { exponent, .. }) = self {
+        if let Self(Finite { exponent, .. }) = self {
             let old_exponent = *exponent;
             *exponent = 0;
             let o = self.set_prec_round(prec, rm);
@@ -145,12 +145,12 @@ impl Float {
     }
 
     #[inline]
-    pub fn shl_prec<T: PrimitiveInt>(self, bits: T, prec: u64) -> (Float, Ordering) {
+    pub fn shl_prec<T: PrimitiveInt>(self, bits: T, prec: u64) -> (Self, Ordering) {
         self.shl_prec_round(bits, prec, Nearest)
     }
 
     #[inline]
-    pub fn shl_prec_ref<T: PrimitiveInt>(&self, bits: T, prec: u64) -> (Float, Ordering) {
+    pub fn shl_prec_ref<T: PrimitiveInt>(&self, bits: T, prec: u64) -> (Self, Ordering) {
         self.shl_prec_round_ref(bits, prec, Nearest)
     }
 

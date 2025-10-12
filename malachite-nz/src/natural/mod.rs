@@ -50,10 +50,10 @@ pub(crate) struct SerdeNatural(String);
 impl Natural {
     // If a `Natural` is `Large` but is small enough to be `Small`, make it `Small`.
     fn demote_if_small(&mut self) {
-        if let Natural(Large(limbs)) = self {
+        if let Self(Large(limbs)) = self {
             match limbs.len() {
-                0 => *self = Natural::ZERO,
-                1 => *self = Natural(Small(limbs[0])),
+                0 => *self = Self::ZERO,
+                1 => *self = Self(Small(limbs[0])),
                 _ => {}
             }
         }
@@ -61,10 +61,10 @@ impl Natural {
 
     // If a `Natural` is `Small`, make it `Large`. Return a reference to the `Limb` vector.
     pub(crate) fn promote_in_place(&mut self) -> &mut Vec<Limb> {
-        if let Natural(Small(x)) = self {
-            *self = Natural(Large(vec![*x]));
+        if let Self(Small(x)) = self {
+            *self = Self(Large(vec![*x]));
         }
-        if let Natural(Large(xs)) = self {
+        if let Self(Large(xs)) = self {
             xs
         } else {
             unreachable!();
@@ -72,7 +72,7 @@ impl Natural {
     }
 
     pub(crate) fn trim(&mut self) {
-        if let Natural(Large(limbs)) = self {
+        if let Self(Large(limbs)) = self {
             let trailing_zero_count = slice_trailing_zeros(limbs);
             if trailing_zero_count != 0 {
                 let len = limbs.len();
@@ -97,33 +97,33 @@ impl Natural {
 
 /// The constant 0.
 impl Zero for Natural {
-    const ZERO: Natural = Natural(Small(0));
+    const ZERO: Self = Self(Small(0));
 }
 
 /// The constant 1.
 impl One for Natural {
-    const ONE: Natural = Natural(Small(1));
+    const ONE: Self = Self(Small(1));
 }
 
 /// The constant 2.
 impl Two for Natural {
-    const TWO: Natural = Natural(Small(2));
+    const TWO: Self = Self(Small(2));
 }
 
 /// The minimum value of a [`Natural`], 0.
 impl Min for Natural {
-    const MIN: Natural = Natural::ZERO;
+    const MIN: Self = Self::ZERO;
 }
 
 #[cfg(feature = "float_helpers")]
 impl Natural {
-    pub const HIGH_BIT: Natural = Natural(Small(1 << (Limb::WIDTH - 1)));
+    pub const HIGH_BIT: Self = Self(Small(1 << (Limb::WIDTH - 1)));
 }
 
 impl Default for Natural {
     /// The default value of a [`Natural`], 0.
-    fn default() -> Natural {
-        Natural::ZERO
+    fn default() -> Self {
+        Self::ZERO
     }
 }
 

@@ -65,22 +65,22 @@ impl Rational {
         log_base: u64,
         before_point: Vec<Natural>,
         after_point: RationalSequence<Natural>,
-    ) -> Rational {
+    ) -> Self {
         let (non_repeating, repeating) = after_point.into_vecs();
         let r_len = u64::exact_from(repeating.len());
         let nr_len = u64::exact_from(non_repeating.len());
         let nr =
             Natural::from_power_of_2_digits_asc(log_base, non_repeating.into_iter().rev()).unwrap();
         let r = Natural::from_power_of_2_digits_asc(log_base, repeating.into_iter().rev()).unwrap();
-        let floor = Rational::from(
+        let floor = Self::from(
             Natural::from_power_of_2_digits_asc(log_base, before_point.into_iter()).unwrap(),
         );
         floor
             + if r == 0u32 {
-                Rational::from(nr) >> (log_base * nr_len)
+                Self::from(nr) >> (log_base * nr_len)
             } else {
-                (Rational::from_naturals(r, Natural::low_mask(log_base * r_len))
-                    + Rational::from(nr))
+                (Self::from_naturals(r, Natural::low_mask(log_base * r_len))
+                    + Self::from(nr))
                     >> (log_base * nr_len)
             }
     }
@@ -136,22 +136,22 @@ impl Rational {
         log_base: u64,
         before_point: &[Natural],
         after_point: &RationalSequence<Natural>,
-    ) -> Rational {
+    ) -> Self {
         let (non_repeating, repeating) = after_point.to_vecs();
         let r_len = u64::exact_from(repeating.len());
         let nr_len = u64::exact_from(non_repeating.len());
         let nr =
             Natural::from_power_of_2_digits_asc(log_base, non_repeating.into_iter().rev()).unwrap();
         let r = Natural::from_power_of_2_digits_asc(log_base, repeating.into_iter().rev()).unwrap();
-        let floor = Rational::from(
+        let floor = Self::from(
             Natural::from_power_of_2_digits_asc(log_base, before_point.iter().cloned()).unwrap(),
         );
         floor
             + if r == 0u32 {
-                Rational::from(nr) >> (log_base * nr_len)
+                Self::from(nr) >> (log_base * nr_len)
             } else {
-                (Rational::from_naturals(r, Natural::low_mask(log_base * r_len))
-                    + Rational::from(nr))
+                (Self::from_naturals(r, Natural::low_mask(log_base * r_len))
+                    + Self::from(nr))
                     >> (log_base * nr_len)
             }
     }

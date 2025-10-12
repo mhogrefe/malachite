@@ -15,7 +15,7 @@ impl PartialOrd for Rational {
     ///
     /// See the documentation for the [`Ord`] implementation.
     #[inline]
-    fn partial_cmp(&self, other: &Rational) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -40,7 +40,7 @@ impl Ord for Rational {
     /// assert!(Rational::from_str("2/3").unwrap() > Rational::ONE_HALF);
     /// assert!(Rational::from_str("-2/3").unwrap() < Rational::ONE_HALF);
     /// ```
-    fn cmp(&self, other: &Rational) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         if core::ptr::eq(self, other) {
             return Equal;
         }

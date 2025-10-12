@@ -240,10 +240,10 @@ impl Float {
     #[inline]
     pub fn sub_prec_round(
         mut self,
-        other: Float,
+        other: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.sub_prec_round_assign(other, prec, rm);
         (self, o)
     }
@@ -353,10 +353,10 @@ impl Float {
     #[inline]
     pub fn sub_prec_round_val_ref(
         mut self,
-        other: &Float,
+        other: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.sub_prec_round_assign_ref(other, prec, rm);
         (self, o)
     }
@@ -466,10 +466,10 @@ impl Float {
     #[inline]
     pub fn sub_prec_round_ref_val(
         &self,
-        other: Float,
+        other: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         self.add_prec_round_ref_val(-other, prec, rm)
     }
 
@@ -578,10 +578,10 @@ impl Float {
     #[inline]
     pub fn sub_prec_round_ref_ref(
         &self,
-        other: &Float,
+        other: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         self.add_prec_round_ref_ref_helper(other, prec, rm, true)
     }
 
@@ -650,7 +650,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_prec(self, other: Float, prec: u64) -> (Float, Ordering) {
+    pub fn sub_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
         self.sub_prec_round(other, prec, Nearest)
     }
 
@@ -719,7 +719,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_prec_val_ref(self, other: &Float, prec: u64) -> (Float, Ordering) {
+    pub fn sub_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.sub_prec_round_val_ref(other, prec, Nearest)
     }
 
@@ -788,7 +788,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_prec_ref_val(&self, other: Float, prec: u64) -> (Float, Ordering) {
+    pub fn sub_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
         self.sub_prec_round_ref_val(other, prec, Nearest)
     }
 
@@ -857,7 +857,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_prec_ref_ref(&self, other: &Float, prec: u64) -> (Float, Ordering) {
+    pub fn sub_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.sub_prec_round_ref_ref(other, prec, Nearest)
     }
 
@@ -952,9 +952,9 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_round(self, other: Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn sub_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
-        Float::sub_prec_round(self, other, prec, rm)
+        Self::sub_prec_round(self, other, prec, rm)
     }
 
     /// Subtracts two [`Float`]s, rounding the result with the specified rounding mode. The
@@ -1048,7 +1048,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_round_val_ref(self, other: &Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn sub_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_val_ref(other, prec, rm)
     }
@@ -1144,7 +1144,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_round_ref_val(&self, other: Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn sub_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_ref_val(other, prec, rm)
     }
@@ -1240,7 +1240,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_round_ref_ref(&self, other: &Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn sub_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_ref_ref(other, prec, rm)
     }
@@ -1318,7 +1318,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "0.4233108");
     /// ```
     #[inline]
-    pub fn sub_prec_round_assign(&mut self, other: Float, prec: u64, rm: RoundingMode) -> Ordering {
+    pub fn sub_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
         self.add_prec_round_assign_helper(other, prec, rm, true)
     }
 
@@ -1409,7 +1409,7 @@ impl Float {
     #[inline]
     pub fn sub_prec_round_assign_ref(
         &mut self,
-        other: &Float,
+        other: &Self,
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
@@ -1463,7 +1463,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "0.4233108");
     /// ```
     #[inline]
-    pub fn sub_prec_assign(&mut self, other: Float, prec: u64) -> Ordering {
+    pub fn sub_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
         self.sub_prec_round_assign(other, prec, Nearest)
     }
 
@@ -1514,7 +1514,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "0.4233108");
     /// ```
     #[inline]
-    pub fn sub_prec_assign_ref(&mut self, other: &Float, prec: u64) -> Ordering {
+    pub fn sub_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
         self.sub_prec_round_assign_ref(other, prec, Nearest)
     }
 
@@ -1577,7 +1577,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "5.859874482048838");
     /// ```
     #[inline]
-    pub fn sub_round_assign(&mut self, other: Float, rm: RoundingMode) -> Ordering {
+    pub fn sub_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_assign(other, prec, rm)
     }
@@ -1641,7 +1641,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "5.859874482048838");
     /// ```
     #[inline]
-    pub fn sub_round_assign_ref(&mut self, other: &Float, rm: RoundingMode) -> Ordering {
+    pub fn sub_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_assign_ref(other, prec, rm)
     }
@@ -1757,7 +1757,7 @@ impl Float {
         other: Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.sub_rational_prec_round_assign(other, prec, rm);
         (self, o)
     }
@@ -1891,7 +1891,7 @@ impl Float {
         other: &Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.sub_rational_prec_round_assign_ref(other, prec, rm);
         (self, o)
     }
@@ -2025,25 +2025,25 @@ impl Float {
         other: Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
             (float_nan!(), _) => (float_nan!(), Equal),
             (float_infinity!(), _) => (float_infinity!(), Equal),
             (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
             (float_negative_zero!(), y) => {
-                let (diff, o) = Float::from_rational_prec_round(y, prec, -rm);
+                let (diff, o) = Self::from_rational_prec_round(y, prec, -rm);
                 (-diff, o.reverse())
             }
             (float_zero!(), y) => {
                 if y == 0u32 {
                     (float_zero!(), Equal)
                 } else {
-                    let (diff, o) = Float::from_rational_prec_round(y, prec, -rm);
+                    let (diff, o) = Self::from_rational_prec_round(y, prec, -rm);
                     (-diff, o.reverse())
                 }
             }
-            (_, y) if y == 0 => Float::from_float_prec_round_ref(self, prec, rm),
+            (_, y) if y == 0 => Self::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
                 if *x == y {
                     return (
@@ -2056,17 +2056,17 @@ impl Float {
                     );
                 }
                 let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, &y);
-                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
                     assert!(rm != Exact, "Inexact Float subtraction");
                     return match (float_rational_diff_sign(x, &y), rm) {
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
-                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
-                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
                 }
-                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -2077,7 +2077,7 @@ impl Float {
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    let (q, o) = Self::from_rational_prec_ref(&y, working_prec);
                     if o == Equal {
                         // Result is exact so we can subtract it directly!
                         return self.sub_prec_round_ref_val(q, prec, rm);
@@ -2244,25 +2244,25 @@ impl Float {
         other: &Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
             (float_nan!(), _) => (float_nan!(), Equal),
             (float_infinity!(), _) => (float_infinity!(), Equal),
             (float_negative_infinity!(), _) => (float_negative_infinity!(), Equal),
             (float_negative_zero!(), y) => {
-                let (diff, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
+                let (diff, o) = Self::from_rational_prec_round_ref(y, prec, -rm);
                 (-diff, o.reverse())
             }
             (float_zero!(), y) => {
                 if *y == 0u32 {
                     (float_zero!(), Equal)
                 } else {
-                    let (diff, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
+                    let (diff, o) = Self::from_rational_prec_round_ref(y, prec, -rm);
                     (-diff, o.reverse())
                 }
             }
-            (_, y) if *y == 0 => Float::from_float_prec_round_ref(self, prec, rm),
+            (_, y) if *y == 0 => Self::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
                 if x == y {
                     return (
@@ -2275,17 +2275,17 @@ impl Float {
                     );
                 }
                 let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, y);
-                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
                     assert!(rm != Exact, "Inexact Float subtraction");
                     return match (float_rational_diff_sign(x, y), rm) {
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
-                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
-                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
                 }
-                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -2296,7 +2296,7 @@ impl Float {
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    let (q, o) = Self::from_rational_prec_ref(y, working_prec);
                     if o == Equal {
                         // Result is exact so we can subtract it directly!
                         return self.sub_prec_round_ref_val(q, prec, rm);
@@ -2397,7 +2397,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_rational_prec(self, other: Rational, prec: u64) -> (Float, Ordering) {
+    pub fn sub_rational_prec(self, other: Rational, prec: u64) -> (Self, Ordering) {
         self.sub_rational_prec_round(other, prec, Nearest)
     }
 
@@ -2464,7 +2464,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Float, Ordering) {
+    pub fn sub_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Self, Ordering) {
         self.sub_rational_prec_round_val_ref(other, prec, Nearest)
     }
 
@@ -2531,7 +2531,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Float, Ordering) {
+    pub fn sub_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Self, Ordering) {
         self.sub_rational_prec_round_ref_val(other, prec, Nearest)
     }
 
@@ -2598,7 +2598,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Float, Ordering) {
+    pub fn sub_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Self, Ordering) {
         self.sub_rational_prec_round_ref_ref(other, prec, Nearest)
     }
 
@@ -2694,7 +2694,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn sub_rational_round(self, other: Rational, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn sub_rational_round(self, other: Rational, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.sub_rational_prec_round(other, prec, rm)
     }
@@ -2796,7 +2796,7 @@ impl Float {
         self,
         other: &Rational,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.sub_rational_prec_round_val_ref(other, prec, rm)
     }
@@ -2898,7 +2898,7 @@ impl Float {
         &self,
         other: Rational,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.sub_rational_prec_round_ref_val(other, prec, rm)
     }
@@ -3000,7 +3000,7 @@ impl Float {
         &self,
         other: &Rational,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.sub_rational_prec_round_ref_ref(other, prec, rm)
     }
@@ -3104,10 +3104,10 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (Float(NaN | Infinity { .. }), _) => Equal,
+            (Self(NaN | Infinity { .. }), _) => Equal,
             (float_negative_zero!(), y) => {
                 let o;
-                (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
+                (*self, o) = Self::from_rational_prec_round(y, prec, -rm);
                 self.neg_assign();
                 o.reverse()
             }
@@ -3116,7 +3116,7 @@ impl Float {
                     Equal
                 } else {
                     let o;
-                    (*self, o) = Float::from_rational_prec_round(y, prec, -rm);
+                    (*self, o) = Self::from_rational_prec_round(y, prec, -rm);
                     self.neg_assign();
                     o.reverse()
                 }
@@ -3132,7 +3132,7 @@ impl Float {
                     return Equal;
                 }
                 let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, &y);
-                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
                     assert!(rm != Exact, "Inexact Float subtraction");
                     return match (float_rational_diff_sign(x, &y), rm) {
                         (true, Ceiling | Up | Nearest) => {
@@ -3140,7 +3140,7 @@ impl Float {
                             Greater
                         }
                         (true, _) => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                         (false, Floor | Up | Nearest) => {
@@ -3148,13 +3148,13 @@ impl Float {
                             Less
                         }
                         (false, _) => {
-                            *self = -Float::max_finite_value_with_prec(prec);
+                            *self = -Self::max_finite_value_with_prec(prec);
                             Greater
                         }
                     };
                 }
-                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -3167,7 +3167,7 @@ impl Float {
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(&y, working_prec);
+                    let (q, o) = Self::from_rational_prec_ref(&y, working_prec);
                     if o == Equal {
                         // Result is exact so we can subtract it directly!
                         return self.sub_prec_round_assign(q, prec, rm);
@@ -3303,10 +3303,10 @@ impl Float {
     ) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
-            (Float(NaN | Infinity { .. }), _) => Equal,
+            (Self(NaN | Infinity { .. }), _) => Equal,
             (float_negative_zero!(), y) => {
                 let o;
-                (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
+                (*self, o) = Self::from_rational_prec_round_ref(y, prec, -rm);
                 self.neg_assign();
                 o.reverse()
             }
@@ -3315,7 +3315,7 @@ impl Float {
                     Equal
                 } else {
                     let o;
-                    (*self, o) = Float::from_rational_prec_round_ref(y, prec, -rm);
+                    (*self, o) = Self::from_rational_prec_round_ref(y, prec, -rm);
                     self.neg_assign();
                     o.reverse()
                 }
@@ -3331,7 +3331,7 @@ impl Float {
                     return Equal;
                 }
                 let (min_exponent, max_exponent) = float_rational_diff_exponent_range(x, y);
-                if min_exponent >= i64::from(Float::MAX_EXPONENT) {
+                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
                     assert!(rm != Exact, "Inexact Float subtraction");
                     return match (float_rational_diff_sign(x, y), rm) {
                         (true, Ceiling | Up | Nearest) => {
@@ -3339,7 +3339,7 @@ impl Float {
                             Greater
                         }
                         (true, _) => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                         (false, Floor | Up | Nearest) => {
@@ -3347,13 +3347,13 @@ impl Float {
                             Less
                         }
                         (false, _) => {
-                            *self = -Float::max_finite_value_with_prec(prec);
+                            *self = -Self::max_finite_value_with_prec(prec);
                             Greater
                         }
                     };
                 }
-                if max_exponent > i64::from(Float::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Float::MIN_EXPONENT - 2)
+                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -3366,7 +3366,7 @@ impl Float {
                 // working_prec grows as O([(1 + sqrt(3)) / 2] ^ n) ≈ O(1.366 ^ n).
                 loop {
                     // Error <= 1/2 ulp(q)
-                    let (q, o) = Float::from_rational_prec_ref(y, working_prec);
+                    let (q, o) = Self::from_rational_prec_ref(y, working_prec);
                     if o == Equal {
                         // Result is exact so we can subtract it directly!
                         return self.sub_prec_round_assign(q, prec, rm);
@@ -3677,8 +3677,8 @@ impl Float {
     }
 }
 
-impl Sub<Float> for Float {
-    type Output = Float;
+impl Sub<Self> for Float {
+    type Output = Self;
 
     /// Subtracts two [`Float`]s, taking both by value.
     ///
@@ -3744,14 +3744,14 @@ impl Sub<Float> for Float {
     /// ```
     ///
     #[inline]
-    fn sub(self, other: Float) -> Float {
+    fn sub(self, other: Self) -> Self {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round(other, prec, Nearest).0
     }
 }
 
-impl Sub<&Float> for Float {
-    type Output = Float;
+impl Sub<&Self> for Float {
+    type Output = Self;
 
     /// Subtracts two [`Float`]s, taking the first by value and the second by reference.
     ///
@@ -3823,7 +3823,7 @@ impl Sub<&Float> for Float {
     /// assert_eq!(Float::from(-1.5) - &Float::from(-2.5), 1.0);
     /// ```
     #[inline]
-    fn sub(self, other: &Float) -> Float {
+    fn sub(self, other: &Self) -> Self {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_val_ref(other, prec, Nearest).0
     }
@@ -3986,7 +3986,7 @@ impl Sub<&Float> for &Float {
     }
 }
 
-impl SubAssign<Float> for Float {
+impl SubAssign<Self> for Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side
     /// by value.
     ///
@@ -4055,13 +4055,13 @@ impl SubAssign<Float> for Float {
     /// assert_eq!(x, 1.0);
     /// ```
     #[inline]
-    fn sub_assign(&mut self, other: Float) {
+    fn sub_assign(&mut self, other: Self) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_assign(other, prec, Nearest);
     }
 }
 
-impl SubAssign<&Float> for Float {
+impl SubAssign<&Self> for Float {
     /// Subtracts a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side
     /// by reference.
     ///
@@ -4130,14 +4130,14 @@ impl SubAssign<&Float> for Float {
     /// assert_eq!(x, 1.0);
     /// ```
     #[inline]
-    fn sub_assign(&mut self, other: &Float) {
+    fn sub_assign(&mut self, other: &Self) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.sub_prec_round_assign_ref(other, prec, Nearest);
     }
 }
 
 impl Sub<Rational> for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Subtracts a [`Float`] by a [`Rational`], taking both by value.
     ///
@@ -4204,14 +4204,14 @@ impl Sub<Rational> for Float {
     /// assert_eq!(Float::from(-2.5) - Rational::exact_from(-1.5), -1.0);
     /// ```
     #[inline]
-    fn sub(self, other: Rational) -> Float {
+    fn sub(self, other: Rational) -> Self {
         let prec = self.significant_bits();
         self.sub_rational_prec_round(other, prec, Nearest).0
     }
 }
 
 impl Sub<&Rational> for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Subtracts a [`Float`] by a [`Rational`], taking the first by value and the second by
     /// reference.
@@ -4282,7 +4282,7 @@ impl Sub<&Rational> for Float {
     /// assert_eq!(Float::from(-2.5) - &Rational::exact_from(-1.5), -1.0);
     /// ```
     #[inline]
-    fn sub(self, other: &Rational) -> Float {
+    fn sub(self, other: &Rational) -> Self {
         let prec = self.significant_bits();
         self.sub_rational_prec_round_val_ref(other, prec, Nearest).0
     }

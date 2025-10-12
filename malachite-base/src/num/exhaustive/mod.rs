@@ -79,9 +79,9 @@ impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            ExhaustiveSignedRange::NonNegative(xs) => xs.next(),
-            ExhaustiveSignedRange::NonPositive(xs) => xs.next(),
-            ExhaustiveSignedRange::BothSigns(xs) => xs.next(),
+            Self::NonNegative(xs) => xs.next(),
+            Self::NonPositive(xs) => xs.next(),
+            Self::BothSigns(xs) => xs.next(),
         }
     }
 }
@@ -1955,9 +1955,9 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloatsInRan
 
     fn next(&mut self) -> Option<T> {
         match self {
-            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllPositive(xs) => xs.next(),
-            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllNegative(xs) => xs.next().map(T::neg),
-            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::PositiveAndNegative(
+            Self::AllPositive(xs) => xs.next(),
+            Self::AllNegative(xs) => xs.next().map(T::neg),
+            Self::PositiveAndNegative(
                 toggle,
                 pos_xs,
                 neg_xs,
@@ -2017,8 +2017,8 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(xs) => xs.next(),
-            ExhaustivePrimitiveFloatInclusiveRange::NotJustSpecials(xs) => xs.next(),
+            Self::JustSpecials(xs) => xs.next(),
+            Self::NotJustSpecials(xs) => xs.next(),
         }
     }
 }

@@ -13,7 +13,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
 
 impl Neg for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Negates a [`Rational`], taking it by value.
     ///
@@ -33,7 +33,7 @@ impl Neg for Rational {
     /// assert_eq!((-Rational::from_signeds(22, 7)).to_string(), "-22/7");
     /// assert_eq!((-Rational::from_signeds(-22, 7)).to_string(), "22/7");
     /// ```
-    fn neg(mut self) -> Rational {
+    fn neg(mut self) -> Self {
         if self.numerator != 0 {
             self.sign.not_assign();
         }

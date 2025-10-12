@@ -47,7 +47,7 @@ impl TryFrom<Integer> for Natural {
     ///     "Err(NaturalFromIntegerError)"
     /// );
     /// ```
-    fn try_from(value: Integer) -> Result<Natural, Self::Error> {
+    fn try_from(value: Integer) -> Result<Self, Self::Error> {
         match value {
             Integer { sign: false, .. } => Err(NaturalFromIntegerError),
             Integer { sign: true, abs } => Ok(abs),
@@ -92,7 +92,7 @@ impl<'a> TryFrom<&'a Integer> for Natural {
     ///     "Err(NaturalFromIntegerError)"
     /// );
     /// ```
-    fn try_from(value: &'a Integer) -> Result<Natural, Self::Error> {
+    fn try_from(value: &'a Integer) -> Result<Self, Self::Error> {
         match *value {
             Integer { sign: false, .. } => Err(NaturalFromIntegerError),
             Integer {
@@ -125,9 +125,9 @@ impl SaturatingFrom<Integer> for Natural {
     /// );
     /// assert_eq!(Natural::saturating_from(-Integer::from(10u32).pow(12)), 0);
     /// ```
-    fn saturating_from(value: Integer) -> Natural {
+    fn saturating_from(value: Integer) -> Self {
         match value {
-            Integer { sign: false, .. } => Natural::ZERO,
+            Integer { sign: false, .. } => Self::ZERO,
             Integer { sign: true, abs } => abs,
         }
     }
@@ -155,9 +155,9 @@ impl<'a> SaturatingFrom<&'a Integer> for Natural {
     /// );
     /// assert_eq!(Natural::saturating_from(&-Integer::from(10u32).pow(12)), 0);
     /// ```
-    fn saturating_from(value: &'a Integer) -> Natural {
+    fn saturating_from(value: &'a Integer) -> Self {
         match *value {
-            Integer { sign: false, .. } => Natural::ZERO,
+            Integer { sign: false, .. } => Self::ZERO,
             Integer {
                 sign: true,
                 ref abs,

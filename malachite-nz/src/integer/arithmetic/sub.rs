@@ -14,8 +14,8 @@ use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
 
-impl Sub<Integer> for Integer {
-    type Output = Integer;
+impl Sub<Self> for Integer {
+    type Output = Self;
 
     /// Subtracts an [`Integer`] by another [`Integer`], taking both by value.
     ///
@@ -46,14 +46,14 @@ impl Sub<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub(mut self, other: Integer) -> Integer {
+    fn sub(mut self, other: Self) -> Self {
         self -= other;
         self
     }
 }
 
-impl Sub<&Integer> for Integer {
-    type Output = Integer;
+impl Sub<&Self> for Integer {
+    type Output = Self;
 
     /// Subtracts an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference.
@@ -85,7 +85,7 @@ impl Sub<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub(mut self, other: &Integer) -> Integer {
+    fn sub(mut self, other: &Self) -> Self {
         self -= other;
         self
     }
@@ -205,7 +205,7 @@ impl Sub<&Integer> for &Integer {
     }
 }
 
-impl SubAssign<Integer> for Integer {
+impl SubAssign<Self> for Integer {
     /// Subtracts an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value.
     ///
@@ -231,7 +231,7 @@ impl SubAssign<Integer> for Integer {
     /// x -= Integer::from(10u32).pow(12) * Integer::from(4u32);
     /// assert_eq!(x, -2000000000000i64);
     /// ```
-    fn sub_assign(&mut self, mut other: Integer) {
+    fn sub_assign(&mut self, mut other: Self) {
         match (&mut *self, &other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
@@ -240,22 +240,22 @@ impl SubAssign<Integer> for Integer {
             }
             // e.g. 10 - -5 or -10 - 5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer {
+                &Self {
                     sign: sy,
                     abs: ref ay,
                 },
             ) if sx == (!sy && *ay != 0) => *ax += ay,
             // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                Integer { abs: ay, .. },
+                Self { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
             _ => {
@@ -267,7 +267,7 @@ impl SubAssign<Integer> for Integer {
     }
 }
 
-impl SubAssign<&Integer> for Integer {
+impl SubAssign<&Self> for Integer {
     /// Subtracts an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -296,35 +296,35 @@ impl SubAssign<&Integer> for Integer {
     /// x -= &(Integer::from(10u32).pow(12) * Integer::from(4u32));
     /// assert_eq!(x, -2000000000000i64);
     /// ```
-    fn sub_assign(&mut self, other: &Integer) {
+    fn sub_assign(&mut self, other: &Self) {
         match (&mut *self, other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), y) => *self = -y.clone(),
             // e.g. 10 - -5 or -10 - 5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer {
+                &Self {
                     sign: sy,
                     abs: ref ay,
                 },
             ) if sx == (!sy && *ay != 0) => *ax += ay,
             // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             (
-                &mut Integer {
+                &mut Self {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                Integer { abs: ay, .. },
+                Self { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             (
-                &mut Integer {
+                &mut Self {
                     sign: ref mut sx,
                     abs: ref mut ax,
                 },
-                &Integer {
+                &Self {
                     sign: sy,
                     abs: ref ay,
                 },

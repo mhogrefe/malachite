@@ -98,7 +98,7 @@ impl Float {
         rm: RoundingMode,
     ) -> Option<(T, i32, Ordering)> {
         match self {
-            Float(Finite {
+            Self(Finite {
                 exponent,
                 significand,
                 ..
@@ -172,7 +172,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// }
     /// ```
     fn raw_mantissa_and_exponent(self) -> (Natural, i32) {
-        if let Float(Finite {
+        if let Self(Finite {
             exponent,
             significand,
             ..
@@ -220,7 +220,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// );
     /// ```
     fn raw_exponent(self) -> i32 {
-        if let Float(Finite { exponent, .. }) = self {
+        if let Self(Finite { exponent, .. }) = self {
             exponent
         } else {
             panic!()
@@ -276,14 +276,14 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     ///     );
     /// }
     /// ```
-    fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i32) -> Float {
-        assert!(raw_exponent <= Float::MAX_EXPONENT);
-        assert!(raw_exponent >= Float::MIN_EXPONENT);
+    fn from_raw_mantissa_and_exponent(raw_mantissa: Natural, raw_exponent: i32) -> Self {
+        assert!(raw_exponent <= Self::MAX_EXPONENT);
+        assert!(raw_exponent >= Self::MIN_EXPONENT);
         let bits = raw_mantissa.significant_bits();
         assert_ne!(bits, 0);
         assert!(bits.divisible_by_power_of_2(Limb::LOG_WIDTH));
         let precision = bits - min(raw_mantissa.trailing_zeros().unwrap(), Limb::WIDTH - 1);
-        Float(Finite {
+        Self(Finite {
             sign: true,
             exponent: raw_exponent,
             significand: raw_mantissa,
@@ -522,7 +522,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// );
     /// ```
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
-        if let Float(Finite {
+        if let Self(Finite {
             exponent,
             significand,
             ..
@@ -580,7 +580,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// );
     /// ```
     fn integer_exponent(self) -> i64 {
-        if let Float(Finite {
+        if let Self(Finite {
             exponent,
             significand,
             ..
@@ -657,9 +657,9 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     fn from_integer_mantissa_and_exponent(
         integer_mantissa: Natural,
         integer_exponent: i64,
-    ) -> Option<Float> {
+    ) -> Option<Self> {
         let nonzero = integer_mantissa != 0u32;
-        let x = Float::exact_from(integer_mantissa) << integer_exponent;
+        let x = Self::exact_from(integer_mantissa) << integer_exponent;
         if x.is_infinite() || (nonzero && x == 0) {
             None
         } else {
@@ -872,7 +872,7 @@ impl IntegerMantissaAndExponent<Natural, i64, Float> for &Float {
     }
 }
 
-impl SciMantissaAndExponent<Float, i32> for Float {
+impl SciMantissaAndExponent<Self, i32> for Float {
     /// Returns a [`Float`]'s scientific mantissa and exponent, taking the [`Float`] by value.
     ///
     /// When $x$ is finite and nonzero, we can write $|x| = 2^{e_s}m_s$, where $e_s$ is an integer
@@ -916,8 +916,8 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     /// assert_eq!(e, -80);
     /// ```
     #[inline]
-    fn sci_mantissa_and_exponent(mut self) -> (Float, i32) {
-        if let Float(Finite { sign, exponent, .. }) = &mut self {
+    fn sci_mantissa_and_exponent(mut self) -> (Self, i32) {
+        if let Self(Finite { sign, exponent, .. }) = &mut self {
             let old_exponent = *exponent;
             *exponent = 1;
             *sign = true;
@@ -1024,16 +1024,16 @@ impl SciMantissaAndExponent<Float, i32> for Float {
     ///     Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0
     /// );
     /// ```
-    fn from_sci_mantissa_and_exponent(mut sci_mantissa: Float, sci_exponent: i32) -> Option<Float> {
+    fn from_sci_mantissa_and_exponent(mut sci_mantissa: Self, sci_exponent: i32) -> Option<Self> {
         assert!(sci_mantissa.is_finite());
         assert!(!sci_mantissa.is_zero());
         if sci_mantissa.is_sign_negative()
             || (&sci_mantissa).raw_exponent() != 1
-            || !(Float::MIN_EXPONENT - 1..=Float::MAX_EXPONENT - 1).contains(&sci_exponent)
+            || !(Self::MIN_EXPONENT - 1..=Self::MAX_EXPONENT - 1).contains(&sci_exponent)
         {
             return None;
         }
-        if let Float(Finite { exponent, .. }) = &mut sci_mantissa {
+        if let Self(Finite { exponent, .. }) = &mut sci_mantissa {
             *exponent = sci_exponent + 1;
         } else {
             panic!()

@@ -2247,7 +2247,7 @@ impl RoundBit {
 
 impl From<bool> for RoundBit {
     #[inline]
-    fn from(b: bool) -> RoundBit {
+    fn from(b: bool) -> Self {
         if b { True } else { False }
     }
 }

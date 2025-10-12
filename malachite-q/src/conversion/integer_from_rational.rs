@@ -38,9 +38,9 @@ impl TryFrom<Rational> for Integer {
     ///     Err(IntegerFromRationalError)
     /// );
     /// ```
-    fn try_from(x: Rational) -> Result<Integer, Self::Error> {
+    fn try_from(x: Rational) -> Result<Self, Self::Error> {
         if x.denominator == 1u32 {
-            Ok(Integer::from_sign_and_abs(x.sign, x.numerator))
+            Ok(Self::from_sign_and_abs(x.sign, x.numerator))
         } else {
             Err(IntegerFromRationalError)
         }
@@ -73,9 +73,9 @@ impl TryFrom<&Rational> for Integer {
     ///     Err(IntegerFromRationalError)
     /// );
     /// ```
-    fn try_from(x: &Rational) -> Result<Integer, Self::Error> {
+    fn try_from(x: &Rational) -> Result<Self, Self::Error> {
         if x.denominator == 1u32 {
-            Ok(Integer::from_sign_and_abs_ref(x.sign, &x.numerator))
+            Ok(Self::from_sign_and_abs_ref(x.sign, &x.numerator))
         } else {
             Err(IntegerFromRationalError)
         }
@@ -182,13 +182,13 @@ impl RoundingFrom<Rational> for Integer {
     ///     "(-3, Greater)"
     /// );
     /// ```
-    fn rounding_from(x: Rational, rm: RoundingMode) -> (Integer, Ordering) {
+    fn rounding_from(x: Rational, rm: RoundingMode) -> (Self, Ordering) {
         let s = x.sign;
         let (n, o) = x
             .numerator
             .div_round(x.denominator, if s { rm } else { -rm });
         (
-            Integer::from_sign_and_abs(x.sign, n),
+            Self::from_sign_and_abs(x.sign, n),
             if s { o } else { o.reverse() },
         )
     }
@@ -268,10 +268,10 @@ impl RoundingFrom<&Rational> for Integer {
     ///     "(-3, Greater)"
     /// );
     /// ```
-    fn rounding_from(x: &Rational, rm: RoundingMode) -> (Integer, Ordering) {
+    fn rounding_from(x: &Rational, rm: RoundingMode) -> (Self, Ordering) {
         let (n, o) = (&x.numerator).div_round(&x.denominator, if x.sign { rm } else { -rm });
         (
-            Integer::from_sign_and_abs(x.sign, n),
+            Self::from_sign_and_abs(x.sign, n),
             if x.sign { o } else { o.reverse() },
         )
     }

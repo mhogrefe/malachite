@@ -649,12 +649,12 @@ impl BinomialCoefficient for Natural {
     ///     "100891344545564193334812497256"
     /// );
     /// ```
-    fn binomial_coefficient(n: Natural, mut k: Natural) -> Natural {
+    fn binomial_coefficient(n: Self, mut k: Self) -> Self {
         if k > n {
-            return Natural::ZERO;
+            return Self::ZERO;
         }
         if k == 0u32 || n == k {
-            return Natural::ONE;
+            return Self::ONE;
         }
         if double_cmp(&k, &n) == Greater {
             k = &n - &k;
@@ -663,7 +663,7 @@ impl BinomialCoefficient for Natural {
     }
 }
 
-impl<'a> BinomialCoefficient<&'a Natural> for Natural {
+impl<'a> BinomialCoefficient<&'a Self> for Natural {
     /// Computes the binomial coefficient of two [`Natural`]s, taking both by reference.
     ///
     /// $$
@@ -708,12 +708,12 @@ impl<'a> BinomialCoefficient<&'a Natural> for Natural {
     ///     "100891344545564193334812497256"
     /// );
     /// ```
-    fn binomial_coefficient(n: &'a Natural, k: &'a Natural) -> Natural {
+    fn binomial_coefficient(n: &'a Self, k: &'a Self) -> Self {
         if k > n {
-            return Natural::ZERO;
+            return Self::ZERO;
         }
         if *k == 0u32 || n == k {
-            return Natural::ONE;
+            return Self::ONE;
         }
         let k = if double_cmp(k, n) == Greater {
             Limb::try_from(&(n - k))

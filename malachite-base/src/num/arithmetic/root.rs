@@ -1422,7 +1422,7 @@ pub fn root_rem_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> (T, T) {
 }
 
 impl FloorRoot<u64> for u8 {
-    type Output = u8;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`u8`].
     ///
@@ -1440,13 +1440,13 @@ impl FloorRoot<u64> for u8 {
     /// # Notes
     /// The [`u8`] implementation uses lookup tables.
     #[inline]
-    fn floor_root(self, exp: u64) -> u8 {
+    fn floor_root(self, exp: u64) -> Self {
         match (self, exp) {
             (_, 0) => panic!(),
             (0 | 1, _) | (_, 1) => self,
             (_, 8..=u64::MAX) => 1,
             (x, 2) => x.floor_sqrt(),
-            (x, 3) => u8::wrapping_from(match U8_CUBES.binary_search(&x) {
+            (x, 3) => Self::wrapping_from(match U8_CUBES.binary_search(&x) {
                 Ok(i) => i,
                 Err(i) => i - 1,
             }),
@@ -1463,7 +1463,7 @@ impl FloorRoot<u64> for u8 {
 }
 
 impl CeilingRoot<u64> for u8 {
-    type Output = u8;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`u8`].
     ///
@@ -1480,13 +1480,13 @@ impl CeilingRoot<u64> for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses lookup tables.
-    fn ceiling_root(self, exp: u64) -> u8 {
+    fn ceiling_root(self, exp: u64) -> Self {
         match (self, exp) {
             (_, 0) => panic!(),
             (0 | 1, _) | (_, 1) => self,
             (_, 8..=u64::MAX) => 2,
             (x, 2) => x.ceiling_sqrt(),
-            (x, 3) => u8::wrapping_from(match U8_CUBES.binary_search(&x) {
+            (x, 3) => Self::wrapping_from(match U8_CUBES.binary_search(&x) {
                 Ok(i) | Err(i) => i,
             }),
             (x, 4) if x <= 16 => 2,
@@ -1502,7 +1502,7 @@ impl CeilingRoot<u64> for u8 {
 }
 
 impl CheckedRoot<u64> for u8 {
-    type Output = u8;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`u8`], or `None` if the [`u8`] is not a perfect $n$th
     /// power.
@@ -1525,12 +1525,12 @@ impl CheckedRoot<u64> for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses lookup tables.
-    fn checked_root(self, exp: u64) -> Option<u8> {
+    fn checked_root(self, exp: u64) -> Option<Self> {
         match (self, exp) {
             (_, 0) => panic!(),
             (0 | 1, _) | (_, 1) => Some(self),
             (x, 2) => x.checked_sqrt(),
-            (x, 3) => U8_CUBES.binary_search(&x).ok().map(u8::wrapping_from),
+            (x, 3) => U8_CUBES.binary_search(&x).ok().map(Self::wrapping_from),
             (16, 4) | (32, 5) | (64, 6) | (128, 7) => Some(2),
             (81, 4) | (243, 5) => Some(3),
             _ => None,
@@ -1539,8 +1539,8 @@ impl CheckedRoot<u64> for u8 {
 }
 
 impl RootRem<u64> for u8 {
-    type RootOutput = u8;
-    type RemOutput = u8;
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`u8`], and the remainder (the difference between
     /// the [`u8`] and the $n$th power of the floor).
@@ -1558,15 +1558,15 @@ impl RootRem<u64> for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses lookup tables.
-    fn root_rem(self, exp: u64) -> (u8, u8) {
+    fn root_rem(self, exp: u64) -> (Self, Self) {
         match (self, exp) {
             (_, 0) => panic!(),
             (0 | 1, _) | (_, 1) => (self, 0),
             (x, 8..=u64::MAX) => (1, x - 1),
             (x, 2) => x.sqrt_rem(),
             (x, 3) => match U8_CUBES.binary_search(&x) {
-                Ok(i) => (u8::wrapping_from(i), 0),
-                Err(i) => (u8::wrapping_from(i - 1), x - U8_CUBES[i - 1]),
+                Ok(i) => (Self::wrapping_from(i), 0),
+                Err(i) => (Self::wrapping_from(i - 1), x - U8_CUBES[i - 1]),
             },
             (x, 4) if x < 16 => (1, x - 1),
             (x, 4) if x < 81 => (2, x - 16),
@@ -1583,7 +1583,7 @@ impl RootRem<u64> for u8 {
 }
 
 impl FloorRoot<u64> for u16 {
-    type Output = u16;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`u16`].
     ///
@@ -1601,13 +1601,13 @@ impl FloorRoot<u64> for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn floor_root(self, exp: u64) -> u16 {
-        u16::wrapping_from(u32::from(self).floor_root(exp))
+    fn floor_root(self, exp: u64) -> Self {
+        Self::wrapping_from(u32::from(self).floor_root(exp))
     }
 }
 
 impl CeilingRoot<u64> for u16 {
-    type Output = u16;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`u16`].
     ///
@@ -1625,13 +1625,13 @@ impl CeilingRoot<u64> for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn ceiling_root(self, exp: u64) -> u16 {
-        u16::wrapping_from(u32::from(self).ceiling_root(exp))
+    fn ceiling_root(self, exp: u64) -> Self {
+        Self::wrapping_from(u32::from(self).ceiling_root(exp))
     }
 }
 
 impl CheckedRoot<u64> for u16 {
-    type Output = u16;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`u16`], or `None` if the [`u16`] is not a perfect $n$th
     /// power.
@@ -1655,14 +1655,14 @@ impl CheckedRoot<u64> for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn checked_root(self, exp: u64) -> Option<u16> {
-        u32::from(self).checked_root(exp).map(u16::wrapping_from)
+    fn checked_root(self, exp: u64) -> Option<Self> {
+        u32::from(self).checked_root(exp).map(Self::wrapping_from)
     }
 }
 
 impl RootRem<u64> for u16 {
-    type RootOutput = u16;
-    type RemOutput = u16;
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`u16`], and the remainder (the difference between
     /// the [`u16`] and the $n$th power of the floor).
@@ -1681,14 +1681,14 @@ impl RootRem<u64> for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn root_rem(self, exp: u64) -> (u16, u16) {
+    fn root_rem(self, exp: u64) -> (Self, Self) {
         let (sqrt, rem) = u32::from(self).root_rem(exp);
-        (u16::wrapping_from(sqrt), u16::wrapping_from(rem))
+        (Self::wrapping_from(sqrt), Self::wrapping_from(rem))
     }
 }
 
 impl FloorRoot<u64> for u32 {
-    type Output = u32;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`u32`].
     ///
@@ -1708,13 +1708,13 @@ impl FloorRoot<u64> for u32 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn floor_root(self, exp: u64) -> u32 {
+    fn floor_root(self, exp: u64) -> Self {
         fast_floor_root_u32(self, exp)
     }
 }
 
 impl CeilingRoot<u64> for u32 {
-    type Output = u32;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`u32`].
     ///
@@ -1734,13 +1734,13 @@ impl CeilingRoot<u64> for u32 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn ceiling_root(self, exp: u64) -> u32 {
+    fn ceiling_root(self, exp: u64) -> Self {
         fast_ceiling_root_u32(self, exp)
     }
 }
 
 impl CheckedRoot<u64> for u32 {
-    type Output = u32;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`u32`], or `None` if the [`u32`] is not a perfect $n$th
     /// power.
@@ -1766,14 +1766,14 @@ impl CheckedRoot<u64> for u32 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn checked_root(self, exp: u64) -> Option<u32> {
+    fn checked_root(self, exp: u64) -> Option<Self> {
         fast_checked_root_u32(self, exp)
     }
 }
 
 impl RootRem<u64> for u32 {
-    type RootOutput = u32;
-    type RemOutput = u32;
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`u32`], and the remainder (the difference between
     /// the [`u32`] and the $n$th power of the floor).
@@ -1794,13 +1794,13 @@ impl RootRem<u64> for u32 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn root_rem(self, exp: u64) -> (u32, u32) {
+    fn root_rem(self, exp: u64) -> (Self, Self) {
         fast_root_rem_u32(self, exp)
     }
 }
 
-impl FloorRoot<u64> for u64 {
-    type Output = u64;
+impl FloorRoot<Self> for u64 {
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`u64`].
     ///
@@ -1820,13 +1820,13 @@ impl FloorRoot<u64> for u64 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn floor_root(self, exp: u64) -> u64 {
+    fn floor_root(self, exp: Self) -> Self {
         fast_floor_root_u64(self, exp)
     }
 }
 
-impl CeilingRoot<u64> for u64 {
-    type Output = u64;
+impl CeilingRoot<Self> for u64 {
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`u64`].
     ///
@@ -1846,13 +1846,13 @@ impl CeilingRoot<u64> for u64 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn ceiling_root(self, exp: u64) -> u64 {
+    fn ceiling_root(self, exp: Self) -> Self {
         fast_ceiling_root_u64(self, exp)
     }
 }
 
-impl CheckedRoot<u64> for u64 {
-    type Output = u64;
+impl CheckedRoot<Self> for u64 {
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`u64`], or `None` if the [`u64`] is not a perfect $n$th
     /// power.
@@ -1878,14 +1878,14 @@ impl CheckedRoot<u64> for u64 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn checked_root(self, exp: u64) -> Option<u64> {
+    fn checked_root(self, exp: Self) -> Option<Self> {
         fast_checked_root_u64(self, exp)
     }
 }
 
-impl RootRem<u64> for u64 {
-    type RootOutput = u64;
-    type RemOutput = u64;
+impl RootRem<Self> for u64 {
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`u64`], and the remainder (the difference between
     /// the [`u64`] and the $n$th power of the floor).
@@ -1906,13 +1906,13 @@ impl RootRem<u64> for u64 {
     /// other roots, it uses Newton's method. In both implementations, the result of these
     /// approximations is adjusted afterwards to account for error.
     #[inline]
-    fn root_rem(self, exp: u64) -> (u64, u64) {
+    fn root_rem(self, exp: Self) -> (Self, Self) {
         fast_root_rem_u64(self, exp)
     }
 }
 
 impl FloorRoot<u64> for usize {
-    type Output = usize;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`usize`].
     ///
@@ -1930,17 +1930,17 @@ impl FloorRoot<u64> for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn floor_root(self, exp: u64) -> usize {
+    fn floor_root(self, exp: u64) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::wrapping_from(self).floor_root(exp))
+            Self::wrapping_from(u32::wrapping_from(self).floor_root(exp))
         } else {
-            usize::wrapping_from(u64::wrapping_from(self).floor_root(exp))
+            Self::wrapping_from(u64::wrapping_from(self).floor_root(exp))
         }
     }
 }
 
 impl CeilingRoot<u64> for usize {
-    type Output = usize;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`usize`].
     ///
@@ -1958,17 +1958,17 @@ impl CeilingRoot<u64> for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn ceiling_root(self, exp: u64) -> usize {
+    fn ceiling_root(self, exp: u64) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::wrapping_from(self).ceiling_root(exp))
+            Self::wrapping_from(u32::wrapping_from(self).ceiling_root(exp))
         } else {
-            usize::wrapping_from(u64::wrapping_from(self).ceiling_root(exp))
+            Self::wrapping_from(u64::wrapping_from(self).ceiling_root(exp))
         }
     }
 }
 
 impl CheckedRoot<u64> for usize {
-    type Output = usize;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`usize`], or `None` if the [`usize`] is not a perfect $n$th
     /// power.
@@ -1992,22 +1992,22 @@ impl CheckedRoot<u64> for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn checked_root(self, exp: u64) -> Option<usize> {
+    fn checked_root(self, exp: u64) -> Option<Self> {
         if USIZE_IS_U32 {
             u32::wrapping_from(self)
                 .checked_root(exp)
-                .map(usize::wrapping_from)
+                .map(Self::wrapping_from)
         } else {
             u64::wrapping_from(self)
                 .checked_root(exp)
-                .map(usize::wrapping_from)
+                .map(Self::wrapping_from)
         }
     }
 }
 
 impl RootRem<u64> for usize {
-    type RootOutput = usize;
-    type RemOutput = usize;
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`usize`], and the remainder (the difference
     /// between the [`usize`] and the $n$th power of the floor).
@@ -2026,19 +2026,19 @@ impl RootRem<u64> for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn root_rem(self, exp: u64) -> (usize, usize) {
+    fn root_rem(self, exp: u64) -> (Self, Self) {
         if USIZE_IS_U32 {
             let (sqrt, rem) = u32::wrapping_from(self).root_rem(exp);
-            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
+            (Self::wrapping_from(sqrt), Self::wrapping_from(rem))
         } else {
             let (sqrt, rem) = u64::wrapping_from(self).root_rem(exp);
-            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
+            (Self::wrapping_from(sqrt), Self::wrapping_from(rem))
         }
     }
 }
 
 impl FloorRoot<u64> for u128 {
-    type Output = u128;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`u128`].
     ///
@@ -2056,16 +2056,16 @@ impl FloorRoot<u64> for u128 {
     /// # Notes
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
-    fn floor_root(self, exp: u64) -> u128 {
+    fn floor_root(self, exp: u64) -> Self {
         if exp == 2 {
             return self.floor_sqrt();
         }
-        floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp)
+        floor_root_approx_and_refine(|x| x as f64, |x| x as Self, self, exp)
     }
 }
 
 impl CeilingRoot<u64> for u128 {
-    type Output = u128;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`u128`].
     ///
@@ -2083,11 +2083,11 @@ impl CeilingRoot<u64> for u128 {
     /// # Notes
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
-    fn ceiling_root(self, exp: u64) -> u128 {
+    fn ceiling_root(self, exp: u64) -> Self {
         if exp == 2 {
             return self.ceiling_sqrt();
         }
-        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
+        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as Self, self, exp);
         if root.pow(u32::saturating_from(exp)) == self {
             root
         } else {
@@ -2097,7 +2097,7 @@ impl CeilingRoot<u64> for u128 {
 }
 
 impl CheckedRoot<u64> for u128 {
-    type Output = u128;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`u128`], or `None` if the [`u128`] is not a perfect $n$th
     /// power.
@@ -2121,11 +2121,11 @@ impl CheckedRoot<u64> for u128 {
     /// # Notes
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
-    fn checked_root(self, exp: u64) -> Option<u128> {
+    fn checked_root(self, exp: u64) -> Option<Self> {
         if exp == 2 {
             return self.checked_sqrt();
         }
-        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
+        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as Self, self, exp);
         if root.pow(u32::saturating_from(exp)) == self {
             Some(root)
         } else {
@@ -2135,8 +2135,8 @@ impl CheckedRoot<u64> for u128 {
 }
 
 impl RootRem<u64> for u128 {
-    type RootOutput = u128;
-    type RemOutput = u128;
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`u128`], and the remainder (the difference between
     /// the [`u128`] and the $n$th power of the floor).
@@ -2155,11 +2155,11 @@ impl RootRem<u64> for u128 {
     /// # Notes
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
-    fn root_rem(self, exp: u64) -> (u128, u128) {
+    fn root_rem(self, exp: u64) -> (Self, Self) {
         if exp == 2 {
             return self.sqrt_rem();
         }
-        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
+        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as Self, self, exp);
         (root, self - root.pow(u32::saturating_from(exp)))
     }
 }

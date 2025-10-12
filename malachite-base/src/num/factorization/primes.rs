@@ -89,7 +89,7 @@ pub struct PrimesLessThanIterator<T: PrimitiveUnsigned> {
 }
 
 impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
-    fn new(n: T) -> PrimesLessThanIterator<T> {
+    fn new(n: T) -> Self {
         let limit = n;
         let n: u64 = n.saturating_into();
         let mut sieve;
@@ -100,7 +100,7 @@ impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
             sieve = alloc::vec![0; limbs_prime_sieve_size::<u64>(n)];
             limbs_prime_sieve_u64(&mut sieve, n);
         }
-        PrimesLessThanIterator {
+        Self {
             small: true,
             i: 0,
             limit,
@@ -216,9 +216,9 @@ pub struct PrimesIterator<T: PrimitiveUnsigned> {
 }
 
 impl<T: PrimitiveUnsigned> PrimesIterator<T> {
-    fn new() -> PrimesIterator<T> {
+    fn new() -> Self {
         let limit = T::saturating_from(1024u16);
-        PrimesIterator {
+        Self {
             limit,
             xs: PrimesLessThanIterator::new(limit),
         }

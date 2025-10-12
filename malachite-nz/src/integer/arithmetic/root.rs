@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 
 impl FloorRoot<u64> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of an [`Integer`], taking the [`Integer`] by value.
     ///
@@ -42,7 +42,7 @@ impl FloorRoot<u64> for Integer {
     /// assert_eq!(Integer::from(-100000000000i64).floor_root(5), -159);
     /// ```
     #[inline]
-    fn floor_root(mut self, exp: u64) -> Integer {
+    fn floor_root(mut self, exp: u64) -> Self {
         self.floor_root_assign(exp);
         self
     }
@@ -141,7 +141,7 @@ impl FloorRootAssign<u64> for Integer {
 }
 
 impl CeilingRoot<u64> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of an [`Integer`], taking the [`Integer`] by value.
     ///
@@ -169,7 +169,7 @@ impl CeilingRoot<u64> for Integer {
     /// assert_eq!(Integer::from(-100000000000i64).ceiling_root(5), -158);
     /// ```
     #[inline]
-    fn ceiling_root(mut self, exp: u64) -> Integer {
+    fn ceiling_root(mut self, exp: u64) -> Self {
         self.ceiling_root_assign(exp);
         self
     }
@@ -269,7 +269,7 @@ impl CeilingRootAssign<u64> for Integer {
 }
 
 impl CheckedRoot<u64> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the the $n$th root of an [`Integer`], or `None` if the [`Integer`] is not a perfect
     /// $n$th power. The [`Integer`] is taken by value.
@@ -332,9 +332,9 @@ impl CheckedRoot<u64> for Integer {
     /// );
     /// ```
     #[inline]
-    fn checked_root(self, exp: u64) -> Option<Integer> {
+    fn checked_root(self, exp: u64) -> Option<Self> {
         if self >= 0 {
-            self.unsigned_abs().checked_root(exp).map(Integer::from)
+            self.unsigned_abs().checked_root(exp).map(Self::from)
         } else if exp.odd() {
             self.unsigned_abs().checked_root(exp).map(Natural::neg)
         } else {

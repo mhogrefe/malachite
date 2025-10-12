@@ -132,7 +132,7 @@ impl Rational {
     ///     Less
     /// );
     /// ```
-    pub fn cmp_complexity(&self, other: &Rational) -> Ordering {
+    pub fn cmp_complexity(&self, other: &Self) -> Ordering {
         self.denominator_ref()
             .cmp(other.denominator_ref())
             .then_with(|| self.numerator_ref().cmp(other.numerator_ref()))
@@ -187,10 +187,10 @@ impl SimplestRationalInInterval for Rational {
     ///     Rational::from_signeds(22, 7)
     /// );
     /// ```
-    fn simplest_rational_in_open_interval(x: &Rational, y: &Rational) -> Rational {
+    fn simplest_rational_in_open_interval(x: &Self, y: &Self) -> Rational {
         assert!(x < y);
         if *x < 0u32 && *y > 0u32 {
-            return Rational::ZERO;
+            return Self::ZERO;
         }
         let neg_x;
         let neg_y;
@@ -227,7 +227,7 @@ impl SimplestRationalInInterval for Rational {
             let m = min_helper_oo(&ox_n, &oy_n) + Natural::ONE;
             let n = (&previous_numerator).add_mul(&numerator, &m);
             let d = (&previous_denominator).add_mul(&denominator, &m);
-            let candidate = Rational {
+            let candidate = Self {
                 sign: true,
                 numerator: n,
                 denominator: d,
@@ -291,7 +291,7 @@ impl SimplestRationalInInterval for Rational {
                             previous_denominator + (denominator << 1),
                         )
                     };
-                    let candidate = Rational {
+                    let candidate = Self {
                         sign: true,
                         numerator: n,
                         denominator: d,
@@ -301,7 +301,7 @@ impl SimplestRationalInInterval for Rational {
             }
         } else {
             let candidate = if floor_y - Natural::ONE != floor_x || !cf_y.is_done() {
-                Rational::from(floor_x + Natural::ONE)
+                Self::from(floor_x + Natural::ONE)
             } else {
                 let floor = floor_x;
                 // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f;
@@ -330,7 +330,7 @@ impl SimplestRationalInInterval for Rational {
                         (&floor * &k + floor + k, x_2 + Natural::TWO)
                     }
                 };
-                Rational {
+                Self {
                     sign: true,
                     numerator: n,
                     denominator: d,
@@ -388,12 +388,12 @@ impl SimplestRationalInInterval for Rational {
     ///     Rational::from_signeds(22, 7)
     /// );
     /// ```
-    fn simplest_rational_in_closed_interval(x: &Rational, y: &Rational) -> Rational {
+    fn simplest_rational_in_closed_interval(x: &Self, y: &Self) -> Rational {
         assert!(x <= y);
         if x == y {
             return x.clone();
         } else if *x <= 0u32 && *y >= 0u32 {
-            return Rational::ZERO;
+            return Self::ZERO;
         } else if x.is_integer() {
             return if y.is_integer() {
                 if *x >= 0u32 {
@@ -404,16 +404,16 @@ impl SimplestRationalInInterval for Rational {
             } else if *x >= 0u32 {
                 x.clone()
             } else {
-                Rational::from(y.floor())
+                Self::from(y.floor())
             };
         } else if y.is_integer() {
             return if *x >= 0u32 {
-                Rational::from(x.ceiling())
+                Self::from(x.ceiling())
             } else {
                 y.clone()
             };
         }
-        let mut best = Rational::simplest_rational_in_open_interval(x, y);
+        let mut best = Self::simplest_rational_in_open_interval(x, y);
         for q in [x, y] {
             if q.cmp_complexity(&best) == Less {
                 best = q.clone();

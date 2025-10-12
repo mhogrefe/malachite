@@ -86,8 +86,8 @@ pub_test! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
 impl Natural {
     fn hamming_distance_limb(&self, other: Limb) -> u64 {
         match self {
-            Natural(Small(small)) => small.hamming_distance(other),
-            Natural(Large(limbs)) => limbs_hamming_distance_limb(limbs, other),
+            Self(Small(small)) => small.hamming_distance(other),
+            Self(Large(limbs)) => limbs_hamming_distance_limb(limbs, other),
         }
     }
 }

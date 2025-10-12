@@ -13,8 +13,8 @@
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, AbsDiff, AbsDiffAssign};
 
-impl AbsDiff<Rational> for Rational {
-    type Output = Rational;
+impl AbsDiff<Self> for Rational {
+    type Output = Self;
 
     /// Computes the absolute value of the difference between two [`Rational`]s, taking both by
     /// value.
@@ -52,13 +52,13 @@ impl AbsDiff<Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn abs_diff(self, other: Rational) -> Rational {
+    fn abs_diff(self, other: Self) -> Self {
         (self - other).abs()
     }
 }
 
-impl AbsDiff<&Rational> for Rational {
-    type Output = Rational;
+impl AbsDiff<&Self> for Rational {
+    type Output = Self;
 
     /// Computes the absolute value of the difference between two [`Rational`]s, taking the first by
     /// value and the second by reference.
@@ -96,7 +96,7 @@ impl AbsDiff<&Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn abs_diff(self, other: &Rational) -> Rational {
+    fn abs_diff(self, other: &Self) -> Self {
         (self - other).abs()
     }
 }
@@ -189,7 +189,7 @@ impl AbsDiff<&Rational> for &Rational {
     }
 }
 
-impl AbsDiffAssign<Rational> for Rational {
+impl AbsDiffAssign<Self> for Rational {
     /// Subtracts a [`Rational`] by another [`Rational`] in place and takes the absolute value,
     /// taking the [`Rational`] on the right-hand side by value.
     ///
@@ -227,13 +227,13 @@ impl AbsDiffAssign<Rational> for Rational {
     /// assert_eq!(x.to_string(), "1507/700");
     /// ```
     #[inline]
-    fn abs_diff_assign(&mut self, other: Rational) {
+    fn abs_diff_assign(&mut self, other: Self) {
         *self -= other;
         self.abs_assign();
     }
 }
 
-impl<'a> AbsDiffAssign<&'a Rational> for Rational {
+impl<'a> AbsDiffAssign<&'a Self> for Rational {
     /// Subtracts a [`Rational`] by another [`Rational`] in place and takes the absolute value,
     /// taking the [`Rational`] on the right-hand side by reference.
     ///
@@ -271,7 +271,7 @@ impl<'a> AbsDiffAssign<&'a Rational> for Rational {
     /// assert_eq!(x.to_string(), "1507/700");
     /// ```
     #[inline]
-    fn abs_diff_assign(&mut self, other: &'a Rational) {
+    fn abs_diff_assign(&mut self, other: &'a Self) {
         *self -= other;
         self.abs_assign();
     }

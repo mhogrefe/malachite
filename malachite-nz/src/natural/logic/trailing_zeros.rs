@@ -59,9 +59,9 @@ impl Natural {
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         match self {
-            &Natural::ZERO => None,
-            Natural(Small(small)) => Some(TrailingZeros::trailing_zeros(*small)),
-            Natural(Large(limbs)) => Some(limbs_trailing_zeros(limbs)),
+            &Self::ZERO => None,
+            Self(Small(small)) => Some(TrailingZeros::trailing_zeros(*small)),
+            Self(Large(limbs)) => Some(limbs_trailing_zeros(limbs)),
         }
     }
 }

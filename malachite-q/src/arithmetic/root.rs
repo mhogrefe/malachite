@@ -12,7 +12,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 
 impl CheckedRoot<u64> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a perfect
     /// $n$th power. The [`Rational`] is taken by value.
@@ -77,7 +77,7 @@ impl CheckedRoot<u64> for Rational {
     ///     "Some(-3/2)"
     /// );
     /// ```
-    fn checked_root(self, pow: u64) -> Option<Rational> {
+    fn checked_root(self, pow: u64) -> Option<Self> {
         let sign = self >= 0;
         let (n, d) = self.into_numerator_and_denominator();
         let root_n;
@@ -89,7 +89,7 @@ impl CheckedRoot<u64> for Rational {
             root_d = d.checked_root(pow)?;
             root_n = Integer::from_sign_and_abs(sign, n).checked_root(pow)?;
         }
-        Some(Rational {
+        Some(Self {
             sign: root_n >= 0,
             numerator: root_n.unsigned_abs(),
             denominator: root_d,
@@ -183,7 +183,7 @@ impl CheckedRoot<u64> for &Rational {
 }
 
 impl CheckedRoot<i64> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a perfect
     /// $n$th power. The [`Rational`] is taken by value.
@@ -262,12 +262,12 @@ impl CheckedRoot<i64> for Rational {
     ///     "Some(-2/3)"
     /// );
     /// ```
-    fn checked_root(self, pow: i64) -> Option<Rational> {
+    fn checked_root(self, pow: i64) -> Option<Self> {
         let u_pow = pow.unsigned_abs();
         if pow >= 0 {
             self.checked_root(u_pow)
         } else {
-            self.checked_root(u_pow).map(Rational::reciprocal)
+            self.checked_root(u_pow).map(Self::reciprocal)
         }
     }
 }

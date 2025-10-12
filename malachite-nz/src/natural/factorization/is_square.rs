@@ -224,8 +224,8 @@ impl IsSquare for Natural {
         match self {
             // use the FLINT n_is_square impl for primitive integers TODO: is the FLINT n_is_square
             // better than the GMP algorithm in this file for word size integers?
-            Natural(Small(small)) => small.is_square(),
-            Natural(Large(limbs)) => limbs_is_square(limbs),
+            Self(Small(small)) => small.is_square(),
+            Self(Large(limbs)) => limbs_is_square(limbs),
         }
     }
 }

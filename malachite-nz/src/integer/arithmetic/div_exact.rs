@@ -9,8 +9,8 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
 
-impl DivExact<Integer> for Integer {
-    type Output = Integer;
+impl DivExact<Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value. The first [`Integer`]
     /// must be exactly divisible by the second. If it isn't, this function may panic or return a
@@ -53,14 +53,14 @@ impl DivExact<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_exact(mut self, other: Integer) -> Integer {
+    fn div_exact(mut self, other: Self) -> Self {
         self.div_exact_assign(other);
         self
     }
 }
 
-impl DivExact<&Integer> for Integer {
-    type Output = Integer;
+impl DivExact<&Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference. The first [`Integer`] must be exactly divisible by the second. If it isn't, this
@@ -103,7 +103,7 @@ impl DivExact<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_exact(mut self, other: &Integer) -> Integer {
+    fn div_exact(mut self, other: &Self) -> Self {
         self.div_exact_assign(other);
         self
     }
@@ -207,7 +207,7 @@ impl DivExact<&Integer> for &Integer {
     }
 }
 
-impl DivExactAssign<Integer> for Integer {
+impl DivExactAssign<Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value. The first [`Integer`] must be exactly divisible by the second. If
     /// it isn't, this function may panic or return a meaningless result.
@@ -247,13 +247,13 @@ impl DivExactAssign<Integer> for Integer {
     /// x.div_exact_assign(Integer::from_str("-987654321000").unwrap());
     /// assert_eq!(x, -123456789000i64);
     /// ```
-    fn div_exact_assign(&mut self, other: Integer) {
+    fn div_exact_assign(&mut self, other: Self) {
         self.abs.div_exact_assign(other.abs);
         self.sign = self.sign == other.sign || self.abs == 0;
     }
 }
 
-impl DivExactAssign<&Integer> for Integer {
+impl DivExactAssign<&Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference. The first [`Integer`] must be exactly divisible by the second.
     /// If it isn't, this function may panic or return a meaningless result.
@@ -293,7 +293,7 @@ impl DivExactAssign<&Integer> for Integer {
     /// x.div_exact_assign(&Integer::from_str("-987654321000").unwrap());
     /// assert_eq!(x, -123456789000i64);
     /// ```
-    fn div_exact_assign(&mut self, other: &Integer) {
+    fn div_exact_assign(&mut self, other: &Self) {
         self.abs.div_exact_assign(&other.abs);
         self.sign = self.sign == other.sign || self.abs == 0;
     }

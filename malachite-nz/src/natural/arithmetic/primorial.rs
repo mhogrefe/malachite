@@ -138,12 +138,12 @@ impl Primorial for Natural {
     ///
     /// This is equivalent to `mpz_primorial_ui` from `mpz/primorial_ui.c`, GMP 6.2.1.
     #[inline]
-    fn primorial(n: u64) -> Natural {
+    fn primorial(n: u64) -> Self {
         assert!(Limb::convertible_from(n));
         if n < SMALL_PRIMORIAL_LIMIT {
-            Natural::from(Limb::primorial(n))
+            Self::from(Limb::primorial(n))
         } else {
-            Natural::from_owned_limbs_asc(limbs_primorial(Limb::wrapping_from(n)))
+            Self::from_owned_limbs_asc(limbs_primorial(Limb::wrapping_from(n)))
         }
     }
 
@@ -187,12 +187,12 @@ impl Primorial for Natural {
     /// );
     /// ```
     #[inline]
-    fn product_of_first_n_primes(n: u64) -> Natural {
+    fn product_of_first_n_primes(n: u64) -> Self {
         assert!(Limb::convertible_from(n));
         if n < SMALL_PRODUCT_OF_FIRST_N_PRIMES_LIMIT {
-            Natural::from(Limb::product_of_first_n_primes(n))
+            Self::from(Limb::product_of_first_n_primes(n))
         } else {
-            Natural::from_owned_limbs_asc(limbs_product_of_first_n_primes(usize::exact_from(n)))
+            Self::from_owned_limbs_asc(limbs_product_of_first_n_primes(usize::exact_from(n)))
         }
     }
 }

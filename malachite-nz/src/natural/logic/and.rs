@@ -222,12 +222,12 @@ impl Natural {
     }
 
     fn and_assign_limb(&mut self, other: Limb) {
-        *self = Natural(Small(self.and_limb_ref(other)));
+        *self = Self(Small(self.and_limb_ref(other)));
     }
 }
 
-impl BitAnd<Natural> for Natural {
-    type Output = Natural;
+impl BitAnd<Self> for Natural {
+    type Output = Self;
 
     /// Takes the bitwise and of two [`Natural`]s, taking both by value.
     ///
@@ -256,14 +256,14 @@ impl BitAnd<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn bitand(mut self, other: Natural) -> Natural {
+    fn bitand(mut self, other: Self) -> Self {
         self &= other;
         self
     }
 }
 
-impl<'a> BitAnd<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> BitAnd<&'a Self> for Natural {
+    type Output = Self;
 
     /// Takes the bitwise and of two [`Natural`]s, taking the first by value and the second by
     /// reference.
@@ -292,7 +292,7 @@ impl<'a> BitAnd<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn bitand(mut self, other: &'a Natural) -> Natural {
+    fn bitand(mut self, other: &'a Self) -> Self {
         self &= other;
         self
     }
@@ -374,7 +374,7 @@ impl BitAnd<&Natural> for &Natural {
     }
 }
 
-impl BitAndAssign<Natural> for Natural {
+impl BitAndAssign<Self> for Natural {
     /// Bitwise-ands a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value.
     ///
@@ -401,11 +401,11 @@ impl BitAndAssign<Natural> for Natural {
     /// x &= Natural::from(0xfffffff0u32);
     /// assert_eq!(x, 0xf0f0_f0f0u32);
     /// ```
-    fn bitand_assign(&mut self, mut other: Natural) {
+    fn bitand_assign(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (_, Natural(Small(y))) => self.and_assign_limb(*y),
-            (Natural(Small(x)), _) => *x = other.and_limb(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.and_assign_limb(*y),
+            (Self(Small(x)), _) => *x = other.and_limb(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 if limbs_and_in_place_either(xs, ys) {
                     swap(xs, ys);
                 }
@@ -415,7 +415,7 @@ impl BitAndAssign<Natural> for Natural {
     }
 }
 
-impl<'a> BitAndAssign<&'a Natural> for Natural {
+impl<'a> BitAndAssign<&'a Self> for Natural {
     /// Bitwise-ands a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
     ///
@@ -441,11 +441,11 @@ impl<'a> BitAndAssign<&'a Natural> for Natural {
     /// x &= &Natural::from(0xfffffff0u32);
     /// assert_eq!(x, 0xf0f0_f0f0u32);
     /// ```
-    fn bitand_assign(&mut self, other: &'a Natural) {
+    fn bitand_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (_, Natural(Small(y))) => self.and_assign_limb(*y),
-            (Natural(Small(x)), _) => *x = other.and_limb_ref(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.and_assign_limb(*y),
+            (Self(Small(x)), _) => *x = other.and_limb_ref(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_vec_and_in_place_left(xs, ys);
                 self.trim();
             }

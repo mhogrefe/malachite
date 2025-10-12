@@ -9,8 +9,8 @@
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ModSub, ModSubAssign};
 
-impl ModSub<Natural, Natural> for Natural {
-    type Output = Natural;
+impl ModSub<Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. All three [`Natural`]s are taken by value.
@@ -49,14 +49,14 @@ impl ModSub<Natural, Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by value.
     #[inline]
-    fn mod_sub(mut self, other: Natural, m: Natural) -> Natural {
+    fn mod_sub(mut self, other: Self, m: Self) -> Self {
         self.mod_sub_assign(other, m);
         self
     }
 }
 
-impl ModSub<Natural, &Natural> for Natural {
-    type Output = Natural;
+impl ModSub<Self, &Self> for Natural {
+    type Output = Self;
 
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
@@ -96,14 +96,14 @@ impl ModSub<Natural, &Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by value and `m` is taken by reference.
     #[inline]
-    fn mod_sub(mut self, other: Natural, m: &Natural) -> Natural {
+    fn mod_sub(mut self, other: Self, m: &Self) -> Self {
         self.mod_sub_assign(other, m);
         self
     }
 }
 
-impl ModSub<&Natural, Natural> for Natural {
-    type Output = Natural;
+impl ModSub<&Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first and third [`Natural`]s are taken by value and the second by
@@ -143,14 +143,14 @@ impl ModSub<&Natural, Natural> for Natural {
     /// This isequivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by value and `c` is taken by reference.
     #[inline]
-    fn mod_sub(mut self, other: &Natural, m: Natural) -> Natural {
+    fn mod_sub(mut self, other: &Self, m: Self) -> Self {
         self.mod_sub_assign(other, m);
         self
     }
 }
 
-impl ModSub<&Natural, &Natural> for Natural {
-    type Output = Natural;
+impl ModSub<&Self, &Self> for Natural {
+    type Output = Self;
 
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] is taken by value and the second and third by
@@ -190,7 +190,7 @@ impl ModSub<&Natural, &Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` is
     /// taken by value and `c` and `m` are taken by reference.
     #[inline]
-    fn mod_sub(mut self, other: &Natural, m: &Natural) -> Natural {
+    fn mod_sub(mut self, other: &Self, m: &Self) -> Self {
         self.mod_sub_assign(other, m);
         self
     }
@@ -405,7 +405,7 @@ impl ModSub<&Natural, &Natural> for &Natural {
     }
 }
 
-impl ModSubAssign<Natural, Natural> for Natural {
+impl ModSubAssign<Self, Self> for Natural {
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
     /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by value.
     ///
@@ -437,7 +437,7 @@ impl ModSubAssign<Natural, Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by value and `a == b`.
-    fn mod_sub_assign(&mut self, other: Natural, m: Natural) {
+    fn mod_sub_assign(&mut self, other: Self, m: Self) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         if *self >= other {
@@ -448,7 +448,7 @@ impl ModSubAssign<Natural, Natural> for Natural {
     }
 }
 
-impl ModSubAssign<Natural, &Natural> for Natural {
+impl ModSubAssign<Self, &Self> for Natural {
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
     /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by value
     /// and the second by reference.
@@ -481,7 +481,7 @@ impl ModSubAssign<Natural, &Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by value, `m` is taken by reference, and `a == b`.
-    fn mod_sub_assign(&mut self, other: Natural, m: &Natural) {
+    fn mod_sub_assign(&mut self, other: Self, m: &Self) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
             other < *m,
@@ -495,7 +495,7 @@ impl ModSubAssign<Natural, &Natural> for Natural {
     }
 }
 
-impl ModSubAssign<&Natural, Natural> for Natural {
+impl ModSubAssign<&Self, Self> for Natural {
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
     /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
     /// reference and the second by value.
@@ -528,7 +528,7 @@ impl ModSubAssign<&Natural, Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by value, `c` is taken by reference, and `a == b`.
-    fn mod_sub_assign(&mut self, other: &Natural, m: Natural) {
+    fn mod_sub_assign(&mut self, other: &Self, m: Self) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
             *other < m,
@@ -542,7 +542,7 @@ impl ModSubAssign<&Natural, Natural> for Natural {
     }
 }
 
-impl ModSubAssign<&Natural, &Natural> for Natural {
+impl ModSubAssign<&Self, &Self> for Natural {
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
     /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by reference.
     ///
@@ -574,7 +574,7 @@ impl ModSubAssign<&Natural, &Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` is
     /// taken by value, `c` and `m` are taken by reference, and `a == b`.
-    fn mod_sub_assign(&mut self, other: &Natural, m: &Natural) {
+    fn mod_sub_assign(&mut self, other: &Self, m: &Self) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         if *self >= *other {

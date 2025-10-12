@@ -23,8 +23,8 @@ impl From<Natural> for Rational {
     ///
     /// assert_eq!(Rational::from(Natural::from(123u32)), 123);
     /// ```
-    fn from(value: Natural) -> Rational {
-        Rational {
+    fn from(value: Natural) -> Self {
+        Self {
             sign: true,
             numerator: value,
             denominator: Natural::ONE,
@@ -49,8 +49,8 @@ impl From<&Natural> for Rational {
     ///
     /// assert_eq!(Rational::from(&Natural::from(123u32)), 123);
     /// ```
-    fn from(value: &Natural) -> Rational {
-        Rational {
+    fn from(value: &Natural) -> Self {
+        Self {
             sign: true,
             numerator: value.clone(),
             denominator: Natural::ONE,

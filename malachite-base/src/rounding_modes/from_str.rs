@@ -42,7 +42,7 @@ impl FromStr for RoundingMode {
     /// assert_eq!(RoundingMode::from_str("abc"), Err("abc".to_string()));
     /// ```
     #[inline]
-    fn from_str(src: &str) -> Result<RoundingMode, String> {
+    fn from_str(src: &str) -> Result<Self, String> {
         match src {
             "Down" => Ok(Down),
             "Up" => Ok(Up),

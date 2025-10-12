@@ -88,7 +88,7 @@ impl Primes for Natural {
     /// );
     /// ```
     #[inline]
-    fn primes_less_than(n: &Natural) -> NaturalPrimesLessThanIterator {
+    fn primes_less_than(n: &Self) -> NaturalPrimesLessThanIterator {
         NaturalPrimesLessThanIterator(u64::primes_less_than(&u64::saturating_from(n)))
     }
 
@@ -134,7 +134,7 @@ impl Primes for Natural {
     /// );
     /// ```
     #[inline]
-    fn primes_less_than_or_equal_to(n: &Natural) -> NaturalPrimesLessThanIterator {
+    fn primes_less_than_or_equal_to(n: &Self) -> NaturalPrimesLessThanIterator {
         NaturalPrimesLessThanIterator(u64::primes_less_than_or_equal_to(&u64::saturating_from(n)))
     }
 

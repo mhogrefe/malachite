@@ -80,28 +80,28 @@ macro_rules! integer_negative_one {
 
 /// The constant 0.
 impl Zero for Integer {
-    const ZERO: Integer = integer_zero!();
+    const ZERO: Self = integer_zero!();
 }
 
 /// The constant 1.
 impl One for Integer {
-    const ONE: Integer = integer_one!();
+    const ONE: Self = integer_one!();
 }
 
 /// The constant 2.
 impl Two for Integer {
-    const TWO: Integer = integer_two!();
+    const TWO: Self = integer_two!();
 }
 
 /// The constant -1.
 impl NegativeOne for Integer {
-    const NEGATIVE_ONE: Integer = integer_negative_one!();
+    const NEGATIVE_ONE: Self = integer_negative_one!();
 }
 
 impl Default for Integer {
     /// The default value of an [`Integer`], 0.
-    fn default() -> Integer {
-        Integer::ZERO
+    fn default() -> Self {
+        Self::ZERO
     }
 }
 

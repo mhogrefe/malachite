@@ -116,13 +116,13 @@ impl XXXAddYYYToZZZ for usize {
     /// This is equivalent to `add_sssaaaaaa` from `longlong.h`, FLINT 2.7.1, where `(sh, sm, sl)`
     /// is returned.
     fn xxx_add_yyy_to_zzz(
-        x_2: usize,
-        x_1: usize,
-        x_0: usize,
-        y_2: usize,
-        y_1: usize,
-        y_0: usize,
-    ) -> (usize, usize, usize) {
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self) {
         if USIZE_IS_U32 {
             let (z_2, z_1, z_0) = u32::xxx_add_yyy_to_zzz(
                 u32::wrapping_from(x_2),
@@ -133,9 +133,9 @@ impl XXXAddYYYToZZZ for usize {
                 u32::wrapping_from(y_0),
             );
             (
-                usize::wrapping_from(z_2),
-                usize::wrapping_from(z_1),
-                usize::wrapping_from(z_0),
+                Self::wrapping_from(z_2),
+                Self::wrapping_from(z_1),
+                Self::wrapping_from(z_0),
             )
         } else {
             let (z_2, z_1, z_0) = u64::xxx_add_yyy_to_zzz(
@@ -147,9 +147,9 @@ impl XXXAddYYYToZZZ for usize {
                 u64::wrapping_from(y_0),
             );
             (
-                usize::wrapping_from(z_2),
-                usize::wrapping_from(z_1),
-                usize::wrapping_from(z_0),
+                Self::wrapping_from(z_2),
+                Self::wrapping_from(z_1),
+                Self::wrapping_from(z_0),
             )
         }
     }

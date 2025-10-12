@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::basic::traits::Zero;
 
-impl SaturatingSub<Natural> for Natural {
-    type Output = Natural;
+impl SaturatingSub<Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by value and returning 0 if the
     /// result is negative.
@@ -46,13 +46,13 @@ impl SaturatingSub<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub(self, other: Natural) -> Natural {
-        CheckedSub::checked_sub(self, other).unwrap_or(Natural::ZERO)
+    fn saturating_sub(self, other: Self) -> Self {
+        CheckedSub::checked_sub(self, other).unwrap_or(Self::ZERO)
     }
 }
 
-impl<'a> SaturatingSub<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> SaturatingSub<&'a Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning 0 if the result is negative.
@@ -87,8 +87,8 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub(self, other: &'a Natural) -> Natural {
-        CheckedSub::checked_sub(self, other).unwrap_or(Natural::ZERO)
+    fn saturating_sub(self, other: &'a Self) -> Self {
+        CheckedSub::checked_sub(self, other).unwrap_or(Self::ZERO)
     }
 }
 
@@ -174,7 +174,7 @@ impl SaturatingSub<&Natural> for &Natural {
     }
 }
 
-impl SaturatingSubAssign<Natural> for Natural {
+impl SaturatingSubAssign<Self> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value and setting the left-hand side to 0 if the result is negative.
     ///
@@ -215,14 +215,14 @@ impl SaturatingSubAssign<Natural> for Natural {
     /// assert_eq!(x, 0);
     /// ```
     #[inline]
-    fn saturating_sub_assign(&mut self, other: Natural) {
+    fn saturating_sub_assign(&mut self, other: Self) {
         if self.sub_assign_ref_no_panic(&other) {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
         }
     }
 }
 
-impl<'a> SaturatingSubAssign<&'a Natural> for Natural {
+impl<'a> SaturatingSubAssign<&'a Self> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference and setting the left-hand side to 0 if the result is negative.
     ///
@@ -263,9 +263,9 @@ impl<'a> SaturatingSubAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 0);
     /// ```
     #[inline]
-    fn saturating_sub_assign(&mut self, other: &'a Natural) {
+    fn saturating_sub_assign(&mut self, other: &'a Self) {
         if self.sub_assign_ref_no_panic(other) {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
         }
     }
 }

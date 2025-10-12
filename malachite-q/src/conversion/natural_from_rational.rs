@@ -42,7 +42,7 @@ impl TryFrom<Rational> for Natural {
     ///     Err(NaturalFromRationalError)
     /// );
     /// ```
-    fn try_from(x: Rational) -> Result<Natural, Self::Error> {
+    fn try_from(x: Rational) -> Result<Self, Self::Error> {
         if x.sign && x.denominator == 1u32 {
             Ok(x.numerator)
         } else {
@@ -80,7 +80,7 @@ impl TryFrom<&Rational> for Natural {
     ///     Err(NaturalFromRationalError)
     /// );
     /// ```
-    fn try_from(x: &Rational) -> Result<Natural, Self::Error> {
+    fn try_from(x: &Rational) -> Result<Self, Self::Error> {
         if x.sign && x.denominator == 1u32 {
             Ok(x.numerator.clone())
         } else {
@@ -181,11 +181,11 @@ impl RoundingFrom<Rational> for Natural {
     ///     "(0, Greater)"
     /// );
     /// ```
-    fn rounding_from(x: Rational, rm: RoundingMode) -> (Natural, Ordering) {
+    fn rounding_from(x: Rational, rm: RoundingMode) -> (Self, Ordering) {
         if x.sign {
             x.numerator.div_round(x.denominator, rm)
         } else if rm == Down || rm == Ceiling || rm == Nearest {
-            (Natural::ZERO, Greater)
+            (Self::ZERO, Greater)
         } else {
             panic!("Cannot round negative Rational to Natural using RoundingMode {rm}");
         }
@@ -258,11 +258,11 @@ impl RoundingFrom<&Rational> for Natural {
     ///     "(0, Greater)"
     /// );
     /// ```
-    fn rounding_from(x: &Rational, rm: RoundingMode) -> (Natural, Ordering) {
+    fn rounding_from(x: &Rational, rm: RoundingMode) -> (Self, Ordering) {
         if x.sign {
             (&x.numerator).div_round(&x.denominator, rm)
         } else if rm == Down || rm == Ceiling || rm == Nearest {
-            (Natural::ZERO, Greater)
+            (Self::ZERO, Greater)
         } else {
             panic!("Cannot round negative Rational to Natural using RoundingMode {rm}");
         }

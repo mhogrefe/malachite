@@ -48,7 +48,7 @@ impl IsPowerOf2 for Float {
     /// ```
     fn is_power_of_2(&self) -> bool {
         match self {
-            Float(Finite {
+            Self(Finite {
                 sign: true,
                 significand,
                 ..

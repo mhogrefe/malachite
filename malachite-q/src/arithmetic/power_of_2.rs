@@ -35,8 +35,8 @@ impl PowerOf2<u64> for Rational {
     ///     "1267650600228229401496703205376"
     /// );
     /// ```
-    fn power_of_2(pow: u64) -> Rational {
-        Rational::from(Natural::power_of_2(pow))
+    fn power_of_2(pow: u64) -> Self {
+        Self::from(Natural::power_of_2(pow))
     }
 }
 
@@ -69,12 +69,12 @@ impl PowerOf2<i64> for Rational {
     ///     "1/1267650600228229401496703205376"
     /// );
     /// ```
-    fn power_of_2(pow: i64) -> Rational {
+    fn power_of_2(pow: i64) -> Self {
         let pow_abs = pow.unsigned_abs();
         if pow >= 0 {
-            Rational::from(Natural::power_of_2(pow_abs))
+            Self::from(Natural::power_of_2(pow_abs))
         } else {
-            Rational {
+            Self {
                 sign: true,
                 numerator: Natural::ONE,
                 denominator: Natural::power_of_2(pow_abs),

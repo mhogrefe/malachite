@@ -44,7 +44,7 @@ impl PartialOrd<Natural> for Float {
             (float_negative_infinity!(), _) => Some(Less),
             (float_either_zero!(), _) => Some(if *other == 0u32 { Equal } else { Less }),
             (
-                Float(Finite {
+                Self(Finite {
                     sign: s_x,
                     exponent: e_x,
                     significand: x,

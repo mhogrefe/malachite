@@ -80,17 +80,17 @@ impl Float {
     /// let s = Float::NEGATIVE_ONE.ulp().map(|x| x.to_string());
     /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("1.0"));
     /// ```
-    pub fn ulp(&self) -> Option<Float> {
+    pub fn ulp(&self) -> Option<Self> {
         match self {
-            Float(Finite {
+            Self(Finite {
                 exponent,
                 precision,
                 ..
             }) => {
                 let ulp_exponent =
                     i64::from(*exponent).checked_sub(i64::try_from(*precision).ok()?)?;
-                if i32::try_from(ulp_exponent).ok()? >= Float::MIN_EXPONENT - 1 {
-                    Some(Float::power_of_2(ulp_exponent))
+                if i32::try_from(ulp_exponent).ok()? >= Self::MIN_EXPONENT - 1 {
+                    Some(Self::power_of_2(ulp_exponent))
                 } else {
                     None
                 }
@@ -168,7 +168,7 @@ impl Float {
             self.neg_assign();
             self.decrement();
             self.neg_assign();
-        } else if let Float(Finite {
+        } else if let Self(Finite {
             exponent,
             precision,
             significand,
@@ -184,8 +184,8 @@ impl Float {
                 ulp,
             );
             if significand.limb_count() > limb_count {
-                if *exponent == Float::MAX_EXPONENT {
-                    *self = Float::INFINITY;
+                if *exponent == Self::MAX_EXPONENT {
+                    *self = Self::INFINITY;
                     return;
                 }
                 *significand >>= 1;
@@ -269,7 +269,7 @@ impl Float {
             self.neg_assign();
             self.increment();
             self.neg_assign();
-        } else if let Float(Finite {
+        } else if let Self(Finite {
             exponent,
             precision,
             significand,
@@ -285,10 +285,10 @@ impl Float {
                 ulp,
             );
             if *significand == 0u32 {
-                *self = Float::ZERO;
+                *self = Self::ZERO;
             } else if significand.significant_bits() < bits {
-                if *exponent == Float::MIN_EXPONENT {
-                    *self = Float::ZERO;
+                if *exponent == Self::MIN_EXPONENT {
+                    *self = Self::ZERO;
                     return;
                 }
                 *significand <<= 1;

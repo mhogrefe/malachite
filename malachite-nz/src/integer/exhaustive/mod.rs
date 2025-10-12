@@ -102,9 +102,9 @@ impl Iterator for ExhaustiveIntegerRange {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            ExhaustiveIntegerRange::NonNegative(xs) => xs.next(),
-            ExhaustiveIntegerRange::NonPositive(xs) => xs.next(),
-            ExhaustiveIntegerRange::BothSigns(xs) => xs.next(),
+            Self::NonNegative(xs) => xs.next(),
+            Self::NonPositive(xs) => xs.next(),
+            Self::BothSigns(xs) => xs.next(),
         }
     }
 }
@@ -130,8 +130,8 @@ impl Iterator for ExhaustiveIntegerRangeToInfinity {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            ExhaustiveIntegerRangeToInfinity::NonNegative(xs) => xs.next(),
-            ExhaustiveIntegerRangeToInfinity::BothSigns(xs) => xs.next(),
+            Self::NonNegative(xs) => xs.next(),
+            Self::BothSigns(xs) => xs.next(),
         }
     }
 }
@@ -157,8 +157,8 @@ impl Iterator for ExhaustiveIntegerRangeToNegativeInfinity {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            ExhaustiveIntegerRangeToNegativeInfinity::NonPositive(xs) => xs.next(),
-            ExhaustiveIntegerRangeToNegativeInfinity::BothSigns(xs) => xs.next(),
+            Self::NonPositive(xs) => xs.next(),
+            Self::BothSigns(xs) => xs.next(),
         }
     }
 }

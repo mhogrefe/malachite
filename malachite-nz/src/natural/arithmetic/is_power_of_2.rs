@@ -61,8 +61,8 @@ impl IsPowerOf2 for Natural {
     /// ```
     fn is_power_of_2(&self) -> bool {
         match self {
-            Natural(Small(small)) => small.is_power_of_2(),
-            Natural(Large(limbs)) => limbs_is_power_of_2(limbs),
+            Self(Small(small)) => small.is_power_of_2(),
+            Self(Large(limbs)) => limbs_is_power_of_2(limbs),
         }
     }
 }

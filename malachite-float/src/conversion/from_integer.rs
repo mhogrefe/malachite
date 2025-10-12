@@ -104,10 +104,10 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_integer_prec_round(x: Integer, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn from_integer_prec_round(x: Integer, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let sign = x >= 0;
         let (f, o) =
-            Float::from_natural_prec_round(x.unsigned_abs(), prec, if sign { rm } else { -rm });
+            Self::from_natural_prec_round(x.unsigned_abs(), prec, if sign { rm } else { -rm });
         if sign { (f, o) } else { (-f, o.reverse()) }
     }
 
@@ -184,9 +184,9 @@ impl Float {
         x: &Integer,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let sign = *x >= 0;
-        let (f, o) = Float::from_natural_prec_round_ref(
+        let (f, o) = Self::from_natural_prec_round_ref(
             x.unsigned_abs_ref(),
             prec,
             if sign { rm } else { -rm },
@@ -252,8 +252,8 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_integer_prec(x: Integer, prec: u64) -> (Float, Ordering) {
-        Float::from_integer_prec_round(x, prec, Nearest)
+    pub fn from_integer_prec(x: Integer, prec: u64) -> (Self, Ordering) {
+        Self::from_integer_prec_round(x, prec, Nearest)
     }
 
     /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by reference. If the
@@ -315,9 +315,9 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_integer_prec_ref(x: &Integer, prec: u64) -> (Float, Ordering) {
+    pub fn from_integer_prec_ref(x: &Integer, prec: u64) -> (Self, Ordering) {
         let sign = *x >= 0;
-        let (f, o) = Float::from_natural_prec_ref(x.unsigned_abs_ref(), prec);
+        let (f, o) = Self::from_natural_prec_ref(x.unsigned_abs_ref(), prec);
         if sign { (f, o) } else { (-f, o.reverse()) }
     }
 }
@@ -384,9 +384,9 @@ impl TryFrom<Integer> for Float {
     /// );
     /// ```
     #[inline]
-    fn try_from(n: Integer) -> Result<Float, Self::Error> {
+    fn try_from(n: Integer) -> Result<Self, Self::Error> {
         let sign = n >= 0;
-        let abs = Float::try_from(n.unsigned_abs())?;
+        let abs = Self::try_from(n.unsigned_abs())?;
         Ok(if sign { abs } else { -abs })
     }
 }
@@ -453,9 +453,9 @@ impl TryFrom<&Integer> for Float {
     /// );
     /// ```
     #[inline]
-    fn try_from(n: &Integer) -> Result<Float, Self::Error> {
+    fn try_from(n: &Integer) -> Result<Self, Self::Error> {
         let sign = *n >= 0;
-        let abs = Float::try_from(n.unsigned_abs())?;
+        let abs = Self::try_from(n.unsigned_abs())?;
         Ok(if sign { abs } else { -abs })
     }
 }
@@ -487,7 +487,7 @@ impl ConvertibleFrom<&Integer> for Float {
     #[inline]
     fn convertible_from(x: &Integer) -> bool {
         *x == 0
-            || (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(
+            || (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(
                 &i32::saturating_from(x.unsigned_abs_ref().floor_log_base_2()).saturating_add(1),
             )
     }

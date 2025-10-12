@@ -467,7 +467,7 @@ impl_jacobi_symbol_unsigned!(u32);
 impl_jacobi_symbol_unsigned!(u64);
 impl_jacobi_symbol_unsigned!(usize);
 
-impl JacobiSymbol<u128> for u128 {
+impl JacobiSymbol<Self> for u128 {
     /// Computes the Jacobi symbol of two `u128`s.
     ///
     /// $$
@@ -485,7 +485,7 @@ impl JacobiSymbol<u128> for u128 {
     /// # Examples
     /// See [here](super::kronecker_symbol#jacobi_symbol).
     #[inline]
-    fn jacobi_symbol(self, n: u128) -> i8 {
+    fn jacobi_symbol(self, n: Self) -> i8 {
         let (x_1, x_0) = self.split_in_half();
         let (y_1, y_0) = n.split_in_half();
         jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0)

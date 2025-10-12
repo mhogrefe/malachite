@@ -12,8 +12,8 @@ use malachite_base::num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
 };
 
-impl Mod<Integer> for Integer {
-    type Output = Integer;
+impl Mod<Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
     /// remainder. The remainder has the same sign as the second [`Integer`].
@@ -55,14 +55,14 @@ impl Mod<Integer> for Integer {
     /// assert_eq!(Integer::from(-23).mod_op(Integer::from(-10)), -3);
     /// ```
     #[inline]
-    fn mod_op(mut self, other: Integer) -> Integer {
+    fn mod_op(mut self, other: Self) -> Self {
         self.mod_assign(other);
         self
     }
 }
 
-impl Mod<&Integer> for Integer {
-    type Output = Integer;
+impl Mod<&Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference and returning just the remainder. The remainder has the same sign as the second
@@ -105,7 +105,7 @@ impl Mod<&Integer> for Integer {
     /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(-10)), -3);
     /// ```
     #[inline]
-    fn mod_op(mut self, other: &Integer) -> Integer {
+    fn mod_op(mut self, other: &Self) -> Self {
         self.mod_assign(other);
         self
     }
@@ -220,7 +220,7 @@ impl Mod<&Integer> for &Integer {
     }
 }
 
-impl ModAssign<Integer> for Integer {
+impl ModAssign<Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by value and
     /// replacing the first by the remainder. The remainder has the same sign as the second
     /// [`Integer`].
@@ -267,7 +267,7 @@ impl ModAssign<Integer> for Integer {
     /// x.mod_assign(Integer::from(-10));
     /// assert_eq!(x, -3);
     /// ```
-    fn mod_assign(&mut self, other: Integer) {
+    fn mod_assign(&mut self, other: Self) {
         if self.sign == other.sign {
             self.abs %= other.abs;
         } else {
@@ -277,7 +277,7 @@ impl ModAssign<Integer> for Integer {
     }
 }
 
-impl ModAssign<&Integer> for Integer {
+impl ModAssign<&Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by reference
     /// and replacing the first by the remainder. The remainder has the same sign as the second
     /// [`Integer`].
@@ -324,7 +324,7 @@ impl ModAssign<&Integer> for Integer {
     /// x.mod_assign(&Integer::from(-10));
     /// assert_eq!(x, -3);
     /// ```
-    fn mod_assign(&mut self, other: &Integer) {
+    fn mod_assign(&mut self, other: &Self) {
         if self.sign == other.sign {
             self.abs %= &other.abs;
         } else {
@@ -334,8 +334,8 @@ impl ModAssign<&Integer> for Integer {
     }
 }
 
-impl Rem<Integer> for Integer {
-    type Output = Integer;
+impl Rem<Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
     /// remainder. The remainder has the same sign as the first [`Integer`].
@@ -375,14 +375,14 @@ impl Rem<Integer> for Integer {
     /// assert_eq!(Integer::from(-23) % Integer::from(-10), -3);
     /// ```
     #[inline]
-    fn rem(mut self, other: Integer) -> Integer {
+    fn rem(mut self, other: Self) -> Self {
         self %= other;
         self
     }
 }
 
-impl Rem<&Integer> for Integer {
-    type Output = Integer;
+impl Rem<&Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference and returning just the remainder. The remainder has the same sign as the first
@@ -423,7 +423,7 @@ impl Rem<&Integer> for Integer {
     /// assert_eq!(Integer::from(-23) % &Integer::from(-10), -3);
     /// ```
     #[inline]
-    fn rem(mut self, other: &Integer) -> Integer {
+    fn rem(mut self, other: &Self) -> Self {
         self %= other;
         self
     }
@@ -522,7 +522,7 @@ impl Rem<&Integer> for &Integer {
     }
 }
 
-impl RemAssign<Integer> for Integer {
+impl RemAssign<Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by value and
     /// replacing the first by the remainder. The remainder has the same sign as the first
     /// [`Integer`].
@@ -570,13 +570,13 @@ impl RemAssign<Integer> for Integer {
     /// assert_eq!(x, -3);
     /// ```
     #[inline]
-    fn rem_assign(&mut self, other: Integer) {
+    fn rem_assign(&mut self, other: Self) {
         self.abs %= other.abs;
         self.sign = self.sign || self.abs == 0;
     }
 }
 
-impl RemAssign<&Integer> for Integer {
+impl RemAssign<&Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by reference
     /// and replacing the first by the remainder. The remainder has the same sign as the first
     /// [`Integer`].
@@ -624,14 +624,14 @@ impl RemAssign<&Integer> for Integer {
     /// assert_eq!(x, -3);
     /// ```
     #[inline]
-    fn rem_assign(&mut self, other: &Integer) {
+    fn rem_assign(&mut self, other: &Self) {
         self.abs %= &other.abs;
         self.sign = self.sign || self.abs == 0;
     }
 }
 
-impl CeilingMod<Integer> for Integer {
-    type Output = Integer;
+impl CeilingMod<Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
     /// remainder. The remainder has the opposite sign as the second [`Integer`].
@@ -671,14 +671,14 @@ impl CeilingMod<Integer> for Integer {
     /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(-10)), 7);
     /// ```
     #[inline]
-    fn ceiling_mod(mut self, other: Integer) -> Integer {
+    fn ceiling_mod(mut self, other: Self) -> Self {
         self.ceiling_mod_assign(other);
         self
     }
 }
 
-impl CeilingMod<&Integer> for Integer {
-    type Output = Integer;
+impl CeilingMod<&Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference and returning just the remainder. The remainder has the opposite sign as the
@@ -719,7 +719,7 @@ impl CeilingMod<&Integer> for Integer {
     /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(-10)), 7);
     /// ```
     #[inline]
-    fn ceiling_mod(mut self, other: &Integer) -> Integer {
+    fn ceiling_mod(mut self, other: &Self) -> Self {
         self.ceiling_mod_assign(other);
         self
     }
@@ -830,7 +830,7 @@ impl CeilingMod<&Integer> for &Integer {
     }
 }
 
-impl CeilingModAssign<Integer> for Integer {
+impl CeilingModAssign<Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand side
     /// by value and replacing the first number by the remainder. The remainder has the opposite
     /// sign as the second number.
@@ -877,7 +877,7 @@ impl CeilingModAssign<Integer> for Integer {
     /// x.ceiling_mod_assign(Integer::from(-10));
     /// assert_eq!(x, 7);
     /// ```
-    fn ceiling_mod_assign(&mut self, other: Integer) {
+    fn ceiling_mod_assign(&mut self, other: Self) {
         if self.sign == other.sign {
             self.abs.neg_mod_assign(other.abs);
         } else {
@@ -887,7 +887,7 @@ impl CeilingModAssign<Integer> for Integer {
     }
 }
 
-impl CeilingModAssign<&Integer> for Integer {
+impl CeilingModAssign<&Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand side
     /// by reference and replacing the first number by the remainder. The remainder has the opposite
     /// sign as the second number.
@@ -934,7 +934,7 @@ impl CeilingModAssign<&Integer> for Integer {
     /// x.ceiling_mod_assign(&Integer::from(-10));
     /// assert_eq!(x, 7);
     /// ```
-    fn ceiling_mod_assign(&mut self, other: &Integer) {
+    fn ceiling_mod_assign(&mut self, other: &Self) {
         if self.sign == other.sign {
             self.abs.neg_mod_assign(&other.abs);
         } else {

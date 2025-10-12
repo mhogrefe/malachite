@@ -88,8 +88,8 @@ pub(crate) struct FFTContext {
 }
 
 impl Default for FFTContext {
-    fn default() -> FFTContext {
-        FFTContext {
+    fn default() -> Self {
+        Self {
             p: 0.0,
             pinv: 0.0,
             mod_data: ModData::default(),

@@ -240,28 +240,28 @@ pub fn limbs_xor_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
 
 impl Natural {
     #[inline]
-    fn xor_limb(mut self, other: Limb) -> Natural {
+    fn xor_limb(mut self, other: Limb) -> Self {
         self.xor_assign_limb(other);
         self
     }
 
-    fn xor_limb_ref(&self, other: Limb) -> Natural {
-        Natural(match self {
-            Natural(Small(small)) => Small(small ^ other),
-            Natural(Large(limbs)) => Large(limbs_xor_limb(limbs, other)),
+    fn xor_limb_ref(&self, other: Limb) -> Self {
+        Self(match self {
+            Self(Small(small)) => Small(small ^ other),
+            Self(Large(limbs)) => Large(limbs_xor_limb(limbs, other)),
         })
     }
 
     fn xor_assign_limb(&mut self, other: Limb) {
         match self {
-            Natural(Small(small)) => *small ^= other,
-            Natural(Large(limbs)) => limbs_xor_limb_in_place(limbs, other),
+            Self(Small(small)) => *small ^= other,
+            Self(Large(limbs)) => limbs_xor_limb_in_place(limbs, other),
         }
     }
 }
 
-impl BitXor<Natural> for Natural {
-    type Output = Natural;
+impl BitXor<Self> for Natural {
+    type Output = Self;
 
     /// Takes the bitwise xor of two [`Natural`]s, taking both by value.
     ///
@@ -290,14 +290,14 @@ impl BitXor<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn bitxor(mut self, other: Natural) -> Natural {
+    fn bitxor(mut self, other: Self) -> Self {
         self ^= other;
         self
     }
 }
 
-impl<'a> BitXor<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> BitXor<&'a Self> for Natural {
+    type Output = Self;
 
     /// Takes the bitwise xor of two [`Natural`]s, taking the first by value and the second by
     /// reference.
@@ -326,7 +326,7 @@ impl<'a> BitXor<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn bitxor(mut self, other: &'a Natural) -> Natural {
+    fn bitxor(mut self, other: &'a Self) -> Self {
         self ^= other;
         self
     }
@@ -408,7 +408,7 @@ impl BitXor<&Natural> for &Natural {
     }
 }
 
-impl BitXorAssign<Natural> for Natural {
+impl BitXorAssign<Self> for Natural {
     /// Bitwise-xors a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value.
     ///
@@ -436,11 +436,11 @@ impl BitXorAssign<Natural> for Natural {
     /// x ^= Natural::from(0x0f000000u32);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitxor_assign(&mut self, mut other: Natural) {
+    fn bitxor_assign(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (_, Natural(Small(y))) => self.xor_assign_limb(*y),
-            (Natural(Small(x)), _) => *self = other.xor_limb(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.xor_assign_limb(*y),
+            (Self(Small(x)), _) => *self = other.xor_limb(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 if limbs_xor_in_place_either(xs, ys) {
                     swap(xs, ys);
                 }
@@ -450,7 +450,7 @@ impl BitXorAssign<Natural> for Natural {
     }
 }
 
-impl<'a> BitXorAssign<&'a Natural> for Natural {
+impl<'a> BitXorAssign<&'a Self> for Natural {
     /// Bitwise-xors a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
     ///
@@ -477,11 +477,11 @@ impl<'a> BitXorAssign<&'a Natural> for Natural {
     /// x |= Natural::from(0x0f000000u32);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitxor_assign(&mut self, other: &'a Natural) {
+    fn bitxor_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (_, Natural(Small(y))) => self.xor_assign_limb(*y),
-            (Natural(Small(x)), _) => *self = other.xor_limb_ref(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.xor_assign_limb(*y),
+            (Self(Small(x)), _) => *self = other.xor_limb_ref(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_xor_in_place_left(xs, ys);
                 self.trim();
             }

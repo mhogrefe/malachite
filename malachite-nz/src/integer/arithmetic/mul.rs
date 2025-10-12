@@ -12,8 +12,8 @@ use core::iter::Product;
 use core::ops::{Mul, MulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 
-impl Mul<Integer> for Integer {
-    type Output = Integer;
+impl Mul<Self> for Integer {
+    type Output = Self;
 
     /// Multiplies two [`Integer`]s, taking both by value.
     ///
@@ -42,14 +42,14 @@ impl Mul<Integer> for Integer {
     ///     "121932631112635269000000"
     /// );
     /// ```
-    fn mul(mut self, other: Integer) -> Integer {
+    fn mul(mut self, other: Self) -> Self {
         self *= other;
         self
     }
 }
 
-impl Mul<&Integer> for Integer {
-    type Output = Integer;
+impl Mul<&Self> for Integer {
+    type Output = Self;
 
     /// Multiplies two [`Integer`]s, taking the first by value and the second by reference.
     ///
@@ -78,7 +78,7 @@ impl Mul<&Integer> for Integer {
     ///     "121932631112635269000000"
     /// );
     /// ```
-    fn mul(mut self, other: &Integer) -> Integer {
+    fn mul(mut self, other: &Self) -> Self {
         self *= other;
         self
     }
@@ -159,7 +159,7 @@ impl Mul<&Integer> for &Integer {
     }
 }
 
-impl MulAssign<Integer> for Integer {
+impl MulAssign<Self> for Integer {
     /// Multiplies an [`Integer`] by an [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value.
     ///
@@ -187,13 +187,13 @@ impl MulAssign<Integer> for Integer {
     /// x *= Integer::from(4000);
     /// assert_eq!(x, -24000000000000i64);
     /// ```
-    fn mul_assign(&mut self, other: Integer) {
+    fn mul_assign(&mut self, other: Self) {
         self.abs *= other.abs;
         self.sign = self.sign == other.sign || self.abs == 0;
     }
 }
 
-impl MulAssign<&Integer> for Integer {
+impl MulAssign<&Self> for Integer {
     /// Multiplies an [`Integer`] by an [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -221,7 +221,7 @@ impl MulAssign<&Integer> for Integer {
     /// x *= &Integer::from(4000);
     /// assert_eq!(x, -24000000000000i64);
     /// ```
-    fn mul_assign(&mut self, other: &Integer) {
+    fn mul_assign(&mut self, other: &Self) {
         self.abs *= &other.abs;
         self.sign = self.sign == other.sign || self.abs == 0;
     }
@@ -257,14 +257,14 @@ impl Product for Integer {
     ///     -210
     /// );
     /// ```
-    fn product<I>(xs: I) -> Integer
+    fn product<I>(xs: I) -> Self
     where
-        I: Iterator<Item = Integer>,
+        I: Iterator<Item = Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
             if x == 0 {
-                return Integer::ZERO;
+                return Self::ZERO;
             }
             let mut p = x;
             for _ in 0..i.trailing_zeros() {
@@ -272,7 +272,7 @@ impl Product for Integer {
             }
             stack.push(p);
         }
-        let mut p = Integer::ONE;
+        let mut p = Self::ONE;
         for x in stack.into_iter().rev() {
             p *= x;
         }
@@ -280,7 +280,7 @@ impl Product for Integer {
     }
 }
 
-impl<'a> Product<&'a Integer> for Integer {
+impl<'a> Product<&'a Self> for Integer {
     /// Multiplies together all the [`Integer`]s in an iterator of [`Integer`] references.
     ///
     /// $$
@@ -306,14 +306,14 @@ impl<'a> Product<&'a Integer> for Integer {
     ///     -210
     /// );
     /// ```
-    fn product<I>(xs: I) -> Integer
+    fn product<I>(xs: I) -> Self
     where
-        I: Iterator<Item = &'a Integer>,
+        I: Iterator<Item = &'a Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
             if *x == 0 {
-                return Integer::ZERO;
+                return Self::ZERO;
             }
             let mut p = x.clone();
             for _ in 0..i.trailing_zeros() {
@@ -321,7 +321,7 @@ impl<'a> Product<&'a Integer> for Integer {
             }
             stack.push(p);
         }
-        let mut p = Integer::ONE;
+        let mut p = Self::ONE;
         for x in stack.into_iter().rev() {
             p *= x;
         }

@@ -31,10 +31,10 @@ use core::ops::Neg;
 /// assert_eq!(-Exact, Exact);
 /// ```
 impl Neg for RoundingMode {
-    type Output = RoundingMode;
+    type Output = Self;
 
     #[inline]
-    fn neg(self) -> RoundingMode {
+    fn neg(self) -> Self {
         match self {
             Floor => Ceiling,
             Ceiling => Floor,

@@ -26,8 +26,8 @@ impl<T: Eq> RationalSequence<T> {
     ///     "[1, 2]"
     /// );
     /// ```
-    pub const fn from_vec(non_repeating: Vec<T>) -> RationalSequence<T> {
-        RationalSequence {
+    pub const fn from_vec(non_repeating: Vec<T>) -> Self {
+        Self {
             non_repeating,
             repeating: vec![],
         }
@@ -69,9 +69,9 @@ impl<T: Eq> RationalSequence<T> {
     ///     "[1, 2, [3, 4]]"
     /// );
     /// ```
-    pub fn from_vecs(mut non_repeating: Vec<T>, mut repeating: Vec<T>) -> RationalSequence<T> {
+    pub fn from_vecs(mut non_repeating: Vec<T>, mut repeating: Vec<T>) -> Self {
         rational_sequence_reduce(&mut non_repeating, &mut repeating);
-        RationalSequence {
+        Self {
             non_repeating,
             repeating,
         }
@@ -137,8 +137,8 @@ impl<T: Clone + Eq> RationalSequence<T> {
     ///     "[1, 2]"
     /// );
     /// ```
-    pub fn from_slice(non_repeating: &[T]) -> RationalSequence<T> {
-        RationalSequence {
+    pub fn from_slice(non_repeating: &[T]) -> Self {
+        Self {
             non_repeating: non_repeating.to_vec(),
             repeating: vec![],
         }
@@ -180,11 +180,11 @@ impl<T: Clone + Eq> RationalSequence<T> {
     ///     "[1, 2, [3, 4]]"
     /// );
     /// ```
-    pub fn from_slices(non_repeating: &[T], repeating: &[T]) -> RationalSequence<T> {
+    pub fn from_slices(non_repeating: &[T], repeating: &[T]) -> Self {
         let mut non_repeating = non_repeating.to_vec();
         let mut repeating = repeating.to_vec();
         rational_sequence_reduce(&mut non_repeating, &mut repeating);
-        RationalSequence {
+        Self {
             non_repeating,
             repeating,
         }

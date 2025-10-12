@@ -46,8 +46,8 @@ impl FromStr for Natural {
     /// assert!(Natural::from_str("-5").is_err());
     /// ```
     #[inline]
-    fn from_str(s: &str) -> Result<Natural, ()> {
-        Natural::from_string_base(10, s).ok_or(())
+    fn from_str(s: &str) -> Result<Self, ()> {
+        Self::from_string_base(10, s).ok_or(())
     }
 }
 
@@ -205,7 +205,7 @@ impl FromStringBase for Natural {
     /// assert!(Natural::from_string_base(2, "2").is_none());
     /// ```
     #[inline]
-    fn from_string_base(base: u8, mut s: &str) -> Option<Natural> {
+    fn from_string_base(base: u8, mut s: &str) -> Option<Self> {
         assert!((2..=36).contains(&base), "base out of range");
         if s.is_empty() {
             None
@@ -216,12 +216,12 @@ impl FromStringBase for Natural {
                 16 => from_hex_str(s),
                 10 => {
                     if s.len() < MAX_DIGITS_PER_LIMB {
-                        Limb::from_str(s).ok().map(|x| Natural(Small(x)))
+                        Limb::from_str(s).ok().map(|x| Self(Small(x)))
                     } else {
                         if let Some(prefix_s) = s.strip_prefix('+') {
                             s = prefix_s;
                         }
-                        Natural::from_digits_desc(
+                        Self::from_digits_desc(
                             &10,
                             s.bytes()
                                 .map(|b| if b >= b'0' { b - b'0' } else { u8::MAX }),
@@ -235,7 +235,7 @@ impl FromStringBase for Natural {
                             return None;
                         }
                     }
-                    Natural::from_digits_desc(
+                    Self::from_digits_desc(
                         &u8::wrapping_from(base),
                         s.bytes().map(|b| digit_from_display_byte(b).unwrap()),
                     )

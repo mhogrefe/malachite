@@ -91,10 +91,10 @@ impl FromSciString for Rational {
     ///     "255/1048576"
     /// );
     /// ```
-    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Rational> {
+    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self> {
         let (s, exponent) = preprocess_sci_string(s, options)?;
-        let x = Rational::from(Integer::parse_int(&s, options.get_base())?);
-        Some(x * Rational::from(options.get_base()).pow(exponent))
+        let x = Self::from(Integer::parse_int(&s, options.get_base())?);
+        Some(x * Self::from(options.get_base()).pow(exponent))
     }
 }
 
@@ -179,16 +179,16 @@ impl Rational {
     pub fn from_sci_string_simplest_with_options(
         s: &str,
         options: FromSciStringOptions,
-    ) -> Option<Rational> {
+    ) -> Option<Self> {
         let (s, exponent) = preprocess_sci_string(s, options)?;
-        let x = Rational::from(Integer::parse_int(&s, options.get_base())?);
-        let p = Rational::from(options.get_base()).pow(exponent);
+        let x = Self::from(Integer::parse_int(&s, options.get_base())?);
+        let p = Self::from(options.get_base()).pow(exponent);
         let q = x * &p;
         if exponent >= 0 {
             Some(q)
         } else {
             let epsilon = p >> 1;
-            Some(Rational::simplest_rational_in_closed_interval(
+            Some(Self::simplest_rational_in_closed_interval(
                 &(&q - &epsilon),
                 &(q + epsilon),
             ))
@@ -272,7 +272,7 @@ impl Rational {
     /// );
     /// ```
     #[inline]
-    pub fn from_sci_string_simplest(s: &str) -> Option<Rational> {
-        Rational::from_sci_string_simplest_with_options(s, FromSciStringOptions::default())
+    pub fn from_sci_string_simplest(s: &str) -> Option<Self> {
+        Self::from_sci_string_simplest_with_options(s, FromSciStringOptions::default())
     }
 }

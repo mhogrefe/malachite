@@ -27,8 +27,8 @@ impl Natural {
     /// const TEN: Natural = Natural::const_from(10);
     /// assert_eq!(TEN, 10);
     /// ```
-    pub const fn const_from(x: Limb) -> Natural {
-        Natural(Small(x))
+    pub const fn const_from(x: Limb) -> Self {
+        Self(Small(x))
     }
 }
 

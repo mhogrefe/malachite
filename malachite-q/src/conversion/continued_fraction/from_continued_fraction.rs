@@ -57,7 +57,7 @@ impl Rational {
     ///     "355/113"
     /// );
     /// ```
-    pub fn from_continued_fraction<I: Iterator<Item = Natural>>(floor: Integer, xs: I) -> Rational {
+    pub fn from_continued_fraction<I: Iterator<Item = Natural>>(floor: Integer, xs: I) -> Self {
         let mut previous_numerator = Integer::ONE;
         let mut previous_denominator = Natural::ZERO;
         let mut numerator = floor;
@@ -69,7 +69,7 @@ impl Rational {
             swap(&mut numerator, &mut previous_numerator);
             swap(&mut denominator, &mut previous_denominator);
         }
-        Rational {
+        Self {
             sign: numerator >= 0,
             numerator: numerator.unsigned_abs(),
             denominator,
@@ -122,7 +122,7 @@ impl Rational {
     pub fn from_continued_fraction_ref<'a, I: Iterator<Item = &'a Natural>>(
         floor: &Integer,
         xs: I,
-    ) -> Rational {
+    ) -> Self {
         let mut previous_numerator = Integer::ONE;
         let mut previous_denominator = Natural::ZERO;
         let mut numerator = floor.clone();
@@ -134,7 +134,7 @@ impl Rational {
             swap(&mut numerator, &mut previous_numerator);
             swap(&mut denominator, &mut previous_denominator);
         }
-        Rational {
+        Self {
             sign: numerator >= 0,
             numerator: numerator.unsigned_abs(),
             denominator,

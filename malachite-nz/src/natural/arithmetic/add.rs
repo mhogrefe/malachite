@@ -538,35 +538,35 @@ pub_crate_test! {limbs_add_same_length_with_carry_in_in_place_left(
 
 impl Natural {
     #[inline]
-    pub(crate) fn add_limb(mut self, other: Limb) -> Natural {
+    pub(crate) fn add_limb(mut self, other: Limb) -> Self {
         self.add_assign_limb(other);
         self
     }
 
-    pub(crate) fn add_limb_ref(&self, other: Limb) -> Natural {
+    pub(crate) fn add_limb_ref(&self, other: Limb) -> Self {
         match (self, other) {
             (x, 0) => x.clone(),
-            (Natural(Small(small)), other) => match small.overflowing_add(other) {
-                (sum, false) => Natural::from(sum),
-                (sum, true) => Natural(Large(vec![sum, 1])),
+            (Self(Small(small)), other) => match small.overflowing_add(other) {
+                (sum, false) => Self::from(sum),
+                (sum, true) => Self(Large(vec![sum, 1])),
             },
-            (Natural(Large(limbs)), other) => Natural(Large(limbs_add_limb(limbs, other))),
+            (Self(Large(limbs)), other) => Self(Large(limbs_add_limb(limbs, other))),
         }
     }
 
     fn add_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => {}
-            (&mut Natural::ZERO, _) => *self = Natural::from(other),
-            (&mut Natural(Small(ref mut small)), other) => {
+            (&mut Self::ZERO, _) => *self = Self::from(other),
+            (&mut Self(Small(ref mut small)), other) => {
                 let (sum, overflow) = small.overflowing_add(other);
                 if overflow {
-                    *self = Natural(Large(vec![sum, 1]));
+                    *self = Self(Large(vec![sum, 1]));
                 } else {
                     *small = sum;
                 }
             }
-            (&mut Natural(Large(ref mut limbs)), other) => {
+            (&mut Self(Large(ref mut limbs)), other) => {
                 limbs_vec_add_limb_in_place(limbs, other);
             }
         }
@@ -575,7 +575,7 @@ impl Natural {
     #[cfg(feature = "float_helpers")]
     pub fn add_assign_at_limb(&mut self, i: usize, y: Limb) {
         if i == 0 {
-            *self += Natural::from(y);
+            *self += Self::from(y);
             return;
         }
         let xs = self.promote_in_place();
@@ -588,8 +588,8 @@ impl Natural {
     }
 }
 
-impl Add<Natural> for Natural {
-    type Output = Natural;
+impl Add<Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s, taking both by value.
     ///
@@ -619,14 +619,14 @@ impl Add<Natural> for Natural {
     ///     3000000000000u64
     /// );
     /// ```
-    fn add(mut self, other: Natural) -> Natural {
+    fn add(mut self, other: Self) -> Self {
         self += other;
         self
     }
 }
 
-impl<'a> Add<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Add<&'a Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s, taking the first by reference and the second by value.
     ///
@@ -657,7 +657,7 @@ impl<'a> Add<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn add(mut self, other: &'a Natural) -> Natural {
+    fn add(mut self, other: &'a Self) -> Self {
         self += other;
         self
     }
@@ -741,7 +741,7 @@ impl Add<&Natural> for &Natural {
     }
 }
 
-impl AddAssign<Natural> for Natural {
+impl AddAssign<Self> for Natural {
     /// Adds a [`Natural`] to a [`Natural`] in place, taking the [`Natural`] on the right-hand side
     /// by value.
     ///
@@ -770,11 +770,11 @@ impl AddAssign<Natural> for Natural {
     /// x += Natural::from(10u32).pow(12) * Natural::from(4u32);
     /// assert_eq!(x, 10000000000000u64);
     /// ```
-    fn add_assign(&mut self, mut other: Natural) {
+    fn add_assign(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (x, &mut Natural(Small(y))) => x.add_assign_limb(y),
-            (&mut Natural(Small(x)), y) => *self = y.add_limb_ref(x),
-            (&mut Natural(Large(ref mut xs)), &mut Natural(Large(ref mut ys))) => {
+            (x, &mut Self(Small(y))) => x.add_assign_limb(y),
+            (&mut Self(Small(x)), y) => *self = y.add_limb_ref(x),
+            (&mut Self(Large(ref mut xs)), &mut Self(Large(ref mut ys))) => {
                 if limbs_vec_add_in_place_either(xs, ys) {
                     *self = other;
                 }
@@ -783,7 +783,7 @@ impl AddAssign<Natural> for Natural {
     }
 }
 
-impl<'a> AddAssign<&'a Natural> for Natural {
+impl<'a> AddAssign<&'a Self> for Natural {
     /// Adds a [`Natural`] to a [`Natural`] in place, taking the [`Natural`] on the right-hand side
     /// by reference.
     ///
@@ -812,11 +812,11 @@ impl<'a> AddAssign<&'a Natural> for Natural {
     /// x += &(Natural::from(10u32).pow(12) * Natural::from(4u32));
     /// assert_eq!(x, 10000000000000u64);
     /// ```
-    fn add_assign(&mut self, other: &'a Natural) {
+    fn add_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (x, &Natural(Small(y))) => x.add_assign_limb(y),
-            (&mut Natural(Small(x)), y) => *self = y.add_limb_ref(x),
-            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+            (x, &Self(Small(y))) => x.add_assign_limb(y),
+            (&mut Self(Small(x)), y) => *self = y.add_limb_ref(x),
+            (&mut Self(Large(ref mut xs)), &Self(Large(ref ys))) => {
                 limbs_vec_add_in_place_left(xs, ys);
             }
         }
@@ -849,11 +849,11 @@ impl Sum for Natural {
     ///     17
     /// );
     /// ```
-    fn sum<I>(xs: I) -> Natural
+    fn sum<I>(xs: I) -> Self
     where
-        I: Iterator<Item = Natural>,
+        I: Iterator<Item = Self>,
     {
-        let mut s = Natural::ZERO;
+        let mut s = Self::ZERO;
         for x in xs {
             s += x;
         }
@@ -861,7 +861,7 @@ impl Sum for Natural {
     }
 }
 
-impl<'a> Sum<&'a Natural> for Natural {
+impl<'a> Sum<&'a Self> for Natural {
     /// Adds up all the [`Natural`]s in an iterator of [`Natural`] references.
     ///
     /// $$
@@ -887,11 +887,11 @@ impl<'a> Sum<&'a Natural> for Natural {
     ///     17
     /// );
     /// ```
-    fn sum<I>(xs: I) -> Natural
+    fn sum<I>(xs: I) -> Self
     where
-        I: Iterator<Item = &'a Natural>,
+        I: Iterator<Item = &'a Self>,
     {
-        let mut s = Natural::ZERO;
+        let mut s = Self::ZERO;
         for x in xs {
             s += x;
         }

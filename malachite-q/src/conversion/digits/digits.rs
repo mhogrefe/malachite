@@ -49,8 +49,8 @@ impl Iterator for RationalDigits {
 
     fn next(&mut self) -> Option<Natural> {
         match self {
-            RationalDigits::General(xs) => xs.next(),
-            RationalDigits::PowerOf2(xs) => xs.next(),
+            Self::General(xs) => xs.next(),
+            Self::PowerOf2(xs) => xs.next(),
         }
     }
 }
@@ -116,11 +116,11 @@ impl Rational {
         } else {
             let mut remainder = self.abs();
             let floor = (&remainder).floor().unsigned_abs();
-            remainder -= Rational::from(&floor);
+            remainder -= Self::from(&floor);
             (
                 floor.to_digits_asc(base),
                 RationalDigits::General(RationalGeneralDigits {
-                    base: Rational::from(base),
+                    base: Self::from(base),
                     remainder,
                 }),
             )

@@ -113,7 +113,7 @@ impl Float {
         mut bits: I,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         assert_ne!(rm, Exact);
         let len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
@@ -161,7 +161,7 @@ impl Float {
             }
         }
         (
-            Float(Finite {
+            Self(Finite {
                 sign: true,
                 exponent,
                 precision: prec,
@@ -262,7 +262,7 @@ impl Float {
     pub fn non_dyadic_from_bits_prec<I: Iterator<Item = bool>>(
         bits: I,
         prec: u64,
-    ) -> (Float, Ordering) {
-        Float::non_dyadic_from_bits_prec_round(bits, prec, Nearest)
+    ) -> (Self, Ordering) {
+        Self::non_dyadic_from_bits_prec_round(bits, prec, Nearest)
     }
 }

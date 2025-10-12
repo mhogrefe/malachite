@@ -1888,13 +1888,13 @@ pub_test! {limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Li
 }}
 
 impl Natural {
-    fn div_exact_limb_ref(&self, other: Limb) -> Natural {
+    fn div_exact_limb_ref(&self, other: Limb) -> Self {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (x, 1) => x.clone(),
-            (Natural(Small(small)), other) => Natural(Small(small / other)),
-            (Natural(Large(limbs)), other) => {
-                Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, other))
+            (Self(Small(small)), other) => Self(Small(small / other)),
+            (Self(Large(limbs)), other) => {
+                Self::from_owned_limbs_asc(limbs_div_exact_limb(limbs, other))
             }
         }
     }
@@ -1903,8 +1903,8 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}
-            (Natural(Small(small)), other) => *small /= other,
-            (Natural(Large(limbs)), other) => {
+            (Self(Small(small)), other) => *small /= other,
+            (Self(Large(limbs)), other) => {
                 limbs_div_exact_limb_in_place(limbs, other);
                 self.trim();
             }
@@ -1912,8 +1912,8 @@ impl Natural {
     }
 }
 
-impl DivExact<Natural> for Natural {
-    type Output = Natural;
+impl DivExact<Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value. The first [`Natural`]
     /// must be exactly divisible by the second. If it isn't, this function may panic or return a
@@ -1959,14 +1959,14 @@ impl DivExact<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_exact(mut self, other: Natural) -> Natural {
+    fn div_exact(mut self, other: Self) -> Self {
         self.div_exact_assign(other);
         self
     }
 }
 
-impl<'a> DivExact<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> DivExact<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference. The first [`Natural`] must be exactly divisible by the second. If it isn't, this
@@ -2012,7 +2012,7 @@ impl<'a> DivExact<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_exact(mut self, other: &'a Natural) -> Natural {
+    fn div_exact(mut self, other: &'a Self) -> Self {
         self.div_exact_assign(other);
         self
     }
@@ -2158,7 +2158,7 @@ impl DivExact<&Natural> for &Natural {
     }
 }
 
-impl DivExactAssign<Natural> for Natural {
+impl DivExactAssign<Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value. The first [`Natural`] must be exactly divisible by the second. If
     /// it isn't, this function may panic or return a meaningless result.
@@ -2198,17 +2198,17 @@ impl DivExactAssign<Natural> for Natural {
     /// x.div_exact_assign(Natural::from_str("987654321000").unwrap());
     /// assert_eq!(x, 123456789000u64);
     /// ```
-    fn div_exact_assign(&mut self, mut other: Natural) {
+    fn div_exact_assign(&mut self, mut other: Self) {
         if *self == other {
-            *self = Natural::ONE;
+            *self = Self::ONE;
             return;
         }
         match (&mut *self, &mut other) {
-            (_, &mut Natural::ZERO) => panic!("division by zero"),
-            (_, &mut Natural::ONE) | (&mut Natural::ZERO, _) => {}
-            (n, &mut Natural(Small(d))) => n.div_exact_assign_limb(d),
-            (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
-            (Natural(Large(ns)), Natural(Large(ds))) => {
+            (_, &mut Self::ZERO) => panic!("division by zero"),
+            (_, &mut Self::ONE) | (&mut Self::ZERO, _) => {}
+            (n, &mut Self(Small(d))) => n.div_exact_assign_limb(d),
+            (Self(Small(_)), Self(Large(_))) => panic!("division not exact"),
+            (Self(Large(ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
@@ -2224,7 +2224,7 @@ impl DivExactAssign<Natural> for Natural {
     }
 }
 
-impl<'a> DivExactAssign<&'a Natural> for Natural {
+impl<'a> DivExactAssign<&'a Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference. The first [`Natural`] must be exactly divisible by the second.
     /// If it isn't, this function may panic or return a meaningless result.
@@ -2264,17 +2264,17 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// x.div_exact_assign(&Natural::from_str("987654321000").unwrap());
     /// assert_eq!(x, 123456789000u64);
     /// ```
-    fn div_exact_assign(&mut self, other: &'a Natural) {
+    fn div_exact_assign(&mut self, other: &'a Self) {
         if self == other {
-            *self = Natural::ONE;
+            *self = Self::ONE;
             return;
         }
         match (&mut *self, other) {
-            (_, &Natural::ZERO) => panic!("division by zero"),
-            (_, &Natural::ONE) | (&mut Natural::ZERO, _) => {}
-            (_, Natural(Small(d))) => self.div_exact_assign_limb(*d),
-            (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
-            (Natural(Large(ns)), Natural(Large(ds))) => {
+            (_, &Self::ZERO) => panic!("division by zero"),
+            (_, &Self::ONE) | (&mut Self::ZERO, _) => {}
+            (_, Self(Small(d))) => self.div_exact_assign_limb(*d),
+            (Self(Small(_)), Self(Large(_))) => panic!("division not exact"),
+            (Self(Large(ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {

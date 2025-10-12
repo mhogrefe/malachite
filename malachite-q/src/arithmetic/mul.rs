@@ -17,8 +17,8 @@ use core::ops::{Mul, MulAssign};
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd};
 use malachite_base::num::basic::traits::{One, Zero};
 
-impl Mul<Rational> for Rational {
-    type Output = Rational;
+impl Mul<Self> for Rational {
+    type Output = Self;
 
     /// Multiplies two [`Rational`]s, taking both by value.
     ///
@@ -45,9 +45,9 @@ impl Mul<Rational> for Rational {
     ///     "1089/350"
     /// );
     /// ```
-    fn mul(self, other: Rational) -> Rational {
+    fn mul(self, other: Self) -> Self {
         if self == 0u32 || other == 0u32 {
-            return Rational::ZERO;
+            return Self::ZERO;
         } else if self == 1u32 {
             return other;
         } else if other == 1u32 {
@@ -55,7 +55,7 @@ impl Mul<Rational> for Rational {
         }
         let g_1 = (&self.numerator).gcd(&other.denominator);
         let g_2 = (&other.numerator).gcd(&self.denominator);
-        Rational {
+        Self {
             sign: self.sign == other.sign,
             numerator: (self.numerator).div_exact(&g_1) * (other.numerator).div_exact(&g_2),
             denominator: (other.denominator).div_exact(g_1) * (self.denominator).div_exact(g_2),
@@ -63,8 +63,8 @@ impl Mul<Rational> for Rational {
     }
 }
 
-impl Mul<&Rational> for Rational {
-    type Output = Rational;
+impl Mul<&Self> for Rational {
+    type Output = Self;
 
     /// Multiplies two [`Rational`]s, taking the first by value and the second by reference.
     ///
@@ -92,7 +92,7 @@ impl Mul<&Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn mul(self, other: &Rational) -> Rational {
+    fn mul(self, other: &Self) -> Self {
         other * self
     }
 }
@@ -189,7 +189,7 @@ impl Mul<&Rational> for &Rational {
     }
 }
 
-impl MulAssign<Rational> for Rational {
+impl MulAssign<Self> for Rational {
     /// Multiplies a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the
     /// right-hand side by value.
     ///
@@ -218,11 +218,11 @@ impl MulAssign<Rational> for Rational {
     /// x *= Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "1089/350");
     /// ```
-    fn mul_assign(&mut self, other: Rational) {
+    fn mul_assign(&mut self, other: Self) {
         if *self == 0u32 || other == 1u32 {
             return;
         } else if other == 0u32 {
-            *self = Rational::ZERO;
+            *self = Self::ZERO;
             return;
         } else if *self == 1u32 {
             *self = other;
@@ -238,7 +238,7 @@ impl MulAssign<Rational> for Rational {
     }
 }
 
-impl MulAssign<&Rational> for Rational {
+impl MulAssign<&Self> for Rational {
     /// Multiplies a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the
     /// right-hand side by reference.
     ///
@@ -267,11 +267,11 @@ impl MulAssign<&Rational> for Rational {
     /// x *= &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "1089/350");
     /// ```
-    fn mul_assign(&mut self, other: &Rational) {
+    fn mul_assign(&mut self, other: &Self) {
         if *self == 0u32 || *other == 1u32 {
             return;
         } else if *other == 0u32 {
-            *self = Rational::ZERO;
+            *self = Self::ZERO;
             return;
         } else if *self == 1u32 {
             *self = other.clone();
@@ -318,14 +318,14 @@ impl Product for Rational {
     ///     "1/5"
     /// );
     /// ```
-    fn product<I>(xs: I) -> Rational
+    fn product<I>(xs: I) -> Self
     where
-        I: Iterator<Item = Rational>,
+        I: Iterator<Item = Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate() {
             if x == 0 {
-                return Rational::ZERO;
+                return Self::ZERO;
             }
             let mut p = x;
             for _ in 0..(i + 1).trailing_zeros() {
@@ -333,7 +333,7 @@ impl Product for Rational {
             }
             stack.push(p);
         }
-        let mut p = Rational::ONE;
+        let mut p = Self::ONE;
         for x in stack.into_iter().rev() {
             p *= x;
         }
@@ -341,7 +341,7 @@ impl Product for Rational {
     }
 }
 
-impl<'a> Product<&'a Rational> for Rational {
+impl<'a> Product<&'a Self> for Rational {
     /// Multiplies together all the [`Rational`]s in an iterator of [`Rational`] references.
     ///
     /// $$
@@ -372,14 +372,14 @@ impl<'a> Product<&'a Rational> for Rational {
     ///     "1/5"
     /// );
     /// ```
-    fn product<I>(xs: I) -> Rational
+    fn product<I>(xs: I) -> Self
     where
-        I: Iterator<Item = &'a Rational>,
+        I: Iterator<Item = &'a Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate() {
             if *x == 0 {
-                return Rational::ZERO;
+                return Self::ZERO;
             }
             let mut p = x.clone();
             for _ in 0..(i + 1).trailing_zeros() {
@@ -387,7 +387,7 @@ impl<'a> Product<&'a Rational> for Rational {
             }
             stack.push(p);
         }
-        let mut p = Rational::ONE;
+        let mut p = Self::ONE;
         for x in stack.into_iter().rev() {
             p *= x;
         }

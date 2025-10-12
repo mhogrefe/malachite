@@ -33,9 +33,9 @@ impl BitDistributorOutputType {
     ///
     /// The corresponding element grows as a power of $i$. See the [`BitDistributor`] documentation
     /// for more.
-    pub fn normal(weight: usize) -> BitDistributorOutputType {
+    pub fn normal(weight: usize) -> Self {
         assert_ne!(weight, 0);
-        BitDistributorOutputType {
+        Self {
             weight,
             max_bits: None,
         }
@@ -48,8 +48,8 @@ impl BitDistributorOutputType {
     ///
     /// The corresponding element grows logarithmically. See the [`BitDistributor`] documentation
     /// for more.
-    pub const fn tiny() -> BitDistributorOutputType {
-        BitDistributorOutputType {
+    pub const fn tiny() -> Self {
+        Self {
             weight: 0,
             max_bits: None,
         }
@@ -105,14 +105,14 @@ pub struct BitDistributor {
 }
 
 impl BitDistributor {
-    fn new_without_init(output_types: &[BitDistributorOutputType]) -> BitDistributor {
+    fn new_without_init(output_types: &[BitDistributorOutputType]) -> Self {
         if output_types
             .iter()
             .all(|output_type| output_type.weight == 0)
         {
             panic!("All output_types cannot be tiny");
         }
-        BitDistributor {
+        Self {
             output_types: output_types.to_vec(),
             bit_map: [0; COUNTER_WIDTH],
             counter: [false; COUNTER_WIDTH],
@@ -139,8 +139,8 @@ impl BitDistributor {
     ///     BitDistributorOutputType::tiny(),
     /// ]);
     /// ```
-    pub fn new(output_types: &[BitDistributorOutputType]) -> BitDistributor {
-        let mut distributor = BitDistributor::new_without_init(output_types);
+    pub fn new(output_types: &[BitDistributorOutputType]) -> Self {
+        let mut distributor = Self::new_without_init(output_types);
         distributor.update_bit_map();
         distributor
     }

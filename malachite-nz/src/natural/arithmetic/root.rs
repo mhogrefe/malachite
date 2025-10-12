@@ -589,7 +589,7 @@ pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
 }}
 
 impl FloorRoot<u64> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Returns the floor of the $n$th root of a [`Natural`], taking the [`Natural`] by value.
     ///
@@ -615,14 +615,14 @@ impl FloorRoot<u64> for Natural {
     /// assert_eq!(Natural::from(1001u16).floor_root(3), 10);
     /// assert_eq!(Natural::from(100000000000u64).floor_root(5), 158);
     /// ```
-    fn floor_root(self, exp: u64) -> Natural {
+    fn floor_root(self, exp: u64) -> Self {
         match exp {
             0 => panic!("Cannot take 0th root"),
             1 => self,
             2 => self.floor_sqrt(),
             exp => match self {
-                Natural(Small(x)) => Natural(Small(x.floor_root(exp))),
-                Natural(Large(xs)) => Natural::from_owned_limbs_asc(limbs_floor_root(&xs, exp).0),
+                Self(Small(x)) => Self(Small(x.floor_root(exp))),
+                Self(Large(xs)) => Self::from_owned_limbs_asc(limbs_floor_root(&xs, exp).0),
             },
         }
     }
@@ -711,7 +711,7 @@ impl FloorRootAssign<u64> for Natural {
 }
 
 impl CeilingRoot<u64> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Returns the ceiling of the $n$th root of a [`Natural`], taking the [`Natural`] by value.
     ///
@@ -737,18 +737,18 @@ impl CeilingRoot<u64> for Natural {
     /// assert_eq!(Natural::from(1001u16).ceiling_root(3), 11);
     /// assert_eq!(Natural::from(100000000000u64).ceiling_root(5), 159);
     /// ```
-    fn ceiling_root(self, exp: u64) -> Natural {
+    fn ceiling_root(self, exp: u64) -> Self {
         match exp {
             0 => panic!("Cannot take 0th root"),
             1 => self,
             2 => self.ceiling_sqrt(),
             exp => match self {
-                Natural(Small(x)) => Natural(Small(x.ceiling_root(exp))),
-                Natural(Large(xs)) => {
+                Self(Small(x)) => Self(Small(x.ceiling_root(exp))),
+                Self(Large(xs)) => {
                     let (floor_root_limbs, inexact) = limbs_floor_root(&xs, exp);
-                    let floor_root = Natural::from_owned_limbs_asc(floor_root_limbs);
+                    let floor_root = Self::from_owned_limbs_asc(floor_root_limbs);
                     if inexact {
-                        floor_root + Natural::ONE
+                        floor_root + Self::ONE
                     } else {
                         floor_root
                     }
@@ -849,7 +849,7 @@ impl CeilingRootAssign<u64> for Natural {
 }
 
 impl CheckedRoot<u64> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Returns the the $n$th root of a [`Natural`], or `None` if the [`Natural`] is not a perfect
     /// $n$th power. The [`Natural`] is taken by value.
@@ -902,16 +902,16 @@ impl CheckedRoot<u64> for Natural {
     ///     "Some(100)"
     /// );
     /// ```
-    fn checked_root(self, exp: u64) -> Option<Natural> {
+    fn checked_root(self, exp: u64) -> Option<Self> {
         match exp {
             0 => panic!("Cannot take 0th root"),
             1 => Some(self),
             2 => self.checked_sqrt(),
             exp => match self {
-                Natural(Small(x)) => x.checked_root(exp).map(|x| Natural(Small(x))),
-                Natural(Large(xs)) => {
+                Self(Small(x)) => x.checked_root(exp).map(|x| Self(Small(x))),
+                Self(Large(xs)) => {
                     let (floor_root_limbs, inexact) = limbs_floor_root(&xs, exp);
-                    let floor_root = Natural::from_owned_limbs_asc(floor_root_limbs);
+                    let floor_root = Self::from_owned_limbs_asc(floor_root_limbs);
                     if inexact { None } else { Some(floor_root) }
                 }
             },
@@ -991,8 +991,8 @@ impl CheckedRoot<u64> for &Natural {
 }
 
 impl RootRem<u64> for Natural {
-    type RootOutput = Natural;
-    type RemOutput = Natural;
+    type RootOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the $n$th root of a [`Natural`], and the remainder (the difference
     /// between the [`Natural`] and the $n$th power of the floor). The [`Natural`] is taken by
@@ -1030,21 +1030,21 @@ impl RootRem<u64> for Natural {
     ///     "(158, 1534195232)"
     /// );
     /// ```
-    fn root_rem(self, exp: u64) -> (Natural, Natural) {
+    fn root_rem(self, exp: u64) -> (Self, Self) {
         match exp {
             0 => panic!("Cannot take 0th root"),
-            1 => (self, Natural::ZERO),
+            1 => (self, Self::ZERO),
             2 => self.sqrt_rem(),
             exp => match self {
-                Natural(Small(x)) => {
+                Self(Small(x)) => {
                     let (root, rem) = x.root_rem(exp);
-                    (Natural(Small(root)), Natural(Small(rem)))
+                    (Self(Small(root)), Self(Small(rem)))
                 }
-                Natural(Large(xs)) => {
+                Self(Large(xs)) => {
                     let (root_limbs, rem_limbs) = limbs_root_rem(&xs, exp);
                     (
-                        Natural::from_owned_limbs_asc(root_limbs),
-                        Natural::from_owned_limbs_asc(rem_limbs),
+                        Self::from_owned_limbs_asc(root_limbs),
+                        Self::from_owned_limbs_asc(rem_limbs),
                     )
                 }
             },
@@ -1117,7 +1117,7 @@ impl RootRem<u64> for &Natural {
 }
 
 impl RootAssignRem<u64> for Natural {
-    type RemOutput = Natural;
+    type RemOutput = Self;
 
     /// Replaces a [`Natural`] with the floor of its $n$th root, and returns the remainder (the
     /// difference between the original [`Natural`] and the $n$th power of the floor).
@@ -1155,7 +1155,7 @@ impl RootAssignRem<u64> for Natural {
     /// assert_eq!(x, 158);
     /// ```
     #[inline]
-    fn root_assign_rem(&mut self, exp: u64) -> Natural {
+    fn root_assign_rem(&mut self, exp: u64) -> Self {
         let rem;
         (*self, rem) = (&*self).root_rem(exp);
         rem

@@ -10,7 +10,7 @@ use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
 
 impl Abs for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Takes the absolute value of a [`Rational`], taking the [`Rational`] by value.
     ///
@@ -31,7 +31,7 @@ impl Abs for Rational {
     /// assert_eq!(Rational::from_signeds(22, 7).abs().to_string(), "22/7");
     /// assert_eq!(Rational::from_signeds(-22, 7).abs().to_string(), "22/7");
     /// ```
-    fn abs(mut self) -> Rational {
+    fn abs(mut self) -> Self {
         self.sign = true;
         self
     }

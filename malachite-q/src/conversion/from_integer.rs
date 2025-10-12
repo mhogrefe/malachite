@@ -26,8 +26,8 @@ impl From<Integer> for Rational {
     /// assert_eq!(Rational::from(Integer::from(123)), 123);
     /// assert_eq!(Rational::from(Integer::from(-123)), -123);
     /// ```
-    fn from(value: Integer) -> Rational {
-        Rational {
+    fn from(value: Integer) -> Self {
+        Self {
             sign: value >= 0,
             numerator: value.unsigned_abs(),
             denominator: Natural::ONE,
@@ -53,8 +53,8 @@ impl From<&Integer> for Rational {
     /// assert_eq!(Rational::from(&Integer::from(123)), 123);
     /// assert_eq!(Rational::from(&Integer::from(-123)), -123);
     /// ```
-    fn from(value: &Integer) -> Rational {
-        Rational {
+    fn from(value: &Integer) -> Self {
+        Self {
             sign: *value >= 0,
             numerator: value.unsigned_abs(),
             denominator: Natural::ONE,

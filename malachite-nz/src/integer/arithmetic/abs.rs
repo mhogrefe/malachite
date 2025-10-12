@@ -11,7 +11,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 
 impl Abs for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by value.
     ///
@@ -33,7 +33,7 @@ impl Abs for Integer {
     /// assert_eq!(Integer::from(-123).abs(), 123);
     /// ```
     #[inline]
-    fn abs(mut self) -> Integer {
+    fn abs(mut self) -> Self {
         self.sign = true;
         self
     }

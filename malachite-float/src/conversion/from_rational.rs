@@ -427,7 +427,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn from_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn from_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         if max(x.significant_bits(), prec) < FROM_RATIONAL_THRESHOLD {
             from_rational_prec_round_direct(x, prec, rm)
         } else {
@@ -501,8 +501,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn from_rational_prec(x: Rational, prec: u64) -> (Float, Ordering) {
-        Float::from_rational_prec_round(x, prec, Nearest)
+    pub fn from_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::from_rational_prec_round(x, prec, Nearest)
     }
 
     /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by reference. If the
@@ -588,7 +588,7 @@ impl Float {
         x: &Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(x.significant_bits(), prec) < FROM_RATIONAL_THRESHOLD {
             from_rational_prec_round_ref_direct(x, prec, rm)
         } else {
@@ -663,8 +663,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn from_rational_prec_ref(x: &Rational, prec: u64) -> (Float, Ordering) {
-        Float::from_rational_prec_round_ref(x, prec, Nearest)
+    pub fn from_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::from_rational_prec_round_ref(x, prec, Nearest)
     }
 }
 
@@ -720,15 +720,15 @@ impl TryFrom<Rational> for Float {
     ///     Err(FloatConversionError::Inexact)
     /// );
     /// ```
-    fn try_from(x: Rational) -> Result<Float, Self::Error> {
+    fn try_from(x: Rational) -> Result<Self, Self::Error> {
         if x == 0u32 {
-            return Ok(Float::ZERO);
+            return Ok(Self::ZERO);
         }
         if let Some(log_denominator) = x.denominator_ref().checked_log_base_2() {
             let exponent = i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1);
-            if exponent > Float::MAX_EXPONENT {
+            if exponent > Self::MAX_EXPONENT {
                 return Err(FloatConversionError::Overflow);
-            } else if exponent < Float::MIN_EXPONENT {
+            } else if exponent < Self::MIN_EXPONENT {
                 return Err(FloatConversionError::Underflow);
             }
             let n = Integer::from_sign_and_abs(x >= 0u32, x.into_numerator());
@@ -792,15 +792,15 @@ impl TryFrom<&Rational> for Float {
     ///     Err(FloatConversionError::Inexact)
     /// );
     /// ```
-    fn try_from(x: &Rational) -> Result<Float, Self::Error> {
+    fn try_from(x: &Rational) -> Result<Self, Self::Error> {
         if *x == 0u32 {
-            return Ok(Float::ZERO);
+            return Ok(Self::ZERO);
         }
         if let Some(log_denominator) = x.denominator_ref().checked_log_base_2() {
             let exponent = i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1);
-            if exponent > Float::MAX_EXPONENT {
+            if exponent > Self::MAX_EXPONENT {
                 return Err(FloatConversionError::Overflow);
-            } else if exponent < Float::MIN_EXPONENT {
+            } else if exponent < Self::MIN_EXPONENT {
                 return Err(FloatConversionError::Underflow);
             }
             let n = x.numerator_ref();
@@ -857,7 +857,7 @@ impl ConvertibleFrom<&Rational> for Float {
     fn convertible_from(x: &Rational) -> bool {
         *x == 0
             || x.denominator_ref().is_power_of_2()
-                && (Float::MIN_EXPONENT..=Float::MAX_EXPONENT)
+                && (Self::MIN_EXPONENT..=Self::MAX_EXPONENT)
                     .contains(&i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1))
     }
 }

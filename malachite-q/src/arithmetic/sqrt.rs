@@ -12,7 +12,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 
 impl CheckedSqrt for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Returns the the square root of a [`Rational`], or `None` if it is not a perfect square. The
     /// [`Rational`] is taken by value.
@@ -65,7 +65,7 @@ impl CheckedSqrt for Rational {
     ///     "Some(5/3)"
     /// );
     /// ```
-    fn checked_sqrt(self) -> Option<Rational> {
+    fn checked_sqrt(self) -> Option<Self> {
         assert!(self >= 0);
         let (n, d) = self.into_numerator_and_denominator();
         let sqrt_n;
@@ -77,7 +77,7 @@ impl CheckedSqrt for Rational {
             sqrt_d = d.checked_sqrt()?;
             sqrt_n = n.checked_sqrt()?;
         }
-        Some(Rational {
+        Some(Self {
             sign: sqrt_n >= 0,
             numerator: sqrt_n,
             denominator: sqrt_d,

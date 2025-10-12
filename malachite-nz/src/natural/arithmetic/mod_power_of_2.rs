@@ -149,7 +149,7 @@ pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64)
 }}
 
 impl ModPowerOf2 for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
     /// value.
@@ -176,7 +176,7 @@ impl ModPowerOf2 for Natural {
     /// assert_eq!(Natural::from(1611u32).mod_power_of_2(4), 11);
     /// ```
     #[inline]
-    fn mod_power_of_2(mut self, pow: u64) -> Natural {
+    fn mod_power_of_2(mut self, pow: u64) -> Self {
         self.mod_power_of_2_assign(pow);
         self
     }
@@ -244,8 +244,8 @@ impl ModPowerOf2Assign for Natural {
     /// ```
     fn mod_power_of_2_assign(&mut self, pow: u64) {
         match &mut *self {
-            Natural(Small(small)) => small.mod_power_of_2_assign(pow),
-            Natural(Large(limbs)) => {
+            Self(Small(small)) => small.mod_power_of_2_assign(pow),
+            Self(Large(limbs)) => {
                 limbs_vec_mod_power_of_2_in_place(limbs, pow);
                 self.trim();
             }
@@ -254,7 +254,7 @@ impl ModPowerOf2Assign for Natural {
 }
 
 impl RemPowerOf2 for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
     /// value.
@@ -284,7 +284,7 @@ impl RemPowerOf2 for Natural {
     /// assert_eq!(Natural::from(1611u32).rem_power_of_2(4), 11);
     /// ```
     #[inline]
-    fn rem_power_of_2(self, pow: u64) -> Natural {
+    fn rem_power_of_2(self, pow: u64) -> Self {
         self.mod_power_of_2(pow)
     }
 }
@@ -366,7 +366,7 @@ impl RemPowerOf2Assign for Natural {
 }
 
 impl NegModPowerOf2 for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Divides the negative of a [`Natural`] by a $2^k$, returning just the remainder. The
     /// [`Natural`] is taken by value.
@@ -397,7 +397,7 @@ impl NegModPowerOf2 for Natural {
     /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_2(4), 5);
     /// ```
     #[inline]
-    fn neg_mod_power_of_2(mut self, pow: u64) -> Natural {
+    fn neg_mod_power_of_2(mut self, pow: u64) -> Self {
         self.neg_mod_power_of_2_assign(pow);
         self
     }
@@ -484,7 +484,7 @@ impl NegModPowerOf2Assign for Natural {
     fn neg_mod_power_of_2_assign(&mut self, pow: u64) {
         if *self == 0 {
         } else if pow <= Limb::WIDTH {
-            *self = Natural::from(Limb::wrapping_from(&*self).neg_mod_power_of_2(pow));
+            *self = Self::from(Limb::wrapping_from(&*self).neg_mod_power_of_2(pow));
         } else {
             let limbs = self.promote_in_place();
             limbs_neg_mod_power_of_2_in_place(limbs, pow);

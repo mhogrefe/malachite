@@ -221,7 +221,7 @@ impl BitConvertible for Integer {
     ///     -105
     /// );
     /// ```
-    fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Integer {
+    fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Self {
         let mut limbs = Vec::new();
         let mut last_width = 0;
         let mut last_bit = false;
@@ -290,7 +290,7 @@ impl BitConvertible for Integer {
     ///     -105
     /// );
     /// ```
-    fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Integer {
+    fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Self {
         let mut limbs = Vec::new();
         let mut last_width = 0;
         let mut first_bit = false;
@@ -313,15 +313,15 @@ impl BitConvertible for Integer {
             limbs.push(limb);
         }
         match limbs.len() {
-            0 => Integer::ZERO,
+            0 => Self::ZERO,
             1 => {
                 if first_bit {
                     if last_width != Limb::WIDTH {
                         limbs[0] |= !Limb::low_mask(last_width);
                     }
-                    Integer::from(SignedLimb::wrapping_from(limbs[0]))
+                    Self::from(SignedLimb::wrapping_from(limbs[0]))
                 } else {
-                    Integer::from(limbs[0])
+                    Self::from(limbs[0])
                 }
             }
             _ => {

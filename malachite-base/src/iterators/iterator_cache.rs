@@ -33,8 +33,8 @@ impl<I: Iterator> IteratorCache<I> {
     ///
     /// IteratorCache::new([1, 2, 3].iter());
     /// ```
-    pub const fn new(xs: I) -> IteratorCache<I> {
-        IteratorCache {
+    pub const fn new(xs: I) -> Self {
+        Self {
             xs,
             cache: Vec::new(),
             done: false,

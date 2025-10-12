@@ -17,7 +17,7 @@ use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::traits::Zero;
 
 impl Natural {
-    pub(crate) fn checked_sub_limb(mut self, other: Limb) -> Option<Natural> {
+    pub(crate) fn checked_sub_limb(mut self, other: Limb) -> Option<Self> {
         if self.sub_assign_limb_no_panic(other) {
             None
         } else {
@@ -25,15 +25,15 @@ impl Natural {
         }
     }
 
-    pub(crate) fn checked_sub_limb_ref(&self, other: Limb) -> Option<Natural> {
+    pub(crate) fn checked_sub_limb_ref(&self, other: Limb) -> Option<Self> {
         match (self, other) {
             (_, 0) => Some(self.clone()),
-            (Natural(Small(small)), other) => small.checked_sub(other).map(Natural::from),
-            (Natural(Large(limbs)), other) => {
+            (Self(Small(small)), other) => small.checked_sub(other).map(Self::from),
+            (Self(Large(limbs)), other) => {
                 if *self < other {
                     None
                 } else {
-                    Some(Natural::from_owned_limbs_asc(
+                    Some(Self::from_owned_limbs_asc(
                         limbs_sub_limb(limbs, other).0,
                     ))
                 }
@@ -45,14 +45,14 @@ impl Natural {
     fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
         match (&mut *self, other) {
             (_, 0) => false,
-            (Natural(Small(x)), y) => match x.checked_sub(y) {
+            (Self(Small(x)), y) => match x.checked_sub(y) {
                 Some(diff) => {
                     *x = diff;
                     false
                 }
                 None => true,
             },
-            (Natural(Large(xs)), y) => {
+            (Self(Large(xs)), y) => {
                 let borrow = limbs_sub_limb_in_place(xs, y);
                 if !borrow {
                     self.trim();
@@ -63,12 +63,12 @@ impl Natural {
     }
 
     // self -= other, return borrow
-    pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
+    pub(crate) fn sub_assign_no_panic(&mut self, other: Self) -> bool {
         match (&mut *self, other) {
-            (_, Natural::ZERO) => false,
-            (x, Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
-            (Natural(Small(_)), _) => true,
-            (&mut Natural(Large(ref mut xs)), Natural(Large(ys))) => {
+            (_, Self::ZERO) => false,
+            (x, Self(Small(y))) => x.sub_assign_limb_no_panic(y),
+            (Self(Small(_)), _) => true,
+            (&mut Self(Large(ref mut xs)), Self(Large(ys))) => {
                 let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, &ys);
                 if !borrow {
                     self.trim();
@@ -79,16 +79,16 @@ impl Natural {
     }
 
     // self -= &other, return borrow
-    pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
+    pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Self) -> bool {
         match (&mut *self, other) {
-            (_, &Natural::ZERO) => false,
+            (_, &Self::ZERO) => false,
             (x, y) if core::ptr::eq(&*x, y) => {
-                *self = Natural::ZERO;
+                *self = Self::ZERO;
                 false
             }
-            (x, &Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
-            (Natural(Small(_)), _) => true,
-            (Natural(Large(xs)), &Natural(Large(ref ys))) => {
+            (x, &Self(Small(y))) => x.sub_assign_limb_no_panic(y),
+            (Self(Small(_)), _) => true,
+            (Self(Large(xs)), &Self(Large(ref ys))) => {
                 let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, ys);
                 if !borrow {
                     self.trim();
@@ -99,22 +99,22 @@ impl Natural {
     }
 
     // self = &other - self, return borrow
-    pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
+    pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Self) -> bool {
         match (&mut *self, other) {
-            (&mut Natural::ZERO, y) => {
+            (&mut Self::ZERO, y) => {
                 *self = y.clone();
                 false
             }
             (x, y) if core::ptr::eq(x, y) => {
-                *self = Natural::ZERO;
+                *self = Self::ZERO;
                 false
             }
-            (Natural(Small(x)), y) => y.checked_sub_limb_ref(*x).is_none_or(|result| {
+            (Self(Small(x)), y) => y.checked_sub_limb_ref(*x).is_none_or(|result| {
                 *self = result;
                 false
             }),
-            (_, Natural(Small(_))) => true,
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(_))) => true,
+            (Self(Large(xs)), Self(Large(ys))) => {
                 let borrow = xs.len() > ys.len() || limbs_vec_sub_in_place_right(ys, xs);
                 if !borrow {
                     self.trim();
@@ -125,8 +125,8 @@ impl Natural {
     }
 }
 
-impl CheckedSub<Natural> for Natural {
-    type Output = Natural;
+impl CheckedSub<Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by value and returning `None` if
     /// the result is negative.
@@ -177,7 +177,7 @@ impl CheckedSub<Natural> for Natural {
     ///     "Some(2000000000000)"
     /// );
     /// ```
-    fn checked_sub(mut self, other: Natural) -> Option<Natural> {
+    fn checked_sub(mut self, other: Self) -> Option<Self> {
         if self.sub_assign_no_panic(other) {
             None
         } else {
@@ -186,8 +186,8 @@ impl CheckedSub<Natural> for Natural {
     }
 }
 
-impl<'a> CheckedSub<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> CheckedSub<&'a Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning `None` if the result is negative.
@@ -238,7 +238,7 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
     ///     "Some(2000000000000)"
     /// );
     /// ```
-    fn checked_sub(mut self, other: &'a Natural) -> Option<Natural> {
+    fn checked_sub(mut self, other: &'a Self) -> Option<Self> {
         if self.sub_assign_ref_no_panic(other) {
             None
         } else {

@@ -42,8 +42,8 @@ pub_crate_test! {limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
 impl Natural {
     fn count_zeros_neg(&self) -> u64 {
         match self {
-            Natural(Small(small)) => CountZeros::count_zeros(small.wrapping_neg()),
-            Natural(Large(limbs)) => limbs_count_zeros_neg(limbs),
+            Self(Small(small)) => CountZeros::count_zeros(small.wrapping_neg()),
+            Self(Large(limbs)) => limbs_count_zeros_neg(limbs),
         }
     }
 }

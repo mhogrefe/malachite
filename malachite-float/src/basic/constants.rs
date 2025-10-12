@@ -141,64 +141,64 @@ macro_rules! float_either_zero {
 
 /// The constant 0.0 (positive zero), with precision 1.
 impl ZeroTrait for Float {
-    const ZERO: Float = float_zero!();
+    const ZERO: Self = float_zero!();
 }
 
 /// The constant 1.0, with precision 1.
 impl One for Float {
-    const ONE: Float = float_one!();
+    const ONE: Self = float_one!();
 }
 
 /// The constant 2.0, with precision 1.
 impl Two for Float {
-    const TWO: Float = float_two!();
+    const TWO: Self = float_two!();
 }
 
 /// The constant -1.0, with precision 1.
 impl NegativeOne for Float {
-    const NEGATIVE_ONE: Float = float_negative_one!();
+    const NEGATIVE_ONE: Self = float_negative_one!();
 }
 
 /// The constant 0.5, with precision 1.
 impl OneHalf for Float {
-    const ONE_HALF: Float = float_one_half!();
+    const ONE_HALF: Self = float_one_half!();
 }
 
 /// The constant -0.0, with precision 1.
 impl NegativeZero for Float {
-    const NEGATIVE_ZERO: Float = float_negative_zero!();
+    const NEGATIVE_ZERO: Self = float_negative_zero!();
 }
 
 /// The constant $\infty$.
 impl InfinityTrait for Float {
-    const INFINITY: Float = float_infinity!();
+    const INFINITY: Self = float_infinity!();
 }
 
 /// The constant $-\infty$.
 impl NegativeInfinity for Float {
-    const NEGATIVE_INFINITY: Float = float_negative_infinity!();
+    const NEGATIVE_INFINITY: Self = float_negative_infinity!();
 }
 
 /// The constant NaN.
 impl NaNTrait for Float {
-    const NAN: Float = float_nan!();
+    const NAN: Self = float_nan!();
 }
 
 impl Default for Float {
     /// The default value of a [`Float`], NaN.
-    fn default() -> Float {
-        Float::NAN
+    fn default() -> Self {
+        Self::NAN
     }
 }
 
 /// The lowest value representable by this type, $-\infty$.
 impl Min for Float {
-    const MIN: Float = Float::NEGATIVE_INFINITY;
+    const MIN: Self = Self::NEGATIVE_INFINITY;
 }
 
 /// The highest value representable by this type, $\infty$.
 impl Max for Float {
-    const MAX: Float = Float::INFINITY;
+    const MAX: Self = Self::INFINITY;
 }
 
 // Implements `Named` for `Float`.
@@ -206,9 +206,9 @@ impl_named!(Float);
 
 impl Float {
     /// The minimum representable positive value, or $2^{-2^{30}}$, with precision 1.
-    pub const MIN_POSITIVE: Float = Float(Finite {
+    pub const MIN_POSITIVE: Self = Self(Finite {
         sign: true,
-        exponent: Float::MIN_EXPONENT,
+        exponent: Self::MIN_EXPONENT,
         precision: 1,
         significand: Natural::HIGH_BIT,
     });
@@ -244,11 +244,11 @@ impl Float {
     /// assert_eq!(Float::min_positive_value_prec(10).get_prec(), Some(10));
     /// assert_eq!(Float::min_positive_value_prec(100).get_prec(), Some(100));
     /// ```
-    pub fn min_positive_value_prec(prec: u64) -> Float {
+    pub fn min_positive_value_prec(prec: u64) -> Self {
         assert_ne!(prec, 0);
-        Float(Finite {
+        Self(Finite {
             sign: true,
-            exponent: Float::MIN_EXPONENT,
+            exponent: Self::MIN_EXPONENT,
             precision: prec,
             significand: Natural::power_of_2(
                 prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
@@ -291,11 +291,11 @@ impl Float {
     /// assert_eq!(Float::max_finite_value_with_prec(10).get_prec(), Some(10));
     /// assert_eq!(Float::max_finite_value_with_prec(100).get_prec(), Some(100));
     /// ```
-    pub fn max_finite_value_with_prec(prec: u64) -> Float {
+    pub fn max_finite_value_with_prec(prec: u64) -> Self {
         assert_ne!(prec, 0);
-        Float(Finite {
+        Self(Finite {
             sign: true,
-            exponent: Float::MAX_EXPONENT,
+            exponent: Self::MAX_EXPONENT,
             precision: prec,
             significand: Natural::low_mask(prec) << prec.neg_mod_power_of_2(Limb::LOG_WIDTH),
         })
@@ -331,9 +331,9 @@ impl Float {
     /// assert_eq!(Float::one_prec(10).get_prec(), Some(10));
     /// assert_eq!(Float::one_prec(100).get_prec(), Some(100));
     /// ```
-    pub fn one_prec(prec: u64) -> Float {
+    pub fn one_prec(prec: u64) -> Self {
         assert_ne!(prec, 0);
-        Float(Finite {
+        Self(Finite {
             sign: true,
             exponent: 1,
             precision: prec,
@@ -375,9 +375,9 @@ impl Float {
     /// assert_eq!(Float::two_prec(10).get_prec(), Some(10));
     /// assert_eq!(Float::two_prec(100).get_prec(), Some(100));
     /// ```
-    pub fn two_prec(prec: u64) -> Float {
+    pub fn two_prec(prec: u64) -> Self {
         assert_ne!(prec, 0);
-        Float(Finite {
+        Self(Finite {
             sign: true,
             exponent: 2,
             precision: prec,
@@ -419,9 +419,9 @@ impl Float {
     /// assert_eq!(Float::negative_one_prec(10).get_prec(), Some(10));
     /// assert_eq!(Float::negative_one_prec(100).get_prec(), Some(100));
     /// ```
-    pub fn negative_one_prec(prec: u64) -> Float {
+    pub fn negative_one_prec(prec: u64) -> Self {
         assert_ne!(prec, 0);
-        Float(Finite {
+        Self(Finite {
             sign: false,
             exponent: 1,
             precision: prec,
@@ -463,9 +463,9 @@ impl Float {
     /// assert_eq!(Float::one_half_prec(10).get_prec(), Some(10));
     /// assert_eq!(Float::one_half_prec(100).get_prec(), Some(100));
     /// ```
-    pub fn one_half_prec(prec: u64) -> Float {
+    pub fn one_half_prec(prec: u64) -> Self {
         assert_ne!(prec, 0);
-        Float(Finite {
+        Self(Finite {
             sign: true,
             exponent: 0,
             precision: prec,

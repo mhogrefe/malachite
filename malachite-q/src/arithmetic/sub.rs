@@ -17,8 +17,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_nz::integer::Integer;
 
-impl Sub<Rational> for Rational {
-    type Output = Rational;
+impl Sub<Self> for Rational {
+    type Output = Self;
 
     /// Subtracts a [`Rational`] by another [`Rational`], taking both by value.
     ///
@@ -45,7 +45,7 @@ impl Sub<Rational> for Rational {
     ///     "1507/700"
     /// );
     /// ```
-    fn sub(self, other: Rational) -> Rational {
+    fn sub(self, other: Self) -> Self {
         if self == 0u32 {
             return -other;
         } else if other == 0u32 {
@@ -56,7 +56,7 @@ impl Sub<Rational> for Rational {
             let diff_n = Integer::from_sign_and_abs(self.sign, self.numerator * &other.denominator)
                 - Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             let diff_d = self.denominator * other.denominator;
-            Rational {
+            Self {
                 sign: diff_n >= 0,
                 numerator: diff_n.unsigned_abs(),
                 denominator: diff_d,
@@ -70,13 +70,13 @@ impl Sub<Rational> for Rational {
                 ) - Integer::from_sign_and_abs(other.sign, other.numerator * &reduced_self_d);
             gcd.gcd_assign(diff_n.unsigned_abs_ref());
             if gcd == 1u32 {
-                Rational {
+                Self {
                     sign: diff_n >= 0,
                     numerator: diff_n.unsigned_abs(),
                     denominator: other.denominator * reduced_self_d,
                 }
             } else {
-                Rational {
+                Self {
                     sign: diff_n >= 0,
                     numerator: diff_n.unsigned_abs().div_exact(&gcd),
                     denominator: (other.denominator).div_exact(gcd) * reduced_self_d,
@@ -86,8 +86,8 @@ impl Sub<Rational> for Rational {
     }
 }
 
-impl Sub<&Rational> for Rational {
-    type Output = Rational;
+impl Sub<&Self> for Rational {
+    type Output = Self;
 
     /// Subtracts a [`Rational`] by another [`Rational`], taking the first by value and the second
     /// by reference.
@@ -116,7 +116,7 @@ impl Sub<&Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn sub(self, other: &Rational) -> Rational {
+    fn sub(self, other: &Self) -> Self {
         -(other - self)
     }
 }
@@ -262,7 +262,7 @@ impl Sub<&Rational> for &Rational {
     }
 }
 
-impl SubAssign<Rational> for Rational {
+impl SubAssign<Self> for Rational {
     /// Subtracts a [`Rational`] by another [`Rational`] in place, taking the [`Rational`] on the
     /// right-hand side by value.
     ///
@@ -291,7 +291,7 @@ impl SubAssign<Rational> for Rational {
     /// x -= Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "1507/700");
     /// ```
-    fn sub_assign(&mut self, other: Rational) {
+    fn sub_assign(&mut self, other: Self) {
         if *self == 0u32 {
             *self = -other;
             return;
@@ -324,7 +324,7 @@ impl SubAssign<Rational> for Rational {
     }
 }
 
-impl SubAssign<&Rational> for Rational {
+impl SubAssign<&Self> for Rational {
     /// Subtracts a [`Rational`] by another [`Rational`] in place, taking the [`Rational`] on the
     /// right-hand side by reference.
     ///
@@ -353,7 +353,7 @@ impl SubAssign<&Rational> for Rational {
     /// x -= &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "1507/700");
     /// ```
-    fn sub_assign(&mut self, other: &Rational) {
+    fn sub_assign(&mut self, other: &Self) {
         if *self == 0u32 {
             self.clone_from(other);
             self.neg_assign();

@@ -291,7 +291,7 @@ macro_rules! power_of_2_digits_unsigned {
 }
 apply_to_unsigneds!(power_of_2_digits_unsigned);
 
-impl PowerOf2Digits<Natural> for Natural {
+impl PowerOf2Digits<Self> for Natural {
     /// Returns a [`Vec`] containing the base-$2^k$ digits of a [`Natural`] in ascending order:
     /// least- to most-significant.
     ///
@@ -339,7 +339,7 @@ impl PowerOf2Digits<Natural> for Natural {
     ///     "[3, 7, 1]"
     /// );
     /// ```
-    fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<Natural> {
+    fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<Self> {
         assert_ne!(log_base, 0);
         if log_base <= Limb::WIDTH || self.limb_count() < 2 {
             return PowerOf2Digits::<Limb>::to_power_of_2_digits_asc(
@@ -348,11 +348,11 @@ impl PowerOf2Digits<Natural> for Natural {
             )
             .iter()
             .copied()
-            .map(Natural::from)
+            .map(Self::from)
             .collect();
         }
         let limbs = match self {
-            Natural(Large(limbs)) => limbs,
+            Self(Large(limbs)) => limbs,
             _ => unreachable!(),
         };
         let mut digits = Vec::new();
@@ -361,10 +361,10 @@ impl PowerOf2Digits<Natural> for Natural {
             digits.extend(
                 limbs
                     .chunks(usize::power_of_2(log_log_base - Limb::LOG_WIDTH))
-                    .map(Natural::from_limbs_asc),
+                    .map(Self::from_limbs_asc),
             );
         } else {
-            let mut digit = Natural::ZERO;
+            let mut digit = Self::ZERO;
             let mut remaining_digit_bits = log_base;
             for &limb in limbs {
                 let mut limb = limb;
@@ -375,19 +375,19 @@ impl PowerOf2Digits<Natural> for Natural {
                         digit.assign_bits(
                             digit_index,
                             digit_index + remaining_limb_bits,
-                            &Natural::from(limb),
+                            &Self::from(limb),
                         );
                         remaining_digit_bits -= remaining_limb_bits;
                         remaining_limb_bits = 0;
                     } else {
-                        digit.assign_bits(digit_index, log_base, &Natural::from(limb));
+                        digit.assign_bits(digit_index, log_base, &Self::from(limb));
                         limb >>= remaining_digit_bits;
                         remaining_limb_bits -= remaining_digit_bits;
                         remaining_digit_bits = 0;
                     }
                     if remaining_digit_bits == 0 {
                         digits.push(digit);
-                        digit = Natural::ZERO;
+                        digit = Self::ZERO;
                         remaining_digit_bits = log_base;
                     }
                 }
@@ -448,7 +448,7 @@ impl PowerOf2Digits<Natural> for Natural {
     ///     "[1, 7, 3]"
     /// );
     /// ```
-    fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<Natural> {
+    fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<Self> {
         let mut digits = self.to_power_of_2_digits_asc(log_base);
         digits.reverse();
         digits
@@ -506,10 +506,10 @@ impl PowerOf2Digits<Natural> for Natural {
     ///     "None"
     /// );
     /// ```
-    fn from_power_of_2_digits_asc<I: Iterator<Item = Natural>>(
+    fn from_power_of_2_digits_asc<I: Iterator<Item = Self>>(
         log_base: u64,
         digits: I,
-    ) -> Option<Natural> {
+    ) -> Option<Self> {
         assert_ne!(log_base, 0);
         if let Some(log_log_base) = log_base.checked_log_base_2() {
             let mut limbs = Vec::new();
@@ -549,9 +549,9 @@ impl PowerOf2Digits<Natural> for Natural {
                     }
                 }
             }
-            Some(Natural::from_owned_limbs_asc(limbs))
+            Some(Self::from_owned_limbs_asc(limbs))
         } else {
-            let mut n = Natural::ZERO;
+            let mut n = Self::ZERO;
             let mut previous_index = 0;
             for digit in digits {
                 if digit.significant_bits() > log_base {
@@ -617,10 +617,10 @@ impl PowerOf2Digits<Natural> for Natural {
     ///     "None"
     /// );
     /// ```
-    fn from_power_of_2_digits_desc<I: Iterator<Item = Natural>>(
+    fn from_power_of_2_digits_desc<I: Iterator<Item = Self>>(
         log_base: u64,
         digits: I,
-    ) -> Option<Natural> {
+    ) -> Option<Self> {
         assert_ne!(log_base, 0);
         if let Some(log_log_base) = log_base.checked_log_base_2() {
             let mut limbs = Vec::new();
@@ -663,10 +663,10 @@ impl PowerOf2Digits<Natural> for Natural {
                     }
                 }
             }
-            Some(Natural::from_owned_limbs_asc(limbs))
+            Some(Self::from_owned_limbs_asc(limbs))
         } else {
             let digits = digits.collect_vec();
-            let mut n = Natural::ZERO;
+            let mut n = Self::ZERO;
             let mut previous_index = 0;
             for digit in digits.iter().rev() {
                 if digit.significant_bits() > log_base {

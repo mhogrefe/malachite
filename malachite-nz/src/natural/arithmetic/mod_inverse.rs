@@ -33,7 +33,7 @@ fn mod_inverse_helper(x: Natural, m: Natural) -> Option<Natural> {
 }
 
 impl ModInverse for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
     /// input must be already reduced modulo $m$. Both [`Natural`]s are taken by value.
@@ -64,19 +64,19 @@ impl ModInverse for Natural {
     /// );
     /// assert_eq!(Natural::from(4u32).mod_inverse(Natural::from(10u32)), None);
     /// ```
-    fn mod_inverse(self, m: Natural) -> Option<Natural> {
+    fn mod_inverse(self, m: Self) -> Option<Self> {
         assert_ne!(self, 0u32);
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {
-            (x @ Natural::ONE, _) => Some(x),
-            (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(y).map(Natural::from),
+            (x @ Self::ONE, _) => Some(x),
+            (Self(Small(x)), Self(Small(y))) => x.mod_inverse(y).map(Self::from),
             (a, b) => mod_inverse_helper(a, b),
         }
     }
 }
 
-impl<'a> ModInverse<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModInverse<&'a Self> for Natural {
+    type Output = Self;
 
     /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
     /// input must be already reduced modulo $m$. The first [`Natural`] is taken by value and the
@@ -108,12 +108,12 @@ impl<'a> ModInverse<&'a Natural> for Natural {
     /// );
     /// assert_eq!(Natural::from(4u32).mod_inverse(&Natural::from(10u32)), None);
     /// ```
-    fn mod_inverse(self, m: &'a Natural) -> Option<Natural> {
+    fn mod_inverse(self, m: &'a Self) -> Option<Self> {
         assert_ne!(self, 0u32);
         assert!(self < *m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {
-            (x @ Natural::ONE, _) => Some(x),
-            (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(*y).map(Natural::from),
+            (x @ Self::ONE, _) => Some(x),
+            (Self(Small(x)), Self(Small(y))) => x.mod_inverse(*y).map(Self::from),
             (a, b) => mod_inverse_helper(a, b.clone()),
         }
     }

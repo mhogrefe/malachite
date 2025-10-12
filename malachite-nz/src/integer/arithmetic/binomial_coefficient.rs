@@ -81,13 +81,13 @@ impl BinomialCoefficient for Integer {
     ///     -10
     /// );
     /// ```
-    fn binomial_coefficient(n: Integer, k: Integer) -> Integer {
+    fn binomial_coefficient(n: Self, k: Self) -> Self {
         assert!(k.sign);
         if n.sign {
-            Integer::from(Natural::binomial_coefficient(n.abs, k.abs))
+            Self::from(Natural::binomial_coefficient(n.abs, k.abs))
         } else {
             let k_abs = k.abs;
-            Integer {
+            Self {
                 sign: k_abs.even(),
                 abs: Natural::binomial_coefficient(n.abs + &k_abs - Natural::ONE, k_abs),
             }
@@ -95,7 +95,7 @@ impl BinomialCoefficient for Integer {
     }
 }
 
-impl<'a> BinomialCoefficient<&'a Integer> for Integer {
+impl<'a> BinomialCoefficient<&'a Self> for Integer {
     /// Computes the binomial coefficient of two [`Integer`]s, taking both by reference.
     ///
     /// The second argument must be non-negative, but the first may be negative. If it is, the
@@ -165,13 +165,13 @@ impl<'a> BinomialCoefficient<&'a Integer> for Integer {
     ///     -10
     /// );
     /// ```
-    fn binomial_coefficient(n: &'a Integer, k: &'a Integer) -> Integer {
+    fn binomial_coefficient(n: &'a Self, k: &'a Self) -> Self {
         assert!(k.sign);
         if n.sign {
-            Integer::from(Natural::binomial_coefficient(&n.abs, &k.abs))
+            Self::from(Natural::binomial_coefficient(&n.abs, &k.abs))
         } else {
             let k_abs = &k.abs;
-            Integer {
+            Self {
                 sign: k_abs.even(),
                 abs: Natural::binomial_coefficient(&(&n.abs + k_abs - Natural::ONE), k_abs),
             }

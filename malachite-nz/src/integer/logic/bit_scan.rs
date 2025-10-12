@@ -113,7 +113,7 @@ impl Natural {
     // self != 0
     fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 if starting_index >= Limb::WIDTH {
                     None
                 } else {
@@ -127,21 +127,21 @@ impl Natural {
                     }
                 }
             }
-            Natural(Large(limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
+            Self(Large(limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
         }
     }
 
     // self != 0
     fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 if starting_index >= Limb::WIDTH {
                     starting_index
                 } else {
                     TrailingZeros::trailing_zeros(!((small - 1) | Limb::low_mask(starting_index)))
                 }
             }
-            Natural(Large(limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
+            Self(Large(limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
         }
     }
 }

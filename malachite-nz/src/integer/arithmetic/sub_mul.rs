@@ -350,8 +350,8 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
     }
 }
 
-impl SubMul<Integer, Integer> for Integer {
-    type Output = Integer;
+impl SubMul<Self, Self> for Integer {
+    type Output = Self;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking all three by
     /// value.
@@ -382,14 +382,14 @@ impl SubMul<Integer, Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub_mul(mut self, y: Integer, z: Integer) -> Integer {
+    fn sub_mul(mut self, y: Self, z: Self) -> Self {
         self.sub_mul_assign(y, z);
         self
     }
 }
 
-impl<'a> SubMul<Integer, &'a Integer> for Integer {
-    type Output = Integer;
+impl<'a> SubMul<Self, &'a Self> for Integer {
+    type Output = Self;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first two by
     /// value and the third by reference.
@@ -420,14 +420,14 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub_mul(mut self, y: Integer, z: &'a Integer) -> Integer {
+    fn sub_mul(mut self, y: Self, z: &'a Self) -> Self {
         self.sub_mul_assign(y, z);
         self
     }
 }
 
-impl<'a> SubMul<&'a Integer, Integer> for Integer {
-    type Output = Integer;
+impl<'a> SubMul<&'a Self, Self> for Integer {
+    type Output = Self;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first and
     /// third by value and the second by reference.
@@ -458,14 +458,14 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub_mul(mut self, y: &'a Integer, z: Integer) -> Integer {
+    fn sub_mul(mut self, y: &'a Self, z: Self) -> Self {
         self.sub_mul_assign(y, z);
         self
     }
 }
 
-impl SubMul<&Integer, &Integer> for Integer {
-    type Output = Integer;
+impl SubMul<&Self, &Self> for Integer {
+    type Output = Self;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first by value
     /// and the second and third by reference.
@@ -496,7 +496,7 @@ impl SubMul<&Integer, &Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn sub_mul(mut self, y: &Integer, z: &Integer) -> Integer {
+    fn sub_mul(mut self, y: &Self, z: &Self) -> Self {
         self.sub_mul_assign(y, z);
         self
     }
@@ -549,7 +549,7 @@ impl SubMul<&Integer, &Integer> for &Integer {
     }
 }
 
-impl SubMulAssign<Integer, Integer> for Integer {
+impl SubMulAssign<Self, Self> for Integer {
     /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking both
     /// [`Integer`]s on the right-hand side by value.
     ///
@@ -576,12 +576,12 @@ impl SubMulAssign<Integer, Integer> for Integer {
     /// x.sub_mul_assign(Integer::from(-0x10000), -Integer::from(10u32).pow(12));
     /// assert_eq!(x, -65537000000000000i64);
     /// ```
-    fn sub_mul_assign(&mut self, y: Integer, z: Integer) {
+    fn sub_mul_assign(&mut self, y: Self, z: Self) {
         self.add_mul_assign(-y, z);
     }
 }
 
-impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
+impl<'a> SubMulAssign<Self, &'a Self> for Integer {
     /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking the
     /// first [`Integer`] on the right-hand side by value and the second by reference.
     ///
@@ -608,12 +608,12 @@ impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
     /// x.sub_mul_assign(Integer::from(-0x10000), &(-Integer::from(10u32).pow(12)));
     /// assert_eq!(x, -65537000000000000i64);
     /// ```
-    fn sub_mul_assign(&mut self, y: Integer, z: &'a Integer) {
+    fn sub_mul_assign(&mut self, y: Self, z: &'a Self) {
         self.add_mul_assign(-y, z);
     }
 }
 
-impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
+impl<'a> SubMulAssign<&'a Self, Self> for Integer {
     /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking the
     /// first [`Integer`] on the right-hand side by reference and the second by value.
     ///
@@ -640,12 +640,12 @@ impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
     /// x.sub_mul_assign(&Integer::from(-0x10000), -Integer::from(10u32).pow(12));
     /// assert_eq!(x, -65537000000000000i64);
     /// ```
-    fn sub_mul_assign(&mut self, y: &'a Integer, z: Integer) {
+    fn sub_mul_assign(&mut self, y: &'a Self, z: Self) {
         self.add_mul_assign(y, -z);
     }
 }
 
-impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
+impl<'a, 'b> SubMulAssign<&'a Self, &'b Self> for Integer {
     /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking both
     /// [`Integer`]s on the right-hand side by reference.
     ///
@@ -672,7 +672,7 @@ impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
     /// x.sub_mul_assign(&Integer::from(-0x10000), &(-Integer::from(10u32).pow(12)));
     /// assert_eq!(x, -65537000000000000i64);
     /// ```
-    fn sub_mul_assign(&mut self, y: &'a Integer, z: &'b Integer) {
+    fn sub_mul_assign(&mut self, y: &'a Self, z: &'b Self) {
         self.neg_assign();
         self.add_mul_assign(y, z);
         self.neg_assign();

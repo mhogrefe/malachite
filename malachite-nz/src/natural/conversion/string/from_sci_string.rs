@@ -26,7 +26,7 @@ pub trait FromSciStringHelper: Sized {
 }
 
 impl FromSciStringHelper for Natural {
-    fn parse_int(mut cs: &[u8], base: u8) -> Option<Natural> {
+    fn parse_int(mut cs: &[u8], base: u8) -> Option<Self> {
         // if T is unsigned, from_string_base won't handle -0
         let mut test_neg_zero = false;
         if let Some(&b'-') = cs.first() {
@@ -41,7 +41,7 @@ impl FromSciStringHelper for Natural {
                     return None;
                 }
             }
-            Some(Natural::ZERO)
+            Some(Self::ZERO)
         } else {
             if let Some(b'+') = cs.first() {
                 cs = &cs[1..];
@@ -51,15 +51,15 @@ impl FromSciStringHelper for Natural {
                     _ => {}
                 }
             }
-            Natural::from_string_base(base, core::str::from_utf8(cs).ok()?)
+            Self::from_string_base(base, core::str::from_utf8(cs).ok()?)
         }
     }
 
-    fn up_1(self, neg: bool) -> Option<Natural> {
+    fn up_1(self, neg: bool) -> Option<Self> {
         if neg {
-            self.checked_sub(Natural::ONE)
+            self.checked_sub(Self::ONE)
         } else {
-            Some(self + Natural::ONE)
+            Some(self + Self::ONE)
         }
     }
 }
@@ -232,7 +232,7 @@ impl FromSciString for Natural {
     /// );
     /// ```
     #[inline]
-    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Natural> {
+    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self> {
         from_sci_string_with_options_helper(s, options)
     }
 }

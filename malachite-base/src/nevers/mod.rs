@@ -51,7 +51,7 @@ impl FromStr for Never {
     /// assert_eq!(Never::from_str("abc"), Err(NeverError));
     /// ```
     #[inline]
-    fn from_str(_: &str) -> Result<Never, NeverError> {
+    fn from_str(_: &str) -> Result<Self, NeverError> {
         Err(NeverError)
     }
 }

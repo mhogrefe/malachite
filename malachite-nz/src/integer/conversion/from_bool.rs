@@ -33,7 +33,7 @@ impl From<bool> for Integer {
     /// assert_eq!(Integer::from(true), 1);
     /// ```
     #[inline]
-    fn from(b: bool) -> Integer {
-        if b { Integer::ONE } else { Integer::ZERO }
+    fn from(b: bool) -> Self {
+        if b { Self::ONE } else { Self::ZERO }
     }
 }

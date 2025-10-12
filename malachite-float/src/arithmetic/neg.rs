@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::logic::traits::NotAssign;
 
 impl Neg for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Negates a [`Float`], taking it by value.
     ///
@@ -56,7 +56,7 @@ impl Neg for Float {
     /// assert_eq!(-Float::NEGATIVE_ONE, Float::ONE);
     /// ```
     #[inline]
-    fn neg(mut self) -> Float {
+    fn neg(mut self) -> Self {
         self.neg_assign();
         self
     }
@@ -184,7 +184,7 @@ impl NegAssign for Float {
     /// assert_eq!(x, Float::ONE);
     /// ```
     fn neg_assign(&mut self) {
-        if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
+        if let Self(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
             sign.not_assign();
         }
     }

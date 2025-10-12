@@ -168,29 +168,29 @@ pub_test! {limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 impl Natural {
     pub(crate) fn mul_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
-            (_, 0) => *self = Natural::ZERO,
-            (_, 1) | (&mut Natural::ZERO, _) => {}
-            (&mut Natural::ONE, _) => *self = Natural::from(other),
-            (Natural(Small(small)), other) => {
+            (_, 0) => *self = Self::ZERO,
+            (_, 1) | (&mut Self::ZERO, _) => {}
+            (&mut Self::ONE, _) => *self = Self::from(other),
+            (Self(Small(small)), other) => {
                 let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {
                     *small = lower;
                 } else {
-                    *self = Natural(Large(vec![lower, upper]));
+                    *self = Self(Large(vec![lower, upper]));
                 }
             }
-            (Natural(Large(limbs)), other) => {
+            (Self(Large(limbs)), other) => {
                 limbs_vec_mul_limb_in_place(limbs, other);
             }
         }
     }
 
-    pub(crate) fn mul_limb_ref(&self, other: Limb) -> Natural {
+    pub(crate) fn mul_limb_ref(&self, other: Limb) -> Self {
         match (self, other) {
-            (_, 0) => Natural::ZERO,
-            (_, 1) | (&Natural::ZERO, _) => self.clone(),
-            (&Natural::ONE, _) => Natural::from(other),
-            (Natural(Small(small)), other) => Natural({
+            (_, 0) => Self::ZERO,
+            (_, 1) | (&Self::ZERO, _) => self.clone(),
+            (&Self::ONE, _) => Self::from(other),
+            (Self(Small(small)), other) => Self({
                 let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {
                     Small(lower)
@@ -198,7 +198,7 @@ impl Natural {
                     Large(vec![lower, upper])
                 }
             }),
-            (Natural(Large(limbs)), other) => Natural(Large(limbs_mul_limb(limbs, other))),
+            (Self(Large(limbs)), other) => Self(Large(limbs_mul_limb(limbs, other))),
         }
     }
 }

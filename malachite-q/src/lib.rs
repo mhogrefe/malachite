@@ -195,7 +195,7 @@ impl SignificantBits for &Rational {
 
 /// The constant 0.
 impl Zero for Rational {
-    const ZERO: Rational = Rational {
+    const ZERO: Self = Self {
         sign: true,
         numerator: Natural::ZERO,
         denominator: Natural::ONE,
@@ -204,7 +204,7 @@ impl Zero for Rational {
 
 /// The constant 1.
 impl One for Rational {
-    const ONE: Rational = Rational {
+    const ONE: Self = Self {
         sign: true,
         numerator: Natural::ONE,
         denominator: Natural::ONE,
@@ -213,7 +213,7 @@ impl One for Rational {
 
 /// The constant 2.
 impl Two for Rational {
-    const TWO: Rational = Rational {
+    const TWO: Self = Self {
         sign: true,
         numerator: Natural::TWO,
         denominator: Natural::ONE,
@@ -222,7 +222,7 @@ impl Two for Rational {
 
 /// The constant -1.
 impl NegativeOne for Rational {
-    const NEGATIVE_ONE: Rational = Rational {
+    const NEGATIVE_ONE: Self = Self {
         sign: false,
         numerator: Natural::ONE,
         denominator: Natural::ONE,
@@ -231,7 +231,7 @@ impl NegativeOne for Rational {
 
 /// The constant 1/2.
 impl OneHalf for Rational {
-    const ONE_HALF: Rational = Rational {
+    const ONE_HALF: Self = Self {
         sign: true,
         numerator: Natural::ONE,
         denominator: Natural::TWO,
@@ -240,8 +240,8 @@ impl OneHalf for Rational {
 
 impl Default for Rational {
     /// The default value of a [`Rational`], 0.
-    fn default() -> Rational {
-        Rational::ZERO
+    fn default() -> Self {
+        Self::ZERO
     }
 }
 

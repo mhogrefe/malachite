@@ -48,7 +48,7 @@ impl Float {
     /// ```
     #[inline]
     pub const fn is_finite(&self) -> bool {
-        matches!(self, Float(Zero { .. } | Finite { .. }))
+        matches!(self, Self(Zero { .. } | Finite { .. }))
     }
 
     /// Determines whether a [`Float`] is infinite.
@@ -182,7 +182,7 @@ impl Float {
     pub const fn is_sign_positive(&self) -> bool {
         match self {
             float_nan!() => false,
-            Float(Infinity { sign } | Finite { sign, .. } | Zero { sign, .. }) => *sign,
+            Self(Infinity { sign } | Finite { sign, .. } | Zero { sign, .. }) => *sign,
         }
     }
 
@@ -211,7 +211,7 @@ impl Float {
     pub const fn is_sign_negative(&self) -> bool {
         match self {
             float_nan!() => false,
-            Float(Infinity { sign } | Finite { sign, .. } | Zero { sign, .. }) => !*sign,
+            Self(Infinity { sign } | Finite { sign, .. } | Zero { sign, .. }) => !*sign,
         }
     }
 
@@ -240,7 +240,7 @@ impl Float {
         match self {
             float_nan!() => FpCategory::Nan,
             float_either_infinity!() => FpCategory::Infinite,
-            Float(Zero { .. }) => FpCategory::Zero,
+            Self(Zero { .. }) => FpCategory::Zero,
             _ => FpCategory::Normal,
         }
     }
@@ -266,7 +266,7 @@ impl Float {
     /// assert_eq!(Float::ONE.into_non_nan(), Some(Float::ONE));
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
-    pub fn into_non_nan(self) -> Option<Float> {
+    pub fn into_non_nan(self) -> Option<Self> {
         match self {
             float_nan!() => None,
             x => Some(x),
@@ -298,7 +298,7 @@ impl Float {
     /// assert_eq!(Float::ONE.to_non_nan(), Some(Float::ONE));
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
-    pub fn to_non_nan(&self) -> Option<Float> {
+    pub fn to_non_nan(&self) -> Option<Self> {
         match self {
             float_nan!() => None,
             x => Some(x.clone()),
@@ -326,9 +326,9 @@ impl Float {
     /// assert_eq!(Float::ONE.into_finite(), Some(Float::ONE));
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
-    pub fn into_finite(self) -> Option<Float> {
+    pub fn into_finite(self) -> Option<Self> {
         match self {
-            Float(NaN | Infinity { .. }) => None,
+            Self(NaN | Infinity { .. }) => None,
             x => Some(x),
         }
     }
@@ -354,9 +354,9 @@ impl Float {
     /// assert_eq!(Float::NEGATIVE_ZERO.to_finite(), Some(Float::NEGATIVE_ZERO));
     /// assert_eq!(Float::ONE.to_finite(), Some(Float::ONE));
     /// ```
-    pub fn to_finite(&self) -> Option<Float> {
+    pub fn to_finite(&self) -> Option<Self> {
         match self {
-            Float(NaN | Infinity { .. }) => None,
+            Self(NaN | Infinity { .. }) => None,
             x => Some(x.clone()),
         }
     }

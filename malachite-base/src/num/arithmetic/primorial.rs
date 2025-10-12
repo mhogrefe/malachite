@@ -165,11 +165,11 @@ impl CheckedPrimorial for usize {
     /// # Examples
     /// See [here](super::primorial#checked_primorial).
     #[inline]
-    fn checked_primorial(n: u64) -> Option<usize> {
+    fn checked_primorial(n: u64) -> Option<Self> {
         if USIZE_IS_U32 {
-            u32::checked_primorial(n).map(usize::wrapping_from)
+            u32::checked_primorial(n).map(Self::wrapping_from)
         } else {
-            u64::checked_primorial(n).map(usize::wrapping_from)
+            u64::checked_primorial(n).map(Self::wrapping_from)
         }
     }
 
@@ -194,11 +194,11 @@ impl CheckedPrimorial for usize {
     /// # Examples
     /// See [here](super::primorial#checked_product_of_first_n_primes).
     #[inline]
-    fn checked_product_of_first_n_primes(n: u64) -> Option<usize> {
+    fn checked_product_of_first_n_primes(n: u64) -> Option<Self> {
         if USIZE_IS_U32 {
-            u32::checked_product_of_first_n_primes(n).map(usize::wrapping_from)
+            u32::checked_product_of_first_n_primes(n).map(Self::wrapping_from)
         } else {
-            u64::checked_product_of_first_n_primes(n).map(usize::wrapping_from)
+            u64::checked_product_of_first_n_primes(n).map(Self::wrapping_from)
         }
     }
 }

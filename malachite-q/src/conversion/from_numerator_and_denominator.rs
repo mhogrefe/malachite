@@ -154,10 +154,10 @@ impl Rational {
     /// const TWO_THIRDS_ALT: Rational = Rational::const_from_unsigneds(22, 33);
     /// assert_eq!(TWO_THIRDS_ALT, Rational::from_unsigneds(2u32, 3));
     /// ```
-    pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Rational {
+    pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Self {
         assert!(denominator != 0);
         let gcd = const_gcd(numerator, denominator);
-        Rational {
+        Self {
             sign: true,
             numerator: Natural::const_from(numerator / gcd),
             denominator: Natural::const_from(denominator / gcd),
@@ -190,13 +190,13 @@ impl Rational {
     /// const NEGATIVE_TWO_THIRDS_ALT: Rational = Rational::const_from_signeds(-22, 33);
     /// assert_eq!(NEGATIVE_TWO_THIRDS_ALT, Rational::from_signeds(-2, 3));
     /// ```
-    pub const fn const_from_signeds(numerator: SignedLimb, denominator: SignedLimb) -> Rational {
+    pub const fn const_from_signeds(numerator: SignedLimb, denominator: SignedLimb) -> Self {
         assert!(denominator != 0);
         let sign = numerator == 0 || (numerator > 0) == (denominator > 0);
         let numerator = numerator.unsigned_abs();
         let denominator = denominator.unsigned_abs();
         let gcd = const_gcd(numerator, denominator);
-        Rational {
+        Self {
             sign,
             numerator: Natural::const_from(numerator / gcd),
             denominator: Natural::const_from(denominator / gcd),
@@ -238,10 +238,10 @@ impl Rational {
     ///     0
     /// );
     /// ```
-    pub fn from_naturals(numerator: Natural, denominator: Natural) -> Rational {
+    pub fn from_naturals(numerator: Natural, denominator: Natural) -> Self {
         assert_ne!(denominator, 0);
         let gcd = (&numerator).gcd(&denominator);
-        Rational {
+        Self {
             sign: true,
             numerator: numerator.div_exact(&gcd),
             denominator: denominator.div_exact(gcd),
@@ -283,10 +283,10 @@ impl Rational {
     ///     0
     /// );
     /// ```
-    pub fn from_naturals_ref(numerator: &Natural, denominator: &Natural) -> Rational {
+    pub fn from_naturals_ref(numerator: &Natural, denominator: &Natural) -> Self {
         assert_ne!(*denominator, 0);
         let gcd = numerator.gcd(denominator);
-        Rational {
+        Self {
             sign: true,
             numerator: numerator.div_exact(&gcd),
             denominator: denominator.div_exact(gcd),
@@ -321,11 +321,11 @@ impl Rational {
     /// assert_eq!(Rational::from_unsigneds(0u32, 6), 0);
     /// ```
     #[inline]
-    pub fn from_unsigneds<T: PrimitiveUnsigned>(numerator: T, denominator: T) -> Rational
+    pub fn from_unsigneds<T: PrimitiveUnsigned>(numerator: T, denominator: T) -> Self
     where
         Natural: From<T>,
     {
-        Rational::from_naturals(Natural::from(numerator), Natural::from(denominator))
+        Self::from_naturals(Natural::from(numerator), Natural::from(denominator))
     }
 
     /// Converts two [`Integer`]s to a [`Rational`], taking the [`Integer`]s by value.
@@ -365,10 +365,10 @@ impl Rational {
     /// assert_eq!(Rational::from_integers(Integer::ZERO, Integer::from(6)), 0);
     /// assert_eq!(Rational::from_integers(Integer::ZERO, Integer::from(-6)), 0);
     /// ```
-    pub fn from_integers(numerator: Integer, denominator: Integer) -> Rational {
+    pub fn from_integers(numerator: Integer, denominator: Integer) -> Self {
         assert_ne!(denominator, 0);
         let sign = numerator == 0 || ((numerator > 0) == (denominator > 0));
-        let mut q = Rational::from_naturals(numerator.unsigned_abs(), denominator.unsigned_abs());
+        let mut q = Self::from_naturals(numerator.unsigned_abs(), denominator.unsigned_abs());
         q.sign = sign;
         q
     }
@@ -416,9 +416,9 @@ impl Rational {
     ///     0
     /// );
     /// ```
-    pub fn from_integers_ref(numerator: &Integer, denominator: &Integer) -> Rational {
+    pub fn from_integers_ref(numerator: &Integer, denominator: &Integer) -> Self {
         assert_ne!(*denominator, 0);
-        let mut q = Rational::from_naturals_ref(
+        let mut q = Self::from_naturals_ref(
             numerator.unsigned_abs_ref(),
             denominator.unsigned_abs_ref(),
         );
@@ -456,11 +456,11 @@ impl Rational {
     /// assert_eq!(Rational::from_signeds(0i8, -6), 0);
     /// ```
     #[inline]
-    pub fn from_signeds<T: PrimitiveSigned>(numerator: T, denominator: T) -> Rational
+    pub fn from_signeds<T: PrimitiveSigned>(numerator: T, denominator: T) -> Self
     where
         Integer: From<T>,
     {
-        Rational::from_integers(Integer::from(numerator), Integer::from(denominator))
+        Self::from_integers(Integer::from(numerator), Integer::from(denominator))
     }
 
     /// Converts a sign and two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by value.
@@ -504,10 +504,10 @@ impl Rational {
         sign: bool,
         numerator: Natural,
         denominator: Natural,
-    ) -> Rational {
+    ) -> Self {
         assert_ne!(denominator, 0);
         let gcd = (&numerator).gcd(&denominator);
-        Rational {
+        Self {
             sign: sign || numerator == 0,
             numerator: numerator.div_exact(&gcd),
             denominator: denominator.div_exact(gcd),
@@ -556,10 +556,10 @@ impl Rational {
         sign: bool,
         numerator: &Natural,
         denominator: &Natural,
-    ) -> Rational {
+    ) -> Self {
         assert_ne!(*denominator, 0);
         let gcd = numerator.gcd(denominator);
-        Rational {
+        Self {
             sign: sign || *numerator == 0,
             numerator: numerator.div_exact(&gcd),
             denominator: denominator.div_exact(gcd),
@@ -604,10 +604,10 @@ impl Rational {
         sign: bool,
         numerator: T,
         denominator: T,
-    ) -> Rational
+    ) -> Self
     where
         Natural: From<T>,
     {
-        Rational::from_sign_and_naturals(sign, Natural::from(numerator), Natural::from(denominator))
+        Self::from_sign_and_naturals(sign, Natural::from(numerator), Natural::from(denominator))
     }
 }

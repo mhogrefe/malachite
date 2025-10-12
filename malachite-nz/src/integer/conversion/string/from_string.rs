@@ -44,8 +44,8 @@ impl FromStr for Integer {
     /// assert!(Integer::from_str("a").is_err());
     /// ```
     #[inline]
-    fn from_str(s: &str) -> Result<Integer, ()> {
-        Integer::from_string_base(10, s).ok_or(())
+    fn from_str(s: &str) -> Result<Self, ()> {
+        Self::from_string_base(10, s).ok_or(())
     }
 }
 
@@ -102,7 +102,7 @@ impl FromStringBase for Integer {
     /// assert!(Integer::from_string_base(2, "-2").is_none());
     /// ```
     #[inline]
-    fn from_string_base(base: u8, s: &str) -> Option<Integer> {
+    fn from_string_base(base: u8, s: &str) -> Option<Self> {
         if let Some(abs_string) = s.strip_prefix('-') {
             if abs_string.starts_with('+') {
                 None
@@ -110,7 +110,7 @@ impl FromStringBase for Integer {
                 Natural::from_string_base(base, abs_string).map(Neg::neg)
             }
         } else {
-            Natural::from_string_base(base, s).map(Integer::from)
+            Natural::from_string_base(base, s).map(Self::from)
         }
     }
 }

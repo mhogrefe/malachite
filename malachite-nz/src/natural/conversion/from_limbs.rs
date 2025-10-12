@@ -62,12 +62,12 @@ impl Natural {
     ///     );
     /// }
     /// ```
-    pub fn from_limbs_asc(xs: &[Limb]) -> Natural {
+    pub fn from_limbs_asc(xs: &[Limb]) -> Self {
         let significant_length = limbs_significant_length(xs);
         match significant_length {
-            0 => Natural::ZERO,
-            1 => Natural(Small(xs[0])),
-            _ => Natural(Large(xs[..significant_length].to_vec())),
+            0 => Self::ZERO,
+            1 => Self(Small(xs[0])),
+            _ => Self(Large(xs[..significant_length].to_vec())),
         }
     }
 
@@ -104,8 +104,8 @@ impl Natural {
     ///     );
     /// }
     /// ```
-    pub fn from_limbs_desc(xs: &[Limb]) -> Natural {
-        Natural::from_owned_limbs_asc(xs.iter().copied().rev().collect())
+    pub fn from_limbs_desc(xs: &[Limb]) -> Self {
+        Self::from_owned_limbs_asc(xs.iter().copied().rev().collect())
     }
 
     /// Converts a [`Vec`] of [limbs](crate#limbs) to a [`Natural`].
@@ -141,14 +141,14 @@ impl Natural {
     ///     );
     /// }
     /// ```
-    pub fn from_owned_limbs_asc(mut xs: Vec<Limb>) -> Natural {
+    pub fn from_owned_limbs_asc(mut xs: Vec<Limb>) -> Self {
         let significant_length = limbs_significant_length(&xs);
         match significant_length {
-            0 => Natural::ZERO,
-            1 => Natural(Small(xs[0])),
+            0 => Self::ZERO,
+            1 => Self(Small(xs[0])),
             _ => {
                 xs.truncate(significant_length);
-                Natural(Large(xs))
+                Self(Large(xs))
             }
         }
     }
@@ -186,8 +186,8 @@ impl Natural {
     ///     );
     /// }
     /// ```
-    pub fn from_owned_limbs_desc(mut xs: Vec<Limb>) -> Natural {
+    pub fn from_owned_limbs_desc(mut xs: Vec<Limb>) -> Self {
         xs.reverse();
-        Natural::from_owned_limbs_asc(xs)
+        Self::from_owned_limbs_asc(xs)
     }
 }

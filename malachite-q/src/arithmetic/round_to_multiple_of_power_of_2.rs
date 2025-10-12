@@ -16,7 +16,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 
 impl RoundToMultipleOfPowerOf2<i64> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Rounds a [`Rational`] to an integer multiple of $2^k$ according to a specified rounding
     /// mode. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
@@ -105,7 +105,7 @@ impl RoundToMultipleOfPowerOf2<i64> for Rational {
         mut self,
         pow: i64,
         rm: RoundingMode,
-    ) -> (Rational, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.round_to_multiple_of_power_of_2_assign(pow, rm);
         (self, o)
     }
@@ -253,7 +253,7 @@ impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     fn round_to_multiple_of_power_of_2_assign(&mut self, pow: i64, rm: RoundingMode) -> Ordering {
         *self >>= pow;
         let (s, o) = Integer::rounding_from(&*self, rm);
-        *self = Rational::from(s) << pow;
+        *self = Self::from(s) << pow;
         o
     }
 }

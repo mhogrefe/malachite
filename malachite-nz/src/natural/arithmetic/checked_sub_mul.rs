@@ -38,15 +38,15 @@ macro_rules! large_right {
 }
 
 impl Natural {
-    fn checked_sub_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Option<Natural> {
+    fn checked_sub_mul_limb_ref_ref(&self, b: &Self, c: Limb) -> Option<Self> {
         match (self, b, c) {
-            (a, _, 0) | (a, &Natural::ZERO, _) => Some(a.clone()),
-            (a, b @ Natural(Small(_)), c) => a.checked_sub(b * Natural::from(c)),
-            (Natural(Small(_)), _, _) => None,
-            (Natural(Large(a_limbs)), Natural(Large(b_limbs)), c) => {
+            (a, _, 0) | (a, &Self::ZERO, _) => Some(a.clone()),
+            (a, b @ Self(Small(_)), c) => a.checked_sub(b * Self::from(c)),
+            (Self(Small(_)), _, _) => None,
+            (Self(Large(a_limbs)), Self(Large(b_limbs)), c) => {
                 if a_limbs.len() >= b_limbs.len() {
                     limbs_sub_mul_limb_greater(a_limbs, b_limbs, c)
-                        .map(Natural::from_owned_limbs_asc)
+                        .map(Self::from_owned_limbs_asc)
                 } else {
                     None
                 }
@@ -54,12 +54,12 @@ impl Natural {
         }
     }
 
-    fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
+    fn sub_mul_assign_limb_no_panic(&mut self, b: Self, c: Limb) -> bool {
         match (&mut *self, b, c) {
-            (_, _, 0) | (_, Natural::ZERO, _) => false,
-            (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
-            (Natural(Small(_)), _, _) => true,
-            (Natural(Large(a_limbs)), Natural(Large(b_limbs)), c) => {
+            (_, _, 0) | (_, Self::ZERO, _) => false,
+            (a, b @ Self(Small(_)), c) => a.sub_assign_no_panic(b * Self::from(c)),
+            (Self(Small(_)), _, _) => true,
+            (Self(Large(a_limbs)), Self(Large(b_limbs)), c) => {
                 let borrow = a_limbs.len() < b_limbs.len()
                     || limbs_sub_mul_limb_greater_in_place_left(a_limbs, &b_limbs, c) != 0;
                 if !borrow {
@@ -70,12 +70,12 @@ impl Natural {
         }
     }
 
-    fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
+    fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Self, c: Limb) -> bool {
         match (&mut *self, b, c) {
-            (_, _, 0) | (_, &Natural::ZERO, _) => false,
-            (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
-            (Natural(Small(_)), _, _) => true,
-            (Natural(Large(a_limbs)), Natural(Large(b_limbs)), c) => {
+            (_, _, 0) | (_, &Self::ZERO, _) => false,
+            (a, b @ Self(Small(_)), c) => a.sub_assign_no_panic(b * Self::from(c)),
+            (Self(Small(_)), _, _) => true,
+            (Self(Large(a_limbs)), Self(Large(b_limbs)), c) => {
                 let borrow = a_limbs.len() < b_limbs.len()
                     || limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0;
                 if !borrow {
@@ -86,45 +86,45 @@ impl Natural {
         }
     }
 
-    pub(crate) fn sub_mul_assign_no_panic(&mut self, b: Natural, c: Natural) -> bool {
+    pub(crate) fn sub_mul_assign_no_panic(&mut self, b: Self, c: Self) -> bool {
         match (&mut *self, b, c) {
-            (a, Natural(Small(small_b)), c) => a.sub_mul_assign_limb_no_panic(c, small_b),
-            (a, b, Natural(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, small_c),
-            (Natural(Small(_)), _, _) => true,
+            (a, Self(Small(small_b)), c) => a.sub_mul_assign_limb_no_panic(c, small_b),
+            (a, b, Self(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, small_c),
+            (Self(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 
-    pub(crate) fn sub_mul_assign_val_ref_no_panic(&mut self, b: Natural, c: &Natural) -> bool {
+    pub(crate) fn sub_mul_assign_val_ref_no_panic(&mut self, b: Self, c: &Self) -> bool {
         match (&mut *self, &b, c) {
-            (a, Natural(Small(small_b)), c) => a.sub_mul_assign_limb_ref_no_panic(c, *small_b),
-            (a, _, Natural(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, *small_c),
-            (Natural(Small(_)), _, _) => true,
+            (a, Self(Small(small_b)), c) => a.sub_mul_assign_limb_ref_no_panic(c, *small_b),
+            (a, _, Self(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, *small_c),
+            (Self(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 
-    pub(crate) fn sub_mul_assign_ref_val_no_panic(&mut self, b: &Natural, c: Natural) -> bool {
+    pub(crate) fn sub_mul_assign_ref_val_no_panic(&mut self, b: &Self, c: Self) -> bool {
         match (&mut *self, b, &c) {
-            (a, Natural(Small(small_b)), _) => a.sub_mul_assign_limb_no_panic(c, *small_b),
-            (a, b, Natural(Small(small_c))) => a.sub_mul_assign_limb_ref_no_panic(b, *small_c),
-            (Natural(Small(_)), _, _) => true,
+            (a, Self(Small(small_b)), _) => a.sub_mul_assign_limb_no_panic(c, *small_b),
+            (a, b, Self(Small(small_c))) => a.sub_mul_assign_limb_ref_no_panic(b, *small_c),
+            (Self(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 
-    pub(crate) fn sub_mul_assign_ref_ref_no_panic(&mut self, b: &Natural, c: &Natural) -> bool {
+    pub(crate) fn sub_mul_assign_ref_ref_no_panic(&mut self, b: &Self, c: &Self) -> bool {
         match (&mut *self, b, c) {
-            (a, Natural(Small(small_b)), c) => a.sub_mul_assign_limb_ref_no_panic(c, *small_b),
-            (a, b, Natural(Small(small_c))) => a.sub_mul_assign_limb_ref_no_panic(b, *small_c),
-            (Natural(Small(_)), _, _) => true,
+            (a, Self(Small(small_b)), c) => a.sub_mul_assign_limb_ref_no_panic(c, *small_b),
+            (a, b, Self(Small(small_c))) => a.sub_mul_assign_limb_ref_no_panic(b, *small_c),
+            (Self(Small(_)), _, _) => true,
             large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 }
 
-impl CheckedSubMul<Natural, Natural> for Natural {
-    type Output = Natural;
+impl CheckedSubMul<Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by value
     /// and returning `None` if the result is negative.
@@ -173,7 +173,7 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     ///     "Some(995705032704)"
     /// );
     /// ```
-    fn checked_sub_mul(mut self, y: Natural, z: Natural) -> Option<Natural> {
+    fn checked_sub_mul(mut self, y: Self, z: Self) -> Option<Self> {
         if self.sub_mul_assign_no_panic(y, z) {
             None
         } else {
@@ -182,8 +182,8 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     }
 }
 
-impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> CheckedSubMul<Self, &'a Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first two by
     /// value and the third by reference and returning `None` if the result is negative.
@@ -232,7 +232,7 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     ///     "Some(995705032704)"
     /// );
     /// ```
-    fn checked_sub_mul(mut self, y: Natural, z: &'a Natural) -> Option<Natural> {
+    fn checked_sub_mul(mut self, y: Self, z: &'a Self) -> Option<Self> {
         if self.sub_mul_assign_val_ref_no_panic(y, z) {
             None
         } else {
@@ -241,8 +241,8 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     }
 }
 
-impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
-    type Output = Natural;
+impl<'a> CheckedSubMul<&'a Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
     /// by value and the second by reference and returning `None` if the result is negative.
@@ -291,7 +291,7 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     ///     "Some(995705032704)"
     /// );
     /// ```
-    fn checked_sub_mul(mut self, y: &'a Natural, z: Natural) -> Option<Natural> {
+    fn checked_sub_mul(mut self, y: &'a Self, z: Self) -> Option<Self> {
         if self.sub_mul_assign_ref_val_no_panic(y, z) {
             None
         } else {
@@ -300,8 +300,8 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     }
 }
 
-impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
-    type Output = Natural;
+impl<'a, 'b> CheckedSubMul<&'a Self, &'b Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first by value
     /// and the second and third by reference and returning `None` if the result is negative.
@@ -350,7 +350,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     ///     "Some(995705032704)"
     /// );
     /// ```
-    fn checked_sub_mul(mut self, y: &'a Natural, z: &'b Natural) -> Option<Natural> {
+    fn checked_sub_mul(mut self, y: &'a Self, z: &'b Self) -> Option<Self> {
         if self.sub_mul_assign_ref_ref_no_panic(y, z) {
             None
         } else {

@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ModNeg, ModNegAssign};
 use malachite_base::num::basic::traits::Zero;
 
-impl ModNeg<Natural> for Natural {
-    type Output = Natural;
+impl ModNeg<Self> for Natural {
+    type Output = Self;
 
     /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by value.
@@ -42,14 +42,14 @@ impl ModNeg<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_neg(mut self, m: Natural) -> Natural {
+    fn mod_neg(mut self, m: Self) -> Self {
         self.mod_neg_assign(&m);
         self
     }
 }
 
-impl<'a> ModNeg<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModNeg<&'a Self> for Natural {
+    type Output = Self;
 
     /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
@@ -78,7 +78,7 @@ impl<'a> ModNeg<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_neg(mut self, m: &'a Natural) -> Natural {
+    fn mod_neg(mut self, m: &'a Self) -> Self {
         self.mod_neg_assign(m);
         self
     }
@@ -154,7 +154,7 @@ impl ModNeg<&Natural> for &Natural {
     }
 }
 
-impl ModNegAssign<Natural> for Natural {
+impl ModNegAssign<Self> for Natural {
     /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The [`Natural`] on the right-hand side is taken by value.
     ///
@@ -189,12 +189,12 @@ impl ModNegAssign<Natural> for Natural {
     /// assert_eq!(n, 999999999993u64);
     /// ```
     #[inline]
-    fn mod_neg_assign(&mut self, m: Natural) {
+    fn mod_neg_assign(&mut self, m: Self) {
         self.mod_neg_assign(&m);
     }
 }
 
-impl<'a> ModNegAssign<&'a Natural> for Natural {
+impl<'a> ModNegAssign<&'a Self> for Natural {
     /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///
@@ -228,7 +228,7 @@ impl<'a> ModNegAssign<&'a Natural> for Natural {
     /// n.mod_neg_assign(&Natural::from(10u32).pow(12));
     /// assert_eq!(n, 999999999993u64);
     /// ```
-    fn mod_neg_assign(&mut self, m: &'a Natural) {
+    fn mod_neg_assign(&mut self, m: &'a Self) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         if *self != 0 {
             assert!(!self.sub_right_assign_no_panic(m));

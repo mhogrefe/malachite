@@ -1896,8 +1896,8 @@ impl Digits<u8> for Natural {
     #[inline]
     fn to_digits_asc(&self, base: &u8) -> Vec<u8> {
         match self {
-            Natural(Small(x)) => x.to_digits_asc(base),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => x.to_digits_asc(base),
+            Self(Large(xs)) => {
                 if let Some(log_base) = base.checked_log_base_2() {
                     self.to_power_of_2_digits_asc(log_base)
                 } else {
@@ -1941,8 +1941,8 @@ impl Digits<u8> for Natural {
     #[inline]
     fn to_digits_desc(&self, base: &u8) -> Vec<u8> {
         match self {
-            Natural(Small(x)) => x.to_digits_desc(base),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => x.to_digits_desc(base),
+            Self(Large(xs)) => {
                 if let Some(log_base) = base.checked_log_base_2() {
                     self.to_power_of_2_digits_desc(log_base)
                 } else {
@@ -1980,19 +1980,19 @@ impl Digits<u8> for Natural {
     /// # Examples
     /// See [here](super::general_digits#from_digits_asc).
     #[inline]
-    fn from_digits_asc<I: Iterator<Item = u8>>(base: &u8, digits: I) -> Option<Natural> {
+    fn from_digits_asc<I: Iterator<Item = u8>>(base: &u8, digits: I) -> Option<Self> {
         if let Some(log_base) = base.checked_log_base_2() {
-            Natural::from_power_of_2_digits_asc(log_base, digits)
+            Self::from_power_of_2_digits_asc(log_base, digits)
         } else {
             let base = u64::from(*base);
             let mut xs = digits.collect_vec();
             if xs.is_empty() {
-                return Some(Natural::ZERO);
+                return Some(Self::ZERO);
             }
             xs.reverse();
             let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), base))];
             let _ = limbs_from_digits_small_base(&mut out, &xs, base)?;
-            Some(Natural::from_owned_limbs_asc(out))
+            Some(Self::from_owned_limbs_asc(out))
         }
     }
 
@@ -2018,18 +2018,18 @@ impl Digits<u8> for Natural {
     /// # Examples
     /// See [here](super::general_digits#from_digits_desc).
     #[inline]
-    fn from_digits_desc<I: Iterator<Item = u8>>(base: &u8, digits: I) -> Option<Natural> {
+    fn from_digits_desc<I: Iterator<Item = u8>>(base: &u8, digits: I) -> Option<Self> {
         if let Some(log_base) = base.checked_log_base_2() {
-            Natural::from_power_of_2_digits_desc(log_base, digits)
+            Self::from_power_of_2_digits_desc(log_base, digits)
         } else {
             let base = u64::from(*base);
             let xs = digits.collect_vec();
             if xs.is_empty() {
-                return Some(Natural::ZERO);
+                return Some(Self::ZERO);
             }
             let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), base))];
             let _ = limbs_from_digits_small_base(&mut out, &xs, base)?;
-            Some(Natural::from_owned_limbs_asc(out))
+            Some(Self::from_owned_limbs_asc(out))
         }
     }
 }
@@ -2233,7 +2233,7 @@ digits_unsigned!(u64);
 digits_unsigned!(u128);
 digits_unsigned!(usize);
 
-impl Digits<Natural> for Natural {
+impl Digits<Self> for Natural {
     /// Returns a [`Vec`] containing the digits of a [`Natural`] in ascending order (least- to
     /// most-significant).
     ///
@@ -2282,12 +2282,12 @@ impl Digits<Natural> for Natural {
     ///     "[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]"
     /// );
     /// ```
-    fn to_digits_asc(&self, base: &Natural) -> Vec<Natural> {
+    fn to_digits_asc(&self, base: &Self) -> Vec<Self> {
         match base {
-            Natural(Small(b)) => self
+            Self(Small(b)) => self
                 .to_digits_asc(b)
                 .into_iter()
-                .map(Natural::from)
+                .map(Self::from)
                 .collect(),
             _ => to_digits_asc_large(self, base),
         }
@@ -2341,12 +2341,12 @@ impl Digits<Natural> for Natural {
     ///     "[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]"
     /// );
     /// ```
-    fn to_digits_desc(&self, base: &Natural) -> Vec<Natural> {
+    fn to_digits_desc(&self, base: &Self) -> Vec<Self> {
         match base {
-            Natural(Small(b)) => self
+            Self(Small(b)) => self
                 .to_digits_desc(b)
                 .into_iter()
-                .map(Natural::from)
+                .map(Self::from)
                 .collect(),
             _ => to_digits_desc_large(self, base),
         }
@@ -2415,9 +2415,9 @@ impl Digits<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn from_digits_asc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {
+    fn from_digits_asc<I: Iterator<Item = Self>>(base: &Self, digits: I) -> Option<Self> {
         match base {
-            Natural(Small(b)) => from_digits_asc_limb_from_natural::<_, Limb>(digits, *b),
+            Self(Small(b)) => from_digits_asc_limb_from_natural::<_, Limb>(digits, *b),
             _ => from_digits_asc_large(digits, base),
         }
     }
@@ -2485,9 +2485,9 @@ impl Digits<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn from_digits_desc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {
+    fn from_digits_desc<I: Iterator<Item = Self>>(base: &Self, digits: I) -> Option<Self> {
         match base {
-            Natural(Small(b)) => from_digits_desc_limb_from_natural::<_, Limb>(digits, *b),
+            Self(Small(b)) => from_digits_desc_limb_from_natural::<_, Limb>(digits, *b),
             _ => from_digits_desc_large(digits, base),
         }
     }

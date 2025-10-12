@@ -12,9 +12,9 @@ use malachite_base::num::arithmetic::traits::{
     DivAssignRem, DivMod, DivRem,
 };
 
-impl DivMod<Integer> for Integer {
-    type DivOutput = Integer;
-    type ModOutput = Integer;
+impl DivMod<Self> for Integer {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning the
     /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
@@ -76,15 +76,15 @@ impl DivMod<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_mod(mut self, other: Integer) -> (Integer, Integer) {
+    fn div_mod(mut self, other: Self) -> (Self, Self) {
         let r = self.div_assign_mod(other);
         (self, r)
     }
 }
 
-impl DivMod<&Integer> for Integer {
-    type DivOutput = Integer;
-    type ModOutput = Integer;
+impl DivMod<&Self> for Integer {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference and returning the quotient and remainder. The quotient is rounded towards negative
@@ -146,7 +146,7 @@ impl DivMod<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_mod(mut self, other: &Integer) -> (Integer, Integer) {
+    fn div_mod(mut self, other: &Self) -> (Self, Self) {
         let r = self.div_assign_mod(other);
         (self, r)
     }
@@ -306,8 +306,8 @@ impl DivMod<&Integer> for &Integer {
     }
 }
 
-impl DivAssignMod<Integer> for Integer {
-    type ModOutput = Integer;
+impl DivAssignMod<Self> for Integer {
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value and returning the remainder. The quotient is rounded towards
@@ -357,7 +357,7 @@ impl DivAssignMod<Integer> for Integer {
     /// assert_eq!(x.div_assign_mod(Integer::from(-10)), -3);
     /// assert_eq!(x, 2);
     /// ```
-    fn div_assign_mod(&mut self, other: Integer) -> Integer {
+    fn div_assign_mod(&mut self, other: Self) -> Self {
         let r = if self.sign == other.sign {
             self.sign = true;
             self.abs.div_assign_mod(other.abs)
@@ -368,12 +368,12 @@ impl DivAssignMod<Integer> for Integer {
             }
             r
         };
-        Integer::from_sign_and_abs(other.sign, r)
+        Self::from_sign_and_abs(other.sign, r)
     }
 }
 
-impl DivAssignMod<&Integer> for Integer {
-    type ModOutput = Integer;
+impl DivAssignMod<&Self> for Integer {
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference and returning the remainder. The quotient is rounded towards
@@ -423,7 +423,7 @@ impl DivAssignMod<&Integer> for Integer {
     /// assert_eq!(x.div_assign_mod(&Integer::from(-10)), -3);
     /// assert_eq!(x, 2);
     /// ```
-    fn div_assign_mod(&mut self, other: &Integer) -> Integer {
+    fn div_assign_mod(&mut self, other: &Self) -> Self {
         let r = if self.sign == other.sign {
             self.sign = true;
             self.abs.div_assign_mod(&other.abs)
@@ -434,13 +434,13 @@ impl DivAssignMod<&Integer> for Integer {
             }
             r
         };
-        Integer::from_sign_and_abs(other.sign, r)
+        Self::from_sign_and_abs(other.sign, r)
     }
 }
 
-impl DivRem<Integer> for Integer {
-    type DivOutput = Integer;
-    type RemOutput = Integer;
+impl DivRem<Self> for Integer {
+    type DivOutput = Self;
+    type RemOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning the
     /// quotient and remainder. The quotient is rounded towards zero and the remainder has the same
@@ -504,15 +504,15 @@ impl DivRem<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_rem(mut self, other: Integer) -> (Integer, Integer) {
+    fn div_rem(mut self, other: Self) -> (Self, Self) {
         let r = self.div_assign_rem(other);
         (self, r)
     }
 }
 
-impl DivRem<&Integer> for Integer {
-    type DivOutput = Integer;
-    type RemOutput = Integer;
+impl DivRem<&Self> for Integer {
+    type DivOutput = Self;
+    type RemOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference and returning the quotient and remainder. The quotient is rounded towards zero and
@@ -576,7 +576,7 @@ impl DivRem<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn div_rem(mut self, other: &Integer) -> (Integer, Integer) {
+    fn div_rem(mut self, other: &Self) -> (Self, Self) {
         let r = self.div_assign_rem(other);
         (self, r)
     }
@@ -732,8 +732,8 @@ impl DivRem<&Integer> for &Integer {
     }
 }
 
-impl DivAssignRem<Integer> for Integer {
-    type RemOutput = Integer;
+impl DivAssignRem<Self> for Integer {
+    type RemOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value and returning the remainder. The quotient is rounded towards zero
@@ -786,15 +786,15 @@ impl DivAssignRem<Integer> for Integer {
     /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign_rem(&mut self, other: Integer) -> Integer {
-        let r = Integer::from_sign_and_abs(self.sign, self.abs.div_assign_mod(other.abs));
+    fn div_assign_rem(&mut self, other: Self) -> Self {
+        let r = Self::from_sign_and_abs(self.sign, self.abs.div_assign_mod(other.abs));
         self.sign = self.sign == other.sign || self.abs == 0;
         r
     }
 }
 
-impl DivAssignRem<&Integer> for Integer {
-    type RemOutput = Integer;
+impl DivAssignRem<&Self> for Integer {
+    type RemOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference and returning the remainder. The quotient is rounded towards
@@ -847,16 +847,16 @@ impl DivAssignRem<&Integer> for Integer {
     /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign_rem(&mut self, other: &Integer) -> Integer {
-        let r = Integer::from_sign_and_abs(self.sign, self.abs.div_assign_mod(&other.abs));
+    fn div_assign_rem(&mut self, other: &Self) -> Self {
+        let r = Self::from_sign_and_abs(self.sign, self.abs.div_assign_mod(&other.abs));
         self.sign = self.sign == other.sign || self.abs == 0;
         r
     }
 }
 
-impl CeilingDivMod<Integer> for Integer {
-    type DivOutput = Integer;
-    type ModOutput = Integer;
+impl CeilingDivMod<Self> for Integer {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning the
     /// quotient and remainder. The quotient is rounded towards positive infinity and the remainder
@@ -918,15 +918,15 @@ impl CeilingDivMod<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn ceiling_div_mod(mut self, other: Integer) -> (Integer, Integer) {
+    fn ceiling_div_mod(mut self, other: Self) -> (Self, Self) {
         let r = self.ceiling_div_assign_mod(other);
         (self, r)
     }
 }
 
-impl CeilingDivMod<&Integer> for Integer {
-    type DivOutput = Integer;
-    type ModOutput = Integer;
+impl CeilingDivMod<&Self> for Integer {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both the first by value and the second
     /// by reference and returning the quotient and remainder. The quotient is rounded towards
@@ -988,7 +988,7 @@ impl CeilingDivMod<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn ceiling_div_mod(mut self, other: &Integer) -> (Integer, Integer) {
+    fn ceiling_div_mod(mut self, other: &Self) -> (Self, Self) {
         let r = self.ceiling_div_assign_mod(other);
         (self, r)
     }
@@ -1148,8 +1148,8 @@ impl CeilingDivMod<&Integer> for &Integer {
     }
 }
 
-impl CeilingDivAssignMod<Integer> for Integer {
-    type ModOutput = Integer;
+impl CeilingDivAssignMod<Self> for Integer {
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value and returning the remainder. The quotient is rounded towards
@@ -1199,7 +1199,7 @@ impl CeilingDivAssignMod<Integer> for Integer {
     /// assert_eq!(x.ceiling_div_assign_mod(Integer::from(-10)), 7);
     /// assert_eq!(x, 3);
     /// ```
-    fn ceiling_div_assign_mod(&mut self, other: Integer) -> Integer {
+    fn ceiling_div_assign_mod(&mut self, other: Self) -> Self {
         let r = if self.sign == other.sign {
             self.sign = true;
             self.abs.ceiling_div_assign_neg_mod(other.abs)
@@ -1208,12 +1208,12 @@ impl CeilingDivAssignMod<Integer> for Integer {
             self.sign = self.abs == 0;
             r
         };
-        Integer::from_sign_and_abs(!other.sign, r)
+        Self::from_sign_and_abs(!other.sign, r)
     }
 }
 
-impl CeilingDivAssignMod<&Integer> for Integer {
-    type ModOutput = Integer;
+impl CeilingDivAssignMod<&Self> for Integer {
+    type ModOutput = Self;
 
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference and returning the remainder. The quotient is rounded towards
@@ -1263,7 +1263,7 @@ impl CeilingDivAssignMod<&Integer> for Integer {
     /// assert_eq!(x.ceiling_div_assign_mod(&Integer::from(-10)), 7);
     /// assert_eq!(x, 3);
     /// ```
-    fn ceiling_div_assign_mod(&mut self, other: &Integer) -> Integer {
+    fn ceiling_div_assign_mod(&mut self, other: &Self) -> Self {
         let r = if self.sign == other.sign {
             self.sign = true;
             self.abs.ceiling_div_assign_neg_mod(&other.abs)
@@ -1272,6 +1272,6 @@ impl CeilingDivAssignMod<&Integer> for Integer {
             self.sign = self.abs == 0;
             r
         };
-        Integer::from_sign_and_abs(!other.sign, r)
+        Self::from_sign_and_abs(!other.sign, r)
     }
 }

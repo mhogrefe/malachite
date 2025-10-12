@@ -452,10 +452,10 @@ limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
 impl Natural {
     fn divisible_by_limb(&self, other: Limb) -> bool {
         match (self, other) {
-            (&Natural::ZERO, _) => true,
+            (&Self::ZERO, _) => true,
             (_, 0) => false,
-            (&Natural(Small(small)), y) => small.divisible_by(y),
-            (Natural(Large(limbs)), y) => limbs_divisible_by_limb(limbs, y),
+            (&Self(Small(small)), y) => small.divisible_by(y),
+            (Self(Large(limbs)), y) => limbs_divisible_by_limb(limbs, y),
         }
     }
 
@@ -463,13 +463,13 @@ impl Natural {
     fn limb_divisible_by_natural(&self, other: Limb) -> bool {
         match (other, self) {
             (0, _) => true,
-            (_, &Natural::ZERO | &Natural(Large(_))) => false,
-            (x, &Natural(Small(small))) => x.divisible_by(small),
+            (_, &Self::ZERO | &Self(Large(_))) => false,
+            (x, &Self(Small(small))) => x.divisible_by(small),
         }
     }
 }
 
-impl DivisibleBy<Natural> for Natural {
+impl DivisibleBy<Self> for Natural {
     /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
     /// the first is a multiple of the second. Both [`Natural`]s are taken by value.
     ///
@@ -509,18 +509,18 @@ impl DivisibleBy<Natural> for Natural {
     ///     true
     /// );
     /// ```
-    fn divisible_by(mut self, mut other: Natural) -> bool {
+    fn divisible_by(mut self, mut other: Self) -> bool {
         match (&mut self, &mut other) {
-            (x, &mut Natural(Small(y))) => x.divisible_by_limb(y),
-            (&mut Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (x, &mut Self(Small(y))) => x.divisible_by_limb(y),
+            (&mut Self(Small(x)), y) => y.limb_divisible_by_natural(x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by(xs, ys)
             }
         }
     }
 }
 
-impl<'a> DivisibleBy<&'a Natural> for Natural {
+impl<'a> DivisibleBy<&'a Self> for Natural {
     /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
     /// the first is a multiple of the second. The first [`Natural`]s is taken by reference and the
     /// second by value.
@@ -561,11 +561,11 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     ///     true
     /// );
     /// ```
-    fn divisible_by(mut self, other: &'a Natural) -> bool {
+    fn divisible_by(mut self, other: &'a Self) -> bool {
         match (&mut self, other) {
-            (x, &Natural(Small(y))) => x.divisible_by_limb(y),
-            (&mut Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (x, &Self(Small(y))) => x.divisible_by_limb(y),
+            (&mut Self(Small(x)), y) => y.limb_divisible_by_natural(x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_val_ref(xs, ys)
             }
         }

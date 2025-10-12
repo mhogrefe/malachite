@@ -52,9 +52,9 @@ impl TryFrom<Float> for Rational {
     /// );
     /// assert_eq!(Rational::try_from(Float::NAN), Err(RationalFromFloatError));
     /// ```
-    fn try_from(x: Float) -> Result<Rational, Self::Error> {
+    fn try_from(x: Float) -> Result<Self, Self::Error> {
         match x {
-            float_either_zero!() => Ok(Rational::ZERO),
+            float_either_zero!() => Ok(Self::ZERO),
             Float(Finite {
                 sign,
                 exponent,
@@ -63,7 +63,7 @@ impl TryFrom<Float> for Rational {
             }) => {
                 let bits = significand_bits(&significand);
                 Ok(
-                    Rational::from(Integer::from_sign_and_abs(sign, significand))
+                    Self::from(Integer::from_sign_and_abs(sign, significand))
                         << (i128::from(exponent) - i128::from(bits)),
                 )
             }
@@ -108,9 +108,9 @@ impl TryFrom<&Float> for Rational {
     /// );
     /// assert_eq!(Rational::try_from(&Float::NAN), Err(RationalFromFloatError));
     /// ```
-    fn try_from(x: &Float) -> Result<Rational, Self::Error> {
+    fn try_from(x: &Float) -> Result<Self, Self::Error> {
         match x {
-            float_either_zero!() => Ok(Rational::ZERO),
+            float_either_zero!() => Ok(Self::ZERO),
             Float(Finite {
                 sign,
                 exponent,
@@ -119,7 +119,7 @@ impl TryFrom<&Float> for Rational {
             }) => {
                 let bits = significand_bits(significand);
                 Ok(
-                    Rational::from(Integer::from_sign_and_abs_ref(*sign, significand))
+                    Self::from(Integer::from_sign_and_abs_ref(*sign, significand))
                         << (i128::from(*exponent) - i128::from(bits)),
                 )
             }

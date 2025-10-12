@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::{ExtendedGcd, NegAssign, UnsignedAb
 
 impl ExtendedGcd for Integer {
     type Gcd = Natural;
-    type Cofactor = Integer;
+    type Cofactor = Self;
 
     /// Computes the GCD (greatest common divisor) of two [`Integer`]s $a$ and $b$, and also the
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. Both [`Integer`]s are
@@ -63,7 +63,7 @@ impl ExtendedGcd for Integer {
     ///     "(3, 27, 10)"
     /// );
     /// ```
-    fn extended_gcd(self, other: Integer) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: Self) -> (Natural, Self, Self) {
         let a_sign = self.sign;
         let b_sign = other.sign;
         let (gcd, mut x, mut y) = self.unsigned_abs().extended_gcd(other.unsigned_abs());
@@ -77,9 +77,9 @@ impl ExtendedGcd for Integer {
     }
 }
 
-impl ExtendedGcd<&Integer> for Integer {
+impl ExtendedGcd<&Self> for Integer {
     type Gcd = Natural;
-    type Cofactor = Integer;
+    type Cofactor = Self;
 
     /// Computes the GCD (greatest common divisor) of two [`Integer`]s $a$ and $b$, and also the
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. The first [`Integer`] is
@@ -130,7 +130,7 @@ impl ExtendedGcd<&Integer> for Integer {
     ///     "(3, 27, 10)"
     /// );
     /// ```
-    fn extended_gcd(self, other: &Integer) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: &Self) -> (Natural, Self, Self) {
         let a_sign = self.sign;
         let (gcd, mut x, mut y) = self.unsigned_abs().extended_gcd(other.unsigned_abs_ref());
         if !a_sign {

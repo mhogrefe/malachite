@@ -256,7 +256,7 @@ impl ToSci for Rational {
         if options.get_rounding_mode() != Exact {
             return true;
         }
-        let q_base = Rational::from(options.get_base());
+        let q_base = Self::from(options.get_base());
         let scale = match options.get_size_options() {
             SciSizeOptions::Precision(precision) => {
                 let log = floor_log_base_of_abs(self, &q_base);
@@ -383,7 +383,7 @@ impl ToSci for Rational {
             f.write_char('-')?;
         }
         let base = options.get_base();
-        let q_base = Rational::from(base);
+        let q_base = Self::from(base);
         let mut trim_zeros = !options.get_include_trailing_zeros();
         let mut log = floor_log_base_of_abs(self, &q_base);
         // Here, precision 0 means that we're rounding down to zero

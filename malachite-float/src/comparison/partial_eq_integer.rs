@@ -39,7 +39,7 @@ impl PartialEq<Integer> for Float {
     fn eq(&self, other: &Integer) -> bool {
         match self {
             float_either_zero!() => *other == 0u32,
-            Float(Finite {
+            Self(Finite {
                 sign,
                 exponent,
                 significand,

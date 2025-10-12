@@ -13,7 +13,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::NotAssign;
 
 impl Not for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the bitwise negation of an [`Integer`], taking it by value.
     ///
@@ -38,7 +38,7 @@ impl Not for Integer {
     /// assert_eq!(!Integer::from(-123), 122);
     /// ```
     #[inline]
-    fn not(mut self) -> Integer {
+    fn not(mut self) -> Self {
         self.not_assign();
         self
     }

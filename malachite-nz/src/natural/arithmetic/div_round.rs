@@ -80,8 +80,8 @@ fn div_round_assign_nearest(q: &mut Natural, r: &Natural, d: &Natural) -> Orderi
     }
 }
 
-impl DivRound<Natural> for Natural {
-    type Output = Natural;
+impl DivRound<Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and rounding according to
     /// a specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned
@@ -174,14 +174,14 @@ impl DivRound<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_round(mut self, other: Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn div_round(mut self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.div_round_assign(other, rm);
         (self, o)
     }
 }
 
-impl<'a> DivRound<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> DivRound<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and rounding according to a specified rounding mode. An [`Ordering`] is also
@@ -275,7 +275,7 @@ impl<'a> DivRound<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_round(mut self, other: &'a Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn div_round(mut self, other: &'a Self, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.div_round_assign(other, rm);
         (self, o)
     }
@@ -490,7 +490,7 @@ impl DivRound<&Natural> for &Natural {
     }
 }
 
-impl DivRoundAssign<Natural> for Natural {
+impl DivRoundAssign<Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value and rounding according to a specified rounding mode. An
     /// [`Ordering`] is returned, indicating whether the assigned value is less than, equal to, or
@@ -551,7 +551,7 @@ impl DivRoundAssign<Natural> for Natural {
     /// assert_eq!(n.div_round_assign(Natural::from(4u32), Nearest), Greater);
     /// assert_eq!(n, 4);
     /// ```
-    fn div_round_assign(&mut self, other: Natural, rm: RoundingMode) -> Ordering {
+    fn div_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         let r = self.div_assign_mod(&other);
         if r == 0 {
             Equal
@@ -559,7 +559,7 @@ impl DivRoundAssign<Natural> for Natural {
             match rm {
                 Floor | Down => Less,
                 Ceiling | Up => {
-                    *self += Natural::ONE;
+                    *self += Self::ONE;
                     Greater
                 }
                 Exact => panic!("Division is not exact"),
@@ -569,7 +569,7 @@ impl DivRoundAssign<Natural> for Natural {
     }
 }
 
-impl<'a> DivRoundAssign<&'a Natural> for Natural {
+impl<'a> DivRoundAssign<&'a Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference and rounding according to a specified rounding mode. An
     /// [`Ordering`] is returned, indicating whether the assigned value is less than, equal to, or
@@ -630,7 +630,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// assert_eq!(n.div_round_assign(&Natural::from(4u32), Nearest), Greater);
     /// assert_eq!(n, 4);
     /// ```
-    fn div_round_assign(&mut self, other: &'a Natural, rm: RoundingMode) -> Ordering {
+    fn div_round_assign(&mut self, other: &'a Self, rm: RoundingMode) -> Ordering {
         let r = self.div_assign_mod(other);
         if r == 0 {
             Equal
@@ -638,7 +638,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
             match rm {
                 Floor | Down => Less,
                 Ceiling | Up => {
-                    *self += Natural::ONE;
+                    *self += Self::ONE;
                     Greater
                 }
                 Exact => panic!("Division is not exact"),
