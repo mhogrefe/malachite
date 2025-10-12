@@ -392,9 +392,9 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            GeometricRandomSignedRange::NonNegative(xs) => xs.next(),
-            GeometricRandomSignedRange::NonPositive(xs) => xs.next(),
-            GeometricRandomSignedRange::BothSigns(xs) => xs.next(),
+            Self::NonNegative(xs) => xs.next(),
+            Self::NonPositive(xs) => xs.next(),
+            Self::BothSigns(xs) => xs.next(),
         }
     }
 }

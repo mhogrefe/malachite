@@ -839,8 +839,8 @@ impl Iterator for RandomNaturalRange {
 
     fn next(&mut self) -> Option<Natural> {
         match self {
-            RandomNaturalRange::SingleOrder(xs) => xs.next(),
-            RandomNaturalRange::MultipleOrders(xs) => xs.next(),
+            Self::SingleOrder(xs) => xs.next(),
+            Self::MultipleOrders(xs) => xs.next(),
         }
     }
 }

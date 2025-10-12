@@ -71,14 +71,14 @@ pub fn char_is_graphic(c: char) -> bool {
 impl CharType {
     pub_crate_test! {contains(self, c: char) -> bool {
         match self {
-            CharType::AsciiLower => c.is_ascii_lowercase(),
-            CharType::AsciiUpper => c.is_ascii_uppercase(),
-            CharType::AsciiNumeric => c.is_ascii_digit(),
-            CharType::AsciiNonAlphanumericGraphic => {
+            Self::AsciiLower => c.is_ascii_lowercase(),
+            Self::AsciiUpper => c.is_ascii_uppercase(),
+            Self::AsciiNumeric => c.is_ascii_digit(),
+            Self::AsciiNonAlphanumericGraphic => {
                 c.is_ascii() && !c.is_ascii_alphanumeric() && !c.is_ascii_control()
             }
-            CharType::NonAsciiGraphic => !c.is_ascii() && !debug_starts_with_slash(c),
-            CharType::NonGraphic => {
+            Self::NonAsciiGraphic => !c.is_ascii() && !debug_starts_with_slash(c),
+            Self::NonGraphic => {
                 c.is_ascii_control() || !c.is_ascii() && debug_starts_with_slash(c)
             }
         }

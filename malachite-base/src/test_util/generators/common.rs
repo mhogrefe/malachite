@@ -23,9 +23,9 @@ pub enum GenMode {
 impl GenMode {
     pub const fn name(self) -> &'static str {
         match self {
-            GenMode::Exhaustive => "exhaustive",
-            GenMode::Random => "random",
-            GenMode::SpecialRandom => "special_random",
+            Self::Exhaustive => "exhaustive",
+            Self::Random => "random",
+            Self::SpecialRandom => "special_random",
         }
     }
 }

@@ -89,8 +89,8 @@ impl Natural {
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         match self {
-            Natural(Small(_)) => true,
-            Natural(Large(xs)) => xs.len() > 1 && *xs.last().unwrap() != 0,
+            Self(Small(_)) => true,
+            Self(Large(xs)) => xs.len() > 1 && *xs.last().unwrap() != 0,
         }
     }
 }

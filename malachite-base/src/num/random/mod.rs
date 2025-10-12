@@ -144,8 +144,8 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
     #[inline]
     fn next(&mut self) -> Option<T> {
         match self {
-            RandomUnsignedsLessThan::One => Some(T::ZERO),
-            RandomUnsignedsLessThan::AtLeastTwo(xs, limit) => loop {
+            Self::One => Some(T::ZERO),
+            Self::AtLeastTwo(xs, limit) => loop {
                 let x = xs.next();
                 if x.unwrap() < *limit {
                     return x;
@@ -188,8 +188,8 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedInclusiveRange<T> {
     #[inline]
     fn next(&mut self) -> Option<T> {
         match self {
-            RandomUnsignedInclusiveRange::NotAll(xs, a) => xs.next().map(|x| x + *a),
-            RandomUnsignedInclusiveRange::All(xs) => xs.next(),
+            Self::NotAll(xs, a) => xs.next().map(|x| x + *a),
+            Self::All(xs) => xs.next(),
         }
     }
 }
@@ -2133,9 +2133,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFiniteFloatInclusiveRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            SpecialRandomFiniteFloatInclusiveRange::AllPositive(xs) => xs.next(),
-            SpecialRandomFiniteFloatInclusiveRange::AllNegative(xs) => xs.next().map(|x| -x),
-            SpecialRandomFiniteFloatInclusiveRange::PositiveAndNegative(bs, xs, ys) => {
+            Self::AllPositive(xs) => xs.next(),
+            Self::AllNegative(xs) => xs.next().map(|x| -x),
+            Self::PositiveAndNegative(bs, xs, ys) => {
                 if bs.next().unwrap() {
                     xs.next()
                 } else {
@@ -2226,9 +2226,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 
     fn next(&mut self) -> Option<T> {
         match self {
-            SpecialRandomFloatInclusiveRange::OnlySpecial(xs) => xs.next(),
-            SpecialRandomFloatInclusiveRange::NoSpecial(xs) => xs.next(),
-            SpecialRandomFloatInclusiveRange::Special(xs) => xs.next(),
+            Self::OnlySpecial(xs) => xs.next(),
+            Self::NoSpecial(xs) => xs.next(),
+            Self::Special(xs) => xs.next(),
         }
     }
 }
