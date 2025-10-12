@@ -7484,8 +7484,7 @@ pub fn random_primitive_int_vec_triple_gen_var_46<T: PrimitiveInt>(
 struct UnsignedVecUnsignedPairGeneratorVar1<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     log_bases: GeometricRandomNaturalValues<u64>,
     ranges: VariableRangeGenerator,
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
@@ -7521,8 +7520,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned, U: Prim
             config.get_or("mean_log_base_d", 1),
         ),
         ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
-        phantom_t: PhantomData,
-        phantom_u: PhantomData,
+        phantom: PhantomData,
     })
 }
 
@@ -7586,8 +7584,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_3<
 
 struct DigitsDesc<T: PrimitiveUnsigned, U: Digits<T> + PrimitiveUnsigned> {
     ranges: VariableRangeGenerator,
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned + SaturatingFrom<U>, U: Digits<T> + PrimitiveUnsigned> Iterator
@@ -7622,8 +7619,7 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_4<
 ) -> It<(Vec<T>, T)> {
     Box::new(DigitsDesc::<T, U> {
         ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
-        phantom_t: PhantomData,
-        phantom_u: PhantomData,
+        phantom: PhantomData,
     })
 }
 
