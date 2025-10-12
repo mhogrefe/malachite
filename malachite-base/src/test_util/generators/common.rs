@@ -36,8 +36,8 @@ pub type It<T> = Box<dyn Iterator<Item = T>>;
 pub struct GenConfig(HashMap<String, u64>);
 
 impl GenConfig {
-    pub fn new() -> GenConfig {
-        GenConfig(HashMap::new())
+    pub fn new() -> Self {
+        Self(HashMap::new())
     }
 
     pub fn insert(&mut self, key: &str, value: u64) {
@@ -50,8 +50,8 @@ impl GenConfig {
 }
 
 impl Default for GenConfig {
-    fn default() -> GenConfig {
-        GenConfig::new()
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -67,8 +67,8 @@ impl<T> Generator<T> {
         exhaustive: &'static dyn Fn() -> It<T>,
         random: &'static dyn Fn(&GenConfig) -> It<T>,
         special_random: &'static dyn Fn(&GenConfig) -> It<T>,
-    ) -> Generator<T> {
-        Generator {
+    ) -> Self {
+        Self {
             phantom: PhantomData,
             exhaustive,
             random,
@@ -79,8 +79,8 @@ impl<T> Generator<T> {
     pub fn new_no_special(
         exhaustive: &'static dyn Fn() -> It<T>,
         random: &'static dyn Fn(&GenConfig) -> It<T>,
-    ) -> Generator<T> {
-        Generator {
+    ) -> Self {
+        Self {
             phantom: PhantomData,
             exhaustive,
             random,

@@ -18,8 +18,8 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn new() -> Runner {
-        Runner {
+    pub fn new() -> Self {
+        Self {
             demo_map: HashMap::new(),
             bench_map: HashMap::new(),
         }
@@ -56,8 +56,8 @@ impl Runner {
 }
 
 impl Default for Runner {
-    fn default() -> Runner {
-        Runner::new()
+    fn default() -> Self {
+        Self::new()
     }
 }
 

@@ -86,11 +86,11 @@ impl StripedBitSource {
     /// }
     /// assert_eq!(string, "0000000101100110000000011110000000001111");
     /// ```
-    pub fn new(seed: Seed, m_numerator: u64, m_denominator: u64) -> StripedBitSource {
+    pub fn new(seed: Seed, m_numerator: u64, m_denominator: u64) -> Self {
         assert_ne!(m_denominator, 0);
         assert!(m_numerator > m_denominator);
         let (numerator, denominator) = mean_to_p_with_min(1u64, m_numerator, m_denominator);
-        StripedBitSource {
+        Self {
             first_bit_of_block: true,
             previous_bit: false,
             bs: random_bools(seed.fork("bs")),
