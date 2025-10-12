@@ -33,7 +33,7 @@ impl From<bool> for Natural {
     /// assert_eq!(Natural::from(true), 1);
     /// ```
     #[inline]
-    fn from(b: bool) -> Natural {
-        if b { Natural::ONE } else { Natural::ZERO }
+    fn from(b: bool) -> Self {
+        if b { Self::ONE } else { Self::ZERO }
     }
 }

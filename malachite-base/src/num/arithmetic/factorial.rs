@@ -358,10 +358,10 @@ impl CheckedFactorial for usize {
     /// # Examples
     /// See [here](super::factorial#checked_factorial).
     #[inline]
-    fn checked_factorial(n: u64) -> Option<usize> {
+    fn checked_factorial(n: u64) -> Option<Self> {
         FACTORIALS_U64
-            .get(usize::try_from(n).ok()?)
-            .and_then(|&f| usize::try_from(f).ok())
+            .get(Self::try_from(n).ok()?)
+            .and_then(|&f| Self::try_from(f).ok())
     }
 }
 
@@ -389,10 +389,10 @@ impl CheckedSubfactorial for usize {
     /// # Examples
     /// See [here](super::factorial#checked_subfactorial).
     #[inline]
-    fn checked_subfactorial(n: u64) -> Option<usize> {
+    fn checked_subfactorial(n: u64) -> Option<Self> {
         SUBFACTORIALS_U64
-            .get(usize::try_from(n).ok()?)
-            .and_then(|&f| usize::try_from(f).ok())
+            .get(Self::try_from(n).ok()?)
+            .and_then(|&f| Self::try_from(f).ok())
     }
 }
 
@@ -417,11 +417,11 @@ impl CheckedDoubleFactorial for usize {
     /// # Examples
     /// See [here](super::factorial#checked_double_factorial).
     #[inline]
-    fn checked_double_factorial(n: u64) -> Option<usize> {
+    fn checked_double_factorial(n: u64) -> Option<Self> {
         if USIZE_IS_U32 {
-            u32::checked_double_factorial(n).map(usize::wrapping_from)
+            u32::checked_double_factorial(n).map(Self::wrapping_from)
         } else {
-            u64::checked_double_factorial(n).map(usize::wrapping_from)
+            u64::checked_double_factorial(n).map(Self::wrapping_from)
         }
     }
 }

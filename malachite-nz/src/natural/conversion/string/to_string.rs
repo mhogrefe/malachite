@@ -66,7 +66,7 @@ impl<T> BaseFmtWrapper<T> {
     /// ```
     pub fn new(x: T, base: u8) -> Self {
         assert!((2..=36).contains(&base), "base out of range");
-        BaseFmtWrapper { x, base }
+        Self { x, base }
     }
 
     /// Recovers the value from a `BaseFmtWrapper`.
@@ -201,7 +201,7 @@ impl ToStringBase for Natural {
     /// ```
     fn to_string_base(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
-        if let Natural(Small(x)) = self {
+        if let Self(Small(x)) = self {
             x.to_string_base(base)
         } else {
             let mut digits = self.to_digits_desc(&base);
@@ -238,7 +238,7 @@ impl ToStringBase for Natural {
     /// ```
     fn to_string_base_upper(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
-        if let Natural(Small(x)) = self {
+        if let Self(Small(x)) = self {
             x.to_string_base_upper(base)
         } else {
             let mut digits = self.to_digits_desc(&base);
@@ -276,8 +276,8 @@ impl Display for Natural {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Natural(Small(x)) => Display::fmt(x, f),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => Display::fmt(x, f),
+            Self(Large(xs)) => {
                 let mut digits = vec![0; usize::exact_from(limbs_digit_count(xs, 10))];
                 let mut xs = xs.clone();
                 let len = limbs_to_digits_small_base_no_alg_specified(&mut digits, 10, &mut xs);
@@ -430,8 +430,8 @@ impl Binary for Natural {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Natural(Small(x)) => Binary::fmt(x, f),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => Binary::fmt(x, f),
+            Self(Large(xs)) => {
                 let mut bits = vec![0; usize::exact_from(limbs_significant_bits(xs))];
                 let mut limbs = xs.iter();
                 let mut limb = *limbs.next().unwrap();
@@ -609,8 +609,8 @@ impl Octal for Natural {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Natural(Small(x)) => Octal::fmt(x, f),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => Octal::fmt(x, f),
+            Self(Large(xs)) => {
                 let mut digits =
                     vec![0; usize::exact_from(limbs_significant_bits(xs).div_round(3, Ceiling).0)];
                 let mut limbs = xs.iter();
@@ -757,8 +757,8 @@ impl LowerHex for Natural {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Natural(Small(x)) => LowerHex::fmt(x, f),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => LowerHex::fmt(x, f),
+            Self(Large(xs)) => {
                 const DIGITS_PER_LIMB: u64 = Limb::WIDTH >> 2;
                 let mut digits =
                     vec![0; usize::exact_from(limbs_significant_bits(xs).shr_round(2, Ceiling).0)];
@@ -819,8 +819,8 @@ impl UpperHex for Natural {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Natural(Small(x)) => UpperHex::fmt(x, f),
-            Natural(Large(xs)) => {
+            Self(Small(x)) => UpperHex::fmt(x, f),
+            Self(Large(xs)) => {
                 const DIGITS_PER_LIMB: u64 = Limb::WIDTH >> 2;
                 let mut digits =
                     vec![0; usize::exact_from(limbs_significant_bits(xs).shr_round(2, Ceiling).0)];

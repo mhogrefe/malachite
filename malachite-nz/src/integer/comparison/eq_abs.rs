@@ -33,7 +33,7 @@ impl EqAbs for Integer {
     /// assert_eq!(Integer::from(-123).eq_abs(&Integer::from(-123)), true);
     /// ```
     #[inline]
-    fn eq_abs(&self, other: &Integer) -> bool {
+    fn eq_abs(&self, other: &Self) -> bool {
         self.abs == other.abs
     }
 }

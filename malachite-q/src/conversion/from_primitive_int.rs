@@ -26,8 +26,8 @@ impl Rational {
     /// const TEN: Rational = Rational::const_from_unsigned(10);
     /// assert_eq!(TEN, 10);
     /// ```
-    pub const fn const_from_unsigned(x: Limb) -> Rational {
-        Rational {
+    pub const fn const_from_unsigned(x: Limb) -> Self {
+        Self {
             sign: true,
             numerator: Natural::const_from(x),
             denominator: Natural::ONE,
@@ -51,8 +51,8 @@ impl Rational {
     /// const NEGATIVE_TEN: Rational = Rational::const_from_signed(-10);
     /// assert_eq!(NEGATIVE_TEN, -10);
     /// ```
-    pub const fn const_from_signed(x: SignedLimb) -> Rational {
-        Rational {
+    pub const fn const_from_signed(x: SignedLimb) -> Self {
+        Self {
             sign: x >= 0,
             numerator: Natural::const_from(x.unsigned_abs()),
             denominator: Natural::ONE,

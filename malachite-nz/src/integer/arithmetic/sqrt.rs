@@ -13,7 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 
 impl FloorSqrt for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the floor of the square root of an [`Integer`], taking it by value.
     ///
@@ -41,7 +41,7 @@ impl FloorSqrt for Integer {
     /// assert_eq!(Integer::from(10000000000u64).floor_sqrt(), 100000);
     /// ```
     #[inline]
-    fn floor_sqrt(mut self) -> Integer {
+    fn floor_sqrt(mut self) -> Self {
         self.floor_sqrt_assign();
         self
     }
@@ -136,7 +136,7 @@ impl FloorSqrtAssign for Integer {
 }
 
 impl CeilingSqrt for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the ceiling of the square root of an [`Integer`], taking it by value.
     ///
@@ -164,7 +164,7 @@ impl CeilingSqrt for Integer {
     /// assert_eq!(Integer::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
     #[inline]
-    fn ceiling_sqrt(mut self) -> Integer {
+    fn ceiling_sqrt(mut self) -> Self {
         self.ceiling_sqrt_assign();
         self
     }
@@ -259,7 +259,7 @@ impl CeilingSqrtAssign for Integer {
 }
 
 impl CheckedSqrt for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Returns the the square root of an [`Integer`], or `None` if it is not a perfect square. The
     /// [`Integer`] is taken by value.
@@ -310,9 +310,9 @@ impl CheckedSqrt for Integer {
     /// );
     /// ```
     #[inline]
-    fn checked_sqrt(self) -> Option<Integer> {
+    fn checked_sqrt(self) -> Option<Self> {
         if self >= 0 {
-            self.unsigned_abs().checked_sqrt().map(Integer::from)
+            self.unsigned_abs().checked_sqrt().map(Self::from)
         } else {
             panic!("Cannot take square root of {self}")
         }

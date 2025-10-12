@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Lcm, LcmAssign};
 use malachite_base::num::basic::traits::Zero;
 
-impl Lcm<Natural> for Natural {
-    type Output = Natural;
+impl Lcm<Self> for Natural {
+    type Output = Self;
 
     /// Computes the LCM (least common multiple) of two [`Natural`]s, taking both by value.
     ///
@@ -35,14 +35,14 @@ impl Lcm<Natural> for Natural {
     /// assert_eq!(Natural::from(3u32).lcm(Natural::from(5u32)), 15);
     /// assert_eq!(Natural::from(12u32).lcm(Natural::from(90u32)), 180);
     /// ```
-    fn lcm(mut self, other: Natural) -> Natural {
+    fn lcm(mut self, other: Self) -> Self {
         self.lcm_assign(other);
         self
     }
 }
 
-impl<'a> Lcm<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Lcm<&'a Self> for Natural {
+    type Output = Self;
 
     /// Computes the LCM (least common multiple) of two [`Natural`]s, taking the first by value and
     /// the second by reference.
@@ -68,7 +68,7 @@ impl<'a> Lcm<&'a Natural> for Natural {
     /// assert_eq!(Natural::from(12u32).lcm(&Natural::from(90u32)), 180);
     /// ```
     #[inline]
-    fn lcm(mut self, other: &'a Natural) -> Natural {
+    fn lcm(mut self, other: &'a Self) -> Self {
         self.lcm_assign(other);
         self
     }
@@ -149,7 +149,7 @@ impl Lcm<&Natural> for &Natural {
     }
 }
 
-impl LcmAssign<Natural> for Natural {
+impl LcmAssign<Self> for Natural {
     /// Replaces a [`Natural`] by its LCM (least common multiple) with another [`Natural`], taking
     /// the [`Natural`] on the right-hand side by value.
     ///
@@ -179,11 +179,11 @@ impl LcmAssign<Natural> for Natural {
     /// assert_eq!(x, 180);
     /// ```
     #[inline]
-    fn lcm_assign(&mut self, mut other: Natural) {
+    fn lcm_assign(&mut self, mut other: Self) {
         if *self == 0 {
             return;
         } else if other == 0 {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
             return;
         }
         let gcd = (&*self).gcd(&other);
@@ -196,7 +196,7 @@ impl LcmAssign<Natural> for Natural {
     }
 }
 
-impl<'a> LcmAssign<&'a Natural> for Natural {
+impl<'a> LcmAssign<&'a Self> for Natural {
     /// Replaces a [`Natural`] by its LCM (least common multiple) with another [`Natural`], taking
     /// the [`Natural`] on the right-hand side by reference.
     ///
@@ -226,11 +226,11 @@ impl<'a> LcmAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 180);
     /// ```
     #[inline]
-    fn lcm_assign(&mut self, other: &'a Natural) {
+    fn lcm_assign(&mut self, other: &'a Self) {
         if *self == 0 {
             return;
         } else if *other == 0 {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
             return;
         }
         self.div_exact_assign((&*self).gcd(other));

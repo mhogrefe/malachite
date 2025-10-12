@@ -351,7 +351,7 @@ pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<L
 }}
 
 impl ModPowerOf2Square for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Squares a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The
     /// [`Natural`] is taken by value.
@@ -386,7 +386,7 @@ impl ModPowerOf2Square for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_square(mut self, pow: u64) -> Natural {
+    fn mod_power_of_2_square(mut self, pow: u64) -> Self {
         self.mod_power_of_2_square_assign(pow);
         self
     }
@@ -492,17 +492,17 @@ impl ModPowerOf2SquareAssign for Natural {
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
         );
         match self {
-            &mut Natural::ZERO => {}
-            Natural(Small(x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),
-            Natural(Small(x)) => {
+            &mut Self::ZERO => {}
+            Self(Small(x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),
+            Self(Small(x)) => {
                 let x_double = DoubleLimb::from(*x);
-                *self = Natural::from(if pow <= Limb::WIDTH << 1 {
+                *self = Self::from(if pow <= Limb::WIDTH << 1 {
                     x_double.mod_power_of_2_square(pow)
                 } else {
                     x_double.square()
                 });
             }
-            Natural(Large(xs)) => {
+            Self(Large(xs)) => {
                 *xs = limbs_mod_power_of_2_square(xs, pow);
                 self.trim();
             }

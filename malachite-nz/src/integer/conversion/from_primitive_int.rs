@@ -25,8 +25,8 @@ impl Integer {
     /// const TEN: Integer = Integer::const_from_unsigned(10);
     /// assert_eq!(TEN, 10);
     /// ```
-    pub const fn const_from_unsigned(x: Limb) -> Integer {
-        Integer {
+    pub const fn const_from_unsigned(x: Limb) -> Self {
+        Self {
             sign: true,
             abs: Natural::const_from(x),
         }
@@ -49,8 +49,8 @@ impl Integer {
     /// const NEGATIVE_TEN: Integer = Integer::const_from_signed(-10);
     /// assert_eq!(NEGATIVE_TEN, -10);
     /// ```
-    pub const fn const_from_signed(x: SignedLimb) -> Integer {
-        Integer {
+    pub const fn const_from_signed(x: SignedLimb) -> Self {
+        Self {
             sign: x >= 0,
             abs: Natural::const_from(x.unsigned_abs()),
         }

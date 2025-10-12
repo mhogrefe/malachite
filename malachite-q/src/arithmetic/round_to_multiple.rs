@@ -14,8 +14,8 @@ use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 
-impl RoundToMultiple<Rational> for Rational {
-    type Output = Rational;
+impl RoundToMultiple<Self> for Rational {
+    type Output = Self;
 
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
     /// specified rounding mode. Both [`Rational`]s are taken by value. An [`Ordering`] is also
@@ -104,14 +104,14 @@ impl RoundToMultiple<Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: Rational, rm: RoundingMode) -> (Rational, Ordering) {
+    fn round_to_multiple(mut self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
 }
 
-impl RoundToMultiple<&Rational> for Rational {
-    type Output = Rational;
+impl RoundToMultiple<&Self> for Rational {
+    type Output = Self;
 
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
     /// specified rounding mode. The first [`Rational`] is taken by value and the second by
@@ -200,7 +200,7 @@ impl RoundToMultiple<&Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &Rational, rm: RoundingMode) -> (Rational, Ordering) {
+    fn round_to_multiple(mut self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
@@ -413,7 +413,7 @@ impl RoundToMultiple<&Rational> for &Rational {
     }
 }
 
-impl RoundToMultipleAssign<Rational> for Rational {
+impl RoundToMultipleAssign<Self> for Rational {
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`] in place, according to
     /// a  specified rounding mode. The [`Rational`] on the right-hand side is taken by value. An
     /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
@@ -471,14 +471,14 @@ impl RoundToMultipleAssign<Rational> for Rational {
     /// assert_eq!(x.round_to_multiple_assign(hundredth.clone(), Nearest), Less);
     /// assert_eq!(x.to_string(), "157/50");
     /// ```
-    fn round_to_multiple_assign(&mut self, other: Rational, mut rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: Self, mut rm: RoundingMode) -> Ordering {
         if *self == other {
             return Equal;
         }
         if other == 0u32 {
             if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
                 let o = if *self >= 0 { Less } else { Greater };
-                *self = Rational::ZERO;
+                *self = Self::ZERO;
                 return o;
             }
             panic!("Cannot round {self} to zero using RoundingMode {rm}");
@@ -489,12 +489,12 @@ impl RoundToMultipleAssign<Rational> for Rational {
         *self /= &other;
         let (x, o) = Integer::rounding_from(&*self, rm);
         let other_sign = other.sign;
-        *self = Rational::from(x) * other;
+        *self = Self::from(x) * other;
         if other_sign { o } else { o.reverse() }
     }
 }
 
-impl RoundToMultipleAssign<&Rational> for Rational {
+impl RoundToMultipleAssign<&Self> for Rational {
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`] in place, according to
     /// a specified rounding mode. The [`Rational`] on the right-hand side is taken by reference. An
     /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
@@ -549,14 +549,14 @@ impl RoundToMultipleAssign<&Rational> for Rational {
     /// assert_eq!(x.round_to_multiple_assign(&hundredth, Nearest), Less);
     /// assert_eq!(x.to_string(), "157/50");
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &Rational, mut rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: &Self, mut rm: RoundingMode) -> Ordering {
         if self == other {
             return Equal;
         }
         if *other == 0u32 {
             if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
                 let o = if *self >= 0u32 { Less } else { Greater };
-                *self = Rational::ZERO;
+                *self = Self::ZERO;
                 return o;
             }
             panic!("Cannot round {self} to zero using RoundingMode {rm}");
@@ -566,7 +566,7 @@ impl RoundToMultipleAssign<&Rational> for Rational {
         }
         *self /= other;
         let (x, o) = Integer::rounding_from(&*self, rm);
-        *self = Rational::from(x) * other;
+        *self = Self::from(x) * other;
         if other.sign { o } else { o.reverse() }
     }
 }

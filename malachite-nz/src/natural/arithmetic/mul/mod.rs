@@ -518,8 +518,8 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
     }
 }}
 
-impl Mul<Natural> for Natural {
-    type Output = Natural;
+impl Mul<Self> for Natural {
+    type Output = Self;
 
     /// Multiplies two [`Natural`]s, taking both by value.
     ///
@@ -552,14 +552,14 @@ impl Mul<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mul(mut self, other: Natural) -> Natural {
+    fn mul(mut self, other: Self) -> Self {
         self *= other;
         self
     }
 }
 
-impl<'a> Mul<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Mul<&'a Self> for Natural {
+    type Output = Self;
 
     /// Multiplies two [`Natural`]s, taking the first by value and the second by reference.
     ///
@@ -592,7 +592,7 @@ impl<'a> Mul<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mul(mut self, other: &'a Natural) -> Natural {
+    fn mul(mut self, other: &'a Self) -> Self {
         self *= other;
         self
     }
@@ -682,7 +682,7 @@ impl Mul<&Natural> for &Natural {
     }
 }
 
-impl MulAssign<Natural> for Natural {
+impl MulAssign<Self> for Natural {
     /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the right-hand
     /// side by value.
     ///
@@ -711,14 +711,14 @@ impl MulAssign<Natural> for Natural {
     /// x *= Natural::from_str("4000").unwrap();
     /// assert_eq!(x.to_string(), "24000000000000");
     /// ```
-    fn mul_assign(&mut self, mut other: Natural) {
+    fn mul_assign(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (Natural(Small(x)), _) => {
+            (Self(Small(x)), _) => {
                 other.mul_assign_limb(*x);
                 *self = other;
             }
-            (_, Natural(Small(y))) => self.mul_assign_limb(*y),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.mul_assign_limb(*y),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 *xs = limbs_mul(xs, ys);
                 self.trim();
             }
@@ -726,7 +726,7 @@ impl MulAssign<Natural> for Natural {
     }
 }
 
-impl<'a> MulAssign<&'a Natural> for Natural {
+impl<'a> MulAssign<&'a Self> for Natural {
     /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the right-hand
     /// side by reference.
     ///
@@ -755,11 +755,11 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     /// x *= &Natural::from_str("4000").unwrap();
     /// assert_eq!(x.to_string(), "24000000000000");
     /// ```
-    fn mul_assign(&mut self, other: &'a Natural) {
+    fn mul_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (Natural(Small(x)), _) => *self = other.mul_limb_ref(*x),
-            (_, Natural(Small(y))) => self.mul_assign_limb(*y),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (Self(Small(x)), _) => *self = other.mul_limb_ref(*x),
+            (_, Self(Small(y))) => self.mul_assign_limb(*y),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 *xs = limbs_mul(xs, ys);
                 self.trim();
             }
@@ -793,14 +793,14 @@ impl Product for Natural {
     ///     210
     /// );
     /// ```
-    fn product<I>(xs: I) -> Natural
+    fn product<I>(xs: I) -> Self
     where
-        I: Iterator<Item = Natural>,
+        I: Iterator<Item = Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
             if x == 0 {
-                return Natural::ZERO;
+                return Self::ZERO;
             }
             let mut p = x;
             for _ in 0..i.trailing_zeros() {
@@ -808,7 +808,7 @@ impl Product for Natural {
             }
             stack.push(p);
         }
-        let mut p = Natural::ONE;
+        let mut p = Self::ONE;
         for x in stack.into_iter().rev() {
             p *= x;
         }
@@ -816,7 +816,7 @@ impl Product for Natural {
     }
 }
 
-impl<'a> Product<&'a Natural> for Natural {
+impl<'a> Product<&'a Self> for Natural {
     /// Multiplies together all the [`Natural`]s in an iterator of [`Natural`] references.
     ///
     /// $$
@@ -842,14 +842,14 @@ impl<'a> Product<&'a Natural> for Natural {
     ///     210
     /// );
     /// ```
-    fn product<I>(xs: I) -> Natural
+    fn product<I>(xs: I) -> Self
     where
-        I: Iterator<Item = &'a Natural>,
+        I: Iterator<Item = &'a Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
             if *x == 0 {
-                return Natural::ZERO;
+                return Self::ZERO;
             }
             let mut p = x.clone();
             for _ in 0..i.trailing_zeros() {
@@ -857,7 +857,7 @@ impl<'a> Product<&'a Natural> for Natural {
             }
             stack.push(p);
         }
-        let mut p = Natural::ONE;
+        let mut p = Self::ONE;
         for x in stack.into_iter().rev() {
             p *= x;
         }

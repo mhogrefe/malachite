@@ -113,7 +113,7 @@ pub_test! {limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
 }}
 
 impl NextPowerOf2 for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Finds the smallest power of 2 greater than or equal to a [`Natural`]. The [`Natural`] is
     /// taken by value.
@@ -141,7 +141,7 @@ impl NextPowerOf2 for Natural {
     /// );
     /// ```
     #[inline]
-    fn next_power_of_2(mut self) -> Natural {
+    fn next_power_of_2(mut self) -> Self {
         self.next_power_of_2_assign();
         self
     }
@@ -221,14 +221,14 @@ impl NextPowerOf2Assign for Natural {
     /// ```
     fn next_power_of_2_assign(&mut self) {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 if let Some(pow) = small.checked_next_power_of_two() {
                     *small = pow;
                 } else {
-                    *self = Natural(Large(vec![0, 1]));
+                    *self = Self(Large(vec![0, 1]));
                 }
             }
-            Natural(Large(limbs)) => {
+            Self(Large(limbs)) => {
                 limbs_vec_next_power_of_2_in_place(limbs);
             }
         }

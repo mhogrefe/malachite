@@ -135,18 +135,18 @@ pub_test! {limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -
 impl Natural {
     fn eq_mod_power_of_2_neg_limb(&self, other: Limb, pow: u64) -> bool {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 pow <= Limb::WIDTH && small.wrapping_neg().eq_mod_power_of_2(other, pow)
             }
-            Natural(Large(limbs)) => limbs_eq_mod_power_of_2_neg_limb(limbs, other, pow),
+            Self(Large(limbs)) => limbs_eq_mod_power_of_2_neg_limb(limbs, other, pow),
         }
     }
 
-    fn eq_mod_power_of_2_neg_pos(&self, other: &Natural, pow: u64) -> bool {
+    fn eq_mod_power_of_2_neg_pos(&self, other: &Self, pow: u64) -> bool {
         match (self, other) {
-            (_, &Natural(Small(y))) => self.eq_mod_power_of_2_neg_limb(y, pow),
-            (&Natural(Small(x)), _) => other.eq_mod_power_of_2_neg_limb(x, pow),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, &Self(Small(y))) => self.eq_mod_power_of_2_neg_limb(y, pow),
+            (&Self(Small(x)), _) => other.eq_mod_power_of_2_neg_limb(x, pow),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_eq_mod_power_of_2_neg_pos(xs, ys, pow)
             }
         }

@@ -74,16 +74,16 @@ impl Float {
     /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682588");
     /// assert_eq!(o, Greater);
     /// ```
-    pub fn thue_morse_constant_prec_round(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn thue_morse_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         assert_ne!(rm, Exact);
         // If the result is 1/2 then the exponent is 0 rather than -1, so we handle that case
         // separately.
         if prec == 1 && (rm == Nearest || rm == Ceiling || rm == Up) {
-            return (Float::ONE_HALF, Greater);
+            return (Self::ONE_HALF, Greater);
         } else if prec == 2 && (rm == Ceiling || rm == Up) {
             // TODO implement const_from_unsigned_prec_times_power_of_2
-            return (Float::one_half_prec(2), Greater);
+            return (Self::one_half_prec(2), Greater);
         }
         let len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
         let mut limbs = vec![0; len];
@@ -120,7 +120,7 @@ impl Float {
             significand += Natural::from(lsb);
         }
         (
-            Float(Finite {
+            Self(Finite {
                 sign: true,
                 exponent: -1,
                 precision: prec,
@@ -178,7 +178,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn thue_morse_constant_prec(prec: u64) -> (Float, Ordering) {
-        Float::thue_morse_constant_prec_round(prec, Nearest)
+    pub fn thue_morse_constant_prec(prec: u64) -> (Self, Ordering) {
+        Self::thue_morse_constant_prec_round(prec, Nearest)
     }
 }

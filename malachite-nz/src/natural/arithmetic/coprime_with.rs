@@ -55,7 +55,7 @@ pub_test! {coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
-impl CoprimeWith<Natural> for Natural {
+impl CoprimeWith<Self> for Natural {
     /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
     /// other than 1. Both [`Natural`]s are taken by value.
     ///
@@ -85,12 +85,12 @@ impl CoprimeWith<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn coprime_with(self, other: Natural) -> bool {
+    fn coprime_with(self, other: Self) -> bool {
         coprime_with_check_2(self, other)
     }
 }
 
-impl<'a> CoprimeWith<&'a Natural> for Natural {
+impl<'a> CoprimeWith<&'a Self> for Natural {
     /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
     /// other than 1. The first [`Natural`] is taken by value and the second by reference.
     ///
@@ -120,7 +120,7 @@ impl<'a> CoprimeWith<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn coprime_with(self, other: &'a Natural) -> bool {
+    fn coprime_with(self, other: &'a Self) -> bool {
         coprime_with_check_2_val_ref(self, other)
     }
 }

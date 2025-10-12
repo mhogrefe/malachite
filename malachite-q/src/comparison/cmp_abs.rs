@@ -16,7 +16,7 @@ impl PartialOrdAbs for Rational {
     ///
     /// See the documentation for the [`OrdAbs`] implementation.
     #[inline]
-    fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
+    fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp_abs(other))
     }
 }
@@ -53,7 +53,7 @@ impl OrdAbs for Rational {
     ///     Greater
     /// );
     /// ```
-    fn cmp_abs(&self, other: &Rational) -> Ordering {
+    fn cmp_abs(&self, other: &Self) -> Ordering {
         if core::ptr::eq(self, other) {
             return Equal;
         }

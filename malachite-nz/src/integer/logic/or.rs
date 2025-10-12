@@ -721,10 +721,10 @@ impl Natural {
         *self = self.or_pos_limb_neg(other);
     }
 
-    fn or_pos_limb_neg(&self, other: Limb) -> Natural {
-        Natural(Small(match self {
-            Natural(Small(small)) => (small | other).wrapping_neg(),
-            Natural(Large(limbs)) => limbs_pos_or_neg_limb(limbs, other),
+    fn or_pos_limb_neg(&self, other: Limb) -> Self {
+        Self(Small(match self {
+            Self(Small(small)) => (small | other).wrapping_neg(),
+            Self(Large(limbs)) => limbs_pos_or_neg_limb(limbs, other),
         }))
     }
 
@@ -733,51 +733,51 @@ impl Natural {
     }
 
     #[allow(clippy::missing_const_for_fn)]
-    fn or_neg_limb_neg(&self, other: Limb) -> Natural {
-        Natural(Small(match self {
-            Natural(Small(small)) => (small.wrapping_neg() | other).wrapping_neg(),
-            Natural(Large(limbs)) => limbs_neg_or_neg_limb(limbs, other),
+    fn or_neg_limb_neg(&self, other: Limb) -> Self {
+        Self(Small(match self {
+            Self(Small(small)) => (small.wrapping_neg() | other).wrapping_neg(),
+            Self(Large(limbs)) => limbs_neg_or_neg_limb(limbs, other),
         }))
     }
 
     fn or_assign_neg_limb_pos(&mut self, other: Limb) {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 *small = (small.wrapping_neg() | other).wrapping_neg();
             }
-            Natural(Large(limbs)) => {
+            Self(Large(limbs)) => {
                 limbs_neg_or_limb_in_place(limbs, other);
                 self.trim();
             }
         }
     }
 
-    fn or_neg_limb_pos(&self, other: Limb) -> Natural {
+    fn or_neg_limb_pos(&self, other: Limb) -> Self {
         match self {
-            Natural(Small(small)) => Natural(Small((small.wrapping_neg() | other).wrapping_neg())),
-            Natural(Large(limbs)) => Natural::from_owned_limbs_asc(limbs_neg_or_limb(limbs, other)),
+            Self(Small(small)) => Self(Small((small.wrapping_neg() | other).wrapping_neg())),
+            Self(Large(limbs)) => Self::from_owned_limbs_asc(limbs_neg_or_limb(limbs, other)),
         }
     }
 
-    fn or_assign_pos_neg_ref(&mut self, other: &Natural) {
+    fn or_assign_pos_neg_ref(&mut self, other: &Self) {
         match (&mut *self, other) {
-            (_, Natural(Small(y))) => self.or_assign_pos_limb_neg(y.wrapping_neg()),
-            (Natural(Small(x)), _) => *self = other.or_neg_limb_pos(*x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.or_assign_pos_limb_neg(y.wrapping_neg()),
+            (Self(Small(x)), _) => *self = other.or_neg_limb_pos(*x),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_vec_or_pos_neg_in_place_left(xs, ys);
                 self.trim();
             }
         }
     }
 
-    fn or_assign_pos_neg(&mut self, mut other: Natural) {
+    fn or_assign_pos_neg(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (_, Natural(Small(y))) => self.or_assign_pos_limb_neg(y.wrapping_neg()),
-            (Natural(Small(x)), _) => {
+            (_, Self(Small(y))) => self.or_assign_pos_limb_neg(y.wrapping_neg()),
+            (Self(Small(x)), _) => {
                 other.or_assign_neg_limb_pos(*x);
                 *self = other;
             }
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_or_pos_neg_in_place_right(xs, ys);
                 *self = other;
                 self.trim();
@@ -785,60 +785,60 @@ impl Natural {
         }
     }
 
-    fn or_assign_neg_pos_ref(&mut self, other: &Natural) {
+    fn or_assign_neg_pos_ref(&mut self, other: &Self) {
         match (&mut *self, other) {
-            (_, Natural(Small(y))) => self.or_assign_neg_limb_pos(*y),
-            (Natural(Small(x)), _) => *self = other.or_pos_limb_neg(x.wrapping_neg()),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.or_assign_neg_limb_pos(*y),
+            (Self(Small(x)), _) => *self = other.or_pos_limb_neg(x.wrapping_neg()),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_or_pos_neg_in_place_right(ys, xs);
                 self.trim();
             }
         }
     }
 
-    fn or_assign_neg_pos(&mut self, mut other: Natural) {
+    fn or_assign_neg_pos(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (_, Natural(Small(y))) => self.or_assign_neg_limb_pos(*y),
-            (Natural(Small(x)), _) => {
+            (_, Self(Small(y))) => self.or_assign_neg_limb_pos(*y),
+            (Self(Small(x)), _) => {
                 other.or_assign_pos_limb_neg(x.wrapping_neg());
                 *self = other;
             }
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_or_pos_neg_in_place_right(ys, xs);
                 self.trim();
             }
         }
     }
 
-    fn or_pos_neg(&self, other: &Natural) -> Natural {
+    fn or_pos_neg(&self, other: &Self) -> Self {
         match (self, other) {
-            (_, &Natural(Small(y))) => self.or_pos_limb_neg(y.wrapping_neg()),
-            (&Natural(Small(x)), _) => other.or_neg_limb_pos(x),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
-                Natural::from_owned_limbs_asc(limbs_or_pos_neg(xs, ys))
+            (_, &Self(Small(y))) => self.or_pos_limb_neg(y.wrapping_neg()),
+            (&Self(Small(x)), _) => other.or_neg_limb_pos(x),
+            (Self(Large(xs)), Self(Large(ys))) => {
+                Self::from_owned_limbs_asc(limbs_or_pos_neg(xs, ys))
             }
         }
     }
 
-    fn or_assign_neg_neg_ref(&mut self, other: &Natural) {
+    fn or_assign_neg_neg_ref(&mut self, other: &Self) {
         match (&mut *self, other) {
-            (_, Natural(Small(y))) => self.or_assign_neg_limb_neg(y.wrapping_neg()),
-            (Natural(Small(x)), _) => *self = other.or_neg_limb_neg(x.wrapping_neg()),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (_, Self(Small(y))) => self.or_assign_neg_limb_neg(y.wrapping_neg()),
+            (Self(Small(x)), _) => *self = other.or_neg_limb_neg(x.wrapping_neg()),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_vec_or_neg_neg_in_place_left(xs, ys);
                 self.trim();
             }
         }
     }
 
-    fn or_assign_neg_neg(&mut self, mut other: Natural) {
+    fn or_assign_neg_neg(&mut self, mut other: Self) {
         match (&mut *self, &mut other) {
-            (_, Natural(Small(y))) => self.or_assign_neg_limb_neg(y.wrapping_neg()),
-            (Natural(Small(x)), _) => {
+            (_, Self(Small(y))) => self.or_assign_neg_limb_neg(y.wrapping_neg()),
+            (Self(Small(x)), _) => {
                 other.or_assign_neg_limb_neg(x.wrapping_neg());
                 *self = other;
             }
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (Self(Large(xs)), Self(Large(ys))) => {
                 if limbs_or_neg_neg_in_place_either(xs, ys) {
                     *self = other;
                 }
@@ -847,19 +847,19 @@ impl Natural {
         }
     }
 
-    fn or_neg_neg(&self, other: &Natural) -> Natural {
+    fn or_neg_neg(&self, other: &Self) -> Self {
         match (self, other) {
-            (_, &Natural(Small(y))) => self.or_neg_limb_neg(y.wrapping_neg()),
-            (&Natural(Small(x)), _) => other.or_neg_limb_neg(x.wrapping_neg()),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
-                Natural::from_owned_limbs_asc(limbs_or_neg_neg(xs, ys))
+            (_, &Self(Small(y))) => self.or_neg_limb_neg(y.wrapping_neg()),
+            (&Self(Small(x)), _) => other.or_neg_limb_neg(x.wrapping_neg()),
+            (Self(Large(xs)), Self(Large(ys))) => {
+                Self::from_owned_limbs_asc(limbs_or_neg_neg(xs, ys))
             }
         }
     }
 }
 
-impl BitOr<Integer> for Integer {
-    type Output = Integer;
+impl BitOr<Self> for Integer {
+    type Output = Self;
 
     /// Takes the bitwise or of two [`Integer`]s, taking both by value.
     ///
@@ -889,14 +889,14 @@ impl BitOr<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn bitor(mut self, other: Integer) -> Integer {
+    fn bitor(mut self, other: Self) -> Self {
         self |= other;
         self
     }
 }
 
-impl<'a> BitOr<&'a Integer> for Integer {
-    type Output = Integer;
+impl<'a> BitOr<&'a Self> for Integer {
+    type Output = Self;
 
     /// Takes the bitwise or of two [`Integer`]s, taking the first by value and the second by
     /// reference.
@@ -926,7 +926,7 @@ impl<'a> BitOr<&'a Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn bitor(mut self, other: &'a Integer) -> Integer {
+    fn bitor(mut self, other: &'a Self) -> Self {
         self |= other;
         self
     }
@@ -1020,7 +1020,7 @@ impl BitOr<&Integer> for &Integer {
     }
 }
 
-impl BitOrAssign<Integer> for Integer {
+impl BitOrAssign<Self> for Integer {
     /// Bitwise-ors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value.
     ///
@@ -1045,7 +1045,7 @@ impl BitOrAssign<Integer> for Integer {
     /// x |= Integer::from(0x0f000000);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitor_assign(&mut self, other: Integer) {
+    fn bitor_assign(&mut self, other: Self) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitor_assign(other.abs),
             (true, false) => {
@@ -1058,7 +1058,7 @@ impl BitOrAssign<Integer> for Integer {
     }
 }
 
-impl<'a> BitOrAssign<&'a Integer> for Integer {
+impl<'a> BitOrAssign<&'a Self> for Integer {
     /// Bitwise-ors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
@@ -1082,7 +1082,7 @@ impl<'a> BitOrAssign<&'a Integer> for Integer {
     /// x |= &Integer::from(0x0f000000);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitor_assign(&mut self, other: &'a Integer) {
+    fn bitor_assign(&mut self, other: &'a Self) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitor_assign(&other.abs),
             (true, false) => {

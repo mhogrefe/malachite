@@ -11,7 +11,7 @@ use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Reciprocal, ReciprocalAssign};
 
 impl Reciprocal for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Reciprocates a [`Rational`], taking it by value.
     ///
@@ -37,7 +37,7 @@ impl Reciprocal for Rational {
     /// );
     /// ```
     #[inline]
-    fn reciprocal(mut self) -> Rational {
+    fn reciprocal(mut self) -> Self {
         self.reciprocal_assign();
         self
     }

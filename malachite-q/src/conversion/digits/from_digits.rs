@@ -65,9 +65,9 @@ impl Rational {
         base: &Natural,
         before_point: Vec<Natural>,
         after_point: RationalSequence<Natural>,
-    ) -> Rational {
+    ) -> Self {
         if let Some(log_base) = base.checked_log_base_2() {
-            return Rational::from_power_of_2_digits(log_base, before_point, after_point);
+            return Self::from_power_of_2_digits(log_base, before_point, after_point);
         }
         let (non_repeating, repeating) = after_point.into_vecs();
         let r_len = u64::exact_from(repeating.len());
@@ -75,13 +75,13 @@ impl Rational {
         let nr = Natural::from_digits_asc(base, non_repeating.into_iter().rev()).unwrap();
         let r = Natural::from_digits_asc(base, repeating.into_iter().rev()).unwrap();
         let floor =
-            Rational::from(Natural::from_digits_asc(base, before_point.into_iter()).unwrap());
+            Self::from(Natural::from_digits_asc(base, before_point.into_iter()).unwrap());
         floor
             + if r == 0u32 {
-                Rational::from_naturals(nr, base.pow(nr_len))
+                Self::from_naturals(nr, base.pow(nr_len))
             } else {
-                (Rational::from_naturals(r, base.pow(r_len) - Natural::ONE) + Rational::from(nr))
-                    / Rational::from(base.pow(nr_len))
+                (Self::from_naturals(r, base.pow(r_len) - Natural::ONE) + Self::from(nr))
+                    / Self::from(base.pow(nr_len))
             }
     }
 
@@ -137,9 +137,9 @@ impl Rational {
         base: &Natural,
         before_point: &[Natural],
         after_point: &RationalSequence<Natural>,
-    ) -> Rational {
+    ) -> Self {
         if let Some(log_base) = base.checked_log_base_2() {
-            return Rational::from_power_of_2_digits_ref(log_base, before_point, after_point);
+            return Self::from_power_of_2_digits_ref(log_base, before_point, after_point);
         }
         let (non_repeating, repeating) = after_point.to_vecs();
         let r_len = u64::exact_from(repeating.len());
@@ -147,13 +147,13 @@ impl Rational {
         let nr = Natural::from_digits_asc(base, non_repeating.into_iter().rev()).unwrap();
         let r = Natural::from_digits_asc(base, repeating.into_iter().rev()).unwrap();
         let floor =
-            Rational::from(Natural::from_digits_asc(base, before_point.iter().cloned()).unwrap());
+            Self::from(Natural::from_digits_asc(base, before_point.iter().cloned()).unwrap());
         floor
             + if r == 0u32 {
-                Rational::from_naturals(nr, base.pow(nr_len))
+                Self::from_naturals(nr, base.pow(nr_len))
             } else {
-                (Rational::from_naturals(r, base.pow(r_len) - Natural::ONE) + Rational::from(nr))
-                    / Rational::from(base.pow(nr_len))
+                (Self::from_naturals(r, base.pow(r_len) - Natural::ONE) + Self::from(nr))
+                    / Self::from(base.pow(nr_len))
             }
     }
 }

@@ -150,7 +150,7 @@ impl PartialOrd for Natural {
     ///
     /// See the documentation for the [`Ord`] implementation.
     #[inline]
-    fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -175,15 +175,15 @@ impl Ord for Natural {
     /// assert!(Natural::from(123u32) < Natural::from(124u32));
     /// assert!(Natural::from(123u32) <= Natural::from(124u32));
     /// ```
-    fn cmp(&self, other: &Natural) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         if core::ptr::eq(self, other) {
             return Equal;
         }
         match (self, other) {
-            (&Natural(Small(ref x)), &Natural(Small(ref y))) => x.cmp(y),
-            (&Natural(Small(_)), &Natural(Large(_))) => Less,
-            (&Natural(Large(_)), &Natural(Small(_))) => Greater,
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_cmp(xs, ys),
+            (&Self(Small(ref x)), &Self(Small(ref y))) => x.cmp(y),
+            (&Self(Small(_)), &Self(Large(_))) => Less,
+            (&Self(Large(_)), &Self(Small(_))) => Greater,
+            (&Self(Large(ref xs)), &Self(Large(ref ys))) => limbs_cmp(xs, ys),
         }
     }
 }
@@ -243,14 +243,14 @@ impl Natural {
     ///     Equal
     /// );
     /// ```
-    pub fn cmp_normalized(&self, other: &Natural) -> Ordering {
+    pub fn cmp_normalized(&self, other: &Self) -> Ordering {
         assert_ne!(*self, 0);
         assert_ne!(*other, 0);
         if core::ptr::eq(self, other) {
             return Equal;
         }
         match (self, other) {
-            (&Natural(Small(x)), &Natural(Small(y))) => {
+            (&Self(Small(x)), &Self(Small(y))) => {
                 let leading_x = x.leading_zeros();
                 let leading_y = y.leading_zeros();
                 match leading_x.cmp(&leading_y) {
@@ -259,22 +259,22 @@ impl Natural {
                     Greater => (x << (leading_x - leading_y)).cmp(&y),
                 }
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys))) => limbs_cmp_normalized(&[x], ys),
-            (&Natural(Large(ref xs)), &Natural(Small(y))) => limbs_cmp_normalized(xs, &[y]),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_cmp_normalized(xs, ys),
+            (&Self(Small(x)), &Self(Large(ref ys))) => limbs_cmp_normalized(&[x], ys),
+            (&Self(Large(ref xs)), &Self(Small(y))) => limbs_cmp_normalized(xs, &[y]),
+            (&Self(Large(ref xs)), &Self(Large(ref ys))) => limbs_cmp_normalized(xs, ys),
         }
     }
 
     #[cfg(feature = "float_helpers")]
-    pub fn cmp_normalized_no_shift(&self, other: &Natural) -> Ordering {
+    pub fn cmp_normalized_no_shift(&self, other: &Self) -> Ordering {
         assert_ne!(*self, 0);
         assert_ne!(*other, 0);
         if core::ptr::eq(self, other) {
             return Equal;
         }
         match (self, other) {
-            (&Natural(Small(x)), &Natural(Small(y))) => x.cmp(&y),
-            (Natural(Small(x)), &Natural(Large(ref ys))) => {
+            (&Self(Small(x)), &Self(Small(y))) => x.cmp(&y),
+            (Self(Small(x)), &Self(Large(ref ys))) => {
                 let (ys_last, ys_init) = ys.split_last().unwrap();
                 let c = x.cmp(ys_last);
                 if c != Equal {
@@ -285,7 +285,7 @@ impl Natural {
                     Less
                 }
             }
-            (&Natural(Large(ref xs)), Natural(Small(y))) => {
+            (&Self(Large(ref xs)), Self(Small(y))) => {
                 let (xs_last, xs_init) = xs.split_last().unwrap();
                 let c = xs_last.cmp(y);
                 if c != Equal {
@@ -296,7 +296,7 @@ impl Natural {
                     Greater
                 }
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+            (&Self(Large(ref xs)), &Self(Large(ref ys))) => {
                 let xs_len = xs.len();
                 let ys_len = ys.len();
                 match xs_len.cmp(&ys_len) {

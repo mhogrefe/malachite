@@ -315,63 +315,63 @@ impl Natural {
     fn eq_neg_limb_mod_limb(&self, other: Limb, m: Limb) -> bool {
         m != 0
             && match self {
-                Natural(Small(small)) => small % m == other.neg_mod(m),
-                Natural(Large(limbs)) => limbs_eq_neg_limb_mod_limb(limbs, other, m),
+                Self(Small(small)) => small % m == other.neg_mod(m),
+                Self(Large(limbs)) => limbs_eq_neg_limb_mod_limb(limbs, other, m),
             }
     }
 
-    fn pos_eq_neg_mod(&self, other: &Natural, m: Natural) -> bool {
+    fn pos_eq_neg_mod(&self, other: &Self, m: Self) -> bool {
         match (self, other, m) {
-            (_, _, Natural::ZERO) => false,
-            (x, &Natural::ZERO, m) => x.divisible_by(m),
-            (&Natural::ZERO, y, m) => y.divisible_by(m),
-            (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_neg_limb_mod_limb(y, m),
-            (&Natural(Small(x)), y, Natural(Small(m))) => y.eq_neg_limb_mod_limb(x, m),
-            (&Natural(Small(x)), &Natural(Small(y)), Natural(Large(ref m))) => {
+            (_, _, Self::ZERO) => false,
+            (x, &Self::ZERO, m) => x.divisible_by(m),
+            (&Self::ZERO, y, m) => y.divisible_by(m),
+            (x, &Self(Small(y)), Self(Small(m))) => x.eq_neg_limb_mod_limb(y, m),
+            (&Self(Small(x)), y, Self(Small(m))) => y.eq_neg_limb_mod_limb(x, m),
+            (&Self(Small(x)), &Self(Small(y)), Self(Large(ref m))) => {
                 limbs_pos_limb_eq_neg_limb_mod(x, y, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Small(m))) => {
+            (&Self(Large(ref xs)), &Self(Large(ref ys)), Self(Small(m))) => {
                 limbs_pos_eq_neg_mod_limb(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Small(y)), Natural(Large(ref mut m))) => {
+            (&Self(Large(ref xs)), &Self(Small(y)), Self(Large(ref mut m))) => {
                 limbs_pos_eq_neg_limb_mod(xs, y, m)
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+            (&Self(Small(x)), &Self(Large(ref ys)), Self(Large(ref mut m))) => {
                 limbs_pos_eq_neg_limb_mod(ys, x, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+            (&Self(Large(ref xs)), &Self(Large(ref ys)), Self(Large(ref mut m))) => {
                 limbs_pos_eq_neg_mod(xs, ys, m)
             }
         }
     }
 
-    fn pos_eq_neg_mod_ref(&self, other: &Natural, m: &Natural) -> bool {
+    fn pos_eq_neg_mod_ref(&self, other: &Self, m: &Self) -> bool {
         match (self, other, m) {
-            (_, _, &Natural::ZERO) => false,
-            (x, &Natural::ZERO, m) => x.divisible_by(m),
-            (&Natural::ZERO, y, m) => y.divisible_by(m),
-            (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_neg_limb_mod_limb(y, m),
-            (&Natural(Small(x)), y, &Natural(Small(m))) => y.eq_neg_limb_mod_limb(x, m),
-            (&Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref m))) => {
+            (_, _, &Self::ZERO) => false,
+            (x, &Self::ZERO, m) => x.divisible_by(m),
+            (&Self::ZERO, y, m) => y.divisible_by(m),
+            (x, &Self(Small(y)), &Self(Small(m))) => x.eq_neg_limb_mod_limb(y, m),
+            (&Self(Small(x)), y, &Self(Small(m))) => y.eq_neg_limb_mod_limb(x, m),
+            (&Self(Small(x)), &Self(Small(y)), &Self(Large(ref m))) => {
                 limbs_pos_limb_eq_neg_limb_mod(x, y, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Small(m))) => {
+            (&Self(Large(ref xs)), &Self(Large(ref ys)), &Self(Small(m))) => {
                 limbs_pos_eq_neg_mod_limb(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref m))) => {
+            (&Self(Large(ref xs)), &Self(Small(y)), &Self(Large(ref m))) => {
                 limbs_pos_eq_neg_limb_mod_ref(xs, y, m)
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+            (&Self(Small(x)), &Self(Large(ref ys)), &Self(Large(ref m))) => {
                 limbs_pos_eq_neg_limb_mod_ref(ys, x, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+            (&Self(Large(ref xs)), &Self(Large(ref ys)), &Self(Large(ref m))) => {
                 limbs_pos_eq_neg_mod_ref(xs, ys, m)
             }
         }
     }
 }
 
-impl EqMod<Integer, Natural> for Integer {
+impl EqMod<Self, Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. All three numbers are taken by value.
@@ -416,7 +416,7 @@ impl EqMod<Integer, Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Integer, m: Natural) -> bool {
+    fn eq_mod(self, other: Self, m: Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, m)
         } else {
@@ -425,7 +425,7 @@ impl EqMod<Integer, Natural> for Integer {
     }
 }
 
-impl EqMod<Integer, &Natural> for Integer {
+impl EqMod<Self, &Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first two numbers are taken by value and the third by reference.
@@ -470,7 +470,7 @@ impl EqMod<Integer, &Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Integer, m: &Natural) -> bool {
+    fn eq_mod(self, other: Self, m: &Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, m)
         } else {
@@ -479,7 +479,7 @@ impl EqMod<Integer, &Natural> for Integer {
     }
 }
 
-impl EqMod<&Integer, Natural> for Integer {
+impl EqMod<&Self, Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first and third numbers are taken by value and the second by reference.
@@ -524,7 +524,7 @@ impl EqMod<&Integer, Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &Integer, m: Natural) -> bool {
+    fn eq_mod(self, other: &Self, m: Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, m)
         } else {
@@ -533,7 +533,7 @@ impl EqMod<&Integer, Natural> for Integer {
     }
 }
 
-impl EqMod<&Integer, &Natural> for Integer {
+impl EqMod<&Self, &Natural> for Integer {
     /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
     /// that is, whether the difference between the two [`Integer`]s is a multiple of the
     /// [`Natural`]. The first number is taken by value and the second and third by reference.
@@ -578,7 +578,7 @@ impl EqMod<&Integer, &Natural> for Integer {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &Integer, m: &Natural) -> bool {
+    fn eq_mod(self, other: &Self, m: &Natural) -> bool {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, m)
         } else {

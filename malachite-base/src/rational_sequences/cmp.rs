@@ -14,7 +14,7 @@ impl<T: Eq + Ord> PartialOrd for RationalSequence<T> {
     ///
     /// See [here](RationalSequence::cmp) for more information.
     #[inline]
-    fn partial_cmp(&self, other: &RationalSequence<T>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -43,7 +43,7 @@ impl<T: Eq + Ord> Ord for RationalSequence<T> {
     ///         < RationalSequence::from_slices(&[1, 2], &[3, 4])
     /// );
     /// ```
-    fn cmp(&self, other: &RationalSequence<T>) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         if self == other {
             Equal
         } else {

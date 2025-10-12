@@ -14,7 +14,7 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{AbsAssign, AbsDiff, AbsDiffAssign, UnsignedAbs};
 
-impl AbsDiff<Integer> for Integer {
+impl AbsDiff<Self> for Integer {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Integer`]s, taking both by
@@ -51,12 +51,12 @@ impl AbsDiff<Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn abs_diff(self, other: Integer) -> Natural {
+    fn abs_diff(self, other: Self) -> Natural {
         (self - other).unsigned_abs()
     }
 }
 
-impl AbsDiff<&Integer> for Integer {
+impl AbsDiff<&Self> for Integer {
     type Output = Natural;
 
     /// Computes the absolute value of the difference between two [`Integer`]s, taking the first by
@@ -94,7 +94,7 @@ impl AbsDiff<&Integer> for Integer {
     /// );
     /// ```
     #[inline]
-    fn abs_diff(self, other: &Integer) -> Natural {
+    fn abs_diff(self, other: &Self) -> Natural {
         (self - other).unsigned_abs()
     }
 }
@@ -186,7 +186,7 @@ impl AbsDiff<&Integer> for &Integer {
     }
 }
 
-impl AbsDiffAssign<Integer> for Integer {
+impl AbsDiffAssign<Self> for Integer {
     /// Subtracts an [`Integer`] by another [`Integer`] in place and takes the absolute value,
     /// taking the [`Integer`] on the right-hand side by value.
     ///
@@ -236,13 +236,13 @@ impl AbsDiffAssign<Integer> for Integer {
     /// assert_eq!(x, 2000000000000u64);
     /// ```
     #[inline]
-    fn abs_diff_assign(&mut self, other: Integer) {
+    fn abs_diff_assign(&mut self, other: Self) {
         *self -= other;
         self.abs_assign();
     }
 }
 
-impl<'a> AbsDiffAssign<&'a Integer> for Integer {
+impl<'a> AbsDiffAssign<&'a Self> for Integer {
     /// Subtracts an [`Integer`] by another [`Integer`] in place and takes the absolute value,
     /// taking the [`Integer`] on the right-hand side by reference.
     ///
@@ -292,7 +292,7 @@ impl<'a> AbsDiffAssign<&'a Integer> for Integer {
     /// assert_eq!(x, 2000000000000u64);
     /// ```
     #[inline]
-    fn abs_diff_assign(&mut self, other: &'a Integer) {
+    fn abs_diff_assign(&mut self, other: &'a Self) {
         *self -= other;
         self.abs_assign();
     }

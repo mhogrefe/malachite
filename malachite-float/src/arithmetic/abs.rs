@@ -50,7 +50,7 @@ impl Float {
     /// assert_eq!(Float::NEGATIVE_ONE.abs_negative_zero(), Float::NEGATIVE_ONE);
     /// ```
     #[inline]
-    pub const fn abs_negative_zero(mut self) -> Float {
+    pub const fn abs_negative_zero(mut self) -> Self {
         self.abs_negative_zero_assign();
         self
     }
@@ -97,7 +97,7 @@ impl Float {
     ///     Float::NEGATIVE_ONE
     /// );
     /// ```
-    pub fn abs_negative_zero_ref(&self) -> Float {
+    pub fn abs_negative_zero_ref(&self) -> Self {
         match self {
             float_negative_zero!() => float_zero!(),
             x => x.clone(),
@@ -147,14 +147,14 @@ impl Float {
     /// assert_eq!(x, Float::NEGATIVE_ONE);
     /// ```
     pub const fn abs_negative_zero_assign(&mut self) {
-        if let Float(Zero { sign }) = self {
+        if let Self(Zero { sign }) = self {
             *sign = true;
         }
     }
 }
 
 impl Abs for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Takes the absolute value of a [`Float`], taking the [`Float`] by value.
     ///
@@ -198,7 +198,7 @@ impl Abs for Float {
     /// assert_eq!(Float::NEGATIVE_ONE.abs(), Float::ONE);
     /// ```
     #[inline]
-    fn abs(mut self) -> Float {
+    fn abs(mut self) -> Self {
         self.abs_assign();
         self
     }
@@ -328,7 +328,7 @@ impl AbsAssign for Float {
     /// assert_eq!(x, Float::ONE);
     /// ```
     fn abs_assign(&mut self) {
-        if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
+        if let Self(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
             *sign = true;
         }
     }

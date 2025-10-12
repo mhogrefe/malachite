@@ -13,8 +13,8 @@
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ModAdd, ModAddAssign};
 
-impl ModAdd<Natural, Natural> for Natural {
-    type Output = Natural;
+impl ModAdd<Self, Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
     /// modulo $m$. All three [`Natural`]s are taken by value.
@@ -50,14 +50,14 @@ impl ModAdd<Natural, Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by value.
     #[inline]
-    fn mod_add(mut self, other: Natural, m: Natural) -> Natural {
+    fn mod_add(mut self, other: Self, m: Self) -> Self {
         self.mod_add_assign(other, m);
         self
     }
 }
 
-impl<'a> ModAdd<Natural, &'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModAdd<Self, &'a Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
     /// modulo $m$. The first two [`Natural`]s are taken by value and the third by reference.
@@ -93,14 +93,14 @@ impl<'a> ModAdd<Natural, &'a Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by value and `m` is taken by reference.
     #[inline]
-    fn mod_add(mut self, other: Natural, m: &'a Natural) -> Natural {
+    fn mod_add(mut self, other: Self, m: &'a Self) -> Self {
         self.mod_add_assign(other, m);
         self
     }
 }
 
-impl<'a> ModAdd<&'a Natural, Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModAdd<&'a Self, Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
     /// modulo $m$. The first and third [`Natural`]s are taken by value and the second by reference.
@@ -136,14 +136,14 @@ impl<'a> ModAdd<&'a Natural, Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by value and `c` is taken by reference.
     #[inline]
-    fn mod_add(mut self, other: &'a Natural, m: Natural) -> Natural {
+    fn mod_add(mut self, other: &'a Self, m: Self) -> Self {
         self.mod_add_assign(other, m);
         self
     }
 }
 
-impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
-    type Output = Natural;
+impl<'a, 'b> ModAdd<&'a Self, &'b Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by value and the second and third by reference.
@@ -179,7 +179,7 @@ impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` is
     /// taken by value and `c` and `m` are taken by reference.
     #[inline]
-    fn mod_add(mut self, other: &'a Natural, m: &'b Natural) -> Natural {
+    fn mod_add(mut self, other: &'a Self, m: &'b Self) -> Self {
         self.mod_add_assign(other, m);
         self
     }
@@ -366,7 +366,7 @@ impl ModAdd<&Natural, &Natural> for &Natural {
     }
 }
 
-impl ModAddAssign<Natural, Natural> for Natural {
+impl ModAddAssign<Self, Self> for Natural {
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be already
     /// reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by value.
     ///
@@ -399,7 +399,7 @@ impl ModAddAssign<Natural, Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by value and `a == b`.
-    fn mod_add_assign(&mut self, other: Natural, m: Natural) {
+    fn mod_add_assign(&mut self, other: Self, m: Self) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         *self += other;
@@ -409,7 +409,7 @@ impl ModAddAssign<Natural, Natural> for Natural {
     }
 }
 
-impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
+impl<'a> ModAddAssign<Self, &'a Self> for Natural {
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by value and the
     /// second by reference.
@@ -443,7 +443,7 @@ impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `c`
     /// are taken by value, `m` is taken by reference, and `a == b`.
-    fn mod_add_assign(&mut self, other: Natural, m: &'a Natural) {
+    fn mod_add_assign(&mut self, other: Self, m: &'a Self) {
         assert!(*self < *m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
             other < *m,
@@ -456,7 +456,7 @@ impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
     }
 }
 
-impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
+impl<'a> ModAddAssign<&'a Self, Self> for Natural {
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by reference and
     /// the second by value.
@@ -490,7 +490,7 @@ impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and `m`
     /// are taken by value, `c` is taken by reference, and `a == b`.
-    fn mod_add_assign(&mut self, other: &'a Natural, m: Natural) {
+    fn mod_add_assign(&mut self, other: &'a Self, m: Self) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
             *other < m,
@@ -503,7 +503,7 @@ impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
     }
 }
 
-impl<'a, 'b> ModAddAssign<&'a Natural, &'b Natural> for Natural {
+impl<'a, 'b> ModAddAssign<&'a Self, &'b Self> for Natural {
     /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be already
     /// reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by reference.
     ///
@@ -536,7 +536,7 @@ impl<'a, 'b> ModAddAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` is
     /// taken by value, `c` and `m` are taken by reference, and `a == b`.
-    fn mod_add_assign(&mut self, other: &'a Natural, m: &'b Natural) {
+    fn mod_add_assign(&mut self, other: &'a Self, m: &'b Self) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         *self += other;

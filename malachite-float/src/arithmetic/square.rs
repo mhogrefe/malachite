@@ -115,7 +115,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn square_prec_round(mut self, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn square_prec_round(mut self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.square_prec_round_assign(prec, rm);
         (self, o)
     }
@@ -214,30 +214,30 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn square_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn square_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match self {
             float_nan!() => (float_nan!(), Equal),
             float_either_infinity!() => (float_infinity!(), Equal),
             float_either_zero!() => (float_zero!(), Equal),
-            Float(Finite {
+            Self(Finite {
                 exponent: x_exp,
                 precision: x_prec,
                 significand: x,
                 ..
             }) => {
                 let twice_exp = x_exp << 1;
-                if twice_exp - 1 > Float::MAX_EXPONENT {
+                if twice_exp - 1 > Self::MAX_EXPONENT {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Ceiling | Up | Nearest => (float_infinity!(), Greater),
-                        _ => (Float::max_finite_value_with_prec(prec), Less),
+                        _ => (Self::max_finite_value_with_prec(prec), Less),
                     };
-                } else if twice_exp < Float::MIN_EXPONENT - 1 {
+                } else if twice_exp < Self::MIN_EXPONENT - 1 {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Floor | Down | Nearest => (float_zero!(), Less),
-                        _ => (Float::min_positive_value_prec(prec), Greater),
+                        _ => (Self::min_positive_value_prec(prec), Greater),
                     };
                 }
                 let (square, exp_offset, o) = square_float_significand_ref(x, *x_prec, prec, rm);
@@ -246,28 +246,28 @@ impl Float {
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
-                if exp > Float::MAX_EXPONENT {
+                if exp > Self::MAX_EXPONENT {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Ceiling | Up | Nearest => (float_infinity!(), Greater),
-                        _ => (Float::max_finite_value_with_prec(prec), Less),
+                        _ => (Self::max_finite_value_with_prec(prec), Less),
                     };
-                } else if exp < Float::MIN_EXPONENT {
+                } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Float::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT - 1
                         && (o == Less || !square.is_power_of_2())
                     {
-                        (Float::min_positive_value_prec(prec), Greater)
+                        (Self::min_positive_value_prec(prec), Greater)
                     } else {
                         match rm {
                             Exact => panic!("Inexact float squaring"),
-                            Ceiling | Up => (Float::min_positive_value_prec(prec), Greater),
+                            Ceiling | Up => (Self::min_positive_value_prec(prec), Greater),
                             _ => (float_zero!(), Less),
                         }
                     };
                 }
                 (
-                    Float(Finite {
+                    Self(Finite {
                         sign: true,
                         exponent: exp,
                         precision: prec,
@@ -337,7 +337,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn square_prec(self, prec: u64) -> (Float, Ordering) {
+    pub fn square_prec(self, prec: u64) -> (Self, Ordering) {
         self.square_prec_round(prec, Nearest)
     }
 
@@ -399,7 +399,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn square_prec_ref(&self, prec: u64) -> (Float, Ordering) {
+    pub fn square_prec_ref(&self, prec: u64) -> (Self, Ordering) {
         self.square_prec_round_ref(prec, Nearest)
     }
 
@@ -484,7 +484,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn square_round(self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn square_round(self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.square_prec_round(prec, rm)
     }
@@ -570,7 +570,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn square_round_ref(&self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn square_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.square_prec_round_ref(prec, rm)
     }
@@ -649,18 +649,18 @@ impl Float {
         assert_ne!(prec, 0);
         match self {
             float_nan!() => Equal,
-            Float(Infinity { sign } | Zero { sign }) => {
+            Self(Infinity { sign } | Zero { sign }) => {
                 *sign = true;
                 Equal
             }
-            Float(Finite {
+            Self(Finite {
                 sign: x_sign,
                 exponent: x_exp,
                 precision: x_prec,
                 significand: x,
             }) => {
                 let twice_exp = *x_exp << 1;
-                if twice_exp - 1 > Float::MAX_EXPONENT {
+                if twice_exp - 1 > Self::MAX_EXPONENT {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Ceiling | Up | Nearest => {
@@ -668,11 +668,11 @@ impl Float {
                             Greater
                         }
                         _ => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                     };
-                } else if twice_exp < Float::MIN_EXPONENT - 1 {
+                } else if twice_exp < Self::MIN_EXPONENT - 1 {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Floor | Down | Nearest => {
@@ -680,7 +680,7 @@ impl Float {
                             Less
                         }
                         _ => {
-                            *self = Float::min_positive_value_prec(prec);
+                            *self = Self::min_positive_value_prec(prec);
                             Greater
                         }
                     };
@@ -691,7 +691,7 @@ impl Float {
                     .unwrap()
                     .checked_add(exp_offset)
                     .unwrap();
-                if *x_exp > Float::MAX_EXPONENT {
+                if *x_exp > Self::MAX_EXPONENT {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Ceiling | Up | Nearest => {
@@ -699,24 +699,24 @@ impl Float {
                             Greater
                         }
                         _ => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                     };
-                } else if *x_exp < Float::MIN_EXPONENT {
+                } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Float::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT - 1
                         && (o == Less || !x.is_power_of_2())
                     {
                         {
-                            *self = Float::min_positive_value_prec(prec);
+                            *self = Self::min_positive_value_prec(prec);
                             Greater
                         }
                     } else {
                         match rm {
                             Exact => panic!("Inexact float squaring"),
                             Ceiling | Up => {
-                                *self = Float::min_positive_value_prec(prec);
+                                *self = Self::min_positive_value_prec(prec);
                                 Greater
                             }
                             _ => {
@@ -848,7 +848,7 @@ impl Float {
 }
 
 impl Square for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Squares a [`Float`], taking it by value.
     ///
@@ -902,7 +902,7 @@ impl Square for Float {
     /// assert_eq!(Float::from(-1.5).square(), 2.0);
     /// ```
     #[inline]
-    fn square(self) -> Float {
+    fn square(self) -> Self {
         let prec = self.significant_bits();
         self.square_prec_round(prec, Nearest).0
     }

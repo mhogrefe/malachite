@@ -831,8 +831,8 @@ impl Iterator for ExhaustiveRationalRange {
     #[inline]
     fn next(&mut self) -> Option<Rational> {
         match self {
-            ExhaustiveRationalRange::Empty => None,
-            ExhaustiveRationalRange::Nonempty(xs) => xs.next().map(|p| p.1),
+            Self::Empty => None,
+            Self::Nonempty(xs) => xs.next().map(|p| p.1),
         }
     }
 }
@@ -951,7 +951,7 @@ impl Iterator for ExhaustiveRationalInclusiveRange {
     #[inline]
     fn next(&mut self) -> Option<Rational> {
         match self {
-            ExhaustiveRationalInclusiveRange::Single(done, x) => {
+            Self::Single(done, x) => {
                 if *done {
                     None
                 } else {
@@ -959,7 +959,7 @@ impl Iterator for ExhaustiveRationalInclusiveRange {
                     Some(x.clone())
                 }
             }
-            ExhaustiveRationalInclusiveRange::Many(xs) => xs.next().map(|p| p.1),
+            Self::Many(xs) => xs.next().map(|p| p.1),
         }
     }
 }

@@ -729,10 +729,10 @@ where
     #[inline]
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
-            RandomOrderedUniqueVecsFixedLength::Zero => Some(vec![]),
-            RandomOrderedUniqueVecsFixedLength::One(xs) => xs.next().map(|x| vec![x]),
-            RandomOrderedUniqueVecsFixedLength::Two(xs) => xs.next(),
-            RandomOrderedUniqueVecsFixedLength::GreaterThan2(xs) => xs.next(),
+            Self::Zero => Some(vec![]),
+            Self::One(xs) => xs.next().map(|x| vec![x]),
+            Self::Two(xs) => xs.next(),
+            Self::GreaterThan2(xs) => xs.next(),
         }
     }
 }
@@ -1350,10 +1350,10 @@ where
     #[inline]
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
-            RandomUniqueVecsFixedLength::Zero => Some(vec![]),
-            RandomUniqueVecsFixedLength::One(xs) => xs.next().map(|x| vec![x]),
-            RandomUniqueVecsFixedLength::Two(xs) => xs.next(),
-            RandomUniqueVecsFixedLength::GreaterThan2(xs) => xs.next(),
+            Self::Zero => Some(vec![]),
+            Self::One(xs) => xs.next().map(|x| vec![x]),
+            Self::Two(xs) => xs.next(),
+            Self::GreaterThan2(xs) => xs.next(),
         }
     }
 }

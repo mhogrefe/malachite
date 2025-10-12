@@ -15,7 +15,7 @@ use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 
 impl FromSciStringHelper for Integer {
-    fn parse_int(mut cs: &[u8], base: u8) -> Option<Integer> {
+    fn parse_int(mut cs: &[u8], base: u8) -> Option<Self> {
         if let Some(b'+') = cs.first() {
             cs = &cs[1..];
             // If the string begins with a '+', the second character cannot be '+' or '-'
@@ -24,14 +24,14 @@ impl FromSciStringHelper for Integer {
                 _ => {}
             }
         }
-        Integer::from_string_base(base, core::str::from_utf8(cs).ok()?)
+        Self::from_string_base(base, core::str::from_utf8(cs).ok()?)
     }
 
-    fn up_1(self, neg: bool) -> Option<Integer> {
+    fn up_1(self, neg: bool) -> Option<Self> {
         Some(if neg {
-            self - Integer::ONE
+            self - Self::ONE
         } else {
-            self + Integer::ONE
+            self + Self::ONE
         })
     }
 }
@@ -99,7 +99,7 @@ impl FromSciString for Integer {
     /// );
     /// ```
     #[inline]
-    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Integer> {
+    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self> {
         from_sci_string_with_options_helper(s, options)
     }
 }

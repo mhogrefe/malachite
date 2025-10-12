@@ -43,10 +43,10 @@ impl PartialOrdAbs<Integer> for Float {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) => None,
-            (Float(Infinity { .. }), _) => Some(Greater),
+            (Self(Infinity { .. }), _) => Some(Greater),
             (float_either_zero!(), y) => Some(if *y == 0 { Equal } else { Less }),
             (
-                Float(Finite {
+                Self(Finite {
                     exponent: e_x,
                     significand: x,
                     ..

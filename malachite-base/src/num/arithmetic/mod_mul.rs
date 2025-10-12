@@ -369,8 +369,8 @@ macro_rules! impl_mod_mul_precomputed_promoted {
 impl_mod_mul_precomputed_promoted!(u8);
 impl_mod_mul_precomputed_promoted!(u16);
 
-impl ModMulPrecomputed<u128, u128> for u128 {
-    type Output = u128;
+impl ModMulPrecomputed<Self, Self> for u128 {
+    type Output = Self;
     type Data = ();
 
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
@@ -378,7 +378,7 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
-    fn precompute_mod_mul_data(_m: &u128) {}
+    fn precompute_mod_mul_data(_m: &Self) {}
 
     /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
     /// $m$.
@@ -398,14 +398,14 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     ///
     /// This is equivalent to `n_mulmod2_preinv` from `ulong_extras.h`, FLINT 2.7.1.
     #[inline]
-    fn mod_mul_precomputed(self, other: u128, m: u128, _data: &()) -> u128 {
+    fn mod_mul_precomputed(self, other: Self, m: Self, _data: &()) -> Self {
         naive_mod_mul(self, other, m)
     }
 }
 
-impl ModMulPrecomputed<usize, usize> for usize {
-    type Output = usize;
-    type Data = usize;
+impl ModMulPrecomputed<Self, Self> for usize {
+    type Output = Self;
+    type Data = Self;
 
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
     /// [`mod_mul_precomputed_assign`](super::traits::ModMulPrecomputedAssign).
@@ -414,11 +414,11 @@ impl ModMulPrecomputed<usize, usize> for usize {
     /// Constant time and additional memory.
     ///
     /// This is equivalent to `n_preinvert_limb` from `ulong_extras.h`, FLINT 2.7.1.
-    fn precompute_mod_mul_data(&m: &usize) -> usize {
+    fn precompute_mod_mul_data(&m: &Self) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::precompute_mod_mul_data(&u32::wrapping_from(m)))
+            Self::wrapping_from(u32::precompute_mod_mul_data(&u32::wrapping_from(m)))
         } else {
-            usize::wrapping_from(u64::precompute_mod_mul_data(&u64::wrapping_from(m)))
+            Self::wrapping_from(u64::precompute_mod_mul_data(&u64::wrapping_from(m)))
         }
     }
 
@@ -439,15 +439,15 @@ impl ModMulPrecomputed<usize, usize> for usize {
     /// See [here](super::mod_mul#mod_mul_precomputed).
     ///
     /// This is equivalent to `n_mulmod2_preinv` from `ulong_extras.h`, FLINT 2.7.1.
-    fn mod_mul_precomputed(self, other: usize, m: usize, data: &usize) -> usize {
+    fn mod_mul_precomputed(self, other: Self, m: Self, data: &Self) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::wrapping_from(self).mod_mul_precomputed(
+            Self::wrapping_from(u32::wrapping_from(self).mod_mul_precomputed(
                 u32::wrapping_from(other),
                 u32::wrapping_from(m),
                 &u32::wrapping_from(*data),
             ))
         } else {
-            usize::wrapping_from(u64::wrapping_from(self).mod_mul_precomputed(
+            Self::wrapping_from(u64::wrapping_from(self).mod_mul_precomputed(
                 u64::wrapping_from(other),
                 u64::wrapping_from(m),
                 &u64::wrapping_from(*data),

@@ -38,7 +38,7 @@ impl Min for char {
     ///
     /// This is the famous NUL character, a [C0
     /// control](https://www.unicode.org/charts/PDF/U0000.pdf).
-    const MIN: char = '\u{0}';
+    const MIN: Self = '\u{0}';
 }
 
 impl Max for char {
@@ -46,6 +46,6 @@ impl Max for char {
     ///
     /// This is a character in [Supplementary Private Use
     /// Area-B](https://www.unicode.org/charts/PDF/U10FF80.pdf).
-    const MAX: char = core::char::MAX;
+    const MAX: Self = core::char::MAX;
 }
 impl_named!(char);

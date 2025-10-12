@@ -35,7 +35,7 @@ impl PowerOf2<u64> for Natural {
     /// );
     /// ```
     #[inline]
-    fn power_of_2(pow: u64) -> Natural {
-        Natural::ONE << pow
+    fn power_of_2(pow: u64) -> Self {
+        Self::ONE << pow
     }
 }

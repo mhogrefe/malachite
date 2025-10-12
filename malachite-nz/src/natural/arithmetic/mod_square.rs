@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign, ModSquare, ModSquareAssign};
 use malachite_base::num::basic::traits::Two;
 
-impl ModSquare<Natural> for Natural {
-    type Output = Natural;
+impl ModSquare<Self> for Natural {
+    type Output = Self;
 
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by value.
@@ -36,13 +36,13 @@ impl ModSquare<Natural> for Natural {
     /// assert_eq!(Natural::from(2u32).mod_square(Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(Natural::from(497u32)), 60);
     /// ```
-    fn mod_square(self, m: Natural) -> Natural {
-        (&self).mod_pow(&Natural::TWO, &m)
+    fn mod_square(self, m: Self) -> Self {
+        (&self).mod_pow(&Self::TWO, &m)
     }
 }
 
-impl ModSquare<&Natural> for Natural {
-    type Output = Natural;
+impl ModSquare<&Self> for Natural {
+    type Output = Self;
 
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
@@ -67,8 +67,8 @@ impl ModSquare<&Natural> for Natural {
     /// assert_eq!(Natural::from(2u32).mod_square(&Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(&Natural::from(497u32)), 60);
     /// ```
-    fn mod_square(self, m: &Natural) -> Natural {
-        (&self).mod_pow(&Natural::TWO, m)
+    fn mod_square(self, m: &Self) -> Self {
+        (&self).mod_pow(&Self::TWO, m)
     }
 }
 
@@ -140,7 +140,7 @@ impl ModSquare<&Natural> for &Natural {
     }
 }
 
-impl ModSquareAssign<Natural> for Natural {
+impl ModSquareAssign<Self> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
     /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by value.
     ///
@@ -170,12 +170,12 @@ impl ModSquareAssign<Natural> for Natural {
     /// assert_eq!(x, 60);
     /// ```
     #[inline]
-    fn mod_square_assign(&mut self, m: Natural) {
-        self.mod_pow_assign(&Natural::TWO, &m);
+    fn mod_square_assign(&mut self, m: Self) {
+        self.mod_pow_assign(&Self::TWO, &m);
     }
 }
 
-impl ModSquareAssign<&Natural> for Natural {
+impl ModSquareAssign<&Self> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
     /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///
@@ -205,7 +205,7 @@ impl ModSquareAssign<&Natural> for Natural {
     /// assert_eq!(x, 60);
     /// ```
     #[inline]
-    fn mod_square_assign(&mut self, m: &Natural) {
-        self.mod_pow_assign(&Natural::TWO, m);
+    fn mod_square_assign(&mut self, m: &Self) {
+        self.mod_pow_assign(&Self::TWO, m);
     }
 }

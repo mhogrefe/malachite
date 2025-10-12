@@ -51,7 +51,7 @@ impl EqAbs for Rational {
     /// );
     /// ```
     #[inline]
-    fn eq_abs(&self, other: &Rational) -> bool {
+    fn eq_abs(&self, other: &Self) -> bool {
         self.numerator == other.numerator && self.denominator == other.denominator
     }
 }

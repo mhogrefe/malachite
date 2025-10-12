@@ -66,19 +66,19 @@ impl Rational {
     /// ```
     pub fn try_from_float_simplest<T: PrimitiveFloat>(
         x: T,
-    ) -> Result<Rational, RationalFromPrimitiveFloatError>
+    ) -> Result<Self, RationalFromPrimitiveFloatError>
     where
-        Rational: TryFrom<T, Error = RationalFromPrimitiveFloatError>,
+        Self: TryFrom<T, Error = RationalFromPrimitiveFloatError>,
     {
-        let q = Rational::try_from(x)?;
+        let q = Self::try_from(x)?;
         Ok(if *q.denominator_ref() <= 2u32 {
             q
         } else {
-            let succ_q = Rational::exact_from(x.next_higher());
-            let pred_q = Rational::exact_from(x.next_lower());
+            let succ_q = Self::exact_from(x.next_higher());
+            let pred_q = Self::exact_from(x.next_lower());
             let x = (pred_q + &q) >> 1;
             let y = (succ_q + q) >> 1;
-            Rational::simplest_rational_in_open_interval(&x, &y)
+            Self::simplest_rational_in_open_interval(&x, &y)
         })
     }
 }

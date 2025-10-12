@@ -10,7 +10,7 @@ use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 
 impl Square for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Squares a [`Rational`], taking it by value.
     ///
@@ -39,7 +39,7 @@ impl Square for Rational {
     /// );
     /// ```
     #[inline]
-    fn square(mut self) -> Rational {
+    fn square(mut self) -> Self {
         self.square_assign();
         self
     }

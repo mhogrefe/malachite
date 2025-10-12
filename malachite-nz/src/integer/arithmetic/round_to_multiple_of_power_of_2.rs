@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::rounding_modes::RoundingMode;
 
 impl RoundToMultipleOfPowerOf2<u64> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Rounds an [`Integer`] to a multiple of $2^k$ according to a specified rounding mode. The
     /// [`Integer`] is taken by value. An [`Ordering`] is also returned, indicating whether the
@@ -113,7 +113,7 @@ impl RoundToMultipleOfPowerOf2<u64> for Integer {
         mut self,
         pow: u64,
         rm: RoundingMode,
-    ) -> (Integer, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.round_to_multiple_of_power_of_2_assign(pow, rm);
         (self, o)
     }

@@ -23,8 +23,8 @@ pub enum SciSizeOptions {
 }
 
 impl Default for SciSizeOptions {
-    fn default() -> SciSizeOptions {
-        SciSizeOptions::Precision(16) // Similar to f64 string output
+    fn default() -> Self {
+        Self::Precision(16) // Similar to f64 string output
     }
 }
 
@@ -84,8 +84,8 @@ pub struct ToSciOptions {
 }
 
 impl Default for ToSciOptions {
-    fn default() -> ToSciOptions {
-        ToSciOptions {
+    fn default() -> Self {
+        Self {
             base: 10,
             rounding_mode: Nearest,
             size_options: SciSizeOptions::default(),
@@ -256,8 +256,8 @@ pub struct FromSciStringOptions {
 }
 
 impl Default for FromSciStringOptions {
-    fn default() -> FromSciStringOptions {
-        FromSciStringOptions {
+    fn default() -> Self {
+        Self {
             base: 10,
             rounding_mode: Nearest,
         }

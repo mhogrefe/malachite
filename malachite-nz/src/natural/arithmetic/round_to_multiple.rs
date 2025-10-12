@@ -12,8 +12,8 @@ use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAs
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
-impl RoundToMultiple<Natural> for Natural {
-    type Output = Natural;
+impl RoundToMultiple<Self> for Natural {
+    type Output = Self;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
     /// mode. Both [`Natural`]s are taken by value. An [`Ordering`] is also returned, indicating
@@ -116,14 +116,14 @@ impl RoundToMultiple<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn round_to_multiple(mut self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
 }
 
-impl RoundToMultiple<&Natural> for Natural {
-    type Output = Natural;
+impl RoundToMultiple<&Self> for Natural {
+    type Output = Self;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
     /// mode. The first [`Natural`] is taken by value and the second by reference. An [`Ordering`]
@@ -227,7 +227,7 @@ impl RoundToMultiple<&Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &Natural, rm: RoundingMode) -> (Natural, Ordering) {
+    fn round_to_multiple(mut self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.round_to_multiple_assign(other, rm);
         (self, o)
     }
@@ -530,7 +530,7 @@ impl RoundToMultiple<&Natural> for &Natural {
     }
 }
 
-impl RoundToMultipleAssign<Natural> for Natural {
+impl RoundToMultipleAssign<Self> for Natural {
     /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a specified
     /// rounding mode. The [`Natural`] on the right-hand side is taken by value. An [`Ordering`] is
     /// returned, indicating whether the returned value is less than, equal to, or greater than the
@@ -610,12 +610,12 @@ impl RoundToMultipleAssign<Natural> for Natural {
     /// );
     /// assert_eq!(x, 16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: Natural, rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         match (&mut *self, other) {
             (x, y) if *x == y => Equal,
-            (x, Natural::ZERO) => match rm {
+            (x, Self::ZERO) => match rm {
                 Down | Floor | Nearest => {
-                    *self = Natural::ZERO;
+                    *self = Self::ZERO;
                     Less
                 }
                 _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
@@ -665,7 +665,7 @@ impl RoundToMultipleAssign<Natural> for Natural {
     }
 }
 
-impl RoundToMultipleAssign<&Natural> for Natural {
+impl RoundToMultipleAssign<&Self> for Natural {
     /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a specified
     /// rounding mode. The [`Natural`] on the right-hand side is taken by reference. An [`Ordering`]
     /// is also returned, indicating whether the returned value is less than, equal to, or greater
@@ -748,12 +748,12 @@ impl RoundToMultipleAssign<&Natural> for Natural {
     /// );
     /// assert_eq!(x, 16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &Natural, rm: RoundingMode) -> Ordering {
+    fn round_to_multiple_assign(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
         match (&mut *self, other) {
             (x, y) if *x == *y => Equal,
-            (x, &Natural::ZERO) => match rm {
+            (x, &Self::ZERO) => match rm {
                 Down | Floor | Nearest => {
-                    *self = Natural::ZERO;
+                    *self = Self::ZERO;
                     Less
                 }
                 _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),

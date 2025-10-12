@@ -70,9 +70,9 @@ impl RoundingFrom<Float> for Integer {
     ///     "(-2, Less)"
     /// );
     /// ```
-    fn rounding_from(f: Float, rm: RoundingMode) -> (Integer, Ordering) {
+    fn rounding_from(f: Float, rm: RoundingMode) -> (Self, Ordering) {
         match f {
-            float_either_zero!() => (Integer::ZERO, Equal),
+            float_either_zero!() => (Self::ZERO, Equal),
             Float(Finite {
                 sign,
                 exponent,
@@ -98,7 +98,7 @@ impl RoundingFrom<Float> for Integer {
                     }
                 };
                 if sign {
-                    (Integer::from(abs_i), abs_o)
+                    (Self::from(abs_i), abs_o)
                 } else {
                     (-abs_i, abs_o.reverse())
                 }
@@ -161,9 +161,9 @@ impl RoundingFrom<&Float> for Integer {
     ///     "(-2, Less)"
     /// );
     /// ```
-    fn rounding_from(f: &Float, rm: RoundingMode) -> (Integer, Ordering) {
+    fn rounding_from(f: &Float, rm: RoundingMode) -> (Self, Ordering) {
         match f {
-            float_either_zero!() => (Integer::ZERO, Equal),
+            float_either_zero!() => (Self::ZERO, Equal),
             Float(Finite {
                 sign,
                 exponent,
@@ -171,7 +171,7 @@ impl RoundingFrom<&Float> for Integer {
                 ..
             }) => {
                 if *significand == 0u32 {
-                    (Integer::ZERO, Equal)
+                    (Self::ZERO, Equal)
                 } else {
                     let abs_rm = if *sign { rm } else { -rm };
                     let (abs_i, abs_o) = if *exponent < 0 {
@@ -192,7 +192,7 @@ impl RoundingFrom<&Float> for Integer {
                         }
                     };
                     if *sign {
-                        (Integer::from(abs_i), abs_o)
+                        (Self::from(abs_i), abs_o)
                     } else {
                         (-abs_i, abs_o.reverse())
                     }
@@ -234,9 +234,9 @@ impl TryFrom<Float> for Integer {
     /// assert_eq!(Integer::try_from(Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Integer::try_from(Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
-    fn try_from(f: Float) -> Result<Integer, Self::Error> {
+    fn try_from(f: Float) -> Result<Self, Self::Error> {
         match f {
-            Float(Zero { .. }) => Ok(Integer::ZERO),
+            Float(Zero { .. }) => Ok(Self::ZERO),
             Float(Finite {
                 sign,
                 exponent,
@@ -251,12 +251,12 @@ impl TryFrom<Float> for Integer {
                     if sb >= eb {
                         let bits = sb - eb;
                         if significand.divisible_by_power_of_2(bits) {
-                            Ok(Integer::from_sign_and_abs(sign, significand >> bits))
+                            Ok(Self::from_sign_and_abs(sign, significand >> bits))
                         } else {
                             Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
                         }
                     } else {
-                        Ok(Integer::from_sign_and_abs(sign, significand << (eb - sb)))
+                        Ok(Self::from_sign_and_abs(sign, significand << (eb - sb)))
                     }
                 }
             }
@@ -296,9 +296,9 @@ impl TryFrom<&Float> for Integer {
     /// assert_eq!(Integer::try_from(&Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Integer::try_from(&Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
-    fn try_from(f: &Float) -> Result<Integer, Self::Error> {
+    fn try_from(f: &Float) -> Result<Self, Self::Error> {
         match f {
-            Float(Zero { .. }) => Ok(Integer::ZERO),
+            Float(Zero { .. }) => Ok(Self::ZERO),
             Float(Finite {
                 sign,
                 exponent,
@@ -313,12 +313,12 @@ impl TryFrom<&Float> for Integer {
                     if sb >= eb {
                         let bits = sb - eb;
                         if significand.divisible_by_power_of_2(bits) {
-                            Ok(Integer::from_sign_and_abs(*sign, significand >> bits))
+                            Ok(Self::from_sign_and_abs(*sign, significand >> bits))
                         } else {
                             Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
                         }
                     } else {
-                        Ok(Integer::from_sign_and_abs(*sign, significand << (eb - sb)))
+                        Ok(Self::from_sign_and_abs(*sign, significand << (eb - sb)))
                     }
                 }
             }

@@ -14,8 +14,8 @@ use malachite_base::num::conversion::traits::FromStringBase;
 
 impl From<Integer> for SerdeInteger {
     #[inline]
-    fn from(x: Integer) -> SerdeInteger {
-        SerdeInteger(format!("{x:#x}"))
+    fn from(x: Integer) -> Self {
+        Self(format!("{x:#x}"))
     }
 }
 
@@ -23,10 +23,10 @@ impl TryFrom<SerdeInteger> for Integer {
     type Error = String;
 
     #[inline]
-    fn try_from(s: SerdeInteger) -> Result<Integer, String> {
+    fn try_from(s: SerdeInteger) -> Result<Self, String> {
         if s.0.starts_with('-') {
             if s.0.starts_with("-0x") {
-                Ok(Integer::from_sign_and_abs(
+                Ok(Self::from_sign_and_abs(
                     false,
                     Natural::from_string_base(16, &s.0[3..])
                         .ok_or_else(|| format!("Unrecognized digits in {}", s.0))?,
@@ -38,7 +38,7 @@ impl TryFrom<SerdeInteger> for Integer {
                 ))
             }
         } else if s.0.starts_with("0x") {
-            Ok(Integer::from(
+            Ok(Self::from(
                 Natural::from_string_base(16, &s.0[2..])
                     .ok_or_else(|| format!("Unrecognized digits in {}", s.0))?,
             ))

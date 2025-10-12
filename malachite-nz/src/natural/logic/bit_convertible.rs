@@ -126,8 +126,8 @@ impl BitConvertible for Natural {
     ///     105
     /// );
     /// ```
-    fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Natural {
-        Natural::from_owned_limbs_asc(
+    fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Self {
+        Self::from_owned_limbs_asc(
             xs.chunks(usize::wrapping_from(Limb::WIDTH))
                 .into_iter()
                 .map(Limb::from_bits_asc)
@@ -167,7 +167,7 @@ impl BitConvertible for Natural {
     ///     105
     /// );
     /// ```
-    fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Natural {
+    fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Self {
         let mut out = Vec::new();
         let mut last_width = 0;
         for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {
@@ -184,8 +184,8 @@ impl BitConvertible for Natural {
             out.push(x);
         }
         match out.len() {
-            0 => Natural::ZERO,
-            1 => Natural::from(out[0]),
+            0 => Self::ZERO,
+            1 => Self::from(out[0]),
             _ => {
                 out.reverse();
                 if last_width != Limb::WIDTH {
@@ -194,7 +194,7 @@ impl BitConvertible for Natural {
                     limbs_slice_shr_in_place(&mut out, Limb::WIDTH - last_width);
                     out[0] |= out_0;
                 }
-                Natural::from_owned_limbs_asc(out)
+                Self::from_owned_limbs_asc(out)
             }
         }
     }

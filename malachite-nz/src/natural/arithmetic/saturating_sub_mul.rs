@@ -12,8 +12,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 
-impl SaturatingSubMul<Natural, Natural> for Natural {
-    type Output = Natural;
+impl SaturatingSubMul<Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by value
     /// and returning 0 if the result is negative.
@@ -51,13 +51,13 @@ impl SaturatingSubMul<Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: Natural, z: Natural) -> Natural {
-        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: Self, z: Self) -> Self {
+        self.checked_sub_mul(y, z).unwrap_or(Self::ZERO)
     }
 }
 
-impl SaturatingSubMul<Natural, &Natural> for Natural {
-    type Output = Natural;
+impl SaturatingSubMul<Self, &Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first two by
     /// value and the third by reference and returning 0 if the result is negative.
@@ -95,13 +95,13 @@ impl SaturatingSubMul<Natural, &Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: Natural, z: &Natural) -> Natural {
-        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: Self, z: &Self) -> Self {
+        self.checked_sub_mul(y, z).unwrap_or(Self::ZERO)
     }
 }
 
-impl SaturatingSubMul<&Natural, Natural> for Natural {
-    type Output = Natural;
+impl SaturatingSubMul<&Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
     /// by value and the second by reference and returning 0 if the result is negative.
@@ -139,13 +139,13 @@ impl SaturatingSubMul<&Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: &Natural, z: Natural) -> Natural {
-        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: &Self, z: Self) -> Self {
+        self.checked_sub_mul(y, z).unwrap_or(Self::ZERO)
     }
 }
 
-impl SaturatingSubMul<&Natural, &Natural> for Natural {
-    type Output = Natural;
+impl SaturatingSubMul<&Self, &Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first by value
     /// and the second and third by reference and returning 0 if the result is negative.
@@ -183,8 +183,8 @@ impl SaturatingSubMul<&Natural, &Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, y: &Natural, z: &Natural) -> Natural {
-        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: &Self, z: &Self) -> Self {
+        self.checked_sub_mul(y, z).unwrap_or(Self::ZERO)
     }
 }
 
@@ -231,7 +231,7 @@ impl SaturatingSubMul<&Natural, &Natural> for &Natural {
     }
 }
 
-impl SaturatingSubMulAssign<Natural, Natural> for Natural {
+impl SaturatingSubMulAssign<Self, Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
     /// [`Natural`]s on the right-hand side by value and replacing the left-hand side [`Natural`]
     /// with 0 if the result is negative.
@@ -266,14 +266,14 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: Natural, z: Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: Self, z: Self) {
         if self.sub_mul_assign_no_panic(y, z) {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
         }
     }
 }
 
-impl SaturatingSubMulAssign<Natural, &Natural> for Natural {
+impl SaturatingSubMulAssign<Self, &Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by value and the second by reference and replacing the
     /// left-hand side [`Natural`] with 0 if the result is negative.
@@ -308,14 +308,14 @@ impl SaturatingSubMulAssign<Natural, &Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: Natural, z: &Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: Self, z: &Self) {
         if self.sub_mul_assign_val_ref_no_panic(y, z) {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
         }
     }
 }
 
-impl SaturatingSubMulAssign<&Natural, Natural> for Natural {
+impl SaturatingSubMulAssign<&Self, Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by reference and the second by value and replacing the
     /// left-hand side [`Natural`] with 0 if the result is negative.
@@ -350,14 +350,14 @@ impl SaturatingSubMulAssign<&Natural, Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: &Natural, z: Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: &Self, z: Self) {
         if self.sub_mul_assign_ref_val_no_panic(y, z) {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
         }
     }
 }
 
-impl SaturatingSubMulAssign<&Natural, &Natural> for Natural {
+impl SaturatingSubMulAssign<&Self, &Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
     /// [`Natural`]s on the right-hand side by reference and replacing the left-hand side
     /// [`Natural`] with 0 if the result is negative.
@@ -392,9 +392,9 @@ impl SaturatingSubMulAssign<&Natural, &Natural> for Natural {
     /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, y: &Natural, z: &Natural) {
+    fn saturating_sub_mul_assign(&mut self, y: &Self, z: &Self) {
         if self.sub_mul_assign_ref_ref_no_panic(y, z) {
-            *self = Natural::ZERO;
+            *self = Self::ZERO;
         }
     }
 }

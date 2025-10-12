@@ -1051,7 +1051,7 @@ pub_crate_test! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
 }}
 
 impl Square for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Squares a [`Natural`], taking it by value.
     ///
@@ -1076,7 +1076,7 @@ impl Square for Natural {
     /// assert_eq!(Natural::from(123u32).square(), 15129);
     /// ```
     #[inline]
-    fn square(mut self) -> Natural {
+    fn square(mut self) -> Self {
         self.square_assign();
         self
     }
@@ -1154,16 +1154,16 @@ impl SquareAssign for Natural {
     /// ```
     fn square_assign(&mut self) {
         match self {
-            &mut (Natural::ZERO | Natural::ONE) => {}
-            Natural(Small(x)) => {
+            &mut (Self::ZERO | Self::ONE) => {}
+            Self(Small(x)) => {
                 let (upper, lower) = Limb::x_mul_y_to_zz(*x, *x);
                 if upper == 0 {
                     *x = lower;
                 } else {
-                    *self = Natural(Large(vec![lower, upper]));
+                    *self = Self(Large(vec![lower, upper]));
                 }
             }
-            Natural(Large(xs)) => {
+            Self(Large(xs)) => {
                 *xs = limbs_square(xs);
                 self.trim();
             }

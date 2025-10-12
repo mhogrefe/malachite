@@ -264,10 +264,10 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
 {
     pub(crate) fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
         match self {
-            IteratorToBitChunks::SameWidth(xs) => xs.next_with_wrapping(wrap),
-            IteratorToBitChunks::EvenFraction(xs) => xs.next_with_wrapping(wrap),
-            IteratorToBitChunks::EvenMultiple(xs) => xs.next_with_wrapping(wrap),
-            IteratorToBitChunks::Irregular(xs) => xs.next_with_wrapping(wrap),
+            Self::SameWidth(xs) => xs.next_with_wrapping(wrap),
+            Self::EvenFraction(xs) => xs.next_with_wrapping(wrap),
+            Self::EvenMultiple(xs) => xs.next_with_wrapping(wrap),
+            Self::Irregular(xs) => xs.next_with_wrapping(wrap),
         }
     }
 }

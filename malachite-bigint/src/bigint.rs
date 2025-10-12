@@ -51,7 +51,7 @@ pub enum Sign {
 }
 
 impl Neg for Sign {
-    type Output = Sign;
+    type Output = Self;
 
     #[inline]
     fn neg(self) -> Self::Output {
@@ -256,7 +256,7 @@ impl Num for BigInt {
             Plus
         };
         let u = BigUint::from_str_radix(s, radix)?;
-        Ok(BigInt::from_biguint(sign, u))
+        Ok(Self::from_biguint(sign, u))
     }
 }
 
@@ -528,22 +528,22 @@ impl BigInt {
     }
 
     #[inline]
-    pub fn checked_add(&self, v: &BigInt) -> Option<BigInt> {
+    pub fn checked_add(&self, v: &Self) -> Option<Self> {
         Some(self + v)
     }
 
     #[inline]
-    pub fn checked_sub(&self, v: &BigInt) -> Option<BigInt> {
+    pub fn checked_sub(&self, v: &Self) -> Option<Self> {
         Some(self - v)
     }
 
     #[inline]
-    pub fn checked_mul(&self, v: &BigInt) -> Option<BigInt> {
+    pub fn checked_mul(&self, v: &Self) -> Option<Self> {
         Some(self * v)
     }
 
     #[inline]
-    pub fn checked_div(&self, v: &BigInt) -> Option<BigInt> {
+    pub fn checked_div(&self, v: &Self) -> Option<Self> {
         if v.is_zero() {
             return None;
         }

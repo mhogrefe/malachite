@@ -102,13 +102,13 @@ impl XMulYToZZ for usize {
     ///
     /// This is equivalent to `umul_ppmm` from `longlong.h`, GMP 6.2.1, where `(w1, w0)` is
     /// returned.
-    fn x_mul_y_to_zz(x: usize, y: usize) -> (usize, usize) {
+    fn x_mul_y_to_zz(x: Self, y: Self) -> (Self, Self) {
         if USIZE_IS_U32 {
             let (z_1, z_0) = u32::x_mul_y_to_zz(u32::wrapping_from(x), u32::wrapping_from(y));
-            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+            (Self::wrapping_from(z_1), Self::wrapping_from(z_0))
         } else {
             let (z_1, z_0) = u64::x_mul_y_to_zz(u64::wrapping_from(x), u64::wrapping_from(y));
-            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+            (Self::wrapping_from(z_1), Self::wrapping_from(z_0))
         }
     }
 }
@@ -137,7 +137,7 @@ impl XMulYToZZ for u128 {
     /// This is equivalent to `umul_ppmm` from `longlong.h`, GMP 6.2.1, where `(w1, w0)` is
     /// returned.
     #[inline]
-    fn x_mul_y_to_zz(x: u128, y: u128) -> (u128, u128) {
+    fn x_mul_y_to_zz(x: Self, y: Self) -> (Self, Self) {
         explicit_x_mul_y_to_zz(x, y)
     }
 }

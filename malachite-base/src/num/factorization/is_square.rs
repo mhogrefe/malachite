@@ -188,7 +188,7 @@ impl IsSquare for u128 {
         // This just checks the particular bit in the bitmask SQR_MOD256_U64 encoding where the
         // input can be a perfect square mod 256.
         if (SQR_MOD256[(idx >> u64::LOG_WIDTH) as usize]
-            >> (idx & const { u64::WIDTH_MASK as u128 }))
+            >> (idx & const { u64::WIDTH_MASK as Self }))
             & 1
             == 0
         {

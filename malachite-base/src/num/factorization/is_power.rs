@@ -643,15 +643,15 @@ impl ExpressAsPower for usize {
     /// - This returns an [`Option`] which is either `Some((base, exp))` if the input is a perfect
     ///   power equal to $\text{base}^\text{exp}$, otherwise `None`.
     /// - For 0 this returns `Some((0, 2))` and for 1 this returns `Some((1, 2))`.
-    fn express_as_power(&self) -> Option<(usize, u64)> {
+    fn express_as_power(&self) -> Option<(Self, u64)> {
         if USIZE_IS_U32 {
             match express_as_power_u32(u32::wrapping_from(*self)) {
-                Some((base, exp)) => Some((usize::wrapping_from(base), exp)),
+                Some((base, exp)) => Some((Self::wrapping_from(base), exp)),
                 _ => None,
             }
         } else {
             match express_as_power_u64(u64::wrapping_from(*self)) {
-                Some((base, exp)) => Some((usize::wrapping_from(base), exp)),
+                Some((base, exp)) => Some((Self::wrapping_from(base), exp)),
                 _ => None,
             }
         }
@@ -766,7 +766,7 @@ impl ExpressAsPower for i64 {
     ///   power equal to $\text{base}^\text{exp}$, otherwise `None`.
     /// - For 0 this returns `Some((0, 2))` and for 1 this returns `Some((1, 2))`.
     #[inline]
-    fn express_as_power(&self) -> Option<(i64, u64)> {
+    fn express_as_power(&self) -> Option<(Self, u64)> {
         express_as_power_i64(*self)
     }
 }
@@ -788,15 +788,15 @@ impl ExpressAsPower for isize {
     /// - This returns an [`Option`] which is either `Some((base, exp))` if the input is a perfect
     ///   power equal to $\text{base}^\text{exp}$, otherwise `None`.
     /// - For 0 this returns `Some((0, 2))` and for 1 this returns `Some((1, 2))`.
-    fn express_as_power(&self) -> Option<(isize, u64)> {
+    fn express_as_power(&self) -> Option<(Self, u64)> {
         if USIZE_IS_U32 {
             match express_as_power_i32(i32::wrapping_from(*self)) {
-                Some((base, exp)) => Some((isize::wrapping_from(base), exp)),
+                Some((base, exp)) => Some((Self::wrapping_from(base), exp)),
                 _ => None,
             }
         } else {
             match express_as_power_i64(i64::wrapping_from(*self)) {
-                Some((base, exp)) => Some((isize::wrapping_from(base), exp)),
+                Some((base, exp)) => Some((Self::wrapping_from(base), exp)),
                 _ => None,
             }
         }

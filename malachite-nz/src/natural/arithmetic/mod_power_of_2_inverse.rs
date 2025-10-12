@@ -57,7 +57,7 @@ fn mod_power_of_2_inverse_helper(xs: &[Limb], pow: u64) -> Option<Natural> {
 }
 
 impl ModPowerOf2Inverse for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be already
     /// reduced modulo $2^k$. The [`Natural`] is taken by value.
@@ -87,25 +87,25 @@ impl ModPowerOf2Inverse for Natural {
     /// );
     /// assert_eq!(Natural::from(4u32).mod_power_of_2_inverse(8), None);
     /// ```
-    fn mod_power_of_2_inverse(self, pow: u64) -> Option<Natural> {
+    fn mod_power_of_2_inverse(self, pow: u64) -> Option<Self> {
         assert_ne!(self, 0u32);
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
         );
         match (self, pow) {
-            (Natural::ONE, _) => Some(Natural::ONE),
+            (Self::ONE, _) => Some(Self::ONE),
             (x, _) if x.even() => None,
-            (Natural(Small(x)), pow) if pow <= Limb::WIDTH => {
-                x.mod_power_of_2_inverse(pow).map(Natural::from)
+            (Self(Small(x)), pow) if pow <= Limb::WIDTH => {
+                x.mod_power_of_2_inverse(pow).map(Self::from)
             }
-            (Natural(Small(x)), pow) => {
+            (Self(Small(x)), pow) => {
                 let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 let mut xs = vec![0; len];
                 xs[0] = x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
-            (Natural(Large(mut xs)), pow) => {
+            (Self(Large(mut xs)), pow) => {
                 let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 xs.resize(len, 0);
                 mod_power_of_2_inverse_helper(&xs, pow)

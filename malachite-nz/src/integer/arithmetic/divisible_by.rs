@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 
-impl DivisibleBy<Integer> for Integer {
+impl DivisibleBy<Self> for Integer {
     /// Returns whether an [`Integer`] is divisible by another [`Integer`]; in other words, whether
     /// the first is a multiple of the second. Both [`Integer`]s are taken by value.
     ///
@@ -43,12 +43,12 @@ impl DivisibleBy<Integer> for Integer {
     ///     true
     /// );
     /// ```
-    fn divisible_by(self, other: Integer) -> bool {
+    fn divisible_by(self, other: Self) -> bool {
         self.abs.divisible_by(other.abs)
     }
 }
 
-impl DivisibleBy<&Integer> for Integer {
+impl DivisibleBy<&Self> for Integer {
     /// Returns whether an [`Integer`] is divisible by another [`Integer`]; in other words, whether
     /// the first is a multiple of the second. The first [`Integer`] is taken by value and the
     /// second by reference.
@@ -83,7 +83,7 @@ impl DivisibleBy<&Integer> for Integer {
     ///     true
     /// );
     /// ```
-    fn divisible_by(self, other: &Integer) -> bool {
+    fn divisible_by(self, other: &Self) -> bool {
         self.abs.divisible_by(&other.abs)
     }
 }

@@ -177,22 +177,22 @@ impl Natural {
     // self cannot be zero
     pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
         match self {
-            Natural(Small(small)) => index >= Limb::WIDTH || small.wrapping_neg().get_bit(index),
-            Natural(Large(limbs)) => limbs_get_bit_neg(limbs, index),
+            Self(Small(small)) => index >= Limb::WIDTH || small.wrapping_neg().get_bit(index),
+            Self(Large(limbs)) => limbs_get_bit_neg(limbs, index),
         }
     }
 
     // self cannot be zero
     fn set_bit_neg(&mut self, index: u64) {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 if index < Limb::WIDTH {
                     small.wrapping_neg_assign();
                     small.set_bit(index);
                     small.wrapping_neg_assign();
                 }
             }
-            Natural(Large(limbs)) => {
+            Self(Large(limbs)) => {
                 limbs_set_bit_neg(limbs, index);
                 self.trim();
             }
@@ -202,20 +202,20 @@ impl Natural {
     // self cannot be zero
     fn clear_bit_neg(&mut self, index: u64) {
         match self {
-            Natural(Small(small)) if index < Limb::WIDTH => {
+            Self(Small(small)) if index < Limb::WIDTH => {
                 let mut cleared_small = small.wrapping_neg();
                 cleared_small.clear_bit(index);
                 if cleared_small == 0 {
-                    *self = Natural(Large(vec![0, 1]));
+                    *self = Self(Large(vec![0, 1]));
                 } else {
                     *small = cleared_small.wrapping_neg();
                 }
             }
-            Natural(Small(_)) => {
+            Self(Small(_)) => {
                 let limbs = self.promote_in_place();
                 limbs_vec_clear_bit_neg(limbs, index);
             }
-            Natural(Large(limbs)) => {
+            Self(Large(limbs)) => {
                 limbs_vec_clear_bit_neg(limbs, index);
             }
         }
@@ -308,8 +308,8 @@ impl BitAccess for Integer {
     /// ```
     fn get_bit(&self, index: u64) -> bool {
         match self {
-            Integer { sign: true, abs } => abs.get_bit(index),
-            Integer { sign: false, abs } => abs.get_bit_neg(index),
+            Self { sign: true, abs } => abs.get_bit(index),
+            Self { sign: false, abs } => abs.get_bit_neg(index),
         }
     }
 
@@ -359,8 +359,8 @@ impl BitAccess for Integer {
     /// ```
     fn set_bit(&mut self, index: u64) {
         match self {
-            Integer { sign: true, abs } => abs.set_bit(index),
-            Integer { sign: false, abs } => abs.set_bit_neg(index),
+            Self { sign: true, abs } => abs.set_bit(index),
+            Self { sign: false, abs } => abs.set_bit_neg(index),
         }
     }
 
@@ -410,8 +410,8 @@ impl BitAccess for Integer {
     /// ```
     fn clear_bit(&mut self, index: u64) {
         match self {
-            Integer { sign: true, abs } => abs.clear_bit(index),
-            Integer { sign: false, abs } => abs.clear_bit_neg(index),
+            Self { sign: true, abs } => abs.clear_bit(index),
+            Self { sign: false, abs } => abs.clear_bit_neg(index),
         }
     }
 }

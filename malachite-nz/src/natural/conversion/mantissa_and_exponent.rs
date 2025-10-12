@@ -107,11 +107,11 @@ impl Natural {
         let mut half_compare = Less; // (mantissa - floor(mantissa)).cmp(&0.5)
         let mut highest_discarded_limb = 0;
         match self {
-            Natural(Small(x)) => {
+            Self(Small(x)) => {
                 most_significant_limbs[0] = *x;
                 significant_bits = x.significant_bits();
             }
-            Natural(Large(xs)) => {
+            Self(Large(xs)) => {
                 let len = xs.len();
                 if len == 2 {
                     most_significant_limbs[0] = xs[0];
@@ -283,7 +283,7 @@ impl Natural {
         sci_mantissa: T,
         sci_exponent: u64,
         rm: RoundingMode,
-    ) -> Option<(Natural, Ordering)> {
+    ) -> Option<(Self, Ordering)> {
         assert_ne!(sci_mantissa, T::ZERO);
         if sci_mantissa < T::ONE || sci_mantissa >= T::TWO {
             return None;
@@ -291,7 +291,7 @@ impl Natural {
         let (integer_mantissa, integer_exponent) = sci_mantissa.integer_mantissa_and_exponent();
         if integer_exponent > 0 {
             Some((
-                Natural::from(integer_mantissa)
+                Self::from(integer_mantissa)
                     << (sci_exponent + u64::exact_from(integer_exponent)),
                 Equal,
             ))
@@ -299,13 +299,13 @@ impl Natural {
             let integer_exponent = u64::exact_from(-integer_exponent);
             if integer_exponent <= sci_exponent {
                 Some((
-                    Natural::from(integer_mantissa) << (sci_exponent - integer_exponent),
+                    Self::from(integer_mantissa) << (sci_exponent - integer_exponent),
                     Equal,
                 ))
             } else if rm == Exact {
                 None
             } else {
-                Some(Natural::from(integer_mantissa).shr_round(integer_exponent - sci_exponent, rm))
+                Some(Self::from(integer_mantissa).shr_round(integer_exponent - sci_exponent, rm))
             }
         }
     }

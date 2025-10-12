@@ -49,8 +49,8 @@ impl ModIsReduced for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_is_reduced(&self, m: &Natural) -> bool {
-        assert_ne!(*m, Natural::ZERO);
+    fn mod_is_reduced(&self, m: &Self) -> bool {
+        assert_ne!(*m, Self::ZERO);
         self < m
     }
 }

@@ -156,11 +156,11 @@ impl Iterator for IntegerBitIterator<'_> {
 
     fn next(&mut self) -> Option<bool> {
         match self {
-            IntegerBitIterator::Zero => None,
-            IntegerBitIterator::Positive(bits, extension_checked) => {
+            Self::Zero => None,
+            Self::Positive(bits, extension_checked) => {
                 bits.iterate_forward(extension_checked)
             }
-            IntegerBitIterator::Negative(bits, extension_checked) => {
+            Self::Negative(bits, extension_checked) => {
                 bits.iterate_forward(extension_checked)
             }
         }
@@ -170,11 +170,11 @@ impl Iterator for IntegerBitIterator<'_> {
 impl DoubleEndedIterator for IntegerBitIterator<'_> {
     fn next_back(&mut self) -> Option<bool> {
         match self {
-            IntegerBitIterator::Zero => None,
-            IntegerBitIterator::Positive(bits, extension_checked) => {
+            Self::Zero => None,
+            Self::Positive(bits, extension_checked) => {
                 bits.iterate_backward(extension_checked)
             }
-            IntegerBitIterator::Negative(bits, extension_checked) => {
+            Self::Negative(bits, extension_checked) => {
                 bits.iterate_backward(extension_checked)
             }
         }
@@ -213,9 +213,9 @@ impl Index<u64> for IntegerBitIterator<'_> {
     /// ```
     fn index(&self, index: u64) -> &bool {
         let bit = match self {
-            IntegerBitIterator::Zero => false,
-            IntegerBitIterator::Positive(bits, _) => bits.limbs.n.get_bit(index),
-            IntegerBitIterator::Negative(bits, _) => bits.bits.limbs.n.get_bit_neg(index),
+            Self::Zero => false,
+            Self::Positive(bits, _) => bits.limbs.n.get_bit(index),
+            Self::Negative(bits, _) => bits.bits.limbs.n.get_bit_neg(index),
         };
         if bit { &true } else { &false }
     }

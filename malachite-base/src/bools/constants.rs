@@ -11,12 +11,12 @@ use crate::named::Named;
 
 impl Min for bool {
     /// The minimum value of a [`bool`]: `false`.
-    const MIN: bool = false;
+    const MIN: Self = false;
 }
 
 impl Max for bool {
     /// The maximum value of a [`bool`]: `true`.
-    const MAX: bool = true;
+    const MAX: Self = true;
 }
 
 impl_named!(bool);

@@ -41,7 +41,7 @@ impl<T> BaseFmtWrapper<T> {
     /// ```
     pub fn new(x: T, base: u8) -> Self {
         assert!((2..=36).contains(&base), "base out of range");
-        BaseFmtWrapper { x, base }
+        Self { x, base }
     }
 
     /// Recovers the value from a `BaseFmtWrapper`.

@@ -51,12 +51,12 @@ impl Float {
     /// assert_eq!(pc.to_string(), "0.4146825098511116602481096221546");
     /// assert_eq!(o, Greater);
     /// ```
-    pub fn prime_constant_prec_round(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn prime_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         // Strictly speaking, this call violates the preconditions for
         // `non_dyadic_from_bits_prec_round`, because the iterator passed in is finite. But since we
         // know exactly how many bits `non_dyadic_from_bits_prec_round` will read, we can get away
         // with this.
-        Float::non_dyadic_from_bits_prec_round(
+        Self::non_dyadic_from_bits_prec_round(
             prime_indicator_sequence_less_than_or_equal_to(if rm == Nearest {
                 prec + 2
             } else {
@@ -110,7 +110,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn prime_constant_prec(prec: u64) -> (Float, Ordering) {
-        Float::prime_constant_prec_round(prec, Nearest)
+    pub fn prime_constant_prec(prec: u64) -> (Self, Ordering) {
+        Self::prime_constant_prec_round(prec, Nearest)
     }
 }

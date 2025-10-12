@@ -192,8 +192,8 @@ macro_rules! impl_mod_pow_precomputed_promoted {
 impl_mod_pow_precomputed_promoted!(u8);
 impl_mod_pow_precomputed_promoted!(u16);
 
-impl ModPowPrecomputed<u64, u128> for u128 {
-    type Output = u128;
+impl ModPowPrecomputed<u64, Self> for u128 {
+    type Output = Self;
     type Data = ();
 
     /// Precomputes data for modular exponentiation.
@@ -203,7 +203,7 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
-    fn precompute_mod_pow_data(_m: &u128) {}
+    fn precompute_mod_pow_data(_m: &Self) {}
 
     /// Raises a number to a power modulo another number $m$. The base must be already reduced
     /// modulo $m$.
@@ -225,14 +225,14 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     /// # Examples
     /// See [here](super::mod_pow#mod_pow_precomputed).
     #[inline]
-    fn mod_pow_precomputed(self, exp: u64, m: u128, _data: &()) -> u128 {
+    fn mod_pow_precomputed(self, exp: u64, m: Self, _data: &()) -> Self {
         simple_binary_mod_pow(self, exp, m)
     }
 }
 
-impl ModPowPrecomputed<u64, usize> for usize {
-    type Output = usize;
-    type Data = (usize, u64);
+impl ModPowPrecomputed<u64, Self> for usize {
+    type Output = Self;
+    type Data = (Self, u64);
 
     /// Precomputes data for modular exponentiation.
     ///
@@ -241,13 +241,13 @@ impl ModPowPrecomputed<u64, usize> for usize {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
-    fn precompute_mod_pow_data(&m: &usize) -> (usize, u64) {
+    fn precompute_mod_pow_data(&m: &Self) -> (Self, u64) {
         if USIZE_IS_U32 {
             let (inverse, shift) = u32::precompute_mod_pow_data(&u32::wrapping_from(m));
-            (usize::wrapping_from(inverse), shift)
+            (Self::wrapping_from(inverse), shift)
         } else {
             let (inverse, shift) = u64::precompute_mod_pow_data(&u64::wrapping_from(m));
-            (usize::wrapping_from(inverse), shift)
+            (Self::wrapping_from(inverse), shift)
         }
     }
 
@@ -270,16 +270,16 @@ impl ModPowPrecomputed<u64, usize> for usize {
     ///
     /// # Examples
     /// See [here](super::mod_pow#mod_pow_precomputed).
-    fn mod_pow_precomputed(self, exp: u64, m: usize, data: &(usize, u64)) -> usize {
+    fn mod_pow_precomputed(self, exp: u64, m: Self, data: &(Self, u64)) -> Self {
         let (inverse, shift) = *data;
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::wrapping_from(self).mod_pow_precomputed(
+            Self::wrapping_from(u32::wrapping_from(self).mod_pow_precomputed(
                 exp,
                 u32::wrapping_from(m),
                 &(u32::wrapping_from(inverse), shift),
             ))
         } else {
-            usize::wrapping_from(u64::wrapping_from(self).mod_pow_precomputed(
+            Self::wrapping_from(u64::wrapping_from(self).mod_pow_precomputed(
                 exp,
                 u64::wrapping_from(m),
                 &(u64::wrapping_from(inverse), shift),

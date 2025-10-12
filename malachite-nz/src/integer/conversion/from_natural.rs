@@ -29,8 +29,8 @@ impl Integer {
     ///     -123
     /// );
     /// ```
-    pub fn from_sign_and_abs(sign: bool, abs: Natural) -> Integer {
-        Integer {
+    pub fn from_sign_and_abs(sign: bool, abs: Natural) -> Self {
+        Self {
             sign: sign || abs == 0,
             abs,
         }
@@ -62,8 +62,8 @@ impl Integer {
     ///     -123
     /// );
     /// ```
-    pub fn from_sign_and_abs_ref(sign: bool, abs: &Natural) -> Integer {
-        Integer {
+    pub fn from_sign_and_abs_ref(sign: bool, abs: &Natural) -> Self {
+        Self {
             sign: sign || *abs == 0,
             abs: abs.clone(),
         }
@@ -88,8 +88,8 @@ impl From<Natural> for Integer {
     ///     1000000000000u64
     /// );
     /// ```
-    fn from(value: Natural) -> Integer {
-        Integer {
+    fn from(value: Natural) -> Self {
+        Self {
             sign: true,
             abs: value,
         }
@@ -118,8 +118,8 @@ impl<'a> From<&'a Natural> for Integer {
     ///     1000000000000u64
     /// );
     /// ```
-    fn from(value: &'a Natural) -> Integer {
-        Integer {
+    fn from(value: &'a Natural) -> Self {
+        Self {
             sign: true,
             abs: value.clone(),
         }

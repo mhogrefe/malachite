@@ -42,18 +42,18 @@ impl PartialEq for Float {
     /// assert_ne!(Float::ONE, Float::TWO);
     /// assert_eq!(Float::ONE, Float::one_prec(100));
     /// ```
-    fn eq(&self, other: &Float) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Float(Infinity { sign: s_x }), Float(Infinity { sign: s_y })) => s_x == s_y,
+            (Self(Infinity { sign: s_x }), Self(Infinity { sign: s_y })) => s_x == s_y,
             (float_either_zero!(), float_either_zero!()) => true,
             (
-                Float(Finite {
+                Self(Finite {
                     sign: s_x,
                     exponent: e_x,
                     significand: x,
                     ..
                 }),
-                Float(Finite {
+                Self(Finite {
                     sign: s_y,
                     exponent: e_y,
                     significand: y,
@@ -106,7 +106,7 @@ impl PartialEq for ComparableFloat {
     /// );
     /// ```
     #[inline]
-    fn eq(&self, other: &ComparableFloat) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.as_ref() == other.as_ref()
     }
 }

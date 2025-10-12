@@ -92,7 +92,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn reciprocal_prec_round(mut self, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn reciprocal_prec_round(mut self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.reciprocal_prec_round_assign(prec, rm);
         (self, o)
     }
@@ -171,20 +171,20 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn reciprocal_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn reciprocal_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match self {
             float_nan!() => (float_nan!(), Equal),
-            Float(Zero { sign }) => (Float(Infinity { sign: *sign }), Equal),
-            Float(Infinity { sign }) => (Float(Zero { sign: *sign }), Equal),
-            Float(Finite {
+            Self(Zero { sign }) => (Self(Infinity { sign: *sign }), Equal),
+            Self(Infinity { sign }) => (Self(Zero { sign: *sign }), Equal),
+            Self(Finite {
                 sign,
                 exponent: exp,
                 precision: x_prec,
                 significand: x,
             }) => {
                 if x.is_power_of_2() {
-                    let (reciprocal, o) = Float::power_of_2_prec(i64::from(1 - exp), prec);
+                    let (reciprocal, o) = Self::power_of_2_prec(i64::from(1 - exp), prec);
                     return if *sign {
                         (reciprocal, o)
                     } else {
@@ -200,7 +200,7 @@ impl Float {
                     .checked_add(i32::exact_from(exp_offset))
                     .unwrap();
                 (
-                    Float(Finite {
+                    Self(Finite {
                         sign,
                         exponent: exp,
                         precision: prec,
@@ -264,7 +264,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn reciprocal_prec(self, prec: u64) -> (Float, Ordering) {
+    pub fn reciprocal_prec(self, prec: u64) -> (Self, Ordering) {
         self.reciprocal_prec_round(prec, Nearest)
     }
 
@@ -320,7 +320,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn reciprocal_prec_ref(&self, prec: u64) -> (Float, Ordering) {
+    pub fn reciprocal_prec_ref(&self, prec: u64) -> (Self, Ordering) {
         self.reciprocal_prec_round_ref(prec, Nearest)
     }
 
@@ -386,7 +386,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn reciprocal_round(self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn reciprocal_round(self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.reciprocal_prec_round(prec, rm)
     }
@@ -453,7 +453,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn reciprocal_round_ref(&self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn reciprocal_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.reciprocal_prec_round_ref(prec, rm)
     }
@@ -531,15 +531,15 @@ impl Float {
         assert_ne!(prec, 0);
         match &mut *self {
             float_nan!() => Equal,
-            Float(Zero { sign }) => {
-                *self = Float(Infinity { sign: *sign });
+            Self(Zero { sign }) => {
+                *self = Self(Infinity { sign: *sign });
                 Equal
             }
-            Float(Infinity { sign }) => {
-                *self = Float(Zero { sign: *sign });
+            Self(Infinity { sign }) => {
+                *self = Self(Zero { sign: *sign });
                 Equal
             }
-            Float(Finite {
+            Self(Finite {
                 sign,
                 exponent: exp,
                 precision: x_prec,
@@ -548,7 +548,7 @@ impl Float {
                 if x.is_power_of_2() {
                     let sign = *sign;
                     let o;
-                    (*self, o) = Float::power_of_2_prec(i64::from(1 - *exp), prec);
+                    (*self, o) = Self::power_of_2_prec(i64::from(1 - *exp), prec);
                     return if sign {
                         o
                     } else {
@@ -686,7 +686,7 @@ impl Float {
 }
 
 impl Reciprocal for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Takes the reciprocal of a [`Float`], taking it by value.
     ///
@@ -734,7 +734,7 @@ impl Reciprocal for Float {
     /// assert_eq!(Float::from(-1.5).reciprocal().to_string(), "-0.8");
     /// ```
     #[inline]
-    fn reciprocal(self) -> Float {
+    fn reciprocal(self) -> Self {
         let prec = self.significant_bits();
         self.reciprocal_prec_round(prec, Nearest).0
     }

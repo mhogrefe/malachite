@@ -76,7 +76,7 @@ impl<T: PrimitiveFloat> NiceFloat<T> {
     }
 }
 
-impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
+impl<T: PrimitiveFloat> PartialEq<Self> for NiceFloat<T> {
     /// Compares two `NiceFloat`s for equality.
     ///
     /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
@@ -99,7 +99,7 @@ impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
     /// assert_eq!(NiceFloat(1.0), NiceFloat(1.0));
     /// ```
     #[inline]
-    fn eq(&self, other: &NiceFloat<T>) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         let f = self.0;
         let g = other.0;
         f.to_bits() == g.to_bits() || f.is_nan() && g.is_nan()
@@ -152,7 +152,7 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     /// assert!(NiceFloat(f32::INFINITY) > NiceFloat(f32::NAN));
     /// assert!(NiceFloat(f32::NAN) < NiceFloat(1.0));
     /// ```
-    fn cmp(&self, other: &NiceFloat<T>) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         let self_type = self.float_type();
         let other_type = other.float_type();
         self_type.cmp(&other_type).then_with(|| {
@@ -165,12 +165,12 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     }
 }
 
-impl<T: PrimitiveFloat> PartialOrd<NiceFloat<T>> for NiceFloat<T> {
+impl<T: PrimitiveFloat> PartialOrd<Self> for NiceFloat<T> {
     /// Compares a `NiceFloat` to another `NiceFloat`.
     ///
     /// See the documentation for the [`Ord`] implementation.
     #[inline]
-    fn partial_cmp(&self, other: &NiceFloat<T>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -321,7 +321,7 @@ impl<T: PrimitiveFloat> FromStr for NiceFloat<T> {
     /// assert_eq!(NiceFloat::from_str(".123").unwrap(), NiceFloat(0.123f32));
     /// ```
     #[inline]
-    fn from_str(src: &str) -> Result<NiceFloat<T>, <T as FromStr>::Err> {
+    fn from_str(src: &str) -> Result<Self, <T as FromStr>::Err> {
         match src {
             "NaN" => Ok(T::NAN),
             "Infinity" => Ok(T::INFINITY),

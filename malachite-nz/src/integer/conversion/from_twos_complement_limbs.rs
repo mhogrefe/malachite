@@ -59,10 +59,10 @@ impl Integer {
     ///     );
     /// }
     /// ```
-    pub fn from_twos_complement_limbs_asc(xs: &[Limb]) -> Integer {
+    pub fn from_twos_complement_limbs_asc(xs: &[Limb]) -> Self {
         match xs {
-            &[] => Integer::ZERO,
-            &[.., last] if !last.get_highest_bit() => Integer::from(Natural::from_limbs_asc(xs)),
+            &[] => Self::ZERO,
+            &[.., last] if !last.get_highest_bit() => Self::from(Natural::from_limbs_asc(xs)),
             xs => -Natural::from_owned_limbs_asc(limbs_twos_complement(xs)),
         }
     }
@@ -112,8 +112,8 @@ impl Integer {
     ///     );
     /// }
     /// ```
-    pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Integer {
-        Integer::from_owned_twos_complement_limbs_asc(xs.iter().copied().rev().collect())
+    pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Self {
+        Self::from_owned_twos_complement_limbs_asc(xs.iter().copied().rev().collect())
     }
 
     /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that less
@@ -163,11 +163,11 @@ impl Integer {
     ///     );
     /// }
     /// ```
-    pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Integer {
+    pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Self {
         match *xs.as_slice() {
-            [] => Integer::ZERO,
+            [] => Self::ZERO,
             [.., last] if !last.get_highest_bit() => {
-                Integer::from(Natural::from_owned_limbs_asc(xs))
+                Self::from(Natural::from_owned_limbs_asc(xs))
             }
             _ => {
                 assert!(!limbs_twos_complement_in_place(&mut xs));
@@ -223,8 +223,8 @@ impl Integer {
     ///     );
     /// }
     /// ```
-    pub fn from_owned_twos_complement_limbs_desc(mut xs: Vec<Limb>) -> Integer {
+    pub fn from_owned_twos_complement_limbs_desc(mut xs: Vec<Limb>) -> Self {
         xs.reverse();
-        Integer::from_owned_twos_complement_limbs_asc(xs)
+        Self::from_owned_twos_complement_limbs_asc(xs)
     }
 }

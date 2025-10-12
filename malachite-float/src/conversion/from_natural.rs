@@ -382,15 +382,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn from_natural_prec_round(x: Natural, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn from_natural_prec_round(x: Natural, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if x == 0u32 {
-            return (Float::ZERO, Equal);
+            return (Self::ZERO, Equal);
         }
         let bits = x.significant_bits();
         if let Ok(bits_i32) = i32::try_from(bits) {
-            if bits_i32 <= Float::MAX_EXPONENT {
-                let mut f = Float(Finite {
+            if bits_i32 <= Self::MAX_EXPONENT {
+                let mut f = Self(Finite {
                     sign: true,
                     exponent: bits_i32,
                     precision: bits,
@@ -401,8 +401,8 @@ impl Float {
             }
         }
         match rm {
-            Up | Ceiling | Nearest => (Float::INFINITY, Greater),
-            Floor | Down => (Float::max_finite_value_with_prec(prec), Less),
+            Up | Ceiling | Nearest => (Self::INFINITY, Greater),
+            Floor | Down => (Self::max_finite_value_with_prec(prec), Less),
             Exact => panic!("Inexact conversion from Natural to Float"),
         }
     }
@@ -462,16 +462,16 @@ impl Float {
         x: &Natural,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if *x == 0u32 {
-            return (Float::ZERO, Equal);
+            return (Self::ZERO, Equal);
         }
         let bits = x.significant_bits();
         if bits <= prec {
             if let Ok(bits_i32) = i32::try_from(bits) {
-                if bits_i32 <= Float::MAX_EXPONENT {
-                    let mut f = Float(Finite {
+                if bits_i32 <= Self::MAX_EXPONENT {
+                    let mut f = Self(Finite {
                         sign: true,
                         exponent: bits_i32,
                         precision: bits,
@@ -482,8 +482,8 @@ impl Float {
                 }
             }
             match rm {
-                Up | Ceiling | Nearest => (Float::INFINITY, Greater),
-                Floor | Down => (Float::max_finite_value_with_prec(prec), Less),
+                Up | Ceiling | Nearest => (Self::INFINITY, Greater),
+                Floor | Down => (Self::max_finite_value_with_prec(prec), Less),
                 Exact => panic!("Inexact conversion from Natural to Float"),
             }
         } else {
@@ -537,8 +537,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn from_natural_prec(x: Natural, prec: u64) -> (Float, Ordering) {
-        Float::from_natural_prec_round(x, prec, Nearest)
+    pub fn from_natural_prec(x: Natural, prec: u64) -> (Self, Ordering) {
+        Self::from_natural_prec_round(x, prec, Nearest)
     }
 
     /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the [`Float`]
@@ -587,8 +587,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn from_natural_prec_ref(x: &Natural, prec: u64) -> (Float, Ordering) {
-        Float::from_natural_prec_round_ref(x, prec, Nearest)
+    pub fn from_natural_prec_ref(x: &Natural, prec: u64) -> (Self, Ordering) {
+        Self::from_natural_prec_round_ref(x, prec, Nearest)
     }
 }
 
@@ -637,13 +637,13 @@ impl TryFrom<Natural> for Float {
     ///     Some(3)
     /// );
     /// ```
-    fn try_from(x: Natural) -> Result<Float, Self::Error> {
+    fn try_from(x: Natural) -> Result<Self, Self::Error> {
         if x == 0 {
-            Ok(Float::ZERO)
+            Ok(Self::ZERO)
         } else {
             let bits = x.significant_bits();
             let prec = bits - x.trailing_zeros().unwrap();
-            let (f, o) = Float::from_natural_prec_round(x, prec, Floor);
+            let (f, o) = Self::from_natural_prec_round(x, prec, Floor);
             if o == Equal {
                 Ok(f)
             } else {
@@ -699,13 +699,13 @@ impl TryFrom<&Natural> for Float {
     /// );
     /// ```
     #[inline]
-    fn try_from(x: &Natural) -> Result<Float, Self::Error> {
+    fn try_from(x: &Natural) -> Result<Self, Self::Error> {
         if *x == 0 {
-            Ok(Float::ZERO)
+            Ok(Self::ZERO)
         } else {
             let bits = x.significant_bits();
             let prec = bits - x.trailing_zeros().unwrap();
-            let (f, o) = Float::from_natural_prec_round_ref(x, prec, Floor);
+            let (f, o) = Self::from_natural_prec_round_ref(x, prec, Floor);
             if o == Equal {
                 Ok(f)
             } else {
@@ -742,7 +742,7 @@ impl ConvertibleFrom<&Natural> for Float {
     #[inline]
     fn convertible_from(x: &Natural) -> bool {
         *x == 0
-            || (Float::MIN_EXPONENT..=Float::MAX_EXPONENT)
+            || (Self::MIN_EXPONENT..=Self::MAX_EXPONENT)
                 .contains(&i32::saturating_from(x.floor_log_base_2()).saturating_add(1))
     }
 }

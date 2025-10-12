@@ -540,8 +540,8 @@ pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]
     }
 }}
 
-impl ModPow<Natural, Natural> for Natural {
-    type Output = Natural;
+impl ModPow<Self, Self> for Natural {
+    type Output = Self;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
     /// already reduced modulo $m$. All three [`Natural`]s are taken by value.
@@ -574,14 +574,14 @@ impl ModPow<Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_pow(mut self, exp: Natural, m: Natural) -> Natural {
+    fn mod_pow(mut self, exp: Self, m: Self) -> Self {
         self.mod_pow_assign(exp, m);
         self
     }
 }
 
-impl<'a> ModPow<Natural, &'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModPow<Self, &'a Self> for Natural {
+    type Output = Self;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
     /// already reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
@@ -615,14 +615,14 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_pow(mut self, exp: Natural, m: &'a Natural) -> Natural {
+    fn mod_pow(mut self, exp: Self, m: &'a Self) -> Self {
         self.mod_pow_assign(exp, m);
         self
     }
 }
 
-impl<'a> ModPow<&'a Natural, Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModPow<&'a Self, Self> for Natural {
+    type Output = Self;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
     /// already reduced modulo $m$. The first and third [`Natural`]s are taken by value and the
@@ -656,14 +656,14 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_pow(mut self, exp: &'a Natural, m: Natural) -> Natural {
+    fn mod_pow(mut self, exp: &'a Self, m: Self) -> Self {
         self.mod_pow_assign(exp, m);
         self
     }
 }
 
-impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
-    type Output = Natural;
+impl<'a, 'b> ModPow<&'a Self, &'b Self> for Natural {
+    type Output = Self;
 
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
     /// already reduced modulo $m$. The first [`Natural`] is taken by value and the second and third
@@ -697,7 +697,7 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_pow(mut self, exp: &'a Natural, m: &'b Natural) -> Natural {
+    fn mod_pow(mut self, exp: &'a Self, m: &'b Self) -> Self {
         self.mod_pow_assign(exp, m);
         self
     }
@@ -934,7 +934,7 @@ impl ModPow<&Natural, &Natural> for &Natural {
     }
 }
 
-impl ModPowAssign<Natural, Natural> for Natural {
+impl ModPowAssign<Self, Self> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
     /// base must be already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken
     /// by value.
@@ -966,13 +966,13 @@ impl ModPowAssign<Natural, Natural> for Natural {
     /// assert_eq!(x, 10);
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow_assign(&mut self, mut exp: Natural, mut m: Natural) {
+    fn mod_pow_assign(&mut self, mut exp: Self, mut m: Self) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, &exp, &m) {
-            (_, _, &Natural::ONE) => *self = Natural::ZERO,
-            (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
-            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+            (_, _, &Self::ONE) => *self = Self::ZERO,
+            (_, &Self::ZERO, _) => *self = Self::ONE,
+            (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
+            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
                 if u64::convertible_from(*e) =>
             {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
@@ -986,13 +986,13 @@ impl ModPowAssign<Natural, Natural> for Natural {
                     exp.promote_in_place(),
                     ms,
                 );
-                *self = Natural::from_owned_limbs_asc(out);
+                *self = Self::from_owned_limbs_asc(out);
             }
         }
     }
 }
 
-impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
+impl<'a> ModPowAssign<Self, &'a Self> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
     /// base must be already reduced modulo $m$. The first [`Natural`] on the right-hand side is
     /// taken by value and the second by reference.
@@ -1024,13 +1024,13 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 10);
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow_assign(&mut self, mut exp: Natural, m: &'a Natural) {
+    fn mod_pow_assign(&mut self, mut exp: Self, m: &'a Self) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, &exp, m) {
-            (_, _, &Natural::ONE) => *self = Natural::ZERO,
-            (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
-            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+            (_, _, &Self::ONE) => *self = Self::ZERO,
+            (_, &Self::ZERO, _) => *self = Self::ONE,
+            (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
+            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
                 if u64::convertible_from(*e) =>
             {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
@@ -1044,13 +1044,13 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
                     exp.promote_in_place(),
                     &ms,
                 );
-                *self = Natural::from_owned_limbs_asc(out);
+                *self = Self::from_owned_limbs_asc(out);
             }
         }
     }
 }
 
-impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
+impl<'a> ModPowAssign<&'a Self, Self> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
     /// base must be already reduced modulo $m$. The first [`Natural`] on the right-hand side is
     /// taken by reference and the second by value.
@@ -1082,13 +1082,13 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 10);
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow_assign(&mut self, exp: &'a Natural, mut m: Natural) {
+    fn mod_pow_assign(&mut self, exp: &'a Self, mut m: Self) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, exp, &m) {
-            (_, _, &Natural::ONE) => *self = Natural::ZERO,
-            (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
-            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+            (_, _, &Self::ONE) => *self = Self::ZERO,
+            (_, &Self::ZERO, _) => *self = Self::ONE,
+            (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
+            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
                 if u64::convertible_from(*e) =>
             {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
@@ -1097,13 +1097,13 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
                 let ms = m.promote_in_place();
                 let mut out = vec![0; ms.len()];
                 limbs_mod_pow(&mut out, self.promote_in_place(), &exp.to_limbs_asc(), ms);
-                *self = Natural::from_owned_limbs_asc(out);
+                *self = Self::from_owned_limbs_asc(out);
             }
         }
     }
 }
 
-impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
+impl<'a, 'b> ModPowAssign<&'a Self, &'b Self> for Natural {
     /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
     /// base must be already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken
     /// by reference.
@@ -1135,13 +1135,13 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x, 10);
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
-    fn mod_pow_assign(&mut self, exp: &'a Natural, m: &'b Natural) {
+    fn mod_pow_assign(&mut self, exp: &'a Self, m: &'b Self) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, exp, m) {
-            (_, _, &Natural::ONE) => *self = Natural::ZERO,
-            (_, &Natural::ZERO, _) => *self = Natural::ONE,
-            (&mut (Natural::ZERO | Natural::ONE), _, _) | (_, &Natural::ONE, _) => {}
-            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+            (_, _, &Self::ONE) => *self = Self::ZERO,
+            (_, &Self::ZERO, _) => *self = Self::ONE,
+            (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
+            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
                 if u64::convertible_from(*e) =>
             {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
@@ -1150,7 +1150,7 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
                 let ms = m.to_limbs_asc();
                 let mut out = vec![0; ms.len()];
                 limbs_mod_pow(&mut out, self.promote_in_place(), &exp.to_limbs_asc(), &ms);
-                *self = Natural::from_owned_limbs_asc(out);
+                *self = Self::from_owned_limbs_asc(out);
             }
         }
     }

@@ -1306,8 +1306,8 @@ impl Iterator for RandomIntegerRange {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            RandomIntegerRange::SingleOrder(xs) => xs.next(),
-            RandomIntegerRange::MultipleOrders(xs) => xs.next(),
+            Self::SingleOrder(xs) => xs.next(),
+            Self::MultipleOrders(xs) => xs.next(),
         }
     }
 }
@@ -1483,11 +1483,11 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 
     fn next(&mut self) -> Option<Integer> {
         match self {
-            StripedRandomIntegerInclusiveRange::NonNegative(xs) => xs.next().map(Integer::from),
-            StripedRandomIntegerInclusiveRange::Negative(xs) => {
+            Self::NonNegative(xs) => xs.next().map(Integer::from),
+            Self::Negative(xs) => {
                 xs.next().map(|x| Integer::from_sign_and_abs(false, x))
             }
-            StripedRandomIntegerInclusiveRange::Both(bs, xs_nn, xs_n) => {
+            Self::Both(bs, xs_nn, xs_n) => {
                 if bs.next().unwrap() {
                     xs_nn.next().map(Integer::from)
                 } else {

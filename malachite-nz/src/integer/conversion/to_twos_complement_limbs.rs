@@ -303,9 +303,9 @@ impl TwosComplementLimbIterator<'_> {
     /// ```
     pub fn get_limb(&self, index: u64) -> Limb {
         match self {
-            TwosComplementLimbIterator::Zero => 0,
-            TwosComplementLimbIterator::Positive(limbs, _) => limbs[usize::exact_from(index)],
-            TwosComplementLimbIterator::Negative(limbs, _) => limbs.0.get_limb(index),
+            Self::Zero => 0,
+            Self::Positive(limbs, _) => limbs[usize::exact_from(index)],
+            Self::Negative(limbs, _) => limbs.0.get_limb(index),
         }
     }
 }
@@ -340,11 +340,11 @@ impl Iterator for TwosComplementLimbIterator<'_> {
     /// ```
     fn next(&mut self) -> Option<Limb> {
         match self {
-            TwosComplementLimbIterator::Zero => None,
-            TwosComplementLimbIterator::Positive(limbs, extension_checked) => {
+            Self::Zero => None,
+            Self::Positive(limbs, extension_checked) => {
                 limbs.iterate_forward(extension_checked)
             }
-            TwosComplementLimbIterator::Negative(limbs, extension_checked) => {
+            Self::Negative(limbs, extension_checked) => {
                 limbs.0.iterate_forward(extension_checked)
             }
         }
@@ -383,11 +383,11 @@ impl DoubleEndedIterator for TwosComplementLimbIterator<'_> {
     /// ```
     fn next_back(&mut self) -> Option<Limb> {
         match self {
-            TwosComplementLimbIterator::Zero => None,
-            TwosComplementLimbIterator::Positive(limbs, extension_checked) => {
+            Self::Zero => None,
+            Self::Positive(limbs, extension_checked) => {
                 limbs.iterate_backward(extension_checked)
             }
-            TwosComplementLimbIterator::Negative(limbs, extension_checked) => {
+            Self::Negative(limbs, extension_checked) => {
                 limbs.0.iterate_backward(extension_checked)
             }
         }

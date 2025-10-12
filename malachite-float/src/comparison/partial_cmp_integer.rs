@@ -45,7 +45,7 @@ impl PartialOrd<Integer> for Float {
             (float_negative_infinity!(), _) => Some(Less),
             (float_either_zero!(), y) => 0u32.partial_cmp(y),
             (
-                Float(Finite {
+                Self(Finite {
                     sign: s_x,
                     exponent: e_x,
                     significand: x,

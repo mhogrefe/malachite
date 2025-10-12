@@ -41,7 +41,7 @@ impl Sign for Float {
     /// assert_eq!(Float::NEGATIVE_ONE.sign(), Less);
     /// ```
     fn sign(&self) -> Ordering {
-        if let Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
+        if let Self(Infinity { sign } | Zero { sign } | Finite { sign, .. }) = self {
             if *sign { Greater } else { Less }
         } else {
             panic!()

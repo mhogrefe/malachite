@@ -32,7 +32,7 @@ use core::cmp::Ordering::*;
 const U8_SQUARES: [u8; 16] = [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225];
 
 impl FloorSqrt for u8 {
-    type Output = u8;
+    type Output = Self;
 
     /// Returns the floor of the square root of a [`u8`].
     ///
@@ -46,8 +46,8 @@ impl FloorSqrt for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
-    fn floor_sqrt(self) -> u8 {
-        u8::wrapping_from(match U8_SQUARES.binary_search(&self) {
+    fn floor_sqrt(self) -> Self {
+        Self::wrapping_from(match U8_SQUARES.binary_search(&self) {
             Ok(i) => i,
             Err(i) => i - 1,
         })
@@ -55,7 +55,7 @@ impl FloorSqrt for u8 {
 }
 
 impl CeilingSqrt for u8 {
-    type Output = u8;
+    type Output = Self;
 
     /// Returns the ceiling of the square root of a [`u8`].
     ///
@@ -69,15 +69,15 @@ impl CeilingSqrt for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
-    fn ceiling_sqrt(self) -> u8 {
-        u8::wrapping_from(match U8_SQUARES.binary_search(&self) {
+    fn ceiling_sqrt(self) -> Self {
+        Self::wrapping_from(match U8_SQUARES.binary_search(&self) {
             Ok(i) | Err(i) => i,
         })
     }
 }
 
 impl CheckedSqrt for u8 {
-    type Output = u8;
+    type Output = Self;
 
     /// Returns the the square root of a [`u8`], or `None` if the [`u8`] is not a perfect square.
     ///
@@ -96,14 +96,14 @@ impl CheckedSqrt for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
-    fn checked_sqrt(self) -> Option<u8> {
-        U8_SQUARES.binary_search(&self).ok().map(u8::wrapping_from)
+    fn checked_sqrt(self) -> Option<Self> {
+        U8_SQUARES.binary_search(&self).ok().map(Self::wrapping_from)
     }
 }
 
 impl SqrtRem for u8 {
-    type SqrtOutput = u8;
-    type RemOutput = u8;
+    type SqrtOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the square root of a [`u8`], and the remainder (the difference between
     /// the [`u8`] and the square of the floor).
@@ -118,10 +118,10 @@ impl SqrtRem for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
-    fn sqrt_rem(self) -> (u8, u8) {
+    fn sqrt_rem(self) -> (Self, Self) {
         match U8_SQUARES.binary_search(&self) {
-            Ok(i) => (u8::wrapping_from(i), 0),
-            Err(i) => (u8::wrapping_from(i - 1), self - U8_SQUARES[i - 1]),
+            Ok(i) => (Self::wrapping_from(i), 0),
+            Err(i) => (Self::wrapping_from(i - 1), self - U8_SQUARES[i - 1]),
         }
     }
 }
@@ -650,7 +650,7 @@ impl_sqrt_newton!(u32, i32);
 impl_sqrt_newton!(u64, i64);
 
 impl FloorSqrt for u16 {
-    type Output = u16;
+    type Output = Self;
 
     /// Returns the floor of the square root of a [`u16`].
     ///
@@ -665,13 +665,13 @@ impl FloorSqrt for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn floor_sqrt(self) -> u16 {
-        u16::wrapping_from(u32::from(self).floor_sqrt())
+    fn floor_sqrt(self) -> Self {
+        Self::wrapping_from(u32::from(self).floor_sqrt())
     }
 }
 
 impl CeilingSqrt for u16 {
-    type Output = u16;
+    type Output = Self;
 
     /// Returns the ceiling of the square root of a [`u16`].
     ///
@@ -686,13 +686,13 @@ impl CeilingSqrt for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn ceiling_sqrt(self) -> u16 {
-        u16::wrapping_from(u32::from(self).ceiling_sqrt())
+    fn ceiling_sqrt(self) -> Self {
+        Self::wrapping_from(u32::from(self).ceiling_sqrt())
     }
 }
 
 impl CheckedSqrt for u16 {
-    type Output = u16;
+    type Output = Self;
 
     /// Returns the the square root of a [`u16`], or `None` if the integer is not a perfect square.
     ///
@@ -712,14 +712,14 @@ impl CheckedSqrt for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn checked_sqrt(self) -> Option<u16> {
-        u32::from(self).checked_sqrt().map(u16::wrapping_from)
+    fn checked_sqrt(self) -> Option<Self> {
+        u32::from(self).checked_sqrt().map(Self::wrapping_from)
     }
 }
 
 impl SqrtRem for u16 {
-    type SqrtOutput = u16;
-    type RemOutput = u16;
+    type SqrtOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the square root of a [`u16`], and the remainder (the difference between
     /// the [`u16`] and the square of the floor).
@@ -735,14 +735,14 @@ impl SqrtRem for u16 {
     /// # Notes
     /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
-    fn sqrt_rem(self) -> (u16, u16) {
+    fn sqrt_rem(self) -> (Self, Self) {
         let (sqrt, rem) = u32::from(self).sqrt_rem();
-        (u16::wrapping_from(sqrt), u16::wrapping_from(rem))
+        (Self::wrapping_from(sqrt), Self::wrapping_from(rem))
     }
 }
 
 impl FloorSqrt for usize {
-    type Output = usize;
+    type Output = Self;
 
     /// Returns the floor of the square root of a [`usize`].
     ///
@@ -757,17 +757,17 @@ impl FloorSqrt for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn floor_sqrt(self) -> usize {
+    fn floor_sqrt(self) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::wrapping_from(self).floor_sqrt())
+            Self::wrapping_from(u32::wrapping_from(self).floor_sqrt())
         } else {
-            usize::wrapping_from(u64::wrapping_from(self).floor_sqrt())
+            Self::wrapping_from(u64::wrapping_from(self).floor_sqrt())
         }
     }
 }
 
 impl CeilingSqrt for usize {
-    type Output = usize;
+    type Output = Self;
 
     /// Returns the ceiling of the square root of a [`usize`].
     ///
@@ -782,17 +782,17 @@ impl CeilingSqrt for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn ceiling_sqrt(self) -> usize {
+    fn ceiling_sqrt(self) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::wrapping_from(self).ceiling_sqrt())
+            Self::wrapping_from(u32::wrapping_from(self).ceiling_sqrt())
         } else {
-            usize::wrapping_from(u64::wrapping_from(self).ceiling_sqrt())
+            Self::wrapping_from(u64::wrapping_from(self).ceiling_sqrt())
         }
     }
 }
 
 impl CheckedSqrt for usize {
-    type Output = usize;
+    type Output = Self;
 
     /// Returns the the square root of a [`usize`], or `None` if the [`usize`] is not a perfect
     /// square.
@@ -813,22 +813,22 @@ impl CheckedSqrt for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn checked_sqrt(self) -> Option<usize> {
+    fn checked_sqrt(self) -> Option<Self> {
         if USIZE_IS_U32 {
             u32::wrapping_from(self)
                 .checked_sqrt()
-                .map(usize::wrapping_from)
+                .map(Self::wrapping_from)
         } else {
             u64::wrapping_from(self)
                 .checked_sqrt()
-                .map(usize::wrapping_from)
+                .map(Self::wrapping_from)
         }
     }
 }
 
 impl SqrtRem for usize {
-    type SqrtOutput = usize;
-    type RemOutput = usize;
+    type SqrtOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the square root of a [`usize`], and the remainder (the difference
     /// between the [`usize`] and the square of the floor).
@@ -844,13 +844,13 @@ impl SqrtRem for usize {
     /// # Notes
     /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
-    fn sqrt_rem(self) -> (usize, usize) {
+    fn sqrt_rem(self) -> (Self, Self) {
         if USIZE_IS_U32 {
             let (sqrt, rem) = u32::wrapping_from(self).sqrt_rem();
-            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
+            (Self::wrapping_from(sqrt), Self::wrapping_from(rem))
         } else {
             let (sqrt, rem) = u64::wrapping_from(self).sqrt_rem();
-            (usize::wrapping_from(sqrt), usize::wrapping_from(rem))
+            (Self::wrapping_from(sqrt), Self::wrapping_from(rem))
         }
     }
 }
@@ -860,7 +860,7 @@ const U128_SQRT_THRESHOLD: u64 = 125;
 const U128_MAX_SQUARE: u128 = 0xfffffffffffffffe0000000000000001;
 
 impl FloorSqrt for u128 {
-    type Output = u128;
+    type Output = Self;
 
     /// Returns the floor of the square root of a [`u128`].
     ///
@@ -900,9 +900,9 @@ impl FloorSqrt for u128 {
     ///
     /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
     /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
-    fn floor_sqrt(self) -> u128 {
+    fn floor_sqrt(self) -> Self {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            floor_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            floor_sqrt_approx_and_refine(|x| x as f64, |x| x as Self, U128_MAX_SQUARE, self)
         } else {
             floor_sqrt_binary(self)
         }
@@ -910,7 +910,7 @@ impl FloorSqrt for u128 {
 }
 
 impl CeilingSqrt for u128 {
-    type Output = u128;
+    type Output = Self;
 
     /// Returns the ceiling of the square root of a [`u128`].
     ///
@@ -950,9 +950,9 @@ impl CeilingSqrt for u128 {
     ///
     /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
     /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
-    fn ceiling_sqrt(self) -> u128 {
+    fn ceiling_sqrt(self) -> Self {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            ceiling_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            ceiling_sqrt_approx_and_refine(|x| x as f64, |x| x as Self, U128_MAX_SQUARE, self)
         } else {
             ceiling_sqrt_binary(self)
         }
@@ -960,7 +960,7 @@ impl CeilingSqrt for u128 {
 }
 
 impl CheckedSqrt for u128 {
-    type Output = u128;
+    type Output = Self;
 
     /// Returns the the square root of a [`u128`], or `None` if the [`u128`] is not a perfect
     /// square.
@@ -1006,9 +1006,9 @@ impl CheckedSqrt for u128 {
     ///
     /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
     /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
-    fn checked_sqrt(self) -> Option<u128> {
+    fn checked_sqrt(self) -> Option<Self> {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            checked_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            checked_sqrt_approx_and_refine(|x| x as f64, |x| x as Self, U128_MAX_SQUARE, self)
         } else {
             checked_sqrt_binary(self)
         }
@@ -1016,8 +1016,8 @@ impl CheckedSqrt for u128 {
 }
 
 impl SqrtRem for u128 {
-    type SqrtOutput = u128;
-    type RemOutput = u128;
+    type SqrtOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the square root of a [`u128`], and the remainder (the difference
     /// between the [`u128`] and the square of the floor).
@@ -1058,9 +1058,9 @@ impl SqrtRem for u128 {
     ///
     /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
     /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
-    fn sqrt_rem(self) -> (u128, u128) {
+    fn sqrt_rem(self) -> (Self, Self) {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            sqrt_rem_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            sqrt_rem_approx_and_refine(|x| x as f64, |x| x as Self, U128_MAX_SQUARE, self)
         } else {
             sqrt_rem_binary(self)
         }

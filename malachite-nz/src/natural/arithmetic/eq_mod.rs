@@ -705,14 +705,14 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], ms: &mut [Limb
 impl Natural {
     fn eq_mod_limb(&self, other: Limb, m: Limb) -> bool {
         match self {
-            Natural(Small(small)) => small.eq_mod(other, m),
-            Natural(Large(_)) if m == 0 => false,
-            Natural(Large(limbs)) => limbs_eq_limb_mod_limb(limbs, other, m),
+            Self(Small(small)) => small.eq_mod(other, m),
+            Self(Large(_)) if m == 0 => false,
+            Self(Large(limbs)) => limbs_eq_limb_mod_limb(limbs, other, m),
         }
     }
 }
 
-impl EqMod<Natural, Natural> for Natural {
+impl EqMod<Self, Self> for Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. All three are taken
     /// by value.
@@ -756,31 +756,31 @@ impl EqMod<Natural, Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, m: Natural) -> bool {
+    fn eq_mod(self, other: Self, m: Self) -> bool {
         match (self, other, m) {
-            (x, y, Natural::ZERO) => x == y,
-            (x, Natural::ZERO, m) => x.divisible_by(m),
-            (Natural::ZERO, y, m) => y.divisible_by(m),
-            (x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
-            (Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+            (x, y, Self::ZERO) => x == y,
+            (x, Self::ZERO, m) => x.divisible_by(m),
+            (Self::ZERO, y, m) => y.divisible_by(m),
+            (x, Self(Small(y)), Self(Small(m))) => x.eq_mod_limb(y, m),
+            (Self(Small(x)), y, Self(Small(m))) => y.eq_mod_limb(x, m),
+            (Self(Small(x)), Self(Small(y)), _) => x == y,
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Small(m))) => {
                 limbs_eq_mod_limb_val_ref(&mut xs, &ys, m)
             }
-            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(mut m))) => {
+            (Self(Large(mut xs)), Self(Small(y)), Self(Large(mut m))) => {
                 limbs_eq_limb_mod(&mut xs, y, &mut m)
             }
-            (Natural(Small(x)), Natural(Large(mut ys)), Natural(Large(mut m))) => {
+            (Self(Small(x)), Self(Large(mut ys)), Self(Large(mut m))) => {
                 limbs_eq_limb_mod(&mut ys, x, &mut m)
             }
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(mut m))) => {
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Large(mut m))) => {
                 limbs_eq_mod_ref_val_val(&ys, &mut xs, &mut m)
             }
         }
     }
 }
 
-impl<'a> EqMod<Natural, &'a Natural> for Natural {
+impl<'a> EqMod<Self, &'a Self> for Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. The first two are
     /// taken by value and the third by reference.
@@ -824,31 +824,31 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, m: &'a Natural) -> bool {
+    fn eq_mod(self, other: Self, m: &'a Self) -> bool {
         match (self, other, m) {
-            (x, y, &Natural::ZERO) => x == y,
-            (x, Natural::ZERO, m) => x.divisible_by(m),
-            (Natural::ZERO, y, m) => y.divisible_by(m),
-            (x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
-            (Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+            (x, y, &Self::ZERO) => x == y,
+            (x, Self::ZERO, m) => x.divisible_by(m),
+            (Self::ZERO, y, m) => y.divisible_by(m),
+            (x, Self(Small(y)), &Self(Small(m))) => x.eq_mod_limb(y, m),
+            (Self(Small(x)), y, &Self(Small(m))) => y.eq_mod_limb(x, m),
+            (Self(Small(x)), Self(Small(y)), _) => x == y,
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Small(m))) => {
                 limbs_eq_mod_limb_val_ref(&mut xs, &ys, *m)
             }
-            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(m))) => {
+            (Self(Large(mut xs)), Self(Small(y)), Self(Large(m))) => {
                 limbs_eq_limb_mod_val_ref(&mut xs, y, m)
             }
-            (Natural(Small(x)), Natural(Large(mut ys)), Natural(Large(m))) => {
+            (Self(Small(x)), Self(Large(mut ys)), Self(Large(m))) => {
                 limbs_eq_limb_mod_val_ref(&mut ys, x, m)
             }
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(m))) => {
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Large(m))) => {
                 limbs_eq_mod_ref_val_ref(&ys, &mut xs, m)
             }
         }
     }
 }
 
-impl<'a> EqMod<&'a Natural, Natural> for Natural {
+impl<'a> EqMod<&'a Self, Self> for Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. The first and third
     /// are taken by value and the second by reference.
@@ -892,31 +892,31 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'a Natural, m: Natural) -> bool {
+    fn eq_mod(self, other: &'a Self, m: Self) -> bool {
         match (self, other, m) {
-            (x, y, Natural::ZERO) => x == *y,
-            (x, &Natural::ZERO, m) => x.divisible_by(m),
-            (Natural::ZERO, y, m) => y.divisible_by(m),
-            (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
-            (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+            (x, y, Self::ZERO) => x == *y,
+            (x, &Self::ZERO, m) => x.divisible_by(m),
+            (Self::ZERO, y, m) => y.divisible_by(m),
+            (x, &Self(Small(y)), Self(Small(m))) => x.eq_mod_limb(y, m),
+            (Self(Small(x)), y, Self(Small(m))) => y.eq_mod_limb(x, m),
+            (Self(Small(x)), &Self(Small(y)), _) => x == y,
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Small(m))) => {
                 limbs_eq_mod_limb_val_ref(&mut xs, ys, m)
             }
-            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(mut m))) => {
+            (Self(Large(mut xs)), Self(Small(y)), Self(Large(mut m))) => {
                 limbs_eq_limb_mod(&mut xs, *y, &mut m)
             }
-            (Natural(Small(x)), Natural(Large(ys)), Natural(Large(mut m))) => {
+            (Self(Small(x)), Self(Large(ys)), Self(Large(mut m))) => {
                 limbs_eq_limb_mod_ref_val(ys, x, &mut m)
             }
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(mut m))) => {
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Large(mut m))) => {
                 limbs_eq_mod_ref_val_val(ys, &mut xs, &mut m)
             }
         }
     }
 }
 
-impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
+impl<'a, 'b> EqMod<&'a Self, &'b Self> for Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
     /// whether the difference between the first two is a multiple of the third. The first is taken
     /// by value and the second and third by reference.
@@ -960,24 +960,24 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'a Natural, m: &'b Natural) -> bool {
+    fn eq_mod(self, other: &'a Self, m: &'b Self) -> bool {
         match (self, other, m) {
-            (x, y, &Natural::ZERO) => x == *y,
-            (x, &Natural::ZERO, m) => x.divisible_by(m),
-            (Natural::ZERO, y, m) => y.divisible_by(m),
-            (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
-            (Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
-            (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Small(m))) => {
+            (x, y, &Self::ZERO) => x == *y,
+            (x, &Self::ZERO, m) => x.divisible_by(m),
+            (Self::ZERO, y, m) => y.divisible_by(m),
+            (x, &Self(Small(y)), &Self(Small(m))) => x.eq_mod_limb(y, m),
+            (Self(Small(x)), y, &Self(Small(m))) => y.eq_mod_limb(x, m),
+            (Self(Small(x)), &Self(Small(y)), _) => x == y,
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Small(m))) => {
                 limbs_eq_mod_limb_val_ref(&mut xs, ys, *m)
             }
-            (Natural(Large(mut xs)), Natural(Small(y)), Natural(Large(m))) => {
+            (Self(Large(mut xs)), Self(Small(y)), Self(Large(m))) => {
                 limbs_eq_limb_mod_val_ref(&mut xs, *y, m)
             }
-            (Natural(Small(x)), Natural(Large(ys)), Natural(Large(m))) => {
+            (Self(Small(x)), Self(Large(ys)), Self(Large(m))) => {
                 limbs_eq_limb_mod_ref_ref(ys, x, m)
             }
-            (Natural(Large(mut xs)), Natural(Large(ys)), Natural(Large(m))) => {
+            (Self(Large(mut xs)), Self(Large(ys)), Self(Large(m))) => {
                 limbs_eq_mod_ref_val_ref(ys, &mut xs, m)
             }
         }

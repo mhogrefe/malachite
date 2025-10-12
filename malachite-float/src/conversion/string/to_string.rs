@@ -91,7 +91,7 @@ impl LowerHex for Float {
         match self {
             float_zero!() => f.write_str(if f.alternate() { "0x0.0" } else { "0.0" }),
             float_negative_zero!() => f.write_str(if f.alternate() { "-0x0.0" } else { "-0.0" }),
-            Float(Finite {
+            Self(Finite {
                 exponent,
                 precision,
                 ..

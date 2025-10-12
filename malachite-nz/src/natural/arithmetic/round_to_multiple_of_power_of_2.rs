@@ -365,7 +365,7 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_in_place(
 }}
 
 impl RoundToMultipleOfPowerOf2<u64> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Rounds a [`Natural`] to a multiple of $2^k$ according to a specified rounding mode. The
     /// [`Natural`] is taken by value. An [`Ordering`] is also returned, indicating whether the
@@ -460,7 +460,7 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
         mut self,
         pow: u64,
         rm: RoundingMode,
-    ) -> (Natural, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.round_to_multiple_of_power_of_2_assign(pow, rm);
         (self, o)
     }
@@ -637,13 +637,13 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     /// ```
     fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) -> Ordering {
         match (&mut *self, pow) {
-            (_, 0) | (&mut Natural::ZERO, _) => Equal,
-            (Natural(Small(small)), pow) => {
+            (_, 0) | (&mut Self::ZERO, _) => Equal,
+            (Self(Small(small)), pow) => {
                 let o = small.shr_round_assign(pow, rm);
                 *self <<= pow;
                 o
             }
-            (Natural(Large(limbs)), pow) => {
+            (Self(Large(limbs)), pow) => {
                 if let Some(o) = limbs_round_to_multiple_of_power_of_2_in_place(limbs, pow, rm) {
                     self.trim();
                     o

@@ -1593,24 +1593,24 @@ impl Natural {
     fn rem_limb_ref(&self, other: Limb) -> Limb {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
-            (Natural(Small(small)), other) => small % other,
-            (Natural(Large(limbs)), other) => limbs_mod_limb::<DoubleLimb, Limb>(limbs, other),
+            (Self(Small(small)), other) => small % other,
+            (Self(Large(limbs)), other) => limbs_mod_limb::<DoubleLimb, Limb>(limbs, other),
         }
     }
 
     fn rem_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
-            (Natural(Small(small)), other) => *small %= other,
-            (Natural(Large(limbs)), other) => {
-                *self = Natural(Small(limbs_mod_limb::<DoubleLimb, Limb>(limbs, other)));
+            (Self(Small(small)), other) => *small %= other,
+            (Self(Large(limbs)), other) => {
+                *self = Self(Small(limbs_mod_limb::<DoubleLimb, Limb>(limbs, other)));
             }
         }
     }
 }
 
-impl Mod<Natural> for Natural {
-    type Output = Natural;
+impl Mod<Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning just the
     /// remainder.
@@ -1652,13 +1652,13 @@ impl Mod<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_op(self, other: Natural) -> Natural {
+    fn mod_op(self, other: Self) -> Self {
         self % other
     }
 }
 
-impl<'a> Mod<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Mod<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning just the remainder.
@@ -1698,7 +1698,7 @@ impl<'a> Mod<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_op(self, other: &'a Natural) -> Natural {
+    fn mod_op(self, other: &'a Self) -> Self {
         self % other
     }
 }
@@ -1793,7 +1793,7 @@ impl Mod<&Natural> for &Natural {
     }
 }
 
-impl ModAssign<Natural> for Natural {
+impl ModAssign<Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by value and
     /// replacing the first by the remainder.
     ///
@@ -1831,12 +1831,12 @@ impl ModAssign<Natural> for Natural {
     /// assert_eq!(x, 530068894399u64);
     /// ```
     #[inline]
-    fn mod_assign(&mut self, other: Natural) {
+    fn mod_assign(&mut self, other: Self) {
         *self %= other;
     }
 }
 
-impl<'a> ModAssign<&'a Natural> for Natural {
+impl<'a> ModAssign<&'a Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by reference and
     /// replacing the first by the remainder.
     ///
@@ -1873,13 +1873,13 @@ impl<'a> ModAssign<&'a Natural> for Natural {
     /// x.mod_assign(&Natural::from_str("1234567890987").unwrap());
     /// assert_eq!(x, 530068894399u64);
     /// ```
-    fn mod_assign(&mut self, other: &'a Natural) {
+    fn mod_assign(&mut self, other: &'a Self) {
         *self %= other;
     }
 }
 
-impl Rem<Natural> for Natural {
-    type Output = Natural;
+impl Rem<Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning just the
     /// remainder.
@@ -1919,14 +1919,14 @@ impl Rem<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn rem(mut self, other: Natural) -> Natural {
+    fn rem(mut self, other: Self) -> Self {
         self %= other;
         self
     }
 }
 
-impl<'a> Rem<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Rem<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning just the remainder.
@@ -1966,7 +1966,7 @@ impl<'a> Rem<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn rem(mut self, other: &'a Natural) -> Natural {
+    fn rem(mut self, other: &'a Self) -> Self {
         self %= other;
         self
     }
@@ -2087,7 +2087,7 @@ impl Rem<&Natural> for &Natural {
     }
 }
 
-impl RemAssign<Natural> for Natural {
+impl RemAssign<Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by value and
     /// replacing the first by the remainder.
     ///
@@ -2126,12 +2126,12 @@ impl RemAssign<Natural> for Natural {
     /// assert_eq!(x, 530068894399u64);
     /// ```
     #[inline]
-    fn rem_assign(&mut self, other: Natural) {
+    fn rem_assign(&mut self, other: Self) {
         *self %= &other;
     }
 }
 
-impl<'a> RemAssign<&'a Natural> for Natural {
+impl<'a> RemAssign<&'a Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by reference and
     /// replacing the first by the remainder.
     ///
@@ -2169,13 +2169,13 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     /// x %= &Natural::from_str("1234567890987").unwrap();
     /// assert_eq!(x, 530068894399u64);
     /// ```
-    fn rem_assign(&mut self, other: &'a Natural) {
+    fn rem_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (_, &Natural::ZERO) => panic!("division by zero"),
-            (_, &Natural::ONE) => *self = Natural::ZERO,
-            (_, Natural(Small(d))) => self.rem_assign_limb(*d),
-            (Natural(Small(_)), _) => {}
-            (Natural(Large(ns)), Natural(Large(ds))) => {
+            (_, &Self::ZERO) => panic!("division by zero"),
+            (_, &Self::ONE) => *self = Self::ZERO,
+            (_, Self(Small(d))) => self.rem_assign_limb(*d),
+            (Self(Small(_)), _) => {}
+            (Self(Large(ns)), Self(Large(ds))) => {
                 if ns.len() >= ds.len() {
                     let mut rs = vec![0; ds.len()];
                     limbs_mod_to_out(&mut rs, ns, ds);
@@ -2187,8 +2187,8 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     }
 }
 
-impl NegMod<Natural> for Natural {
-    type Output = Natural;
+impl NegMod<Self> for Natural {
+    type Output = Self;
 
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking both by value and
     /// returning just the remainder.
@@ -2228,14 +2228,14 @@ impl NegMod<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn neg_mod(mut self, other: Natural) -> Natural {
+    fn neg_mod(mut self, other: Self) -> Self {
         self.neg_mod_assign(other);
         self
     }
 }
 
-impl<'a> NegMod<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> NegMod<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking the first by value and
     /// the second by reference and returning just the remainder.
@@ -2275,7 +2275,7 @@ impl<'a> NegMod<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn neg_mod(mut self, other: &'a Natural) -> Natural {
+    fn neg_mod(mut self, other: &'a Self) -> Self {
         self.neg_mod_assign(other);
         self
     }
@@ -2371,7 +2371,7 @@ impl NegMod<&Natural> for &Natural {
     }
 }
 
-impl NegModAssign<Natural> for Natural {
+impl NegModAssign<Self> for Natural {
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking the second [`Natural`]s
     /// by value and replacing the first by the remainder.
     ///
@@ -2408,7 +2408,7 @@ impl NegModAssign<Natural> for Natural {
     /// x.neg_mod_assign(Natural::from_str("1234567890987").unwrap());
     /// assert_eq!(x, 704498996588u64);
     /// ```
-    fn neg_mod_assign(&mut self, other: Natural) {
+    fn neg_mod_assign(&mut self, other: Self) {
         *self %= &other;
         if *self != 0 {
             self.sub_right_assign_no_panic(&other);
@@ -2416,7 +2416,7 @@ impl NegModAssign<Natural> for Natural {
     }
 }
 
-impl<'a> NegModAssign<&'a Natural> for Natural {
+impl<'a> NegModAssign<&'a Self> for Natural {
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking the second [`Natural`]s
     /// by reference and replacing the first by the remainder.
     ///
@@ -2453,7 +2453,7 @@ impl<'a> NegModAssign<&'a Natural> for Natural {
     /// x.neg_mod_assign(&Natural::from_str("1234567890987").unwrap());
     /// assert_eq!(x, 704498996588u64);
     /// ```
-    fn neg_mod_assign(&mut self, other: &'a Natural) {
+    fn neg_mod_assign(&mut self, other: &'a Self) {
         *self %= other;
         if *self != 0 {
             self.sub_right_assign_no_panic(other);

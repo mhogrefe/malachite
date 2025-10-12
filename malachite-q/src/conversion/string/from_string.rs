@@ -54,7 +54,7 @@ impl FromStr for Rational {
     /// assert!(Rational::from_str("1/-2").is_err());
     /// ```
     #[inline]
-    fn from_str(s: &str) -> Result<Rational, ()> {
+    fn from_str(s: &str) -> Result<Self, ()> {
         let (abs_string, sign) = if let Some(abs_string) = s.strip_prefix('-') {
             if abs_string.starts_with('+') {
                 return Err(());
@@ -75,7 +75,7 @@ impl FromStr for Rational {
             numerator = Natural::from_str(abs_string)?;
             denominator = Natural::ONE;
         }
-        Ok(Rational::from_sign_and_naturals(
+        Ok(Self::from_sign_and_naturals(
             sign,
             numerator,
             denominator,

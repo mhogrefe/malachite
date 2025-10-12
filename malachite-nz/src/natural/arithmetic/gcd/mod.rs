@@ -109,8 +109,8 @@ fn gcd_greater_helper(mut xs: &mut [Limb], mut ys: &mut [Limb]) -> Natural {
     n << ((u64::exact_from(common_zero_limbs) << Limb::LOG_WIDTH) + common_zero_bits)
 }
 
-impl Gcd<Natural> for Natural {
-    type Output = Natural;
+impl Gcd<Self> for Natural {
+    type Output = Self;
 
     /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking both by value.
     ///
@@ -137,14 +137,14 @@ impl Gcd<Natural> for Natural {
     /// assert_eq!(Natural::from(3u32).gcd(Natural::from(5u32)), 1);
     /// assert_eq!(Natural::from(12u32).gcd(Natural::from(90u32)), 6);
     /// ```
-    fn gcd(mut self, other: Natural) -> Natural {
+    fn gcd(mut self, other: Self) -> Self {
         self.gcd_assign(other);
         self
     }
 }
 
-impl<'a> Gcd<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Gcd<&'a Self> for Natural {
+    type Output = Self;
 
     /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking the first by value
     /// and the second by reference.
@@ -173,7 +173,7 @@ impl<'a> Gcd<&'a Natural> for Natural {
     /// assert_eq!(Natural::from(12u32).gcd(&Natural::from(90u32)), 6);
     /// ```
     #[inline]
-    fn gcd(mut self, other: &'a Natural) -> Natural {
+    fn gcd(mut self, other: &'a Self) -> Self {
         self.gcd_assign(other);
         self
     }
@@ -270,7 +270,7 @@ impl Gcd<&Natural> for &Natural {
     }
 }
 
-impl GcdAssign<Natural> for Natural {
+impl GcdAssign<Self> for Natural {
     /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`], taking
     /// the [`Natural`] on the right-hand side by value.
     ///
@@ -300,18 +300,18 @@ impl GcdAssign<Natural> for Natural {
     /// assert_eq!(x, 6);
     /// ```
     #[inline]
-    fn gcd_assign(&mut self, other: Natural) {
+    fn gcd_assign(&mut self, other: Self) {
         match (&mut *self, other) {
-            (_, Natural::ZERO) => {}
-            (&mut Natural::ZERO, y) => *self = y,
-            (Natural(Small(x)), Natural(Small(y))) => x.gcd_assign(y),
-            (Natural(Large(xs)), Natural(Small(y))) => {
-                *self = Natural::from(limbs_gcd_limb(xs, y));
+            (_, Self::ZERO) => {}
+            (&mut Self::ZERO, y) => *self = y,
+            (Self(Small(x)), Self(Small(y))) => x.gcd_assign(y),
+            (Self(Large(xs)), Self(Small(y))) => {
+                *self = Self::from(limbs_gcd_limb(xs, y));
             }
-            (Natural(Small(x)), Natural(Large(ys))) => {
-                *self = Natural::from(limbs_gcd_limb(&ys, *x));
+            (Self(Small(x)), Self(Large(ys))) => {
+                *self = Self::from(limbs_gcd_limb(&ys, *x));
             }
-            (Natural(Large(xs)), Natural(Large(mut ys))) => {
+            (Self(Large(xs)), Self(Large(mut ys))) => {
                 let mut xs: &mut [Limb] = &mut *xs;
                 let mut ys: &mut [Limb] = &mut ys;
                 match limbs_cmp(xs, ys) {
@@ -327,7 +327,7 @@ impl GcdAssign<Natural> for Natural {
     }
 }
 
-impl<'a> GcdAssign<&'a Natural> for Natural {
+impl<'a> GcdAssign<&'a Self> for Natural {
     /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`], taking
     /// the [`Natural`] on the right-hand side by reference.
     ///
@@ -357,18 +357,18 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 6);
     /// ```
     #[inline]
-    fn gcd_assign(&mut self, other: &'a Natural) {
+    fn gcd_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (_, &Natural::ZERO) => {}
-            (&mut Natural::ZERO, y) => self.clone_from(y),
-            (Natural(Small(x)), Natural(Small(y))) => x.gcd_assign(*y),
-            (Natural(Large(xs)), Natural(Small(y))) => {
-                *self = Natural::from(limbs_gcd_limb(xs, *y));
+            (_, &Self::ZERO) => {}
+            (&mut Self::ZERO, y) => self.clone_from(y),
+            (Self(Small(x)), Self(Small(y))) => x.gcd_assign(*y),
+            (Self(Large(xs)), Self(Small(y))) => {
+                *self = Self::from(limbs_gcd_limb(xs, *y));
             }
-            (Natural(Small(x)), Natural(Large(ys))) => {
-                *self = Natural::from(limbs_gcd_limb(ys, *x));
+            (Self(Small(x)), Self(Large(ys))) => {
+                *self = Self::from(limbs_gcd_limb(ys, *x));
             }
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (Self(Large(xs)), Self(Large(ys))) => {
                 let c = limbs_cmp(xs, ys);
                 if c == Equal {
                     return;

@@ -102,8 +102,8 @@ pub fn limbs_eq_mod_power_of_2(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
 impl Natural {
     fn eq_mod_power_of_2_limb(&self, other: Limb, pow: u64) -> bool {
         match self {
-            Natural(Small(small)) => small.eq_mod_power_of_2(other, pow),
-            Natural(Large(limbs)) => limbs_eq_limb_mod_power_of_2(limbs, other, pow),
+            Self(Small(small)) => small.eq_mod_power_of_2(other, pow),
+            Self(Large(limbs)) => limbs_eq_limb_mod_power_of_2(limbs, other, pow),
         }
     }
 }

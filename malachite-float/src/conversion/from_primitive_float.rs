@@ -42,29 +42,29 @@ impl Float {
         x: T,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if x.is_nan() {
-            (Float::NAN, Equal)
+            (Self::NAN, Equal)
         } else if !x.is_finite() {
             if x.is_sign_positive() {
-                (Float::INFINITY, Equal)
+                (Self::INFINITY, Equal)
             } else {
-                (Float::NEGATIVE_INFINITY, Equal)
+                (Self::NEGATIVE_INFINITY, Equal)
             }
         } else if x == T::ZERO {
             if x.is_sign_positive() {
-                (Float::ZERO, Equal)
+                (Self::ZERO, Equal)
             } else {
-                (Float::NEGATIVE_ZERO, Equal)
+                (Self::NEGATIVE_ZERO, Equal)
             }
         } else {
             let (m, e) = x.integer_mantissa_and_exponent();
             if x.is_sign_positive() {
-                let (f, o) = Float::from_unsigned_prec_round(m, prec, rm);
+                let (f, o) = Self::from_unsigned_prec_round(m, prec, rm);
                 (f << e, o)
             } else {
-                let (abs, o) = Float::from_unsigned_prec_round(m, prec, -rm);
+                let (abs, o) = Self::from_unsigned_prec_round(m, prec, -rm);
                 (-(abs << e), o.reverse())
             }
         }
@@ -94,29 +94,29 @@ impl Float {
     /// # Examples
     /// See [here](super::from_primitive_float#from_primitive_float_prec).
     #[inline]
-    pub fn from_primitive_float_prec<T: PrimitiveFloat>(x: T, prec: u64) -> (Float, Ordering) {
+    pub fn from_primitive_float_prec<T: PrimitiveFloat>(x: T, prec: u64) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if x.is_nan() {
-            (Float::NAN, Equal)
+            (Self::NAN, Equal)
         } else if !x.is_finite() {
             if x.is_sign_positive() {
-                (Float::INFINITY, Equal)
+                (Self::INFINITY, Equal)
             } else {
-                (Float::NEGATIVE_INFINITY, Equal)
+                (Self::NEGATIVE_INFINITY, Equal)
             }
         } else if x == T::ZERO {
             if x.is_sign_positive() {
-                (Float::ZERO, Equal)
+                (Self::ZERO, Equal)
             } else {
-                (Float::NEGATIVE_ZERO, Equal)
+                (Self::NEGATIVE_ZERO, Equal)
             }
         } else {
             let (m, e) = x.integer_mantissa_and_exponent();
             if x.is_sign_positive() {
-                let (f, o) = Float::from_unsigned_prec(m, prec);
+                let (f, o) = Self::from_unsigned_prec(m, prec);
                 (f << e, o)
             } else {
-                let (abs, o) = Float::from_unsigned_prec(m, prec);
+                let (abs, o) = Self::from_unsigned_prec(m, prec);
                 (-(abs << e), o.reverse())
             }
         }

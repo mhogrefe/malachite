@@ -601,12 +601,12 @@ impl TryFrom<&Natural> for usize {
     ///
     /// # Examples
     /// See [here](super::primitive_int_from_natural#try_from).
-    fn try_from(value: &Natural) -> Result<usize, Self::Error> {
+    fn try_from(value: &Natural) -> Result<Self, Self::Error> {
         if USIZE_IS_U32 {
-            u32::try_from(value).map(usize::wrapping_from)
+            u32::try_from(value).map(Self::wrapping_from)
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
-            u64::try_from(value).map(usize::wrapping_from)
+            assert_eq!(Self::WIDTH, u64::WIDTH);
+            u64::try_from(value).map(Self::wrapping_from)
         }
     }
 }
@@ -620,12 +620,12 @@ impl SaturatingFrom<&Natural> for usize {
     ///
     /// # Examples
     /// See [here](super::primitive_int_from_natural#saturating_from).
-    fn saturating_from(value: &Natural) -> usize {
+    fn saturating_from(value: &Natural) -> Self {
         if USIZE_IS_U32 {
-            usize::wrapping_from(u32::saturating_from(value))
+            Self::wrapping_from(u32::saturating_from(value))
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
-            usize::wrapping_from(u64::saturating_from(value))
+            assert_eq!(Self::WIDTH, u64::WIDTH);
+            Self::wrapping_from(u64::saturating_from(value))
         }
     }
 }
@@ -641,14 +641,14 @@ impl OverflowingFrom<&Natural> for usize {
     ///
     /// # Examples
     /// See [here](super::primitive_int_from_natural#overflowing_from).
-    fn overflowing_from(value: &Natural) -> (usize, bool) {
+    fn overflowing_from(value: &Natural) -> (Self, bool) {
         if USIZE_IS_U32 {
             let (result, overflow) = u32::overflowing_from(value);
-            (usize::wrapping_from(result), overflow)
+            (Self::wrapping_from(result), overflow)
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(Self::WIDTH, u64::WIDTH);
             let (result, overflow) = u64::overflowing_from(value);
-            (usize::wrapping_from(result), overflow)
+            (Self::wrapping_from(result), overflow)
         }
     }
 }
@@ -665,7 +665,7 @@ impl ConvertibleFrom<&Natural> for usize {
         if USIZE_IS_U32 {
             u32::convertible_from(value)
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(Self::WIDTH, u64::WIDTH);
             u64::convertible_from(value)
         }
     }

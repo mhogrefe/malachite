@@ -20,8 +20,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 
-impl Add<Rational> for Rational {
-    type Output = Rational;
+impl Add<Self> for Rational {
+    type Output = Self;
 
     /// Adds two [`Rational`]s, taking both by value.
     ///
@@ -48,7 +48,7 @@ impl Add<Rational> for Rational {
     ///     "2893/700"
     /// );
     /// ```
-    fn add(self, other: Rational) -> Rational {
+    fn add(self, other: Self) -> Self {
         if self == 0u32 {
             return other;
         } else if other == 0u32 {
@@ -59,7 +59,7 @@ impl Add<Rational> for Rational {
             let sum_n = Integer::from_sign_and_abs(self.sign, self.numerator * &other.denominator)
                 + Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             let sum_d = self.denominator * other.denominator;
-            Rational {
+            Self {
                 sign: sum_n >= 0,
                 numerator: sum_n.unsigned_abs(),
                 denominator: sum_d,
@@ -73,13 +73,13 @@ impl Add<Rational> for Rational {
                 ) + Integer::from_sign_and_abs(other.sign, other.numerator * &reduced_self_d);
             gcd.gcd_assign(sum_n.unsigned_abs_ref());
             if gcd == 1u32 {
-                Rational {
+                Self {
                     sign: sum_n >= 0,
                     numerator: sum_n.unsigned_abs(),
                     denominator: other.denominator * reduced_self_d,
                 }
             } else {
-                Rational {
+                Self {
                     sign: sum_n >= 0,
                     numerator: sum_n.unsigned_abs().div_exact(&gcd),
                     denominator: (other.denominator).div_exact(gcd) * reduced_self_d,
@@ -89,8 +89,8 @@ impl Add<Rational> for Rational {
     }
 }
 
-impl Add<&Rational> for Rational {
-    type Output = Rational;
+impl Add<&Self> for Rational {
+    type Output = Self;
 
     /// Adds two [`Rational`]s, taking both by the first by value and the second by reference.
     ///
@@ -118,7 +118,7 @@ impl Add<&Rational> for Rational {
     /// );
     /// ```
     #[inline]
-    fn add(self, other: &Rational) -> Rational {
+    fn add(self, other: &Self) -> Self {
         other + self
     }
 }
@@ -261,7 +261,7 @@ impl Add<&Rational> for &Rational {
     }
 }
 
-impl AddAssign<Rational> for Rational {
+impl AddAssign<Self> for Rational {
     /// Adds a [`Rational`] to a [`Rational`] in place, taking the [`Rational`] on the right-hand
     /// side by value.
     ///
@@ -290,7 +290,7 @@ impl AddAssign<Rational> for Rational {
     /// x += Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "2893/700");
     /// ```
-    fn add_assign(&mut self, other: Rational) {
+    fn add_assign(&mut self, other: Self) {
         if *self == 0u32 {
             *self = other;
             return;
@@ -323,7 +323,7 @@ impl AddAssign<Rational> for Rational {
     }
 }
 
-impl AddAssign<&Rational> for Rational {
+impl AddAssign<&Self> for Rational {
     /// Adds a [`Rational`] to a [`Rational`] in place, taking the [`Rational`] on the right-hand
     /// side by reference.
     ///
@@ -352,7 +352,7 @@ impl AddAssign<&Rational> for Rational {
     /// x += &Rational::from_signeds(99, 100);
     /// assert_eq!(x.to_string(), "2893/700");
     /// ```
-    fn add_assign(&mut self, other: &Rational) {
+    fn add_assign(&mut self, other: &Self) {
         if *self == 0u32 {
             self.clone_from(other);
             return;
@@ -416,9 +416,9 @@ impl Sum for Rational {
     ///     "19079/2520"
     /// );
     /// ```
-    fn sum<I>(xs: I) -> Rational
+    fn sum<I>(xs: I) -> Self
     where
-        I: Iterator<Item = Rational>,
+        I: Iterator<Item = Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate() {
@@ -428,7 +428,7 @@ impl Sum for Rational {
             }
             stack.push(s);
         }
-        let mut s = Rational::ZERO;
+        let mut s = Self::ZERO;
         for x in stack.into_iter().rev() {
             s += x;
         }
@@ -436,7 +436,7 @@ impl Sum for Rational {
     }
 }
 
-impl<'a> Sum<&'a Rational> for Rational {
+impl<'a> Sum<&'a Self> for Rational {
     /// Adds up all the [`Rational`]s in an iterator of [`Rational`] references.
     ///
     /// $$
@@ -467,9 +467,9 @@ impl<'a> Sum<&'a Rational> for Rational {
     ///     "19079/2520"
     /// );
     /// ```
-    fn sum<I>(xs: I) -> Rational
+    fn sum<I>(xs: I) -> Self
     where
-        I: Iterator<Item = &'a Rational>,
+        I: Iterator<Item = &'a Self>,
     {
         let mut stack = Vec::new();
         for (i, x) in xs.enumerate() {
@@ -479,7 +479,7 @@ impl<'a> Sum<&'a Rational> for Rational {
             }
             stack.push(s);
         }
-        let mut s = Rational::ZERO;
+        let mut s = Self::ZERO;
         for x in stack.into_iter().rev() {
             s += x;
         }

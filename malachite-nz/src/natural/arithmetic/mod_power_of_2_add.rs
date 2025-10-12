@@ -225,23 +225,23 @@ pub_test! {limbs_mod_power_of_2_add_in_place_either(
 }}
 
 impl Natural {
-    fn mod_power_of_2_add_limb_ref(&self, y: Limb, pow: u64) -> Natural {
+    fn mod_power_of_2_add_limb_ref(&self, y: Limb, pow: u64) -> Self {
         match (self, y, pow) {
             (_, 0, _) => self.clone(),
-            (&Natural::ZERO, _, _) => Natural(Small(y)),
-            (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
-                Natural(Small(small.mod_power_of_2_add(other, pow)))
+            (&Self::ZERO, _, _) => Self(Small(y)),
+            (&Self(Small(small)), other, pow) if pow <= Limb::WIDTH => {
+                Self(Small(small.mod_power_of_2_add(other, pow)))
             }
-            (&Natural(Small(small)), other, _) => {
+            (&Self(Small(small)), other, _) => {
                 let (sum, overflow) = small.overflowing_add(other);
                 if overflow {
-                    Natural(Large(vec![sum, 1]))
+                    Self(Large(vec![sum, 1]))
                 } else {
-                    Natural(Small(sum))
+                    Self(Small(sum))
                 }
             }
-            (&Natural(Large(ref limbs)), other, pow) => {
-                Natural::from_owned_limbs_asc(limbs_mod_power_of_2_add_limb(limbs, other, pow))
+            (&Self(Large(ref limbs)), other, pow) => {
+                Self::from_owned_limbs_asc(limbs_mod_power_of_2_add_limb(limbs, other, pow))
             }
         }
     }
@@ -249,19 +249,19 @@ impl Natural {
     fn mod_power_of_2_add_assign_limb(&mut self, y: Limb, pow: u64) {
         match (&mut *self, y, pow) {
             (_, 0, _) => {}
-            (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)),
-            (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
+            (&mut Self::ZERO, _, _) => *self = Self(Small(y)),
+            (&mut Self(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_2_add_assign(other, pow);
             }
-            (&mut Natural(Small(ref mut small)), other, _) => {
+            (&mut Self(Small(ref mut small)), other, _) => {
                 let (sum, overflow) = small.overflowing_add(other);
                 if overflow {
-                    *self = Natural(Large(vec![sum, 1]));
+                    *self = Self(Large(vec![sum, 1]));
                 } else {
                     *small = sum;
                 }
             }
-            (&mut Natural(Large(ref mut limbs)), y, pow) => {
+            (&mut Self(Large(ref mut limbs)), y, pow) => {
                 limbs_vec_mod_power_of_2_add_limb_in_place(limbs, y, pow);
                 self.trim();
             }
@@ -269,8 +269,8 @@ impl Natural {
     }
 }
 
-impl ModPowerOf2Add<Natural> for Natural {
-    type Output = Natural;
+impl ModPowerOf2Add<Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$. Both
     /// [`Natural`]s are taken by value.
@@ -300,14 +300,14 @@ impl ModPowerOf2Add<Natural> for Natural {
     ///     8
     /// );
     /// ```
-    fn mod_power_of_2_add(mut self, other: Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_add(mut self, other: Self, pow: u64) -> Self {
         self.mod_power_of_2_add_assign(other, pow);
         self
     }
 }
 
-impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> ModPowerOf2Add<&'a Self> for Natural {
+    type Output = Self;
 
     /// Adds two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$. The
     /// first [`Natural`] is taken by value and the second by reference.
@@ -337,7 +337,7 @@ impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_add(mut self, other: &'a Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_add(mut self, other: &'a Self, pow: u64) -> Self {
         self.mod_power_of_2_add_assign(other, pow);
         self
     }
@@ -437,7 +437,7 @@ impl ModPowerOf2Add<&Natural> for &Natural {
     }
 }
 
-impl ModPowerOf2AddAssign<Natural> for Natural {
+impl ModPowerOf2AddAssign<Self> for Natural {
     /// Adds two [`Natural`]s modulo $2^k$, in place. The inputs must be already reduced modulo
     /// $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
@@ -468,7 +468,7 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
     /// x.mod_power_of_2_add_assign(Natural::from(14u32), 4);
     /// assert_eq!(x, 8);
     /// ```
-    fn mod_power_of_2_add_assign(&mut self, mut other: Natural, pow: u64) {
+    fn mod_power_of_2_add_assign(&mut self, mut other: Self, pow: u64) {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
@@ -478,10 +478,10 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (&mut *self, &mut other) {
-            (x, &mut Natural(Small(y))) => x.mod_power_of_2_add_assign_limb(y, pow),
-            (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_add_limb_ref(x, pow),
-            (&mut Natural(Large(ref mut xs)), _) => {
-                if let Natural(Large(mut ys)) = other {
+            (x, &mut Self(Small(y))) => x.mod_power_of_2_add_assign_limb(y, pow),
+            (&mut Self(Small(x)), y) => *self = y.mod_power_of_2_add_limb_ref(x, pow),
+            (&mut Self(Large(ref mut xs)), _) => {
+                if let Self(Large(mut ys)) = other {
                     if limbs_mod_power_of_2_add_in_place_either(xs, &mut ys, pow) {
                         *xs = ys;
                     }
@@ -492,7 +492,7 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
     }
 }
 
-impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
+impl<'a> ModPowerOf2AddAssign<&'a Self> for Natural {
     /// Adds two [`Natural`]s modulo $2^k$, in place. The inputs must be already reduced modulo
     /// $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
@@ -522,7 +522,7 @@ impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
     /// x.mod_power_of_2_add_assign(&Natural::from(14u32), 4);
     /// assert_eq!(x, 8);
     /// ```
-    fn mod_power_of_2_add_assign(&mut self, other: &'a Natural, pow: u64) {
+    fn mod_power_of_2_add_assign(&mut self, other: &'a Self, pow: u64) {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
@@ -535,9 +535,9 @@ impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
             (x, y) if core::ptr::eq(x, y) => {
                 self.mod_power_of_2_shl_assign(pow, 1);
             }
-            (x, &Natural(Small(y))) => x.mod_power_of_2_add_assign_limb(y, pow),
-            (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_add_limb_ref(x, pow),
-            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+            (x, &Self(Small(y))) => x.mod_power_of_2_add_assign_limb(y, pow),
+            (&mut Self(Small(x)), y) => *self = y.mod_power_of_2_add_limb_ref(x, pow),
+            (&mut Self(Large(ref mut xs)), &Self(Large(ref ys))) => {
                 limbs_vec_mod_power_of_2_add_in_place_left(xs, ys, pow);
                 self.trim();
             }

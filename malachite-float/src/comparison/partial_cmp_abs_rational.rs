@@ -48,7 +48,7 @@ impl PartialOrdAbs<Rational> for Float {
             (float_either_infinity!(), _) => Some(Greater),
             (float_either_zero!(), y) => Some(if *y == 0 { Equal } else { Less }),
             (
-                Float(Finite {
+                Self(Finite {
                     exponent: e_x,
                     significand: significand_x,
                     ..

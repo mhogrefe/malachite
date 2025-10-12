@@ -886,10 +886,10 @@ impl Float {
     #[inline]
     pub fn div_prec_round(
         mut self,
-        other: Float,
+        other: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.div_prec_round_assign(other, prec, rm);
         (self, o)
     }
@@ -1006,10 +1006,10 @@ impl Float {
     #[inline]
     pub fn div_prec_round_val_ref(
         mut self,
-        other: &Float,
+        other: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.div_prec_round_assign_ref(other, prec, rm);
         (self, o)
     }
@@ -1126,10 +1126,10 @@ impl Float {
     #[inline]
     pub fn div_prec_round_ref_val(
         &self,
-        other: Float,
+        other: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
             (float_nan!(), _)
@@ -1137,33 +1137,33 @@ impl Float {
             | (float_either_infinity!(), float_either_infinity!())
             | (float_either_zero!(), float_either_zero!()) => (float_nan!(), Equal),
             (
-                Float(Infinity { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
+                Self(Infinity { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Zero { sign: y_sign })) => (
-                Float(Infinity {
+            | (Self(Finite { sign: x_sign, .. }), Self(Zero { sign: y_sign })) => (
+                Self(Infinity {
                     sign: *x_sign == y_sign,
                 }),
                 Equal,
             ),
             (
-                Float(Zero { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
+                Self(Zero { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Infinity { sign: y_sign })) => (
-                Float(Zero {
+            | (Self(Finite { sign: x_sign, .. }), Self(Infinity { sign: y_sign })) => (
+                Self(Zero {
                     sign: *x_sign == y_sign,
                 }),
                 Equal,
             ),
             (
-                Float(Finite {
+                Self(Finite {
                     sign: x_sign,
                     exponent: x_exp,
                     precision: x_prec,
                     significand: x,
                 }),
-                Float(Finite {
+                Self(Finite {
                     sign: y_sign,
                     exponent: y_exp,
                     precision: y_prec,
@@ -1181,20 +1181,20 @@ impl Float {
                 }
                 let sign = *x_sign == y_sign;
                 let exp_diff = *x_exp - y_exp;
-                if exp_diff > Float::MAX_EXPONENT {
+                if exp_diff > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
-                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
-                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
-                } else if exp_diff + 2 < Float::MIN_EXPONENT {
+                } else if exp_diff + 2 < Self::MIN_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
-                        (true, Ceiling | Up) => (Float::min_positive_value_prec(prec), Greater),
+                        (true, Ceiling | Up) => (Self::min_positive_value_prec(prec), Greater),
                         (true, _) => (float_zero!(), Less),
-                        (false, Floor | Up) => (-Float::min_positive_value_prec(prec), Less),
+                        (false, Floor | Up) => (-Self::min_positive_value_prec(prec), Less),
                         (false, _) => (float_negative_zero!(), Greater),
                     };
                 }
@@ -1207,36 +1207,36 @@ impl Float {
                     if sign { rm } else { -rm },
                 );
                 let exp = exp_diff.checked_add(i32::exact_from(exp_offset)).unwrap();
-                if exp > Float::MAX_EXPONENT {
+                if exp > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
-                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
-                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
-                } else if exp < Float::MIN_EXPONENT {
+                } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Float::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT - 1
                         && (o == Less || !quotient.is_power_of_2())
                     {
                         if sign {
-                            (Float::min_positive_value_prec(prec), Greater)
+                            (Self::min_positive_value_prec(prec), Greater)
                         } else {
-                            (-Float::min_positive_value_prec(prec), Less)
+                            (-Self::min_positive_value_prec(prec), Less)
                         }
                     } else {
                         match (sign, rm) {
                             (_, Exact) => panic!("Inexact Float division"),
-                            (true, Ceiling | Up) => (Float::min_positive_value_prec(prec), Greater),
+                            (true, Ceiling | Up) => (Self::min_positive_value_prec(prec), Greater),
                             (true, _) => (float_zero!(), Less),
-                            (false, Floor | Up) => (-Float::min_positive_value_prec(prec), Less),
+                            (false, Floor | Up) => (-Self::min_positive_value_prec(prec), Less),
                             (false, _) => (float_negative_zero!(), Greater),
                         }
                     };
                 }
                 (
-                    Float(Finite {
+                    Self(Finite {
                         sign,
                         exponent: exp,
                         precision: prec,
@@ -1360,10 +1360,10 @@ impl Float {
     #[inline]
     pub fn div_prec_round_ref_ref(
         &self,
-        other: &Float,
+        other: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match (self, other) {
             (float_nan!(), _)
@@ -1371,33 +1371,33 @@ impl Float {
             | (float_either_infinity!(), float_either_infinity!())
             | (float_either_zero!(), float_either_zero!()) => (float_nan!(), Equal),
             (
-                Float(Infinity { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
+                Self(Infinity { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Zero { sign: y_sign })) => (
-                Float(Infinity {
+            | (Self(Finite { sign: x_sign, .. }), Self(Zero { sign: y_sign })) => (
+                Self(Infinity {
                     sign: x_sign == y_sign,
                 }),
                 Equal,
             ),
             (
-                Float(Zero { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
+                Self(Zero { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Infinity { sign: y_sign })) => (
-                Float(Zero {
+            | (Self(Finite { sign: x_sign, .. }), Self(Infinity { sign: y_sign })) => (
+                Self(Zero {
                     sign: x_sign == y_sign,
                 }),
                 Equal,
             ),
             (
-                Float(Finite {
+                Self(Finite {
                     sign: x_sign,
                     exponent: x_exp,
                     precision: x_prec,
                     significand: x,
                 }),
-                Float(Finite {
+                Self(Finite {
                     sign: y_sign,
                     exponent: y_exp,
                     precision: y_prec,
@@ -1415,20 +1415,20 @@ impl Float {
                 }
                 let sign = x_sign == y_sign;
                 let exp_diff = *x_exp - y_exp;
-                if exp_diff > Float::MAX_EXPONENT {
+                if exp_diff > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
-                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
-                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
-                } else if exp_diff + 2 < Float::MIN_EXPONENT {
+                } else if exp_diff + 2 < Self::MIN_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
-                        (true, Ceiling | Up) => (Float::min_positive_value_prec(prec), Greater),
+                        (true, Ceiling | Up) => (Self::min_positive_value_prec(prec), Greater),
                         (true, _) => (float_zero!(), Less),
-                        (false, Floor | Up) => (-Float::min_positive_value_prec(prec), Less),
+                        (false, Floor | Up) => (-Self::min_positive_value_prec(prec), Less),
                         (false, _) => (float_negative_zero!(), Greater),
                     };
                 }
@@ -1441,36 +1441,36 @@ impl Float {
                     if sign { rm } else { -rm },
                 );
                 let exp = exp_diff.checked_add(i32::exact_from(exp_offset)).unwrap();
-                if exp > Float::MAX_EXPONENT {
+                if exp > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
-                        (true, _) => (Float::max_finite_value_with_prec(prec), Less),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
-                        (false, _) => (-Float::max_finite_value_with_prec(prec), Greater),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
-                } else if exp < Float::MIN_EXPONENT {
+                } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Float::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT - 1
                         && (o == Less || !quotient.is_power_of_2())
                     {
                         if sign {
-                            (Float::min_positive_value_prec(prec), Greater)
+                            (Self::min_positive_value_prec(prec), Greater)
                         } else {
-                            (-Float::min_positive_value_prec(prec), Less)
+                            (-Self::min_positive_value_prec(prec), Less)
                         }
                     } else {
                         match (sign, rm) {
                             (_, Exact) => panic!("Inexact Float division"),
-                            (true, Ceiling | Up) => (Float::min_positive_value_prec(prec), Greater),
+                            (true, Ceiling | Up) => (Self::min_positive_value_prec(prec), Greater),
                             (true, _) => (float_zero!(), Less),
-                            (false, Floor | Up) => (-Float::min_positive_value_prec(prec), Less),
+                            (false, Floor | Up) => (-Self::min_positive_value_prec(prec), Less),
                             (false, _) => (float_negative_zero!(), Greater),
                         }
                     };
                 }
                 (
-                    Float(Finite {
+                    Self(Finite {
                         sign,
                         exponent: exp,
                         precision: prec,
@@ -1555,7 +1555,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn div_prec(self, other: Float, prec: u64) -> (Float, Ordering) {
+    pub fn div_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
         self.div_prec_round(other, prec, Nearest)
     }
 
@@ -1632,7 +1632,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn div_prec_val_ref(self, other: &Float, prec: u64) -> (Float, Ordering) {
+    pub fn div_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.div_prec_round_val_ref(other, prec, Nearest)
     }
 
@@ -1709,7 +1709,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn div_prec_ref_val(&self, other: Float, prec: u64) -> (Float, Ordering) {
+    pub fn div_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
         self.div_prec_round_ref_val(other, prec, Nearest)
     }
 
@@ -1786,7 +1786,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn div_prec_ref_ref(&self, other: &Float, prec: u64) -> (Float, Ordering) {
+    pub fn div_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.div_prec_round_ref_ref(other, prec, Nearest)
     }
 
@@ -1888,7 +1888,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_round(self, other: Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn div_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round(other, prec, rm)
     }
@@ -1991,7 +1991,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_round_val_ref(self, other: &Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn div_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_val_ref(other, prec, rm)
     }
@@ -2094,7 +2094,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_round_ref_val(&self, other: Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn div_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_ref_val(other, prec, rm)
     }
@@ -2197,7 +2197,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_round_ref_ref(&self, other: &Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn div_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_ref_ref(other, prec, rm)
     }
@@ -2290,7 +2290,7 @@ impl Float {
     /// assert_eq!(quotient.to_string(), "1.155727");
     /// ```
     #[inline]
-    pub fn div_prec_round_assign(&mut self, other: Float, prec: u64, rm: RoundingMode) -> Ordering {
+    pub fn div_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
         assert_ne!(prec, 0);
         match (&mut *self, other) {
             (float_nan!(), _)
@@ -2301,21 +2301,21 @@ impl Float {
                 Equal
             }
             (
-                Float(Infinity { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
+                Self(Infinity { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Zero { sign: y_sign })) => {
-                *self = Float(Infinity {
+            | (Self(Finite { sign: x_sign, .. }), Self(Zero { sign: y_sign })) => {
+                *self = Self(Infinity {
                     sign: *x_sign == y_sign,
                 });
                 Equal
             }
             (
-                Float(Zero { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
+                Self(Zero { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Infinity { sign: y_sign })) => {
-                *self = Float(Zero {
+            | (Self(Finite { sign: x_sign, .. }), Self(Infinity { sign: y_sign })) => {
+                *self = Self(Zero {
                     sign: *x_sign == y_sign,
                 });
                 Equal
@@ -2334,13 +2334,13 @@ impl Float {
                 o
             }
             (
-                Float(Finite {
+                Self(Finite {
                     sign: x_sign,
                     exponent: x_exp,
                     precision: x_prec,
                     significand: x,
                 }),
-                Float(Finite {
+                Self(Finite {
                     sign: y_sign,
                     exponent: y_exp,
                     precision: y_prec,
@@ -2349,7 +2349,7 @@ impl Float {
             ) => {
                 let sign = *x_sign == y_sign;
                 let exp_diff = *x_exp - y_exp;
-                if exp_diff > Float::MAX_EXPONENT {
+                if exp_diff > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => {
@@ -2357,7 +2357,7 @@ impl Float {
                             Greater
                         }
                         (true, _) => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                         (false, Floor | Up | Nearest) => {
@@ -2365,15 +2365,15 @@ impl Float {
                             Less
                         }
                         (false, _) => {
-                            *self = -Float::max_finite_value_with_prec(prec);
+                            *self = -Self::max_finite_value_with_prec(prec);
                             Greater
                         }
                     };
-                } else if exp_diff + 2 < Float::MIN_EXPONENT {
+                } else if exp_diff + 2 < Self::MIN_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up) => {
-                            *self = Float::min_positive_value_prec(prec);
+                            *self = Self::min_positive_value_prec(prec);
                             Greater
                         }
                         (true, _) => {
@@ -2381,7 +2381,7 @@ impl Float {
                             Less
                         }
                         (false, Floor | Up) => {
-                            *self = -Float::min_positive_value_prec(prec);
+                            *self = -Self::min_positive_value_prec(prec);
                             Less
                         }
                         (false, _) => {
@@ -2399,7 +2399,7 @@ impl Float {
                     if sign { rm } else { -rm },
                 );
                 *x_exp = exp_diff.checked_add(i32::exact_from(exp_offset)).unwrap();
-                if *x_exp > Float::MAX_EXPONENT {
+                if *x_exp > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => {
@@ -2407,7 +2407,7 @@ impl Float {
                             Greater
                         }
                         (true, _) => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                         (false, Floor | Up | Nearest) => {
@@ -2415,27 +2415,27 @@ impl Float {
                             Less
                         }
                         (false, _) => {
-                            *self = -Float::max_finite_value_with_prec(prec);
+                            *self = -Self::max_finite_value_with_prec(prec);
                             Greater
                         }
                     };
-                } else if *x_exp < Float::MIN_EXPONENT {
+                } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Float::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT - 1
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {
-                            *self = Float::min_positive_value_prec(prec);
+                            *self = Self::min_positive_value_prec(prec);
                             Greater
                         } else {
-                            *self = -Float::min_positive_value_prec(prec);
+                            *self = -Self::min_positive_value_prec(prec);
                             Less
                         }
                     } else {
                         match (sign, rm) {
                             (_, Exact) => panic!("Inexact Float division"),
                             (true, Ceiling | Up) => {
-                                *self = Float::min_positive_value_prec(prec);
+                                *self = Self::min_positive_value_prec(prec);
                                 Greater
                             }
                             (true, _) => {
@@ -2443,7 +2443,7 @@ impl Float {
                                 Less
                             }
                             (false, Floor | Up) => {
-                                *self = -Float::min_positive_value_prec(prec);
+                                *self = -Self::min_positive_value_prec(prec);
                                 Less
                             }
                             (false, _) => {
@@ -2550,7 +2550,7 @@ impl Float {
     #[inline]
     pub fn div_prec_round_assign_ref(
         &mut self,
-        other: &Float,
+        other: &Self,
         prec: u64,
         rm: RoundingMode,
     ) -> Ordering {
@@ -2564,21 +2564,21 @@ impl Float {
                 Equal
             }
             (
-                Float(Infinity { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
+                Self(Infinity { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Zero { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Zero { sign: y_sign })) => {
-                *self = Float(Infinity {
+            | (Self(Finite { sign: x_sign, .. }), Self(Zero { sign: y_sign })) => {
+                *self = Self(Infinity {
                     sign: x_sign == y_sign,
                 });
                 Equal
             }
             (
-                Float(Zero { sign: x_sign }),
-                Float(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
+                Self(Zero { sign: x_sign }),
+                Self(Finite { sign: y_sign, .. } | Infinity { sign: y_sign }),
             )
-            | (Float(Finite { sign: x_sign, .. }), Float(Infinity { sign: y_sign })) => {
-                *self = Float(Zero {
+            | (Self(Finite { sign: x_sign, .. }), Self(Infinity { sign: y_sign })) => {
+                *self = Self(Zero {
                     sign: x_sign == y_sign,
                 });
                 Equal
@@ -2597,13 +2597,13 @@ impl Float {
                 o
             }
             (
-                Float(Finite {
+                Self(Finite {
                     sign: x_sign,
                     exponent: x_exp,
                     precision: x_prec,
                     significand: x,
                 }),
-                Float(Finite {
+                Self(Finite {
                     sign: y_sign,
                     exponent: y_exp,
                     precision: y_prec,
@@ -2612,7 +2612,7 @@ impl Float {
             ) => {
                 let sign = x_sign == y_sign;
                 let exp_diff = *x_exp - y_exp;
-                if exp_diff > Float::MAX_EXPONENT {
+                if exp_diff > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => {
@@ -2620,7 +2620,7 @@ impl Float {
                             Greater
                         }
                         (true, _) => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                         (false, Floor | Up | Nearest) => {
@@ -2628,15 +2628,15 @@ impl Float {
                             Less
                         }
                         (false, _) => {
-                            *self = -Float::max_finite_value_with_prec(prec);
+                            *self = -Self::max_finite_value_with_prec(prec);
                             Greater
                         }
                     };
-                } else if exp_diff + 2 < Float::MIN_EXPONENT {
+                } else if exp_diff + 2 < Self::MIN_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up) => {
-                            *self = Float::min_positive_value_prec(prec);
+                            *self = Self::min_positive_value_prec(prec);
                             Greater
                         }
                         (true, _) => {
@@ -2644,7 +2644,7 @@ impl Float {
                             Less
                         }
                         (false, Floor | Up) => {
-                            *self = -Float::min_positive_value_prec(prec);
+                            *self = -Self::min_positive_value_prec(prec);
                             Less
                         }
                         (false, _) => {
@@ -2662,7 +2662,7 @@ impl Float {
                     if sign { rm } else { -rm },
                 );
                 *x_exp = exp_diff.checked_add(i32::exact_from(exp_offset)).unwrap();
-                if *x_exp > Float::MAX_EXPONENT {
+                if *x_exp > Self::MAX_EXPONENT {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float division"),
                         (true, Ceiling | Up | Nearest) => {
@@ -2670,7 +2670,7 @@ impl Float {
                             Greater
                         }
                         (true, _) => {
-                            *self = Float::max_finite_value_with_prec(prec);
+                            *self = Self::max_finite_value_with_prec(prec);
                             Less
                         }
                         (false, Floor | Up | Nearest) => {
@@ -2678,27 +2678,27 @@ impl Float {
                             Less
                         }
                         (false, _) => {
-                            *self = -Float::max_finite_value_with_prec(prec);
+                            *self = -Self::max_finite_value_with_prec(prec);
                             Greater
                         }
                     };
-                } else if *x_exp < Float::MIN_EXPONENT {
+                } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Float::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT - 1
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {
-                            *self = Float::min_positive_value_prec(prec);
+                            *self = Self::min_positive_value_prec(prec);
                             Greater
                         } else {
-                            *self = -Float::min_positive_value_prec(prec);
+                            *self = -Self::min_positive_value_prec(prec);
                             Less
                         }
                     } else {
                         match (sign, rm) {
                             (_, Exact) => panic!("Inexact Float division"),
                             (true, Ceiling | Up) => {
-                                *self = Float::min_positive_value_prec(prec);
+                                *self = Self::min_positive_value_prec(prec);
                                 Greater
                             }
                             (true, _) => {
@@ -2706,7 +2706,7 @@ impl Float {
                                 Less
                             }
                             (false, Floor | Up) => {
-                                *self = -Float::min_positive_value_prec(prec);
+                                *self = -Self::min_positive_value_prec(prec);
                                 Less
                             }
                             (false, _) => {
@@ -2771,7 +2771,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "1.155727");
     /// ```
     #[inline]
-    pub fn div_prec_assign(&mut self, other: Float, prec: u64) -> Ordering {
+    pub fn div_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
         self.div_prec_round_assign(other, prec, Nearest)
     }
 
@@ -2823,7 +2823,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "1.155727");
     /// ```
     #[inline]
-    pub fn div_prec_assign_ref(&mut self, other: &Float, prec: u64) -> Ordering {
+    pub fn div_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
         self.div_prec_round_assign_ref(other, prec, Nearest)
     }
 
@@ -2886,7 +2886,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "1.1557273497909217");
     /// ```
     #[inline]
-    pub fn div_round_assign(&mut self, other: Float, rm: RoundingMode) -> Ordering {
+    pub fn div_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_assign(other, prec, rm)
     }
@@ -2950,7 +2950,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "1.1557273497909217");
     /// ```
     #[inline]
-    pub fn div_round_assign_ref(&mut self, other: &Float, rm: RoundingMode) -> Ordering {
+    pub fn div_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_assign_ref(other, prec, rm)
     }
@@ -3045,7 +3045,7 @@ impl Float {
         other: Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.div_rational_prec_round_assign(other, prec, rm);
         (self, o)
     }
@@ -3158,7 +3158,7 @@ impl Float {
         other: &Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let o = self.div_rational_prec_round_assign_ref(other, prec, rm);
         (self, o)
     }
@@ -3271,7 +3271,7 @@ impl Float {
         other: Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(self.complexity(), other.significant_bits()) < DIV_RATIONAL_THRESHOLD {
             div_rational_prec_round_naive_ref_val(self, other, prec, rm)
         } else {
@@ -3387,7 +3387,7 @@ impl Float {
         other: &Rational,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(self.complexity(), other.significant_bits()) < DIV_RATIONAL_THRESHOLD {
             div_rational_prec_round_naive_ref_ref(self, other, prec, rm)
         } else {
@@ -3453,7 +3453,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_rational_prec(self, other: Rational, prec: u64) -> (Float, Ordering) {
+    pub fn div_rational_prec(self, other: Rational, prec: u64) -> (Self, Ordering) {
         self.div_rational_prec_round(other, prec, Nearest)
     }
 
@@ -3517,7 +3517,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Float, Ordering) {
+    pub fn div_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Self, Ordering) {
         self.div_rational_prec_round_val_ref(other, prec, Nearest)
     }
 
@@ -3580,7 +3580,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Float, Ordering) {
+    pub fn div_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Self, Ordering) {
         self.div_rational_prec_round_ref_val(other, prec, Nearest)
     }
 
@@ -3644,7 +3644,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Float, Ordering) {
+    pub fn div_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Self, Ordering) {
         self.div_rational_prec_round_ref_ref(other, prec, Nearest)
     }
 
@@ -3719,7 +3719,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn div_rational_round(self, other: Rational, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn div_rational_round(self, other: Rational, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.div_rational_prec_round(other, prec, rm)
     }
@@ -3799,7 +3799,7 @@ impl Float {
         self,
         other: &Rational,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.div_rational_prec_round_val_ref(other, prec, rm)
     }
@@ -3879,7 +3879,7 @@ impl Float {
         &self,
         other: Rational,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.div_rational_prec_round_ref_val(other, prec, rm)
     }
@@ -3959,7 +3959,7 @@ impl Float {
         &self,
         other: &Rational,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.div_rational_prec_round_ref_ref(other, prec, rm)
     }
@@ -4520,10 +4520,10 @@ impl Float {
     #[inline]
     pub fn rational_div_float_prec_round(
         x: Rational,
-        y: Float,
+        y: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(x.significant_bits(), y.complexity()) < RATIONAL_DIV_THRESHOLD {
             rational_div_float_prec_round_naive(x, y, prec, rm)
         } else {
@@ -4641,10 +4641,10 @@ impl Float {
     #[inline]
     pub fn rational_div_float_prec_round_val_ref(
         x: Rational,
-        y: &Float,
+        y: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(x.significant_bits(), y.complexity()) < RATIONAL_DIV_THRESHOLD {
             rational_div_float_prec_round_naive_val_ref(x, y, prec, rm)
         } else {
@@ -4762,10 +4762,10 @@ impl Float {
     #[inline]
     pub fn rational_div_float_prec_round_ref_val(
         x: &Rational,
-        y: Float,
+        y: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(x.significant_bits(), y.complexity()) < RATIONAL_DIV_THRESHOLD {
             rational_div_float_prec_round_naive_ref_val(x, y, prec, rm)
         } else {
@@ -4883,10 +4883,10 @@ impl Float {
     #[inline]
     pub fn rational_div_float_prec_round_ref_ref(
         x: &Rational,
-        y: &Float,
+        y: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         if max(x.significant_bits(), y.complexity()) < RATIONAL_DIV_THRESHOLD {
             rational_div_float_prec_round_naive_ref_ref(x, y, prec, rm)
         } else {
@@ -4949,8 +4949,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn rational_div_float_prec(x: Rational, y: Float, prec: u64) -> (Float, Ordering) {
-        Float::rational_div_float_prec_round(x, y, prec, Nearest)
+    pub fn rational_div_float_prec(x: Rational, y: Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_div_float_prec_round(x, y, prec, Nearest)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result to the nearest value of the
@@ -5010,8 +5010,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn rational_div_float_prec_val_ref(x: Rational, y: &Float, prec: u64) -> (Float, Ordering) {
-        Float::rational_div_float_prec_round_val_ref(x, y, prec, Nearest)
+    pub fn rational_div_float_prec_val_ref(x: Rational, y: &Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_div_float_prec_round_val_ref(x, y, prec, Nearest)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result to the nearest value of the
@@ -5071,8 +5071,8 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn rational_div_float_prec_ref_val(x: &Rational, y: Float, prec: u64) -> (Float, Ordering) {
-        Float::rational_div_float_prec_round_ref_val(x, y, prec, Nearest)
+    pub fn rational_div_float_prec_ref_val(x: &Rational, y: Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_div_float_prec_round_ref_val(x, y, prec, Nearest)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result to the nearest value of the
@@ -5134,10 +5134,10 @@ impl Float {
     #[inline]
     pub fn rational_div_float_prec_ref_ref(
         x: &Rational,
-        y: &Float,
+        y: &Self,
         prec: u64,
-    ) -> (Float, Ordering) {
-        Float::rational_div_float_prec_round_ref_ref(x, y, prec, Nearest)
+    ) -> (Self, Ordering) {
+        Self::rational_div_float_prec_round_ref_ref(x, y, prec, Nearest)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result with the specified rounding mode.
@@ -5209,9 +5209,9 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn rational_div_float_round(x: Rational, y: Float, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn rational_div_float_round(x: Rational, y: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = y.significant_bits();
-        Float::rational_div_float_prec_round(x, y, prec, rm)
+        Self::rational_div_float_prec_round(x, y, prec, rm)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result with the specified rounding mode.
@@ -5285,11 +5285,11 @@ impl Float {
     #[inline]
     pub fn rational_div_float_round_val_ref(
         x: Rational,
-        y: &Float,
+        y: &Self,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = y.significant_bits();
-        Float::rational_div_float_prec_round_val_ref(x, y, prec, rm)
+        Self::rational_div_float_prec_round_val_ref(x, y, prec, rm)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result with the specified rounding mode.
@@ -5363,11 +5363,11 @@ impl Float {
     #[inline]
     pub fn rational_div_float_round_ref_val(
         x: &Rational,
-        y: Float,
+        y: Self,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = y.significant_bits();
-        Float::rational_div_float_prec_round_ref_val(x, y, prec, rm)
+        Self::rational_div_float_prec_round_ref_val(x, y, prec, rm)
     }
 
     /// Divides a [`Rational`] by a [`Float`], rounding the result with the specified rounding mode.
@@ -5441,16 +5441,16 @@ impl Float {
     #[inline]
     pub fn rational_div_float_round_ref_ref(
         x: &Rational,
-        y: &Float,
+        y: &Self,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         let prec = y.significant_bits();
-        Float::rational_div_float_prec_round_ref_ref(x, y, prec, rm)
+        Self::rational_div_float_prec_round_ref_ref(x, y, prec, rm)
     }
 }
 
-impl Div<Float> for Float {
-    type Output = Float;
+impl Div<Self> for Float {
+    type Output = Self;
 
     /// Divides two [`Float`]s, taking both by value.
     ///
@@ -5528,14 +5528,14 @@ impl Div<Float> for Float {
     /// assert_eq!((Float::from(-1.5) / Float::from(-2.5)).to_string(), "0.6");
     /// ```
     #[inline]
-    fn div(self, other: Float) -> Float {
+    fn div(self, other: Self) -> Self {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round(other, prec, Nearest).0
     }
 }
 
-impl Div<&Float> for Float {
-    type Output = Float;
+impl Div<&Self> for Float {
+    type Output = Self;
 
     /// Divides two [`Float`]s, taking the first by value and the second by reference.
     ///
@@ -5614,7 +5614,7 @@ impl Div<&Float> for Float {
     /// assert_eq!((Float::from(-1.5) / &Float::from(-2.5)).to_string(), "0.6");
     /// ```
     #[inline]
-    fn div(self, other: &Float) -> Float {
+    fn div(self, other: &Self) -> Self {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_val_ref(other, prec, Nearest).0
     }
@@ -5792,7 +5792,7 @@ impl Div<&Float> for &Float {
     }
 }
 
-impl DivAssign<Float> for Float {
+impl DivAssign<Self> for Float {
     /// Divides a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side by
     /// value.
     ///
@@ -5871,13 +5871,13 @@ impl DivAssign<Float> for Float {
     /// assert_eq!(x.to_string(), "0.6");
     /// ```
     #[inline]
-    fn div_assign(&mut self, other: Float) {
+    fn div_assign(&mut self, other: Self) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_assign(other, prec, Nearest);
     }
 }
 
-impl DivAssign<&Float> for Float {
+impl DivAssign<&Self> for Float {
     /// Divides a [`Float`] by a [`Float`] in place, taking the [`Float`] on the right-hand side by
     /// reference.
     ///
@@ -5956,14 +5956,14 @@ impl DivAssign<&Float> for Float {
     /// assert_eq!(x.to_string(), "0.6");
     /// ```
     #[inline]
-    fn div_assign(&mut self, other: &Float) {
+    fn div_assign(&mut self, other: &Self) {
         let prec = max(self.significant_bits(), other.significant_bits());
         self.div_prec_round_assign_ref(other, prec, Nearest);
     }
 }
 
 impl Div<Rational> for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Divides a [`Float`] by a [`Rational`], taking both by value.
     ///
@@ -6043,14 +6043,14 @@ impl Div<Rational> for Float {
     /// );
     /// ```
     #[inline]
-    fn div(self, other: Rational) -> Float {
+    fn div(self, other: Rational) -> Self {
         let prec = self.significant_bits();
         self.div_rational_prec_round(other, prec, Nearest).0
     }
 }
 
 impl Div<&Rational> for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Divides a [`Float`] by a [`Rational`], taking the first by value and the second by
     /// reference.
@@ -6134,7 +6134,7 @@ impl Div<&Rational> for Float {
     /// );
     /// ```
     #[inline]
-    fn div(self, other: &Rational) -> Float {
+    fn div(self, other: &Rational) -> Self {
         let prec = self.significant_bits();
         self.div_rational_prec_round_val_ref(other, prec, Nearest).0
     }

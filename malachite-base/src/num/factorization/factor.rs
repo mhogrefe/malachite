@@ -75,8 +75,8 @@ impl<T: PrimitiveUnsigned, const N: usize> IntoIterator for Factors<T, N> {
 }
 
 impl<T: PrimitiveUnsigned, const N: usize> Factors<T, N> {
-    const fn new() -> Factors<T, N> {
-        Factors {
+    const fn new() -> Self {
+        Self {
             factors: [T::ZERO; N],
             exponents: [0; N],
         }
@@ -363,8 +363,8 @@ struct WyhashRandomU64s {
 }
 
 impl WyhashRandomU64s {
-    const fn new() -> WyhashRandomU64s {
-        WyhashRandomU64s {
+    const fn new() -> Self {
+        Self {
             seed: 0x452aee49c457bbc3,
         }
     }
@@ -771,7 +771,7 @@ impl Factor for u8 {
         }
         let zeros = n.trailing_zeros();
         if zeros != 0 {
-            factors.insert(2, zeros as u8);
+            factors.insert(2, zeros as Self);
             n >>= zeros;
             if n == 1 {
                 return factors;
@@ -907,7 +907,7 @@ impl Factor for u16 {
     fn factor(&self) -> FactorsU16 {
         let mut factors = FactorsU16::new();
         for (f, e) in u32::from(*self).factor() {
-            factors.insert(f as u16, e);
+            factors.insert(f as Self, e);
         }
         factors
     }
@@ -974,7 +974,7 @@ impl Factor for u32 {
                     factor_arr[factors_left - 1] = factor;
                 }
                 if factor >= cutoff && !factor.is_prime() {
-                    cofactor = u32::exact_from(factor_one_line_u64(
+                    cofactor = Self::exact_from(factor_one_line_u64(
                         u64::from(factor),
                         FACTOR_ONE_LINE_ITERS,
                     ));
@@ -1121,11 +1121,11 @@ impl Factor for usize {
         let mut factors = FactorsUsize::new();
         if USIZE_IS_U32 {
             for (f, e) in (*self as u32).factor() {
-                factors.insert(f as usize, e);
+                factors.insert(f as Self, e);
             }
         } else {
             for (f, e) in (*self as u64).factor() {
-                factors.insert(f as usize, e);
+                factors.insert(f as Self, e);
             }
         }
         factors

@@ -347,47 +347,47 @@ pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Li
 }}
 
 impl Natural {
-    fn add_mul_limb_ref_ref(&self, y: &Natural, z: Limb) -> Natural {
+    fn add_mul_limb_ref_ref(&self, y: &Self, z: Limb) -> Self {
         match (self, y, z) {
-            (x, _, 0) | (x, &Natural::ZERO, _) => x.clone(),
+            (x, _, 0) | (x, &Self::ZERO, _) => x.clone(),
             (x, y, 1) => x + y,
-            (x, &Natural::ONE, z) => x + Natural::from(z),
-            (Natural(Large(xs)), Natural(Large(ys)), z) => {
-                Natural(Large(limbs_add_mul_limb(xs, ys, z)))
+            (x, &Self::ONE, z) => x + Self::from(z),
+            (Self(Large(xs)), Self(Large(ys)), z) => {
+                Self(Large(limbs_add_mul_limb(xs, ys, z)))
             }
-            (x, y, z) => x + y * Natural::from(z),
+            (x, y, z) => x + y * Self::from(z),
         }
     }
 
-    fn add_mul_assign_limb(&mut self, mut y: Natural, z: Limb) {
+    fn add_mul_assign_limb(&mut self, mut y: Self, z: Limb) {
         match (&mut *self, &mut y, z) {
-            (_, _, 0) | (_, &mut Natural::ZERO, _) => {}
+            (_, _, 0) | (_, &mut Self::ZERO, _) => {}
             (x, _, 1) => *x += y,
-            (x, &mut Natural::ONE, z) => *x += Natural::from(z),
-            (Natural(Large(xs)), Natural(Large(ys)), z) => {
+            (x, &mut Self::ONE, z) => *x += Self::from(z),
+            (Self(Large(xs)), Self(Large(ys)), z) => {
                 if limbs_vec_add_mul_limb_in_place_either(xs, ys, z) {
                     *self = y;
                 }
             }
-            (x, _, z) => *x += y * Natural::from(z),
+            (x, _, z) => *x += y * Self::from(z),
         }
     }
 
-    fn add_mul_assign_limb_ref(&mut self, y: &Natural, z: Limb) {
+    fn add_mul_assign_limb_ref(&mut self, y: &Self, z: Limb) {
         match (&mut *self, y, z) {
-            (_, _, 0) | (_, &Natural::ZERO, _) => {}
+            (_, _, 0) | (_, &Self::ZERO, _) => {}
             (x, y, 1) => *x += y,
-            (x, &Natural::ONE, z) => *x += Natural::from(z),
-            (Natural(Large(xs)), Natural(Large(ys)), z) => {
+            (x, &Self::ONE, z) => *x += Self::from(z),
+            (Self(Large(xs)), Self(Large(ys)), z) => {
                 limbs_vec_add_mul_limb_in_place_left(xs, ys, z);
             }
-            (x, y, z) => *x += y * Natural::from(z),
+            (x, y, z) => *x += y * Self::from(z),
         }
     }
 }
 
-impl AddMul<Natural, Natural> for Natural {
-    type Output = Natural;
+impl AddMul<Self, Self> for Natural {
+    type Output = Self;
 
     /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by value.
     ///
@@ -418,14 +418,14 @@ impl AddMul<Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn add_mul(mut self, y: Natural, z: Natural) -> Natural {
+    fn add_mul(mut self, y: Self, z: Self) -> Self {
         self.add_mul_assign(y, z);
         self
     }
 }
 
-impl<'a> AddMul<Natural, &'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> AddMul<Self, &'a Self> for Natural {
+    type Output = Self;
 
     /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking the first two by value
     /// and the third by reference.
@@ -457,14 +457,14 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn add_mul(mut self, y: Natural, z: &'a Natural) -> Natural {
+    fn add_mul(mut self, y: Self, z: &'a Self) -> Self {
         self.add_mul_assign(y, z);
         self
     }
 }
 
-impl<'a> AddMul<&'a Natural, Natural> for Natural {
-    type Output = Natural;
+impl<'a> AddMul<&'a Self, Self> for Natural {
+    type Output = Self;
 
     /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking the first and third by
     /// value and the second by reference.
@@ -496,14 +496,14 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn add_mul(mut self, y: &'a Natural, z: Natural) -> Natural {
+    fn add_mul(mut self, y: &'a Self, z: Self) -> Self {
         self.add_mul_assign(y, z);
         self
     }
 }
 
-impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
-    type Output = Natural;
+impl<'a, 'b> AddMul<&'a Self, &'b Self> for Natural {
+    type Output = Self;
 
     /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking the first by value and
     /// the second and third by reference.
@@ -535,7 +535,7 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn add_mul(mut self, y: &'a Natural, z: &'b Natural) -> Natural {
+    fn add_mul(mut self, y: &'a Self, z: &'b Self) -> Self {
         self.add_mul_assign(y, z);
         self
     }
@@ -583,7 +583,7 @@ impl AddMul<&Natural, &Natural> for &Natural {
     }
 }
 
-impl AddMulAssign<Natural, Natural> for Natural {
+impl AddMulAssign<Self, Self> for Natural {
     /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking both
     /// [`Natural`]s on the right-hand side by value.
     ///
@@ -610,19 +610,19 @@ impl AddMulAssign<Natural, Natural> for Natural {
     /// x.add_mul_assign(Natural::from(0x10000u32), Natural::from(10u32).pow(12));
     /// assert_eq!(x, 65537000000000000u64);
     /// ```
-    fn add_mul_assign(&mut self, mut y: Natural, mut z: Natural) {
+    fn add_mul_assign(&mut self, mut y: Self, mut z: Self) {
         match (&mut *self, &mut y, &mut z) {
-            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
-            (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
-            (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
-            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
+            (Self(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Self(Small(y)), _) => self.add_mul_assign_limb(z, *y),
+            (_, _, Self(Small(z))) => self.add_mul_assign_limb(y, *z),
+            (Self(Large(xs)), Self(Large(ys)), Self(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }
 }
 
-impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
+impl<'a> AddMulAssign<Self, &'a Self> for Natural {
     /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking the first
     /// [`Natural`] on the right-hand side by value and the second by reference.
     ///
@@ -649,19 +649,19 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     /// x.add_mul_assign(Natural::from(0x10000u32), &Natural::from(10u32).pow(12));
     /// assert_eq!(x, 65537000000000000u64);
     /// ```
-    fn add_mul_assign(&mut self, mut y: Natural, z: &'a Natural) {
+    fn add_mul_assign(&mut self, mut y: Self, z: &'a Self) {
         match (&mut *self, &mut y, z) {
-            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
-            (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
-            (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
-            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
+            (Self(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Self(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
+            (_, _, Self(Small(z))) => self.add_mul_assign_limb(y, *z),
+            (Self(Large(xs)), Self(Large(ys)), Self(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }
 }
 
-impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
+impl<'a> AddMulAssign<&'a Self, Self> for Natural {
     /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking the first
     /// [`Natural`] on the right-hand side by reference and the second by value.
     ///
@@ -688,19 +688,19 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     /// x.add_mul_assign(&Natural::from(0x10000u32), Natural::from(10u32).pow(12));
     /// assert_eq!(x, 65537000000000000u64);
     /// ```
-    fn add_mul_assign(&mut self, y: &'a Natural, mut z: Natural) {
+    fn add_mul_assign(&mut self, y: &'a Self, mut z: Self) {
         match (&mut *self, y, &mut z) {
-            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
-            (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
-            (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
-            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
+            (Self(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Self(Small(y)), _) => self.add_mul_assign_limb(z, *y),
+            (_, _, Self(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
+            (Self(Large(xs)), Self(Large(ys)), Self(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }
     }
 }
 
-impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
+impl<'a, 'b> AddMulAssign<&'a Self, &'b Self> for Natural {
     /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking both
     /// [`Natural`]s on the right-hand side by reference.
     ///
@@ -727,12 +727,12 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     /// x.add_mul_assign(&Natural::from(0x10000u32), &Natural::from(10u32).pow(12));
     /// assert_eq!(x, 65537000000000000u64);
     /// ```
-    fn add_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
+    fn add_mul_assign(&mut self, y: &'a Self, z: &'b Self) {
         match (&mut *self, y, z) {
-            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
-            (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
-            (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
-            (Natural(Large(xs)), Natural(Large(ys)), Natural(Large(zs))) => {
+            (Self(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Self(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
+            (_, _, Self(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
+            (Self(Large(xs)), Self(Large(ys)), Self(Large(zs))) => {
                 limbs_add_mul_in_place_left(xs, ys, zs);
             }
         }

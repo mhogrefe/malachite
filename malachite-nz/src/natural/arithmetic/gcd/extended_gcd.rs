@@ -73,7 +73,7 @@ impl<'a> ExtendedGcdContext<'a> {
         us0: &'a mut [Limb],
         us1: &'a mut [Limb],
         scratch: &'a mut [Limb],
-    ) -> ExtendedGcdContext<'a> {
+    ) -> Self {
         let gs_len = gs.len();
         ExtendedGcdContext {
             gs,
@@ -752,7 +752,7 @@ fn extended_gcd_helper(a: Natural, b: Natural) -> (Natural, Integer, Integer) {
 }
 
 impl ExtendedGcd for Natural {
-    type Gcd = Natural;
+    type Gcd = Self;
     type Cofactor = Integer;
 
     /// Computes the GCD (greatest common divisor) of two [`Natural`]s $a$ and $b$, and also the
@@ -796,23 +796,23 @@ impl ExtendedGcd for Natural {
     ///     "(2, -9, 47)"
     /// );
     /// ```
-    fn extended_gcd(self, other: Natural) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: Self) -> (Self, Integer, Integer) {
         match (self, other) {
-            (Natural::ZERO, Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
+            (Self::ZERO, Self::ZERO) => (Self::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if a == b => (b, Integer::ZERO, Integer::ONE),
-            (Natural::ZERO, b) => (b, Integer::ZERO, Integer::ONE),
-            (a, Natural::ZERO) => (a, Integer::ONE, Integer::ZERO),
-            (Natural(Small(x)), Natural(Small(y))) => {
+            (Self::ZERO, b) => (b, Integer::ZERO, Integer::ONE),
+            (a, Self::ZERO) => (a, Integer::ONE, Integer::ZERO),
+            (Self(Small(x)), Self(Small(y))) => {
                 let (gcd, s, t) = x.extended_gcd(y);
-                (Natural::from(gcd), Integer::from(s), Integer::from(t))
+                (Self::from(gcd), Integer::from(s), Integer::from(t))
             }
             (a, b) => extended_gcd_helper(a, b),
         }
     }
 }
 
-impl<'a> ExtendedGcd<&'a Natural> for Natural {
-    type Gcd = Natural;
+impl<'a> ExtendedGcd<&'a Self> for Natural {
+    type Gcd = Self;
     type Cofactor = Integer;
 
     /// Computes the GCD (greatest common divisor) of two [`Natural`]s $a$ and $b$, and also the
@@ -856,15 +856,15 @@ impl<'a> ExtendedGcd<&'a Natural> for Natural {
     ///     "(2, -9, 47)"
     /// );
     /// ```
-    fn extended_gcd(self, other: &'a Natural) -> (Natural, Integer, Integer) {
+    fn extended_gcd(self, other: &'a Self) -> (Self, Integer, Integer) {
         match (self, other) {
-            (Natural::ZERO, &Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
+            (Self::ZERO, &Self::ZERO) => (Self::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if a == *b => (b.clone(), Integer::ZERO, Integer::ONE),
-            (Natural::ZERO, b) => (b.clone(), Integer::ZERO, Integer::ONE),
-            (a, &Natural::ZERO) => (a, Integer::ONE, Integer::ZERO),
-            (Natural(Small(x)), Natural(Small(y))) => {
+            (Self::ZERO, b) => (b.clone(), Integer::ZERO, Integer::ONE),
+            (a, &Self::ZERO) => (a, Integer::ONE, Integer::ZERO),
+            (Self(Small(x)), Self(Small(y))) => {
                 let (gcd, s, t) = x.extended_gcd(*y);
-                (Natural::from(gcd), Integer::from(s), Integer::from(t))
+                (Self::from(gcd), Integer::from(s), Integer::from(t))
             }
             (a, b) => extended_gcd_helper(a, b.clone()),
         }

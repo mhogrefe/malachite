@@ -147,7 +147,7 @@ impl ModPowerOf2Assign for Integer {
 }
 
 impl RemPowerOf2 for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Divides an [`Integer`] by $2^k$, taking it by value and returning just the remainder. The
     /// remainder has the same sign as the first number.
@@ -181,9 +181,9 @@ impl RemPowerOf2 for Integer {
     /// // -100 * 2^4 + -11 = -1611
     /// assert_eq!(Integer::from(-1611).rem_power_of_2(4), -11);
     /// ```
-    fn rem_power_of_2(self, pow: u64) -> Integer {
+    fn rem_power_of_2(self, pow: u64) -> Self {
         let abs_rem = self.abs.mod_power_of_2(pow);
-        Integer {
+        Self {
             sign: self.sign || abs_rem == 0,
             abs: abs_rem,
         }
@@ -278,7 +278,7 @@ impl RemPowerOf2Assign for Integer {
 }
 
 impl CeilingModPowerOf2 for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Divides an [`Integer`] by $2^k$, taking it by value and returning just the remainder. The
     /// remainder is non-positive.
@@ -308,13 +308,13 @@ impl CeilingModPowerOf2 for Integer {
     /// // -100 * 2^4 + -11 = -1611
     /// assert_eq!(Integer::from(-1611).ceiling_mod_power_of_2(4), -11);
     /// ```
-    fn ceiling_mod_power_of_2(self, pow: u64) -> Integer {
+    fn ceiling_mod_power_of_2(self, pow: u64) -> Self {
         let abs_mod = if self.sign {
             self.abs.neg_mod_power_of_2(pow)
         } else {
             self.abs.mod_power_of_2(pow)
         };
-        Integer {
+        Self {
             sign: abs_mod == 0,
             abs: abs_mod,
         }

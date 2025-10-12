@@ -376,14 +376,14 @@ impl FromOtherTypeSlice<u32> for usize {
             if xs.is_empty() {
                 0
             } else {
-                usize::wrapping_from(xs[0])
+                Self::wrapping_from(xs[0])
             }
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(Self::WIDTH, u64::WIDTH);
             let mut result = 0;
             let mut offset = 0;
             for &u in xs.iter().take(2) {
-                result |= usize::wrapping_from(u) << offset;
+                result |= Self::wrapping_from(u) << offset;
                 offset += u32::WIDTH;
             }
             result
@@ -407,13 +407,13 @@ impl VecFromOtherTypeSlice<u32> for usize {
         if USIZE_IS_U32 {
             out = vec![0; xs.len()];
             for (x, &u) in out.iter_mut().zip(xs.iter()) {
-                *x = usize::wrapping_from(u);
+                *x = Self::wrapping_from(u);
             }
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(Self::WIDTH, u64::WIDTH);
             out = vec![0; xs.len().shr_round(1, Ceiling).0];
             for (x, chunk) in out.iter_mut().zip(xs.chunks(2)) {
-                *x = usize::from_other_type_slice(chunk);
+                *x = Self::from_other_type_slice(chunk);
             }
         }
         out
@@ -429,7 +429,7 @@ impl VecFromOtherType<u32> for usize {
     /// See [here](super::slice#vec_from_other_type).
     #[inline]
     fn vec_from_other_type(x: u32) -> Vec<Self> {
-        vec![usize::wrapping_from(x)]
+        vec![Self::wrapping_from(x)]
     }
 }
 
@@ -445,7 +445,7 @@ impl FromOtherTypeSlice<u64> for usize {
         if xs.is_empty() {
             0
         } else {
-            usize::wrapping_from(xs[0])
+            Self::wrapping_from(xs[0])
         }
     }
 }
@@ -469,15 +469,15 @@ impl VecFromOtherTypeSlice<u64> for usize {
             for (chunk, &u) in out.chunks_exact_mut(2).zip(xs.iter()) {
                 let mut u = u;
                 for x in chunk {
-                    *x = usize::wrapping_from(u);
-                    u >>= usize::WIDTH;
+                    *x = Self::wrapping_from(u);
+                    u >>= Self::WIDTH;
                 }
             }
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(Self::WIDTH, u64::WIDTH);
             out = ::alloc::vec![0; xs.len()];
             for (x, &u) in out.iter_mut().zip(xs.iter()) {
-                *x = usize::wrapping_from(u);
+                *x = Self::wrapping_from(u);
             }
         }
         out
@@ -494,10 +494,10 @@ impl VecFromOtherType<u64> for usize {
     fn vec_from_other_type(x: u64) -> Vec<Self> {
         if USIZE_IS_U32 {
             let (upper, lower) = x.split_in_half();
-            ::alloc::vec![usize::wrapping_from(lower), usize::wrapping_from(upper)]
+            ::alloc::vec![Self::wrapping_from(lower), Self::wrapping_from(upper)]
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
-            ::alloc::vec![usize::wrapping_from(x)]
+            assert_eq!(Self::WIDTH, u64::WIDTH);
+            ::alloc::vec![Self::wrapping_from(x)]
         }
     }
 }
@@ -514,7 +514,7 @@ impl FromOtherTypeSlice<usize> for u32 {
         if xs.is_empty() {
             0
         } else {
-            u32::wrapping_from(xs[0])
+            Self::wrapping_from(xs[0])
         }
     }
 }
@@ -536,7 +536,7 @@ impl VecFromOtherTypeSlice<usize> for u32 {
         if USIZE_IS_U32 {
             out = ::alloc::vec![0; xs.len()];
             for (x, &u) in out.iter_mut().zip(xs.iter()) {
-                *x = u32::wrapping_from(u);
+                *x = Self::wrapping_from(u);
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
@@ -544,8 +544,8 @@ impl VecFromOtherTypeSlice<usize> for u32 {
             for (chunk, &u) in out.chunks_exact_mut(2).zip(xs.iter()) {
                 let mut u = u;
                 for x in chunk {
-                    *x = u32::wrapping_from(u);
-                    u >>= u32::WIDTH;
+                    *x = Self::wrapping_from(u);
+                    u >>= Self::WIDTH;
                 }
             }
         }
@@ -563,7 +563,7 @@ impl VecFromOtherType<usize> for u32 {
     #[allow(arithmetic_overflow)]
     fn vec_from_other_type(x: usize) -> Vec<Self> {
         if USIZE_IS_U32 {
-            ::alloc::vec![u32::wrapping_from(x)]
+            ::alloc::vec![Self::wrapping_from(x)]
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
             let (upper, lower) = u64::wrapping_from(x).split_in_half();
@@ -584,16 +584,16 @@ impl FromOtherTypeSlice<usize> for u64 {
             let mut result = 0;
             let mut offset = 0;
             for &u in xs.iter().take(2) {
-                result |= u64::wrapping_from(u) << offset;
+                result |= Self::wrapping_from(u) << offset;
                 offset += usize::WIDTH;
             }
             result
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(usize::WIDTH, Self::WIDTH);
             if xs.is_empty() {
                 0
             } else {
-                u64::wrapping_from(xs[0])
+                Self::wrapping_from(xs[0])
             }
         }
     }
@@ -615,13 +615,13 @@ impl VecFromOtherTypeSlice<usize> for u64 {
         if USIZE_IS_U32 {
             out = ::alloc::vec![0; xs.len().shr_round(1, Ceiling).0];
             for (x, chunk) in out.iter_mut().zip(xs.chunks(2)) {
-                *x = u64::from_other_type_slice(chunk);
+                *x = Self::from_other_type_slice(chunk);
             }
         } else {
-            assert_eq!(usize::WIDTH, u64::WIDTH);
+            assert_eq!(usize::WIDTH, Self::WIDTH);
             out = ::alloc::vec![0; xs.len()];
             for (x, &u) in out.iter_mut().zip(xs.iter()) {
-                *x = u64::wrapping_from(u);
+                *x = Self::wrapping_from(u);
             }
         }
         out
@@ -637,6 +637,6 @@ impl VecFromOtherType<usize> for u64 {
     /// See [here](super::slice#vec_from_other_type).
     #[inline]
     fn vec_from_other_type(x: usize) -> Vec<Self> {
-        ::alloc::vec![u64::wrapping_from(x)]
+        ::alloc::vec![Self::wrapping_from(x)]
     }
 }

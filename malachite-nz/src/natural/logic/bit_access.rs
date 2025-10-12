@@ -143,8 +143,8 @@ impl BitAccess for Natural {
     /// ```
     fn get_bit(&self, index: u64) -> bool {
         match self {
-            Natural(Small(small)) => small.get_bit(index),
-            Natural(Large(limbs)) => limbs_get_bit(limbs, index),
+            Self(Small(small)) => small.get_bit(index),
+            Self(Large(limbs)) => limbs_get_bit(limbs, index),
         }
     }
 
@@ -185,7 +185,7 @@ impl BitAccess for Natural {
     /// ```
     fn set_bit(&mut self, index: u64) {
         match self {
-            Natural(Small(small)) => {
+            Self(Small(small)) => {
                 if index < Limb::WIDTH {
                     let mut modified = *small;
                     modified.set_bit(index);
@@ -193,10 +193,10 @@ impl BitAccess for Natural {
                 } else {
                     let mut limbs = vec![*small];
                     limbs_vec_set_bit(&mut limbs, index);
-                    *self = Natural(Large(limbs));
+                    *self = Self(Large(limbs));
                 }
             }
-            Natural(Large(limbs)) => {
+            Self(Large(limbs)) => {
                 limbs_vec_set_bit(limbs, index);
             }
         }
@@ -242,8 +242,8 @@ impl BitAccess for Natural {
     /// ```
     fn clear_bit(&mut self, index: u64) {
         match self {
-            Natural(Small(small)) => small.clear_bit(index),
-            Natural(Large(limbs)) => {
+            Self(Small(small)) => small.clear_bit(index),
+            Self(Large(limbs)) => {
                 limbs_clear_bit(limbs, index);
                 self.trim();
             }

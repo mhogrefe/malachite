@@ -150,21 +150,21 @@ impl XXDivModYToQR for usize {
     /// See [here](super::xx_div_mod_y_to_qr#xx_div_mod_y_to_qr).
     ///
     /// This is `udiv_qrnnd` from `longlong.h`, FLINT 2.7.1, where `(q, r)` is returned.
-    fn xx_div_mod_y_to_qr(x_1: usize, x_0: usize, y: usize) -> (usize, usize) {
+    fn xx_div_mod_y_to_qr(x_1: Self, x_0: Self, y: Self) -> (Self, Self) {
         if USIZE_IS_U32 {
             let (q, r) = u32::xx_div_mod_y_to_qr(
                 u32::wrapping_from(x_1),
                 u32::wrapping_from(x_0),
                 u32::wrapping_from(y),
             );
-            (usize::wrapping_from(q), usize::wrapping_from(r))
+            (Self::wrapping_from(q), Self::wrapping_from(r))
         } else {
             let (q, r) = u64::xx_div_mod_y_to_qr(
                 u64::wrapping_from(x_1),
                 u64::wrapping_from(x_0),
                 u64::wrapping_from(y),
             );
-            (usize::wrapping_from(q), usize::wrapping_from(r))
+            (Self::wrapping_from(q), Self::wrapping_from(r))
         }
     }
 }
@@ -196,7 +196,7 @@ impl XXDivModYToQR for u128 {
     /// This is equivalent to `udiv_qrnnd` from `longlong.h`, FLINT 2.7.1, where `(q, r)` is
     /// returned.
     #[inline]
-    fn xx_div_mod_y_to_qr(x_1: u128, x_0: u128, y: u128) -> (u128, u128) {
+    fn xx_div_mod_y_to_qr(x_1: Self, x_0: Self, y: Self) -> (Self, Self) {
         explicit_xx_div_mod_y_to_qr(x_1, x_0, y)
     }
 }

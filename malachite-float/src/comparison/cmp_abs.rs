@@ -52,7 +52,7 @@ impl PartialOrdAbs for Float {
     /// assert!(Float::ONE_HALF.lt_abs(&Float::ONE));
     /// assert!(Float::ONE_HALF.lt_abs(&Float::NEGATIVE_ONE));
     /// ```
-    fn partial_cmp_abs(&self, other: &Float) -> Option<Ordering> {
+    fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) | (_, float_nan!()) => None,
             (float_either_infinity!(), float_either_infinity!())
@@ -60,12 +60,12 @@ impl PartialOrdAbs for Float {
             (float_either_infinity!(), _) | (_, float_either_zero!()) => Some(Greater),
             (_, float_either_infinity!()) | (float_either_zero!(), _) => Some(Less),
             (
-                Float(Finite {
+                Self(Finite {
                     exponent: e_x,
                     significand: x,
                     ..
                 }),
-                Float(Finite {
+                Self(Finite {
                     exponent: e_y,
                     significand: y,
                     ..
@@ -125,7 +125,7 @@ impl<'a> OrdAbs for ComparableFloatRef<'a> {
     /// );
     /// ```
     #[allow(clippy::match_same_arms)]
-    fn cmp_abs(&self, other: &ComparableFloatRef<'a>) -> Ordering {
+    fn cmp_abs(&self, other: &Self) -> Ordering {
         match (&self.0, &other.0) {
             (float_nan!(), float_nan!())
             | (float_either_infinity!(), float_either_infinity!())
@@ -210,7 +210,7 @@ impl OrdAbs for ComparableFloat {
     /// assert!(ComparableFloat(Float::ONE_HALF).lt_abs(&ComparableFloat(Float::NEGATIVE_ONE)));
     /// ```
     #[inline]
-    fn cmp_abs(&self, other: &ComparableFloat) -> Ordering {
+    fn cmp_abs(&self, other: &Self) -> Ordering {
         self.as_ref().cmp_abs(&other.as_ref())
     }
 }
@@ -220,7 +220,7 @@ impl PartialOrdAbs for ComparableFloat {
     ///
     /// See the documentation for the [`Ord`] implementation.
     #[inline]
-    fn partial_cmp_abs(&self, other: &ComparableFloat) -> Option<Ordering> {
+    fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
         Some(self.as_ref().cmp_abs(&other.as_ref()))
     }
 }

@@ -14,7 +14,7 @@ impl PartialOrd for Integer {
     ///
     /// See the documentation for the [`Ord`] implementation.
     #[inline]
-    fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -39,7 +39,7 @@ impl Ord for Integer {
     /// assert!(Integer::from(-123) > Integer::from(-124));
     /// assert!(Integer::from(-123) >= Integer::from(-124));
     /// ```
-    fn cmp(&self, other: &Integer) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         if core::ptr::eq(self, other) {
             Equal
         } else {

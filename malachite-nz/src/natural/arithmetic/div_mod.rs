@@ -1885,17 +1885,17 @@ pub_crate_test! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Lim
 }}
 
 impl Natural {
-    fn div_mod_limb_ref(&self, other: Limb) -> (Natural, Limb) {
+    fn div_mod_limb_ref(&self, other: Limb) -> (Self, Limb) {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (n, 1) => (n.clone(), 0),
-            (Natural(Small(small)), other) => {
+            (Self(Small(small)), other) => {
                 let (q, r) = small.div_rem(other);
-                (Natural(Small(q)), r)
+                (Self(Small(q)), r)
             }
-            (Natural(Large(limbs)), other) => {
+            (Self(Large(limbs)), other) => {
                 let (qs, r) = limbs_div_limb_mod(limbs, other);
-                (Natural::from_owned_limbs_asc(qs), r)
+                (Self::from_owned_limbs_asc(qs), r)
             }
         }
     }
@@ -1914,9 +1914,9 @@ impl Natural {
     }}
 }
 
-impl DivMod<Natural> for Natural {
-    type DivOutput = Natural;
-    type ModOutput = Natural;
+impl DivMod<Self> for Natural {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the
     /// quotient and remainder. The quotient is rounded towards negative infinity.
@@ -1963,15 +1963,15 @@ impl DivMod<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_mod(mut self, other: Natural) -> (Natural, Natural) {
+    fn div_mod(mut self, other: Self) -> (Self, Self) {
         let r = self.div_assign_mod(other);
         (self, r)
     }
 }
 
-impl<'a> DivMod<&'a Natural> for Natural {
-    type DivOutput = Natural;
-    type ModOutput = Natural;
+impl<'a> DivMod<&'a Self> for Natural {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning the quotient and remainder. The quotient is rounded towards negative
@@ -2019,7 +2019,7 @@ impl<'a> DivMod<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_mod(mut self, other: &'a Natural) -> (Natural, Natural) {
+    fn div_mod(mut self, other: &'a Self) -> (Self, Self) {
         let r = self.div_assign_mod(other);
         (self, r)
     }
@@ -2173,8 +2173,8 @@ impl DivMod<&Natural> for &Natural {
     }
 }
 
-impl DivAssignMod<Natural> for Natural {
-    type ModOutput = Natural;
+impl DivAssignMod<Self> for Natural {
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value and returning the remainder. The quotient is rounded towards
@@ -2218,23 +2218,23 @@ impl DivAssignMod<Natural> for Natural {
     /// );
     /// assert_eq!(x, 810000006723u64);
     /// ```
-    fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
+    fn div_assign_mod(&mut self, mut other: Self) -> Self {
         if *self == other {
-            *self = Natural::ONE;
-            return Natural::ZERO;
+            *self = Self::ONE;
+            return Self::ZERO;
         }
         match (&mut *self, &mut other) {
-            (_, &mut Natural::ZERO) => panic!("division by zero"),
-            (_, &mut Natural::ONE) => Natural::ZERO,
-            (n, &mut Natural(Small(d))) => Natural(Small(n.div_assign_mod_limb(d))),
-            (Natural(Small(_)), _) => {
-                let mut r = Natural::ZERO;
+            (_, &mut Self::ZERO) => panic!("division by zero"),
+            (_, &mut Self::ONE) => Self::ZERO,
+            (n, &mut Self(Small(d))) => Self(Small(n.div_assign_mod_limb(d))),
+            (Self(Small(_)), _) => {
+                let mut r = Self::ZERO;
                 swap(self, &mut r);
                 r
             }
-            (Natural(Large(ns)), Natural(Large(ds))) => {
+            (Self(Large(ns)), Self(Large(ds))) => {
                 if ns.len() < ds.len() {
-                    let mut r = Natural::ZERO;
+                    let mut r = Self::ZERO;
                     swap(self, &mut r);
                     r
                 } else {
@@ -2250,8 +2250,8 @@ impl DivAssignMod<Natural> for Natural {
     }
 }
 
-impl<'a> DivAssignMod<&'a Natural> for Natural {
-    type ModOutput = Natural;
+impl<'a> DivAssignMod<&'a Self> for Natural {
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value and returning the remainder. The quotient is rounded towards
@@ -2295,39 +2295,39 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     /// );
     /// assert_eq!(x, 810000006723u64);
     /// ```
-    fn div_assign_mod(&mut self, other: &'a Natural) -> Natural {
+    fn div_assign_mod(&mut self, other: &'a Self) -> Self {
         if self == other {
-            *self = Natural::ONE;
-            return Natural::ZERO;
+            *self = Self::ONE;
+            return Self::ZERO;
         }
         match (&mut *self, other) {
-            (_, &Natural::ZERO) => panic!("division by zero"),
-            (_, &Natural::ONE) => Natural::ZERO,
-            (_, Natural(Small(d))) => Natural(Small(self.div_assign_mod_limb(*d))),
-            (Natural(Small(_)), _) => {
-                let mut r = Natural::ZERO;
+            (_, &Self::ZERO) => panic!("division by zero"),
+            (_, &Self::ONE) => Self::ZERO,
+            (_, Self(Small(d))) => Self(Small(self.div_assign_mod_limb(*d))),
+            (Self(Small(_)), _) => {
+                let mut r = Self::ZERO;
                 swap(self, &mut r);
                 r
             }
-            (Natural(Large(ns)), Natural(Large(ds))) => {
+            (Self(Large(ns)), Self(Large(ds))) => {
                 if ns.len() < ds.len() {
-                    let mut r = Natural::ZERO;
+                    let mut r = Self::ZERO;
                     swap(self, &mut r);
                     r
                 } else {
                     let (mut qs, rs) = limbs_div_mod(ns, ds);
                     swap(&mut qs, ns);
                     self.trim();
-                    Natural::from_owned_limbs_asc(rs)
+                    Self::from_owned_limbs_asc(rs)
                 }
             }
         }
     }
 }
 
-impl DivRem<Natural> for Natural {
-    type DivOutput = Natural;
-    type RemOutput = Natural;
+impl DivRem<Self> for Natural {
+    type DivOutput = Self;
+    type RemOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the
     /// quotient and remainder. The quotient is rounded towards zero.
@@ -2377,14 +2377,14 @@ impl DivRem<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_rem(self, other: Natural) -> (Natural, Natural) {
+    fn div_rem(self, other: Self) -> (Self, Self) {
         self.div_mod(other)
     }
 }
 
-impl<'a> DivRem<&'a Natural> for Natural {
-    type DivOutput = Natural;
-    type RemOutput = Natural;
+impl<'a> DivRem<&'a Self> for Natural {
+    type DivOutput = Self;
+    type RemOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning the quotient and remainder. The quotient is rounded towards zero.
@@ -2434,7 +2434,7 @@ impl<'a> DivRem<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div_rem(self, other: &'a Natural) -> (Natural, Natural) {
+    fn div_rem(self, other: &'a Self) -> (Self, Self) {
         self.div_mod(other)
     }
 }
@@ -2551,8 +2551,8 @@ impl DivRem<&Natural> for &Natural {
     }
 }
 
-impl DivAssignRem<Natural> for Natural {
-    type RemOutput = Natural;
+impl DivAssignRem<Self> for Natural {
+    type RemOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value and returning the remainder. The quotient is rounded towards zero.
@@ -2599,13 +2599,13 @@ impl DivAssignRem<Natural> for Natural {
     /// assert_eq!(x, 810000006723u64);
     /// ```
     #[inline]
-    fn div_assign_rem(&mut self, other: Natural) -> Natural {
+    fn div_assign_rem(&mut self, other: Self) -> Self {
         self.div_assign_mod(other)
     }
 }
 
-impl<'a> DivAssignRem<&'a Natural> for Natural {
-    type RemOutput = Natural;
+impl<'a> DivAssignRem<&'a Self> for Natural {
+    type RemOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference and returning the remainder. The quotient is rounded towards
@@ -2653,14 +2653,14 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     /// assert_eq!(x, 810000006723u64);
     /// ```
     #[inline]
-    fn div_assign_rem(&mut self, other: &'a Natural) -> Natural {
+    fn div_assign_rem(&mut self, other: &'a Self) -> Self {
         self.div_assign_mod(other)
     }
 }
 
-impl CeilingDivNegMod<Natural> for Natural {
-    type DivOutput = Natural;
-    type ModOutput = Natural;
+impl CeilingDivNegMod<Self> for Natural {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the ceiling
     /// of the quotient and the remainder of the negative of the first [`Natural`] divided by the
@@ -2708,15 +2708,15 @@ impl CeilingDivNegMod<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn ceiling_div_neg_mod(mut self, other: Natural) -> (Natural, Natural) {
+    fn ceiling_div_neg_mod(mut self, other: Self) -> (Self, Self) {
         let r = self.ceiling_div_assign_neg_mod(other);
         (self, r)
     }
 }
 
-impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
-    type DivOutput = Natural;
-    type ModOutput = Natural;
+impl<'a> CeilingDivNegMod<&'a Self> for Natural {
+    type DivOutput = Self;
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning the ceiling of the quotient and the remainder of the negative of the
@@ -2764,7 +2764,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn ceiling_div_neg_mod(mut self, other: &'a Natural) -> (Natural, Natural) {
+    fn ceiling_div_neg_mod(mut self, other: &'a Self) -> (Self, Self) {
         let r = self.ceiling_div_assign_neg_mod(other);
         (self, r)
     }
@@ -2886,8 +2886,8 @@ impl CeilingDivNegMod<&Natural> for &Natural {
     }
 }
 
-impl CeilingDivAssignNegMod<Natural> for Natural {
-    type ModOutput = Natural;
+impl CeilingDivAssignNegMod<Self> for Natural {
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value and returning the remainder of the negative of the first number
@@ -2931,19 +2931,19 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     /// );
     /// assert_eq!(x, 810000006724u64);
     /// ```
-    fn ceiling_div_assign_neg_mod(&mut self, other: Natural) -> Natural {
+    fn ceiling_div_assign_neg_mod(&mut self, other: Self) -> Self {
         let r = self.div_assign_mod(&other);
         if r == 0 {
-            Natural::ZERO
+            Self::ZERO
         } else {
-            *self += Natural::ONE;
+            *self += Self::ONE;
             other - r
         }
     }
 }
 
-impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
-    type ModOutput = Natural;
+impl<'a> CeilingDivAssignNegMod<&'a Self> for Natural {
+    type ModOutput = Self;
 
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference and returning the remainder of the negative of the first number
@@ -2987,12 +2987,12 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     /// );
     /// assert_eq!(x, 810000006724u64);
     /// ```
-    fn ceiling_div_assign_neg_mod(&mut self, other: &'a Natural) -> Natural {
+    fn ceiling_div_assign_neg_mod(&mut self, other: &'a Self) -> Self {
         let r = self.div_assign_mod(other);
         if r == 0 {
-            Natural::ZERO
+            Self::ZERO
         } else {
-            *self += Natural::ONE;
+            *self += Self::ONE;
             other - r
         }
     }

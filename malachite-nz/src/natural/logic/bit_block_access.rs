@@ -175,7 +175,7 @@ pub_test! {limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[L
 }}
 
 impl BitBlockAccess for Natural {
-    type Bits = Natural;
+    type Bits = Self;
 
     /// Extracts a block of adjacent bits from a [`Natural`], taking the [`Natural`] by reference.
     ///
@@ -222,11 +222,11 @@ impl BitBlockAccess for Natural {
     /// );
     /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(10, 10), 0);
     /// ```
-    fn get_bits(&self, start: u64, end: u64) -> Natural {
+    fn get_bits(&self, start: u64, end: u64) -> Self {
         match self {
-            Natural(Small(small)) => Natural(Small(small.get_bits(start, end))),
-            Natural(Large(limbs)) => {
-                Natural::from_owned_limbs_asc(limbs_slice_get_bits(limbs, start, end))
+            Self(Small(small)) => Self(Small(small.get_bits(start, end))),
+            Self(Large(limbs)) => {
+                Self::from_owned_limbs_asc(limbs_slice_get_bits(limbs, start, end))
             }
         }
     }
@@ -279,11 +279,11 @@ impl BitBlockAccess for Natural {
     ///     0
     /// );
     /// ```
-    fn get_bits_owned(self, start: u64, end: u64) -> Natural {
+    fn get_bits_owned(self, start: u64, end: u64) -> Self {
         match self {
-            Natural(Small(small)) => Natural(Small(small.get_bits(start, end))),
-            Natural(Large(limbs)) => {
-                Natural::from_owned_limbs_asc(limbs_vec_get_bits(limbs, start, end))
+            Self(Small(small)) => Self(Small(small.get_bits(start, end))),
+            Self(Large(limbs)) => {
+                Self::from_owned_limbs_asc(limbs_vec_get_bits(limbs, start, end))
             }
         }
     }
@@ -346,12 +346,12 @@ impl BitBlockAccess for Natural {
     /// n.assign_bits(80, 100, &Natural::from(456u32));
     /// assert_eq!(n.to_string(), "551270173744270903666016379");
     /// ```
-    fn assign_bits(&mut self, start: u64, end: u64, bits: &Natural) {
+    fn assign_bits(&mut self, start: u64, end: u64, bits: &Self) {
         if start == end {
             return;
         }
-        if let Natural(Small(small_self)) = self {
-            if let Natural(Small(small_bits)) = bits {
+        if let Self(Small(small_self)) = self {
+            if let Self(Small(small_bits)) = bits {
                 let bits_width = end - start;
                 let small_bits = small_bits.mod_power_of_2(bits_width);
                 if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
@@ -362,8 +362,8 @@ impl BitBlockAccess for Natural {
         }
         let limbs = self.promote_in_place();
         match bits {
-            Natural(Small(small_bits)) => limbs_assign_bits(limbs, start, end, &[*small_bits]),
-            Natural(Large(bits_limbs)) => limbs_assign_bits(limbs, start, end, bits_limbs),
+            Self(Small(small_bits)) => limbs_assign_bits(limbs, start, end, &[*small_bits]),
+            Self(Large(bits_limbs)) => limbs_assign_bits(limbs, start, end, bits_limbs),
         }
         self.trim();
     }

@@ -135,16 +135,16 @@ pub_test! {limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
 impl Natural {
     fn hamming_distance_neg_limb(&self, other: Limb) -> u64 {
         match self {
-            Natural(Small(small)) => small.wrapping_neg().hamming_distance(other.wrapping_neg()),
-            Natural(Large(limbs)) => limbs_hamming_distance_limb_neg(limbs, other),
+            Self(Small(small)) => small.wrapping_neg().hamming_distance(other.wrapping_neg()),
+            Self(Large(limbs)) => limbs_hamming_distance_limb_neg(limbs, other),
         }
     }
 
-    fn hamming_distance_neg(&self, other: &Natural) -> u64 {
+    fn hamming_distance_neg(&self, other: &Self) -> u64 {
         match (self, other) {
-            (&Natural(Small(x)), _) => other.hamming_distance_neg_limb(x),
-            (_, &Natural(Small(y))) => self.hamming_distance_neg_limb(y),
-            (Natural(Large(xs)), Natural(Large(ys))) => limbs_hamming_distance_neg(xs, ys),
+            (&Self(Small(x)), _) => other.hamming_distance_neg_limb(x),
+            (_, &Self(Small(y))) => self.hamming_distance_neg_limb(y),
+            (Self(Large(xs)), Self(Large(ys))) => limbs_hamming_distance_neg(xs, ys),
         }
     }
 }

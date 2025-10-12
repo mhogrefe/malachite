@@ -74,11 +74,11 @@ impl RoundingFrom<Float> for Natural {
     ///     "(0, Greater)"
     /// );
     /// ```
-    fn rounding_from(f: Float, rm: RoundingMode) -> (Natural, Ordering) {
+    fn rounding_from(f: Float, rm: RoundingMode) -> (Self, Ordering) {
         match f {
-            float_either_zero!() => (Natural::ZERO, Equal),
+            float_either_zero!() => (Self::ZERO, Equal),
             float_negative_infinity!() => match rm {
-                Ceiling | Down | Nearest => (Natural::ZERO, Greater),
+                Ceiling | Down | Nearest => (Self::ZERO, Greater),
                 _ => panic!("Can't convert -Infinity to Natural using {rm}"),
             },
             Float(Finite {
@@ -89,13 +89,13 @@ impl RoundingFrom<Float> for Natural {
             }) => {
                 if !sign {
                     match rm {
-                        Ceiling | Down | Nearest => (Natural::ZERO, Greater),
+                        Ceiling | Down | Nearest => (Self::ZERO, Greater),
                         _ => panic!("Cannot convert negative number to Natural using {rm}"),
                     }
                 } else if exponent < 0 {
                     match rm {
-                        Floor | Down | Nearest => (Natural::ZERO, Less),
-                        Ceiling | Up => (Natural::ONE, Greater),
+                        Floor | Down | Nearest => (Self::ZERO, Less),
+                        Ceiling | Up => (Self::ONE, Greater),
                         Exact => panic!("Cannot convert Float to Natural using {rm}"),
                     }
                 } else {
@@ -171,11 +171,11 @@ impl RoundingFrom<&Float> for Natural {
     ///     "(0, Greater)"
     /// );
     /// ```
-    fn rounding_from(f: &Float, rm: RoundingMode) -> (Natural, Ordering) {
+    fn rounding_from(f: &Float, rm: RoundingMode) -> (Self, Ordering) {
         match f {
-            float_either_zero!() => (Natural::ZERO, Equal),
+            float_either_zero!() => (Self::ZERO, Equal),
             float_negative_infinity!() => match rm {
-                Ceiling | Down | Nearest => (Natural::ZERO, Greater),
+                Ceiling | Down | Nearest => (Self::ZERO, Greater),
                 _ => panic!("Can't convert -Infinity to Natural using {rm}"),
             },
             Float(Finite {
@@ -186,13 +186,13 @@ impl RoundingFrom<&Float> for Natural {
             }) => {
                 if !sign {
                     match rm {
-                        Ceiling | Down | Nearest => (Natural::ZERO, Greater),
+                        Ceiling | Down | Nearest => (Self::ZERO, Greater),
                         _ => panic!("Cannot convert -Infinity to Natural using {rm}"),
                     }
                 } else if *exponent < 0 {
                     match rm {
-                        Floor | Down | Nearest => (Natural::ZERO, Less),
-                        Ceiling | Up => (Natural::ONE, Greater),
+                        Floor | Down | Nearest => (Self::ZERO, Less),
+                        Ceiling | Up => (Self::ONE, Greater),
                         Exact => panic!("Cannot convert Float to Natural using {rm}"),
                     }
                 } else {
@@ -243,9 +243,9 @@ impl TryFrom<Float> for Natural {
     /// assert_eq!(Natural::try_from(Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Natural::try_from(Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
-    fn try_from(f: Float) -> Result<Natural, Self::Error> {
+    fn try_from(f: Float) -> Result<Self, Self::Error> {
         match f {
-            float_either_zero!() => Ok(Natural::ZERO),
+            float_either_zero!() => Ok(Self::ZERO),
             Float(Finite {
                 sign,
                 exponent,
@@ -309,9 +309,9 @@ impl TryFrom<&Float> for Natural {
     /// assert_eq!(Natural::try_from(&Float::INFINITY), Err(FloatInfiniteOrNan));
     /// assert_eq!(Natural::try_from(&Float::NAN), Err(FloatInfiniteOrNan));
     /// ```
-    fn try_from(f: &Float) -> Result<Natural, Self::Error> {
+    fn try_from(f: &Float) -> Result<Self, Self::Error> {
         match f {
-            float_either_zero!() => Ok(Natural::ZERO),
+            float_either_zero!() => Ok(Self::ZERO),
             Float(Finite {
                 sign,
                 exponent,

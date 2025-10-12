@@ -1973,13 +1973,13 @@ pub(crate) fn limbs_hensel_div_limb_in_place(
 }
 
 impl Natural {
-    fn div_limb_ref(&self, other: Limb) -> Natural {
+    fn div_limb_ref(&self, other: Limb) -> Self {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (n, 1) => n.clone(),
-            (Natural(Small(small)), other) => Natural(Small(small / other)),
-            (Natural(Large(limbs)), other) => {
-                Natural::from_owned_limbs_asc(limbs_div_limb(limbs, other))
+            (Self(Small(small)), other) => Self(Small(small / other)),
+            (Self(Large(limbs)), other) => {
+                Self::from_owned_limbs_asc(limbs_div_limb(limbs, other))
             }
         }
     }
@@ -1995,8 +1995,8 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}
-            (Natural(Small(small)), other) => *small /= other,
-            (Natural(Large(limbs)), other) => {
+            (Self(Small(small)), other) => *small /= other,
+            (Self(Large(limbs)), other) => {
                 limbs_div_limb_in_place(limbs, other);
                 self.trim();
             }
@@ -2019,8 +2019,8 @@ impl Natural {
     }
 }
 
-impl Div<Natural> for Natural {
-    type Output = Natural;
+impl Div<Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value. The quotient is rounded
     /// towards negative infinity. The quotient and remainder (which is not computed) satisfy $x =
@@ -2056,14 +2056,14 @@ impl Div<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div(mut self, other: Natural) -> Natural {
+    fn div(mut self, other: Self) -> Self {
         self /= other;
         self
     }
 }
 
-impl<'a> Div<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> Div<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference. The quotient is rounded towards negative infinity. The quotient and remainder
@@ -2095,7 +2095,7 @@ impl<'a> Div<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn div(mut self, other: &'a Natural) -> Natural {
+    fn div(mut self, other: &'a Self) -> Self {
         self /= other;
         self
     }
@@ -2205,7 +2205,7 @@ impl Div<&Natural> for &Natural {
     }
 }
 
-impl DivAssign<Natural> for Natural {
+impl DivAssign<Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value. The quotient is rounded towards negative infinity. The quotient
     /// and remainder (which is not computed) satisfy $x = qy + r$ and $0 \leq r < y$.
@@ -2235,20 +2235,20 @@ impl DivAssign<Natural> for Natural {
     /// x /= Natural::from_str("1234567890987").unwrap();
     /// assert_eq!(x, 810000006723u64);
     /// ```
-    fn div_assign(&mut self, other: Natural) {
+    fn div_assign(&mut self, other: Self) {
         match (&mut *self, other) {
-            (_, Natural::ZERO) => panic!("division by zero"),
+            (_, Self::ZERO) => panic!("division by zero"),
             (x, y) if *x == y => {
-                *self = Natural::ONE;
+                *self = Self::ONE;
             }
-            (_, Natural::ONE) => {}
-            (n, Natural(Small(d))) => n.div_assign_limb(d),
-            (Natural(Small(_)), _) => *self = Natural::ZERO,
-            (Natural(Large(ns)), Natural(Large(mut ds))) => {
+            (_, Self::ONE) => {}
+            (n, Self(Small(d))) => n.div_assign_limb(d),
+            (Self(Small(_)), _) => *self = Self::ZERO,
+            (Self(Large(ns)), Self(Large(mut ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
-                    *self = Natural::ZERO;
+                    *self = Self::ZERO;
                 } else {
                     let mut qs = vec![0; ns_len - ds_len + 1];
                     limbs_div_to_out(&mut qs, ns, &mut ds);
@@ -2260,7 +2260,7 @@ impl DivAssign<Natural> for Natural {
     }
 }
 
-impl<'a> DivAssign<&'a Natural> for Natural {
+impl<'a> DivAssign<&'a Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference. The quotient is rounded towards negative infinity. The
     /// quotient and remainder (which is not computed) satisfy $x = qy + r$ and $0 \leq r < y$.
@@ -2290,20 +2290,20 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     /// x /= &Natural::from_str("1234567890987").unwrap();
     /// assert_eq!(x, 810000006723u64);
     /// ```
-    fn div_assign(&mut self, other: &'a Natural) {
+    fn div_assign(&mut self, other: &'a Self) {
         match (&mut *self, other) {
-            (_, &Natural::ZERO) => panic!("division by zero"),
+            (_, &Self::ZERO) => panic!("division by zero"),
             (x, y) if x == y => {
-                *self = Natural::ONE;
+                *self = Self::ONE;
             }
-            (_, &Natural::ONE) => {}
-            (n, &Natural(Small(d))) => n.div_assign_limb(d),
-            (Natural(Small(_)), _) => *self = Natural::ZERO,
-            (Natural(Large(ns)), Natural(Large(ds))) => {
+            (_, &Self::ONE) => {}
+            (n, &Self(Small(d))) => n.div_assign_limb(d),
+            (Self(Small(_)), _) => *self = Self::ZERO,
+            (Self(Large(ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 if ns_len < ds_len {
-                    *self = Natural::ZERO;
+                    *self = Self::ZERO;
                 } else {
                     let mut qs = vec![0; ns_len - ds_len + 1];
                     limbs_div_to_out_val_ref(&mut qs, ns, ds);
@@ -2315,8 +2315,8 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     }
 }
 
-impl CheckedDiv<Natural> for Natural {
-    type Output = Natural;
+impl CheckedDiv<Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value. The quotient is rounded
     /// towards negative infinity. The quotient and remainder (which is not computed) satisfy $x =
@@ -2358,33 +2358,33 @@ impl CheckedDiv<Natural> for Natural {
     /// assert_eq!(Natural::ONE.checked_div(Natural::ZERO), None);
     /// ```
     #[inline]
-    fn checked_div(self, mut other: Natural) -> Option<Natural> {
+    fn checked_div(self, mut other: Self) -> Option<Self> {
         match (self, &mut other) {
-            (_, &mut Natural::ZERO) => None,
-            (x, y) if x == *y => Some(Natural::ONE),
-            (n, &mut Natural::ONE) => Some(n),
-            (mut n, &mut Natural(Small(d))) => {
+            (_, &mut Self::ZERO) => None,
+            (x, y) if x == *y => Some(Self::ONE),
+            (n, &mut Self::ONE) => Some(n),
+            (mut n, &mut Self(Small(d))) => {
                 n.div_assign_limb(d);
                 Some(n)
             }
-            (Natural(Small(_)), _) => Some(Natural::ZERO),
-            (Natural(Large(mut ns)), Natural(Large(ds))) => {
+            (Self(Small(_)), _) => Some(Self::ZERO),
+            (Self(Large(mut ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 Some(if ns_len < ds_len {
-                    Natural::ZERO
+                    Self::ZERO
                 } else {
                     let mut qs = vec![0; ns_len - ds_len + 1];
                     limbs_div_to_out(&mut qs, &mut ns, ds);
-                    Natural::from_owned_limbs_asc(qs)
+                    Self::from_owned_limbs_asc(qs)
                 })
             }
         }
     }
 }
 
-impl<'a> CheckedDiv<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> CheckedDiv<&'a Self> for Natural {
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference. The quotient is rounded towards negative infinity. The quotient and remainder
@@ -2426,25 +2426,25 @@ impl<'a> CheckedDiv<&'a Natural> for Natural {
     /// assert_eq!(Natural::ONE.checked_div(&Natural::ZERO), None);
     /// ```
     #[inline]
-    fn checked_div(self, other: &'a Natural) -> Option<Natural> {
+    fn checked_div(self, other: &'a Self) -> Option<Self> {
         match (self, other) {
-            (_, &Natural::ZERO) => None,
-            (x, y) if x == *y => Some(Natural::ONE),
-            (n, &Natural::ONE) => Some(n.clone()),
-            (mut n, &Natural(Small(d))) => {
+            (_, &Self::ZERO) => None,
+            (x, y) if x == *y => Some(Self::ONE),
+            (n, &Self::ONE) => Some(n.clone()),
+            (mut n, &Self(Small(d))) => {
                 n.div_assign_limb(d);
                 Some(n)
             }
-            (Natural(Small(_)), _) => Some(Natural::ZERO),
-            (Natural(Large(mut ns)), Natural(Large(ds))) => {
+            (Self(Small(_)), _) => Some(Self::ZERO),
+            (Self(Large(mut ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
                 Some(if ns_len < ds_len {
-                    Natural::ZERO
+                    Self::ZERO
                 } else {
                     let mut qs = vec![0; ns_len - ds_len + 1];
                     limbs_div_to_out_val_ref(&mut qs, &mut ns, ds);
-                    Natural::from_owned_limbs_asc(qs)
+                    Self::from_owned_limbs_asc(qs)
                 })
             }
         }

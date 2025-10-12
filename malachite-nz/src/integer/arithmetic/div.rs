@@ -12,8 +12,8 @@ use core::ops::{Div, DivAssign};
 use malachite_base::num::arithmetic::traits::CheckedDiv;
 use malachite_base::num::basic::traits::Zero;
 
-impl Div<Integer> for Integer {
-    type Output = Integer;
+impl Div<Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value. The quotient is rounded
     /// towards zero. The quotient and remainder (which is not computed) satisfy $x = qy + r$ and $0
@@ -50,14 +50,14 @@ impl Div<Integer> for Integer {
     /// assert_eq!(Integer::from(-23) / Integer::from(-10), 2);
     /// ```
     #[inline]
-    fn div(mut self, other: Integer) -> Integer {
+    fn div(mut self, other: Self) -> Self {
         self /= other;
         self
     }
 }
 
-impl Div<&Integer> for Integer {
-    type Output = Integer;
+impl Div<&Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference. The quotient is rounded towards zero. The quotient and remainder (which is not
@@ -94,7 +94,7 @@ impl Div<&Integer> for Integer {
     /// assert_eq!(Integer::from(-23) / &Integer::from(-10), 2);
     /// ```
     #[inline]
-    fn div(mut self, other: &Integer) -> Integer {
+    fn div(mut self, other: &Self) -> Self {
         self /= other;
         self
     }
@@ -186,7 +186,7 @@ impl Div<&Integer> for &Integer {
     }
 }
 
-impl DivAssign<Integer> for Integer {
+impl DivAssign<Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value. The quotient is rounded towards zero. The quotient and remainder
     /// (which is not computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
@@ -230,13 +230,13 @@ impl DivAssign<Integer> for Integer {
     /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign(&mut self, other: Integer) {
+    fn div_assign(&mut self, other: Self) {
         self.abs /= other.abs;
         self.sign = self.sign == other.sign || self.abs == 0;
     }
 }
 
-impl DivAssign<&Integer> for Integer {
+impl DivAssign<&Self> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference. The quotient is rounded towards zero. The quotient and
     /// remainder (which is not computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
@@ -280,14 +280,14 @@ impl DivAssign<&Integer> for Integer {
     /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign(&mut self, other: &Integer) {
+    fn div_assign(&mut self, other: &Self) {
         self.abs /= &other.abs;
         self.sign = self.sign == other.sign || self.abs == 0;
     }
 }
 
-impl CheckedDiv<Integer> for Integer {
-    type Output = Integer;
+impl CheckedDiv<Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value. The quotient is rounded
     /// towards negative infinity. The quotient and remainder (which is not computed) satisfy $x =
@@ -329,7 +329,7 @@ impl CheckedDiv<Integer> for Integer {
     /// assert_eq!(Integer::ONE.checked_div(Integer::ZERO), None);
     /// ```
     #[inline]
-    fn checked_div(self, other: Integer) -> Option<Integer> {
+    fn checked_div(self, other: Self) -> Option<Self> {
         match (self, other) {
             (_, integer_zero!()) => None,
             (x, y) => Some(x / y),
@@ -337,8 +337,8 @@ impl CheckedDiv<Integer> for Integer {
     }
 }
 
-impl CheckedDiv<&Integer> for Integer {
-    type Output = Integer;
+impl CheckedDiv<&Self> for Integer {
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
     /// reference. The quotient is rounded towards negative infinity. The quotient and remainder
@@ -380,7 +380,7 @@ impl CheckedDiv<&Integer> for Integer {
     /// assert_eq!(Integer::ONE.checked_div(&Integer::ZERO), None);
     /// ```
     #[inline]
-    fn checked_div(self, other: &Integer) -> Option<Integer> {
+    fn checked_div(self, other: &Self) -> Option<Self> {
         match (self, other) {
             (_, &integer_zero!()) => None,
             (x, y) => Some(x / y),

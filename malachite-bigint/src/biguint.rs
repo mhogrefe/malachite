@@ -296,7 +296,7 @@ impl BigUint {
 
     #[inline]
     pub fn from_slice(slice: &[u32]) -> Self {
-        let mut uint = BigUint::zero();
+        let mut uint = Self::zero();
         uint.assign_from_slice(slice);
         uint
     }

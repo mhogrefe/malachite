@@ -146,7 +146,7 @@ impl Approximate for Rational {
             return self;
         }
         if *max_denominator == 1u32 {
-            return Rational::from(Integer::rounding_from(self, Nearest).0);
+            return Self::from(Integer::rounding_from(self, Nearest).0);
         }
         approximate_helper(&self, max_denominator)
     }
@@ -247,7 +247,7 @@ impl ApproximateAssign for Rational {
         assert_ne!(*max_denominator, 0);
         if self.denominator_ref() <= max_denominator {
         } else if *max_denominator == 1u32 {
-            *self = Rational::from(Integer::rounding_from(&*self, Nearest).0);
+            *self = Self::from(Integer::rounding_from(&*self, Nearest).0);
         } else {
             *self = approximate_helper(&*self, max_denominator);
         }

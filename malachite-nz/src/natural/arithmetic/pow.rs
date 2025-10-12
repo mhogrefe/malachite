@@ -531,7 +531,7 @@ impl Natural {
 }
 
 impl Pow<u64> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Raises a [`Natural`] to a power, taking the [`Natural`] by value.
     ///
@@ -564,7 +564,7 @@ impl Pow<u64> for Natural {
     /// );
     /// ```
     #[inline]
-    fn pow(mut self, exp: u64) -> Natural {
+    fn pow(mut self, exp: u64) -> Self {
         self.pow_assign(exp);
         self
     }
@@ -662,19 +662,19 @@ impl PowAssign<u64> for Natural {
     /// ```
     fn pow_assign(&mut self, exp: u64) {
         match (&mut *self, exp) {
-            (x, 0) => *x = Natural::ONE,
-            (_, 1) | (&mut (Natural::ZERO | Natural::ONE), _) => {}
+            (x, 0) => *x = Self::ONE,
+            (_, 1) | (&mut (Self::ZERO | Self::ONE), _) => {}
             (x, 2) => x.square_assign(),
-            (Natural(Small(small)), exp) => {
+            (Self(Small(small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
                     *small = small.checked_pow(u32::wrapping_from(exp)).unwrap();
                 } else {
-                    *self = Natural(Large(limbs_pow(&[*small], exp)));
+                    *self = Self(Large(limbs_pow(&[*small], exp)));
                     self.demote_if_small();
                 }
             }
-            (Natural(Large(limbs)), exp) => {
-                *self = Natural(Large(limbs_pow(limbs, exp)));
+            (Self(Large(limbs)), exp) => {
+                *self = Self(Large(limbs_pow(limbs, exp)));
                 self.demote_if_small();
             }
         }

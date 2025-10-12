@@ -274,8 +274,8 @@ fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
     panic!("Cannot perform sub_mul. a: {a}, b: {b}, c: {c}");
 }
 
-impl SubMul<Natural, Natural> for Natural {
-    type Output = Natural;
+impl SubMul<Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by value.
     ///
@@ -310,14 +310,14 @@ impl SubMul<Natural, Natural> for Natural {
     ///     995705032704u64
     /// );
     /// ```
-    fn sub_mul(self, y: Natural, z: Natural) -> Natural {
+    fn sub_mul(self, y: Self, z: Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
 
-impl<'a> SubMul<Natural, &'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> SubMul<Self, &'a Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first two by
     /// value and the third by reference.
@@ -353,14 +353,14 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     ///     995705032704u64
     /// );
     /// ```
-    fn sub_mul(self, y: Natural, z: &'a Natural) -> Natural {
+    fn sub_mul(self, y: Self, z: &'a Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
 
-impl<'a> SubMul<&'a Natural, Natural> for Natural {
-    type Output = Natural;
+impl<'a> SubMul<&'a Self, Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
     /// by value and the second by reference.
@@ -396,14 +396,14 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     ///     995705032704u64
     /// );
     /// ```
-    fn sub_mul(self, y: &'a Natural, z: Natural) -> Natural {
+    fn sub_mul(self, y: &'a Self, z: Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
 
-impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
-    type Output = Natural;
+impl<'a, 'b> SubMul<&'a Self, &'b Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first by value
     /// and the second and third by reference.
@@ -439,7 +439,7 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     ///     995705032704u64
     /// );
     /// ```
-    fn sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+    fn sub_mul(self, y: &'a Self, z: &'b Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
@@ -488,7 +488,7 @@ impl SubMul<&Natural, &Natural> for &Natural {
     }
 }
 
-impl SubMulAssign<Natural, Natural> for Natural {
+impl SubMulAssign<Self, Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
     /// [`Natural`]s on the right-hand side by value.
     ///
@@ -520,7 +520,7 @@ impl SubMulAssign<Natural, Natural> for Natural {
     /// x.sub_mul_assign(Natural::from(0x10000u32), Natural::from(0x10000u32));
     /// assert_eq!(x, 995705032704u64);
     /// ```
-    fn sub_mul_assign(&mut self, y: Natural, z: Natural) {
+    fn sub_mul_assign(&mut self, y: Self, z: Self) {
         assert!(
             !self.sub_mul_assign_no_panic(y, z),
             "Natural sub_mul_assign cannot have a negative result"
@@ -528,7 +528,7 @@ impl SubMulAssign<Natural, Natural> for Natural {
     }
 }
 
-impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
+impl<'a> SubMulAssign<Self, &'a Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by value and the second by reference.
     ///
@@ -560,7 +560,7 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     /// x.sub_mul_assign(Natural::from(0x10000u32), &Natural::from(0x10000u32));
     /// assert_eq!(x, 995705032704u64);
     /// ```
-    fn sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
+    fn sub_mul_assign(&mut self, y: Self, z: &'a Self) {
         assert!(
             !self.sub_mul_assign_val_ref_no_panic(y, z),
             "Natural sub_mul_assign cannot have a negative result"
@@ -568,7 +568,7 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     }
 }
 
-impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
+impl<'a> SubMulAssign<&'a Self, Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by reference and the second by value.
     ///
@@ -600,7 +600,7 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     /// x.sub_mul_assign(&Natural::from(0x10000u32), Natural::from(0x10000u32));
     /// assert_eq!(x, 995705032704u64);
     /// ```
-    fn sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
+    fn sub_mul_assign(&mut self, y: &'a Self, z: Self) {
         assert!(
             !self.sub_mul_assign_ref_val_no_panic(y, z),
             "Natural sub_mul_assign cannot have a negative result"
@@ -608,7 +608,7 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     }
 }
 
-impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
+impl<'a, 'b> SubMulAssign<&'a Self, &'b Self> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
     /// [`Natural`]s on the right-hand side by reference.
     ///
@@ -640,7 +640,7 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// x.sub_mul_assign(&Natural::from(0x10000u32), &Natural::from(0x10000u32));
     /// assert_eq!(x, 995705032704u64);
     /// ```
-    fn sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
+    fn sub_mul_assign(&mut self, y: &'a Self, z: &'b Self) {
         assert!(
             !self.sub_mul_assign_ref_ref_no_panic(y, z),
             "Natural sub_mul_assign cannot have a negative result"

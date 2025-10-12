@@ -88,7 +88,7 @@ impl ContinuedFraction for Rational {
     /// ```
     fn continued_fraction(mut self) -> (Integer, RationalContinuedFraction) {
         let f = (&self).floor();
-        self -= Rational::from(&f);
+        self -= Self::from(&f);
         let (d, n) = self.into_numerator_and_denominator();
         (
             f,

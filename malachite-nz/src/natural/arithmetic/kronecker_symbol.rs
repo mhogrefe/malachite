@@ -668,7 +668,7 @@ pub_crate_test! {
     }
 }}
 
-impl LegendreSymbol<Natural> for Natural {
+impl LegendreSymbol<Self> for Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking both by value.
     ///
     /// This implementation is identical to that of [`JacobiSymbol`], since there is no
@@ -699,14 +699,14 @@ impl LegendreSymbol<Natural> for Natural {
     /// assert_eq!(Natural::from(11u32).legendre_symbol(Natural::from(5u32)), 1);
     /// ```
     #[inline]
-    fn legendre_symbol(self, other: Natural) -> i8 {
+    fn legendre_symbol(self, other: Self) -> i8 {
         assert_ne!(other, 0u32);
         assert!(other.odd());
         (&self).kronecker_symbol(&other)
     }
 }
 
-impl<'a> LegendreSymbol<&'a Natural> for Natural {
+impl<'a> LegendreSymbol<&'a Self> for Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking the first by value and the second
     /// by reference.
     ///
@@ -747,7 +747,7 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn legendre_symbol(self, other: &'a Natural) -> i8 {
+    fn legendre_symbol(self, other: &'a Self) -> i8 {
         assert_ne!(*other, 0u32);
         assert!(other.odd());
         (&self).kronecker_symbol(other)
@@ -849,7 +849,7 @@ impl LegendreSymbol<&Natural> for &Natural {
     }
 }
 
-impl JacobiSymbol<Natural> for Natural {
+impl JacobiSymbol<Self> for Natural {
     /// Computes the Jacobi symbol of two [`Natural`]s, taking both by value.
     ///
     /// $$
@@ -878,14 +878,14 @@ impl JacobiSymbol<Natural> for Natural {
     /// assert_eq!(Natural::from(11u32).jacobi_symbol(Natural::from(9u32)), 1);
     /// ```
     #[inline]
-    fn jacobi_symbol(self, other: Natural) -> i8 {
+    fn jacobi_symbol(self, other: Self) -> i8 {
         assert_ne!(other, 0u32);
         assert!(other.odd());
         (&self).kronecker_symbol(&other)
     }
 }
 
-impl<'a> JacobiSymbol<&'a Natural> for Natural {
+impl<'a> JacobiSymbol<&'a Self> for Natural {
     /// Computes the Jacobi symbol of two [`Natural`]s, taking the first by value and the second by
     /// reference.
     ///
@@ -915,7 +915,7 @@ impl<'a> JacobiSymbol<&'a Natural> for Natural {
     /// assert_eq!(Natural::from(11u32).jacobi_symbol(&Natural::from(9u32)), 1);
     /// ```
     #[inline]
-    fn jacobi_symbol(self, other: &'a Natural) -> i8 {
+    fn jacobi_symbol(self, other: &'a Self) -> i8 {
         assert_ne!(*other, 0u32);
         assert!(other.odd());
         (&self).kronecker_symbol(other)
@@ -1019,7 +1019,7 @@ impl JacobiSymbol<&Natural> for &Natural {
     }
 }
 
-impl KroneckerSymbol<Natural> for Natural {
+impl KroneckerSymbol<Self> for Natural {
     /// Computes the Kronecker symbol of two [`Natural`]s, taking both by value.
     ///
     /// $$
@@ -1061,12 +1061,12 @@ impl KroneckerSymbol<Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn kronecker_symbol(self, other: Natural) -> i8 {
+    fn kronecker_symbol(self, other: Self) -> i8 {
         (&self).kronecker_symbol(&other)
     }
 }
 
-impl<'a> KroneckerSymbol<&'a Natural> for Natural {
+impl<'a> KroneckerSymbol<&'a Self> for Natural {
     /// Computes the Kronecker symbol of two [`Natural`]s, taking the first by value and the second
     /// by reference.
     ///
@@ -1109,7 +1109,7 @@ impl<'a> KroneckerSymbol<&'a Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn kronecker_symbol(self, other: &'a Natural) -> i8 {
+    fn kronecker_symbol(self, other: &'a Self) -> i8 {
         (&self).kronecker_symbol(other)
     }
 }

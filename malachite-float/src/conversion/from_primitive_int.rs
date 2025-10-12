@@ -74,21 +74,21 @@ impl Float {
     ///     );
     /// }
     /// ```
-    pub const fn const_from_unsigned_times_power_of_2(x: Limb, pow: i32) -> Float {
+    pub const fn const_from_unsigned_times_power_of_2(x: Limb, pow: i32) -> Self {
         if x == 0 {
-            return Float::ZERO;
+            return Self::ZERO;
         }
         let bits = const_limb_significant_bits(x);
         let bits_i32 = bits as i32;
         let exponent = bits_i32.saturating_add(pow);
-        assert!(exponent <= Float::MAX_EXPONENT);
-        assert!(exponent >= Float::MIN_EXPONENT);
+        assert!(exponent <= Self::MAX_EXPONENT);
+        assert!(exponent >= Self::MIN_EXPONENT);
         let prec = bits - x.trailing_zeros() as u64;
         let mut limbs = prec >> Limb::LOG_WIDTH;
         if prec & Limb::WIDTH_MASK != 0 {
             limbs += 1;
         }
-        Float(Finite {
+        Self(Finite {
             sign: true,
             exponent,
             precision: prec,
@@ -120,8 +120,8 @@ impl Float {
     /// assert_eq!(Float::const_from_unsigned(123).to_string(), "123.0");
     /// ```
     #[inline]
-    pub const fn const_from_unsigned(x: Limb) -> Float {
-        Float::const_from_unsigned_times_power_of_2(x, 0)
+    pub const fn const_from_unsigned(x: Limb) -> Self {
+        Self::const_from_unsigned_times_power_of_2(x, 0)
     }
 
     /// Converts a signed primitive integer to a [`Float`], after multiplying it by the specified
@@ -190,22 +190,22 @@ impl Float {
     ///     );
     /// }
     /// ```
-    pub const fn const_from_signed_times_power_of_2(x: SignedLimb, pow: i32) -> Float {
+    pub const fn const_from_signed_times_power_of_2(x: SignedLimb, pow: i32) -> Self {
         if x == 0 {
-            return Float::ZERO;
+            return Self::ZERO;
         }
         let x_abs = x.unsigned_abs();
         let bits = const_limb_significant_bits(x_abs);
         let bits_i32 = bits as i32;
         let exponent = bits_i32.saturating_add(pow);
-        assert!(exponent <= Float::MAX_EXPONENT);
-        assert!(exponent >= Float::MIN_EXPONENT);
+        assert!(exponent <= Self::MAX_EXPONENT);
+        assert!(exponent >= Self::MIN_EXPONENT);
         let prec = bits - x_abs.trailing_zeros() as u64;
         let mut limbs = prec >> Limb::LOG_WIDTH;
         if prec & Limb::WIDTH_MASK != 0 {
             limbs += 1;
         }
-        Float(Finite {
+        Self(Finite {
             sign: x > 0,
             exponent,
             precision: prec,
@@ -238,8 +238,8 @@ impl Float {
     /// assert_eq!(Float::const_from_signed(-123).to_string(), "-123.0");
     /// ```
     #[inline]
-    pub const fn const_from_signed(x: SignedLimb) -> Float {
-        Float::const_from_signed_times_power_of_2(x, 0)
+    pub const fn const_from_signed(x: SignedLimb) -> Self {
+        Self::const_from_signed_times_power_of_2(x, 0)
     }
 
     /// Converts a primitive unsigned integer to a [`Float`]. If the [`Float`] is nonzero, it has
@@ -269,11 +269,11 @@ impl Float {
         x: T,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering)
+    ) -> (Self, Ordering)
     where
         Natural: From<T>,
     {
-        Float::from_natural_prec_round(Natural::from(x), prec, rm)
+        Self::from_natural_prec_round(Natural::from(x), prec, rm)
     }
 
     /// Converts an unsigned primitive integer to a [`Float`]. If the [`Float`] is nonzero, it has
@@ -301,11 +301,11 @@ impl Float {
     /// # Examples
     /// See [here](super::from_primitive_int#from_unsigned_prec).
     #[inline]
-    pub fn from_unsigned_prec<T: PrimitiveUnsigned>(x: T, prec: u64) -> (Float, Ordering)
+    pub fn from_unsigned_prec<T: PrimitiveUnsigned>(x: T, prec: u64) -> (Self, Ordering)
     where
         Natural: From<T>,
     {
-        Float::from_natural_prec(Natural::from(x), prec)
+        Self::from_natural_prec(Natural::from(x), prec)
     }
 
     /// Converts a primitive signed integer to a [`Float`]. If the [`Float`] is nonzero, it has the
@@ -335,11 +335,11 @@ impl Float {
         x: T,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering)
+    ) -> (Self, Ordering)
     where
         Integer: From<T>,
     {
-        Float::from_integer_prec_round(Integer::from(x), prec, rm)
+        Self::from_integer_prec_round(Integer::from(x), prec, rm)
     }
 
     /// Converts a signed primitive integer to a [`Float`]. If the [`Float`] is nonzero, it has the
@@ -367,11 +367,11 @@ impl Float {
     /// # Examples
     /// See [here](super::from_primitive_int#from_signed_prec).
     #[inline]
-    pub fn from_signed_prec<T: PrimitiveSigned>(x: T, prec: u64) -> (Float, Ordering)
+    pub fn from_signed_prec<T: PrimitiveSigned>(x: T, prec: u64) -> (Self, Ordering)
     where
         Integer: From<T>,
     {
-        Float::from_integer_prec(Integer::from(x), prec)
+        Self::from_integer_prec(Integer::from(x), prec)
     }
 }
 

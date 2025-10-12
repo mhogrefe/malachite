@@ -99,7 +99,7 @@ impl Rational {
     pub fn power_of_2_digits(&self, log_base: u64) -> (Vec<Natural>, RationalPowerOf2Digits) {
         let mut remainder = self.abs();
         let floor = (&remainder).floor().unsigned_abs();
-        remainder -= Rational::from(&floor);
+        remainder -= Self::from(&floor);
         (
             floor.to_power_of_2_digits_asc(log_base),
             RationalPowerOf2Digits {

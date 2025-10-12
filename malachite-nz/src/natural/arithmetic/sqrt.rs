@@ -613,7 +613,7 @@ pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 }}
 
 impl FloorSqrt for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Returns the floor of the square root of a [`Natural`], taking it by value.
     ///
@@ -638,7 +638,7 @@ impl FloorSqrt for Natural {
     /// assert_eq!(Natural::from(10000000000u64).floor_sqrt(), 100000);
     /// ```
     #[inline]
-    fn floor_sqrt(self) -> Natural {
+    fn floor_sqrt(self) -> Self {
         (&self).floor_sqrt()
     }
 }
@@ -720,7 +720,7 @@ impl FloorSqrtAssign for Natural {
 }
 
 impl CeilingSqrt for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Returns the ceiling of the square root of a [`Natural`], taking it by value.
     ///
@@ -745,7 +745,7 @@ impl CeilingSqrt for Natural {
     /// assert_eq!(Natural::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
     #[inline]
-    fn ceiling_sqrt(self) -> Natural {
+    fn ceiling_sqrt(self) -> Self {
         (&self).ceiling_sqrt()
     }
 }
@@ -827,7 +827,7 @@ impl CeilingSqrtAssign for Natural {
 }
 
 impl CheckedSqrt for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Returns the the square root of a [`Natural`], or `None` if it is not a perfect square. The
     /// [`Natural`] is taken by value.
@@ -875,7 +875,7 @@ impl CheckedSqrt for Natural {
     /// );
     /// ```
     #[inline]
-    fn checked_sqrt(self) -> Option<Natural> {
+    fn checked_sqrt(self) -> Option<Self> {
         (&self).checked_sqrt()
     }
 }
@@ -940,8 +940,8 @@ impl CheckedSqrt for &Natural {
 }
 
 impl SqrtRem for Natural {
-    type SqrtOutput = Natural;
-    type RemOutput = Natural;
+    type SqrtOutput = Self;
+    type RemOutput = Self;
 
     /// Returns the floor of the square root of a [`Natural`] and the remainder (the difference
     /// between the [`Natural`] and the square of the floor). The [`Natural`] is taken by value.
@@ -974,7 +974,7 @@ impl SqrtRem for Natural {
     /// );
     /// ```
     #[inline]
-    fn sqrt_rem(self) -> (Natural, Natural) {
+    fn sqrt_rem(self) -> (Self, Self) {
         (&self).sqrt_rem()
     }
 }
@@ -1042,7 +1042,7 @@ impl SqrtRem for &Natural {
 }
 
 impl SqrtAssignRem for Natural {
-    type RemOutput = Natural;
+    type RemOutput = Self;
 
     /// Replaces a [`Natural`] with the floor of its square root and returns the remainder (the
     /// difference between the original [`Natural`] and the square of the floor).
@@ -1084,7 +1084,7 @@ impl SqrtAssignRem for Natural {
     /// assert_eq!(x, 100000);
     /// ```
     #[inline]
-    fn sqrt_assign_rem(&mut self) -> Natural {
+    fn sqrt_assign_rem(&mut self) -> Self {
         let rem;
         (*self, rem) = (&*self).sqrt_rem();
         rem

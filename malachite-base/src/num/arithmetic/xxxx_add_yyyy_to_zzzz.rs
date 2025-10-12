@@ -125,15 +125,15 @@ impl XXXXAddYYYYToZZZZ for usize {
     /// This is equivalent to `add_ssssaaaaaaaa` from `longlong.h`, FLINT 2.7.1, where `(s3, s2, s1,
     /// s0)` is returned.
     fn xxxx_add_yyyy_to_zzzz(
-        x_3: usize,
-        x_2: usize,
-        x_1: usize,
-        x_0: usize,
-        y_3: usize,
-        y_2: usize,
-        y_1: usize,
-        y_0: usize,
-    ) -> (usize, usize, usize, usize) {
+        x_3: Self,
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_3: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self, Self) {
         if USIZE_IS_U32 {
             let (z_3, z_2, z_1, z_0) = u32::xxxx_add_yyyy_to_zzzz(
                 u32::wrapping_from(x_3),
@@ -146,10 +146,10 @@ impl XXXXAddYYYYToZZZZ for usize {
                 u32::wrapping_from(y_0),
             );
             (
-                usize::wrapping_from(z_3),
-                usize::wrapping_from(z_2),
-                usize::wrapping_from(z_1),
-                usize::wrapping_from(z_0),
+                Self::wrapping_from(z_3),
+                Self::wrapping_from(z_2),
+                Self::wrapping_from(z_1),
+                Self::wrapping_from(z_0),
             )
         } else {
             let (z_3, z_2, z_1, z_0) = u64::xxxx_add_yyyy_to_zzzz(
@@ -163,10 +163,10 @@ impl XXXXAddYYYYToZZZZ for usize {
                 u64::wrapping_from(y_0),
             );
             (
-                usize::wrapping_from(z_3),
-                usize::wrapping_from(z_2),
-                usize::wrapping_from(z_1),
-                usize::wrapping_from(z_0),
+                Self::wrapping_from(z_3),
+                Self::wrapping_from(z_2),
+                Self::wrapping_from(z_1),
+                Self::wrapping_from(z_0),
             )
         }
     }

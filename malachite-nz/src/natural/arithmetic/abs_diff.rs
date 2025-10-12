@@ -13,8 +13,8 @@
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{AbsDiff, AbsDiffAssign};
 
-impl AbsDiff<Natural> for Natural {
-    type Output = Natural;
+impl AbsDiff<Self> for Natural {
+    type Output = Self;
 
     /// Computes the absolute value of the difference between two [`Natural`]s, taking both by
     /// value.
@@ -52,7 +52,7 @@ impl AbsDiff<Natural> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn abs_diff(self, other: Natural) -> Natural {
+    fn abs_diff(self, other: Self) -> Self {
         if self >= other {
             self - other
         } else {
@@ -61,8 +61,8 @@ impl AbsDiff<Natural> for Natural {
     }
 }
 
-impl<'a> AbsDiff<&'a Natural> for Natural {
-    type Output = Natural;
+impl<'a> AbsDiff<&'a Self> for Natural {
+    type Output = Self;
 
     /// Computes the absolute value of the difference between two [`Natural`]s, taking the first by
     /// value and the second by reference.
@@ -101,7 +101,7 @@ impl<'a> AbsDiff<&'a Natural> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn abs_diff(self, other: &'a Natural) -> Natural {
+    fn abs_diff(self, other: &'a Self) -> Self {
         if self >= *other {
             self - other
         } else {
@@ -218,7 +218,7 @@ impl AbsDiff<&Natural> for &Natural {
     }
 }
 
-impl AbsDiffAssign<Natural> for Natural {
+impl AbsDiffAssign<Self> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place and takes the absolute value, taking
     /// the [`Natural`] on the right-hand side by value.
     ///
@@ -267,7 +267,7 @@ impl AbsDiffAssign<Natural> for Natural {
     /// x.abs_diff_assign(Natural::from(10u32).pow(12) * Natural::from(3u32));
     /// assert_eq!(x, 2000000000000u64);
     /// ```
-    fn abs_diff_assign(&mut self, other: Natural) {
+    fn abs_diff_assign(&mut self, other: Self) {
         if *self >= other {
             *self -= other;
         } else {
@@ -276,7 +276,7 @@ impl AbsDiffAssign<Natural> for Natural {
     }
 }
 
-impl<'a> AbsDiffAssign<&'a Natural> for Natural {
+impl<'a> AbsDiffAssign<&'a Self> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place and takes the absolute value, taking
     /// the [`Natural`] on the right-hand side by reference.
     ///
@@ -325,7 +325,7 @@ impl<'a> AbsDiffAssign<&'a Natural> for Natural {
     /// x.abs_diff_assign(&Natural::from(10u32).pow(12) * Natural::from(3u32));
     /// assert_eq!(x, 2000000000000u64);
     /// ```
-    fn abs_diff_assign(&mut self, other: &'a Natural) {
+    fn abs_diff_assign(&mut self, other: &'a Self) {
         if *self >= *other {
             *self -= other;
         } else {

@@ -33,7 +33,7 @@ impl From<bool> for Rational {
     /// assert_eq!(Rational::from(true), 1);
     /// ```
     #[inline]
-    fn from(b: bool) -> Rational {
-        if b { Rational::ONE } else { Rational::ZERO }
+    fn from(b: bool) -> Self {
+        if b { Self::ONE } else { Self::ZERO }
     }
 }

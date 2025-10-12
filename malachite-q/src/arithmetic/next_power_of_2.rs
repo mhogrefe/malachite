@@ -13,7 +13,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 impl NextPowerOf2 for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Finds the smallest power of 2 greater than or equal to a [`Rational`]. The [`Rational`] is
     /// taken by value.
@@ -42,7 +42,7 @@ impl NextPowerOf2 for Rational {
     /// );
     /// ```
     #[inline]
-    fn next_power_of_2(self) -> Rational {
+    fn next_power_of_2(self) -> Self {
         assert!(self > 0);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
@@ -51,7 +51,7 @@ impl NextPowerOf2 for Rational {
             Greater => exponent += 1,
             _ => {}
         }
-        Rational::power_of_2(exponent)
+        Self::power_of_2(exponent)
     }
 }
 

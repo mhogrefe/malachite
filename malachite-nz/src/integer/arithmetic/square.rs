@@ -10,7 +10,7 @@ use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 
 impl Square for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Squares an [`Integer`], taking it by value.
     ///
@@ -36,7 +36,7 @@ impl Square for Integer {
     /// assert_eq!(Integer::from(-123).square(), 15129);
     /// ```
     #[inline]
-    fn square(mut self) -> Integer {
+    fn square(mut self) -> Self {
         self.square_assign();
         self
     }

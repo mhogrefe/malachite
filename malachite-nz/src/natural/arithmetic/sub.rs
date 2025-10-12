@@ -522,12 +522,12 @@ fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
 }
 
 impl Natural {
-    pub(crate) fn sub_limb(self, other: Limb) -> Natural {
+    pub(crate) fn sub_limb(self, other: Limb) -> Self {
         self.checked_sub_limb(other)
             .expect("Cannot subtract a Limb from a smaller Natural")
     }
 
-    pub(crate) fn sub_limb_ref(&self, other: Limb) -> Natural {
+    pub(crate) fn sub_limb_ref(&self, other: Limb) -> Self {
         self.checked_sub_limb_ref(other).unwrap_or_else(|| {
             sub_panic(self, other);
         })
@@ -536,7 +536,7 @@ impl Natural {
     #[cfg(feature = "float_helpers")]
     pub fn sub_assign_at_limb(&mut self, i: usize, y: Limb) {
         if i == 0 {
-            *self -= Natural::from(y);
+            *self -= Self::from(y);
             return;
         }
         let xs = self.promote_in_place();
@@ -548,8 +548,8 @@ impl Natural {
     }
 }
 
-impl Sub<Natural> for Natural {
-    type Output = Natural;
+impl Sub<Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking both by value.
     ///
@@ -577,14 +577,14 @@ impl Sub<Natural> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn sub(self, other: Natural) -> Natural {
+    fn sub(self, other: Self) -> Self {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
 }
 
-impl Sub<&Natural> for Natural {
-    type Output = Natural;
+impl Sub<&Self> for Natural {
+    type Output = Self;
 
     /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference.
@@ -613,7 +613,7 @@ impl Sub<&Natural> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
-    fn sub(self, other: &Natural) -> Natural {
+    fn sub(self, other: &Self) -> Self {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
@@ -691,7 +691,7 @@ impl Sub<&Natural> for &Natural {
     }
 }
 
-impl SubAssign<Natural> for Natural {
+impl SubAssign<Self> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value.
     ///
@@ -721,7 +721,7 @@ impl SubAssign<Natural> for Natural {
     /// x -= Natural::from(10u32).pow(12) * Natural::from(4u32);
     /// assert_eq!(x, 0);
     /// ```
-    fn sub_assign(&mut self, other: Natural) {
+    fn sub_assign(&mut self, other: Self) {
         assert!(
             !self.sub_assign_no_panic(other),
             "Cannot subtract a Natural from a smaller Natural"
@@ -729,7 +729,7 @@ impl SubAssign<Natural> for Natural {
     }
 }
 
-impl SubAssign<&Natural> for Natural {
+impl SubAssign<&Self> for Natural {
     /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
     ///
@@ -759,7 +759,7 @@ impl SubAssign<&Natural> for Natural {
     /// x -= &(Natural::from(10u32).pow(12) * Natural::from(4u32));
     /// assert_eq!(x, 0);
     /// ```
-    fn sub_assign(&mut self, other: &Natural) {
+    fn sub_assign(&mut self, other: &Self) {
         assert!(
             !self.sub_assign_ref_no_panic(other),
             "Cannot subtract a Natural from a smaller Natural"

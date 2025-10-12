@@ -185,48 +185,48 @@ pub_test! {limbs_mod_power_of_2_sub_in_place_either(
 }}
 
 impl Natural {
-    fn mod_power_of_2_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {
+    fn mod_power_of_2_sub_limb_ref(&self, y: Limb, pow: u64) -> Self {
         match (self, y, pow) {
             (x, 0, _) => x.clone(),
-            (&Natural::ZERO, _, _) => Natural(Small(y)).mod_power_of_2_neg(pow),
-            (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
-                Natural(Small(small.mod_power_of_2_sub(other, pow)))
+            (&Self::ZERO, _, _) => Self(Small(y)).mod_power_of_2_neg(pow),
+            (&Self(Small(small)), other, pow) if pow <= Limb::WIDTH => {
+                Self(Small(small.mod_power_of_2_sub(other, pow)))
             }
-            (&Natural(Small(small)), other, _) => {
+            (&Self(Small(small)), other, _) => {
                 let (diff, overflow) = small.overflowing_sub(other);
                 if overflow {
                     let mut out = limbs_low_mask(pow);
                     out[0] = diff;
-                    Natural(Large(out))
+                    Self(Large(out))
                 } else {
-                    Natural(Small(diff))
+                    Self(Small(diff))
                 }
             }
-            (Natural(Large(limbs)), other, _) => {
-                Natural::from_owned_limbs_asc(limbs_sub_limb(limbs, other).0)
+            (Self(Large(limbs)), other, _) => {
+                Self::from_owned_limbs_asc(limbs_sub_limb(limbs, other).0)
             }
         }
     }
 
     // other - self
-    fn mod_power_of_2_right_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {
+    fn mod_power_of_2_right_sub_limb_ref(&self, y: Limb, pow: u64) -> Self {
         match (self, y, pow) {
             (_, 0, _) => self.mod_power_of_2_neg(pow),
-            (&Natural::ZERO, _, _) => Natural(Small(y)),
-            (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
-                Natural(Small(other.mod_power_of_2_sub(small, pow)))
+            (&Self::ZERO, _, _) => Self(Small(y)),
+            (&Self(Small(small)), other, pow) if pow <= Limb::WIDTH => {
+                Self(Small(other.mod_power_of_2_sub(small, pow)))
             }
-            (&Natural(Small(small)), other, _) => {
+            (&Self(Small(small)), other, _) => {
                 let (diff, overflow) = other.overflowing_sub(small);
                 if overflow {
                     let mut out = limbs_low_mask(pow);
                     out[0] = diff;
-                    Natural(Large(out))
+                    Self(Large(out))
                 } else {
-                    Natural(Small(diff))
+                    Self(Small(diff))
                 }
             }
-            (Natural(Large(limbs)), other, _) => Natural::from_owned_limbs_asc(
+            (Self(Large(limbs)), other, _) => Self::from_owned_limbs_asc(
                 limbs_mod_power_of_2_limb_sub_limbs(other, limbs, pow),
             ),
         }
@@ -235,21 +235,21 @@ impl Natural {
     fn mod_power_of_2_sub_assign_limb(&mut self, y: Limb, pow: u64) {
         match (&mut *self, y, pow) {
             (_, 0, _) => {}
-            (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)).mod_power_of_2_neg(pow),
-            (Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
+            (&mut Self::ZERO, _, _) => *self = Self(Small(y)).mod_power_of_2_neg(pow),
+            (Self(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_2_sub_assign(other, pow);
             }
-            (Natural(Small(small)), other, _) => {
+            (Self(Small(small)), other, _) => {
                 let (diff, overflow) = small.overflowing_sub(other);
                 if overflow {
                     let mut out = limbs_low_mask(pow);
                     out[0] = diff;
-                    *self = Natural(Large(out));
+                    *self = Self(Large(out));
                 } else {
                     *small = diff;
                 }
             }
-            (Natural(Large(limbs)), other, _) => {
+            (Self(Large(limbs)), other, _) => {
                 limbs_sub_limb_in_place(limbs, other);
                 self.trim();
             }
@@ -260,21 +260,21 @@ impl Natural {
     fn mod_power_of_2_right_sub_assign_limb(&mut self, other: Limb, pow: u64) {
         match (&mut *self, other, pow) {
             (_, 0, _) => self.mod_power_of_2_neg_assign(pow),
-            (&mut Natural::ZERO, _, _) => *self = Natural(Small(other)),
-            (Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
+            (&mut Self::ZERO, _, _) => *self = Self(Small(other)),
+            (Self(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 *small = other.mod_power_of_2_sub(*small, pow);
             }
-            (Natural(Small(small)), other, _) => {
+            (Self(Small(small)), other, _) => {
                 let (diff, overflow) = other.overflowing_sub(*small);
                 if overflow {
                     let mut out = limbs_low_mask(pow);
                     out[0] = diff;
-                    *self = Natural(Large(out));
+                    *self = Self(Large(out));
                 } else {
                     *small = diff;
                 }
             }
-            (Natural(Large(limbs)), other, _) => {
+            (Self(Large(limbs)), other, _) => {
                 limbs_mod_power_of_2_limb_sub_limbs_in_place(other, limbs, pow);
                 self.trim();
             }
@@ -282,8 +282,8 @@ impl Natural {
     }
 }
 
-impl ModPowerOf2Sub<Natural> for Natural {
-    type Output = Natural;
+impl ModPowerOf2Sub<Self> for Natural {
+    type Output = Self;
 
     /// Subtracts two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
     /// Both [`Natural`]s are taken by value.
@@ -312,14 +312,14 @@ impl ModPowerOf2Sub<Natural> for Natural {
     ///     445
     /// );
     /// ```
-    fn mod_power_of_2_sub(mut self, other: Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_sub(mut self, other: Self, pow: u64) -> Self {
         self.mod_power_of_2_sub_assign(other, pow);
         self
     }
 }
 
-impl ModPowerOf2Sub<&Natural> for Natural {
-    type Output = Natural;
+impl ModPowerOf2Sub<&Self> for Natural {
+    type Output = Self;
 
     /// Subtracts two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
     /// The first [`Natural`] is taken by value and the second by reference.
@@ -349,7 +349,7 @@ impl ModPowerOf2Sub<&Natural> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_sub(mut self, other: &Natural, pow: u64) -> Natural {
+    fn mod_power_of_2_sub(mut self, other: &Self, pow: u64) -> Self {
         self.mod_power_of_2_sub_assign(other, pow);
         self
     }
@@ -466,7 +466,7 @@ impl ModPowerOf2Sub<&Natural> for &Natural {
     }
 }
 
-impl ModPowerOf2SubAssign<Natural> for Natural {
+impl ModPowerOf2SubAssign<Self> for Natural {
     /// Subtracts two [`Natural`] modulo $2^k$, in place. The inputs must be already reduced modulo
     /// $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
@@ -496,7 +496,7 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
     /// x.mod_power_of_2_sub_assign(Natural::from(123u32), 9);
     /// assert_eq!(x, 445);
     /// ```
-    fn mod_power_of_2_sub_assign(&mut self, mut other: Natural, pow: u64) {
+    fn mod_power_of_2_sub_assign(&mut self, mut other: Self, pow: u64) {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
@@ -506,12 +506,12 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (&mut *self, &mut other) {
-            (x, &mut Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
-            (&mut Natural(Small(x)), y) => {
+            (x, &mut Self(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
+            (&mut Self(Small(x)), y) => {
                 y.mod_power_of_2_right_sub_assign_limb(x, pow);
                 *self = other;
             }
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (Self(Large(xs)), Self(Large(ys))) => {
                 if limbs_mod_power_of_2_sub_in_place_either(xs, ys, pow) {
                     swap(xs, ys);
                 }
@@ -521,7 +521,7 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
     }
 }
 
-impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
+impl<'a> ModPowerOf2SubAssign<&'a Self> for Natural {
     /// Subtracts two [`Natural`] modulo $2^k$, in place. The inputs must be already reduced modulo
     /// $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
@@ -551,7 +551,7 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
     /// x.mod_power_of_2_sub_assign(&Natural::from(123u32), 9);
     /// assert_eq!(x, 445);
     /// ```
-    fn mod_power_of_2_sub_assign(&mut self, other: &'a Natural, pow: u64) {
+    fn mod_power_of_2_sub_assign(&mut self, other: &'a Self, pow: u64) {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
@@ -561,10 +561,10 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (&mut *self, other) {
-            (x, y) if core::ptr::eq(x, y) => *self = Natural::ZERO,
-            (x, &Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
-            (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_right_sub_limb_ref(x, pow),
-            (Natural(Large(xs)), Natural(Large(ys))) => {
+            (x, y) if core::ptr::eq(x, y) => *self = Self::ZERO,
+            (x, &Self(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
+            (&mut Self(Small(x)), y) => *self = y.mod_power_of_2_right_sub_limb_ref(x, pow),
+            (Self(Large(xs)), Self(Large(ys))) => {
                 limbs_mod_power_of_2_sub_in_place_left(xs, ys, pow);
                 self.trim();
             }
