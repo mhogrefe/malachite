@@ -291,8 +291,7 @@ impl Natural {
         let (integer_mantissa, integer_exponent) = sci_mantissa.integer_mantissa_and_exponent();
         if integer_exponent > 0 {
             Some((
-                Self::from(integer_mantissa)
-                    << (sci_exponent + u64::exact_from(integer_exponent)),
+                Self::from(integer_mantissa) << (sci_exponent + u64::exact_from(integer_exponent)),
                 Equal,
             ))
         } else {

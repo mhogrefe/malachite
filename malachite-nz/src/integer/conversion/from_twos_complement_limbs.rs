@@ -166,9 +166,7 @@ impl Integer {
     pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Self {
         match *xs.as_slice() {
             [] => Self::ZERO,
-            [.., last] if !last.get_highest_bit() => {
-                Self::from(Natural::from_owned_limbs_asc(xs))
-            }
+            [.., last] if !last.get_highest_bit() => Self::from(Natural::from_owned_limbs_asc(xs)),
             _ => {
                 assert!(!limbs_twos_complement_in_place(&mut xs));
                 -Natural::from_owned_limbs_asc(xs)

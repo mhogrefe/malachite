@@ -1025,9 +1025,7 @@ impl Natural {
                     Small(result.wrapping_neg())
                 })
             }
-            Self(Large(limbs)) => {
-                Self::from_owned_limbs_asc(limbs_neg_xor_limb(limbs, other))
-            }
+            Self(Large(limbs)) => Self::from_owned_limbs_asc(limbs_neg_xor_limb(limbs, other)),
         }
     }
 
@@ -1075,9 +1073,7 @@ impl Natural {
     fn xor_neg_limb_neg(&self, other: Limb) -> Self {
         match self {
             Self(Small(small)) => Self(Small(small.wrapping_neg() ^ other)),
-            Self(Large(limbs)) => {
-                Self::from_owned_limbs_asc(limbs_neg_xor_limb_neg(limbs, other))
-            }
+            Self(Large(limbs)) => Self::from_owned_limbs_asc(limbs_neg_xor_limb_neg(limbs, other)),
         }
     }
 

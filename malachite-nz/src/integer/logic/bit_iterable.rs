@@ -157,12 +157,8 @@ impl Iterator for IntegerBitIterator<'_> {
     fn next(&mut self) -> Option<bool> {
         match self {
             Self::Zero => None,
-            Self::Positive(bits, extension_checked) => {
-                bits.iterate_forward(extension_checked)
-            }
-            Self::Negative(bits, extension_checked) => {
-                bits.iterate_forward(extension_checked)
-            }
+            Self::Positive(bits, extension_checked) => bits.iterate_forward(extension_checked),
+            Self::Negative(bits, extension_checked) => bits.iterate_forward(extension_checked),
         }
     }
 }
@@ -171,12 +167,8 @@ impl DoubleEndedIterator for IntegerBitIterator<'_> {
     fn next_back(&mut self) -> Option<bool> {
         match self {
             Self::Zero => None,
-            Self::Positive(bits, extension_checked) => {
-                bits.iterate_backward(extension_checked)
-            }
-            Self::Negative(bits, extension_checked) => {
-                bits.iterate_backward(extension_checked)
-            }
+            Self::Positive(bits, extension_checked) => bits.iterate_backward(extension_checked),
+            Self::Negative(bits, extension_checked) => bits.iterate_backward(extension_checked),
         }
     }
 }

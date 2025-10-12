@@ -1957,11 +1957,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloatsInRan
         match self {
             Self::AllPositive(xs) => xs.next(),
             Self::AllNegative(xs) => xs.next().map(T::neg),
-            Self::PositiveAndNegative(
-                toggle,
-                pos_xs,
-                neg_xs,
-            ) => {
+            Self::PositiveAndNegative(toggle, pos_xs, neg_xs) => {
                 toggle.not_assign();
                 if *toggle {
                     pos_xs.next().or_else(|| neg_xs.next().map(T::neg))

@@ -282,9 +282,7 @@ impl BitBlockAccess for Natural {
     fn get_bits_owned(self, start: u64, end: u64) -> Self {
         match self {
             Self(Small(small)) => Self(Small(small.get_bits(start, end))),
-            Self(Large(limbs)) => {
-                Self::from_owned_limbs_asc(limbs_vec_get_bits(limbs, start, end))
-            }
+            Self(Large(limbs)) => Self::from_owned_limbs_asc(limbs_vec_get_bits(limbs, start, end)),
         }
     }
 

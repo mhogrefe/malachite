@@ -79,8 +79,7 @@ impl Rational {
             + if r == 0u32 {
                 Self::from(nr) >> (log_base * nr_len)
             } else {
-                (Self::from_naturals(r, Natural::low_mask(log_base * r_len))
-                    + Self::from(nr))
+                (Self::from_naturals(r, Natural::low_mask(log_base * r_len)) + Self::from(nr))
                     >> (log_base * nr_len)
             }
     }
@@ -150,8 +149,7 @@ impl Rational {
             + if r == 0u32 {
                 Self::from(nr) >> (log_base * nr_len)
             } else {
-                (Self::from_naturals(r, Natural::low_mask(log_base * r_len))
-                    + Self::from(nr))
+                (Self::from_naturals(r, Natural::low_mask(log_base * r_len)) + Self::from(nr))
                     >> (log_base * nr_len)
             }
     }

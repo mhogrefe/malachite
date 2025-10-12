@@ -1710,12 +1710,8 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
 
     fn next(&mut self) -> Option<S> {
         match self {
-            Self::NonNegative(_, xs) => {
-                xs.next().map(S::wrapping_from)
-            }
-            Self::Negative(_, xs) => {
-                xs.next().map(|x| S::wrapping_from(x).wrapping_neg())
-            }
+            Self::NonNegative(_, xs) => xs.next().map(S::wrapping_from),
+            Self::Negative(_, xs) => xs.next().map(|x| S::wrapping_from(x).wrapping_neg()),
             Self::Both(_, bs, xs_nn, xs_n) => {
                 if bs.next().unwrap() {
                     xs_nn.next().map(S::wrapping_from)

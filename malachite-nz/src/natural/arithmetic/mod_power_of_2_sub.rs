@@ -226,9 +226,9 @@ impl Natural {
                     Self(Small(diff))
                 }
             }
-            (Self(Large(limbs)), other, _) => Self::from_owned_limbs_asc(
-                limbs_mod_power_of_2_limb_sub_limbs(other, limbs, pow),
-            ),
+            (Self(Large(limbs)), other, _) => {
+                Self::from_owned_limbs_asc(limbs_mod_power_of_2_limb_sub_limbs(other, limbs, pow))
+            }
         }
     }
 

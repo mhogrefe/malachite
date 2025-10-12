@@ -1978,9 +1978,7 @@ impl Natural {
             (_, 0) => panic!("division by zero"),
             (n, 1) => n.clone(),
             (Self(Small(small)), other) => Self(Small(small / other)),
-            (Self(Large(limbs)), other) => {
-                Self::from_owned_limbs_asc(limbs_div_limb(limbs, other))
-            }
+            (Self(Large(limbs)), other) => Self::from_owned_limbs_asc(limbs_div_limb(limbs, other)),
         }
     }
 

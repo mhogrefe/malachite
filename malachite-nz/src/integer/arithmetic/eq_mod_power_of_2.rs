@@ -146,9 +146,7 @@ impl Natural {
         match (self, other) {
             (_, &Self(Small(y))) => self.eq_mod_power_of_2_neg_limb(y, pow),
             (&Self(Small(x)), _) => other.eq_mod_power_of_2_neg_limb(x, pow),
-            (Self(Large(xs)), Self(Large(ys))) => {
-                limbs_eq_mod_power_of_2_neg_pos(xs, ys, pow)
-            }
+            (Self(Large(xs)), Self(Large(ys))) => limbs_eq_mod_power_of_2_neg_pos(xs, ys, pow),
         }
     }
 }

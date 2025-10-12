@@ -2743,18 +2743,16 @@ where
             (0, 0) => Self::Zero(false),
             (0, 1) => Self::ZeroOne(true, xs),
             (1, 1) => Self::One(xs),
-            (a, b) => Self::GreaterThanOne(
-                ExhaustiveOrderedUniqueCollectionsGreaterThanOne {
-                    done: false,
-                    first: true,
-                    min_bits: usize::saturating_from(a),
-                    max_bits: usize::saturating_from(b),
-                    xs: IteratorCache::new(xs),
-                    pattern: vec![true; usize::saturating_from(a)],
-                    bit_count: usize::saturating_from(a),
-                    phantom: PhantomData,
-                },
-            ),
+            (a, b) => Self::GreaterThanOne(ExhaustiveOrderedUniqueCollectionsGreaterThanOne {
+                done: false,
+                first: true,
+                min_bits: usize::saturating_from(a),
+                max_bits: usize::saturating_from(b),
+                xs: IteratorCache::new(xs),
+                pattern: vec![true; usize::saturating_from(a)],
+                bit_count: usize::saturating_from(a),
+                phantom: PhantomData,
+            }),
         }
     }
 }

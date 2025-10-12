@@ -2284,11 +2284,7 @@ impl Digits<Self> for Natural {
     /// ```
     fn to_digits_asc(&self, base: &Self) -> Vec<Self> {
         match base {
-            Self(Small(b)) => self
-                .to_digits_asc(b)
-                .into_iter()
-                .map(Self::from)
-                .collect(),
+            Self(Small(b)) => self.to_digits_asc(b).into_iter().map(Self::from).collect(),
             _ => to_digits_asc_large(self, base),
         }
     }
@@ -2343,11 +2339,7 @@ impl Digits<Self> for Natural {
     /// ```
     fn to_digits_desc(&self, base: &Self) -> Vec<Self> {
         match base {
-            Self(Small(b)) => self
-                .to_digits_desc(b)
-                .into_iter()
-                .map(Self::from)
-                .collect(),
+            Self(Small(b)) => self.to_digits_desc(b).into_iter().map(Self::from).collect(),
             _ => to_digits_desc_large(self, base),
         }
     }

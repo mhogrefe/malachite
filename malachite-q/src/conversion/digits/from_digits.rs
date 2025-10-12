@@ -74,8 +74,7 @@ impl Rational {
         let nr_len = u64::exact_from(non_repeating.len());
         let nr = Natural::from_digits_asc(base, non_repeating.into_iter().rev()).unwrap();
         let r = Natural::from_digits_asc(base, repeating.into_iter().rev()).unwrap();
-        let floor =
-            Self::from(Natural::from_digits_asc(base, before_point.into_iter()).unwrap());
+        let floor = Self::from(Natural::from_digits_asc(base, before_point.into_iter()).unwrap());
         floor
             + if r == 0u32 {
                 Self::from_naturals(nr, base.pow(nr_len))

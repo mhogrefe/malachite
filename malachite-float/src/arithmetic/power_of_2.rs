@@ -283,10 +283,6 @@ impl PowerOf2<i64> for Float {
                 }
             }
         }
-        if pow > 0 {
-            Self::INFINITY
-        } else {
-            Self::ZERO
-        }
+        if pow > 0 { Self::INFINITY } else { Self::ZERO }
     }
 }

@@ -378,9 +378,7 @@ impl ModPowerOf2PowAssign<&Self> for Natural {
             _ if pow == 0 => *self = Self::ZERO,
             (_, &Self::ZERO) => *self = Self::ONE,
             (&mut (Self::ZERO | Self::ONE), _) | (_, &Self::ONE) => {}
-            (Self(Small(x)), Self(Small(e)))
-                if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
-            {
+            (Self(Small(x)), Self(Small(e))) if pow <= Limb::WIDTH && u64::convertible_from(*e) => {
                 x.mod_power_of_2_pow_assign(u64::wrapping_from(*e), pow);
             }
             (_, Self(Small(e))) => {

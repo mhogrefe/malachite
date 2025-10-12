@@ -352,9 +352,7 @@ impl Natural {
             (x, _, 0) | (x, &Self::ZERO, _) => x.clone(),
             (x, y, 1) => x + y,
             (x, &Self::ONE, z) => x + Self::from(z),
-            (Self(Large(xs)), Self(Large(ys)), z) => {
-                Self(Large(limbs_add_mul_limb(xs, ys, z)))
-            }
+            (Self(Large(xs)), Self(Large(ys)), z) => Self(Large(limbs_add_mul_limb(xs, ys, z))),
             (x, y, z) => x + y * Self::from(z),
         }
     }
