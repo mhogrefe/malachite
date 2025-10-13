@@ -187,9 +187,9 @@ impl Natural {
             (&Self(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Self(Small(small.mod_power_of_2_mul(other, pow)))
             }
-            (&Self(Small(small)), other, pow) => Self::from(
-                (DoubleLimb::from(small) * DoubleLimb::from(other)).mod_power_of_2(pow),
-            ),
+            (&Self(Small(small)), other, pow) => {
+                Self::from((DoubleLimb::from(small) * DoubleLimb::from(other)).mod_power_of_2(pow))
+            }
             (x, other, pow) => (x * Self::from(other)).mod_power_of_2(pow),
         }
     }

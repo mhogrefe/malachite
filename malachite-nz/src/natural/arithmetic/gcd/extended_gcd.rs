@@ -75,7 +75,7 @@ impl<'a> ExtendedGcdContext<'a> {
         scratch: &'a mut [Limb],
     ) -> Self {
         let gs_len = gs.len();
-        ExtendedGcdContext {
+        Self {
             gs,
             gs_len,
             ss,

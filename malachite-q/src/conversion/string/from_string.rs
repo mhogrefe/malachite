@@ -75,10 +75,6 @@ impl FromStr for Rational {
             numerator = Natural::from_str(abs_string)?;
             denominator = Natural::ONE;
         }
-        Ok(Self::from_sign_and_naturals(
-            sign,
-            numerator,
-            denominator,
-        ))
+        Ok(Self::from_sign_and_naturals(sign, numerator, denominator))
     }
 }

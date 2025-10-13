@@ -45,8 +45,7 @@ impl Natural {
             (Self(Small(_)), _, _) => None,
             (Self(Large(a_limbs)), Self(Large(b_limbs)), c) => {
                 if a_limbs.len() >= b_limbs.len() {
-                    limbs_sub_mul_limb_greater(a_limbs, b_limbs, c)
-                        .map(Self::from_owned_limbs_asc)
+                    limbs_sub_mul_limb_greater(a_limbs, b_limbs, c).map(Self::from_owned_limbs_asc)
                 } else {
                     None
                 }

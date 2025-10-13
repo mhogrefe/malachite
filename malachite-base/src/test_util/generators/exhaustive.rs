@@ -1002,8 +1002,7 @@ pub fn exhaustive_signed_triple_gen_var_3<T: PrimitiveSigned>() -> It<(T, T, T)>
 }
 
 struct SignedModEqTriplesInnerGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
-    phantom_u: PhantomData<*const U>,
-    phantom_s: PhantomData<*const S>,
+    phantom: PhantomData<(U, S)>,
 }
 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
@@ -1031,8 +1030,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
 }
 
 struct SignedModEqTriplesGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
-    phantom_u: PhantomData<*const U>,
-    phantom_s: PhantomData<*const S>,
+    phantom: PhantomData<(U, S)>,
 }
 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>>
@@ -1055,8 +1053,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + UnsignedAbs<Output = U> + Wrappi
                     primitive_int_increasing_inclusive_range(U::ZERO, U::MAX / m_abs)
                         .map(move |k| (m_abs, k)),
                     SignedModEqTriplesInnerGenerator {
-                        phantom_u: PhantomData,
-                        phantom_s: PhantomData,
+                        phantom: PhantomData,
                     },
                 )
                 .map(|p| p.1),
@@ -1076,8 +1073,7 @@ pub fn exhaustive_signed_triple_gen_var_4<
         ),
         exhaustive_signeds(),
         SignedModEqTriplesGenerator {
-            phantom_u: PhantomData,
-            phantom_s: PhantomData,
+            phantom: PhantomData,
         },
     ))))
 }
@@ -1130,8 +1126,7 @@ pub fn exhaustive_signed_signed_signed_unsigned_quadruple_gen_var_1<
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
 
 struct SignedModPow2EqTriplesInnerGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
-    phantom_u: PhantomData<*const U>,
-    phantom_s: PhantomData<*const S>,
+    phantom: PhantomData<(U, S)>,
 }
 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
@@ -1159,8 +1154,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
 }
 
 struct SignedModPow2EqTriplesGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
-    phantom_u: PhantomData<*const U>,
-    phantom_s: PhantomData<*const S>,
+    phantom: PhantomData<(U, S)>,
 }
 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
@@ -1182,8 +1176,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
                     primitive_int_increasing_inclusive_range(U::ZERO, U::MAX >> pow)
                         .map(move |k| (pow, k)),
                     SignedModPow2EqTriplesInnerGenerator {
-                        phantom_u: PhantomData,
-                        phantom_s: PhantomData,
+                        phantom: PhantomData,
                     },
                 )
                 .map(|p| p.1),
@@ -1200,8 +1193,7 @@ pub fn exhaustive_signed_signed_unsigned_triple_gen_var_1<
         ruler_sequence(),
         exhaustive_unsigneds(),
         SignedModPow2EqTriplesGenerator::<U, S> {
-            phantom_u: PhantomData,
-            phantom_s: PhantomData,
+            phantom: PhantomData,
         },
     ))))
 }
@@ -2043,8 +2035,7 @@ pub fn exhaustive_unsigned_signed_pair_gen_var_2<T: PrimitiveFloat>() -> It<(u64
 // -- (PrimitiveUnsigned, PrimitiveSigned, PrimitiveUnsigned) --
 
 struct ModPowerOf2PairWithExtraSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 type LongType<T, U> = ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, ExhaustiveSigneds<U>>;
@@ -2073,8 +2064,7 @@ pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_1<
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
         ModPowerOf2PairWithExtraSignedGenerator::<T, U> {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     ))))
 }
@@ -2806,8 +2796,7 @@ pub fn exhaustive_unsigned_triple_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveU
 }
 
 struct ModPowerOf2PairWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -2835,8 +2824,7 @@ pub fn exhaustive_unsigned_triple_gen_var_15<T: PrimitiveUnsigned, U: PrimitiveU
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
         ModPowerOf2PairWithExtraUnsignedGenerator::<T, U> {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     ))))
 }
@@ -2997,8 +2985,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_7<T: PrimitiveUnsigned, U: Primitiv
 }
 
 struct ModPowerOf2TripleWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -3027,8 +3014,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_8<T: PrimitiveUnsigned, U: Primitiv
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
         ModPowerOf2TripleWithExtraUnsignedGenerator::<T, U> {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     ))))
 }
@@ -3037,8 +3023,7 @@ struct ModPowerOf2QuadrupleWithTwoExtraUnsignedsGenerator<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 > {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -3067,8 +3052,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_9<T: PrimitiveUnsigned, U: Primitiv
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
         ModPowerOf2QuadrupleWithTwoExtraUnsignedsGenerator::<T, U> {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     ))))
 }
@@ -4070,8 +4054,7 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -
 }
 
 struct UnsignedVecUnsignedPairGeneratorVar2<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -4102,8 +4085,7 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_2<
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(1, U::WIDTH),
         UnsignedVecUnsignedPairGeneratorVar2::<T, U> {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     )))
 }
@@ -4121,8 +4103,7 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_3<
 // var 4 is in malachite-nz
 
 struct ValidDigitsGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned + WrappingFrom<U>, U: PrimitiveUnsigned>
@@ -4148,8 +4129,7 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_5<
         ),
         primitive_int_increasing_inclusive_range(U::TWO, U::saturating_from(T::MAX)),
         ValidDigitsGenerator {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     )))
 }
@@ -4181,8 +4161,7 @@ impl<T: PrimitiveUnsigned> Iterator for DigitsDesc<T> {
 }
 
 struct DigitsDescGenerator<T: PrimitiveUnsigned, U: Digits<T> + PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: Digits<T> + PrimitiveUnsigned>
@@ -4210,8 +4189,7 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_7<
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(T::TWO, T::saturating_from(U::MAX)),
         DigitsDescGenerator::<T, U> {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
+            phantom: PhantomData,
         },
     )))
 }

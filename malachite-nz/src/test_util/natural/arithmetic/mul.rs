@@ -114,8 +114,8 @@ pub fn natural_product_naive<I: Iterator<Item = Natural>>(xs: I) -> Natural {
 
 impl CRTData {
     // This is crt_data_init from src/fft_small.h, FLINT 3.3.0-dev, returning CRTData.
-    fn new(prime: u64, coeff_len: usize, nprimes: usize) -> CRTData {
-        CRTData {
+    fn new(prime: u64, coeff_len: usize, nprimes: usize) -> Self {
+        Self {
             prime,
             coeff_len,
             nprimes,

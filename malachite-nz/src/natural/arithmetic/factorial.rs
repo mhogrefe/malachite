@@ -593,11 +593,7 @@ impl Multifactorial for Natural {
         assert!(Limb::convertible_from(m));
         if n < 3 || n - 3 < m - 1 {
             // n < 3 || n - 1 <= m
-            if n == 0 {
-                Self::ONE
-            } else {
-                Self::from(n)
-            }
+            if n == 0 { Self::ONE } else { Self::from(n) }
         } else {
             // 0 < m < n - 1 < Limb::MAX
             let gcd = n.gcd(m);

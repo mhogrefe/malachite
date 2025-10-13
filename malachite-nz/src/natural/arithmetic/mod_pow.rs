@@ -972,9 +972,7 @@ impl ModPowAssign<Self, Self> for Natural {
             (_, _, &Self::ONE) => *self = Self::ZERO,
             (_, &Self::ZERO, _) => *self = Self::ONE,
             (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
-            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
-                if u64::convertible_from(*e) =>
-            {
+            (Self(Small(x)), Self(Small(e)), Self(Small(m))) if u64::convertible_from(*e) => {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
@@ -1030,9 +1028,7 @@ impl<'a> ModPowAssign<Self, &'a Self> for Natural {
             (_, _, &Self::ONE) => *self = Self::ZERO,
             (_, &Self::ZERO, _) => *self = Self::ONE,
             (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
-            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
-                if u64::convertible_from(*e) =>
-            {
+            (Self(Small(x)), Self(Small(e)), Self(Small(m))) if u64::convertible_from(*e) => {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
@@ -1088,9 +1084,7 @@ impl<'a> ModPowAssign<&'a Self, Self> for Natural {
             (_, _, &Self::ONE) => *self = Self::ZERO,
             (_, &Self::ZERO, _) => *self = Self::ONE,
             (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
-            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
-                if u64::convertible_from(*e) =>
-            {
+            (Self(Small(x)), Self(Small(e)), Self(Small(m))) if u64::convertible_from(*e) => {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {
@@ -1141,9 +1135,7 @@ impl<'a, 'b> ModPowAssign<&'a Self, &'b Self> for Natural {
             (_, _, &Self::ONE) => *self = Self::ZERO,
             (_, &Self::ZERO, _) => *self = Self::ONE,
             (&mut (Self::ZERO | Self::ONE), _, _) | (_, &Self::ONE, _) => {}
-            (Self(Small(x)), Self(Small(e)), Self(Small(m)))
-                if u64::convertible_from(*e) =>
-            {
+            (Self(Small(x)), Self(Small(e)), Self(Small(m))) if u64::convertible_from(*e) => {
                 x.mod_pow_assign(u64::wrapping_from(*e), *m);
             }
             _ => {

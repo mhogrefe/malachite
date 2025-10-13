@@ -2895,8 +2895,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_29<T: PrimitiveUnsigned>() -> It<(Ve
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 struct ValidDigitsGenerator1<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -2932,8 +2931,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
                 exhaustive_positive_primitive_ints(),
             ),
             ValidDigitsGenerator1 {
-                phantom_t: PhantomData,
-                phantom_u: PhantomData,
+                phantom: PhantomData,
             },
         )
         .map(|((base, _), (xs, out))| (out, xs, base)),
@@ -2941,8 +2939,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
 }
 
 struct ValidDigitsGenerator2<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -2976,8 +2973,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
                 exhaustive_positive_primitive_ints(),
             ),
             ValidDigitsGenerator2 {
-                phantom_t: PhantomData,
-                phantom_u: PhantomData,
+                phantom: PhantomData,
             },
         )
         .map(|((base, _), (xs, out))| (out, xs, base)),

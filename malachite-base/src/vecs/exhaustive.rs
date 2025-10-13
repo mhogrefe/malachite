@@ -1768,8 +1768,7 @@ where
     done: bool,
     xs: IteratorCache<I>,
     indices: Vec<usize>,
-    phantom_i: PhantomData<*const I::Item>,
-    phantom_c: PhantomData<*const C>,
+    phantom: PhantomData<(I::Item, C)>,
 }
 
 impl<I: Iterator, C: FromIterator<I::Item>> LexFixedLengthOrderedUniqueCollections<I, C>
@@ -1782,8 +1781,7 @@ where
             done: false,
             xs: IteratorCache::new(xs),
             indices: (0..usize::exact_from(k)).collect(),
-            phantom_i: PhantomData,
-            phantom_c: PhantomData,
+            phantom: PhantomData,
         }
     }
 }
@@ -1970,8 +1968,7 @@ where
                 done: false,
                 xs: IteratorCache::new(self.xs.clone()),
                 indices: (0..usize::exact_from(self.current_len)).collect(),
-                phantom_i: PhantomData,
-                phantom_c: PhantomData,
+                phantom: PhantomData,
             };
             if let Some(next) = self.current_xss.next() {
                 Some(next)
@@ -2227,8 +2224,7 @@ where
     max_len: usize,
     xs: IteratorCache<I>,
     indices: Vec<usize>,
-    phantom_i: PhantomData<*const I::Item>,
-    phantom_c: PhantomData<*const C>,
+    phantom: PhantomData<(I::Item, C)>,
 }
 
 impl<I: Iterator, C: FromIterator<I::Item>> LexOrderedUniqueCollections<I, C>
@@ -2243,8 +2239,7 @@ where
             max_len: usize::exact_from(b),
             xs: IteratorCache::new(xs),
             indices: (0..usize::exact_from(a)).collect(),
-            phantom_i: PhantomData,
-            phantom_c: PhantomData,
+            phantom: PhantomData,
         }
     }
 }
@@ -2743,18 +2738,16 @@ where
             (0, 0) => Self::Zero(false),
             (0, 1) => Self::ZeroOne(true, xs),
             (1, 1) => Self::One(xs),
-            (a, b) => Self::GreaterThanOne(
-                ExhaustiveOrderedUniqueCollectionsGreaterThanOne {
-                    done: false,
-                    first: true,
-                    min_bits: usize::saturating_from(a),
-                    max_bits: usize::saturating_from(b),
-                    xs: IteratorCache::new(xs),
-                    pattern: vec![true; usize::saturating_from(a)],
-                    bit_count: usize::saturating_from(a),
-                    phantom: PhantomData,
-                },
-            ),
+            (a, b) => Self::GreaterThanOne(ExhaustiveOrderedUniqueCollectionsGreaterThanOne {
+                done: false,
+                first: true,
+                min_bits: usize::saturating_from(a),
+                max_bits: usize::saturating_from(b),
+                xs: IteratorCache::new(xs),
+                pattern: vec![true; usize::saturating_from(a)],
+                bit_count: usize::saturating_from(a),
+                phantom: PhantomData,
+            }),
         }
     }
 }
@@ -3989,8 +3982,7 @@ where
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct ExhaustiveUniqueVecsGenerator<T: Clone, I: Iterator<Item = T>> {
-    phantom_t: PhantomData<T>,
-    phantom_i: PhantomData<I>,
+    phantom: PhantomData<(T, I)>,
 }
 
 impl<T: Clone, I: Iterator<Item = T>> ExhaustiveUniqueVecsGenerator<T, I> {
@@ -3998,8 +3990,7 @@ impl<T: Clone, I: Iterator<Item = T>> ExhaustiveUniqueVecsGenerator<T, I> {
     #[inline]
     pub const fn new() -> Self {
         Self {
-            phantom_i: PhantomData,
-            phantom_t: PhantomData,
+            phantom: PhantomData,
         }
     }
 }

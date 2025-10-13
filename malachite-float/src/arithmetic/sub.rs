@@ -238,12 +238,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn sub_prec_round(
-        mut self,
-        other: Self,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Self, Ordering) {
+    pub fn sub_prec_round(mut self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.sub_prec_round_assign(other, prec, rm);
         (self, o)
     }

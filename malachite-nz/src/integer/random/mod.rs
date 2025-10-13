@@ -1484,9 +1484,7 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
     fn next(&mut self) -> Option<Integer> {
         match self {
             Self::NonNegative(xs) => xs.next().map(Integer::from),
-            Self::Negative(xs) => {
-                xs.next().map(|x| Integer::from_sign_and_abs(false, x))
-            }
+            Self::Negative(xs) => xs.next().map(|x| Integer::from_sign_and_abs(false, x)),
             Self::Both(bs, xs_nn, xs_n) => {
                 if bs.next().unwrap() {
                     xs_nn.next().map(Integer::from)

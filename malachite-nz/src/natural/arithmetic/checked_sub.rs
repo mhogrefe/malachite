@@ -33,9 +33,7 @@ impl Natural {
                 if *self < other {
                     None
                 } else {
-                    Some(Self::from_owned_limbs_asc(
-                        limbs_sub_limb(limbs, other).0,
-                    ))
+                    Some(Self::from_owned_limbs_asc(limbs_sub_limb(limbs, other).0))
                 }
             }
         }

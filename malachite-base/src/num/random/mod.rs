@@ -2496,8 +2496,8 @@ impl VariableRangeGenerator {
     /// assert_eq!(generator.next_in_range::<u32>(10, 20), 16);
     /// assert_eq!(generator.next_in_inclusive_range::<u64>(10, 20), 14);
     /// ```
-    pub fn new(seed: Seed) -> VariableRangeGenerator {
-        VariableRangeGenerator {
+    pub fn new(seed: Seed) -> Self {
+        Self {
             xs: random_primitive_ints(seed),
             x: 0,
             in_inner_loop: false,

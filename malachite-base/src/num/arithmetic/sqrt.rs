@@ -97,7 +97,10 @@ impl CheckedSqrt for u8 {
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
     fn checked_sqrt(self) -> Option<Self> {
-        U8_SQUARES.binary_search(&self).ok().map(Self::wrapping_from)
+        U8_SQUARES
+            .binary_search(&self)
+            .ok()
+            .map(Self::wrapping_from)
     }
 }
 

@@ -341,12 +341,8 @@ impl Iterator for TwosComplementLimbIterator<'_> {
     fn next(&mut self) -> Option<Limb> {
         match self {
             Self::Zero => None,
-            Self::Positive(limbs, extension_checked) => {
-                limbs.iterate_forward(extension_checked)
-            }
-            Self::Negative(limbs, extension_checked) => {
-                limbs.0.iterate_forward(extension_checked)
-            }
+            Self::Positive(limbs, extension_checked) => limbs.iterate_forward(extension_checked),
+            Self::Negative(limbs, extension_checked) => limbs.0.iterate_forward(extension_checked),
         }
     }
 }
@@ -384,12 +380,8 @@ impl DoubleEndedIterator for TwosComplementLimbIterator<'_> {
     fn next_back(&mut self) -> Option<Limb> {
         match self {
             Self::Zero => None,
-            Self::Positive(limbs, extension_checked) => {
-                limbs.iterate_backward(extension_checked)
-            }
-            Self::Negative(limbs, extension_checked) => {
-                limbs.0.iterate_backward(extension_checked)
-            }
+            Self::Positive(limbs, extension_checked) => limbs.iterate_backward(extension_checked),
+            Self::Negative(limbs, extension_checked) => limbs.0.iterate_backward(extension_checked),
         }
     }
 }

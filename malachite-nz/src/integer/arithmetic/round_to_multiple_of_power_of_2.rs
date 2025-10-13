@@ -109,11 +109,7 @@ impl RoundToMultipleOfPowerOf2<u64> for Integer {
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple_of_power_of_2(
-        mut self,
-        pow: u64,
-        rm: RoundingMode,
-    ) -> (Self, Ordering) {
+    fn round_to_multiple_of_power_of_2(mut self, pow: u64, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.round_to_multiple_of_power_of_2_assign(pow, rm);
         (self, o)
     }

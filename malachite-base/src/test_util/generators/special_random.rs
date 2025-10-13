@@ -6414,8 +6414,7 @@ struct UnsignedVecUnsignedPairGeneratorVar1<T: PrimitiveUnsigned, U: PrimitiveUn
     log_bases: GeometricRandomNaturalValues<u64>,
     ranges: VariableRangeGenerator,
     striped_bit_source: StripedBitSource,
-    phantom_t: PhantomData<*const T>,
-    phantom_u: PhantomData<*const U>,
+    phantom: PhantomData<(T, U)>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
@@ -6461,8 +6460,7 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
             config.get_or("mean_stripe_d", 1),
         ),
         ranges: VariableRangeGenerator::new(EXAMPLE_SEED.fork("ranges")),
-        phantom_t: PhantomData,
-        phantom_u: PhantomData,
+        phantom: PhantomData,
     })
 }
 

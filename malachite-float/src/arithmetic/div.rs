@@ -884,12 +884,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn div_prec_round(
-        mut self,
-        other: Self,
-        prec: u64,
-        rm: RoundingMode,
-    ) -> (Self, Ordering) {
+    pub fn div_prec_round(mut self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let o = self.div_prec_round_assign(other, prec, rm);
         (self, o)
     }
@@ -5132,11 +5127,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn rational_div_float_prec_ref_ref(
-        x: &Rational,
-        y: &Self,
-        prec: u64,
-    ) -> (Self, Ordering) {
+    pub fn rational_div_float_prec_ref_ref(x: &Rational, y: &Self, prec: u64) -> (Self, Ordering) {
         Self::rational_div_float_prec_round_ref_ref(x, y, prec, Nearest)
     }
 

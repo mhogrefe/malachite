@@ -418,10 +418,8 @@ impl Rational {
     /// ```
     pub fn from_integers_ref(numerator: &Integer, denominator: &Integer) -> Self {
         assert_ne!(*denominator, 0);
-        let mut q = Self::from_naturals_ref(
-            numerator.unsigned_abs_ref(),
-            denominator.unsigned_abs_ref(),
-        );
+        let mut q =
+            Self::from_naturals_ref(numerator.unsigned_abs_ref(), denominator.unsigned_abs_ref());
         q.sign = *numerator == 0 || ((*numerator > 0) == (*denominator > 0));
         q
     }
@@ -500,11 +498,7 @@ impl Rational {
     ///     "-2/3"
     /// );
     /// ```
-    pub fn from_sign_and_naturals(
-        sign: bool,
-        numerator: Natural,
-        denominator: Natural,
-    ) -> Self {
+    pub fn from_sign_and_naturals(sign: bool, numerator: Natural, denominator: Natural) -> Self {
         assert_ne!(denominator, 0);
         let gcd = (&numerator).gcd(&denominator);
         Self {
