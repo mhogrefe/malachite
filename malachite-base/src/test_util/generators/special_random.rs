@@ -2513,7 +2513,33 @@ pub fn special_random_signed_unsigned_rounding_mode_triple_gen_var_2<
     )
 }
 
-// var 3 is in malachite-float.
+// vars 3 through 5 are in malachite-float.
+
+pub fn special_random_signed_unsigned_rounding_mode_triple_gen_var_6<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
 
 // -- (PrimitiveSigned, RoundingMode) --
 
@@ -5562,7 +5588,33 @@ pub fn special_random_unsigned_unsigned_rounding_mode_triple_gen_var_4<
     )
 }
 
-// var 5 is in malachite-float.
+// vars 5 through 6 are in malachite-float.
+
+pub fn special_random_unsigned_unsigned_rounding_mode_triple_gen_var_7<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
 

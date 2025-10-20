@@ -1264,7 +1264,7 @@ pub fn signed_unsigned_pair_gen_var_18<T: PrimitiveSigned, U: PrimitiveUnsigned>
     )
 }
 
-// All `(T, U)`s where `T` is signed, `U` is unsigned, and both `T` and `U` are small, and the `U`
+// All `(T, U)`s where `T` is signed, `U` is unsigned, both `T` and `U` are small, and the `U`
 // is positive.
 pub fn signed_unsigned_pair_gen_var_19<T: PrimitiveSigned, U: PrimitiveUnsigned>()
 -> Generator<(T, U)> {
@@ -1379,7 +1379,27 @@ pub fn signed_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveSigned, U: Pri
     )
 }
 
-// var 3 is in malachite-float.
+// vars 3 through 6 are in malachite-float.
+
+// All `(T, U, RoundingMode)` where `T` is signed, `U` is unsigned, and the `U` is positive.
+pub fn signed_unsigned_rounding_mode_triple_gen_var_7<T: PrimitiveSigned, U: PrimitiveUnsigned>()
+-> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_rounding_mode_triple_gen_var_6,
+        &random_primitive_int_unsigned_rounding_mode_triple_gen_var_4,
+        &special_random_signed_unsigned_rounding_mode_triple_gen_var_6,
+    )
+}
+
+// All `(T, U, RoundingMode)` where `T` is small and signed, `U` is small and unsigned, and the `U`
+// is positive.
+pub fn signed_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveSigned, U: PrimitiveUnsigned>()
+-> Generator<(T, U, RoundingMode)> {
+    Generator::new_no_special(
+        &exhaustive_signed_unsigned_rounding_mode_triple_gen_var_6,
+        &random_signed_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
 
 // -- (PrimitiveSigned, RoundingMode) --
 
@@ -2806,7 +2826,19 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_4<
     )
 }
 
-// var 5 is in malachite-float.
+// vars 5 through 6 are in malachite-float.
+
+// All `(T, U, RoundingMode)` where `T` and `U` are unsigned and the `U` is positive.
+pub fn unsigned_unsigned_rounding_mode_triple_gen_var_7<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8,
+        &random_primitive_int_unsigned_rounding_mode_triple_gen_var_4,
+        &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_7,
+    )
+}
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
 

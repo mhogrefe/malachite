@@ -49,9 +49,7 @@ use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_signeds,
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
 };
-use malachite_base::num::random::striped::{
-    striped_random_positive_unsigneds, striped_random_signeds, striped_random_unsigneds,
-};
+use malachite_base::num::random::striped::{striped_random_signeds, striped_random_unsigneds};
 use malachite_base::num::random::{random_primitive_floats, random_unsigned_inclusive_range};
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -2627,17 +2625,17 @@ pub fn special_random_float_signed_unsigned_triple_gen_var_1<
             )
         },
         &|seed| {
-            striped_random_signeds(
+            geometric_random_signeds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
-            striped_random_positive_unsigneds(
+            geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -2665,17 +2663,17 @@ pub fn special_random_float_signed_unsigned_triple_gen_var_2<
             )
         },
         &|seed| {
-            striped_random_signeds(
+            geometric_random_signeds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
-            striped_random_positive_unsigneds(
+            geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3263,17 +3261,17 @@ pub fn special_random_float_unsigned_unsigned_triple_gen_var_1<
             )
         },
         &|seed| {
-            striped_random_unsigneds(
+            geometric_random_unsigneds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
-            striped_random_positive_unsigneds(
+            geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3301,17 +3299,17 @@ pub fn special_random_float_unsigned_unsigned_triple_gen_var_2<
             )
         },
         &|seed| {
-            striped_random_unsigneds(
+            geometric_random_unsigneds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
-            striped_random_positive_unsigneds(
+            geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("mean_stripe_n", 32),
-                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))

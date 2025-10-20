@@ -49,8 +49,8 @@ use malachite_base::num::random::geometric::{
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
 };
 use malachite_base::num::random::{
-    RandomUnsignedInclusiveRange, random_positive_unsigneds, random_primitive_ints,
-    random_unsigned_inclusive_range, special_random_primitive_floats,
+    RandomUnsignedInclusiveRange, random_primitive_ints, random_unsigned_inclusive_range,
+    special_random_primitive_floats,
 };
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -2395,8 +2395,78 @@ pub fn random_float_primitive_int_primitive_int_triple_gen<T: PrimitiveInt>(
     ))
 }
 
-pub fn random_float_primitive_int_primitive_int_triple_gen_var_1<
-    T: PrimitiveInt,
+// -- (Float, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn random_float_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_float_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Float, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Float, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn random_float_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >(
     config: &GenConfig,
@@ -2414,13 +2484,25 @@ pub fn random_float_primitive_int_primitive_int_triple_gen_var_1<
                 config.get_or("mean_zero_p_d", 64),
             )
         },
-        &|seed| random_primitive_ints(seed),
-        &|seed| random_positive_unsigneds(seed),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
     ))
 }
 
-pub fn random_float_primitive_int_primitive_int_triple_gen_var_2<
-    T: PrimitiveInt,
+pub fn random_float_unsigned_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >(
     config: &GenConfig,
@@ -2438,8 +2520,20 @@ pub fn random_float_primitive_int_primitive_int_triple_gen_var_2<
                 config.get_or("mean_zero_p_d", 64),
             )
         },
-        &|seed| random_primitive_ints(seed),
-        &|seed| random_positive_unsigneds(seed),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
     ))
 }
 

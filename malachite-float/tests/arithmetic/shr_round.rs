@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    IsPowerOf2, ShlRound, ShrRound, ShrRoundAssign, UnsignedAbs,
+    IsPowerOf2, PowerOf2, ShlRound, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{
@@ -20,19 +20,30 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_rounding_mode_pair_gen_var_5,
-    unsigned_rounding_mode_pair_gen, unsigned_rounding_mode_pair_gen_var_5,
+    signed_unsigned_pair_gen_var_19, signed_unsigned_pair_gen_var_20,
+    signed_unsigned_rounding_mode_triple_gen_var_7, signed_unsigned_rounding_mode_triple_gen_var_8,
+    unsigned_pair_gen_var_18, unsigned_rounding_mode_pair_gen,
+    unsigned_rounding_mode_pair_gen_var_5, unsigned_unsigned_rounding_mode_triple_gen_var_7,
 };
-use malachite_float::test_util::arithmetic::shr_round::shr_round_naive;
 use malachite_float::test_util::arithmetic::shr_round::{
-    rug_shr_round_signed, rug_shr_round_unsigned,
+    rug_shr_prec_round_signed, rug_shr_prec_round_unsigned, rug_shr_prec_signed,
+    rug_shr_prec_unsigned, rug_shr_round_signed, rug_shr_round_unsigned, shr_prec_naive,
+    shr_prec_round_naive, shr_round_naive,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_rounding_mode_pair_gen, float_signed_rounding_mode_triple_gen_var_4,
-    float_signed_rounding_mode_triple_gen_var_5, float_unsigned_rounding_mode_triple_gen_var_8,
-    float_unsigned_rounding_mode_triple_gen_var_9,
+    float_signed_rounding_mode_triple_gen_var_5,
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_3,
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_4,
+    float_signed_unsigned_triple_gen_var_1, float_signed_unsigned_triple_gen_var_2,
+    float_unsigned_pair_gen_var_1, float_unsigned_rounding_mode_triple_gen_var_1,
+    float_unsigned_rounding_mode_triple_gen_var_8, float_unsigned_rounding_mode_triple_gen_var_9,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4,
+    float_unsigned_unsigned_triple_gen_var_1, float_unsigned_unsigned_triple_gen_var_2,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
@@ -40,6 +51,1921 @@ use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 use std::ops::Shr;
 use std::panic::catch_unwind;
+
+fn test_shr_prec_round_unsigned_helper<
+    T: PrimitiveUnsigned,
+    F: Fn(Float, T, u64, RoundingMode, Float, Ordering),
+>(
+    f: F,
+) where
+    Float: ShrRoundAssign<T> + ShrRound<T, Output = Float>,
+    Rational: Shr<T, Output = Rational>,
+    for<'a> &'a Float: ShrRound<T, Output = Float>,
+{
+    let test_r = |s,
+                  s_hex,
+                  v: u64,
+                  prec: u64,
+                  rm: RoundingMode,
+                  out: &str,
+                  out_hex: &str,
+                  out_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let v = T::exact_from(v);
+
+        let mut n = x.clone();
+        let o = n.shr_prec_round_assign(v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.clone().shr_prec_round(v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.shr_prec_round_ref(v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = shr_prec_round_naive(x.clone(), v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert_eq!(o, out_o);
+
+        f(x, v, prec, rm, n, out_o);
+    };
+
+    let test = |s, s_hex, v: u64, prec: u64, out: &str, out_hex: &str| {
+        for rm in exhaustive_rounding_modes() {
+            test_r(s, s_hex, v, prec, rm, out, out_hex, Equal);
+        }
+    };
+    test("NaN", "NaN", 0, 1, "NaN", "NaN");
+    test("NaN", "NaN", 0, 10, "NaN", "NaN");
+    test("NaN", "NaN", 10, 1, "NaN", "NaN");
+    test("NaN", "NaN", 10, 10, "NaN", "NaN");
+    test("Infinity", "Infinity", 0, 1, "Infinity", "Infinity");
+    test("Infinity", "Infinity", 0, 10, "Infinity", "Infinity");
+    test("Infinity", "Infinity", 10, 1, "Infinity", "Infinity");
+    test("Infinity", "Infinity", 10, 10, "Infinity", "Infinity");
+    test("-Infinity", "-Infinity", 0, 1, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 0, 10, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 10, 1, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 10, 10, "-Infinity", "-Infinity");
+    test("0.0", "0x0.0", 10, 1, "0.0", "0x0.0");
+    test("0.0", "0x0.0", 10, 10, "0.0", "0x0.0");
+    test("-0.0", "-0x0.0", 10, 1, "-0.0", "-0x0.0");
+    test("-0.0", "-0x0.0", 10, 10, "-0.0", "-0x0.0");
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Floor,
+        "6.0e1",
+        "0x4.0E+1#1",
+        Less,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Ceiling,
+        "1.0e2",
+        "0x8.0E+1#1",
+        Greater,
+    );
+    test_r("123.0", "0x7b.0#7", 0, 1, Down, "6.0e1", "0x4.0E+1#1", Less);
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Up,
+        "1.0e2",
+        "0x8.0E+1#1",
+        Greater,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Nearest,
+        "1.0e2",
+        "0x8.0E+1#1",
+        Greater,
+    );
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Floor,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Ceiling,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Down,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r("123.0", "0x7b.0#7", 0, 10, Up, "123.0", "0x7b.0#10", Equal);
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Nearest,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Exact,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+
+    test_r("123.0", "0x7b.0#7", 10, 1, Floor, "0.06", "0x0.1#1", Less);
+    test_r(
+        "123.0", "0x7b.0#7", 10, 1, Ceiling, "0.1", "0x0.2#1", Greater,
+    );
+    test_r("123.0", "0x7b.0#7", 10, 1, Down, "0.06", "0x0.1#1", Less);
+    test_r("123.0", "0x7b.0#7", 10, 1, Up, "0.1", "0x0.2#1", Greater);
+    test_r(
+        "123.0", "0x7b.0#7", 10, 1, Nearest, "0.1", "0x0.2#1", Greater,
+    );
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Floor,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Ceiling,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Down,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Up,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Nearest,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Exact,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Floor,
+        "-1.0e2",
+        "-0x8.0E+1#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Ceiling,
+        "-6.0e1",
+        "-0x4.0E+1#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Down,
+        "-6.0e1",
+        "-0x4.0E+1#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Up,
+        "-1.0e2",
+        "-0x8.0E+1#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Nearest,
+        "-1.0e2",
+        "-0x8.0E+1#1",
+        Less,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Floor,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Ceiling,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Down,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Up,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Nearest,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Exact,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Floor,
+        "-0.1",
+        "-0x0.2#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Ceiling,
+        "-0.06",
+        "-0x0.1#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Down,
+        "-0.06",
+        "-0x0.1#1",
+        Greater,
+    );
+    test_r("-123.0", "-0x7b.0#7", 10, 1, Up, "-0.1", "-0x0.2#1", Less);
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Nearest,
+        "-0.1",
+        "-0x0.2#1",
+        Less,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Floor,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Ceiling,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Down,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Up,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Nearest,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Exact,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Nearest,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+
+    test_r(
+        "too_small",
+        "0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        Nearest,
+        "too_small",
+        "0x1.00000000000000000E-268435456#66",
+        Greater,
+    );
+    test_r(
+        "-too_small",
+        "-0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        Nearest,
+        "-too_small",
+        "-0x1.00000000000000000E-268435456#66",
+        Less,
+    );
+}
+
+#[test]
+fn test_shr_prec_round_unsigned() {
+    test_shr_prec_round_unsigned_helper::<u8, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_unsigned_helper::<u16, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_unsigned_helper::<u32, _>(|x, v, prec, rm, shifted, o_out| {
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (n, o) = rug_shr_prec_round_unsigned(&rug::Float::exact_from(&x), v, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&n)),
+                ComparableFloatRef(&shifted)
+            );
+            assert_eq!(o, o_out);
+        }
+    });
+    test_shr_prec_round_unsigned_helper::<u64, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_unsigned_helper::<u128, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_unsigned_helper::<usize, _>(|_, _, _, _, _, _| {});
+}
+
+fn test_shr_prec_round_signed_helper<
+    T: PrimitiveSigned,
+    F: Fn(Float, T, u64, RoundingMode, Float, Ordering),
+>(
+    f: F,
+) where
+    Float: ShrRoundAssign<T> + ShrRound<T, Output = Float>,
+    Rational: Shr<T, Output = Rational>,
+    for<'a> &'a Float: ShrRound<T, Output = Float>,
+{
+    let test_r = |s,
+                  s_hex,
+                  v: i64,
+                  prec: u64,
+                  rm: RoundingMode,
+                  out: &str,
+                  out_hex: &str,
+                  out_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let v = T::exact_from(v);
+
+        let mut n = x.clone();
+        let o = n.shr_prec_round_assign(v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.clone().shr_prec_round(v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.shr_prec_round_ref(v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = shr_prec_round_naive(x.clone(), v, prec, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert_eq!(o, out_o);
+
+        f(x, v, prec, rm, n, out_o);
+    };
+
+    let test = |s, s_hex, v: i64, prec: u64, out: &str, out_hex: &str| {
+        for rm in exhaustive_rounding_modes() {
+            test_r(s, s_hex, v, prec, rm, out, out_hex, Equal);
+        }
+    };
+    test("NaN", "NaN", 0, 1, "NaN", "NaN");
+    test("NaN", "NaN", 0, 10, "NaN", "NaN");
+    test("NaN", "NaN", 10, 1, "NaN", "NaN");
+    test("NaN", "NaN", 10, 10, "NaN", "NaN");
+    test("NaN", "NaN", -10, 1, "NaN", "NaN");
+    test("NaN", "NaN", -10, 10, "NaN", "NaN");
+    test("Infinity", "Infinity", 0, 1, "Infinity", "Infinity");
+    test("Infinity", "Infinity", 0, 10, "Infinity", "Infinity");
+    test("Infinity", "Infinity", 10, 1, "Infinity", "Infinity");
+    test("Infinity", "Infinity", 10, 10, "Infinity", "Infinity");
+    test("Infinity", "Infinity", -10, 1, "Infinity", "Infinity");
+    test("Infinity", "Infinity", -10, 10, "Infinity", "Infinity");
+    test("-Infinity", "-Infinity", 0, 1, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 0, 10, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 10, 1, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 10, 10, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", -10, 1, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", -10, 10, "-Infinity", "-Infinity");
+    test("0.0", "0x0.0", 10, 1, "0.0", "0x0.0");
+    test("0.0", "0x0.0", 10, 10, "0.0", "0x0.0");
+    test("0.0", "0x0.0", -10, 1, "0.0", "0x0.0");
+    test("0.0", "0x0.0", -10, 10, "0.0", "0x0.0");
+    test("-0.0", "-0x0.0", 10, 1, "-0.0", "-0x0.0");
+    test("-0.0", "-0x0.0", 10, 10, "-0.0", "-0x0.0");
+    test("-0.0", "-0x0.0", -10, 1, "-0.0", "-0x0.0");
+    test("-0.0", "-0x0.0", -10, 10, "-0.0", "-0x0.0");
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Floor,
+        "6.0e1",
+        "0x4.0E+1#1",
+        Less,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Ceiling,
+        "1.0e2",
+        "0x8.0E+1#1",
+        Greater,
+    );
+    test_r("123.0", "0x7b.0#7", 0, 1, Down, "6.0e1", "0x4.0E+1#1", Less);
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Up,
+        "1.0e2",
+        "0x8.0E+1#1",
+        Greater,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        1,
+        Nearest,
+        "1.0e2",
+        "0x8.0E+1#1",
+        Greater,
+    );
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Floor,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Ceiling,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Down,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r("123.0", "0x7b.0#7", 0, 10, Up, "123.0", "0x7b.0#10", Equal);
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Nearest,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        0,
+        10,
+        Exact,
+        "123.0",
+        "0x7b.0#10",
+        Equal,
+    );
+
+    test_r("123.0", "0x7b.0#7", 10, 1, Floor, "0.06", "0x0.1#1", Less);
+    test_r(
+        "123.0", "0x7b.0#7", 10, 1, Ceiling, "0.1", "0x0.2#1", Greater,
+    );
+    test_r("123.0", "0x7b.0#7", 10, 1, Down, "0.06", "0x0.1#1", Less);
+    test_r("123.0", "0x7b.0#7", 10, 1, Up, "0.1", "0x0.2#1", Greater);
+    test_r(
+        "123.0", "0x7b.0#7", 10, 1, Nearest, "0.1", "0x0.2#1", Greater,
+    );
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Floor,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Ceiling,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Down,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Up,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Nearest,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        10,
+        Exact,
+        "0.1201",
+        "0x0.1ec0#10",
+        Equal,
+    );
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        1,
+        Floor,
+        "7.0e4",
+        "0x1.0E+4#1",
+        Less,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        1,
+        Ceiling,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        1,
+        Down,
+        "7.0e4",
+        "0x1.0E+4#1",
+        Less,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        1,
+        Up,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        1,
+        Nearest,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        Floor,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        Ceiling,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        Down,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        Up,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        Nearest,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        Exact,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Floor,
+        "-1.0e2",
+        "-0x8.0E+1#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Ceiling,
+        "-6.0e1",
+        "-0x4.0E+1#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Down,
+        "-6.0e1",
+        "-0x4.0E+1#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Up,
+        "-1.0e2",
+        "-0x8.0E+1#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        1,
+        Nearest,
+        "-1.0e2",
+        "-0x8.0E+1#1",
+        Less,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Floor,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Ceiling,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Down,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Up,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Nearest,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        0,
+        10,
+        Exact,
+        "-123.0",
+        "-0x7b.0#10",
+        Equal,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Floor,
+        "-0.1",
+        "-0x0.2#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Ceiling,
+        "-0.06",
+        "-0x0.1#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Down,
+        "-0.06",
+        "-0x0.1#1",
+        Greater,
+    );
+    test_r("-123.0", "-0x7b.0#7", 10, 1, Up, "-0.1", "-0x0.2#1", Less);
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        1,
+        Nearest,
+        "-0.1",
+        "-0x0.2#1",
+        Less,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Floor,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Ceiling,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Down,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Up,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Nearest,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        Exact,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        1,
+        Floor,
+        "-1.0e5",
+        "-0x2.0E+4#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        1,
+        Ceiling,
+        "-7.0e4",
+        "-0x1.0E+4#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        1,
+        Down,
+        "-7.0e4",
+        "-0x1.0E+4#1",
+        Greater,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        1,
+        Up,
+        "-1.0e5",
+        "-0x2.0E+4#1",
+        Less,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        1,
+        Nearest,
+        "-1.0e5",
+        "-0x2.0E+4#1",
+        Less,
+    );
+
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        Floor,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        Ceiling,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        Down,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        Up,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        Nearest,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+    test_r(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        Exact,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+
+    test_r(
+        "too_big",
+        "0x4.0E+268435455#1",
+        -1,
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_r(
+        "too_big",
+        "0x4.0E+268435455#1",
+        -1,
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_r(
+        "too_big",
+        "0x4.0E+268435455#1",
+        -1,
+        1,
+        Down,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_r(
+        "too_big",
+        "0x4.0E+268435455#1",
+        -1,
+        1,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_r(
+        "too_big",
+        "0x4.0E+268435455#1",
+        -1,
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+
+    test_r(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        -1,
+        1,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_r(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        -1,
+        1,
+        Ceiling,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_r(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        -1,
+        1,
+        Down,
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        Greater,
+    );
+    test_r(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        -1,
+        1,
+        Up,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test_r(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        -1,
+        1,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_r(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Down,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Up,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_r(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        Nearest,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+
+    test_r(
+        "too_small",
+        "0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        Nearest,
+        "too_small",
+        "0x1.00000000000000000E-268435456#66",
+        Greater,
+    );
+    test_r(
+        "-too_small",
+        "-0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        Nearest,
+        "-too_small",
+        "-0x1.00000000000000000E-268435456#66",
+        Less,
+    );
+}
+
+#[test]
+fn test_shr_prec_round_signed() {
+    test_shr_prec_round_signed_helper::<i8, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_signed_helper::<i16, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_signed_helper::<i32, _>(|x, v, prec, rm, shifted, o_out| {
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (n, o) = rug_shr_prec_round_signed(&rug::Float::exact_from(&x), v, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&n)),
+                ComparableFloatRef(&shifted)
+            );
+            assert_eq!(o, o_out);
+        }
+    });
+    test_shr_prec_round_signed_helper::<i64, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_signed_helper::<i128, _>(|_, _, _, _, _, _| {});
+    test_shr_prec_round_signed_helper::<isize, _>(|_, _, _, _, _, _| {});
+}
+
+#[test]
+fn shr_prec_round_fail() {
+    assert_panic!(Float::ONE.shr_prec_round(Float::MIN_EXPONENT, 1, Exact));
+    assert_panic!(Float::ONE.shr_prec_round(Float::MAX_EXPONENT + 2, 1, Exact));
+    assert_panic!(Float::NEGATIVE_ONE.shr_prec_round(Float::MIN_EXPONENT, 1, Exact));
+    assert_panic!(Float::NEGATIVE_ONE.shr_prec_round(Float::MAX_EXPONENT + 2, 1, Exact));
+}
+
+fn test_shr_prec_unsigned_helper<T: PrimitiveUnsigned, F: Fn(Float, T, u64, Float, Ordering)>(f: F)
+where
+    Rational: Shr<T, Output = Rational>,
+{
+    let test = |s, s_hex, v: u64, prec: u64, out: &str, out_hex: &str, out_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let v = T::exact_from(v);
+
+        let mut n = x.clone();
+        let o = n.shr_prec_assign(v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.clone().shr_prec(v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.shr_prec_ref(v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = shr_prec_naive(x.clone(), v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert_eq!(o, out_o);
+
+        f(x, v, prec, n, out_o);
+    };
+
+    test("NaN", "NaN", 0, 1, "NaN", "NaN", Equal);
+    test("NaN", "NaN", 0, 10, "NaN", "NaN", Equal);
+    test("NaN", "NaN", 10, 1, "NaN", "NaN", Equal);
+    test("NaN", "NaN", 10, 10, "NaN", "NaN", Equal);
+    test("Infinity", "Infinity", 0, 1, "Infinity", "Infinity", Equal);
+    test("Infinity", "Infinity", 0, 10, "Infinity", "Infinity", Equal);
+    test("Infinity", "Infinity", 10, 1, "Infinity", "Infinity", Equal);
+    test(
+        "Infinity", "Infinity", 10, 10, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        0,
+        1,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        0,
+        10,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        10,
+        1,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        10,
+        10,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test("0.0", "0x0.0", 10, 1, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", 10, 10, "0.0", "0x0.0", Equal);
+    test("-0.0", "-0x0.0", 10, 1, "-0.0", "-0x0.0", Equal);
+    test("-0.0", "-0x0.0", 10, 10, "-0.0", "-0x0.0", Equal);
+
+    test("123.0", "0x7b.0#7", 0, 1, "1.0e2", "0x8.0E+1#1", Greater);
+    test("123.0", "0x7b.0#7", 0, 10, "123.0", "0x7b.0#10", Equal);
+    test("123.0", "0x7b.0#7", 10, 1, "0.1", "0x0.2#1", Greater);
+    test("123.0", "0x7b.0#7", 10, 10, "0.1201", "0x0.1ec0#10", Equal);
+    test("-123.0", "-0x7b.0#7", 0, 1, "-1.0e2", "-0x8.0E+1#1", Less);
+    test("-123.0", "-0x7b.0#7", 0, 10, "-123.0", "-0x7b.0#10", Equal);
+    test("-123.0", "-0x7b.0#7", 10, 1, "-0.1", "-0x0.2#1", Less);
+    test(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test(
+        "too_small",
+        "0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        "too_small",
+        "0x1.00000000000000000E-268435456#66",
+        Greater,
+    );
+    test(
+        "-too_small",
+        "-0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        "-too_small",
+        "-0x1.00000000000000000E-268435456#66",
+        Less,
+    );
+}
+
+#[test]
+fn test_shr_prec_unsigned() {
+    test_shr_prec_unsigned_helper::<u8, _>(|_, _, _, _, _| {});
+    test_shr_prec_unsigned_helper::<u16, _>(|_, _, _, _, _| {});
+    test_shr_prec_unsigned_helper::<u32, _>(|x, v, prec, shifted, o_out| {
+        let (n, o) = rug_shr_prec_unsigned(&rug::Float::exact_from(&x), v, prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&n)),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o, o_out);
+    });
+    test_shr_prec_unsigned_helper::<u64, _>(|_, _, _, _, _| {});
+    test_shr_prec_unsigned_helper::<u128, _>(|_, _, _, _, _| {});
+    test_shr_prec_unsigned_helper::<usize, _>(|_, _, _, _, _| {});
+}
+
+fn test_shr_prec_signed_helper<T: PrimitiveSigned, F: Fn(Float, T, u64, Float, Ordering)>(f: F)
+where
+    Rational: Shr<T, Output = Rational>,
+{
+    let test = |s, s_hex, v: i64, prec: u64, out: &str, out_hex: &str, out_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let v = T::exact_from(v);
+
+        let mut n = x.clone();
+        let o = n.shr_prec_assign(v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.clone().shr_prec(v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = x.shr_prec_ref(v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert!(n.is_valid());
+        assert_eq!(o, out_o);
+
+        let (n, o) = shr_prec_naive(x.clone(), v, prec);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(to_hex_string(&n), out_hex);
+        assert_eq!(o, out_o);
+
+        f(x, v, prec, n, out_o);
+    };
+    test("NaN", "NaN", 0, 1, "NaN", "NaN", Equal);
+    test("NaN", "NaN", 0, 10, "NaN", "NaN", Equal);
+    test("NaN", "NaN", 10, 1, "NaN", "NaN", Equal);
+    test("NaN", "NaN", 10, 10, "NaN", "NaN", Equal);
+    test("NaN", "NaN", -10, 1, "NaN", "NaN", Equal);
+    test("NaN", "NaN", -10, 10, "NaN", "NaN", Equal);
+    test("Infinity", "Infinity", 0, 1, "Infinity", "Infinity", Equal);
+    test("Infinity", "Infinity", 0, 10, "Infinity", "Infinity", Equal);
+    test("Infinity", "Infinity", 10, 1, "Infinity", "Infinity", Equal);
+    test(
+        "Infinity", "Infinity", 10, 10, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "Infinity", "Infinity", -10, 1, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "Infinity", "Infinity", -10, 10, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        0,
+        1,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        0,
+        10,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        10,
+        1,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        10,
+        10,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        -10,
+        1,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        -10,
+        10,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test("0.0", "0x0.0", 10, 1, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", 10, 10, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", -10, 1, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", -10, 10, "0.0", "0x0.0", Equal);
+    test("-0.0", "-0x0.0", 10, 1, "-0.0", "-0x0.0", Equal);
+    test("-0.0", "-0x0.0", 10, 10, "-0.0", "-0x0.0", Equal);
+    test("-0.0", "-0x0.0", -10, 1, "-0.0", "-0x0.0", Equal);
+    test("-0.0", "-0x0.0", -10, 10, "-0.0", "-0x0.0", Equal);
+
+    test("123.0", "0x7b.0#7", 0, 1, "1.0e2", "0x8.0E+1#1", Greater);
+    test("123.0", "0x7b.0#7", 0, 10, "123.0", "0x7b.0#10", Equal);
+    test("123.0", "0x7b.0#7", 10, 1, "0.1", "0x0.2#1", Greater);
+    test("123.0", "0x7b.0#7", 10, 10, "0.1201", "0x0.1ec0#10", Equal);
+    test("123.0", "0x7b.0#7", -10, 1, "1.0e5", "0x2.0E+4#1", Greater);
+    test(
+        "123.0",
+        "0x7b.0#7",
+        -10,
+        10,
+        "1.26e5",
+        "0x1.ec0E+4#10",
+        Equal,
+    );
+    test("-123.0", "-0x7b.0#7", 0, 1, "-1.0e2", "-0x8.0E+1#1", Less);
+    test("-123.0", "-0x7b.0#7", 0, 10, "-123.0", "-0x7b.0#10", Equal);
+    test("-123.0", "-0x7b.0#7", 10, 1, "-0.1", "-0x0.2#1", Less);
+    test(
+        "-123.0",
+        "-0x7b.0#7",
+        10,
+        10,
+        "-0.1201",
+        "-0x0.1ec0#10",
+        Equal,
+    );
+    test("-123.0", "-0x7b.0#7", -10, 1, "-1.0e5", "-0x2.0E+4#1", Less);
+    test(
+        "-123.0",
+        "-0x7b.0#7",
+        -10,
+        10,
+        "-1.26e5",
+        "-0x1.ec0E+4#10",
+        Equal,
+    );
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        -1,
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test(
+        "-too_big",
+        "-0x4.0E+268435455#1",
+        -1,
+        1,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test(
+        "too_small",
+        "0x1.0E-268435456#1",
+        1,
+        1,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test(
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        1,
+        1,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test(
+        "too_small",
+        "0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        "too_small",
+        "0x1.00000000000000000E-268435456#66",
+        Greater,
+    );
+    test(
+        "-too_small",
+        "-0x4.df81e47e11c9aa6dE-268435455#67",
+        7,
+        66,
+        "-too_small",
+        "-0x1.00000000000000000E-268435456#66",
+        Less,
+    );
+}
+
+#[test]
+fn test_shr_prec_signed() {
+    test_shr_prec_signed_helper::<i8, _>(|_, _, _, _, _| {});
+    test_shr_prec_signed_helper::<i16, _>(|_, _, _, _, _| {});
+    test_shr_prec_signed_helper::<i32, _>(|x, v, prec, shifted, o_out| {
+        let (n, o) = rug_shr_prec_signed(&rug::Float::exact_from(&x), v, prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&n)),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o, o_out);
+    });
+    test_shr_prec_signed_helper::<i64, _>(|_, _, _, _, _| {});
+    test_shr_prec_signed_helper::<i128, _>(|_, _, _, _, _| {});
+    test_shr_prec_signed_helper::<isize, _>(|_, _, _, _, _| {});
+}
 
 fn test_shr_round_unsigned_helper<
     T: PrimitiveUnsigned,
@@ -1239,6 +3165,641 @@ fn test_shr_round_signed() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
+fn shr_prec_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(n: Float, u: T, prec: u64)
+where
+    i128: TryFrom<T>,
+    u64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+{
+    let mut mut_n = n.clone();
+    let o = mut_n.shr_prec_assign(u, prec);
+    assert!(mut_n.is_valid());
+    let shifted = mut_n;
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (shifted_alt, o_alt) = n.shr_prec_round_ref(u, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&shifted_alt),
+                ComparableFloatRef(&shifted)
+            );
+            assert_eq!(o_alt, Equal);
+        }
+    }
+
+    let (shifted_alt, o_alt) = n.shr_prec_ref(u, prec);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    let (shifted_alt, o_alt) = n.clone().shr_prec(u, prec);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    if i128::from(n.get_exponent().unwrap_or(1))
+        .wrapping_add(i128::exact_from(u))
+        .lt_abs(&1_000_000)
+    {
+        let (shifted_alt, o_alt) = shr_prec_naive(n.clone(), u, prec);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted),
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    if shifted.is_normal() {
+        assert_eq!(shifted.get_prec(), Some(prec));
+    }
+
+    let (shifted_2, o_2) = (-&n).shr_prec(u, prec);
+    let (shifted_2_alt, o_2_alt) = n.shr_prec_ref(u, prec);
+    assert_eq!(ComparableFloat(-shifted_2_alt), ComparableFloat(shifted_2));
+    assert_eq!(o_2_alt.reverse(), o_2);
+
+    if shifted.is_normal() {
+        let (shifted_alt, o_alt) = n.div_prec(Float::power_of_2(u64::exact_from(u)), prec);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    }
+}
+
+fn shr_prec_properties_helper_unsigned<T: PrimitiveUnsigned>()
+where
+    i128: TryFrom<T>,
+    u64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+{
+    float_unsigned_unsigned_triple_gen_var_1::<T, _>().test_properties(|(n, u, prec)| {
+        shr_prec_properties_helper_unsigned_helper(n, u, prec);
+    });
+
+    float_unsigned_unsigned_triple_gen_var_2::<T, _>().test_properties(|(n, u, prec)| {
+        shr_prec_properties_helper_unsigned_helper(n, u, prec);
+    });
+
+    float_unsigned_pair_gen_var_1().test_properties(|(n, prec)| {
+        let (shifted, o) = n.shr_prec_ref(T::ZERO, prec);
+        let (shifted_alt, o_alt) = Float::from_float_prec(n, prec);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(shifted_alt));
+        assert_eq!(o, o_alt);
+    });
+
+    unsigned_pair_gen_var_18::<T, _>().test_properties(|(u, prec)| {
+        let (shifted, o) = Float::NAN.shr_prec(u, prec);
+        assert!(shifted.is_nan());
+        assert_eq!(o, Equal);
+        assert_eq!(Float::INFINITY.shr_prec(u, prec), (Float::INFINITY, Equal));
+        assert_eq!(
+            Float::NEGATIVE_INFINITY.shr_prec(u, prec),
+            (Float::NEGATIVE_INFINITY, Equal)
+        );
+
+        let (shifted, o) = Float::ZERO.shr_prec(u, prec);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+
+        let (shifted, o) = Float::NEGATIVE_ZERO.shr_prec(u, prec);
+        assert_eq!(
+            ComparableFloat(shifted),
+            ComparableFloat(Float::NEGATIVE_ZERO)
+        );
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_properties_helper_signed_helper<T: PrimitiveSigned>(n: Float, i: T, prec: u64)
+where
+    i128: TryFrom<T>,
+    i64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    let mut mut_n = n.clone();
+    let o = mut_n.shr_prec_assign(i, prec);
+    assert!(mut_n.is_valid());
+    let shifted = mut_n;
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (shifted_alt, o_alt) = n.shr_prec_round_ref(i, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&shifted_alt),
+                ComparableFloatRef(&shifted)
+            );
+            assert_eq!(o_alt, Equal);
+        }
+    }
+
+    let (shifted_alt, o_alt) = n.shr_prec_ref(i, prec);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    let (shifted_alt, o_alt) = n.clone().shr_prec(i, prec);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    if i128::from(n.get_exponent().unwrap_or(1))
+        .wrapping_add(i128::exact_from(i))
+        .lt_abs(&1_000_000)
+    {
+        let (shifted_alt, o_alt) = shr_prec_naive(n.clone(), i, prec);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    if shifted.is_normal() {
+        assert_eq!(shifted.get_prec(), Some(prec));
+    }
+
+    if i >= T::ZERO {
+        let (shifted_alt, o_alt) = n.shr_prec_ref(i.unsigned_abs(), prec);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    } else if i != T::MIN {
+        let (shifted_alt, o_alt) = n.shl_prec_ref(i.unsigned_abs(), prec);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    };
+
+    let (shifted_2, o_2) = (-&n).shr_prec(i, prec);
+    let (shifted_2_alt, o_2_alt) = n.shr_prec_ref(i, prec);
+    assert_eq!(ComparableFloat(-shifted_2_alt), ComparableFloat(shifted_2));
+    assert_eq!(o_2_alt.reverse(), o_2);
+
+    if shifted.is_normal() {
+        let (shifted_alt, o_alt) = n.div_prec(Float::power_of_2(i64::exact_from(i)), prec);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    }
+}
+
+fn shr_prec_properties_helper_signed<T: PrimitiveSigned>()
+where
+    i128: TryFrom<T>,
+    i64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    float_signed_unsigned_triple_gen_var_1::<T, _>().test_properties(|(n, i, prec)| {
+        shr_prec_properties_helper_signed_helper(n, i, prec);
+    });
+
+    float_signed_unsigned_triple_gen_var_2::<T, _>().test_properties(|(n, i, prec)| {
+        shr_prec_properties_helper_signed_helper(n, i, prec);
+    });
+
+    float_unsigned_pair_gen_var_1().test_properties(|(n, prec)| {
+        let (shifted, o) = n.shr_prec_ref(T::ZERO, prec);
+        let (shifted_alt, o_alt) = Float::from_float_prec(n, prec);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(shifted_alt));
+        assert_eq!(o, o_alt);
+    });
+
+    signed_unsigned_pair_gen_var_19::<T, _>().test_properties(|(i, prec)| {
+        let (shifted, o) = Float::NAN.shr_prec(i, prec);
+        assert!(shifted.is_nan());
+        assert_eq!(o, Equal);
+        assert_eq!(Float::INFINITY.shr_prec(i, prec), (Float::INFINITY, Equal));
+        assert_eq!(
+            Float::NEGATIVE_INFINITY.shr_prec(i, prec),
+            (Float::NEGATIVE_INFINITY, Equal)
+        );
+
+        let (shifted, o) = Float::ZERO.shr_prec(i, prec);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+
+        let (shifted, o) = Float::NEGATIVE_ZERO.shr_prec(i, prec);
+        assert_eq!(
+            ComparableFloat(shifted),
+            ComparableFloat(Float::NEGATIVE_ZERO)
+        );
+        assert_eq!(o, Equal);
+    });
+
+    signed_unsigned_pair_gen_var_20::<T, _>().test_properties(|(i, prec)| {
+        let (shifted, o) = Float::ONE.shr_prec(i, prec);
+        if shifted.is_normal() {
+            assert!(shifted.is_power_of_2());
+            assert_eq!(o, Equal);
+        }
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_rug_unsigned_helper(n: Float, u: u32, prec: u64) {
+    let (shifted, o) = n.shr_prec_ref(u, prec);
+    let (rug_shifted, rug_o) = rug_shr_prec_unsigned(&rug::Float::exact_from(&n), u, prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_shifted)),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o, rug_o);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_rug_signed_helper(n: Float, i: i32, prec: u64) {
+    let (shifted, o) = n.shr_prec_ref(i, prec);
+    let (rug_shifted, rug_o) = rug_shr_prec_signed(&rug::Float::exact_from(&n), i, prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_shifted)),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o, rug_o);
+}
+
+#[test]
+fn shr_prec_properties() {
+    apply_fn_to_unsigneds!(shr_prec_properties_helper_unsigned);
+    apply_fn_to_signeds!(shr_prec_properties_helper_signed);
+
+    float_unsigned_unsigned_triple_gen_var_1::<u32, _>()
+        .test_properties(|(n, u, prec)| shr_prec_rug_unsigned_helper(n, u, prec));
+
+    float_unsigned_unsigned_triple_gen_var_2::<u32, _>()
+        .test_properties(|(n, u, prec)| shr_prec_rug_unsigned_helper(n, u, prec));
+
+    float_signed_unsigned_triple_gen_var_1::<i32, _>()
+        .test_properties(|(n, i, prec)| shr_prec_rug_signed_helper(n, i, prec));
+
+    float_signed_unsigned_triple_gen_var_2::<i32, _>()
+        .test_properties(|(n, i, prec)| shr_prec_rug_signed_helper(n, i, prec));
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
+    n: Float,
+    u: T,
+    prec: u64,
+    rm: RoundingMode,
+) where
+    i128: TryFrom<T>,
+    u64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+{
+    let mut mut_n = n.clone();
+    let o = mut_n.shr_prec_round_assign(u, prec, rm);
+    assert!(mut_n.is_valid());
+    let shifted = mut_n;
+
+    match (n >= 0, rm) {
+        (_, Floor) | (true, Down) | (false, Up) => {
+            assert_ne!(o, Greater);
+        }
+        (_, Ceiling) | (true, Up) | (false, Down) => {
+            assert_ne!(o, Less);
+        }
+        (_, Exact) => assert_eq!(o, Equal),
+        _ => {}
+    }
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (shifted_alt, o_alt) = n.shr_prec_round_ref(u, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&shifted_alt),
+                ComparableFloatRef(&shifted)
+            );
+            assert_eq!(o_alt, Equal);
+        }
+    }
+
+    let (shifted_alt, o_alt) = n.shr_prec_round_ref(u, prec, rm);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    let (shifted_alt, o_alt) = n.clone().shr_prec_round(u, prec, rm);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    if i128::from(n.get_exponent().unwrap_or(1))
+        .wrapping_add(i128::exact_from(u))
+        .lt_abs(&1_000_000)
+    {
+        let (shifted_alt, o_alt) = shr_prec_round_naive(n.clone(), u, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted),
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    if shifted.is_normal() {
+        assert_eq!(shifted.get_prec(), Some(prec));
+    }
+
+    let (shifted_2, o_2) = (-&n).shr_prec_round(u, prec, rm);
+    let (shifted_2_alt, o_2_alt) = n.shr_prec_round_ref(u, prec, -rm);
+    assert_eq!(ComparableFloat(-shifted_2_alt), ComparableFloat(shifted_2));
+    assert_eq!(o_2_alt.reverse(), o_2);
+
+    if shifted.is_normal() {
+        let (shifted_alt, o_alt) =
+            n.div_prec_round(Float::power_of_2(u64::exact_from(u)), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    }
+}
+
+fn shr_prec_round_properties_helper_unsigned<T: PrimitiveUnsigned>()
+where
+    i128: TryFrom<T>,
+    u64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+{
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3::<T>().test_properties(
+        |(n, u, prec, rm)| {
+            shr_prec_round_properties_helper_unsigned_helper(n, u, prec, rm);
+        },
+    );
+
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4::<T>().test_properties(
+        |(n, u, prec, rm)| {
+            shr_prec_round_properties_helper_unsigned_helper(n, u, prec, rm);
+        },
+    );
+
+    float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(n, prec, rm)| {
+        let (shifted, o) = n.shr_prec_round_ref(T::ZERO, prec, rm);
+        let (shifted_alt, o_alt) = Float::from_float_prec_round(n, prec, rm);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(shifted_alt));
+        assert_eq!(o, o_alt);
+    });
+
+    unsigned_unsigned_rounding_mode_triple_gen_var_7::<T, _>().test_properties(|(u, prec, rm)| {
+        let (shifted, o) = Float::NAN.shr_prec_round(u, prec, rm);
+        assert!(shifted.is_nan());
+        assert_eq!(o, Equal);
+        assert_eq!(
+            Float::INFINITY.shr_prec_round(u, prec, rm),
+            (Float::INFINITY, Equal)
+        );
+        assert_eq!(
+            Float::NEGATIVE_INFINITY.shr_prec_round(u, prec, rm),
+            (Float::NEGATIVE_INFINITY, Equal)
+        );
+
+        let (shifted, o) = Float::ZERO.shr_prec_round(u, prec, rm);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+
+        let (shifted, o) = Float::NEGATIVE_ZERO.shr_prec_round(u, prec, rm);
+        assert_eq!(
+            ComparableFloat(shifted),
+            ComparableFloat(Float::NEGATIVE_ZERO)
+        );
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_round_properties_helper_signed_helper<T: PrimitiveSigned>(
+    n: Float,
+    i: T,
+    prec: u64,
+    rm: RoundingMode,
+) where
+    i128: TryFrom<T>,
+    i64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    let mut mut_n = n.clone();
+    let o = mut_n.shr_prec_round_assign(i, prec, rm);
+    assert!(mut_n.is_valid());
+    let shifted = mut_n;
+
+    match (n >= 0, rm) {
+        (_, Floor) | (true, Down) | (false, Up) => {
+            assert_ne!(o, Greater);
+        }
+        (_, Ceiling) | (true, Up) | (false, Down) => {
+            assert_ne!(o, Less);
+        }
+        (_, Exact) => assert_eq!(o, Equal),
+        _ => {}
+    }
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (shifted_alt, o_alt) = n.shr_prec_round_ref(i, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&shifted_alt),
+                ComparableFloatRef(&shifted)
+            );
+            assert_eq!(o_alt, Equal);
+        }
+    }
+
+    let (shifted_alt, o_alt) = n.shr_prec_round_ref(i, prec, rm);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    let (shifted_alt, o_alt) = n.clone().shr_prec_round(i, prec, rm);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
+    if i128::from(n.get_exponent().unwrap_or(1))
+        .wrapping_add(i128::exact_from(i))
+        .lt_abs(&1_000_000)
+    {
+        let (shifted_alt, o_alt) = shr_prec_round_naive(n.clone(), i, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    if shifted.is_normal() {
+        assert_eq!(shifted.get_prec(), Some(prec));
+    }
+
+    if i >= T::ZERO {
+        let (shifted_alt, o_alt) = n.shr_prec_round_ref(i.unsigned_abs(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    } else if i != T::MIN {
+        let (shifted_alt, o_alt) = n.shl_prec_round_ref(i.unsigned_abs(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    };
+
+    let (shifted_2, o_2) = (-&n).shr_prec_round(i, prec, rm);
+    let (shifted_2_alt, o_2_alt) = n.shr_prec_round_ref(i, prec, -rm);
+    assert_eq!(ComparableFloat(-shifted_2_alt), ComparableFloat(shifted_2));
+    assert_eq!(o_2_alt.reverse(), o_2);
+
+    if shifted.is_normal() {
+        let (shifted_alt, o_alt) =
+            n.div_prec_round(Float::power_of_2(i64::exact_from(i)), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&shifted_alt),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o_alt, o);
+    }
+}
+
+fn shr_prec_round_properties_helper_signed<T: PrimitiveSigned>()
+where
+    i128: TryFrom<T>,
+    i64: TryFrom<T>,
+    Rational: Shr<T, Output = Rational>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_3::<T>().test_properties(
+        |(n, i, prec, rm)| {
+            shr_prec_round_properties_helper_signed_helper(n, i, prec, rm);
+        },
+    );
+
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_4::<T>().test_properties(
+        |(n, i, prec, rm)| {
+            shr_prec_round_properties_helper_signed_helper(n, i, prec, rm);
+        },
+    );
+
+    float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(n, prec, rm)| {
+        let (shifted, o) = n.shr_prec_round_ref(T::ZERO, prec, rm);
+        let (shifted_alt, o_alt) = Float::from_float_prec_round(n, prec, rm);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(shifted_alt));
+        assert_eq!(o, o_alt);
+    });
+
+    signed_unsigned_rounding_mode_triple_gen_var_7::<T, _>().test_properties(|(i, prec, rm)| {
+        let (shifted, o) = Float::NAN.shr_prec_round(i, prec, rm);
+        assert!(shifted.is_nan());
+        assert_eq!(o, Equal);
+        assert_eq!(
+            Float::INFINITY.shr_prec_round(i, prec, rm),
+            (Float::INFINITY, Equal)
+        );
+        assert_eq!(
+            Float::NEGATIVE_INFINITY.shr_prec_round(i, prec, rm),
+            (Float::NEGATIVE_INFINITY, Equal)
+        );
+
+        let (shifted, o) = Float::ZERO.shr_prec_round(i, prec, rm);
+        assert_eq!(ComparableFloat(shifted), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+
+        let (shifted, o) = Float::NEGATIVE_ZERO.shr_prec_round(i, prec, rm);
+        assert_eq!(
+            ComparableFloat(shifted),
+            ComparableFloat(Float::NEGATIVE_ZERO)
+        );
+        assert_eq!(o, Equal);
+    });
+
+    signed_unsigned_rounding_mode_triple_gen_var_8::<T, _>().test_properties(|(i, prec, rm)| {
+        let (shifted, o) = Float::ONE.shr_prec_round(i, prec, rm);
+        assert!(shifted.is_power_of_2());
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_round_rug_unsigned_helper(n: Float, u: u32, prec: u64, rm: RoundingMode) {
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (shifted, o) = n.shr_prec_round_ref(u, prec, rm);
+        let (rug_shifted, rug_o) =
+            rug_shr_prec_round_unsigned(&rug::Float::exact_from(&n), u, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_shifted)),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o, rug_o);
+    }
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn shr_prec_round_rug_signed_helper(n: Float, i: i32, prec: u64, rm: RoundingMode) {
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (shifted, o) = n.shr_prec_round_ref(i, prec, rm);
+        let (rug_shifted, rug_o) =
+            rug_shr_prec_round_signed(&rug::Float::exact_from(&n), i, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_shifted)),
+            ComparableFloatRef(&shifted)
+        );
+        assert_eq!(o, rug_o);
+    }
+}
+
+#[test]
+fn shr_prec_round_properties() {
+    apply_fn_to_unsigneds!(shr_prec_round_properties_helper_unsigned);
+    apply_fn_to_signeds!(shr_prec_round_properties_helper_signed);
+
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3::<u32>()
+        .test_properties(|(n, u, prec, rm)| shr_prec_round_rug_unsigned_helper(n, u, prec, rm));
+
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4::<u32>()
+        .test_properties(|(n, u, prec, rm)| shr_prec_round_rug_unsigned_helper(n, u, prec, rm));
+
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_3::<i32>()
+        .test_properties(|(n, i, prec, rm)| shr_prec_round_rug_signed_helper(n, i, prec, rm));
+
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_4::<i32>()
+        .test_properties(|(n, i, prec, rm)| shr_prec_round_rug_signed_helper(n, i, prec, rm));
+}
+
+#[allow(clippy::needless_pass_by_value)]
 fn shr_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
     n: Float,
     u: T,
@@ -1247,7 +3808,7 @@ fn shr_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
     for<'a> &'a Integer: Shr<T, Output = Integer>,
     Float: ShrRound<T, Output = Float> + ShrRoundAssign<T> + ShlRound<T, Output = Float>,
     Rational: Shr<T, Output = Rational>,
-    for<'a> &'a Float: ShrRound<T, Output = Float>,
+    for<'a> &'a Float: ShrRound<T, Output = Float> + Shr<T, Output = Float>,
     u64: TryFrom<T>,
     i128: TryFrom<T>,
 {
@@ -1293,6 +3854,14 @@ fn shr_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
     );
     assert_eq!(o_alt, o);
 
+    let (shifted_alt, o_alt) = n.shr_prec_round_ref(u, n.get_prec().unwrap_or(1), rm);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
     if i128::from(n.get_exponent().unwrap_or(1))
         .wrapping_sub(i128::exact_from(u))
         .lt_abs(&1_000_000)
@@ -1330,10 +3899,12 @@ fn shr_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
     assert_eq!(ComparableFloat(-shifted_2_alt), ComparableFloat(shifted_2));
     assert_eq!(o_2_alt.reverse(), o_2);
 
-    // TODO add
-    //
-    // if shifted.is_normal() { assert_eq!( ComparableFloat(&n >> u), ComparableFloat(n /
-    // Float::power_of_2(u64::exact_from(u))) ); }
+    if shifted.is_normal() {
+        assert_eq!(
+            ComparableFloat(&n >> u),
+            ComparableFloat(n / Float::power_of_2(u64::exact_from(u)))
+        );
+    }
 }
 
 fn shr_round_properties_helper_unsigned<T: PrimitiveUnsigned>()
@@ -1341,7 +3912,7 @@ where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
     Float: ShrRound<T, Output = Float> + ShlRound<T, Output = Float> + ShrRoundAssign<T>,
     Rational: Shr<T, Output = Rational>,
-    for<'a> &'a Float: ShrRound<T, Output = Float>,
+    for<'a> &'a Float: ShrRound<T, Output = Float> + Shr<T, Output = Float>,
     u64: TryFrom<T>,
     i128: TryFrom<T>,
 {
@@ -1394,9 +3965,11 @@ where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
     Float: ShrRound<T, Output = Float> + ShrRoundAssign<T> + ShlRound<T, Output = Float>,
     for<'a> &'a Float: ShrRound<T, Output = Float>
+        + Shr<T, Output = Float>
         + ShrRound<<T as UnsignedAbs>::Output, Output = Float>
         + ShlRound<<T as UnsignedAbs>::Output, Output = Float>
         + ShlRound<T, Output = Float>,
+    u64: TryFrom<T>,
     i64: TryFrom<T>,
     i128: TryFrom<T>,
 {
@@ -1442,6 +4015,14 @@ where
     );
     assert_eq!(o_alt, o);
 
+    let (shifted_alt, o_alt) = n.shr_prec_round_ref(i, n.get_prec().unwrap_or(1), rm);
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    assert_eq!(o_alt, o);
+
     if shifted.is_normal() {
         assert_eq!(n.get_prec(), shifted.get_prec());
     }
@@ -1475,10 +4056,12 @@ where
     assert_eq!(ComparableFloat(-shifted_2_alt), ComparableFloat(shifted_2));
     assert_eq!(o_2_alt.reverse(), o_2);
 
-    // TODO add
-    //
-    // if shifted.is_normal() { assert_eq!( ComparableFloat(&n >> i), ComparableFloat(n /
-    // Float::power_of_2(u64::exact_from(i))) ); }
+    if shifted.is_normal() {
+        assert_eq!(
+            ComparableFloat(&n >> i),
+            ComparableFloat(n / Float::power_of_2(i64::exact_from(i)))
+        );
+    }
 }
 
 fn shr_round_properties_helper_signed<T: PrimitiveSigned>()
@@ -1486,10 +4069,12 @@ where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
     Float: ShrRound<T, Output = Float> + ShrRoundAssign<T> + ShlRound<T, Output = Float>,
     for<'a> &'a Float: ShrRound<T, Output = Float>
+        + Shr<T, Output = Float>
         + ShrRound<<T as UnsignedAbs>::Output, Output = Float>
         + ShlRound<<T as UnsignedAbs>::Output, Output = Float>
         + ShlRound<T, Output = Float>,
     i64: TryFrom<T>,
+    u64: TryFrom<T>,
     i128: TryFrom<T>,
 {
     float_signed_rounding_mode_triple_gen_var_4::<T>().test_properties(|(n, i, rm)| {

@@ -102,6 +102,55 @@ impl Float {
         }
     }
 
+    /// Left-shifts a [`Float`] (multiplies it by a power of 2), rounding the result with the
+    /// specified rounding mode and precision, and taking the [`Float`] by value.
+    ///
+    /// `NaN`, infinities, and zeros are unchanged. If the output has a precision, it is `prec`.
+    ///
+    /// $$
+    /// f(x,k,p,m) = x2^k.
+    /// $$
+    ///
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is `prec`.
+    /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,k,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,k,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::shl_prec`] instead. If you
+    /// know that your target precision is the precision of the input, consider using
+    /// [`Float::shl_round`] instead. If both of these things are true, or you don't care about
+    /// overflow or underflow behavior, consider using `<<` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the result overflows or underflows, or cannot be expressed
+    /// exactly with the specified precision.
+    ///
+    /// # Examples
+    /// See [here](super::shl_prec_round#shl_prec_round).
     pub fn shl_prec_round<T: PrimitiveInt>(
         mut self,
         bits: T,
@@ -112,6 +161,55 @@ impl Float {
         (self, o)
     }
 
+    /// Left-shifts a [`Float`] (multiplies it by a power of 2), rounding the result with the
+    /// specified rounding mode and precision, and taking the [`Float`] by reference.
+    ///
+    /// `NaN`, infinities, and zeros are unchanged. If the output has a precision, it is `prec`.
+    ///
+    /// $$
+    /// f(x,k,p,m) = x2^k.
+    /// $$
+    ///
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is `prec`.
+    /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,k,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,k,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::shl_prec_ref`] instead. If
+    /// you know that your target precision is the precision of the input, consider using
+    /// [`Float::shl_round_ref`] instead. If both of these things are true, or you don't care about
+    /// overflow or underflow behavior, consider using `<<` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the result overflows or underflows, or cannot be expressed
+    /// exactly with the specified precision.
+    ///
+    /// # Examples
+    /// See [here](super::shl_prec_round#shl_prec_round).
     pub fn shl_prec_round_ref<T: PrimitiveInt>(
         &self,
         bits: T,
@@ -123,6 +221,55 @@ impl Float {
         (x, o)
     }
 
+    /// Left-shifts a [`Float`] (multiplies it by a power of 2) in place, rounding the result with
+    /// the specified rounding mode and precision.
+    ///
+    /// `NaN`, infinities, and zeros are unchanged. If the output has a precision, it is `prec`.
+    ///
+    /// $$
+    /// x \gets x2^k.
+    /// $$
+    ///
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is `prec`.
+    /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,k,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,k,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::shl_prec_assign`] instead. If
+    /// you know that your target precision is the precision of the input, consider using
+    /// [`Float::shl_round_assign`] instead. If both of these things are true, or you don't care
+    /// about overflow or underflow behavior, consider using `<<=` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the result overflows or underflows, or cannot be expressed
+    /// exactly with the specified precision.
+    ///
+    /// # Examples
+    /// See [here](super::shl_prec_round#shl_prec_round).
     pub fn shl_prec_round_assign<T: PrimitiveInt>(
         &mut self,
         bits: T,
@@ -134,7 +281,7 @@ impl Float {
             *exponent = 0;
             let o = self.set_prec_round(prec, rm);
             self.shl_prec_round_assign_helper(
-                <T as SaturatingInto<i32>>::saturating_into(bits).saturating_sub(old_exponent),
+                <T as SaturatingInto<i32>>::saturating_into(bits).saturating_add(old_exponent),
                 prec,
                 rm,
                 o,
@@ -144,16 +291,100 @@ impl Float {
         }
     }
 
+    /// Left-shifts a [`Float`] (multiplies it by a power of 2), rounding the result with the
+    /// specified precision, and taking the [`Float`] by value.
+    ///
+    /// `NaN`, infinities, and zeros are unchanged. If the output has a precision, it is `prec`.
+    ///
+    /// $$
+    /// f(x,k,p) = x2^k.
+    /// $$
+    ///
+    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,k,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,k,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,k,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you know that your target precision is the precision of the input, or you don't care
+    /// about overflow or underflow behavior, consider using `<<` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// See [here](super::shl_prec#shl_prec).
     #[inline]
     pub fn shl_prec<T: PrimitiveInt>(self, bits: T, prec: u64) -> (Self, Ordering) {
         self.shl_prec_round(bits, prec, Nearest)
     }
 
+    /// Left-shifts a [`Float`] (multiplies it by a power of 2), rounding the result with the
+    /// specified precision, and taking the [`Float`] by reference.
+    ///
+    /// `NaN`, infinities, and zeros are unchanged. If the output has a precision, it is `prec`.
+    ///
+    /// $$
+    /// f(x,k,p) = x2^k.
+    /// $$
+    ///
+    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,k,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,k,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,k,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you know that your target precision is the precision of the input, or you don't care
+    /// about overflow or underflow behavior, consider using `<<` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// See [here](super::shl_prec#shl_prec).
     #[inline]
     pub fn shl_prec_ref<T: PrimitiveInt>(&self, bits: T, prec: u64) -> (Self, Ordering) {
         self.shl_prec_round_ref(bits, prec, Nearest)
     }
 
+    /// Left-shifts a [`Float`] (multiplies it by a power of 2) in place, rounding the result with
+    /// the specified precision.
+    ///
+    /// `NaN`, infinities, and zeros are unchanged. If the output has a precision, it is `prec`.
+    ///
+    /// $$
+    /// x \gets x2^k.
+    /// $$
+    ///
+    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,k,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,k,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,k,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you know that your target precision is the precision of the input, or you don't care
+    /// about overflow or underflow behavior, consider using `<<=` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// See [here](super::shl_prec#shl_prec).
     #[inline]
     pub fn shl_prec_assign<T: PrimitiveInt>(&mut self, bits: T, prec: u64) -> Ordering {
         self.shl_prec_round_assign(bits, prec, Nearest)
@@ -239,8 +470,8 @@ macro_rules! impl_natural_shl_round {
         impl ShlRound<$t> for Float {
             type Output = Float;
 
-            /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking the [`Float`] by
-            /// value.
+            /// Left-shifts a [`Float`] (multiplies it by a power of 2), rounding the result with
+            /// the specified rounding mode and taking the [`Float`] by value.
             ///
             /// `NaN`, infinities, and zeros are unchanged. If the [`Float`] has a precision, the
             /// output has the same precision.
@@ -300,8 +531,8 @@ macro_rules! impl_natural_shl_round {
         impl ShlRound<$t> for &Float {
             type Output = Float;
 
-            /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking the [`Float`] by
-            /// reference.
+            /// Left-shifts a [`Float`] (multiplies it by a power of 2), rounding the result with
+            /// the specified rounding mode and taking the [`Float`] by reference.
             ///
             /// `NaN`, infinities, and zeros are unchanged. If the [`Float`] has a precision, the
             /// output has the same precision.
@@ -358,7 +589,8 @@ macro_rules! impl_natural_shl_round {
         }
 
         impl ShlRoundAssign<$t> for Float {
-            /// Left-shifts a [`Float`] (multiplies it by a power of 2), in place.
+            /// Left-shifts a [`Float`] (multiplies it by a power of 2), in place, rounding the
+            /// result with the specified rounding mode.
             ///
             /// `NaN`, infinities, and zeros are unchanged. If the [`Float`] has a precision, the
             /// precision is unchanged.

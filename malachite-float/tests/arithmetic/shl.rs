@@ -506,6 +506,12 @@ where
         ComparableFloatRef(&shifted_alt),
         ComparableFloatRef(&shifted)
     );
+    let shifted_alt = n.clone().shl_prec(u, n.get_prec().unwrap_or(1)).0;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
 
     if i128::from(n.get_exponent().unwrap_or(1))
         .wrapping_add(i128::exact_from(u))
@@ -617,6 +623,12 @@ where
         ComparableFloatRef(&shifted)
     );
     let shifted_alt = n.clone().shl_round(i, Nearest).0;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
+    let shifted_alt = n.clone().shl_prec(i, n.get_prec().unwrap_or(1)).0;
     assert!(shifted_alt.is_valid());
     assert_eq!(
         ComparableFloatRef(&shifted_alt),

@@ -1685,7 +1685,20 @@ pub fn exhaustive_signed_unsigned_rounding_mode_triple_gen_var_2<
     ))
 }
 
-// var 3 is in malachite-float.
+// var 3 through 5 are in malachite-float.
+
+pub fn exhaustive_signed_unsigned_rounding_mode_triple_gen_var_6<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs(
+            exhaustive_signeds::<T>(),
+            exhaustive_positive_primitive_ints::<U>(),
+        ),
+        exhaustive_rounding_modes(),
+    )))
+}
 
 // -- (PrimitiveSigned, RoundingMode) --
 
@@ -3202,7 +3215,20 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_5<
     ))
 }
 
-// var 6 is in malachite-float.
+// vars 6 through 7 are in malachite-float.
+
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs(
+            exhaustive_unsigneds::<T>(),
+            exhaustive_positive_primitive_ints::<U>(),
+        ),
+        exhaustive_rounding_modes(),
+    )))
+}
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
 

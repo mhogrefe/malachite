@@ -1203,7 +1203,7 @@ pub fn float_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUn
 -> Generator<(Float, T, U)> {
     Generator::new(
         &exhaustive_float_signed_unsigned_triple_gen_var_1,
-        &random_float_primitive_int_primitive_int_triple_gen_var_1,
+        &random_float_signed_unsigned_triple_gen_var_1,
         &special_random_float_signed_unsigned_triple_gen_var_1,
     )
 }
@@ -1212,11 +1212,7 @@ pub fn float_signed_unsigned_triple_gen_var_1_rm<T: PrimitiveSigned, U: Primitiv
 -> Generator<((rug::Float, T, U), (Float, T, U))> {
     Generator::new(
         &|| float_t_u_triple_rm(exhaustive_float_signed_unsigned_triple_gen_var_1()),
-        &|config| {
-            float_t_u_triple_rm(random_float_primitive_int_primitive_int_triple_gen_var_1(
-                config,
-            ))
-        },
+        &|config| float_t_u_triple_rm(random_float_signed_unsigned_triple_gen_var_1(config)),
         &|config| {
             float_t_u_triple_rm(special_random_float_signed_unsigned_triple_gen_var_1(
                 config,
@@ -1231,7 +1227,7 @@ pub fn float_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUn
 -> Generator<(Float, T, U)> {
     Generator::new(
         &exhaustive_float_signed_unsigned_triple_gen_var_2,
-        &random_float_primitive_int_primitive_int_triple_gen_var_2,
+        &random_float_signed_unsigned_triple_gen_var_2,
         &special_random_float_signed_unsigned_triple_gen_var_2,
     )
 }
@@ -1534,12 +1530,12 @@ pub fn float_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(
     )
 }
 
-// All `(Float, T, U)` where `T` and `U` are unsigned and the `U` is positive.
+// All `(Float, T, U)` where `T` and `U` are unsigned and the `U` is positive and small.
 pub fn float_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
 -> Generator<(Float, T, U)> {
     Generator::new(
         &exhaustive_float_unsigned_unsigned_triple_gen_var_1,
-        &random_float_primitive_int_primitive_int_triple_gen_var_1,
+        &random_float_unsigned_unsigned_triple_gen_var_1,
         &special_random_float_unsigned_unsigned_triple_gen_var_1,
     )
 }
@@ -1548,11 +1544,7 @@ pub fn float_unsigned_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>()
 -> Generator<((rug::Float, T, u64), (Float, T, u64))> {
     Generator::new(
         &|| float_t_u_triple_rm(exhaustive_float_unsigned_unsigned_triple_gen_var_1()),
-        &|config| {
-            float_t_u_triple_rm(random_float_primitive_int_primitive_int_triple_gen_var_1(
-                config,
-            ))
-        },
+        &|config| float_t_u_triple_rm(random_float_unsigned_unsigned_triple_gen_var_1(config)),
         &|config| {
             float_t_u_triple_rm(special_random_float_unsigned_unsigned_triple_gen_var_1(
                 config,
@@ -1562,12 +1554,12 @@ pub fn float_unsigned_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>()
 }
 
 // All `(Float, T, U)` where the `Float` is extreme, the `T` and `U` are unsigned, and the `U` is
-// positive.
+// positive and small.
 pub fn float_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
 -> Generator<(Float, T, U)> {
     Generator::new(
         &exhaustive_float_unsigned_unsigned_triple_gen_var_2,
-        &random_float_primitive_int_primitive_int_triple_gen_var_2,
+        &random_float_unsigned_unsigned_triple_gen_var_2,
         &special_random_float_unsigned_unsigned_triple_gen_var_2,
     )
 }
@@ -2632,7 +2624,32 @@ where
     )
 }
 
-// -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+// -- (Natural, PrimitiveUnsigned, RoundingMode) --
+
+// var 1 is in malachite-nz
+
+// All `(Natural, u64, RoundingMode)` that are valid inputs to `Float::from_natural_prec_round`.
+pub fn natural_unsigned_rounding_mode_triple_gen_var_2() -> Generator<(Natural, u64, RoundingMode)>
+{
+    Generator::new(
+        &exhaustive_natural_unsigned_rounding_mode_triple_gen_var_2,
+        &random_natural_unsigned_rounding_mode_triple_gen_var_2,
+        &special_random_natural_unsigned_rounding_mode_triple_gen_var_2,
+    )
+}
+
+// All `(Natural, u64, RoundingMode)` that are valid inputs to `Float::from_natural_prec_round`,
+// excluding those with `Exact`.
+pub fn natural_unsigned_rounding_mode_triple_gen_var_3() -> Generator<(Natural, u64, RoundingMode)>
+{
+    Generator::new(
+        &exhaustive_natural_unsigned_rounding_mode_triple_gen_var_3,
+        &random_natural_unsigned_rounding_mode_triple_gen_var_3,
+        &special_random_natural_unsigned_rounding_mode_triple_gen_var_3,
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 through 2 are in malachite-base.
 
@@ -2672,31 +2689,6 @@ pub fn signed_unsigned_rounding_mode_triple_gen_var_6() -> Generator<(i64, u64, 
         &exhaustive_signed_unsigned_rounding_mode_triple_gen_var_5,
         &random_signed_unsigned_rounding_mode_triple_gen_var_4,
         &special_random_signed_unsigned_rounding_mode_triple_gen_var_5,
-    )
-}
-
-// -- (Natural, PrimitiveUnsigned, RoundingMode) --
-
-// var 1 is in malachite-nz
-
-// All `(Natural, u64, RoundingMode)` that are valid inputs to `Float::from_natural_prec_round`.
-pub fn natural_unsigned_rounding_mode_triple_gen_var_2() -> Generator<(Natural, u64, RoundingMode)>
-{
-    Generator::new(
-        &exhaustive_natural_unsigned_rounding_mode_triple_gen_var_2,
-        &random_natural_unsigned_rounding_mode_triple_gen_var_2,
-        &special_random_natural_unsigned_rounding_mode_triple_gen_var_2,
-    )
-}
-
-// All `(Natural, u64, RoundingMode)` that are valid inputs to `Float::from_natural_prec_round`,
-// excluding those with `Exact`.
-pub fn natural_unsigned_rounding_mode_triple_gen_var_3() -> Generator<(Natural, u64, RoundingMode)>
-{
-    Generator::new(
-        &exhaustive_natural_unsigned_rounding_mode_triple_gen_var_3,
-        &random_natural_unsigned_rounding_mode_triple_gen_var_3,
-        &special_random_natural_unsigned_rounding_mode_triple_gen_var_3,
     )
 }
 

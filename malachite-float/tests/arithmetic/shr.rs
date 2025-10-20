@@ -558,6 +558,12 @@ where
         ComparableFloatRef(&shifted_alt),
         ComparableFloatRef(&shifted)
     );
+    let shifted_alt = n.clone().shr_prec(u, n.get_prec().unwrap_or(1)).0;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
 
     if i128::from(n.get_exponent().unwrap_or(1))
         .wrapping_sub(i128::exact_from(u))
@@ -589,10 +595,11 @@ where
                 &(&n * Float::power_of_2(i64::exact_from(u).checked_neg().unwrap()))
             )
         );
-        // TODO add
-        //
-        // assert_eq!( ComparableFloat(shifted), ComparableFloat(n /
-        // Float::power_of_2(u64::exact_from(u))) );
+
+        assert_eq!(
+            ComparableFloat(shifted),
+            ComparableFloat(n / Float::power_of_2(u64::exact_from(u)))
+        );
     }
 }
 
@@ -679,6 +686,12 @@ where
         ComparableFloatRef(&shifted_alt),
         ComparableFloatRef(&shifted)
     );
+    let shifted_alt = n.clone().shr_prec(i, n.get_prec().unwrap_or(1)).0;
+    assert!(shifted_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&shifted_alt),
+        ComparableFloatRef(&shifted)
+    );
 
     if i128::from(n.get_exponent().unwrap_or(1))
         .wrapping_sub(i128::exact_from(i))
@@ -719,10 +732,11 @@ where
             ComparableFloat(&n >> i),
             ComparableFloat(&n * Float::power_of_2(i64::exact_from(i).checked_neg().unwrap()))
         );
-        // TODO add
-        //
-        // assert_eq!( ComparableFloat(&n >> i), ComparableFloat(n /
-        // Float::power_of_2(i64::exact_from(i))) );
+
+        assert_eq!(
+            ComparableFloat(&n >> i),
+            ComparableFloat(n / Float::power_of_2(i64::exact_from(i)))
+        );
     }
 }
 
