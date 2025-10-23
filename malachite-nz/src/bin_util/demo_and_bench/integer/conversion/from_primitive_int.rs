@@ -219,7 +219,7 @@ fn benchmark_integer_const_from_unsigned(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |u| {
-            no_out!(Integer::const_from_unsigned(u))
+            no_out!(Integer::const_from_unsigned(u));
         })],
     );
 }

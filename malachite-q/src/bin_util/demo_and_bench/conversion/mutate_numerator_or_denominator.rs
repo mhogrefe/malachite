@@ -109,7 +109,7 @@ fn benchmark_rational_mutate_numerator(
             no_out!(n.mutate_numerator(|x| {
                 *x = new_numerator;
                 out
-            }))
+            }));
         })],
     );
 }
@@ -132,7 +132,7 @@ fn benchmark_rational_mutate_denominator(
             no_out!(n.mutate_denominator(|x| {
                 *x = new_denominator;
                 out
-            }))
+            }));
         })],
     );
 }
@@ -161,7 +161,7 @@ fn benchmark_rational_mutate_numerator_and_denominator(
                 *x = new_numerator;
                 *y = new_denominator;
                 out
-            }))
+            }));
         })],
     );
 }

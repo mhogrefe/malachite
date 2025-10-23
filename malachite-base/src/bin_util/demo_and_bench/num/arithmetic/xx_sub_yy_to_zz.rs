@@ -58,10 +58,10 @@ fn benchmark_xx_sub_yy_to_zz_algorithms<T: PrimitiveUnsigned>(
         &quadruple_max_bit_bucketer("x_1", "x_0", "y_1", "y_0"),
         &mut [
             ("default", &mut |(x_1, x_0, y_1, y_0)| {
-                no_out!(T::xx_sub_yy_to_zz(x_1, x_0, y_1, y_0))
+                no_out!(T::xx_sub_yy_to_zz(x_1, x_0, y_1, y_0));
             }),
             ("explicit", &mut |(x_1, x_0, y_1, y_0)| {
-                no_out!(explicit_xx_sub_yy_to_zz(x_1, x_0, y_1, y_0))
+                no_out!(explicit_xx_sub_yy_to_zz(x_1, x_0, y_1, y_0));
             }),
         ],
     );

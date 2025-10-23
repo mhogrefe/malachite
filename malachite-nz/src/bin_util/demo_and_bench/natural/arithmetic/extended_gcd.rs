@@ -125,10 +125,10 @@ fn benchmark_natural_extended_gcd_algorithms(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.extended_gcd(y))),
             ("Euclidean", &mut |(x, y)| {
-                no_out!(extended_gcd_euclidean_natural(x, y))
+                no_out!(extended_gcd_euclidean_natural(x, y));
             }),
             ("binary", &mut |(x, y)| {
-                no_out!(extended_gcd_binary_natural(x, y))
+                no_out!(extended_gcd_binary_natural(x, y));
             }),
         ],
     );
@@ -151,7 +151,7 @@ fn benchmark_natural_extended_gcd_library_comparison(
         &mut [
             ("Malachite", &mut |(_, (x, y))| no_out!(x.extended_gcd(y))),
             ("rug", &mut |((x, y), _)| {
-                no_out!(x.extended_gcd(y, rug::Integer::new()))
+                no_out!(x.extended_gcd(y, rug::Integer::new()));
             }),
         ],
     );
@@ -173,16 +173,16 @@ fn benchmark_natural_extended_gcd_evaluation_strategy(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.extended_gcd(Natural)", &mut |(x, y)| {
-                no_out!(x.extended_gcd(y))
+                no_out!(x.extended_gcd(y));
             }),
             ("Natural.extended_gcd(&Natural)", &mut |(x, y)| {
-                no_out!(x.extended_gcd(&y))
+                no_out!(x.extended_gcd(&y));
             }),
             ("&Natural.extended_gcd(Natural)", &mut |(x, y)| {
-                no_out!((&x).extended_gcd(y))
+                no_out!((&x).extended_gcd(y));
             }),
             ("&Natural.extended_gcd(&Natural)", &mut |(x, y)| {
-                no_out!((&x).extended_gcd(&y))
+                no_out!((&x).extended_gcd(&y));
             }),
         ],
     );

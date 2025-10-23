@@ -172,7 +172,7 @@ fn benchmark_float_partial_cmp_rational_algorithms(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.partial_cmp(&y))),
             ("alt", &mut |(x, y)| {
-                no_out!(float_partial_cmp_rational_alt(&x, &y))
+                no_out!(float_partial_cmp_rational_alt(&x, &y));
             }),
         ],
     );

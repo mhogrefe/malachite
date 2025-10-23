@@ -417,7 +417,7 @@ fn benchmark_float_from_unsigned_library_comparison<T: PrimitiveUnsigned>(
                         u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
                     },
                     n
-                ))
+                ));
             }),
         ],
     );
@@ -443,10 +443,10 @@ fn benchmark_float_from_unsigned_prec_library_comparison<T: PrimitiveUnsigned>(
         &pair_primitive_int_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec)| {
-                no_out!(Float::from_unsigned_prec(n, prec))
+                no_out!(Float::from_unsigned_prec(n, prec));
             }),
             ("rug", &mut |(n, prec)| {
-                no_out!(rug::Float::with_val(u32::exact_from(prec), n))
+                no_out!(rug::Float::with_val(u32::exact_from(prec), n));
             }),
         ],
     );
@@ -475,14 +475,14 @@ fn benchmark_float_from_unsigned_prec_round_library_comparison<T: PrimitiveUnsig
         &triple_1_2_primitive_int_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec, rm)| {
-                no_out!(Float::from_unsigned_prec_round(n, prec, rm))
+                no_out!(Float::from_unsigned_prec_round(n, prec, rm));
             }),
             ("rug", &mut |(n, prec, rm)| {
                 no_out!(rug::Float::with_val_round(
                     u32::exact_from(prec),
                     n,
                     rug_round_try_from_rounding_mode(rm).unwrap()
-                ))
+                ));
             }),
         ],
     );
@@ -521,7 +521,7 @@ fn benchmark_float_const_from_unsigned_times_power_of_2(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(Float::const_from_unsigned_times_power_of_2(n, pow))
+            no_out!(Float::const_from_unsigned_times_power_of_2(n, pow));
         })],
     );
 }
@@ -554,7 +554,7 @@ fn benchmark_float_from_signed_library_comparison<T: PrimitiveSigned>(
                         u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
                     },
                     n
-                ))
+                ));
             }),
         ],
     );
@@ -580,10 +580,10 @@ fn benchmark_float_from_signed_prec_library_comparison<T: PrimitiveSigned>(
         &pair_primitive_int_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec)| {
-                no_out!(Float::from_signed_prec(n, prec))
+                no_out!(Float::from_signed_prec(n, prec));
             }),
             ("rug", &mut |(n, prec)| {
-                no_out!(rug::Float::with_val(u32::exact_from(prec), n))
+                no_out!(rug::Float::with_val(u32::exact_from(prec), n));
             }),
         ],
     );
@@ -612,14 +612,14 @@ fn benchmark_float_from_signed_prec_round_library_comparison<T: PrimitiveSigned>
         &triple_1_2_primitive_int_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec, rm)| {
-                no_out!(Float::from_signed_prec_round(n, prec, rm))
+                no_out!(Float::from_signed_prec_round(n, prec, rm));
             }),
             ("rug", &mut |(n, prec, rm)| {
                 no_out!(rug::Float::with_val_round(
                     u32::exact_from(prec),
                     n,
                     rug_round_try_from_rounding_mode(rm).unwrap()
-                ))
+                ));
             }),
         ],
     );
@@ -658,7 +658,7 @@ fn benchmark_float_const_from_signed_times_power_of_2(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(Float::const_from_signed_times_power_of_2(n, pow))
+            no_out!(Float::const_from_signed_times_power_of_2(n, pow));
         })],
     );
 }

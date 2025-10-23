@@ -66,10 +66,10 @@ fn benchmark_rational_continued_fraction_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Rational.continued_fraction()", &mut |n| {
-                no_out!(n.continued_fraction().1.collect_vec())
+                no_out!(n.continued_fraction().1.collect_vec());
             }),
             ("(&Rational).continued_fraction()", &mut |n| {
-                no_out!((&n).continued_fraction().1.collect_vec())
+                no_out!((&n).continued_fraction().1.collect_vec());
             }),
         ],
     );

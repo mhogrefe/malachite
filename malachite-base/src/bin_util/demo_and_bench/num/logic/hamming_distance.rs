@@ -79,7 +79,7 @@ fn benchmark_checked_hamming_distance_signed<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.checked_hamming_distance(y))
+            no_out!(x.checked_hamming_distance(y));
         })],
     );
 }

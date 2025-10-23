@@ -121,7 +121,7 @@ fn benchmark_float_rounding_from_natural<
         file_name,
         &pair_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, rm)| {
-            no_out!(T::rounding_from(&n, rm))
+            no_out!(T::rounding_from(&n, rm));
         })],
     );
 }

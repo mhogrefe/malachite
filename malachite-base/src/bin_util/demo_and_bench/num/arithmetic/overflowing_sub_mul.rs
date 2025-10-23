@@ -103,7 +103,7 @@ fn benchmark_overflowing_sub_mul_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_max_bit_bucketer("x", "y", "z"),
         &mut [("Malachite", &mut |(x, y, z)| {
-            no_out!(x.overflowing_sub_mul(y, z))
+            no_out!(x.overflowing_sub_mul(y, z));
         })],
     );
 }
@@ -123,7 +123,7 @@ fn benchmark_overflowing_sub_mul_signed<T: PrimitiveSigned>(
         file_name,
         &triple_max_bit_bucketer("x", "y", "z"),
         &mut [("Malachite", &mut |(x, y, z)| {
-            no_out!(x.overflowing_sub_mul(y, z))
+            no_out!(x.overflowing_sub_mul(y, z));
         })],
     );
 }
@@ -148,7 +148,7 @@ fn benchmark_overflowing_sub_mul_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_max_bit_bucketer("x", "y", "z"),
         &mut [("Malachite", &mut |(mut x, y, z)| {
-            no_out!(x.overflowing_sub_mul_assign(y, z))
+            no_out!(x.overflowing_sub_mul_assign(y, z));
         })],
     );
 }
@@ -173,7 +173,7 @@ fn benchmark_overflowing_sub_mul_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_max_bit_bucketer("x", "y", "z"),
         &mut [("Malachite", &mut |(mut x, y, z)| {
-            no_out!(x.overflowing_sub_mul_assign(y, z))
+            no_out!(x.overflowing_sub_mul_assign(y, z));
         })],
     );
 }

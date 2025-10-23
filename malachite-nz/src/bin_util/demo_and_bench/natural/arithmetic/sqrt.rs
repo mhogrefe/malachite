@@ -257,7 +257,7 @@ fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &pair_max_bit_bucketer("n_hi", "n_lo"),
         &mut [("sqrt_rem_2_newton(Limb, Limb)", &mut |(n_hi, n_lo)| {
-            no_out!(sqrt_rem_2_newton::<Limb, SignedLimb>(n_hi, n_lo))
+            no_out!(sqrt_rem_2_newton::<Limb, SignedLimb>(n_hi, n_lo));
         })],
     );
 }
@@ -310,7 +310,7 @@ fn benchmark_limbs_sqrt_to_out(gm: GenMode, config: &GenConfig, limit: usize, fi
             mut out,
             xs,
         )| {
-            limbs_sqrt_to_out(&mut out, &xs)
+            limbs_sqrt_to_out(&mut out, &xs);
         })],
     );
 }
@@ -327,7 +327,7 @@ fn benchmark_limbs_sqrt_rem_to_out(gm: GenMode, config: &GenConfig, limit: usize
         &mut [(
             "limbs_sqrt_rem_to_out(&mut [Limb], &mut [Limb], &[Limb])",
             &mut |(mut sqrt_out, mut rem_out, xs)| {
-                no_out!(limbs_sqrt_rem_to_out(&mut sqrt_out, &mut rem_out, &xs))
+                no_out!(limbs_sqrt_rem_to_out(&mut sqrt_out, &mut rem_out, &xs));
             },
         )],
     );
@@ -343,7 +343,7 @@ fn benchmark_limbs_floor_sqrt(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &vec_len_bucketer(),
         &mut [("limbs_floor_sqrt(&[Limb])", &mut |xs| {
-            no_out!(limbs_floor_sqrt(&xs))
+            no_out!(limbs_floor_sqrt(&xs));
         })],
     );
 }
@@ -358,7 +358,7 @@ fn benchmark_limbs_ceiling_sqrt(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &vec_len_bucketer(),
         &mut [("limbs_ceiling_sqrt(&[Limb])", &mut |xs| {
-            no_out!(limbs_ceiling_sqrt(&xs))
+            no_out!(limbs_ceiling_sqrt(&xs));
         })],
     );
 }
@@ -373,7 +373,7 @@ fn benchmark_limbs_checked_sqrt(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &vec_len_bucketer(),
         &mut [("limbs_checked_sqrt(&[Limb])", &mut |xs| {
-            no_out!(limbs_checked_sqrt(&xs))
+            no_out!(limbs_checked_sqrt(&xs));
         })],
     );
 }
@@ -388,7 +388,7 @@ fn benchmark_limbs_sqrt_rem(gm: GenMode, config: &GenConfig, limit: usize, file_
         file_name,
         &vec_len_bucketer(),
         &mut [("limbs_sqrt_rem(&[Limb])", &mut |xs| {
-            no_out!(limbs_sqrt_rem(&xs))
+            no_out!(limbs_sqrt_rem(&xs));
         })],
     );
 }
@@ -410,7 +410,7 @@ fn benchmark_natural_floor_sqrt_evaluation_strategy(
         &mut [
             ("Natural.floor_sqrt()", &mut |x| no_out!(x.floor_sqrt())),
             ("(&Natural).floor_sqrt()", &mut |x| {
-                no_out!((&x).floor_sqrt())
+                no_out!((&x).floor_sqrt());
             }),
         ],
     );
@@ -495,7 +495,7 @@ fn benchmark_natural_ceiling_sqrt_evaluation_strategy(
         &mut [
             ("Natural.ceiling_sqrt()", &mut |x| no_out!(x.ceiling_sqrt())),
             ("(&Natural).ceiling_sqrt()", &mut |x| {
-                no_out!((&x).ceiling_sqrt())
+                no_out!((&x).ceiling_sqrt());
             }),
         ],
     );
@@ -557,7 +557,7 @@ fn benchmark_natural_checked_sqrt_evaluation_strategy(
         &mut [
             ("Natural.checked_sqrt()", &mut |x| no_out!(x.checked_sqrt())),
             ("(&Natural).checked_sqrt()", &mut |x| {
-                no_out!((&x).checked_sqrt())
+                no_out!((&x).checked_sqrt());
             }),
         ],
     );
@@ -648,7 +648,7 @@ fn benchmark_natural_sqrt_rem_library_comparison(
         &pair_2_natural_bit_bucketer("x"),
         &mut [
             ("rug", &mut |(x, _)| {
-                no_out!(x.sqrt_rem(rug::Integer::new()))
+                no_out!(x.sqrt_rem(rug::Integer::new()));
             }),
             ("Malachite", &mut |(_, x)| no_out!(x.sqrt_rem())),
         ],

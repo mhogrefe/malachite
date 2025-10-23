@@ -214,7 +214,7 @@ fn benchmark_rational_const_from_unsigned(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |u| {
-            no_out!(Rational::const_from_unsigned(u))
+            no_out!(Rational::const_from_unsigned(u));
         })],
     );
 }
@@ -234,7 +234,7 @@ fn benchmark_rational_const_from_signed(
         file_name,
         &signed_bit_bucketer(),
         &mut [("Malachite", &mut |i| {
-            no_out!(Rational::const_from_signed(i))
+            no_out!(Rational::const_from_signed(i));
         })],
     );
 }

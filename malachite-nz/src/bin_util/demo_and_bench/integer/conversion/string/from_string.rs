@@ -86,7 +86,7 @@ fn benchmark_integer_from_str_library_comparison(
         &string_len_bucketer(),
         &mut [
             ("Malachite", &mut |s| {
-                no_out!(Integer::from_str(&s).unwrap())
+                no_out!(Integer::from_str(&s).unwrap());
             }),
             ("num", &mut |s| no_out!(BigInt::from_str(&s).unwrap())),
             ("rug", &mut |s| no_out!(rug::Integer::from_str(&s).unwrap())),
@@ -110,13 +110,13 @@ fn benchmark_integer_from_string_base_library_comparison(
         &pair_2_string_len_bucketer("s"),
         &mut [
             ("Malachite", &mut |(base, s)| {
-                no_out!(Integer::from_string_base(base, &s).unwrap())
+                no_out!(Integer::from_string_base(base, &s).unwrap());
             }),
             ("num", &mut |(base, s)| {
-                no_out!(BigInt::from_str_radix(&s, u32::wrapping_from(base)).unwrap())
+                no_out!(BigInt::from_str_radix(&s, u32::wrapping_from(base)).unwrap());
             }),
             ("rug", &mut |(base, s)| {
-                no_out!(rug::Integer::from_str_radix(&s, i32::wrapping_from(base)).unwrap())
+                no_out!(rug::Integer::from_str_radix(&s, i32::wrapping_from(base)).unwrap());
             }),
         ],
     );

@@ -169,7 +169,7 @@ fn benchmark_shl_round_assign_unsigned_signed<
         file_name,
         &triple_2_unsigned_abs_bucketer("i"),
         &mut [("Malachite", &mut |(mut n, i, rm)| {
-            no_out!(n.shl_round_assign(i, rm))
+            no_out!(n.shl_round_assign(i, rm));
         })],
     );
 }
@@ -194,7 +194,7 @@ fn benchmark_shl_round_assign_signed_signed<
         file_name,
         &triple_2_unsigned_abs_bucketer("i"),
         &mut [("Malachite", &mut |(mut n, i, rm)| {
-            no_out!(n.shl_round_assign(i, rm))
+            no_out!(n.shl_round_assign(i, rm));
         })],
     );
 }

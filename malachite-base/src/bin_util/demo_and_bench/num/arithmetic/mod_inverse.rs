@@ -52,10 +52,10 @@ fn benchmark_mod_inverse_algorithms<
         &mut [
             ("default", &mut |(n, m)| no_out!(n.mod_inverse(m))),
             ("Euclidean", &mut |(n, m)| {
-                no_out!(mod_inverse_euclidean::<U, S>(n, m))
+                no_out!(mod_inverse_euclidean::<U, S>(n, m));
             }),
             ("binary", &mut |(n, m)| {
-                no_out!(mod_inverse_binary::<U, S>(n, m))
+                no_out!(mod_inverse_binary::<U, S>(n, m));
             }),
         ],
     );

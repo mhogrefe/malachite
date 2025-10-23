@@ -41,7 +41,7 @@ fn benchmark_overflowing_abs_assign<T: PrimitiveSigned>(
         file_name,
         &signed_bit_bucketer(),
         &mut [("Malachite", &mut |mut i| {
-            no_out!(i.overflowing_abs_assign())
+            no_out!(i.overflowing_abs_assign());
         })],
     );
 }

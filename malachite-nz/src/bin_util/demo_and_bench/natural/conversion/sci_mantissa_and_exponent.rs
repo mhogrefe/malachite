@@ -216,7 +216,7 @@ fn benchmark_natural_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         file_name,
         &pair_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, rm)| {
-            no_out!(n.sci_mantissa_and_exponent_round::<T>(rm))
+            no_out!(n.sci_mantissa_and_exponent_round::<T>(rm));
         })],
     );
 }
@@ -240,7 +240,7 @@ fn benchmark_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
         &mut [("Malachite", &mut |(m, e)| {
             no_out!(
                 <&Natural as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(m, e)
-            )
+            );
         })],
     );
 }
@@ -263,7 +263,7 @@ fn benchmark_natural_from_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         file_name,
         &triple_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(m, e, rm)| {
-            no_out!(Natural::from_sci_mantissa_and_exponent_round(m, e, rm))
+            no_out!(Natural::from_sci_mantissa_and_exponent_round(m, e, rm));
         })],
     );
 }

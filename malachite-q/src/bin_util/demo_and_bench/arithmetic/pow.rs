@@ -112,10 +112,10 @@ fn benchmark_rational_pow_u64_library_comparison(
         &mut [
             ("Malachite", &mut |(_, _, (x, exp))| no_out!(x.pow(exp))),
             ("num", &mut |((x, exp), _, _)| {
-                no_out!(x.pow(i32::exact_from(exp)))
+                no_out!(x.pow(i32::exact_from(exp)));
             }),
             ("rug", &mut |(_, (x, exp), _)| {
-                no_out!(x.pow(u32::exact_from(exp)))
+                no_out!(x.pow(u32::exact_from(exp)));
             }),
         ],
     );
@@ -138,7 +138,7 @@ fn benchmark_rational_pow_u64_evaluation_strategy(
         &mut [
             ("Rational.pow(u64)", &mut |(n, exp)| no_out!(n.pow(exp))),
             ("(&Rational).pow(u64)", &mut |(n, exp)| {
-                no_out!((&n).pow(exp))
+                no_out!((&n).pow(exp));
             }),
         ],
     );
@@ -179,10 +179,10 @@ fn benchmark_rational_pow_i64_library_comparison(
         &mut [
             ("Malachite", &mut |(_, _, (x, exp))| no_out!(x.pow(exp))),
             ("num", &mut |((x, exp), _, _)| {
-                no_out!(x.pow(i32::exact_from(exp)))
+                no_out!(x.pow(i32::exact_from(exp)));
             }),
             ("rug", &mut |(_, (x, exp), _)| {
-                no_out!(x.pow(i32::exact_from(exp)))
+                no_out!(x.pow(i32::exact_from(exp)));
             }),
         ],
     );
@@ -205,7 +205,7 @@ fn benchmark_rational_pow_i64_evaluation_strategy(
         &mut [
             ("Rational.pow(u64)", &mut |(n, exp)| no_out!(n.pow(exp))),
             ("(&Rational).pow(u64)", &mut |(n, exp)| {
-                no_out!((&n).pow(exp))
+                no_out!((&n).pow(exp));
             }),
         ],
     );

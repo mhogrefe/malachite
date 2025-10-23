@@ -77,7 +77,7 @@ fn benchmark_limbs_slice_clear_bit_neg(
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut xs, index)| {
-            no_out!(limbs_slice_clear_bit_neg(&mut xs, index))
+            no_out!(limbs_slice_clear_bit_neg(&mut xs, index));
         })],
     );
 }
@@ -97,7 +97,7 @@ fn benchmark_limbs_vec_clear_bit_neg(
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut xs, index)| {
-            no_out!(limbs_vec_clear_bit_neg(&mut xs, index))
+            no_out!(limbs_vec_clear_bit_neg(&mut xs, index));
         })],
     );
 }

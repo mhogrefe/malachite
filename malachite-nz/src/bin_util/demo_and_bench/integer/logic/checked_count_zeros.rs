@@ -72,10 +72,10 @@ fn benchmark_integer_checked_count_zeros_algorithms(
         &mut [
             ("default", &mut |n| no_out!(n.checked_count_zeros())),
             ("using bits explicitly", &mut |n| {
-                no_out!(integer_checked_count_zeros_alt_1(&n))
+                no_out!(integer_checked_count_zeros_alt_1(&n));
             }),
             ("using limbs explicitly", &mut |n| {
-                no_out!(integer_checked_count_zeros_alt_2(&n))
+                no_out!(integer_checked_count_zeros_alt_2(&n));
             }),
         ],
     );

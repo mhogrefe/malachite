@@ -62,10 +62,10 @@ fn benchmark_rational_next_power_of_2_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Rational.next_power_of_2()", &mut |x| {
-                no_out!(x.next_power_of_2())
+                no_out!(x.next_power_of_2());
             }),
             ("(&Rational).next_power_of_2()", &mut |x| {
-                no_out!((&x).next_power_of_2())
+                no_out!((&x).next_power_of_2());
             }),
         ],
     );

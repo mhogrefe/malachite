@@ -55,7 +55,7 @@ fn benchmark_natural_to_bits_asc_evaluation_strategy(
         &mut [
             ("Natural.to_bits_asc()", &mut |n| no_out!(n.to_bits_asc())),
             ("Natural.bits().collect_vec()", &mut |n| {
-                no_out!(n.bits().collect_vec())
+                no_out!(n.bits().collect_vec());
             }),
         ],
     );
@@ -100,7 +100,7 @@ fn benchmark_natural_to_bits_desc_evaluation_strategy(
         &mut [
             ("Natural.to_bits_asc()", &mut |n| no_out!(n.to_bits_desc())),
             ("Natural.bits().rev().collect_vec()", &mut |n| {
-                no_out!(n.bits().rev().collect_vec())
+                no_out!(n.bits().rev().collect_vec());
             }),
         ],
     );

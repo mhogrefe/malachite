@@ -184,10 +184,10 @@ fn benchmark_integer_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
         &pair_1_integer_bit_bucketer("n"),
         &mut [
             (&format!("Integer << {}", T::NAME), &mut |(x, y)| {
-                no_out!(x << y)
+                no_out!(x << y);
             }),
             (&format!("&Integer << {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x << y)
+                no_out!(&x << y);
             }),
         ],
     );
@@ -213,10 +213,10 @@ fn benchmark_integer_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
         &pair_1_integer_bit_bucketer("n"),
         &mut [
             (&format!("Integer << {}", T::NAME), &mut |(x, y)| {
-                no_out!(x << y)
+                no_out!(x << y);
             }),
             (&format!("&Integer << {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x << y)
+                no_out!(&x << y);
             }),
         ],
     );

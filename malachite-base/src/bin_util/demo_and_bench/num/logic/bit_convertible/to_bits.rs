@@ -120,10 +120,10 @@ fn benchmark_to_bits_asc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             (&format!("{}.to_bits_asc()", T::NAME), &mut |n| {
-                no_out!(n.to_bits_asc())
+                no_out!(n.to_bits_asc());
             }),
             (&format!("{}.bits().collect_vec()", T::NAME), &mut |n| {
-                no_out!(n.bits().collect_vec())
+                no_out!(n.bits().collect_vec());
             }),
         ],
     );
@@ -146,10 +146,10 @@ fn benchmark_to_bits_asc_evaluation_strategy_signed<T: PrimitiveSigned>(
         &signed_bit_bucketer(),
         &mut [
             (&format!("{}.to_bits_asc()", T::NAME), &mut |n| {
-                no_out!(n.to_bits_asc())
+                no_out!(n.to_bits_asc());
             }),
             (&format!("{}.bits().collect_vec()", T::NAME), &mut |n| {
-                no_out!(n.bits().collect_vec())
+                no_out!(n.bits().collect_vec());
             }),
         ],
     );
@@ -216,7 +216,7 @@ fn benchmark_to_bits_desc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             (&format!("{}.to_bits_desc()", T::NAME), &mut |n| {
-                no_out!(n.to_bits_desc())
+                no_out!(n.to_bits_desc());
             }),
             (
                 &format!("{}.bits().rev().collect_vec()", T::NAME),
@@ -243,7 +243,7 @@ fn benchmark_to_bits_desc_evaluation_strategy_signed<T: PrimitiveSigned>(
         &signed_bit_bucketer(),
         &mut [
             (&format!("{}.to_bits_desc()", T::NAME), &mut |n| {
-                no_out!(n.to_bits_desc())
+                no_out!(n.to_bits_desc());
             }),
             (
                 &format!("{}.bits().rev().collect_vec()", T::NAME),

@@ -82,7 +82,7 @@ fn benchmark_rational_from_power_of_2_digits_evaluation_strategy(
                         log_base,
                         before_point,
                         after_point
-                    ))
+                    ));
                 },
             ),
             (
@@ -92,7 +92,7 @@ fn benchmark_rational_from_power_of_2_digits_evaluation_strategy(
                         log_base,
                         &before_point,
                         &after_point
-                    ))
+                    ));
                 },
             ),
         ],

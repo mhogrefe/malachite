@@ -129,7 +129,7 @@ fn benchmark_div_round_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.div_round_assign(y, rm))
+            no_out!(x.div_round_assign(y, rm));
         })],
     );
 }
@@ -149,7 +149,7 @@ fn benchmark_div_round_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.div_round_assign(y, rm))
+            no_out!(x.div_round_assign(y, rm));
         })],
     );
 }

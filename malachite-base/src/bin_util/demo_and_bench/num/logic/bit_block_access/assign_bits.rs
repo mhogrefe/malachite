@@ -76,10 +76,10 @@ fn benchmark_assign_bits_algorithms_unsigned<T: PrimitiveUnsigned>(
         &assign_bits_bucketer(),
         &mut [
             ("default", &mut |(mut n, start, end, bits)| {
-                no_out!(n.assign_bits(start, end, &bits))
+                no_out!(n.assign_bits(start, end, &bits));
             }),
             ("naive", &mut |(mut n, start, end, bits)| {
-                no_out!(assign_bits_naive::<T, T::Bits>(&mut n, start, end, &bits))
+                no_out!(assign_bits_naive::<T, T::Bits>(&mut n, start, end, &bits));
             }),
         ],
     );
@@ -104,10 +104,10 @@ fn benchmark_assign_bits_algorithms_signed<
         &assign_bits_bucketer(),
         &mut [
             ("default", &mut |(mut n, start, end, bits)| {
-                no_out!(n.assign_bits(start, end, &bits))
+                no_out!(n.assign_bits(start, end, &bits));
             }),
             ("naive", &mut |(mut n, start, end, bits)| {
-                no_out!(assign_bits_naive::<T, U>(&mut n, start, end, &bits))
+                no_out!(assign_bits_naive::<T, U>(&mut n, start, end, &bits));
             }),
         ],
     );

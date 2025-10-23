@@ -48,7 +48,7 @@ fn benchmark_nice_float_eq_algorithms<T: PrimitiveFloat>(
         &pair_max_primitive_float_bucketer("f", "g"),
         &mut [
             ("Malachite", &mut |(x, y)| {
-                no_out!(NiceFloat(x) == NiceFloat(y))
+                no_out!(NiceFloat(x) == NiceFloat(y));
             }),
             ("Rust default", &mut |(x, y)| no_out!(x == y)),
         ],

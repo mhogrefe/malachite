@@ -89,10 +89,10 @@ fn benchmark_natural_abs_diff_assign_evaluation_strategy(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.abs_diff_assign(Natural)", &mut |(mut x, y)| {
-                x.abs_diff_assign(y)
+                x.abs_diff_assign(y);
             }),
             ("Natural.abs_diff_assign(&Natural)", &mut |(mut x, y)| {
-                x.abs_diff_assign(&y)
+                x.abs_diff_assign(&y);
             }),
         ],
     );
@@ -114,16 +114,16 @@ fn benchmark_natural_abs_diff_evaluation_strategy(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.abs_diff(Natural)", &mut |(x, y)| {
-                no_out!(x.abs_diff(y))
+                no_out!(x.abs_diff(y));
             }),
             ("Natural.abs_diff(&Natural)", &mut |(x, y)| {
-                no_out!(x.abs_diff(&y))
+                no_out!(x.abs_diff(&y));
             }),
             ("&Natural.abs_diff(Natural)", &mut |(x, y)| {
-                no_out!((&x).abs_diff(y))
+                no_out!((&x).abs_diff(y));
             }),
             ("&Natural.abs_diff(&Natural)", &mut |(x, y)| {
-                no_out!((&x).abs_diff(&y))
+                no_out!((&x).abs_diff(&y));
             }),
         ],
     );

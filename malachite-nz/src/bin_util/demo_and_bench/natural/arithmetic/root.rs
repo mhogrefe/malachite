@@ -325,7 +325,7 @@ fn benchmark_limbs_floor_root(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, exp)| {
-            no_out!(limbs_floor_root(&xs, exp))
+            no_out!(limbs_floor_root(&xs, exp));
         })],
     );
 }
@@ -340,7 +340,7 @@ fn benchmark_limbs_root_rem(gm: GenMode, config: &GenConfig, limit: usize, file_
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, exp)| {
-            no_out!(limbs_root_rem(&xs, exp))
+            no_out!(limbs_root_rem(&xs, exp));
         })],
     );
 }
@@ -362,7 +362,7 @@ fn benchmark_natural_floor_cbrt_evaluation_strategy(
         &mut [
             ("Natural.floor_root(3)", &mut |x| no_out!(x.floor_root(3))),
             ("(&Natural).floor_root(3)", &mut |x| {
-                no_out!((&x).floor_root(3))
+                no_out!((&x).floor_root(3));
             }),
         ],
     );
@@ -446,10 +446,10 @@ fn benchmark_natural_ceiling_cbrt_evaluation_strategy(
         &natural_bit_bucketer("x"),
         &mut [
             ("Natural.ceiling_root(3)", &mut |x| {
-                no_out!(x.ceiling_root(3))
+                no_out!(x.ceiling_root(3));
             }),
             ("(&Natural).ceiling_root(3)", &mut |x| {
-                no_out!((&x).ceiling_root(3))
+                no_out!((&x).ceiling_root(3));
             }),
         ],
     );
@@ -510,10 +510,10 @@ fn benchmark_natural_checked_cbrt_evaluation_strategy(
         &natural_bit_bucketer("x"),
         &mut [
             ("Natural.checked_root(3)", &mut |x| {
-                no_out!(x.checked_root(3))
+                no_out!(x.checked_root(3));
             }),
             ("(&Natural).checked_root(3)", &mut |x| {
-                no_out!((&x).checked_root(3))
+                no_out!((&x).checked_root(3));
             }),
         ],
     );
@@ -604,7 +604,7 @@ fn benchmark_natural_cbrt_rem_library_comparison(
         &pair_2_natural_bit_bucketer("x"),
         &mut [
             ("rug", &mut |(x, _)| {
-                no_out!(x.root_rem(rug::Integer::new(), 3))
+                no_out!(x.root_rem(rug::Integer::new(), 3));
             }),
             ("Malachite", &mut |(_, x)| no_out!(x.root_rem(3))),
         ],
@@ -645,10 +645,10 @@ fn benchmark_natural_floor_root_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.floor_root()", &mut |(x, exp)| {
-                no_out!(x.floor_root(exp))
+                no_out!(x.floor_root(exp));
             }),
             ("(&Natural).floor_root()", &mut |(x, exp)| {
-                no_out!((&x).floor_root(exp))
+                no_out!((&x).floor_root(exp));
             }),
         ],
     );
@@ -671,7 +671,7 @@ fn benchmark_natural_floor_root_algorithms(
         &mut [
             ("default", &mut |(x, exp)| no_out!(x.floor_root(exp))),
             ("binary", &mut |(x, exp)| {
-                no_out!(floor_root_binary(&x, exp))
+                no_out!(floor_root_binary(&x, exp));
             }),
         ],
     );
@@ -694,13 +694,13 @@ fn benchmark_natural_floor_root_library_comparison(
         &triple_3_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("num", &mut |((x, exp), _, _)| {
-                no_out!(x.nth_root(u32::exact_from(exp)))
+                no_out!(x.nth_root(u32::exact_from(exp)));
             }),
             ("rug", &mut |(_, (x, exp), _)| {
-                no_out!(x.root(u32::exact_from(exp)))
+                no_out!(x.root(u32::exact_from(exp)));
             }),
             ("Malachite", &mut |(_, _, (x, exp))| {
-                no_out!(x.floor_root(exp))
+                no_out!(x.floor_root(exp));
             }),
         ],
     );
@@ -740,10 +740,10 @@ fn benchmark_natural_ceiling_root_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.ceiling_root()", &mut |(x, exp)| {
-                no_out!(x.ceiling_root(exp))
+                no_out!(x.ceiling_root(exp));
             }),
             ("(&Natural).ceiling_root()", &mut |(x, exp)| {
-                no_out!((&x).ceiling_root(exp))
+                no_out!((&x).ceiling_root(exp));
             }),
         ],
     );
@@ -766,7 +766,7 @@ fn benchmark_natural_ceiling_root_algorithms(
         &mut [
             ("default", &mut |(x, exp)| no_out!(x.ceiling_root(exp))),
             ("binary", &mut |(x, exp)| {
-                no_out!(ceiling_root_binary(&x, exp))
+                no_out!(ceiling_root_binary(&x, exp));
             }),
         ],
     );
@@ -806,10 +806,10 @@ fn benchmark_natural_checked_root_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.checked_root()", &mut |(x, exp)| {
-                no_out!(x.checked_root(exp))
+                no_out!(x.checked_root(exp));
             }),
             ("(&Natural).checked_root()", &mut |(x, exp)| {
-                no_out!((&x).checked_root(exp))
+                no_out!((&x).checked_root(exp));
             }),
         ],
     );
@@ -832,7 +832,7 @@ fn benchmark_natural_checked_root_algorithms(
         &mut [
             ("default", &mut |(x, exp)| no_out!(x.checked_root(exp))),
             ("binary", &mut |(x, exp)| {
-                no_out!(checked_root_binary(&x, exp))
+                no_out!(checked_root_binary(&x, exp));
             }),
         ],
     );
@@ -854,10 +854,10 @@ fn benchmark_natural_root_rem_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.root_rem()", &mut |(x, exp)| {
-                no_out!(x.root_rem(exp))
+                no_out!(x.root_rem(exp));
             }),
             ("(&Natural).root_rem()", &mut |(x, exp)| {
-                no_out!((&x).root_rem(exp))
+                no_out!((&x).root_rem(exp));
             }),
         ],
     );
@@ -906,7 +906,7 @@ fn benchmark_natural_root_rem_library_comparison(
         &pair_2_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("rug", &mut |((x, exp), _)| {
-                no_out!(x.root_rem(rug::Integer::new(), u32::exact_from(exp)))
+                no_out!(x.root_rem(rug::Integer::new(), u32::exact_from(exp)));
             }),
             ("Malachite", &mut |(_, (x, exp))| no_out!(x.root_rem(exp))),
         ],
@@ -928,7 +928,7 @@ fn benchmark_natural_root_assign_rem(
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(mut x, exp)| {
-            no_out!(x.root_assign_rem(exp))
+            no_out!(x.root_assign_rem(exp));
         })],
     );
 }

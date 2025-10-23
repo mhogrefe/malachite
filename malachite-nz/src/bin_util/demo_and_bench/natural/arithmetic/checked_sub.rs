@@ -97,16 +97,16 @@ fn benchmark_natural_checked_sub_evaluation_strategy(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.checked_sub(Natural)", &mut |(x, y)| {
-                no_out!(x.checked_sub(y))
+                no_out!(x.checked_sub(y));
             }),
             ("Natural.checked_sub(&Natural)", &mut |(x, y)| {
-                no_out!(x.checked_sub(&y))
+                no_out!(x.checked_sub(&y));
             }),
             ("&Natural.checked_sub(Natural)", &mut |(x, y)| {
-                no_out!((&x).checked_sub(y))
+                no_out!((&x).checked_sub(y));
             }),
             ("&Natural.checked_sub(&Natural)", &mut |(x, y)| {
-                no_out!((&x).checked_sub(&y))
+                no_out!((&x).checked_sub(&y));
             }),
         ],
     );

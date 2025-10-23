@@ -224,10 +224,10 @@ fn benchmark_from_naturals_evaluation_strategy(
         &pair_natural_max_bit_bucketer("n", "d"),
         &mut [
             ("from_naturals", &mut |(n, d)| {
-                no_out!(Rational::from_naturals(n, d))
+                no_out!(Rational::from_naturals(n, d));
             }),
             ("from_naturals_ref", &mut |(n, d)| {
-                no_out!(Rational::from_naturals_ref(&n, &d))
+                no_out!(Rational::from_naturals_ref(&n, &d));
             }),
         ],
     );
@@ -250,7 +250,7 @@ fn benchmark_from_unsigneds<T: PrimitiveUnsigned>(
         file_name,
         &pair_max_bit_bucketer("n", "d"),
         &mut [("from_unsigneds", &mut |(n, d)| {
-            no_out!(Rational::from_unsigneds(n, d))
+            no_out!(Rational::from_unsigneds(n, d));
         })],
     );
 }
@@ -271,10 +271,10 @@ fn benchmark_from_integers_evaluation_strategy(
         &pair_integer_max_bit_bucketer("n", "d"),
         &mut [
             ("from_integers", &mut |(n, d)| {
-                no_out!(Rational::from_integers(n, d))
+                no_out!(Rational::from_integers(n, d));
             }),
             ("from_integers_ref", &mut |(n, d)| {
-                no_out!(Rational::from_integers_ref(&n, &d))
+                no_out!(Rational::from_integers_ref(&n, &d));
             }),
         ],
     );
@@ -297,11 +297,11 @@ fn benchmark_from_integers_library_comparison(
         &triple_3_pair_integer_max_bit_bucketer("n", "d"),
         &mut [
             ("Malachite", &mut |(_, _, (n, d))| {
-                no_out!(Rational::from_integers(n, d))
+                no_out!(Rational::from_integers(n, d));
             }),
             ("num", &mut |((n, d), _, _)| no_out!(BigRational::new(n, d))),
             ("rug", &mut |(_, (n, d), _)| {
-                no_out!(rug::Rational::from((n, d)))
+                no_out!(rug::Rational::from((n, d)));
             }),
         ],
     );
@@ -324,7 +324,7 @@ fn benchmark_from_signeds<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("n", "d"),
         &mut [("from_unsigneds", &mut |(n, d)| {
-            no_out!(Rational::from_signeds(n, d))
+            no_out!(Rational::from_signeds(n, d));
         })],
     );
 }
@@ -345,10 +345,10 @@ fn benchmark_from_sign_and_naturals_evaluation_strategy(
         &triple_1_2_natural_max_bit_bucketer("n", "d"),
         &mut [
             ("from_sign_and_naturals", &mut |(n, d, sign)| {
-                no_out!(Rational::from_sign_and_naturals(sign, n, d))
+                no_out!(Rational::from_sign_and_naturals(sign, n, d));
             }),
             ("from_sign_and_naturals_ref", &mut |(n, d, sign)| {
-                no_out!(Rational::from_sign_and_naturals_ref(sign, &n, &d))
+                no_out!(Rational::from_sign_and_naturals_ref(sign, &n, &d));
             }),
         ],
     );
@@ -375,7 +375,7 @@ fn benchmark_from_sign_and_unsigneds<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("n", "d"),
         &mut [("from_sign_and_unsigneds", &mut |(n, d, sign)| {
-            no_out!(Rational::from_sign_and_unsigneds(sign, n, d))
+            no_out!(Rational::from_sign_and_unsigneds(sign, n, d));
         })],
     );
 }
@@ -394,7 +394,7 @@ fn benchmark_const_from_unsigneds(gm: GenMode, config: &GenConfig, limit: usize,
         file_name,
         &pair_max_bit_bucketer("n", "d"),
         &mut [("const_from_unsigneds", &mut |(n, d)| {
-            no_out!(Rational::const_from_unsigneds(n, d))
+            no_out!(Rational::const_from_unsigneds(n, d));
         })],
     );
 }
@@ -413,7 +413,7 @@ fn benchmark_const_from_signeds(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &pair_max_bit_bucketer("n", "d"),
         &mut [("const_from_signeds", &mut |(n, d)| {
-            no_out!(Rational::const_from_signeds(n, d))
+            no_out!(Rational::const_from_signeds(n, d));
         })],
     );
 }

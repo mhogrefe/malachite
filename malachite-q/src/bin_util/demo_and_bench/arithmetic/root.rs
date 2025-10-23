@@ -103,10 +103,10 @@ fn benchmark_rational_checked_root_u64_evaluation_strategy(
         &pair_1_rational_bit_bucketer("x"),
         &mut [
             ("Rational.checked_root(u64)", &mut |(x, exp)| {
-                no_out!(x.checked_root(exp))
+                no_out!(x.checked_root(exp));
             }),
             ("(&Rational).checked_root(u64)", &mut |(x, exp)| {
-                no_out!((&x).checked_root(exp))
+                no_out!((&x).checked_root(exp));
             }),
         ],
     );
@@ -128,10 +128,10 @@ fn benchmark_rational_checked_root_i64_evaluation_strategy(
         &pair_1_rational_bit_bucketer("x"),
         &mut [
             ("Rational.checked_root(i64)", &mut |(x, exp)| {
-                no_out!(x.checked_root(exp))
+                no_out!(x.checked_root(exp));
             }),
             ("(&Rational).checked_root(i64)", &mut |(x, exp)| {
-                no_out!((&x).checked_root(exp))
+                no_out!((&x).checked_root(exp));
             }),
         ],
     );

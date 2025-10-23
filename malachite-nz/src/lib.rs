@@ -159,6 +159,7 @@
     clippy::flat_map_option,
     clippy::unnecessary_wraps,
     clippy::unnested_or_patterns,
+    clippy::use_self,
     clippy::trivially_copy_pass_by_ref
 )]
 #![cfg_attr(

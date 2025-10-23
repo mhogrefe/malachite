@@ -21,40 +21,40 @@ use std::cmp::Ordering::*;
 #[cfg(feature = "32_bit_limbs")]
 impl From<&BigUint> for Natural {
     #[inline]
-    fn from(n: &BigUint) -> Natural {
-        Natural::from_owned_limbs_asc(n.to_u32_digits())
+    fn from(n: &BigUint) -> Self {
+        Self::from_owned_limbs_asc(n.to_u32_digits())
     }
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
 impl From<&BigUint> for Natural {
     #[inline]
-    fn from(n: &BigUint) -> Natural {
-        Natural::from_owned_limbs_asc(Limb::vec_from_other_type_slice(&n.to_u32_digits()))
+    fn from(n: &BigUint) -> Self {
+        Self::from_owned_limbs_asc(Limb::vec_from_other_type_slice(&n.to_u32_digits()))
     }
 }
 
 #[cfg(feature = "32_bit_limbs")]
 impl From<&Natural> for BigUint {
     #[inline]
-    fn from(n: &Natural) -> BigUint {
-        BigUint::new(n.to_limbs_asc())
+    fn from(n: &Natural) -> Self {
+        Self::new(n.to_limbs_asc())
     }
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
 impl From<&Natural> for BigUint {
     #[inline]
-    fn from(n: &Natural) -> BigUint {
-        BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
+    fn from(n: &Natural) -> Self {
+        Self::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
     }
 }
 
 #[cfg(feature = "32_bit_limbs")]
 impl From<&Natural> for BigInt {
     #[inline]
-    fn from(n: &Natural) -> BigInt {
-        BigInt::from_biguint(
+    fn from(n: &Natural) -> Self {
+        Self::from_biguint(
             if *n == 0 { Sign::NoSign } else { Sign::Plus },
             BigUint::new(n.to_limbs_asc()),
         )
@@ -64,8 +64,8 @@ impl From<&Natural> for BigInt {
 #[cfg(not(feature = "32_bit_limbs"))]
 impl From<&Natural> for BigInt {
     #[inline]
-    fn from(n: &Natural) -> BigInt {
-        BigInt::from_biguint(
+    fn from(n: &Natural) -> Self {
+        Self::from_biguint(
             if *n == 0 { Sign::NoSign } else { Sign::Plus },
             BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc())),
         )
@@ -76,9 +76,9 @@ impl TryFrom<&rug::Integer> for Natural {
     type Error = ();
 
     #[inline]
-    fn try_from(n: &rug::Integer) -> Result<Natural, ()> {
+    fn try_from(n: &rug::Integer) -> Result<Self, ()> {
         if *n >= 0 {
-            Ok(Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf)))
+            Ok(Self::from_owned_limbs_asc(n.to_digits(Order::Lsf)))
         } else {
             Err(())
         }
@@ -87,34 +87,34 @@ impl TryFrom<&rug::Integer> for Natural {
 
 impl From<&Natural> for rug::Integer {
     #[inline]
-    fn from(n: &Natural) -> rug::Integer {
-        rug::Integer::from_digits(&n.to_limbs_asc(), Order::Lsf)
+    fn from(n: &Natural) -> Self {
+        Self::from_digits(&n.to_limbs_asc(), Order::Lsf)
     }
 }
 
 impl From<&BigInt> for Integer {
     #[inline]
-    fn from(n: &BigInt) -> Integer {
-        Integer::from_sign_and_abs(n.sign() != Sign::Minus, Natural::from(n.magnitude()))
+    fn from(n: &BigInt) -> Self {
+        Self::from_sign_and_abs(n.sign() != Sign::Minus, Natural::from(n.magnitude()))
     }
 }
 
 impl From<&Integer> for BigInt {
     #[inline]
-    fn from(n: &Integer) -> BigInt {
+    fn from(n: &Integer) -> Self {
         let sign = match n.sign() {
             Less => Sign::Minus,
             Equal => Sign::NoSign,
             Greater => Sign::Plus,
         };
-        BigInt::from_biguint(sign, BigUint::from(n.unsigned_abs_ref()))
+        Self::from_biguint(sign, BigUint::from(n.unsigned_abs_ref()))
     }
 }
 
 impl From<&rug::Integer> for Integer {
     #[inline]
-    fn from(n: &rug::Integer) -> Integer {
-        Integer::from_sign_and_abs(
+    fn from(n: &rug::Integer) -> Self {
+        Self::from_sign_and_abs(
             *n >= 0,
             Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf)),
         )
@@ -123,8 +123,8 @@ impl From<&rug::Integer> for Integer {
 
 impl From<&Integer> for rug::Integer {
     #[inline]
-    fn from(n: &Integer) -> rug::Integer {
-        let out = rug::Integer::from(n.unsigned_abs_ref());
+    fn from(n: &Integer) -> Self {
+        let out = Self::from(n.unsigned_abs_ref());
         if *n >= 0 { out } else { -out }
     }
 }

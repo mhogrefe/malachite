@@ -106,13 +106,13 @@ fn benchmark_simplest_rational_in_open_interval_algorithms(
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [
             ("default", &mut |(x, y)| {
-                no_out!(Rational::simplest_rational_in_open_interval(&x, &y))
+                no_out!(Rational::simplest_rational_in_open_interval(&x, &y));
             }),
             ("explicit", &mut |(x, y)| {
-                no_out!(simplest_rational_in_open_interval_explicit(&x, &y))
+                no_out!(simplest_rational_in_open_interval_explicit(&x, &y));
             }),
             ("naive", &mut |(x, y)| {
-                no_out!(simplest_rational_in_open_interval_naive(&x, &y))
+                no_out!(simplest_rational_in_open_interval_naive(&x, &y));
             }),
         ],
     );
@@ -134,10 +134,10 @@ fn benchmark_simplest_rational_in_open_interval_algorithms_2(
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [
             ("default", &mut |(x, y)| {
-                no_out!(Rational::simplest_rational_in_open_interval(&x, &y))
+                no_out!(Rational::simplest_rational_in_open_interval(&x, &y));
             }),
             ("explicit", &mut |(x, y)| {
-                no_out!(simplest_rational_in_open_interval_explicit(&x, &y))
+                no_out!(simplest_rational_in_open_interval_explicit(&x, &y));
             }),
         ],
     );
@@ -158,7 +158,7 @@ fn benchmark_simplest_rational_in_closed_interval(
         file_name,
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(Rational::simplest_rational_in_closed_interval(&x, &y))
+            no_out!(Rational::simplest_rational_in_closed_interval(&x, &y));
         })],
     );
 }
@@ -179,10 +179,10 @@ fn benchmark_simplest_rational_in_closed_interval_algorithms(
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [
             ("default", &mut |(x, y)| {
-                no_out!(Rational::simplest_rational_in_closed_interval(&x, &y))
+                no_out!(Rational::simplest_rational_in_closed_interval(&x, &y));
             }),
             ("naive", &mut |(x, y)| {
-                no_out!(simplest_rational_in_closed_interval_naive(&x, &y))
+                no_out!(simplest_rational_in_closed_interval_naive(&x, &y));
             }),
         ],
     );

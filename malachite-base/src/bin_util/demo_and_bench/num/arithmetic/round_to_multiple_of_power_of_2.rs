@@ -126,7 +126,7 @@ fn benchmark_round_to_multiple_of_power_of_2_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, y, rm)| {
-            no_out!(x.round_to_multiple_of_power_of_2(y, rm))
+            no_out!(x.round_to_multiple_of_power_of_2(y, rm));
         })],
     );
 }
@@ -150,7 +150,7 @@ fn benchmark_round_to_multiple_of_power_of_2_assign_unsigned<T: PrimitiveUnsigne
         file_name,
         &triple_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm));
         })],
     );
 }
@@ -174,7 +174,7 @@ fn benchmark_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, y, rm)| {
-            no_out!(x.round_to_multiple_of_power_of_2(y, rm))
+            no_out!(x.round_to_multiple_of_power_of_2(y, rm));
         })],
     );
 }
@@ -198,7 +198,7 @@ fn benchmark_round_to_multiple_of_power_of_2_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm));
         })],
     );
 }

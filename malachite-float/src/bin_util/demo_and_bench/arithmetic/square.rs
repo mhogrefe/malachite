@@ -570,7 +570,7 @@ fn benchmark_float_square_algorithms(
             ("default", &mut |x| no_out!(x.square())),
             ("naive", &mut |x| {
                 let xsb = x.significant_bits();
-                no_out!(square_prec_round_naive(x, xsb, Nearest).0)
+                no_out!(square_prec_round_naive(x, xsb, Nearest).0);
             }),
         ],
     );
@@ -605,10 +605,10 @@ fn benchmark_float_square_prec_evaluation_strategy(
         &pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("Float.square_prec(u64)", &mut |(x, prec)| {
-                no_out!(x.square_prec(prec))
+                no_out!(x.square_prec(prec));
             }),
             ("(&Float).square_prec_ref(u64)", &mut |(x, prec)| {
-                no_out!(x.square_prec_ref(prec))
+                no_out!(x.square_prec_ref(prec));
             }),
         ],
     );
@@ -630,10 +630,10 @@ fn benchmark_float_square_prec_library_comparison(
         &pair_2_pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, prec))| {
-                no_out!(x.square_prec_ref(prec))
+                no_out!(x.square_prec_ref(prec));
             }),
             ("rug", &mut |((x, prec), _)| {
-                no_out!(rug_square_prec(&x, prec))
+                no_out!(rug_square_prec(&x, prec));
             }),
         ],
     );
@@ -656,7 +656,7 @@ fn benchmark_float_square_prec_algorithms(
         &mut [
             ("default", &mut |(x, prec)| no_out!(x.square_prec(prec))),
             ("naive", &mut |(x, prec)| {
-                no_out!(square_prec_round_naive(x, prec, Nearest))
+                no_out!(square_prec_round_naive(x, prec, Nearest));
             }),
         ],
     );
@@ -677,7 +677,7 @@ fn benchmark_float_square_prec_assign(
         file_name,
         &pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [("Float.square_prec_assign(u64)", &mut |(mut x, prec)| {
-            no_out!(x.square_prec_assign(prec))
+            no_out!(x.square_prec_assign(prec));
         })],
     );
 }
@@ -698,10 +698,10 @@ fn benchmark_float_square_round_evaluation_strategy(
         &pair_1_float_complexity_bucketer("x"),
         &mut [
             ("Float.square_round(RoundingMode)", &mut |(x, rm)| {
-                no_out!(x.square_round(rm))
+                no_out!(x.square_round(rm));
             }),
             ("(&Float).square_round_ref(RoundingMode)", &mut |(x, rm)| {
-                no_out!(x.square_round_ref(rm))
+                no_out!(x.square_round_ref(rm));
             }),
         ],
     );
@@ -723,7 +723,7 @@ fn benchmark_float_square_round_library_comparison(
         &pair_2_pair_1_float_complexity_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, rm))| {
-                no_out!(x.square_round_ref(rm))
+                no_out!(x.square_round_ref(rm));
             }),
             ("rug", &mut |((x, rm), _)| no_out!(rug_square_round(&x, rm))),
         ],
@@ -772,7 +772,7 @@ fn benchmark_float_square_round_assign(
             mut x,
             rm,
         )| {
-            no_out!(x.square_round_assign(rm))
+            no_out!(x.square_round_assign(rm));
         })],
     );
 }
@@ -820,10 +820,10 @@ fn benchmark_float_square_prec_round_library_comparison(
         &pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, prec, rm))| {
-                no_out!(x.square_prec_round_ref(prec, rm))
+                no_out!(x.square_prec_round_ref(prec, rm));
             }),
             ("rug", &mut |((x, prec, rm), _)| {
-                no_out!(rug_square_prec_round(&x, prec, rm))
+                no_out!(rug_square_prec_round(&x, prec, rm));
             }),
         ],
     );
@@ -845,10 +845,10 @@ fn benchmark_float_square_prec_round_algorithms(
         &triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("default", &mut |(x, prec, rm)| {
-                no_out!(x.square_prec_round(prec, rm))
+                no_out!(x.square_prec_round(prec, rm));
             }),
             ("naive", &mut |(x, prec, rm)| {
-                no_out!(square_prec_round_naive(x, prec, rm))
+                no_out!(square_prec_round_naive(x, prec, rm));
             }),
         ],
     );

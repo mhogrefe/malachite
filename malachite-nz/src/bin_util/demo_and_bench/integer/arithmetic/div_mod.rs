@@ -258,7 +258,7 @@ fn benchmark_integer_div_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.div_mod(y))),
             ("using div_round and mod_op", &mut |(x, y)| {
-                no_out!(((&x).div_round(&y, Floor), x.mod_op(y)))
+                no_out!(((&x).div_round(&y, Floor), x.mod_op(y)));
             }),
         ],
     );
@@ -280,16 +280,16 @@ fn benchmark_integer_div_mod_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.div_mod(Integer)", &mut |(x, y)| {
-                no_out!(x.div_mod(y))
+                no_out!(x.div_mod(y));
             }),
             ("Integer.div_mod(&Integer)", &mut |(x, y)| {
-                no_out!(x.div_mod(&y))
+                no_out!(x.div_mod(&y));
             }),
             ("(&Integer).div_mod(Integer)", &mut |(x, y)| {
-                no_out!((&x).div_mod(y))
+                no_out!((&x).div_mod(y));
             }),
             ("(&Integer).div_mod(&Integer)", &mut |(x, y)| {
-                no_out!((&x).div_mod(&y))
+                no_out!((&x).div_mod(&y));
             }),
         ],
     );
@@ -311,10 +311,10 @@ fn benchmark_integer_div_assign_mod_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.div_assign_mod(Integer)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_mod(y))
+                no_out!(x.div_assign_mod(y));
             }),
             ("Integer.div_assign_mod(&Integer)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_mod(&y))
+                no_out!(x.div_assign_mod(&y));
             }),
         ],
     );
@@ -379,16 +379,16 @@ fn benchmark_integer_div_rem_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.div_rem(Integer)", &mut |(x, y)| {
-                no_out!(x.div_rem(y))
+                no_out!(x.div_rem(y));
             }),
             ("Integer.div_rem(&Integer)", &mut |(x, y)| {
-                no_out!(x.div_rem(&y))
+                no_out!(x.div_rem(&y));
             }),
             ("(&Integer).div_rem(Integer)", &mut |(x, y)| {
-                no_out!((&x).div_rem(y))
+                no_out!((&x).div_rem(y));
             }),
             ("(&Integer).div_rem(&Integer)", &mut |(x, y)| {
-                no_out!((&x).div_rem(&y))
+                no_out!((&x).div_rem(&y));
             }),
         ],
     );
@@ -410,10 +410,10 @@ fn benchmark_integer_div_assign_rem_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.div_assign_rem(Integer)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_rem(y))
+                no_out!(x.div_assign_rem(y));
             }),
             ("Integer.div_assign_rem(&Integer)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_rem(&y))
+                no_out!(x.div_assign_rem(&y));
             }),
         ],
     );
@@ -435,7 +435,7 @@ fn benchmark_integer_ceiling_div_mod_library_comparison(
         &pair_2_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.ceiling_div_mod(y))
+                no_out!(x.ceiling_div_mod(y));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.div_rem_ceil(y))),
         ],
@@ -482,16 +482,16 @@ fn benchmark_integer_ceiling_div_mod_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.ceiling_div_mod(Integer)", &mut |(x, y)| {
-                no_out!(x.ceiling_div_mod(y))
+                no_out!(x.ceiling_div_mod(y));
             }),
             ("Integer.ceiling_div_mod(&Integer)", &mut |(x, y)| {
-                no_out!(x.ceiling_div_mod(&y))
+                no_out!(x.ceiling_div_mod(&y));
             }),
             ("(&Integer).ceiling_div_mod(Integer)", &mut |(x, y)| {
-                no_out!((&x).ceiling_div_mod(y))
+                no_out!((&x).ceiling_div_mod(y));
             }),
             ("(&Integer).ceiling_div_mod(&Integer)", &mut |(x, y)| {
-                no_out!((&x).ceiling_div_mod(&y))
+                no_out!((&x).ceiling_div_mod(&y));
             }),
         ],
     );

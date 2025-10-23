@@ -46,7 +46,7 @@ fn benchmark_rational_sequence_mutate(
             no_out!(xs.mutate(index, |x| {
                 *x = y;
                 z
-            }))
+            }));
         })],
     );
 }

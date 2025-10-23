@@ -61,10 +61,10 @@ fn benchmark_rational_sequence_from_vecs_evaluation_strategy(
         &pair_sum_vec_len_bucketer("xs", "ys"),
         &mut [
             ("from_vecs", &mut |(xs, ys)| {
-                no_out!(RationalSequence::from_vecs(xs, ys))
+                no_out!(RationalSequence::from_vecs(xs, ys));
             }),
             ("from_slices", &mut |(xs, ys)| {
-                no_out!(RationalSequence::from_slices(&xs, &ys))
+                no_out!(RationalSequence::from_slices(&xs, &ys));
             }),
         ],
     );

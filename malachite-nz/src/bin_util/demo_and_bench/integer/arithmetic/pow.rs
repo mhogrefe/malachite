@@ -88,10 +88,10 @@ fn benchmark_integer_pow_library_comparison(
         &mut [
             ("Malachite", &mut |(_, _, (x, exp))| no_out!(x.pow(exp))),
             ("num", &mut |((x, exp), _, _)| {
-                no_out!(x.pow(u32::exact_from(exp)))
+                no_out!(x.pow(u32::exact_from(exp)));
             }),
             ("rug", &mut |(_, (x, exp), _)| {
-                no_out!(x.pow(u32::exact_from(exp)))
+                no_out!(x.pow(u32::exact_from(exp)));
             }),
         ],
     );
@@ -114,7 +114,7 @@ fn benchmark_integer_pow_evaluation_strategy(
         &mut [
             ("Integer.pow(u64)", &mut |(x, exp)| no_out!(x.pow(exp))),
             ("(&Integer).pow(u64)", &mut |(x, exp)| {
-                no_out!((&x).pow(exp))
+                no_out!((&x).pow(exp));
             }),
         ],
     );

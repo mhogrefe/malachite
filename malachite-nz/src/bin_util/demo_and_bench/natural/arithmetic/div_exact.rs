@@ -418,7 +418,7 @@ fn benchmark_limbs_modular_invert_limb(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |x| {
-            no_out!(limbs_modular_invert_limb::<Limb>(x))
+            no_out!(limbs_modular_invert_limb::<Limb>(x));
         })],
     );
 }
@@ -439,7 +439,7 @@ fn benchmark_limbs_div_exact_limb_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("div_exact", &mut |(xs, y)| {
-                no_out!(limbs_div_exact_limb(&xs, y))
+                no_out!(limbs_div_exact_limb(&xs, y));
             }),
             ("div", &mut |(xs, y)| no_out!(limbs_div_limb(&xs, y))),
         ],
@@ -462,10 +462,10 @@ fn benchmark_limbs_div_exact_limb_to_out_algorithms(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("div_exact", &mut |(mut out, xs, y)| {
-                limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y)
+                limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut out, &xs, y);
             }),
             ("div", &mut |(mut out, xs, y)| {
-                limbs_div_limb_to_out(&mut out, &xs, y)
+                limbs_div_limb_to_out(&mut out, &xs, y);
             }),
         ],
     );
@@ -487,10 +487,10 @@ fn benchmark_limbs_div_exact_limb_in_place_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("div_exact", &mut |(mut xs, y)| {
-                limbs_div_exact_limb_in_place(&mut xs, y)
+                limbs_div_exact_limb_in_place(&mut xs, y);
             }),
             ("div", &mut |(mut xs, y)| {
-                limbs_div_limb_in_place(&mut xs, y)
+                limbs_div_limb_in_place(&mut xs, y);
             }),
         ],
     );
@@ -512,10 +512,10 @@ fn benchmark_limbs_div_exact_3_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("limbs_div_exact_3", &mut |xs| {
-                no_out!(limbs_div_exact_3(&xs))
+                no_out!(limbs_div_exact_3(&xs));
             }),
             ("limbs_div_exact_limb_no_special_3", &mut |xs| {
-                no_out!(limbs_div_exact_limb_no_special_3(&xs, 3))
+                no_out!(limbs_div_exact_limb_no_special_3(&xs, 3));
             }),
         ],
     );
@@ -539,14 +539,14 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
             (
                 "limbs_div_exact_limb_to_out_no_special_3",
                 &mut |(mut out, xs)| {
-                    limbs_div_exact_limb_to_out_no_special_3::<DoubleLimb, Limb>(&mut out, &xs, 3)
+                    limbs_div_exact_limb_to_out_no_special_3::<DoubleLimb, Limb>(&mut out, &xs, 3);
                 },
             ),
             ("limbs_div_exact_3_to_out", &mut |(mut out, xs)| {
-                limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut out, &xs)
+                limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut out, &xs);
             }),
             ("limbs_div_exact_3_to_out_alt", &mut |(mut out, xs)| {
-                limbs_div_exact_3_to_out_alt(&mut out, &xs)
+                limbs_div_exact_3_to_out_alt(&mut out, &xs);
             }),
         ],
     );
@@ -572,10 +572,10 @@ fn benchmark_limbs_div_exact_3_in_place_algorithms(
                 &mut |mut xs| limbs_div_exact_limb_in_place_no_special_3(&mut xs, 3),
             ),
             ("limbs_div_exact_3_in_place", &mut |mut xs| {
-                limbs_div_exact_3_in_place(&mut xs)
+                limbs_div_exact_3_in_place(&mut xs);
             }),
             ("limbs_div_exact_3_in_place_alt", &mut |mut xs| {
-                limbs_div_exact_3_in_place_alt(&mut xs)
+                limbs_div_exact_3_in_place_alt(&mut xs);
             }),
         ],
     );
@@ -630,7 +630,7 @@ fn benchmark_limbs_modular_div_mod_schoolbook(
         &mut [("Malachite", &mut |(mut qs, mut ns, ds, inverse)| {
             no_out!(limbs_modular_div_mod_schoolbook(
                 &mut qs, &mut ns, &ds, inverse
-            ))
+            ));
         })],
     );
 }
@@ -654,7 +654,7 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
             ("schoolbook", &mut |(mut qs, mut ns, ds, inverse)| {
                 no_out!(limbs_modular_div_mod_schoolbook(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
             ("divide-and-conquer", &mut |(
                 mut qs,
@@ -664,7 +664,7 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
             )| {
                 no_out!(limbs_modular_div_mod_divide_and_conquer(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
         ],
     );
@@ -689,7 +689,7 @@ fn benchmark_limbs_modular_div_mod_barrett_algorithms(
                 let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
                 no_out!(limbs_modular_div_mod_divide_and_conquer(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
             ("Barrett", &mut |(mut qs, mut rs, ns, ds)| {
                 let mut scratch =
@@ -700,7 +700,7 @@ fn benchmark_limbs_modular_div_mod_barrett_algorithms(
                     &ns,
                     &ds,
                     &mut scratch
-                ))
+                ));
             }),
         ],
     );
@@ -721,7 +721,7 @@ fn benchmark_limbs_modular_div_schoolbook(
         file_name,
         &quadruple_2_vec_len_bucketer("ns"),
         &mut [("Malachite", &mut |(mut qs, mut ns, ds, inverse)| {
-            limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse)
+            limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
         })],
     );
 }
@@ -743,7 +743,7 @@ fn benchmark_limbs_modular_div_divide_and_conquer_algorithms(
         &quadruple_3_vec_len_bucketer("ns"),
         &mut [
             ("schoolbook", &mut |(mut qs, mut ns, ds, inverse)| {
-                limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse)
+                limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
             }),
             ("divide-and-conquer", &mut |(
                 mut qs,
@@ -751,7 +751,7 @@ fn benchmark_limbs_modular_div_divide_and_conquer_algorithms(
                 ds,
                 inverse,
             )| {
-                limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
+                limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
             }),
         ],
     );
@@ -774,12 +774,12 @@ fn benchmark_limbs_modular_div_barrett_algorithms(
         &mut [
             ("divide-and-conquer", &mut |(mut qs, mut ns, ds)| {
                 let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-                limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
+                limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
             }),
             ("Barrett", &mut |(mut qs, ns, ds)| {
                 let mut scratch =
                     vec![0; limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
-                limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch)
+                limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch);
             }),
         ],
     );
@@ -805,7 +805,7 @@ fn benchmark_limbs_modular_div_evaluation_strategy(
                 "limbs_modular_div(&mut [Limb], &mut [Limb], &[Limb], &mut [Limb])",
                 &mut |(mut qs, mut ns, ds)| {
                     let mut scratch = vec![0; limbs_modular_div_scratch_len(ns.len(), ds.len())];
-                    limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch)
+                    limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch);
                 },
             ),
             (
@@ -813,7 +813,7 @@ fn benchmark_limbs_modular_div_evaluation_strategy(
                 &mut |(mut qs, ns, ds)| {
                     let mut scratch =
                         vec![0; limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
-                    limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch)
+                    limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch);
                 },
             ),
         ],
@@ -836,7 +836,7 @@ fn benchmark_limbs_div_exact_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("div_exact", &mut |(ns, ds)| {
-                no_out!(limbs_div_exact(&ns, &ds))
+                no_out!(limbs_div_exact(&ns, &ds));
             }),
             ("div", &mut |(ns, ds)| no_out!(limbs_div(&ns, &ds))),
         ],
@@ -859,10 +859,10 @@ fn benchmark_limbs_div_exact_to_out_algorithms(
         &triple_2_vec_len_bucketer("ns"),
         &mut [
             ("div", &mut |(mut qs, mut ns, mut ds)| {
-                limbs_div_to_out(&mut qs, &mut ns, &mut ds)
+                limbs_div_to_out(&mut qs, &mut ns, &mut ds);
             }),
             ("div exact", &mut |(mut qs, mut ns, mut ds)| {
-                limbs_div_exact_to_out(&mut qs, &mut ns, &mut ds)
+                limbs_div_exact_to_out(&mut qs, &mut ns, &mut ds);
             }),
         ],
     );
@@ -942,10 +942,10 @@ fn benchmark_natural_div_exact_assign_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.div_exact_assign(Natural)", &mut |(mut x, y)| {
-                x.div_exact_assign(y)
+                x.div_exact_assign(y);
             }),
             ("Natural.div_exact_assign(&Natural)", &mut |(mut x, y)| {
-                x.div_exact_assign(&y)
+                x.div_exact_assign(&y);
             }),
         ],
     );
@@ -1015,16 +1015,16 @@ fn benchmark_natural_div_exact_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.div_exact(Natural)", &mut |(x, y)| {
-                no_out!(x.div_exact(y))
+                no_out!(x.div_exact(y));
             }),
             ("Natural.div_exact(&Natural)", &mut |(x, y)| {
-                no_out!(x.div_exact(&y))
+                no_out!(x.div_exact(&y));
             }),
             ("(&Natural).div_exact(Natural)", &mut |(x, y)| {
-                no_out!((&x).div_exact(y))
+                no_out!((&x).div_exact(y));
             }),
             ("(&Natural).div_exact(&Natural)", &mut |(x, y)| {
-                no_out!((&x).div_exact(&y))
+                no_out!((&x).div_exact(&y));
             }),
         ],
     );

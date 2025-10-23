@@ -50,7 +50,7 @@ fn benchmark_mod_power_of_2_is_reduced<T: PrimitiveUnsigned>(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.mod_power_of_2_is_reduced(pow))
+            no_out!(n.mod_power_of_2_is_reduced(pow));
         })],
     );
 }

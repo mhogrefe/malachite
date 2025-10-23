@@ -95,7 +95,7 @@ fn benchmark_limbs_odd_factorial(gm: GenMode, config: &GenConfig, limit: usize, 
         file_name,
         &pair_1_bucketer("n"),
         &mut [("Malachite", &mut |(n, double)| {
-            no_out!(limbs_odd_factorial(n, double))
+            no_out!(limbs_odd_factorial(n, double));
         })],
     );
 }
@@ -133,7 +133,7 @@ fn benchmark_factorial_library_comparison(
         &mut [
             ("Malachite", &mut |n| no_out!(Natural::factorial(n))),
             ("rug", &mut |n| {
-                no_out!(rug::Integer::factorial(u32::exact_from(n)).complete())
+                no_out!(rug::Integer::factorial(u32::exact_from(n)).complete());
             }),
         ],
     );
@@ -177,7 +177,7 @@ fn benchmark_double_factorial_library_comparison(
         &mut [
             ("Malachite", &mut |n| no_out!(Natural::double_factorial(n))),
             ("rug", &mut |n| {
-                no_out!(rug::Integer::factorial_2(u32::exact_from(n)).complete())
+                no_out!(rug::Integer::factorial_2(u32::exact_from(n)).complete());
             }),
         ],
     );
@@ -199,7 +199,7 @@ fn benchmark_multifactorial_algorithms(
         &usize_convertible_pair_ratio_bucketer("n", "m"),
         &mut [
             ("default", &mut |(n, m)| {
-                no_out!(Natural::multifactorial(n, m))
+                no_out!(Natural::multifactorial(n, m));
             }),
             ("naive", &mut |(n, m)| no_out!(multifactorial_naive(n, m))),
         ],
@@ -222,12 +222,12 @@ fn benchmark_multifactorial_library_comparison(
         &usize_convertible_pair_ratio_bucketer("n", "m"),
         &mut [
             ("Malachite", &mut |(m, n)| {
-                no_out!(Natural::multifactorial(m, n))
+                no_out!(Natural::multifactorial(m, n));
             }),
             ("rug", &mut |(m, n)| {
                 no_out!(
                     rug::Integer::factorial_m(u32::exact_from(n), u32::exact_from(m)).complete()
-                )
+                );
             }),
         ],
     );

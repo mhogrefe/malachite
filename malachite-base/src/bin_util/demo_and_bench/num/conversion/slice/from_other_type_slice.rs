@@ -51,7 +51,7 @@ fn benchmark_from_other_type_slice<T: FromOtherTypeSlice<U> + Named, U: Primitiv
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |xs| {
-            no_out!(T::from_other_type_slice(&xs))
+            no_out!(T::from_other_type_slice(&xs));
         })],
     );
 }

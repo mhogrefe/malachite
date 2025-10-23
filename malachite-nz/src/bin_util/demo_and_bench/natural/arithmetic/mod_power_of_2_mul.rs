@@ -202,21 +202,21 @@ fn benchmark_limbs_mod_power_of_2_mul_evaluation_strategy(
                 ref mut ys,
                 pow,
             )| {
-                no_out!(limbs_mod_power_of_2_mul(xs, ys, pow))
+                no_out!(limbs_mod_power_of_2_mul(xs, ys, pow));
             }),
             ("limbs_mod_power_of_2_mul_val_ref", &mut |(
                 ref mut xs,
                 ref ys,
                 pow,
             )| {
-                no_out!(limbs_mod_power_of_2_mul_val_ref(xs, ys, pow))
+                no_out!(limbs_mod_power_of_2_mul_val_ref(xs, ys, pow));
             }),
             ("limbs_mod_power_of_2_mul_ref_ref", &mut |(
                 ref xs,
                 ref ys,
                 pow,
             )| {
-                no_out!(limbs_mod_power_of_2_mul_ref_ref(xs, ys, pow))
+                no_out!(limbs_mod_power_of_2_mul_ref_ref(xs, ys, pow));
             }),
         ],
     );
@@ -265,13 +265,13 @@ fn benchmark_natural_mod_power_of_2_mul_algorithms(
         &triple_3_bucketer("pow"),
         &mut [
             ("default", &mut |(x, y, pow)| {
-                no_out!(x.mod_power_of_2_mul(y, pow))
+                no_out!(x.mod_power_of_2_mul(y, pow));
             }),
             ("naive", &mut |(x, y, pow)| {
-                no_out!((x * y).mod_power_of_2(pow))
+                no_out!((x * y).mod_power_of_2(pow));
             }),
             ("using mod_mul", &mut |(x, y, pow)| {
-                no_out!(x.mod_mul(y, Natural::power_of_2(pow)))
+                no_out!(x.mod_mul(y, Natural::power_of_2(pow)));
             }),
         ],
     );

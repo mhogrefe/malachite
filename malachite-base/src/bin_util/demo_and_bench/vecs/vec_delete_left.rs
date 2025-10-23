@@ -39,7 +39,7 @@ fn benchmark_vec_delete_left(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, amount)| {
-            vec_delete_left(&mut xs, amount)
+            vec_delete_left(&mut xs, amount);
         })],
     );
 }

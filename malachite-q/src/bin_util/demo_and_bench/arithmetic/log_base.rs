@@ -94,7 +94,7 @@ fn benchmark_rational_floor_log_base(
         file_name,
         &pair_rational_max_bit_bucketer("n", "base"),
         &mut [("Malachite", &mut |(n, base)| {
-            no_out!(n.floor_log_base(&base))
+            no_out!(n.floor_log_base(&base));
         })],
     );
 }
@@ -114,7 +114,7 @@ fn benchmark_rational_ceiling_log_base(
         file_name,
         &pair_rational_max_bit_bucketer("n", "base"),
         &mut [("Malachite", &mut |(n, base)| {
-            no_out!(n.ceiling_log_base(&base))
+            no_out!(n.ceiling_log_base(&base));
         })],
     );
 }
@@ -134,7 +134,7 @@ fn benchmark_rational_checked_log_base(
         file_name,
         &pair_rational_max_bit_bucketer("n", "base"),
         &mut [("Malachite", &mut |(n, base)| {
-            no_out!(n.checked_log_base(&base))
+            no_out!(n.checked_log_base(&base));
         })],
     );
 }

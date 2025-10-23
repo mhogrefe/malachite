@@ -60,7 +60,7 @@ fn benchmark_assign_bit_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut n, index, bit)| {
-            n.assign_bit(index, bit)
+            n.assign_bit(index, bit);
         })],
     );
 }
@@ -80,7 +80,7 @@ fn benchmark_assign_bit_signed<T: PrimitiveSigned>(
         file_name,
         &triple_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut n, index, bit)| {
-            n.assign_bit(index, bit)
+            n.assign_bit(index, bit);
         })],
     );
 }

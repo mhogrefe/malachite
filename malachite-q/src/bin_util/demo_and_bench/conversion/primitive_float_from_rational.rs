@@ -255,7 +255,7 @@ fn benchmark_f32_rounding_from_down_rational_library_comparison(
         &pair_2_rational_bit_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, n)| {
-                no_out!(f32::rounding_from(n, Down))
+                no_out!(f32::rounding_from(n, Down));
             }),
             ("rug", &mut |(n, _)| no_out!(n.to_f32())),
         ],
@@ -278,7 +278,7 @@ fn benchmark_f64_rounding_from_down_rational_library_comparison(
         &pair_2_rational_bit_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, n)| {
-                no_out!(f64::rounding_from(n, Down))
+                no_out!(f64::rounding_from(n, Down));
             }),
             ("rug", &mut |(n, _)| no_out!(n.to_f64())),
         ],
@@ -303,10 +303,10 @@ fn benchmark_float_try_from_rational_evaluation_strategy<
         &rational_bit_bucketer("n"),
         &mut [
             (&format!("{}::try_from(Rational)", T::NAME), &mut |n| {
-                no_out!(T::try_from(n).ok())
+                no_out!(T::try_from(n).ok());
             }),
             (&format!("{}::try_from(&Rational)", T::NAME), &mut |n| {
-                no_out!(T::try_from(&n).ok())
+                no_out!(T::try_from(&n).ok());
             }),
         ],
     );
@@ -332,10 +332,10 @@ fn benchmark_float_exact_from_rational_evaluation_strategy<
         &rational_bit_bucketer("n"),
         &mut [
             (&format!("{}::exact_from(Rational)", T::NAME), &mut |n| {
-                no_out!(T::exact_from(n))
+                no_out!(T::exact_from(n));
             }),
             (&format!("{}::exact_from(&Rational)", T::NAME), &mut |n| {
-                no_out!(T::exact_from(&n))
+                no_out!(T::exact_from(&n));
             }),
         ],
     );

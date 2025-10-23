@@ -194,10 +194,10 @@ fn benchmark_limbs_precompute_mod_mul_two_limbs_algorithms(
         &limb_pair_significant_bits_bucketer("m"),
         &mut [
             ("default", &mut |(m_1, m_0)| {
-                no_out!(limbs_precompute_mod_mul_two_limbs(m_1, m_0))
+                no_out!(limbs_precompute_mod_mul_two_limbs(m_1, m_0));
             }),
             ("alt", &mut |(m_1, m_0)| {
-                no_out!(limbs_precompute_mod_mul_two_limbs_alt(m_1, m_0))
+                no_out!(limbs_precompute_mod_mul_two_limbs_alt(m_1, m_0));
             }),
         ],
     );
@@ -231,10 +231,10 @@ fn benchmark_limbs_mod_mul_two_limbs(
             )| {
                 no_out!(limbs_mod_mul_two_limbs(
                     x_1, x_0, y_1, y_0, m_1, m_0, inv_2, inv_1, inv_0
-                ))
+                ));
             }),
             ("naive", &mut |(x_1, x_0, y_1, y_0, m_1, m_0, _, _, _)| {
-                no_out!(limbs_mod_mul_two_limbs_naive(x_1, x_0, y_1, y_0, m_1, m_0))
+                no_out!(limbs_mod_mul_two_limbs_naive(x_1, x_0, y_1, y_0, m_1, m_0));
             }),
         ],
     );
@@ -313,25 +313,25 @@ fn benchmark_natural_mod_mul_evaluation_strategy(
         &triple_3_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_mul(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_mul(y, m))
+                no_out!(x.mod_mul(y, m));
             }),
             ("Natural.mod_mul(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_mul(y, &m))
+                no_out!(x.mod_mul(y, &m));
             }),
             ("Natural.mod_mul(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_mul(&y, m))
+                no_out!(x.mod_mul(&y, m));
             }),
             ("Natural.mod_mul(&Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_mul(&y, &m))
+                no_out!(x.mod_mul(&y, &m));
             }),
             ("(&Natural).mod_mul(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_mul(y, m))
+                no_out!((&x).mod_mul(y, m));
             }),
             ("(&Natural).mod_mul(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_mul(y, &m))
+                no_out!((&x).mod_mul(y, &m));
             }),
             ("(&Natural).mod_mul(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_mul(&y, m))
+                no_out!((&x).mod_mul(&y, m));
             }),
             (
                 "(&Natural).mod_mul(&Natural, &Natural)",

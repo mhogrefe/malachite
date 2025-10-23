@@ -207,7 +207,7 @@ fn benchmark_div_mod_signed_algorithms<T: PrimitiveSigned>(
         &mut [
             ("using div_mod", &mut |(x, y)| no_out!(x.div_mod(y))),
             ("using div_round and mod_op", &mut |(x, y)| {
-                no_out!((x.div_round(y, Floor), x.mod_op(y)))
+                no_out!((x.div_round(y, Floor), x.mod_op(y)));
             }),
         ],
     );
@@ -346,10 +346,10 @@ fn benchmark_ceiling_div_neg_mod_algorithms<T: PrimitiveUnsigned>(
         &pair_max_bit_bucketer("x", "y"),
         &mut [
             ("using ceiling_div_neg_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_neg_mod(y))
+                no_out!(x.ceiling_div_neg_mod(y));
             }),
             ("using div_round and neg_mod", &mut |(x, y)| {
-                no_out!((x.div_round(y, Ceiling), x.neg_mod(y)))
+                no_out!((x.div_round(y, Ceiling), x.neg_mod(y)));
             }),
         ],
     );
@@ -372,10 +372,10 @@ fn benchmark_ceiling_div_mod_algorithms<T: PrimitiveSigned>(
         &pair_max_bit_bucketer("x", "y"),
         &mut [
             ("using ceiling_div_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_mod(y))
+                no_out!(x.ceiling_div_mod(y));
             }),
             ("using div_round and ceiling_mod", &mut |(x, y)| {
-                no_out!((x.div_round(y, Ceiling), x.ceiling_mod(y)))
+                no_out!((x.div_round(y, Ceiling), x.ceiling_mod(y)));
             }),
         ],
     );
@@ -396,7 +396,7 @@ fn benchmark_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.ceiling_div_assign_neg_mod(y))
+            no_out!(x.ceiling_div_assign_neg_mod(y));
         })],
     );
 }
@@ -416,7 +416,7 @@ fn benchmark_ceiling_div_assign_mod<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.ceiling_div_assign_mod(y))
+            no_out!(x.ceiling_div_assign_mod(y));
         })],
     );
 }

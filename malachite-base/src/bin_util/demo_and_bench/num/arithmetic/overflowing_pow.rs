@@ -63,7 +63,7 @@ fn benchmark_overflowing_pow_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.overflowing_pow_assign(y))
+            no_out!(x.overflowing_pow_assign(y));
         })],
     );
 }
@@ -83,7 +83,7 @@ fn benchmark_overflowing_pow_assign_signed<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.overflowing_pow_assign(y))
+            no_out!(x.overflowing_pow_assign(y));
         })],
     );
 }

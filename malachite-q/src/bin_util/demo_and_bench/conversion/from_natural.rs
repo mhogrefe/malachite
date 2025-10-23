@@ -49,10 +49,10 @@ fn benchmark_rational_from_natural_evaluation_strategy(
         &natural_bit_bucketer("n"),
         &mut [
             ("Rational::from(Natural)", &mut |n| {
-                no_out!(Rational::from(n))
+                no_out!(Rational::from(n));
             }),
             ("Rational::from(&Natural)", &mut |n| {
-                no_out!(Rational::from(&n))
+                no_out!(Rational::from(&n));
             }),
         ],
     );

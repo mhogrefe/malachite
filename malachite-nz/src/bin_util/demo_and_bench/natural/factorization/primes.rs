@@ -68,10 +68,10 @@ fn benchmark_natural_primes_less_than_algorithms(
         &natural_bucketer("n"),
         &mut [
             ("default", &mut |n| {
-                no_out!(Natural::primes_less_than(&n).count())
+                no_out!(Natural::primes_less_than(&n).count());
             }),
             ("using primes", &mut |n| {
-                no_out!(Natural::primes().take_while(|p| *p < n).count())
+                no_out!(Natural::primes().take_while(|p| *p < n).count());
             }),
         ],
     );
@@ -93,10 +93,10 @@ fn benchmark_natural_primes_less_than_or_equal_to_algorithms(
         &natural_bucketer("n"),
         &mut [
             ("default", &mut |n| {
-                no_out!(Natural::primes_less_than_or_equal_to(&n).count())
+                no_out!(Natural::primes_less_than_or_equal_to(&n).count());
             }),
             ("using primes", &mut |n| {
-                no_out!(Natural::primes().take_while(|p| *p <= n).count())
+                no_out!(Natural::primes().take_while(|p| *p <= n).count());
             }),
         ],
     );

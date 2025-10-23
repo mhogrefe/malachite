@@ -284,7 +284,7 @@ fn benchmark_limbs_sub_mul_limb_greater(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, ys, z)| {
-            no_out!(limbs_sub_mul_limb_greater(&xs, &ys, z))
+            no_out!(limbs_sub_mul_limb_greater(&xs, &ys, z));
         })],
     );
 }
@@ -306,7 +306,7 @@ fn benchmark_limbs_sub_mul_limb_same_length_in_place_left(
         &mut [("Malachite", &mut |(mut xs, ys, z)| {
             no_out!(limbs_sub_mul_limb_same_length_in_place_left(
                 &mut xs, &ys, z
-            ))
+            ));
         })],
     );
 }
@@ -326,7 +326,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_left(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, ys, z)| {
-            no_out!(limbs_sub_mul_limb_greater_in_place_left(&mut xs, &ys, z))
+            no_out!(limbs_sub_mul_limb_greater_in_place_left(&mut xs, &ys, z));
         })],
     );
 }
@@ -348,7 +348,7 @@ fn benchmark_limbs_sub_mul_limb_same_length_in_place_right(
         &mut [("Malachite", &mut |(xs, mut ys, z)| {
             no_out!(limbs_sub_mul_limb_same_length_in_place_right(
                 &xs, &mut ys, z
-            ))
+            ));
         })],
     );
 }
@@ -370,7 +370,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_right(
         &mut [("Malachite", &mut |(xs, mut ys, z)| {
             no_out!(limbs_sub_mul_limb_same_length_in_place_right(
                 &xs, &mut ys, z
-            ))
+            ));
         })],
     );
 }
@@ -385,7 +385,7 @@ fn benchmark_limbs_sub_mul(gm: GenMode, config: &GenConfig, limit: usize, file_n
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, ys, zs)| {
-            no_out!(limbs_sub_mul(&xs, &ys, &zs))
+            no_out!(limbs_sub_mul(&xs, &ys, &zs));
         })],
     );
 }
@@ -405,7 +405,7 @@ fn benchmark_limbs_sub_mul_in_place_left(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, ys, zs)| {
-            no_out!(limbs_sub_mul_in_place_left(&mut xs, &ys, &zs))
+            no_out!(limbs_sub_mul_in_place_left(&mut xs, &ys, &zs));
         })],
     );
 }
@@ -465,7 +465,7 @@ fn benchmark_natural_sub_mul_assign_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(b, c),
             ),
             ("Natural += Natural * Natural", &mut |(mut a, b, c)| {
-                a += b * c
+                a += b * c;
             }),
         ],
     );
@@ -491,7 +491,7 @@ fn benchmark_natural_sub_mul_assign_val_ref_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(b, &c),
             ),
             ("Natural += Natural * &Natural", &mut |(mut a, b, c)| {
-                a += b * &c
+                a += b * &c;
             }),
         ],
     );
@@ -517,7 +517,7 @@ fn benchmark_natural_sub_mul_assign_ref_val_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(&b, c),
             ),
             ("Natural += &Natural * Natural", &mut |(mut a, b, c)| {
-                a += &b * c
+                a += &b * c;
             }),
         ],
     );
@@ -543,7 +543,7 @@ fn benchmark_natural_sub_mul_assign_ref_ref_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(&b, &c),
             ),
             ("Natural += &Natural * &Natural", &mut |(mut a, b, c)| {
-                a += &b * &c
+                a += &b * &c;
             }),
         ],
     );
@@ -565,16 +565,16 @@ fn benchmark_natural_sub_mul_evaluation_stategy(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.sub_mul(Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, c))
+                no_out!(a.sub_mul(b, c));
             }),
             ("Natural.sub_mul(Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, &c))
+                no_out!(a.sub_mul(b, &c));
             }),
             ("Natural.sub_mul(&Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, c))
+                no_out!(a.sub_mul(&b, c));
             }),
             ("Natural.sub_mul(&Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, &c))
+                no_out!(a.sub_mul(&b, &c));
             }),
             (
                 "(&Natural).sub_mul(&Natural, &Natural)",
@@ -601,10 +601,10 @@ fn benchmark_natural_sub_mul_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.sub_mul(Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, c))
+                no_out!(a.sub_mul(b, c));
             }),
             ("Natural - Natural * Natural", &mut |(a, b, c)| {
-                no_out!(a - b * c)
+                no_out!(a - b * c);
             }),
         ],
     );
@@ -627,10 +627,10 @@ fn benchmark_natural_sub_mul_val_val_ref_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.sub_mul(Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, &c))
+                no_out!(a.sub_mul(b, &c));
             }),
             ("Natural - Natural * &Natural", &mut |(a, b, c)| {
-                no_out!(a - b * &c)
+                no_out!(a - b * &c);
             }),
         ],
     );
@@ -653,10 +653,10 @@ fn benchmark_natural_sub_mul_val_ref_val_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.sub_mul(&Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, c))
+                no_out!(a.sub_mul(&b, c));
             }),
             ("Natural - &Natural * Natural", &mut |(a, b, c)| {
-                no_out!(a - &b * c)
+                no_out!(a - &b * c);
             }),
         ],
     );
@@ -679,10 +679,10 @@ fn benchmark_natural_sub_mul_val_ref_ref_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.sub_mul(&Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, &c))
+                no_out!(a.sub_mul(&b, &c));
             }),
             ("Natural - &Natural * &Natural", &mut |(a, b, c)| {
-                no_out!(a - &b * &c)
+                no_out!(a - &b * &c);
             }),
         ],
     );
@@ -709,7 +709,7 @@ fn benchmark_natural_sub_mul_ref_ref_ref_algorithms(
                 &mut |(a, b, c)| no_out!((&a).sub_mul(&b, &c)),
             ),
             ("(&Natural) - &Natural * &Natural", &mut |(a, b, c)| {
-                no_out!((&a) - &b * &c)
+                no_out!((&a) - &b * &c);
             }),
         ],
     );

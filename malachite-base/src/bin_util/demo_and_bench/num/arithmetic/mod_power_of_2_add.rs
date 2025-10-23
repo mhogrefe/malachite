@@ -65,7 +65,7 @@ fn benchmark_mod_power_of_2_add<T: PrimitiveUnsigned>(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(x, y, pow)| {
-            no_out!(x.mod_power_of_2_add(y, pow))
+            no_out!(x.mod_power_of_2_add(y, pow));
         })],
     );
 }
@@ -85,7 +85,7 @@ fn benchmark_mod_power_of_2_add_assign<T: PrimitiveUnsigned>(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(mut x, y, pow)| {
-            x.mod_power_of_2_add_assign(y, pow)
+            x.mod_power_of_2_add_assign(y, pow);
         })],
     );
 }

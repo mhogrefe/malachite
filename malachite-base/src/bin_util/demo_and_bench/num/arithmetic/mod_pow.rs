@@ -63,7 +63,7 @@ fn benchmark_mod_pow_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, exp, m)| no_out!(x.mod_pow(exp, m))),
             ("simple binary", &mut |(x, exp, m)| {
-                no_out!(simple_binary_mod_pow(x, exp, m))
+                no_out!(simple_binary_mod_pow(x, exp, m));
             }),
         ],
     );
@@ -86,10 +86,10 @@ fn benchmark_mod_pow_naive_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, exp, m)| no_out!(x.mod_pow(exp, m))),
             ("naive", &mut |(x, exp, m)| {
-                no_out!(naive_mod_pow(x, exp, m))
+                no_out!(naive_mod_pow(x, exp, m));
             }),
             ("simple binary", &mut |(x, exp, m)| {
-                no_out!(simple_binary_mod_pow(x, exp, m))
+                no_out!(simple_binary_mod_pow(x, exp, m));
             }),
         ],
     );

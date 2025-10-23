@@ -69,10 +69,10 @@ fn benchmark_natural_count_ones_algorithms(
         &mut [
             ("default", &mut |n| no_out!(n.count_ones())),
             ("using bits explicitly", &mut |n| {
-                no_out!(natural_count_ones_alt_1(&n))
+                no_out!(natural_count_ones_alt_1(&n));
             }),
             ("using limbs explicitly", &mut |n| {
-                no_out!(natural_count_ones_alt_2(&n))
+                no_out!(natural_count_ones_alt_2(&n));
             }),
         ],
     );

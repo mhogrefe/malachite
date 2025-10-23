@@ -279,13 +279,13 @@ fn benchmark_float_from_rational_prec_library_comparison(
         &pair_rational_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec)| {
-                no_out!(Float::from_rational_prec(n, prec))
+                no_out!(Float::from_rational_prec(n, prec));
             }),
             ("rug", &mut |(n, prec)| {
                 no_out!(rug::Float::with_val(
                     u32::exact_from(prec),
                     rug::Rational::from(&n),
-                ))
+                ));
             }),
         ],
     );
@@ -334,13 +334,13 @@ fn benchmark_float_from_rational_prec_round_algorithms(
         &triple_1_2_rational_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("default", &mut |(n, prec, rm)| {
-                no_out!(Float::from_rational_prec_round(n, prec, rm))
+                no_out!(Float::from_rational_prec_round(n, prec, rm));
             }),
             ("direct", &mut |(n, prec, rm)| {
-                no_out!(from_rational_prec_round_direct(n, prec, rm))
+                no_out!(from_rational_prec_round_direct(n, prec, rm));
             }),
             ("using div", &mut |(n, prec, rm)| {
-                no_out!(from_rational_prec_round_using_div(n, prec, rm))
+                no_out!(from_rational_prec_round_using_div(n, prec, rm));
             }),
         ],
     );
@@ -362,13 +362,13 @@ fn benchmark_float_from_rational_prec_round_ref_algorithms(
         &triple_1_2_rational_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("default", &mut |(n, prec, rm)| {
-                no_out!(Float::from_rational_prec_round_ref(&n, prec, rm))
+                no_out!(Float::from_rational_prec_round_ref(&n, prec, rm));
             }),
             ("direct", &mut |(n, prec, rm)| {
-                no_out!(from_rational_prec_round_ref_direct(&n, prec, rm))
+                no_out!(from_rational_prec_round_ref_direct(&n, prec, rm));
             }),
             ("using div", &mut |(n, prec, rm)| {
-                no_out!(from_rational_prec_round_ref_using_div(&n, prec, rm))
+                no_out!(from_rational_prec_round_ref_using_div(&n, prec, rm));
             }),
         ],
     );
@@ -390,14 +390,14 @@ fn benchmark_float_from_rational_prec_round_library_comparison(
         &triple_1_2_rational_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec, rm)| {
-                no_out!(Float::from_rational_prec_round(n, prec, rm))
+                no_out!(Float::from_rational_prec_round(n, prec, rm));
             }),
             ("rug", &mut |(n, prec, rm)| {
                 no_out!(rug::Float::with_val_round(
                     u32::exact_from(prec),
                     rug::Rational::from(&n),
                     rug_round_try_from_rounding_mode(rm).unwrap()
-                ))
+                ));
             }),
         ],
     );
@@ -420,10 +420,10 @@ fn benchmark_float_try_from_rational_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Float::try_from(Rational)", &mut |x| {
-                no_out!(Float::try_from(x))
+                no_out!(Float::try_from(x));
             }),
             ("Float::try_from(&Rational)", &mut |x| {
-                no_out!(Float::try_from(&x))
+                no_out!(Float::try_from(&x));
             }),
         ],
     );

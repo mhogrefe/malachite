@@ -56,10 +56,10 @@ fn benchmark_xx_div_mod_y_to_qr_algorithms<T: PrimitiveUnsigned>(
         &triple_max_bit_bucketer("x_1", "x_0", "y"),
         &mut [
             ("default", &mut |(x_1, x_0, y)| {
-                no_out!(T::xx_div_mod_y_to_qr(x_1, x_0, y))
+                no_out!(T::xx_div_mod_y_to_qr(x_1, x_0, y));
             }),
             ("explicit", &mut |(x_1, x_0, y)| {
-                no_out!(explicit_xx_div_mod_y_to_qr(x_1, x_0, y))
+                no_out!(explicit_xx_div_mod_y_to_qr(x_1, x_0, y));
             }),
         ],
     );

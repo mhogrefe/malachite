@@ -79,7 +79,7 @@ fn benchmark_primorial_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::primorial(n))),
             ("naive", &mut |n| {
-                no_out!(checked_primorial_naive::<T>(n).unwrap())
+                no_out!(checked_primorial_naive::<T>(n).unwrap());
             }),
         ],
     );
@@ -120,7 +120,7 @@ fn benchmark_product_of_first_n_primes_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::product_of_first_n_primes(n))),
             ("naive", &mut |n| {
-                no_out!(checked_product_of_first_n_primes_naive::<T>(n).unwrap())
+                no_out!(checked_product_of_first_n_primes_naive::<T>(n).unwrap());
             }),
         ],
     );
@@ -141,7 +141,7 @@ fn benchmark_checked_product_of_first_n_primes<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |n| {
-            no_out!(T::checked_product_of_first_n_primes(n))
+            no_out!(T::checked_product_of_first_n_primes(n));
         })],
     );
 }

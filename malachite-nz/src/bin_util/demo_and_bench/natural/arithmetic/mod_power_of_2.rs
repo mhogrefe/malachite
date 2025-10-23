@@ -240,7 +240,7 @@ fn benchmark_limbs_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize,
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(xs, pow)| {
-            no_out!(limbs_mod_power_of_2(&xs, pow))
+            no_out!(limbs_mod_power_of_2(&xs, pow));
         })],
     );
 }
@@ -260,7 +260,7 @@ fn benchmark_limbs_slice_mod_power_of_2_in_place(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(mut xs, pow)| {
-            limbs_slice_mod_power_of_2_in_place(&mut xs, pow)
+            limbs_slice_mod_power_of_2_in_place(&mut xs, pow);
         })],
     );
 }
@@ -280,7 +280,7 @@ fn benchmark_limbs_vec_mod_power_of_2_in_place(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(mut xs, pow)| {
-            limbs_vec_mod_power_of_2_in_place(&mut xs, pow)
+            limbs_vec_mod_power_of_2_in_place(&mut xs, pow);
         })],
     );
 }
@@ -300,7 +300,7 @@ fn benchmark_limbs_neg_mod_power_of_2(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(xs, pow)| {
-            no_out!(limbs_neg_mod_power_of_2(&xs, pow))
+            no_out!(limbs_neg_mod_power_of_2(&xs, pow));
         })],
     );
 }
@@ -320,7 +320,7 @@ fn benchmark_limbs_neg_mod_power_of_2_in_place(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(mut xs, pow)| {
-            limbs_neg_mod_power_of_2_in_place(&mut xs, pow)
+            limbs_neg_mod_power_of_2_in_place(&mut xs, pow);
         })],
     );
 }
@@ -359,10 +359,10 @@ fn benchmark_natural_mod_power_of_2_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!(n.mod_power_of_2(u))
+                no_out!(n.mod_power_of_2(u));
             }),
             ("(&Natural).mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!((&n).mod_power_of_2(u))
+                no_out!((&n).mod_power_of_2(u));
             }),
         ],
     );
@@ -402,10 +402,10 @@ fn benchmark_natural_rem_power_of_2_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.rem_power_of_2(u64)", &mut |(n, u)| {
-                no_out!(n.rem_power_of_2(u))
+                no_out!(n.rem_power_of_2(u));
             }),
             ("(&Natural).rem_power_of_2(u64)", &mut |(n, u)| {
-                no_out!((&n).rem_power_of_2(u))
+                no_out!((&n).rem_power_of_2(u));
             }),
         ],
     );
@@ -426,7 +426,7 @@ fn benchmark_natural_neg_mod_power_of_2_assign(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(mut n, u)| {
-            n.neg_mod_power_of_2_assign(u)
+            n.neg_mod_power_of_2_assign(u);
         })],
     );
 }
@@ -447,10 +447,10 @@ fn benchmark_natural_neg_mod_power_of_2_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.neg_mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!(n.neg_mod_power_of_2(u))
+                no_out!(n.neg_mod_power_of_2(u));
             }),
             ("(&Natural).neg_mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!((&n).neg_mod_power_of_2(u))
+                no_out!((&n).neg_mod_power_of_2(u));
             }),
         ],
     );

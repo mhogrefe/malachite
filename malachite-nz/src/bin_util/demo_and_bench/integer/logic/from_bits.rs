@@ -33,7 +33,7 @@ fn demo_integer_from_bits_asc(gm: GenMode, config: &GenConfig, limit: usize) {
         println!(
             "from_bits_asc({:?}) = {:?}",
             bits,
-            Integer::from_bits_asc(bits.iter().cloned())
+            Integer::from_bits_asc(bits.iter().copied())
         );
     }
 }
@@ -43,7 +43,7 @@ fn demo_integer_from_bits_desc(gm: GenMode, config: &GenConfig, limit: usize) {
         println!(
             "from_bits_desc({:?}) = {:?}",
             bits,
-            Integer::from_bits_desc(bits.iter().cloned())
+            Integer::from_bits_desc(bits.iter().copied())
         );
     }
 }
@@ -64,13 +64,13 @@ fn benchmark_integer_from_bits_asc_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |bits| {
-                no_out!(Integer::from_bits_asc(bits.into_iter()))
+                no_out!(Integer::from_bits_asc(bits.into_iter()));
             }),
             ("alt", &mut |bits| {
-                no_out!(from_bits_asc_alt::<Integer, _>(bits.into_iter()))
+                no_out!(from_bits_asc_alt::<Integer, _>(bits.into_iter()));
             }),
             ("naive", &mut |bits| {
-                no_out!(from_bits_asc_naive(bits.into_iter()))
+                no_out!(from_bits_asc_naive(bits.into_iter()));
             }),
         ],
     );
@@ -92,13 +92,13 @@ fn benchmark_integer_from_bits_desc_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |bits| {
-                no_out!(Integer::from_bits_desc(bits.into_iter()))
+                no_out!(Integer::from_bits_desc(bits.into_iter()));
             }),
             ("alt", &mut |bits| {
-                no_out!(from_bits_desc_alt::<Integer, _>(bits.into_iter()))
+                no_out!(from_bits_desc_alt::<Integer, _>(bits.into_iter()));
             }),
             ("naive", &mut |bits| {
-                no_out!(from_bits_desc_naive(bits.into_iter()))
+                no_out!(from_bits_desc_naive(bits.into_iter()));
             }),
         ],
     );

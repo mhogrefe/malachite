@@ -503,7 +503,7 @@ fn benchmark_limbs_from_digits_small_base_basecase_algorithms<T: PrimitiveUnsign
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("basecase", &mut |(mut out, xs, base)| {
-                no_out!(limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap())
+                no_out!(limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap());
             }),
             ("naive", &mut |(_, xs, base)| {
                 from_digits_desc_naive_primitive(&xs, T::exact_from(base))
@@ -536,10 +536,10 @@ fn benchmark_limbs_from_digits_small_base_algorithms<T: PrimitiveUnsigned>(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("full", &mut |(mut out, xs, base)| {
-                no_out!(limbs_from_digits_small_base(&mut out, &xs, base))
+                no_out!(limbs_from_digits_small_base(&mut out, &xs, base));
             }),
             ("basecase", &mut |(mut out, xs, base)| {
-                no_out!(limbs_from_digits_small_base_basecase(&mut out, &xs, base))
+                no_out!(limbs_from_digits_small_base_basecase(&mut out, &xs, base));
             }),
         ],
     );
@@ -564,7 +564,7 @@ fn benchmark_from_digits_desc_basecase_algorithms<T: ConvertibleFrom<Limb> + Pri
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("default", &mut |(xs, base)| {
-                no_out!(from_digits_desc_basecase(&xs, base).unwrap())
+                no_out!(from_digits_desc_basecase(&xs, base).unwrap());
             }),
             ("naive", &mut |(xs, base)| {
                 from_digits_desc_naive_primitive(&xs, T::exact_from(base))
@@ -593,7 +593,7 @@ fn benchmark_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         file_name,
         &pair_1_vec_len_times_pair_2_bits_bucketer("xs", "base"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(from_digits_asc_limb(xs.into_iter(), base))
+            no_out!(from_digits_asc_limb(xs.into_iter(), base));
         })],
     );
 }
@@ -617,10 +617,10 @@ fn benchmark_from_digits_desc_limb_algorithms<T: ConvertibleFrom<Limb> + Primiti
         &pair_1_vec_len_times_pair_2_bits_bucketer("xs", "base"),
         &mut [
             ("full", &mut |(xs, base)| {
-                no_out!(from_digits_desc_limb(xs.into_iter(), base))
+                no_out!(from_digits_desc_limb(xs.into_iter(), base));
             }),
             ("basecase", &mut |(xs, base)| {
-                no_out!(from_digits_desc_basecase(&xs, base))
+                no_out!(from_digits_desc_basecase(&xs, base));
             }),
         ],
     );
@@ -636,7 +636,7 @@ fn benchmark_from_digits_asc_large(gm: GenMode, config: &GenConfig, limit: usize
         file_name,
         &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(from_digits_desc_large(xs.into_iter(), &base))
+            no_out!(from_digits_desc_large(xs.into_iter(), &base));
         })],
     );
 }
@@ -657,10 +657,10 @@ fn benchmark_from_digits_desc_large_algorithms(
         &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
         &mut [
             ("large", &mut |(xs, base)| {
-                no_out!(from_digits_desc_large(xs.into_iter(), &base))
+                no_out!(from_digits_desc_large(xs.into_iter(), &base));
             }),
             ("naive", &mut |(xs, base)| {
-                no_out!(from_digits_desc_naive(&xs, &base))
+                no_out!(from_digits_desc_naive(&xs, &base));
             }),
         ],
     );
@@ -687,7 +687,7 @@ fn benchmark_from_digits_asc_unsigned<T: PrimitiveUnsigned + SaturatingFrom<T> +
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(Natural::from_digits_asc(&base, xs.into_iter()))
+            no_out!(Natural::from_digits_asc(&base, xs.into_iter()));
         })],
     );
 }
@@ -716,7 +716,7 @@ fn benchmark_from_digits_desc_unsigned_algorithms<
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("default", &mut |(xs, base)| {
-                no_out!(Natural::from_digits_desc(&base, xs.into_iter()))
+                no_out!(Natural::from_digits_desc(&base, xs.into_iter()));
             }),
             ("naive", &mut |(xs, base)| {
                 from_digits_desc_naive_primitive(&xs, T::exact_from(base));
@@ -735,7 +735,7 @@ fn benchmark_from_digits_asc(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(Natural::from_digits_asc(&base, xs.into_iter()))
+            no_out!(Natural::from_digits_asc(&base, xs.into_iter()));
         })],
     );
 }
@@ -756,7 +756,7 @@ fn benchmark_from_digits_desc_algorithms(
         &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
         &mut [
             ("default", &mut |(xs, base)| {
-                no_out!(Natural::from_digits_desc(&base, xs.into_iter()))
+                no_out!(Natural::from_digits_desc(&base, xs.into_iter()));
             }),
             ("naive", &mut |(xs, base)| {
                 from_digits_desc_naive(&xs, &base);

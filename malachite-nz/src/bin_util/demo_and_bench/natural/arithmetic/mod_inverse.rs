@@ -84,16 +84,16 @@ fn benchmark_natural_mod_inverse_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_inverse(Natural)", &mut |(n, m)| {
-                no_out!(n.mod_inverse(m))
+                no_out!(n.mod_inverse(m));
             }),
             ("Natural.mod_inverse(&Natural)", &mut |(n, m)| {
-                no_out!(n.mod_inverse(&m))
+                no_out!(n.mod_inverse(&m));
             }),
             ("(&Natural).mod_inverse(Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_inverse(m))
+                no_out!((&n).mod_inverse(m));
             }),
             ("(&Natural).mod_inverse(&Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_inverse(&m))
+                no_out!((&n).mod_inverse(&m));
             }),
         ],
     );

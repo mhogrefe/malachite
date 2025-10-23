@@ -92,7 +92,7 @@ fn benchmark_length_after_point_in_small_base(
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(q, base)| {
-            no_out!(q.length_after_point_in_small_base(base))
+            no_out!(q.length_after_point_in_small_base(base));
         })],
     );
 }
@@ -125,7 +125,7 @@ fn benchmark_rational_fmt_sci_valid(
         file_name,
         &pair_1_rational_bit_bucketer("n"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.fmt_sci_valid(options))
+            no_out!(x.fmt_sci_valid(options));
         })],
     );
 }
@@ -145,7 +145,7 @@ fn benchmark_rational_to_sci_with_options(
         file_name,
         &pair_1_rational_bit_bucketer("n"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.to_sci_with_options(options).to_string())
+            no_out!(x.to_sci_with_options(options).to_string());
         })],
     );
 }

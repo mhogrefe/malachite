@@ -137,7 +137,7 @@ fn benchmark_primitive_int_rounding_from_rational<
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, rm)| {
-            no_out!(T::rounding_from(&x, rm))
+            no_out!(T::rounding_from(&x, rm));
         })],
     );
 }

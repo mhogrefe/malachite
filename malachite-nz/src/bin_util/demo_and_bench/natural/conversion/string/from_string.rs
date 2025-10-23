@@ -102,7 +102,7 @@ fn benchmark_natural_from_str_library_comparison(
         &string_len_bucketer(),
         &mut [
             ("Malachite", &mut |s| {
-                no_out!(Natural::from_str(&s).unwrap())
+                no_out!(Natural::from_str(&s).unwrap());
             }),
             ("num", &mut |s| no_out!(BigUint::from_str(&s).unwrap())),
             ("rug", &mut |s| no_out!(rug::Integer::from_str(&s).unwrap())),
@@ -127,7 +127,7 @@ fn benchmark_natural_from_str_algorithms(
         &mut [
             ("default", &mut |s| no_out!(Natural::from_str(&s).unwrap())),
             ("naive", &mut |s| {
-                no_out!(from_string_base_naive(10, &s).unwrap())
+                no_out!(from_string_base_naive(10, &s).unwrap());
             }),
         ],
     );
@@ -149,13 +149,13 @@ fn benchmark_natural_from_string_base_library_comparison(
         &pair_2_string_len_bucketer("s"),
         &mut [
             ("Malachite", &mut |(base, s)| {
-                no_out!(Natural::from_string_base(base, &s).unwrap())
+                no_out!(Natural::from_string_base(base, &s).unwrap());
             }),
             ("num", &mut |(base, s)| {
-                no_out!(BigUint::from_str_radix(&s, u32::wrapping_from(base)).unwrap())
+                no_out!(BigUint::from_str_radix(&s, u32::wrapping_from(base)).unwrap());
             }),
             ("rug", &mut |(base, s)| {
-                no_out!(rug::Integer::from_str_radix(&s, i32::wrapping_from(base)).unwrap())
+                no_out!(rug::Integer::from_str_radix(&s, i32::wrapping_from(base)).unwrap());
             }),
         ],
     );
@@ -177,13 +177,13 @@ fn benchmark_natural_from_string_base_binary_library_comparison(
         &string_len_bucketer(),
         &mut [
             ("Malachite", &mut |s| {
-                no_out!(Natural::from_string_base(2, &s).unwrap())
+                no_out!(Natural::from_string_base(2, &s).unwrap());
             }),
             ("num", &mut |s| {
-                no_out!(BigUint::from_str_radix(&s, 2).unwrap())
+                no_out!(BigUint::from_str_radix(&s, 2).unwrap());
             }),
             ("rug", &mut |s| {
-                no_out!(rug::Integer::from_str_radix(&s, 2).unwrap())
+                no_out!(rug::Integer::from_str_radix(&s, 2).unwrap());
             }),
         ],
     );
@@ -205,13 +205,13 @@ fn benchmark_natural_from_string_base_octal_library_comparison(
         &string_len_bucketer(),
         &mut [
             ("Malachite", &mut |s| {
-                no_out!(Natural::from_string_base(8, &s).unwrap())
+                no_out!(Natural::from_string_base(8, &s).unwrap());
             }),
             ("num", &mut |s| {
-                no_out!(BigUint::from_str_radix(&s, 8).unwrap())
+                no_out!(BigUint::from_str_radix(&s, 8).unwrap());
             }),
             ("rug", &mut |s| {
-                no_out!(rug::Integer::from_str_radix(&s, 8).unwrap())
+                no_out!(rug::Integer::from_str_radix(&s, 8).unwrap());
             }),
         ],
     );
@@ -233,13 +233,13 @@ fn benchmark_natural_from_string_base_hex_library_comparison(
         &string_len_bucketer(),
         &mut [
             ("Malachite", &mut |s| {
-                no_out!(Natural::from_string_base(16, &s).unwrap())
+                no_out!(Natural::from_string_base(16, &s).unwrap());
             }),
             ("num", &mut |s| {
-                no_out!(BigUint::from_str_radix(&s, 16).unwrap())
+                no_out!(BigUint::from_str_radix(&s, 16).unwrap());
             }),
             ("rug", &mut |s| {
-                no_out!(rug::Integer::from_str_radix(&s, 16).unwrap())
+                no_out!(rug::Integer::from_str_radix(&s, 16).unwrap());
             }),
         ],
     );
@@ -261,10 +261,10 @@ fn benchmark_natural_from_string_base_algorithms(
         &pair_2_string_len_bucketer("s"),
         &mut [
             ("default", &mut |(base, s)| {
-                no_out!(Natural::from_string_base(base, &s).unwrap())
+                no_out!(Natural::from_string_base(base, &s).unwrap());
             }),
             ("naive", &mut |(base, s)| {
-                no_out!(from_string_base_naive(base, &s).unwrap())
+                no_out!(from_string_base_naive(base, &s).unwrap());
             }),
         ],
     );

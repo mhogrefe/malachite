@@ -29,31 +29,31 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_u8_primitive_root_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<u8>().get(gm, config).take(limit) {
-        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime())
+        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime());
     }
 }
 
 fn demo_u16_primitive_root_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<u16>().get(gm, config).take(limit) {
-        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime())
+        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime());
     }
 }
 
 fn demo_u32_primitive_root_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<u32>().get(gm, config).take(limit) {
-        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime())
+        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime());
     }
 }
 
 fn demo_u64_primitive_root_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<u64>().get(gm, config).take(limit) {
-        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime())
+        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime());
     }
 }
 
 fn demo_usize_primitive_root_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<usize>().get(gm, config).take(limit) {
-        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime())
+        println!("primitive_root_prime({}) = {}", u, u.primitive_root_prime());
     }
 }
 

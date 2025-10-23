@@ -137,7 +137,7 @@ fn benchmark_from_digits_asc<
         file_name,
         &pair_1_vec_len_bucketer("digits"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(U::from_digits_asc(&base, xs.iter().copied()))
+            no_out!(U::from_digits_asc(&base, xs.iter().copied()));
         })],
     );
 }
@@ -165,7 +165,7 @@ fn benchmark_from_digits_desc<
         file_name,
         &pair_1_vec_len_bucketer("digits"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(U::from_digits_desc(&base, xs.iter().copied()))
+            no_out!(U::from_digits_desc(&base, xs.iter().copied()));
         })],
     );
 }

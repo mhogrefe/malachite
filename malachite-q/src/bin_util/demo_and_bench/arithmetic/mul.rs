@@ -228,13 +228,13 @@ fn benchmark_rational_product_library_comparison(
         &triple_3_vec_rational_sum_bits_bucketer(),
         &mut [
             ("Malachite", &mut |(_, _, xs)| {
-                no_out!(Rational::product(xs.into_iter()))
+                no_out!(Rational::product(xs.into_iter()));
             }),
             ("num", &mut |(xs, _, _)| {
-                no_out!(BigRational::product(xs.into_iter()))
+                no_out!(BigRational::product(xs.into_iter()));
             }),
             ("rug", &mut |(_, xs, _)| {
-                no_out!(rug::Rational::product(xs.iter()))
+                no_out!(rug::Rational::product(xs.iter()));
             }),
         ],
     );
@@ -256,10 +256,10 @@ fn benchmark_rational_product_algorithms(
         &vec_rational_sum_bits_bucketer(),
         &mut [
             ("default", &mut |xs| {
-                no_out!(Rational::product(xs.into_iter()))
+                no_out!(Rational::product(xs.into_iter()));
             }),
             ("naive", &mut |xs| {
-                no_out!(rational_product_naive(xs.into_iter()))
+                no_out!(rational_product_naive(xs.into_iter()));
             }),
         ],
     );
@@ -281,10 +281,10 @@ fn benchmark_rational_product_evaluation_strategy(
         &vec_rational_sum_bits_bucketer(),
         &mut [
             ("Rational::product(Iterator<Item=Rational>)", &mut |xs| {
-                no_out!(Rational::product(xs.into_iter()))
+                no_out!(Rational::product(xs.into_iter()));
             }),
             ("Rational::product(Iterator<Item=&Rational>)", &mut |xs| {
-                no_out!(Rational::product(xs.iter()))
+                no_out!(Rational::product(xs.iter()));
             }),
         ],
     );

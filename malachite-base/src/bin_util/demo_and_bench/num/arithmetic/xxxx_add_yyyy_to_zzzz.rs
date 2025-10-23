@@ -75,7 +75,7 @@ fn benchmark_xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(
         )| {
             no_out!(T::xxxx_add_yyyy_to_zzzz(
                 x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0
-            ))
+            ));
         })],
     );
 }

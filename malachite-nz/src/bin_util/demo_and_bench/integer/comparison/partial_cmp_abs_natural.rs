@@ -162,7 +162,7 @@ fn benchmark_integer_partial_cmp_abs_natural_library_comparison(
         &pair_2_integer_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.partial_cmp_abs(&y))
+                no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.cmp_abs(&y))),
         ],
@@ -185,7 +185,7 @@ fn benchmark_natural_partial_cmp_abs_integer_library_comparison(
         &pair_2_integer_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(y.partial_cmp_abs(&x))
+                no_out!(y.partial_cmp_abs(&x));
             }),
             ("rug", &mut |((x, y), _)| no_out!(y.cmp_abs(&x))),
         ],

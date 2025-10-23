@@ -134,7 +134,7 @@ fn benchmark_factorial_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::factorial(n))),
             ("naive", &mut |n| {
-                no_out!(checked_factorial_naive::<T>(n).unwrap())
+                no_out!(checked_factorial_naive::<T>(n).unwrap());
             }),
         ],
     );
@@ -175,7 +175,7 @@ fn benchmark_double_factorial_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::double_factorial(n))),
             ("naive", &mut |n| {
-                no_out!(checked_double_factorial_naive::<T>(n).unwrap())
+                no_out!(checked_double_factorial_naive::<T>(n).unwrap());
             }),
         ],
     );
@@ -196,7 +196,7 @@ fn benchmark_checked_double_factorial<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |n| {
-            no_out!(T::checked_double_factorial(n))
+            no_out!(T::checked_double_factorial(n));
         })],
     );
 }
@@ -218,7 +218,7 @@ fn benchmark_multifactorial_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, m)| no_out!(T::multifactorial(n, m))),
             ("naive", &mut |(n, m)| {
-                no_out!(checked_multifactorial_naive::<T>(n, m).unwrap())
+                no_out!(checked_multifactorial_naive::<T>(n, m).unwrap());
             }),
         ],
     );
@@ -239,7 +239,7 @@ fn benchmark_checked_multifactorial<T: PrimitiveUnsigned>(
         file_name,
         &usize_convertible_pair_max_bucketer("n", "m"),
         &mut [("Malachite", &mut |(n, m)| {
-            no_out!(T::checked_multifactorial(n, m))
+            no_out!(T::checked_multifactorial(n, m));
         })],
     );
 }
@@ -261,7 +261,7 @@ fn benchmark_subfactorial_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::subfactorial(n))),
             ("naive", &mut |n| {
-                no_out!(checked_subfactorial_naive::<T>(n).unwrap())
+                no_out!(checked_subfactorial_naive::<T>(n).unwrap());
             }),
         ],
     );

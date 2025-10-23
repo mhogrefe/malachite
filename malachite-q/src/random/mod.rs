@@ -1364,8 +1364,8 @@ impl Iterator for RandomRationalInclusiveRange {
 
     fn next(&mut self) -> Option<Rational> {
         match self {
-            RandomRationalInclusiveRange::Single(x) => Some(x.clone()),
-            RandomRationalInclusiveRange::Multiple(xs) => xs.next(),
+            Self::Single(x) => Some(x.clone()),
+            Self::Multiple(xs) => xs.next(),
         }
     }
 }

@@ -90,7 +90,7 @@ fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
         &pair_1_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(x, log_base)| {
-                no_out!(PowerOf2Digits::<U>::to_power_of_2_digits_asc(&x, log_base))
+                no_out!(PowerOf2Digits::<U>::to_power_of_2_digits_asc(&x, log_base));
             }),
             (
                 &format!("{}.power_of_2_digits(u64).collect_vec()", T::NAME),
@@ -125,7 +125,7 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
         &pair_1_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(x, log_base)| {
-                no_out!(PowerOf2Digits::<U>::to_power_of_2_digits_desc(&x, log_base))
+                no_out!(PowerOf2Digits::<U>::to_power_of_2_digits_desc(&x, log_base));
             }),
             (
                 &format!("{}.power_of_2_digits(u64).rev().collect_vec()", T::NAME),
@@ -134,7 +134,7 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
                         PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base)
                             .rev()
                             .collect_vec()
-                    )
+                    );
                 },
             ),
         ],

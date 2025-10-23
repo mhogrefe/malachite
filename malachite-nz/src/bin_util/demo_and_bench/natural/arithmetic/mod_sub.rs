@@ -183,7 +183,7 @@ fn benchmark_natural_mod_sub_algorithms(
         &mut [
             ("default", &mut |(x, y, m)| no_out!(x.mod_sub(y, m))),
             ("naive", &mut |(x, y, m)| {
-                no_out!((Integer::from(x) - Integer::from(y)).mod_op(Integer::from(m)))
+                no_out!((Integer::from(x) - Integer::from(y)).mod_op(Integer::from(m)));
             }),
         ],
     );
@@ -205,25 +205,25 @@ fn benchmark_natural_mod_sub_evaluation_strategy(
         &triple_3_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_sub(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_sub(y, m))
+                no_out!(x.mod_sub(y, m));
             }),
             ("Natural.mod_sub(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_sub(y, &m))
+                no_out!(x.mod_sub(y, &m));
             }),
             ("Natural.mod_sub(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_sub(&y, m))
+                no_out!(x.mod_sub(&y, m));
             }),
             ("Natural.mod_sub(&Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_sub(&y, &m))
+                no_out!(x.mod_sub(&y, &m));
             }),
             ("(&Natural).mod_sub(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_sub(y, m))
+                no_out!((&x).mod_sub(y, m));
             }),
             ("(&Natural).mod_sub(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_sub(y, &m))
+                no_out!((&x).mod_sub(y, &m));
             }),
             ("(&Natural).mod_sub(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_sub(&y, m))
+                no_out!((&x).mod_sub(&y, m));
             }),
             (
                 "(&Natural).mod_sub(&Natural, &Natural)",

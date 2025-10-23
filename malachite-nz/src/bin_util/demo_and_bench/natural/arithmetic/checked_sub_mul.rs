@@ -167,7 +167,7 @@ fn benchmark_natural_checked_sub_mul_algorithms(
         &triple_natural_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Natural.sub_mul(Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.checked_sub_mul(b, c))
+                no_out!(a.checked_sub_mul(b, c));
             }),
             (
                 "Natural.checked_sub(Natural * Natural)",
@@ -193,7 +193,7 @@ fn benchmark_natural_checked_sub_mul_val_val_ref_algorithms(
         &triple_natural_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Natural.sub_mul(Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.checked_sub_mul(b, &c))
+                no_out!(a.checked_sub_mul(b, &c));
             }),
             (
                 "Natural.checked_sub(Natural * &Natural)",
@@ -219,7 +219,7 @@ fn benchmark_natural_checked_sub_mul_val_ref_val_algorithms(
         &triple_natural_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Natural.sub_mul(&Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.checked_sub_mul(&b, c))
+                no_out!(a.checked_sub_mul(&b, c));
             }),
             (
                 "Natural.checked_sub(&Natural * Natural)",
@@ -245,7 +245,7 @@ fn benchmark_natural_checked_sub_mul_val_ref_ref_algorithms(
         &triple_natural_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Natural.sub_mul(&Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.checked_sub_mul(&b, &c))
+                no_out!(a.checked_sub_mul(&b, &c));
             }),
             (
                 "Natural.checked_sub(&Natural * &Natural)",

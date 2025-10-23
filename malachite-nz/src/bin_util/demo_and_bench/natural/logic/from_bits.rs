@@ -33,7 +33,7 @@ fn demo_natural_from_bits_asc(gm: GenMode, config: &GenConfig, limit: usize) {
         println!(
             "from_bits_asc({:?}) = {:?}",
             bits,
-            Natural::from_bits_asc(bits.iter().cloned())
+            Natural::from_bits_asc(bits.iter().copied())
         );
     }
 }
@@ -43,7 +43,7 @@ fn demo_natural_from_bits_desc(gm: GenMode, config: &GenConfig, limit: usize) {
         println!(
             "from_bits_desc({:?}) = {:?}",
             bits,
-            Natural::from_bits_desc(bits.iter().cloned())
+            Natural::from_bits_desc(bits.iter().copied())
         );
     }
 }
@@ -64,13 +64,13 @@ fn benchmark_natural_from_bits_asc_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |bits| {
-                no_out!(Natural::from_bits_asc(bits.into_iter()))
+                no_out!(Natural::from_bits_asc(bits.into_iter()));
             }),
             ("alt", &mut |bits| {
-                no_out!(from_bits_asc_alt::<Natural, _>(bits.into_iter()))
+                no_out!(from_bits_asc_alt::<Natural, _>(bits.into_iter()));
             }),
             ("naive", &mut |bits| {
-                no_out!(from_bits_asc_naive(bits.into_iter()))
+                no_out!(from_bits_asc_naive(bits.into_iter()));
             }),
         ],
     );
@@ -92,13 +92,13 @@ fn benchmark_natural_from_bits_desc_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |ref bits| {
-                no_out!(Natural::from_bits_desc(bits.iter().cloned()))
+                no_out!(Natural::from_bits_desc(bits.iter().copied()));
             }),
             ("alt", &mut |ref bits| {
-                no_out!(from_bits_desc_alt::<Natural, _>(bits.iter().cloned()))
+                no_out!(from_bits_desc_alt::<Natural, _>(bits.iter().copied()));
             }),
             ("naive", &mut |ref bits| {
-                no_out!(from_bits_desc_naive(bits.iter().cloned()))
+                no_out!(from_bits_desc_naive(bits.iter().copied()));
             }),
         ],
     );

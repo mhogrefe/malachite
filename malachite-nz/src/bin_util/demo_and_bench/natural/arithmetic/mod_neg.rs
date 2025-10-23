@@ -90,10 +90,10 @@ fn benchmark_natural_mod_neg_assign_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_neg_assign(Natural)", &mut |(mut n, m)| {
-                n.mod_neg_assign(m)
+                n.mod_neg_assign(m);
             }),
             ("Natural.mod_neg_assign(&Natural)", &mut |(mut n, m)| {
-                n.mod_neg_assign(&m)
+                n.mod_neg_assign(&m);
             }),
         ],
     );
@@ -115,16 +115,16 @@ fn benchmark_natural_mod_neg_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_neg(Natural)", &mut |(n, m)| {
-                no_out!(n.mod_neg(m))
+                no_out!(n.mod_neg(m));
             }),
             ("Natural.mod_neg(&Natural)", &mut |(n, m)| {
-                no_out!(n.mod_neg(&m))
+                no_out!(n.mod_neg(&m));
             }),
             ("(&Natural).mod_neg(Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_neg(m))
+                no_out!((&n).mod_neg(m));
             }),
             ("(&Natural).mod_neg(&Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_neg(&m))
+                no_out!((&n).mod_neg(&m));
             }),
         ],
     );
@@ -146,10 +146,10 @@ fn benchmark_natural_mod_neg_algorithms(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_neg(Natural)", &mut |(n, m)| {
-                no_out!(n.mod_neg(m))
+                no_out!(n.mod_neg(m));
             }),
             ("(-Natural).mod(Natural)", &mut |(n, m)| {
-                no_out!(Natural::exact_from((-n).mod_op(Integer::from(m))))
+                no_out!(Natural::exact_from((-n).mod_op(Integer::from(m))));
             }),
         ],
     );

@@ -183,7 +183,7 @@ fn benchmark_float_partial_cmp_abs_library_comparison(
         &pair_2_pair_float_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.partial_cmp_abs(&y))
+                no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.cmp_abs(&y))),
         ],
@@ -205,7 +205,7 @@ fn benchmark_comparable_float_cmp_abs(
         file_name,
         &pair_float_max_complexity_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)))
+            no_out!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)));
         })],
     );
 }
@@ -225,7 +225,7 @@ fn benchmark_comparable_float_ref_cmp_abs(
         file_name,
         &pair_float_max_complexity_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(ComparableFloatRef(&x).cmp_abs(&ComparableFloatRef(&y)))
+            no_out!(ComparableFloatRef(&x).cmp_abs(&ComparableFloatRef(&y)));
         })],
     );
 }

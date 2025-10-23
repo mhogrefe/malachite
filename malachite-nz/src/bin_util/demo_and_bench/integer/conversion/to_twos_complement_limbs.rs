@@ -229,7 +229,7 @@ fn benchmark_limbs_maybe_sign_extend_non_negative_in_place(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |ref mut xs| {
-            limbs_maybe_sign_extend_non_negative_in_place(xs)
+            limbs_maybe_sign_extend_non_negative_in_place(xs);
         })],
     );
 }
@@ -250,13 +250,13 @@ fn benchmark_limbs_twos_complement_in_place_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |ref mut xs| {
-                no_out!(limbs_twos_complement_in_place(xs))
+                no_out!(limbs_twos_complement_in_place(xs));
             }),
             ("integrated", &mut |ref mut xs| {
-                no_out!(limbs_twos_complement_in_place_alt_1(xs))
+                no_out!(limbs_twos_complement_in_place_alt_1(xs));
             }),
             ("sub 1 and not", &mut |ref mut xs| {
-                no_out!(limbs_twos_complement_in_place_alt_2(xs))
+                no_out!(limbs_twos_complement_in_place_alt_2(xs));
             }),
         ],
     );
@@ -277,7 +277,7 @@ fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |ref mut xs| {
-            limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs)
+            limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs);
         })],
     );
 }
@@ -298,13 +298,13 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Integer.to_twos_complement_limbs_asc()", &mut |n| {
-                no_out!(n.to_twos_complement_limbs_asc())
+                no_out!(n.to_twos_complement_limbs_asc());
             }),
             ("Integer.into_twos_complement_limbs_asc()", &mut |n| {
-                no_out!(n.into_twos_complement_limbs_asc())
+                no_out!(n.into_twos_complement_limbs_asc());
             }),
             ("Integer.twos_complement_limbs().collect_vec()", &mut |n| {
-                no_out!(n.twos_complement_limbs().collect_vec())
+                no_out!(n.twos_complement_limbs().collect_vec());
             }),
         ],
     );
@@ -326,10 +326,10 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Integer.to_twos_complement_limbs_desc()", &mut |n| {
-                no_out!(n.to_twos_complement_limbs_desc())
+                no_out!(n.to_twos_complement_limbs_desc());
             }),
             ("Integer.into_twos_complement_limbs_desc()", &mut |n| {
-                no_out!(n.into_twos_complement_limbs_desc())
+                no_out!(n.into_twos_complement_limbs_desc());
             }),
             (
                 "Integer.twos_complement_limbs().rev().collect_vec()",
@@ -390,7 +390,7 @@ fn benchmark_integer_twos_complement_limb_count(
         file_name,
         &integer_bit_bucketer("n"),
         &mut [("Malachite", &mut |n| {
-            no_out!(n.twos_complement_limb_count())
+            no_out!(n.twos_complement_limb_count());
         })],
     );
 }

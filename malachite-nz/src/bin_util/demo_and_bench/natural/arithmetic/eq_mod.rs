@@ -389,7 +389,7 @@ fn benchmark_limbs_limb_mod_exact_odd_limb(
         file_name,
         &triple_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, d, carry)| {
-            no_out!(limbs_limb_mod_exact_odd_limb(n, d, carry))
+            no_out!(limbs_limb_mod_exact_odd_limb(n, d, carry));
         })],
     );
 }
@@ -409,7 +409,7 @@ fn benchmark_limbs_mod_exact_odd_limb(
         file_name,
         &triple_1_vec_len_bucketer("ns"),
         &mut [("Malachite", &mut |(ref ns, d, carry)| {
-            no_out!(limbs_mod_exact_odd_limb(ns, d, carry))
+            no_out!(limbs_mod_exact_odd_limb(ns, d, carry));
         })],
     );
 }
@@ -432,13 +432,13 @@ fn benchmark_limbs_eq_limb_mod_limb_algorithms(
         &triple_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_eq_limb_mod_limb", &mut |(ref xs, y, m)| {
-                no_out!(limbs_eq_limb_mod_limb(xs, y, m))
+                no_out!(limbs_eq_limb_mod_limb(xs, y, m));
             }),
             ("limbs_mod_limb", &mut |(ref xs, y, m)| {
-                no_out!(limbs_mod_limb::<DoubleLimb, Limb>(xs, m) == y % m)
+                no_out!(limbs_mod_limb::<DoubleLimb, Limb>(xs, m) == y % m);
             }),
             ("combined_limbs_eq_limb_mod_limb", &mut |(ref xs, y, m)| {
-                no_out!(combined_limbs_eq_limb_mod_limb(xs, y, m))
+                no_out!(combined_limbs_eq_limb_mod_limb(xs, y, m));
             }),
         ],
     );
@@ -460,28 +460,28 @@ fn benchmark_limbs_eq_limb_mod_evaluation_strategy(
         &triple_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_eq_limb_mod", &mut |(ref mut xs, ref mut ms, y)| {
-                no_out!(limbs_eq_limb_mod(xs, y, ms))
+                no_out!(limbs_eq_limb_mod(xs, y, ms));
             }),
             ("limbs_eq_limb_mod_val_ref", &mut |(
                 ref mut xs,
                 ref mut ms,
                 y,
             )| {
-                no_out!(limbs_eq_limb_mod_val_ref(xs, y, ms))
+                no_out!(limbs_eq_limb_mod_val_ref(xs, y, ms));
             }),
             ("limbs_eq_limb_mod_ref_val", &mut |(
                 ref xs,
                 ref mut ms,
                 y,
             )| {
-                no_out!(limbs_eq_limb_mod_ref_val(xs, y, ms))
+                no_out!(limbs_eq_limb_mod_ref_val(xs, y, ms));
             }),
             ("limbs_eq_limb_mod_ref_ref", &mut |(
                 ref xs,
                 ref mut ms,
                 y,
             )| {
-                no_out!(limbs_eq_limb_mod_ref_ref(xs, y, ms))
+                no_out!(limbs_eq_limb_mod_ref_ref(xs, y, ms));
             }),
         ],
     );
@@ -503,13 +503,13 @@ fn benchmark_limbs_eq_limb_mod_algorithms(
         &triple_1_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(ref xs, ref ms, y)| {
-                no_out!(limbs_eq_limb_mod_ref_ref(xs, y, ms))
+                no_out!(limbs_eq_limb_mod_ref_ref(xs, y, ms));
             }),
             ("naive 1", &mut |(ref xs, ref ms, y)| {
-                no_out!(limbs_eq_limb_mod_naive_1(xs, y, ms))
+                no_out!(limbs_eq_limb_mod_naive_1(xs, y, ms));
             }),
             ("naive 2", &mut |(ref xs, ref ms, y)| {
-                no_out!(limbs_eq_limb_mod_naive_2(xs, y, ms))
+                no_out!(limbs_eq_limb_mod_naive_2(xs, y, ms));
             }),
         ],
     );
@@ -535,17 +535,17 @@ fn benchmark_limbs_eq_mod_limb_evaluation_strategy(
                 ref ys,
                 ms,
             )| {
-                no_out!(limbs_eq_mod_limb_val_ref(xs, ys, ms))
+                no_out!(limbs_eq_mod_limb_val_ref(xs, ys, ms));
             }),
             ("limbs_eq_mod_limb_ref_val", &mut |(
                 ref xs,
                 ref mut ys,
                 ms,
             )| {
-                no_out!(limbs_eq_mod_limb_ref_val(xs, ys, ms))
+                no_out!(limbs_eq_mod_limb_ref_val(xs, ys, ms));
             }),
             ("limbs_eq_mod_limb_ref_ref", &mut |(ref xs, ref ys, ms)| {
-                no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, ms))
+                no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, ms));
             }),
         ],
     );
@@ -567,13 +567,13 @@ fn benchmark_limbs_eq_mod_limb_algorithms(
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [
             ("standard", &mut |(ref xs, ref ys, ms)| {
-                no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, ms))
+                no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, ms));
             }),
             ("naive 1", &mut |(ref xs, ref ys, ms)| {
-                no_out!(limbs_eq_mod_limb_naive_1(xs, ys, ms))
+                no_out!(limbs_eq_mod_limb_naive_1(xs, ys, ms));
             }),
             ("naive 2", &mut |(ref xs, ref ys, ms)| {
-                no_out!(limbs_eq_mod_limb_naive_2(xs, ys, ms))
+                no_out!(limbs_eq_mod_limb_naive_2(xs, ys, ms));
             }),
         ],
     );
@@ -599,28 +599,28 @@ fn benchmark_limbs_eq_mod_evaluation_strategy(
                 ref mut ys,
                 ref mut ms,
             )| {
-                no_out!(limbs_eq_mod_ref_val_val(xs, ys, ms))
+                no_out!(limbs_eq_mod_ref_val_val(xs, ys, ms));
             }),
             ("limbs_eq_mod_ref_val_ref", &mut |(
                 ref xs,
                 ref mut ys,
                 ref ms,
             )| {
-                no_out!(limbs_eq_mod_ref_val_ref(xs, ys, ms))
+                no_out!(limbs_eq_mod_ref_val_ref(xs, ys, ms));
             }),
             ("limbs_eq_mod_ref_ref_val", &mut |(
                 ref xs,
                 ref ys,
                 ref mut ms,
             )| {
-                no_out!(limbs_eq_mod_ref_ref_val(xs, ys, ms))
+                no_out!(limbs_eq_mod_ref_ref_val(xs, ys, ms));
             }),
             ("limbs_eq_mod_ref_ref_ref", &mut |(
                 ref xs,
                 ref ys,
                 ref ms,
             )| {
-                no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, ms))
+                no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, ms));
             }),
         ],
     );
@@ -642,13 +642,13 @@ fn benchmark_limbs_eq_mod_algorithms(
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [
             ("standard", &mut |(ref xs, ref ys, ref ms)| {
-                no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, ms))
+                no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, ms));
             }),
             ("naive 1", &mut |(ref xs, ref ys, ref ms)| {
-                no_out!(limbs_eq_mod_naive_1(xs, ys, ms))
+                no_out!(limbs_eq_mod_naive_1(xs, ys, ms));
             }),
             ("naive 2", &mut |(ref xs, ref ys, ref ms)| {
-                no_out!(limbs_eq_mod_naive_2(xs, ys, ms))
+                no_out!(limbs_eq_mod_naive_2(xs, ys, ms));
             }),
         ],
     );
@@ -670,28 +670,28 @@ fn benchmark_natural_eq_mod_evaluation_strategy(
         &triple_1_2_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.eq_mod(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(y, m))
+                no_out!(x.eq_mod(y, m));
             }),
             ("Natural.eq_mod(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(y, &m))
+                no_out!(x.eq_mod(y, &m));
             }),
             ("Natural.eq_mod(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(&y, m))
+                no_out!(x.eq_mod(&y, m));
             }),
             ("Natural.eq_mod(&Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(&y, &m))
+                no_out!(x.eq_mod(&y, &m));
             }),
             ("(&Natural).eq_mod(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(y, m))
+                no_out!((&x).eq_mod(y, m));
             }),
             ("(&Natural).eq_mod(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(y, &m))
+                no_out!((&x).eq_mod(y, &m));
             }),
             ("(&Natural).eq_mod(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(&y, m))
+                no_out!((&x).eq_mod(&y, m));
             }),
             ("(&Natural).eq_mod(&Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(&y, &m))
+                no_out!((&x).eq_mod(&y, &m));
             }),
         ],
     );
@@ -735,7 +735,7 @@ fn benchmark_natural_eq_mod_algorithms(
         &triple_1_2_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.eq_mod(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(y, m))
+                no_out!(x.eq_mod(y, m));
             }),
             (
                 "Natural == Natural || Natural != 0 && Natural % Natural == Natural % Natural",
@@ -748,7 +748,7 @@ fn benchmark_natural_eq_mod_algorithms(
                         (Integer::from(x) - Integer::from(y))
                             .unsigned_abs()
                             .divisible_by(m)
-                    )
+                    );
                 },
             ),
         ],

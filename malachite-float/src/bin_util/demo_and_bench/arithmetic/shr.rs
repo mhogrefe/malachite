@@ -387,10 +387,10 @@ fn benchmark_float_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
         &pair_1_float_complexity_bucketer("n"),
         &mut [
             (&format!("Float >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(x >> y)
+                no_out!(x >> y);
             }),
             (&format!("&Float >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x >> y)
+                no_out!(&x >> y);
             }),
         ],
     );
@@ -416,10 +416,10 @@ fn benchmark_float_shr_signed_evaluation_strategy<T: PrimitiveSigned>(
         &pair_1_float_complexity_bucketer("n"),
         &mut [
             (&format!("Float >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(x >> y)
+                no_out!(x >> y);
             }),
             (&format!("&Float >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x >> y)
+                no_out!(&x >> y);
             }),
         ],
     );

@@ -119,7 +119,7 @@ fn benchmark_round_to_multiple_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y, rm)| {
-            no_out!(x.round_to_multiple(y, rm))
+            no_out!(x.round_to_multiple(y, rm));
         })],
     );
 }
@@ -143,7 +143,7 @@ fn benchmark_round_to_multiple_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.round_to_multiple_assign(y, rm))
+            no_out!(x.round_to_multiple_assign(y, rm));
         })],
     );
 }
@@ -166,7 +166,7 @@ fn benchmark_round_to_multiple_signed<
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y, rm)| {
-            no_out!(x.round_to_multiple(y, rm))
+            no_out!(x.round_to_multiple(y, rm));
         })],
     );
 }
@@ -193,7 +193,7 @@ fn benchmark_round_to_multiple_assign_signed<
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.round_to_multiple_assign(y, rm))
+            no_out!(x.round_to_multiple_assign(y, rm));
         })],
     );
 }

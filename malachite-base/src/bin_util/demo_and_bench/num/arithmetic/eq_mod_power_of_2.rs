@@ -73,7 +73,7 @@ fn benchmark_eq_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y, pow)| {
-            no_out!(x.eq_mod_power_of_2(y, pow))
+            no_out!(x.eq_mod_power_of_2(y, pow));
         })],
     );
 }
@@ -93,7 +93,7 @@ fn benchmark_eq_mod_power_of_2_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y, pow)| {
-            no_out!(x.eq_mod_power_of_2(y, pow))
+            no_out!(x.eq_mod_power_of_2(y, pow));
         })],
     );
 }

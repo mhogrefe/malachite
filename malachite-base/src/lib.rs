@@ -76,6 +76,19 @@
 //! - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
 //!   takes a long time to build. Enabling this feature also enables `test_build`.
 
+#![allow(
+    unstable_name_collisions,
+    clippy::assertions_on_constants,
+    clippy::cognitive_complexity,
+    clippy::many_single_char_names,
+    clippy::range_plus_one,
+    clippy::suspicious_arithmetic_impl,
+    clippy::suspicious_op_assign_impl,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::upper_case_acronyms,
+    clippy::multiple_bound_locations
+)]
 #![warn(
     clippy::cast_lossless,
     clippy::explicit_into_iter_loop,
@@ -108,16 +121,8 @@
     clippy::flat_map_option,
     clippy::unnecessary_wraps,
     clippy::unnested_or_patterns,
+    clippy::use_self,
     clippy::trivially_copy_pass_by_ref
-)]
-#![allow(
-    clippy::cognitive_complexity,
-    clippy::float_cmp,
-    clippy::many_single_char_names,
-    clippy::too_many_arguments,
-    clippy::type_complexity,
-    clippy::upper_case_acronyms,
-    unstable_name_collisions
 )]
 #![cfg_attr(
     not(any(feature = "test_build", feature = "random", feature = "std")),

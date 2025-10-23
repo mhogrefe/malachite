@@ -55,7 +55,7 @@ fn benchmark_limbs_set_bit_neg(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut xs, index)| {
-            no_out!(limbs_set_bit_neg(&mut xs, index))
+            no_out!(limbs_set_bit_neg(&mut xs, index));
         })],
     );
 }

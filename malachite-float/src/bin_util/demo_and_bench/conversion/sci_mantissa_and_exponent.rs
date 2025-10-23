@@ -731,7 +731,7 @@ fn benchmark_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         file_name,
         &pair_1_float_complexity_bucketer("x"),
         &mut [("Malachite", &mut |(x, rm)| {
-            no_out!(x.sci_mantissa_and_exponent_round::<T>(rm))
+            no_out!(x.sci_mantissa_and_exponent_round::<T>(rm));
         })],
     );
 }
@@ -752,12 +752,12 @@ fn benchmark_float_sci_mantissa_and_exponent_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.sci_mantissa_and_exponent()", &mut |x| {
-                no_out!(SciMantissaAndExponent::<Float, _, _>::sci_mantissa_and_exponent(x))
+                no_out!(SciMantissaAndExponent::<Float, _, _>::sci_mantissa_and_exponent(x));
             }),
             ("(&Float).sci_mantissa_and_exponent()", &mut |x| {
                 no_out!(
                     <&Float as SciMantissaAndExponent<Float, _, _>>::sci_mantissa_and_exponent(&x)
-                )
+                );
             }),
         ],
     );
@@ -779,10 +779,10 @@ fn benchmark_float_sci_mantissa_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.sci_mantissa()", &mut |x| {
-                no_out!(SciMantissaAndExponent::<Float, _, _>::sci_mantissa(x))
+                no_out!(SciMantissaAndExponent::<Float, _, _>::sci_mantissa(x));
             }),
             ("(&Float).sci_mantissa()", &mut |x| {
-                no_out!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_mantissa(&x))
+                no_out!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_mantissa(&x));
             }),
         ],
     );
@@ -804,10 +804,10 @@ fn benchmark_float_sci_exponent_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.sci_exponent()", &mut |x| {
-                no_out!(SciMantissaAndExponent::<Float, _, _>::sci_exponent(x))
+                no_out!(SciMantissaAndExponent::<Float, _, _>::sci_exponent(x));
             }),
             ("(&Float).sci_exponent()", &mut |x| {
-                no_out!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&x))
+                no_out!(<&Float as SciMantissaAndExponent<Float, _, _>>::sci_exponent(&x));
             }),
         ],
     );
@@ -837,7 +837,7 @@ fn benchmark_float_from_sci_mantissa_and_exponent_float_evaluation_strategy(
                         Float,
                     >>::from_sci_mantissa_and_exponent(
                         mantissa, exponent
-                    ))
+                    ));
                 },
             ),
             (
@@ -849,7 +849,7 @@ fn benchmark_float_from_sci_mantissa_and_exponent_float_evaluation_strategy(
                         Float,
                     >>::from_sci_mantissa_and_exponent(
                         mantissa, exponent
-                    ))
+                    ));
                 },
             ),
         ],
@@ -873,7 +873,7 @@ fn benchmark_float_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Malachite", &mut |x| {
-            no_out!(SciMantissaAndExponent::<T, _, _>::sci_mantissa_and_exponent(&x))
+            no_out!(SciMantissaAndExponent::<T, _, _>::sci_mantissa_and_exponent(&x));
         })],
     );
 }
@@ -895,7 +895,7 @@ fn benchmark_float_sci_mantissa_primitive_float<T: PrimitiveFloat>(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Malachite", &mut |x| {
-            no_out!(SciMantissaAndExponent::<T, _, _>::sci_mantissa(&x))
+            no_out!(SciMantissaAndExponent::<T, _, _>::sci_mantissa(&x));
         })],
     );
 }
@@ -917,7 +917,7 @@ fn benchmark_float_sci_exponent_primitive_float<T: PrimitiveFloat>(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Malachite", &mut |x| {
-            no_out!(SciMantissaAndExponent::<T, _, _>::sci_exponent(&x))
+            no_out!(SciMantissaAndExponent::<T, _, _>::sci_exponent(&x));
         })],
     );
 }
@@ -949,7 +949,7 @@ fn benchmark_float_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFl
                     >>::from_sci_mantissa_and_exponent(
                         mantissa, exponent
                     )
-                )
+                );
             },
         )],
     );

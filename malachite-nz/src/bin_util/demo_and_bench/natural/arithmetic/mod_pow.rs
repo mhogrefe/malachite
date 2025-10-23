@@ -290,7 +290,7 @@ fn benchmark_natural_mod_pow_algorithms(
         &mut [
             ("default", &mut |(x, exp, m)| no_out!(x.mod_pow(exp, m))),
             ("simple binary", &mut |(x, exp, m)| {
-                no_out!(simple_binary_mod_pow(&x, &exp, &m))
+                no_out!(simple_binary_mod_pow(&x, &exp, &m));
             }),
         ],
     );
@@ -312,13 +312,13 @@ fn benchmark_natural_mod_pow_library_comparison(
         &triple_3_triple_1_3_prod_natural_bits_bucketer("exp", "m"),
         &mut [
             ("Malachite", &mut |(_, _, (x, exp, m))| {
-                no_out!(x.mod_pow(exp, m))
+                no_out!(x.mod_pow(exp, m));
             }),
             ("num", &mut |((x, exp, m), _, _)| {
-                no_out!(x.modpow(&exp, &m))
+                no_out!(x.modpow(&exp, &m));
             }),
             ("rug", &mut |(_, (x, exp, m), _)| {
-                no_out!(x.pow_mod(&exp, &m).unwrap())
+                no_out!(x.pow_mod(&exp, &m).unwrap());
             }),
         ],
     );
@@ -340,23 +340,23 @@ fn benchmark_natural_mod_pow_evaluation_strategy(
         &triple_1_3_prod_natural_bits_bucketer("exp", "m"),
         &mut [
             ("Natural.mod_pow(Natural, Natural)", &mut |(x, exp, m)| {
-                no_out!(x.mod_pow(exp, m))
+                no_out!(x.mod_pow(exp, m));
             }),
             ("Natural.mod_pow(Natural, &Natural)", &mut |(x, exp, m)| {
-                no_out!(x.mod_pow(exp, &m))
+                no_out!(x.mod_pow(exp, &m));
             }),
             ("Natural.mod_pow(&Natural, Natural)", &mut |(x, exp, m)| {
-                no_out!(x.mod_pow(&exp, m))
+                no_out!(x.mod_pow(&exp, m));
             }),
             ("Natural.mod_pow(&Natural, &Natural)", &mut |(x, exp, m)| {
-                no_out!(x.mod_pow(&exp, &m))
+                no_out!(x.mod_pow(&exp, &m));
             }),
             ("(&Natural).mod_pow(Natural, Natural)", &mut |(
                 x,
                 exp,
                 m,
             )| {
-                no_out!((&x).mod_pow(exp, m))
+                no_out!((&x).mod_pow(exp, m));
             }),
             (
                 "(&Natural).mod_pow(Natural, &Natural)",

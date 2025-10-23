@@ -208,13 +208,13 @@ fn benchmark_to_numerator_and_denominator_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("to_numerator_and_denominator", &mut |x| {
-                no_out!(x.to_numerator_and_denominator())
+                no_out!(x.to_numerator_and_denominator());
             }),
             ("into_numerator_and_denominator", &mut |x| {
-                no_out!(x.into_numerator_and_denominator())
+                no_out!(x.into_numerator_and_denominator());
             }),
             ("numerator_and_denominator_ref", &mut |x| {
-                no_out!(x.numerator_and_denominator_ref())
+                no_out!(x.numerator_and_denominator_ref());
             }),
         ],
     );

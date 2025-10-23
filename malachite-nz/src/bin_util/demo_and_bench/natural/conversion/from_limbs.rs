@@ -81,10 +81,10 @@ fn benchmark_natural_from_limbs_asc_evaluation_strategy(
         &vec_len_bucketer(),
         &mut [
             ("Natural::from_limbs_asc(&[u32])", &mut |ref xs| {
-                no_out!(Natural::from_limbs_asc(xs))
+                no_out!(Natural::from_limbs_asc(xs));
             }),
             ("Natural::from_owned_limbs_asc(&[u32])", &mut |xs| {
-                no_out!(Natural::from_owned_limbs_asc(xs))
+                no_out!(Natural::from_owned_limbs_asc(xs));
             }),
         ],
     );
@@ -106,10 +106,10 @@ fn benchmark_natural_from_limbs_desc_evaluation_strategy(
         &vec_len_bucketer(),
         &mut [
             ("Natural::from_limbs_desc(&[u32])", &mut |ref xs| {
-                no_out!(Natural::from_limbs_desc(xs))
+                no_out!(Natural::from_limbs_desc(xs));
             }),
             ("Natural::from_owned_limbs_desc(&[u32])", &mut |xs| {
-                no_out!(Natural::from_owned_limbs_desc(xs))
+                no_out!(Natural::from_owned_limbs_desc(xs));
             }),
         ],
     );

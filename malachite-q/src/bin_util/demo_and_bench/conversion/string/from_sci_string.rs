@@ -183,7 +183,7 @@ fn benchmark_rational_from_sci_string_with_options(
                 let mut options = FromSciStringOptions::default();
                 options.set_base(base);
                 Rational::from_sci_string_with_options(&s, options)
-            })
+            });
         })],
     );
 }
@@ -203,7 +203,7 @@ fn benchmark_rational_from_sci_string_simplest(
         file_name,
         &string_len_bucketer(),
         &mut [("Malachite", &mut |s| {
-            no_out!(Rational::from_sci_string_simplest(&s))
+            no_out!(Rational::from_sci_string_simplest(&s));
         })],
     );
 }
@@ -227,7 +227,7 @@ fn benchmark_rational_from_sci_string_simplest_with_options(
                 let mut options = FromSciStringOptions::default();
                 options.set_base(base);
                 Rational::from_sci_string_simplest_with_options(&s, options)
-            })
+            });
         })],
     );
 }

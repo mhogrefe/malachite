@@ -173,10 +173,10 @@ fn benchmark_natural_rounding_from_float_evaluation_strategy(
         &pair_1_float_complexity_bucketer("x"),
         &mut [
             ("Natural::rounding_from(Float)", &mut |(f, rm)| {
-                no_out!(Natural::rounding_from(f, rm))
+                no_out!(Natural::rounding_from(f, rm));
             }),
             ("Natural::rounding_from(&Float)", &mut |(f, rm)| {
-                no_out!(Natural::rounding_from(&f, rm))
+                no_out!(Natural::rounding_from(&f, rm));
             }),
         ],
     );
@@ -199,10 +199,10 @@ fn benchmark_natural_try_from_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Natural::try_from(Float)", &mut |f| {
-                no_out!(Natural::try_from(f))
+                no_out!(Natural::try_from(f));
             }),
             ("Natural::try_from(&Float)", &mut |f| {
-                no_out!(Natural::try_from(&f))
+                no_out!(Natural::try_from(&f));
             }),
         ],
     );

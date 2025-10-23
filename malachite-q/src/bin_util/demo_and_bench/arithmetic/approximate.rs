@@ -126,10 +126,10 @@ fn benchmark_rational_approximate_evaluation_strategy(
         &pair_1_rational_bit_bucketer("n"),
         &mut [
             ("Rational.approximate(&Natural)", &mut |(x, y)| {
-                no_out!(x.approximate(&y))
+                no_out!(x.approximate(&y));
             }),
             ("(&Rational).approximate(&Natural)", &mut |(x, y)| {
-                no_out!((&x).approximate(&y))
+                no_out!((&x).approximate(&y));
             }),
         ],
     );

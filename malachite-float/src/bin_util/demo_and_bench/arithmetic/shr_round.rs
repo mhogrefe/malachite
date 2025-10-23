@@ -1171,7 +1171,7 @@ fn benchmark_float_shr_prec_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_float_complexity_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, u, prec)| {
-            no_out!(n.shr_prec_assign(u, prec))
+            no_out!(n.shr_prec_assign(u, prec));
         })],
     );
 }
@@ -1191,7 +1191,7 @@ fn benchmark_float_shr_prec_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_float_complexity_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, u, prec)| {
-            no_out!(n.shr_prec_assign(u, prec))
+            no_out!(n.shr_prec_assign(u, prec));
         })],
     );
 }
@@ -1269,7 +1269,7 @@ fn benchmark_float_shr_prec_unsigned_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, u, prec)| no_out!(n.shr_prec(u, prec))),
             ("naive", &mut |(n, u, prec)| {
-                no_out!(shr_prec_naive(n, u, prec))
+                no_out!(shr_prec_naive(n, u, prec));
             }),
         ],
     );
@@ -1294,7 +1294,7 @@ fn benchmark_float_shr_prec_signed_algorithms<T: PrimitiveSigned>(
         &mut [
             ("default", &mut |(n, u, prec)| no_out!(n.shr_prec(u, prec))),
             ("naive", &mut |(n, u, prec)| {
-                no_out!(shr_prec_naive(n, u, prec))
+                no_out!(shr_prec_naive(n, u, prec));
             }),
         ],
     );
@@ -1316,10 +1316,10 @@ fn benchmark_float_shr_prec_assign_u32_library_comparison(
         &pair_2_triple_1_float_complexity_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, u, prec))| {
-                no_out!(n.shr_prec(u, prec))
+                no_out!(n.shr_prec(u, prec));
             }),
             ("rug", &mut |((n, u, prec), _)| {
-                no_out!(rug_shr_prec_unsigned(&n, u, prec))
+                no_out!(rug_shr_prec_unsigned(&n, u, prec));
             }),
         ],
     );
@@ -1341,10 +1341,10 @@ fn benchmark_float_shr_prec_assign_i32_library_comparison(
         &pair_2_triple_1_float_complexity_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, i, prec))| {
-                no_out!(n.shr_prec(i, prec))
+                no_out!(n.shr_prec(i, prec));
             }),
             ("rug", &mut |((n, i, prec), _)| {
-                no_out!(rug_shr_prec_signed(&n, i, prec))
+                no_out!(rug_shr_prec_signed(&n, i, prec));
             }),
         ],
     );
@@ -1368,7 +1368,7 @@ fn benchmark_float_shr_prec_round_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &quadruple_1_float_complexity_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, u, prec, rm)| {
-            no_out!(n.shr_prec_round_assign(u, prec, rm))
+            no_out!(n.shr_prec_round_assign(u, prec, rm));
         })],
     );
 }
@@ -1391,7 +1391,7 @@ fn benchmark_float_shr_prec_round_assign_signed<T: PrimitiveSigned>(
         file_name,
         &quadruple_1_float_complexity_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, u, prec, rm)| {
-            no_out!(n.shr_prec_round_assign(u, prec, rm))
+            no_out!(n.shr_prec_round_assign(u, prec, rm));
         })],
     );
 }
@@ -1468,10 +1468,10 @@ fn benchmark_float_shr_prec_round_unsigned_algorithms<T: PrimitiveUnsigned>(
         &quadruple_1_float_complexity_bucketer("n"),
         &mut [
             ("default", &mut |(n, u, prec, rm)| {
-                no_out!(n.shr_prec_round(u, prec, rm))
+                no_out!(n.shr_prec_round(u, prec, rm));
             }),
             ("naive", &mut |(n, u, prec, rm)| {
-                no_out!(shr_prec_round_naive(n, u, prec, rm))
+                no_out!(shr_prec_round_naive(n, u, prec, rm));
             }),
         ],
     );
@@ -1495,10 +1495,10 @@ fn benchmark_float_shr_prec_round_signed_algorithms<T: PrimitiveSigned>(
         &quadruple_1_float_complexity_bucketer("n"),
         &mut [
             ("default", &mut |(n, u, prec, rm)| {
-                no_out!(n.shr_prec_round(u, prec, rm))
+                no_out!(n.shr_prec_round(u, prec, rm));
             }),
             ("naive", &mut |(n, u, prec, rm)| {
-                no_out!(shr_prec_round_naive(n, u, prec, rm))
+                no_out!(shr_prec_round_naive(n, u, prec, rm));
             }),
         ],
     );
@@ -1520,10 +1520,10 @@ fn benchmark_float_shr_prec_round_assign_u32_library_comparison(
         &pair_2_quadruple_1_float_complexity_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, u, prec, rm))| {
-                no_out!(n.shr_prec_round(u, prec, rm))
+                no_out!(n.shr_prec_round(u, prec, rm));
             }),
             ("rug", &mut |((n, u, prec, rm), _)| {
-                no_out!(rug_shr_prec_round_unsigned(&n, u, prec, rm))
+                no_out!(rug_shr_prec_round_unsigned(&n, u, prec, rm));
             }),
         ],
     );
@@ -1545,10 +1545,10 @@ fn benchmark_float_shr_prec_round_assign_i32_library_comparison(
         &pair_2_quadruple_1_float_complexity_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, i, prec, rm))| {
-                no_out!(n.shr_prec_round(i, prec, rm))
+                no_out!(n.shr_prec_round(i, prec, rm));
             }),
             ("rug", &mut |((n, i, prec, rm), _)| {
-                no_out!(rug_shr_prec_round_signed(&n, i, prec, rm))
+                no_out!(rug_shr_prec_round_signed(&n, i, prec, rm));
             }),
         ],
     );
@@ -1571,7 +1571,7 @@ fn benchmark_float_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_float_complexity_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, u, rm)| {
-            no_out!(n.shr_round_assign(u, rm))
+            no_out!(n.shr_round_assign(u, rm));
         })],
     );
 }
@@ -1593,7 +1593,7 @@ fn benchmark_float_shr_round_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_float_complexity_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, u, rm)| {
-            no_out!(n.shr_round_assign(u, rm))
+            no_out!(n.shr_round_assign(u, rm));
         })],
     );
 }
@@ -1679,7 +1679,7 @@ fn benchmark_float_shr_round_unsigned_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, u, rm)| no_out!(n.shr_round(u, rm))),
             ("naive", &mut |(n, u, rm)| {
-                no_out!(shr_round_naive(n, u, rm))
+                no_out!(shr_round_naive(n, u, rm));
             }),
         ],
     );
@@ -1706,7 +1706,7 @@ fn benchmark_float_shr_round_signed_algorithms<T: PrimitiveSigned>(
         &mut [
             ("default", &mut |(n, u, rm)| no_out!(n.shr_round(u, rm))),
             ("naive", &mut |(n, u, rm)| {
-                no_out!(shr_round_naive(n, u, rm))
+                no_out!(shr_round_naive(n, u, rm));
             }),
         ],
     );
@@ -1728,10 +1728,10 @@ fn benchmark_float_shr_round_assign_u32_library_comparison(
         &pair_2_triple_1_float_complexity_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, u, rm))| {
-                no_out!((&n).shr_round(u, rm))
+                no_out!((&n).shr_round(u, rm));
             }),
             ("rug", &mut |((n, u, rm), _)| {
-                no_out!(rug_shr_round_unsigned(&n, u, rm))
+                no_out!(rug_shr_round_unsigned(&n, u, rm));
             }),
         ],
     );
@@ -1753,10 +1753,10 @@ fn benchmark_float_shr_round_assign_i32_library_comparison(
         &pair_2_triple_1_float_complexity_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, i, rm))| {
-                no_out!((&n).shr_round(i, rm))
+                no_out!((&n).shr_round(i, rm));
             }),
             ("rug", &mut |((n, i, rm), _)| {
-                no_out!(rug_shr_round_signed(&n, i, rm))
+                no_out!(rug_shr_round_signed(&n, i, rm));
             }),
         ],
     );

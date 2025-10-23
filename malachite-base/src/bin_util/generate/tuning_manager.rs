@@ -59,7 +59,7 @@ struct FunctionRecord {
 }
 
 fn get_all_top_level_functions() -> BTreeMap<String, FunctionRecord> {
-    let allowed_double_names: HashSet<&str> = ALLOWED_DOUBLE_NAMES.iter().cloned().collect();
+    let allowed_double_names: HashSet<&str> = ALLOWED_DOUBLE_NAMES.iter().copied().collect();
     let mut fns = BTreeMap::new();
     let file_paths = find_all_file_paths();
     for path in &file_paths {
@@ -112,16 +112,15 @@ fn get_all_tuneable_constants() -> BTreeMap<String, FunctionRecord> {
                             break;
                         }
                     }
-                    if p.is_none() {
-                        panic!("Bad const. line {i} in {path}");
-                    }
+                    assert!(p.is_some(), "Bad const. line {i} in {path}");
                     let p = p.unwrap();
                     let name = &line[p.len()..];
                     let colon_index = name.chars().position(|c| c == ':').unwrap();
                     let name = &name[..colon_index];
-                    if constants.contains_key(name) {
-                        panic!("Duplicate constant name: {name}");
-                    }
+                    assert!(
+                        !constants.contains_key(name),
+                        "Duplicate constant name: {name}"
+                    );
                     constants.insert(
                         name.to_string(),
                         FunctionRecord {

@@ -55,7 +55,7 @@ fn benchmark_limbs_clear_bit(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut xs, index)| {
-            no_out!(limbs_clear_bit(&mut xs, index))
+            no_out!(limbs_clear_bit(&mut xs, index));
         })],
     );
 }

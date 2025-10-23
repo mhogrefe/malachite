@@ -249,7 +249,7 @@ impl Num for BigInt {
         let sign = if s.starts_with('-') {
             let tail = &s[1..];
             if !tail.starts_with('+') {
-                s = tail
+                s = tail;
             }
             Minus
         } else {
@@ -311,7 +311,7 @@ impl num_integer::Integer for BigInt {
 impl Roots for BigInt {
     #[inline]
     fn nth_root(&self, n: u32) -> Self {
-        (&self.0).floor_root(n as u64).into()
+        (&self.0).floor_root(u64::from(n)).into()
     }
 }
 
@@ -365,7 +365,7 @@ impl BigInt {
 
     #[inline]
     pub fn from_signed_bytes_be(digits: &[u8]) -> Self {
-        let is_negative = match digits.first().cloned() {
+        let is_negative = match digits.first().copied() {
             Some(x) => x > 0x7f,
             None => return Self::zero(),
         };
@@ -383,7 +383,7 @@ impl BigInt {
 
     #[inline]
     pub fn from_signed_bytes_le(digits: &[u8]) -> Self {
-        let is_negative = match digits.last().cloned() {
+        let is_negative = match digits.last().copied() {
             Some(x) => x > 0x7f,
             None => return Self::zero(),
         };
@@ -448,7 +448,7 @@ impl BigInt {
     #[inline]
     pub fn to_signed_bytes_be(&self) -> Vec<u8> {
         let mut bytes = self.magnitude().to_bytes_be();
-        let first_byte = bytes.first().cloned().unwrap_or(0);
+        let first_byte = bytes.first().copied().unwrap_or(0);
         let is_negative = self.is_negative();
         if first_byte > 0x7f
             && !(first_byte == 0x80 && bytes.iter().skip(1).all(Zero::is_zero) && is_negative)
@@ -466,7 +466,7 @@ impl BigInt {
     pub fn to_signed_bytes_le(&self) -> Vec<u8> {
         let mut bytes = self.magnitude().to_bytes_le();
         let is_negative = self.is_negative();
-        let last_byte = bytes.last().cloned().unwrap_or(0);
+        let last_byte = bytes.last().copied().unwrap_or(0);
         if last_byte > 0x7f
             && !(last_byte == 0x80 && bytes.iter().rev().skip(1).all(Zero::is_zero) && is_negative)
         {
@@ -609,9 +609,9 @@ impl BigInt {
     #[inline]
     pub fn set_bit(&mut self, bit: u64, value: bool) {
         if value {
-            self.0.set_bit(bit)
+            self.0.set_bit(bit);
         } else {
-            self.0.clear_bit(bit)
+            self.0.clear_bit(bit);
         }
     }
 }
@@ -619,13 +619,13 @@ impl BigInt {
 /// order.
 #[inline]
 fn twos_complement_le(digits: &mut [u8]) {
-    twos_complement(digits)
+    twos_complement(digits);
 }
 
 /// Perform in-place two's complement of the given binary representation in big-endian byte order.
 #[inline]
 fn twos_complement_be(digits: &mut [u8]) {
-    twos_complement(digits.iter_mut().rev())
+    twos_complement(digits.iter_mut().rev());
 }
 
 /// Perform in-place two's complement of the given digit iterator starting from the least
@@ -670,6 +670,6 @@ mod test {
     #[test]
     fn test_display_bigint() {
         let n = BigInt::from_str("1234567890").unwrap();
-        assert_eq!(format!("{}", n), "1234567890");
+        assert_eq!(format!("{n}"), "1234567890");
     }
 }

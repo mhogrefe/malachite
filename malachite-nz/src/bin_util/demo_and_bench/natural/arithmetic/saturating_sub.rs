@@ -136,16 +136,16 @@ fn benchmark_natural_saturating_sub_evaluation_strategy(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.saturating_sub(Natural)", &mut |(x, y)| {
-                no_out!(x.saturating_sub(y))
+                no_out!(x.saturating_sub(y));
             }),
             ("Natural.saturating_sub(&Natural)", &mut |(x, y)| {
-                no_out!(x.saturating_sub(&y))
+                no_out!(x.saturating_sub(&y));
             }),
             ("&Natural.saturating_sub(Natural)", &mut |(x, y)| {
-                no_out!((&x).saturating_sub(y))
+                no_out!((&x).saturating_sub(y));
             }),
             ("&Natural.saturating_sub(&Natural)", &mut |(x, y)| {
-                no_out!((&x).saturating_sub(&y))
+                no_out!((&x).saturating_sub(&y));
             }),
         ],
     );

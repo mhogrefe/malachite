@@ -68,7 +68,7 @@ fn benchmark_limbs_index_of_next_true_bit(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, u)| {
-            no_out!(limbs_index_of_next_true_bit(&xs, u))
+            no_out!(limbs_index_of_next_true_bit(&xs, u));
         })],
     );
 }
@@ -89,10 +89,10 @@ fn benchmark_natural_index_of_next_true_bit_algorithms(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, u)| {
-                no_out!(n.index_of_next_true_bit(u))
+                no_out!(n.index_of_next_true_bit(u));
             }),
             ("using bits explicitly", &mut |(n, u)| {
-                no_out!(natural_index_of_next_true_bit_alt(&n, u))
+                no_out!(natural_index_of_next_true_bit_alt(&n, u));
             }),
         ],
     );

@@ -77,7 +77,7 @@ fn benchmark_limbs_divisible_by_power_of_2(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, pow)| {
-            no_out!(limbs_divisible_by_power_of_2(&xs, pow))
+            no_out!(limbs_divisible_by_power_of_2(&xs, pow));
         })],
     );
 }
@@ -98,7 +98,7 @@ fn benchmark_natural_divisible_by_power_of_2_library_comparison(
         &pair_2_pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, (n, pow))| {
-                no_out!(n.divisible_by_power_of_2(pow))
+                no_out!(n.divisible_by_power_of_2(pow));
             }),
             ("rug", &mut |((n, pow), _)| {
                 n.is_divisible_2pow(u32::exact_from(pow));
@@ -124,7 +124,7 @@ fn benchmark_natural_divisible_by_power_of_2_algorithms(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.divisible_by_power_of_2(u64)", &mut |(n, pow)| {
-                no_out!(n.divisible_by_power_of_2(pow))
+                no_out!(n.divisible_by_power_of_2(pow));
             }),
             (
                 "Natural.trailing_zeros().map_or(true, |z| z >= u64)",

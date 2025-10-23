@@ -60,7 +60,7 @@ fn benchmark_xxx_add_yyy_to_zzz<T: PrimitiveUnsigned>(
         file_name,
         &sextuple_max_bit_bucketer("x_2", "x_1", "x_0", "y_2", "y_1", "y_0"),
         &mut [("default", &mut |(x_2, x_1, x_0, y_2, y_1, y_0)| {
-            no_out!(T::xxx_add_yyy_to_zzz(x_2, x_1, x_0, y_2, y_1, y_0))
+            no_out!(T::xxx_add_yyy_to_zzz(x_2, x_1, x_0, y_2, y_1, y_0));
         })],
     );
 }

@@ -40,7 +40,7 @@ fn benchmark_vec_pad_left(gm: GenMode, config: &GenConfig, limit: usize, file_na
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, pad_size, pad_value)| {
-            vec_pad_left(&mut xs, pad_size, pad_value)
+            vec_pad_left(&mut xs, pad_size, pad_value);
         })],
     );
 }

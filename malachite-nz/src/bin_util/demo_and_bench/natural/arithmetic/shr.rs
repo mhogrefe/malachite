@@ -213,7 +213,7 @@ fn benchmark_limbs_shr_to_out(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, bits)| {
-            no_out!(limbs_shr_to_out(&mut out, &xs, bits))
+            no_out!(limbs_shr_to_out(&mut out, &xs, bits));
         })],
     );
 }
@@ -233,7 +233,7 @@ fn benchmark_limbs_slice_shr_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            no_out!(limbs_slice_shr_in_place(&mut xs, bits))
+            no_out!(limbs_slice_shr_in_place(&mut xs, bits));
         })],
     );
 }
@@ -253,7 +253,7 @@ fn benchmark_limbs_vec_shr_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            limbs_vec_shr_in_place(&mut xs, bits)
+            limbs_vec_shr_in_place(&mut xs, bits);
         })],
     );
 }
@@ -384,10 +384,10 @@ fn benchmark_natural_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             (&format!("Natural >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(x >> y)
+                no_out!(x >> y);
             }),
             (&format!("&Natural >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x >> y)
+                no_out!(&x >> y);
             }),
         ],
     );
@@ -433,10 +433,10 @@ fn benchmark_natural_shr_signed_evaluation_strategy<T: PrimitiveSigned>(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             (&format!("Natural >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(x >> y)
+                no_out!(x >> y);
             }),
             (&format!("&Natural >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x >> y)
+                no_out!(&x >> y);
             }),
         ],
     );

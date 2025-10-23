@@ -204,13 +204,13 @@ fn benchmark_integer_product_library_comparison(
         &triple_3_vec_integer_sum_bits_bucketer(),
         &mut [
             ("Malachite", &mut |(_, _, xs)| {
-                no_out!(Integer::product(xs.into_iter()))
+                no_out!(Integer::product(xs.into_iter()));
             }),
             ("num", &mut |(xs, _, _)| {
-                no_out!(BigInt::product(xs.into_iter()))
+                no_out!(BigInt::product(xs.into_iter()));
             }),
             ("rug", &mut |(_, xs, _)| {
-                no_out!(rug::Integer::product(xs.iter()))
+                no_out!(rug::Integer::product(xs.iter()));
             }),
         ],
     );
@@ -232,10 +232,10 @@ fn benchmark_integer_product_algorithms(
         &vec_integer_sum_bits_bucketer(),
         &mut [
             ("default", &mut |xs| {
-                no_out!(Integer::product(xs.into_iter()))
+                no_out!(Integer::product(xs.into_iter()));
             }),
             ("naive", &mut |xs| {
-                no_out!(integer_product_naive(xs.into_iter()))
+                no_out!(integer_product_naive(xs.into_iter()));
             }),
         ],
     );
@@ -257,10 +257,10 @@ fn benchmark_integer_product_evaluation_strategy(
         &vec_integer_sum_bits_bucketer(),
         &mut [
             ("Integer::product(Iterator<Item=Integer>)", &mut |xs| {
-                no_out!(Integer::product(xs.into_iter()))
+                no_out!(Integer::product(xs.into_iter()));
             }),
             ("Integer::product(Iterator<Item=&Integer>)", &mut |xs| {
-                no_out!(Integer::product(xs.iter()))
+                no_out!(Integer::product(xs.iter()));
             }),
         ],
     );

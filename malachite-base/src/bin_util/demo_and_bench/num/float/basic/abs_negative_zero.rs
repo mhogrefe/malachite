@@ -76,7 +76,7 @@ fn benchmark_abs_negative_zero_assign<T: PrimitiveFloat>(
         file_name,
         &primitive_float_bucketer("f"),
         &mut [("Malachite", &mut |mut x| {
-            no_out!(x.abs_negative_zero_assign())
+            no_out!(x.abs_negative_zero_assign());
         })],
     );
 }

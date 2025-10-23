@@ -371,7 +371,7 @@ fn benchmark_float_partial_cmp_abs_unsigned_library_comparison<T: PrimitiveUnsig
         &pair_2_pair_float_unsigned_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.partial_cmp_abs(&y))
+                no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.abs().partial_cmp(&y))),
         ],
@@ -397,7 +397,7 @@ fn benchmark_unsigned_partial_cmp_abs_float_library_comparison<
         &pair_2_pair_float_unsigned_max_complexity_bucketer("y", "x"),
         &mut [
             ("Malachite", &mut |(_, (y, x))| {
-                no_out!(x.partial_cmp_abs(&y))
+                no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((y, x), _)| no_out!(x.partial_cmp(&y.abs()))),
         ],
@@ -424,10 +424,10 @@ fn benchmark_float_partial_cmp_abs_signed_library_comparison<T: PrimitiveSigned>
         &pair_2_pair_float_signed_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.partial_cmp_abs(&y))
+                no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((x, y), _)| {
-                no_out!(x.abs().partial_cmp(&y.unsigned_abs()))
+                no_out!(x.abs().partial_cmp(&y.unsigned_abs()));
             }),
         ],
     );
@@ -454,10 +454,10 @@ fn benchmark_signed_partial_cmp_abs_float_library_comparison<
         &pair_2_pair_float_signed_max_complexity_bucketer("y", "x"),
         &mut [
             ("Malachite", &mut |(_, (y, x))| {
-                no_out!(x.partial_cmp_abs(&y))
+                no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((y, x), _)| {
-                no_out!(x.unsigned_abs().partial_cmp(&y.abs()))
+                no_out!(x.unsigned_abs().partial_cmp(&y.abs()));
             }),
         ],
     );

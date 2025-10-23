@@ -146,10 +146,10 @@ fn benchmark_natural_try_from_integer_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Natural::try_from(Integer)", &mut |n| {
-                no_out!(Natural::try_from(n).ok())
+                no_out!(Natural::try_from(n).ok());
             }),
             ("Natural::try_from(&Integer)", &mut |n| {
-                no_out!(Natural::try_from(&n).ok())
+                no_out!(Natural::try_from(&n).ok());
             }),
         ],
     );
@@ -171,10 +171,10 @@ fn benchmark_natural_exact_from_integer_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Natural::exact_from(Integer)", &mut |n| {
-                no_out!(Natural::exact_from(n))
+                no_out!(Natural::exact_from(n));
             }),
             ("Natural::exact_from(&Integer)", &mut |n| {
-                no_out!(Natural::exact_from(&n))
+                no_out!(Natural::exact_from(&n));
             }),
         ],
     );
@@ -196,10 +196,10 @@ fn benchmark_natural_saturating_from_integer_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Natural::saturating_from(Integer)", &mut |n| {
-                no_out!(Natural::saturating_from(n))
+                no_out!(Natural::saturating_from(n));
             }),
             ("Natural::saturating_from(&Integer)", &mut |n| {
-                no_out!(Natural::saturating_from(&n))
+                no_out!(Natural::saturating_from(&n));
             }),
         ],
     );
@@ -221,10 +221,10 @@ fn benchmark_natural_convertible_from_integer_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Natural::convertible_from(Integer)", &mut |n| {
-                no_out!(Natural::convertible_from(n))
+                no_out!(Natural::convertible_from(n));
             }),
             ("Natural::convertible_from(&Integer)", &mut |n| {
-                no_out!(Natural::convertible_from(&n))
+                no_out!(Natural::convertible_from(&n));
             }),
         ],
     );
@@ -248,7 +248,7 @@ fn benchmark_natural_convertible_from_integer_algorithms(
         &mut [
             ("standard", &mut |n| no_out!(Natural::convertible_from(n))),
             ("using try_from", &mut |n| {
-                no_out!(Natural::try_from(n).is_ok())
+                no_out!(Natural::try_from(n).is_ok());
             }),
         ],
     );

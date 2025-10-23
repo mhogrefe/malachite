@@ -101,7 +101,7 @@ fn benchmark_bits_to_twos_complement_bits_non_negative(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |mut bits| {
-            bits_to_twos_complement_bits_non_negative(&mut bits)
+            bits_to_twos_complement_bits_non_negative(&mut bits);
         })],
     );
 }
@@ -121,7 +121,7 @@ fn benchmark_bits_slice_to_twos_complement_bits_negative(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |mut bits| {
-            no_out!(bits_slice_to_twos_complement_bits_negative(&mut bits))
+            no_out!(bits_slice_to_twos_complement_bits_negative(&mut bits));
         })],
     );
 }
@@ -141,7 +141,7 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |ref mut bits| {
-            bits_vec_to_twos_complement_bits_negative(bits)
+            bits_vec_to_twos_complement_bits_negative(bits);
         })],
     );
 }
@@ -163,7 +163,7 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
         &mut [
             ("Integer.to_bits_asc()", &mut |n| no_out!(n.to_bits_asc())),
             ("Integer.bits().collect_vec()", &mut |n| {
-                no_out!(n.bits().collect_vec())
+                no_out!(n.bits().collect_vec());
             }),
         ],
     );
@@ -208,7 +208,7 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
         &mut [
             ("Integer.to_bits_desc()", &mut |n| no_out!(n.to_bits_desc())),
             ("Integer.bits().rev().collect_vec()", &mut |n| {
-                no_out!(n.bits().rev().collect_vec())
+                no_out!(n.bits().rev().collect_vec());
             }),
         ],
     );

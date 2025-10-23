@@ -131,15 +131,15 @@ fn benchmark_to_power_of_2_digits_asc_algorithms<
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, log_base)| {
-                no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base))
+                no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base));
             }),
             ("naive", &mut |(n, log_base)| {
-                no_out!(Natural::to_power_of_2_digits_asc_naive::<T>(&n, log_base))
+                no_out!(Natural::to_power_of_2_digits_asc_naive::<T>(&n, log_base));
             }),
             ("using iterator", &mut |(n, log_base)| {
                 no_out!(
                     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base).collect_vec()
-                )
+                );
             }),
         ],
     );
@@ -169,14 +169,14 @@ fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, log_base)| {
-                no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base))
+                no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base));
             }),
             (
                 "Natural.power_of_2_digits(u64).collect_vec()",
                 &mut |(n, log_base)| {
                     no_out!(
                         PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).collect_vec()
-                    )
+                    );
                 },
             ),
         ],
@@ -207,7 +207,7 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, log_base)| {
-                no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_desc(&n, log_base))
+                no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_desc(&n, log_base));
             }),
             (
                 "Natural.power_of_2_digits(u64).rev().collect_vec()",
@@ -216,7 +216,7 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
                         PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base)
                             .rev()
                             .collect_vec()
-                    )
+                    );
                 },
             ),
         ],
@@ -241,17 +241,17 @@ fn benchmark_natural_to_power_of_2_digits_asc_natural_algorithms(
             ("default", &mut |(n, log_base)| {
                 no_out!(PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(
                     &n, log_base
-                ))
+                ));
             }),
             ("naive", &mut |(n, log_base)| {
-                no_out!(n.to_power_of_2_digits_asc_natural_naive(log_base))
+                no_out!(n.to_power_of_2_digits_asc_natural_naive(log_base));
             }),
             ("using iterator", &mut |(n, log_base)| {
                 no_out!(
                     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base)
                         .rev()
                         .collect_vec()
-                )
+                );
             }),
         ],
     );
@@ -274,7 +274,7 @@ fn benchmark_natural_to_power_of_2_digits_desc_natural(
         &mut [("Malachite", &mut |(n, log_base)| {
             no_out!(PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(
                 &n, log_base
-            ))
+            ));
         })],
     );
 }

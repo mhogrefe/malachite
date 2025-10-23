@@ -107,10 +107,10 @@ fn benchmark_natural_limbs_evaluation_strategy(
         &mut [
             ("Natural.to_limbs_asc()", &mut |n| no_out!(n.to_limbs_asc())),
             ("Natural.into_limbs_asc()", &mut |n| {
-                no_out!(n.into_limbs_asc())
+                no_out!(n.into_limbs_asc());
             }),
             ("Natural.limbs().collect_vec()", &mut |n| {
-                no_out!(n.limbs().collect_vec())
+                no_out!(n.limbs().collect_vec());
             }),
         ],
     );
@@ -132,13 +132,13 @@ fn benchmark_natural_limbs_rev_evaluation_strategy(
         &natural_bit_bucketer("n"),
         &mut [
             ("Natural.to_limbs_desc()", &mut |n| {
-                no_out!(n.to_limbs_desc())
+                no_out!(n.to_limbs_desc());
             }),
             ("Natural.into_limbs_desc()", &mut |n| {
-                no_out!(n.into_limbs_desc())
+                no_out!(n.into_limbs_desc());
             }),
             ("Natural.limbs().rev().collect_vec()", &mut |n| {
-                no_out!(n.limbs().rev().collect_vec())
+                no_out!(n.limbs().rev().collect_vec());
             }),
         ],
     );
@@ -159,7 +159,7 @@ fn benchmark_natural_limbs_size_hint(
         file_name,
         &natural_bit_bucketer("n"),
         &mut [("Natural.limbs().size_hint()", &mut |n| {
-            no_out!(n.limbs().size_hint())
+            no_out!(n.limbs().size_hint());
         })],
     );
 }

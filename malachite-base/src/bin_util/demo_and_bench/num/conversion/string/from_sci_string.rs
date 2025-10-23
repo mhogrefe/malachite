@@ -135,7 +135,7 @@ fn benchmark_primitive_int_from_sci_string_with_options<T: PrimitiveInt>(
         file_name,
         &pair_1_string_len_bucketer("s"),
         &mut [("Malachite", &mut |(s, options)| {
-            no_out!(T::from_sci_string_with_options(&s, options))
+            no_out!(T::from_sci_string_with_options(&s, options));
         })],
     );
 }

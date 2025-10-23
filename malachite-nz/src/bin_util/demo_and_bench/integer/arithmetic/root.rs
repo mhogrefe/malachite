@@ -226,7 +226,7 @@ fn benchmark_integer_floor_cbrt_evaluation_strategy(
         &mut [
             ("Integer.floor_root(3)", &mut |x| no_out!(x.floor_root(3))),
             ("(&Integer).floor_root(3)", &mut |x| {
-                no_out!((&x).floor_root(3))
+                no_out!((&x).floor_root(3));
             }),
         ],
     );
@@ -249,7 +249,7 @@ fn benchmark_integer_floor_cbrt_library_comparison(
         &triple_3_integer_bit_bucketer("x"),
         &mut [
             ("num", &mut |(x, _, _)| {
-                no_out!(x.nth_root(u32::exact_from(3)))
+                no_out!(x.nth_root(u32::exact_from(3)));
             }),
             ("rug", &mut |(_, x, _)| no_out!(x.root(u32::exact_from(3)))),
             ("Malachite", &mut |(_, _, x)| no_out!(x.floor_root(3))),
@@ -291,10 +291,10 @@ fn benchmark_integer_ceiling_cbrt_evaluation_strategy(
         &integer_bit_bucketer("x"),
         &mut [
             ("Integer.ceiling_root(3)", &mut |x| {
-                no_out!(x.ceiling_root(3))
+                no_out!(x.ceiling_root(3));
             }),
             ("(&Integer).ceiling_root(3)", &mut |x| {
-                no_out!((&x).ceiling_root(3))
+                no_out!((&x).ceiling_root(3));
             }),
         ],
     );
@@ -334,10 +334,10 @@ fn benchmark_integer_checked_cbrt_evaluation_strategy(
         &integer_bit_bucketer("x"),
         &mut [
             ("Integer.checked_root(3)", &mut |x| {
-                no_out!(x.checked_root(3))
+                no_out!(x.checked_root(3));
             }),
             ("(&Integer).checked_root(3)", &mut |x| {
-                no_out!((&x).checked_root(3))
+                no_out!((&x).checked_root(3));
             }),
         ],
     );
@@ -359,10 +359,10 @@ fn benchmark_integer_floor_root_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.floor_root(u64)", &mut |(x, exp)| {
-                no_out!(x.floor_root(exp))
+                no_out!(x.floor_root(exp));
             }),
             ("(&Integer).floor_root(u64)", &mut |(x, exp)| {
-                no_out!((&x).floor_root(exp))
+                no_out!((&x).floor_root(exp));
             }),
         ],
     );
@@ -385,13 +385,13 @@ fn benchmark_integer_floor_root_library_comparison(
         &triple_3_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("num", &mut |((x, exp), _, _)| {
-                no_out!(x.nth_root(u32::exact_from(exp)))
+                no_out!(x.nth_root(u32::exact_from(exp)));
             }),
             ("rug", &mut |(_, (x, exp), _)| {
-                no_out!(x.root(u32::exact_from(exp)))
+                no_out!(x.root(u32::exact_from(exp)));
             }),
             ("Malachite", &mut |(_, _, (x, exp))| {
-                no_out!(x.floor_root(exp))
+                no_out!(x.floor_root(exp));
             }),
         ],
     );
@@ -431,10 +431,10 @@ fn benchmark_integer_ceiling_root_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.ceiling_root(u64)", &mut |(x, exp)| {
-                no_out!(x.ceiling_root(exp))
+                no_out!(x.ceiling_root(exp));
             }),
             ("(&Integer).ceiling_root(u64)", &mut |(x, exp)| {
-                no_out!((&x).ceiling_root(exp))
+                no_out!((&x).ceiling_root(exp));
             }),
         ],
     );
@@ -474,10 +474,10 @@ fn benchmark_integer_checked_root_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.checked_root(u64)", &mut |(x, exp)| {
-                no_out!(x.checked_root(exp))
+                no_out!(x.checked_root(exp));
             }),
             ("(&Integer).checked_root(u64)", &mut |(x, exp)| {
-                no_out!((&x).checked_root(exp))
+                no_out!((&x).checked_root(exp));
             }),
         ],
     );

@@ -707,10 +707,10 @@ fn benchmark_unsigned_try_from_float_evaluation_strategy<T: TryFrom<Float> + Pri
         &float_complexity_bucketer("x"),
         &mut [
             (&format!("{}::try_from(Float)", T::NAME), &mut |x| {
-                no_out!(T::try_from(x))
+                no_out!(T::try_from(x));
             }),
             (&format!("{}::try_from(&Float)", T::NAME), &mut |x| {
-                no_out!(T::try_from(&x))
+                no_out!(T::try_from(&x));
             }),
         ],
     );
@@ -789,10 +789,10 @@ fn benchmark_signed_try_from_float_evaluation_strategy<T: TryFrom<Float> + Primi
         &float_complexity_bucketer("x"),
         &mut [
             (&format!("{}::try_from(Float)", T::NAME), &mut |x| {
-                no_out!(T::try_from(x))
+                no_out!(T::try_from(x));
             }),
             (&format!("{}::try_from(&Float)", T::NAME), &mut |x| {
-                no_out!(T::try_from(&x))
+                no_out!(T::try_from(&x));
             }),
         ],
     );

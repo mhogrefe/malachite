@@ -99,10 +99,10 @@ fn benchmark_float_thue_morse_constant_prec_round_algorithms(
         &pair_1_bucketer("prec"),
         &mut [
             ("default", &mut |(p, rm)| {
-                no_out!(Float::thue_morse_constant_prec_round(p, rm))
+                no_out!(Float::thue_morse_constant_prec_round(p, rm));
             }),
             ("naive", &mut |(p, rm)| {
-                no_out!(thue_morse_constant_prec_round_naive(p, rm))
+                no_out!(thue_morse_constant_prec_round_naive(p, rm));
             }),
         ],
     );
@@ -124,10 +124,10 @@ fn benchmark_float_thue_morse_constant_prec_algorithms(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |p| {
-                no_out!(Float::thue_morse_constant_prec(p))
+                no_out!(Float::thue_morse_constant_prec(p));
             }),
             ("naive", &mut |p| {
-                no_out!(thue_morse_constant_prec_round_naive(p, Nearest))
+                no_out!(thue_morse_constant_prec_round_naive(p, Nearest));
             }),
         ],
     );

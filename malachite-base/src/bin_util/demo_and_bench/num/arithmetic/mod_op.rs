@@ -202,7 +202,7 @@ fn benchmark_neg_mod_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("using neg_mod", &mut |(x, y)| no_out!(x.neg_mod(y))),
             ("using ceiling_div_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_neg_mod(y).1)
+                no_out!(x.ceiling_div_neg_mod(y).1);
             }),
         ],
     );
@@ -244,7 +244,7 @@ fn benchmark_ceiling_mod_algorithms<T: PrimitiveSigned>(
         &mut [
             ("using ceiling_mod", &mut |(x, y)| no_out!(x.ceiling_mod(y))),
             ("using ceiling_div_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_mod(y).1)
+                no_out!(x.ceiling_div_mod(y).1);
             }),
         ],
     );

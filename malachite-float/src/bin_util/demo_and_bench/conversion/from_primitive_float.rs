@@ -189,7 +189,7 @@ fn benchmark_float_from_primitive_float_library_comparison<T: PrimitiveFloat>(
                         u32::exact_from(n.significant_bits() - TrailingZeros::trailing_zeros(n))
                     },
                     x
-                ))
+                ));
             }),
         ],
     );
@@ -214,10 +214,10 @@ fn benchmark_float_from_primitive_float_prec_library_comparison<T: PrimitiveFloa
         &pair_primitive_float_bit_u64_max_bucketer("x", "prec"),
         &mut [
             ("Malachite", &mut |(x, prec)| {
-                no_out!(Float::from_primitive_float_prec(x, prec))
+                no_out!(Float::from_primitive_float_prec(x, prec));
             }),
             ("rug", &mut |(x, prec)| {
-                no_out!(rug::Float::with_val(max(1, u32::exact_from(prec)), x))
+                no_out!(rug::Float::with_val(max(1, u32::exact_from(prec)), x));
             }),
         ],
     );
@@ -245,14 +245,14 @@ fn benchmark_float_from_primitive_float_prec_round_library_comparison<T: Primiti
         &triple_1_2_primitive_float_bit_u64_max_bucketer("x", "prec"),
         &mut [
             ("Malachite", &mut |(x, prec, rm)| {
-                no_out!(Float::from_primitive_float_prec_round(x, prec, rm))
+                no_out!(Float::from_primitive_float_prec_round(x, prec, rm));
             }),
             ("rug", &mut |(x, prec, rm)| {
                 no_out!(rug::Float::with_val_round(
                     max(1, u32::exact_from(prec)),
                     x,
                     rug_round_try_from_rounding_mode(rm).unwrap()
-                ))
+                ));
             }),
         ],
     );

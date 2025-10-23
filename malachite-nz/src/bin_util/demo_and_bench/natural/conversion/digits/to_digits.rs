@@ -265,7 +265,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms<T: PrimitiveUnsigned
             ("basecase", &mut |(mut out, len, xs, base)| {
                 no_out!(limbs_to_digits_small_base_basecase(
                     &mut out, len, &xs, base
-                ))
+                ));
             }),
             ("naive", &mut |(_, _, xs, base)| {
                 let mut digits = Vec::new();
@@ -303,7 +303,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms_2<T: PrimitiveUnsign
                 xs,
                 base,
             )| {
-                no_out!(limbs_to_digits_small_base_basecase(&mut out, 0, &xs, base))
+                no_out!(limbs_to_digits_small_base_basecase(&mut out, 0, &xs, base));
             }),
             ("limbs_to_digits_small_base", &mut |(
                 mut out,
@@ -311,7 +311,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms_2<T: PrimitiveUnsign
                 mut xs,
                 base,
             )| {
-                no_out!(limbs_to_digits_small_base(&mut out, base, &mut xs, None))
+                no_out!(limbs_to_digits_small_base(&mut out, base, &mut xs, None));
             }),
         ],
     );
@@ -336,7 +336,7 @@ fn benchmark_limbs_to_digits_small_base_algorithms<T: PrimitiveUnsigned>(
         &triple_3_vec_len_bucketer("xs"),
         &mut [
             ("default", &mut |(mut out, base, mut xs)| {
-                no_out!(limbs_to_digits_small_base(&mut out, base, &mut xs, None))
+                no_out!(limbs_to_digits_small_base(&mut out, base, &mut xs, None));
             }),
             ("naive", &mut |(_, base, xs)| {
                 let mut digits = Vec::new();
@@ -550,7 +550,7 @@ fn benchmark_to_digits_desc_natural(
         file_name,
         &natural_bit_ratio_bucketer("x", "base"),
         &mut [("Malachite", &mut |(x, base)| {
-            no_out!(x.to_digits_desc(&base))
+            no_out!(x.to_digits_desc(&base));
         })],
     );
 }

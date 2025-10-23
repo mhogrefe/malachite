@@ -49,10 +49,10 @@ fn benchmark_rational_from_integer_evaluation_strategy(
         &integer_bit_bucketer("n"),
         &mut [
             ("Rational::from(Integer)", &mut |n| {
-                no_out!(Rational::from(n))
+                no_out!(Rational::from(n));
             }),
             ("Rational::from(&Integer)", &mut |n| {
-                no_out!(Rational::from(&n))
+                no_out!(Rational::from(&n));
             }),
         ],
     );

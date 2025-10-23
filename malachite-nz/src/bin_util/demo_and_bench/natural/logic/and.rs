@@ -231,7 +231,7 @@ fn benchmark_limbs_and_same_length_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, ys)| {
-            limbs_and_same_length_to_out(&mut out, &xs, &ys)
+            limbs_and_same_length_to_out(&mut out, &xs, &ys);
         })],
     );
 }
@@ -246,7 +246,7 @@ fn benchmark_limbs_and_to_out(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &triple_2_3_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut out, xs, ys)| {
-            limbs_and_to_out(&mut out, &xs, &ys)
+            limbs_and_to_out(&mut out, &xs, &ys);
         })],
     );
 }
@@ -266,7 +266,7 @@ fn benchmark_limbs_slice_and_same_length_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            limbs_slice_and_same_length_in_place_left(&mut xs, &ys)
+            limbs_slice_and_same_length_in_place_left(&mut xs, &ys);
         })],
     );
 }
@@ -286,7 +286,7 @@ fn benchmark_limbs_slice_and_in_place_left(
         file_name,
         &pair_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            no_out!(limbs_slice_and_in_place_left(&mut xs, &ys))
+            no_out!(limbs_slice_and_in_place_left(&mut xs, &ys));
         })],
     );
 }
@@ -306,7 +306,7 @@ fn benchmark_limbs_vec_and_in_place_left(
         file_name,
         &pair_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            limbs_vec_and_in_place_left(&mut xs, &ys)
+            limbs_vec_and_in_place_left(&mut xs, &ys);
         })],
     );
 }
@@ -326,7 +326,7 @@ fn benchmark_limbs_and_in_place_either(
         file_name,
         &pair_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, mut ys)| {
-            no_out!(limbs_and_in_place_either(&mut xs, &mut ys))
+            no_out!(limbs_and_in_place_either(&mut xs, &mut ys));
         })],
     );
 }
@@ -411,10 +411,10 @@ fn benchmark_natural_and_algorithms(
         &mut [
             ("default", &mut |(ref x, ref y)| no_out!(x & y)),
             ("using bits explicitly", &mut |(ref x, ref y)| {
-                no_out!(natural_and_alt_1(x, y))
+                no_out!(natural_and_alt_1(x, y));
             }),
             ("using limbs explicitly", &mut |(ref x, ref y)| {
-                no_out!(natural_and_alt_2(x, y))
+                no_out!(natural_and_alt_2(x, y));
             }),
         ],
     );

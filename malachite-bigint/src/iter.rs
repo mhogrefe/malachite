@@ -84,7 +84,7 @@ pub struct U64Digits<'a> {
 
 impl<'a> U64Digits<'a> {
     #[inline]
-    pub(crate) fn new(iter: LimbIterator<'a>) -> Self {
+    pub(crate) const fn new(iter: LimbIterator<'a>) -> Self {
         Self { iter }
     }
 }

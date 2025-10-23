@@ -73,13 +73,13 @@ fn benchmark_rational_serialize_json_library_comparison(
         &triple_3_rational_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, x)| {
-                no_out!(serde_json::to_string(&x).unwrap())
+                no_out!(serde_json::to_string(&x).unwrap());
             }),
             ("num", &mut |(x, _, _)| {
-                no_out!(serde_json::to_string(&x).unwrap())
+                no_out!(serde_json::to_string(&x).unwrap());
             }),
             ("rug", &mut |(_, x, _)| {
-                no_out!(serde_json::to_string(&x).unwrap())
+                no_out!(serde_json::to_string(&x).unwrap());
             }),
         ],
     );

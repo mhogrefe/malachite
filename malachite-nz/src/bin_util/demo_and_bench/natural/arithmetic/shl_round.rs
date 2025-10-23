@@ -94,7 +94,7 @@ fn benchmark_natural_shl_round_assign<T: PrimitiveSigned>(
         file_name,
         &triple_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.shl_round_assign(y, rm))
+            no_out!(x.shl_round_assign(y, rm));
         })],
     );
 }

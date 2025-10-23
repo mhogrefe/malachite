@@ -917,7 +917,7 @@ impl ModMulPrecomputedAssign<Self, Self> for Natural {
             (x, Self::ZERO, _, _) => *x = Self::ZERO,
             (&mut Self::ONE, y, _, _) => *self = y,
             (&mut Self(Small(x)), Self(Small(y)), Self(Small(m)), &ModMulData::OneLimb(inv)) => {
-                *self = Self::from(x.mod_mul_precomputed(y, m, &inv))
+                *self = Self::from(x.mod_mul_precomputed(y, m, &inv));
             }
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
@@ -983,7 +983,7 @@ impl<'a> ModMulPrecomputedAssign<Self, &'a Self> for Natural {
             (x, Self::ZERO, _, _) => *x = Self::ZERO,
             (&mut Self::ONE, y, _, _) => *self = y,
             (&mut Self(Small(x)), Self(Small(y)), &Self(Small(m)), &ModMulData::OneLimb(inv)) => {
-                *self = Self::from(x.mod_mul_precomputed(y, m, &inv))
+                *self = Self::from(x.mod_mul_precomputed(y, m, &inv));
             }
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
@@ -1049,7 +1049,7 @@ impl<'a> ModMulPrecomputedAssign<&'a Self, Self> for Natural {
             (x, &Self::ZERO, _, _) => *x = Self::ZERO,
             (&mut Self::ONE, y, _, _) => *self = y.clone(),
             (&mut Self(Small(x)), &Self(Small(y)), Self(Small(m)), &ModMulData::OneLimb(inv)) => {
-                *self = Self::from(x.mod_mul_precomputed(y, m, &inv))
+                *self = Self::from(x.mod_mul_precomputed(y, m, &inv));
             }
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
@@ -1111,7 +1111,7 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Self, &'b Self> for Natural {
             (x, &Self::ZERO, _, _) => *x = Self::ZERO,
             (&mut Self::ONE, y, _, _) => *self = y.clone(),
             (&mut Self(Small(x)), &Self(Small(y)), &Self(Small(m)), &ModMulData::OneLimb(inv)) => {
-                *self = Self::from(x.mod_mul_precomputed(y, m, &inv))
+                *self = Self::from(x.mod_mul_precomputed(y, m, &inv));
             }
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {

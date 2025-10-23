@@ -79,6 +79,7 @@
     clippy::flat_map_option,
     clippy::unnecessary_wraps,
     clippy::unnested_or_patterns,
+    clippy::use_self,
     clippy::trivially_copy_pass_by_ref
 )]
 #![cfg_attr(
@@ -202,7 +203,7 @@ impl Float {
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         match self {
-            Float(Finite {
+            Self(Finite {
                 precision,
                 significand,
                 exponent,
@@ -210,8 +211,8 @@ impl Float {
             }) => {
                 if *precision == 0
                     || !significand.is_valid()
-                    || *exponent > Float::MAX_EXPONENT
-                    || *exponent < Float::MIN_EXPONENT
+                    || *exponent > Self::MAX_EXPONENT
+                    || *exponent < Self::MIN_EXPONENT
                 {
                     return false;
                 }

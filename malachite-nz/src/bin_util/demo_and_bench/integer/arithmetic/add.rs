@@ -200,13 +200,13 @@ fn benchmark_integer_sum_library_comparison(
         &triple_3_vec_integer_sum_bits_bucketer(),
         &mut [
             ("Malachite", &mut |(_, _, xs)| {
-                no_out!(Integer::sum(xs.into_iter()))
+                no_out!(Integer::sum(xs.into_iter()));
             }),
             ("num", &mut |(xs, _, _)| {
-                no_out!(BigInt::sum(xs.into_iter()))
+                no_out!(BigInt::sum(xs.into_iter()));
             }),
             ("rug", &mut |(_, xs, _)| {
-                no_out!(rug::Integer::sum(xs.iter()))
+                no_out!(rug::Integer::sum(xs.iter()));
             }),
         ],
     );
@@ -249,10 +249,10 @@ fn benchmark_integer_sum_evaluation_strategy(
         &vec_integer_sum_bits_bucketer(),
         &mut [
             ("Integer::sum(Iterator<Item=Integer>)", &mut |xs| {
-                no_out!(Integer::sum(xs.into_iter()))
+                no_out!(Integer::sum(xs.into_iter()));
             }),
             ("Integer::sum(Iterator<Item=&Integer>)", &mut |xs| {
-                no_out!(Integer::sum(xs.iter()))
+                no_out!(Integer::sum(xs.iter()));
             }),
         ],
     );

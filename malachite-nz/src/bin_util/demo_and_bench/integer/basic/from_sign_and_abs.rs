@@ -59,10 +59,10 @@ fn benchmark_from_sign_and_abs_evaluation_strategy(
         &pair_1_natural_bit_bucketer("abs"),
         &mut [
             ("from_sign_and_abs", &mut |(abs, sign)| {
-                no_out!(Integer::from_sign_and_abs(sign, abs))
+                no_out!(Integer::from_sign_and_abs(sign, abs));
             }),
             ("from_sign_and_abs_ref", &mut |(abs, sign)| {
-                no_out!(Integer::from_sign_and_abs_ref(sign, &abs))
+                no_out!(Integer::from_sign_and_abs_ref(sign, &abs));
             }),
         ],
     );

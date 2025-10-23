@@ -182,10 +182,10 @@ fn benchmark_integer_mod_power_of_2_evaluation_strategy(
         &pair_2_bucketer("index"),
         &mut [
             ("Integer.mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!(n.mod_power_of_2(u))
+                no_out!(n.mod_power_of_2(u));
             }),
             ("(&Integer).mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!((&n).mod_power_of_2(u))
+                no_out!((&n).mod_power_of_2(u));
             }),
         ],
     );
@@ -225,10 +225,10 @@ fn benchmark_integer_rem_power_of_2_evaluation_strategy(
         &pair_2_bucketer("index"),
         &mut [
             ("Integer.rem_power_of_2(u64)", &mut |(n, u)| {
-                no_out!(n.rem_power_of_2(u))
+                no_out!(n.rem_power_of_2(u));
             }),
             ("(&Integer).rem_power_of_2(u64)", &mut |(n, u)| {
-                no_out!((&n).rem_power_of_2(u))
+                no_out!((&n).rem_power_of_2(u));
             }),
         ],
     );
@@ -249,7 +249,7 @@ fn benchmark_integer_ceiling_mod_power_of_2_assign(
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut n, u)| {
-            n.ceiling_mod_power_of_2_assign(u)
+            n.ceiling_mod_power_of_2_assign(u);
         })],
     );
 }
@@ -270,10 +270,10 @@ fn benchmark_integer_ceiling_mod_power_of_2_evaluation_strategy(
         &pair_2_bucketer("index"),
         &mut [
             ("Integer.ceiling_mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!(n.ceiling_mod_power_of_2(u))
+                no_out!(n.ceiling_mod_power_of_2(u));
             }),
             ("(&Integer).ceiling_mod_power_of_2(u64)", &mut |(n, u)| {
-                no_out!((&n).ceiling_mod_power_of_2(u))
+                no_out!((&n).ceiling_mod_power_of_2(u));
             }),
         ],
     );

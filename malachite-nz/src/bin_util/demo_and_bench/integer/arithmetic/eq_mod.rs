@@ -293,7 +293,7 @@ fn benchmark_limbs_eq_neg_limb_mod_limb(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("limbs_eq_neg_limb_mod_limb", &mut |(xs, y, m)| {
-            no_out!(limbs_eq_neg_limb_mod_limb(&xs, y, m))
+            no_out!(limbs_eq_neg_limb_mod_limb(&xs, y, m));
         })],
     );
 }
@@ -313,7 +313,7 @@ fn benchmark_limbs_pos_limb_eq_neg_limb_mod(
         file_name,
         &triple_1_vec_len_bucketer("m"),
         &mut [("limbs_pos_limb_eq_neg_limb_mod", &mut |(m, x, y)| {
-            no_out!(limbs_pos_limb_eq_neg_limb_mod(x, y, &m))
+            no_out!(limbs_pos_limb_eq_neg_limb_mod(x, y, &m));
         })],
     );
 }
@@ -334,10 +334,10 @@ fn benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy(
         &triple_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_pos_eq_neg_limb_mod", &mut |(xs, mut m, y)| {
-                no_out!(limbs_pos_eq_neg_limb_mod(&xs, y, &mut m))
+                no_out!(limbs_pos_eq_neg_limb_mod(&xs, y, &mut m));
             }),
             ("limbs_pos_eq_neg_limb_mod_ref", &mut |(xs, m, y)| {
-                no_out!(limbs_pos_eq_neg_limb_mod_ref(&xs, y, &m))
+                no_out!(limbs_pos_eq_neg_limb_mod_ref(&xs, y, &m));
             }),
         ],
     );
@@ -358,7 +358,7 @@ fn benchmark_limbs_pos_eq_neg_mod_limb(
         file_name,
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [("limbs_pos_eq_neg_mod_limb", &mut |(xs, ys, m)| {
-            no_out!(limbs_pos_eq_neg_mod_limb(&xs, &ys, m))
+            no_out!(limbs_pos_eq_neg_mod_limb(&xs, &ys, m));
         })],
     );
 }
@@ -379,10 +379,10 @@ fn benchmark_limbs_pos_eq_neg_mod_evaluation_strategy(
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [
             ("limbs_pos_eq_neg_mod", &mut |(ref xs, ref y, ref mut m)| {
-                no_out!(limbs_pos_eq_neg_mod(xs, y, m))
+                no_out!(limbs_pos_eq_neg_mod(xs, y, m));
             }),
             ("limbs_pos_eq_neg_mod_ref", &mut |(ref xs, ref y, ref m)| {
-                no_out!(limbs_pos_eq_neg_mod_ref(xs, y, m))
+                no_out!(limbs_pos_eq_neg_mod_ref(xs, y, m));
             }),
         ],
     );
@@ -404,28 +404,28 @@ fn benchmark_integer_eq_mod_evaluation_strategy(
         &triple_1_2_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Integer.eq_mod(Integer, Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(y, m))
+                no_out!(x.eq_mod(y, m));
             }),
             ("Integer.eq_mod(Integer, &Integer)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(y, &m))
+                no_out!(x.eq_mod(y, &m));
             }),
             ("Integer.eq_mod(&Integer, Integer)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(&y, m))
+                no_out!(x.eq_mod(&y, m));
             }),
             ("Integer.eq_mod(&Integer, &Integer)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(&y, &m))
+                no_out!(x.eq_mod(&y, &m));
             }),
             ("(&Integer).eq_mod(Integer, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(y, m))
+                no_out!((&x).eq_mod(y, m));
             }),
             ("(&Integer).eq_mod(Integer, &Integer)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(y, &m))
+                no_out!((&x).eq_mod(y, &m));
             }),
             ("(&Integer).eq_mod(&Integer, Integer)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(&y, m))
+                no_out!((&x).eq_mod(&y, m));
             }),
             ("(&Integer).eq_mod(&Integer, &Integer)", &mut |(x, y, m)| {
-                no_out!((&x).eq_mod(&y, &m))
+                no_out!((&x).eq_mod(&y, &m));
             }),
         ],
     );
@@ -469,12 +469,12 @@ fn benchmark_integer_eq_mod_algorithms(
         &triple_1_2_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Integer.eq_mod(Integer, Natural)", &mut |(x, y, m)| {
-                no_out!(x.eq_mod(y, m))
+                no_out!(x.eq_mod(y, m));
             }),
             (
                 "Integer == Integer || Integer != 0 && Integer % Natural == Integer % Natural",
                 &mut |(x, y, m)| {
-                    no_out!(x == y || m != 0 && x.unsigned_abs() % &m == y.unsigned_abs() % m)
+                    no_out!(x == y || m != 0 && x.unsigned_abs() % &m == y.unsigned_abs() % m);
                 },
             ),
             (

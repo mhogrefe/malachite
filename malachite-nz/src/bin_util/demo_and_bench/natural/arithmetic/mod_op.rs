@@ -460,23 +460,23 @@ fn benchmark_limbs_mod_limb_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("alt 1", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_alt_1::<DoubleLimb, Limb>(&ns, d))
+                no_out!(limbs_mod_limb_alt_1::<DoubleLimb, Limb>(&ns, d));
             }),
             ("alt 2", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_alt_2::<DoubleLimb, Limb>(&ns, d))
+                no_out!(limbs_mod_limb_alt_2::<DoubleLimb, Limb>(&ns, d));
             }),
             ("alt 3", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_alt_3(&ns, d))
+                no_out!(limbs_mod_limb_alt_3(&ns, d));
             }),
             ("limbs_mod_limb_any_leading_zeros_1", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(
                     &ns, d
-                ))
+                ));
             }),
             ("limbs_mod_limb_any_leading_zeros_2", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(
                     &ns, d
-                ))
+                ));
             }),
         ],
     );
@@ -586,10 +586,10 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("limbs_mod_limb_small_normalized", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&ns, d))
+                no_out!(limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(&ns, d));
             }),
             ("limbs_mod_limb_any_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d));
             }),
         ],
     );
@@ -613,10 +613,10 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
             ("limbs_mod_limb_small_unnormalized", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(
                     &ns, d
-                ))
+                ));
             }),
             ("limbs_mod_limb_any_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d));
             }),
         ],
     );
@@ -638,12 +638,12 @@ fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
         &pair_1_vec_len_bucketer("ns"),
         &mut [
             ("limbs_mod_limb_any_leading_zeros", &mut |(ns, d)| {
-                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d))
+                no_out!(limbs_mod_limb_any_leading_zeros::<DoubleLimb, Limb>(&ns, d));
             }),
             ("limbs_mod_limb_at_least_1_leading_zero", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(
                     &ns, d
-                ))
+                ));
             }),
         ],
     );
@@ -667,12 +667,12 @@ fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
             ("Malachite", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(
                     &ns, d
-                ))
+                ));
             }),
             ("limbs_mod_limb_at_least_2_leading_zeros", &mut |(ns, d)| {
                 no_out!(limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(
                     &ns, d
-                ))
+                ));
             }),
         ],
     );
@@ -694,10 +694,10 @@ fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
         &triple_2_vec_len_bucketer("ns"),
         &mut [
             ("using div/mod", &mut |(mut qs, mut ns, ds)| {
-                no_out!(limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds))
+                no_out!(limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds));
             }),
             ("standard", &mut |(_, ns, ds)| {
-                no_out!(limbs_mod_by_two_limb_normalized(&ns, &ds))
+                no_out!(limbs_mod_by_two_limb_normalized(&ns, &ds));
             }),
         ],
     );
@@ -719,10 +719,10 @@ fn benchmark_limbs_mod_schoolbook_algorithms(
         &quadruple_2_vec_len_bucketer("ns"),
         &mut [
             ("using div/mod", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse));
             }),
             ("standard", &mut |(_, mut ns, ds, inverse)| {
-                limbs_mod_schoolbook(&mut ns, &ds, inverse)
+                limbs_mod_schoolbook(&mut ns, &ds, inverse);
             }),
         ],
     );
@@ -745,7 +745,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
         &quadruple_2_3_diff_vec_len_bucketer("ns", "ds"),
         &mut [
             ("Schoolbook", &mut |(_, mut ns, ds, inverse)| {
-                limbs_mod_schoolbook(&mut ns, &ds, inverse)
+                limbs_mod_schoolbook(&mut ns, &ds, inverse);
             }),
             ("divide-and-conquer using div/mod", &mut |(
                 mut qs,
@@ -755,7 +755,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
             )| {
                 no_out!(limbs_div_mod_divide_and_conquer(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
             ("divide-and-conquer", &mut |(
                 mut qs,
@@ -763,7 +763,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
                 ds,
                 inverse,
             )| {
-                limbs_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
+                limbs_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
             }),
         ],
     );
@@ -830,7 +830,7 @@ fn benchmark_limbs_mod_to_out_algorithms(
                 limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds);
             }),
             ("standard", &mut |(_, mut rs, ns, ds)| {
-                limbs_mod_to_out(&mut rs, &ns, &ds)
+                limbs_mod_to_out(&mut rs, &ns, &ds);
             }),
         ],
     );
@@ -852,10 +852,10 @@ fn benchmark_natural_mod_assign_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.mod_assign(Natural)", &mut |(mut x, y)| {
-                no_out!(x.mod_assign(y))
+                no_out!(x.mod_assign(y));
             }),
             ("Natural.mod_assign(&Natural)", &mut |(mut x, y)| {
-                no_out!(x.mod_assign(&y))
+                no_out!(x.mod_assign(&y));
             }),
         ],
     );
@@ -921,16 +921,16 @@ fn benchmark_natural_mod_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.mod_op(Natural)", &mut |(x, y)| {
-                no_out!(x.mod_op(y))
+                no_out!(x.mod_op(y));
             }),
             ("Natural.mod_op(&Natural)", &mut |(x, y)| {
-                no_out!(x.mod_op(&y))
+                no_out!(x.mod_op(&y));
             }),
             ("(&Natural).mod_op(Natural)", &mut |(x, y)| {
-                no_out!((&x).mod_op(y))
+                no_out!((&x).mod_op(y));
             }),
             ("(&Natural).mod_op(&Natural)", &mut |(x, y)| {
-                no_out!((&x).mod_op(&y))
+                no_out!((&x).mod_op(&y));
             }),
         ],
     );
@@ -1020,10 +1020,10 @@ fn benchmark_natural_neg_mod_assign_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.neg_mod_assign(Natural)", &mut |(mut x, y)| {
-                no_out!(x.neg_mod_assign(y))
+                no_out!(x.neg_mod_assign(y));
             }),
             ("Natural.neg_mod_assign(&Natural)", &mut |(mut x, y)| {
-                no_out!(x.neg_mod_assign(&y))
+                no_out!(x.neg_mod_assign(&y));
             }),
         ],
     );
@@ -1068,7 +1068,7 @@ fn benchmark_natural_neg_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.neg_mod(y))),
             ("using ceiling_div_neg_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_neg_mod(y).1)
+                no_out!(x.ceiling_div_neg_mod(y).1);
             }),
         ],
     );
@@ -1090,16 +1090,16 @@ fn benchmark_natural_neg_mod_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.neg_mod(Natural)", &mut |(x, y)| {
-                no_out!(x.neg_mod(y))
+                no_out!(x.neg_mod(y));
             }),
             ("Natural.neg_mod(&Natural)", &mut |(x, y)| {
-                no_out!(x.neg_mod(&y))
+                no_out!(x.neg_mod(&y));
             }),
             ("(&Natural).neg_mod(Natural)", &mut |(x, y)| {
-                no_out!((&x).neg_mod(y))
+                no_out!((&x).neg_mod(y));
             }),
             ("(&Natural).neg_mod(&Natural)", &mut |(x, y)| {
-                no_out!((&x).neg_mod(&y))
+                no_out!((&x).neg_mod(&y));
             }),
         ],
     );

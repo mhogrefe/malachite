@@ -57,7 +57,7 @@ fn benchmark_primorial_library_comparison(
         &mut [
             ("Malachite", &mut |n| no_out!(Natural::primorial(n))),
             ("rug", &mut |n| {
-                no_out!(rug::Integer::primorial(u32::exact_from(n)).complete())
+                no_out!(rug::Integer::primorial(u32::exact_from(n)).complete());
             }),
         ],
     );
@@ -95,10 +95,10 @@ fn benchmark_product_of_first_n_primes_algorithms(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |n| {
-                no_out!(Natural::product_of_first_n_primes(n))
+                no_out!(Natural::product_of_first_n_primes(n));
             }),
             ("naive", &mut |n| {
-                no_out!(product_of_first_n_primes_naive(n))
+                no_out!(product_of_first_n_primes_naive(n));
             }),
         ],
     );

@@ -309,7 +309,7 @@ fn benchmark_limbs_shr_round_up(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, bits)| {
-            no_out!(limbs_shr_round_up(&xs, bits))
+            no_out!(limbs_shr_round_up(&xs, bits));
         })],
     );
 }
@@ -329,7 +329,7 @@ fn benchmark_limbs_shr_round_nearest(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, bits)| {
-            no_out!(limbs_shr_round_nearest(&xs, bits))
+            no_out!(limbs_shr_round_nearest(&xs, bits));
         })],
     );
 }
@@ -344,7 +344,7 @@ fn benchmark_limbs_shr_exact(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, bits)| {
-            no_out!(limbs_shr_exact(&xs, bits))
+            no_out!(limbs_shr_exact(&xs, bits));
         })],
     );
 }
@@ -359,7 +359,7 @@ fn benchmark_limbs_shr_round(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, bits, rm)| {
-            no_out!(limbs_shr_round(&xs, bits, rm))
+            no_out!(limbs_shr_round(&xs, bits, rm));
         })],
     );
 }
@@ -379,7 +379,7 @@ fn benchmark_limbs_vec_shr_round_up_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            no_out!(limbs_vec_shr_round_up_in_place(&mut xs, bits))
+            no_out!(limbs_vec_shr_round_up_in_place(&mut xs, bits));
         })],
     );
 }
@@ -399,7 +399,7 @@ fn benchmark_limbs_vec_shr_round_nearest_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            no_out!(limbs_vec_shr_round_nearest_in_place(&mut xs, bits))
+            no_out!(limbs_vec_shr_round_nearest_in_place(&mut xs, bits));
         })],
     );
 }
@@ -419,7 +419,7 @@ fn benchmark_limbs_vec_shr_exact_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            no_out!(limbs_vec_shr_exact_in_place(&mut xs, bits))
+            no_out!(limbs_vec_shr_exact_in_place(&mut xs, bits));
         })],
     );
 }
@@ -439,7 +439,7 @@ fn benchmark_limbs_vec_shr_round_in_place(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits, rm)| {
-            no_out!(limbs_vec_shr_round_in_place(&mut xs, bits, rm))
+            no_out!(limbs_vec_shr_round_in_place(&mut xs, bits, rm));
         })],
     );
 }
@@ -461,7 +461,7 @@ fn benchmark_natural_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.shr_round_assign(y, rm))
+            no_out!(x.shr_round_assign(y, rm));
         })],
     );
 }
@@ -513,7 +513,7 @@ fn benchmark_natural_shr_round_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.shr_round_assign(y, rm))
+            no_out!(x.shr_round_assign(y, rm));
         })],
     );
 }

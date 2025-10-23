@@ -103,7 +103,7 @@ fn benchmark_integer_floor_sqrt_evaluation_strategy(
         &mut [
             ("Integer.floor_sqrt()", &mut |x| no_out!(x.floor_sqrt())),
             ("(&Integer).floor_sqrt()", &mut |x| {
-                no_out!((&x).floor_sqrt())
+                no_out!((&x).floor_sqrt());
             }),
         ],
     );
@@ -167,7 +167,7 @@ fn benchmark_integer_ceiling_sqrt_evaluation_strategy(
         &mut [
             ("Integer.ceiling_sqrt()", &mut |x| no_out!(x.ceiling_sqrt())),
             ("(&Integer).ceiling_sqrt()", &mut |x| {
-                no_out!((&x).ceiling_sqrt())
+                no_out!((&x).ceiling_sqrt());
             }),
         ],
     );
@@ -208,7 +208,7 @@ fn benchmark_integer_checked_sqrt_evaluation_strategy(
         &mut [
             ("Integer.checked_sqrt()", &mut |x| no_out!(x.checked_sqrt())),
             ("(&Integer).checked_sqrt()", &mut |x| {
-                no_out!((&x).checked_sqrt())
+                no_out!((&x).checked_sqrt());
             }),
         ],
     );

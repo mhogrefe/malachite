@@ -83,7 +83,7 @@ fn benchmark_natural_mod_power_of_2_neg_assign(
             mut n,
             pow,
         )| {
-            n.mod_power_of_2_neg_assign(pow)
+            n.mod_power_of_2_neg_assign(pow);
         })],
     );
 }
@@ -104,10 +104,10 @@ fn benchmark_natural_mod_power_of_2_neg_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.mod_power_of_2_neg(u64)", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_neg(pow))
+                no_out!(n.mod_power_of_2_neg(pow));
             }),
             ("(&Natural).mod_power_of_2_neg(u64)", &mut |(n, pow)| {
-                no_out!((&n).mod_power_of_2_neg(pow))
+                no_out!((&n).mod_power_of_2_neg(pow));
             }),
         ],
     );
@@ -129,10 +129,10 @@ fn benchmark_natural_mod_power_of_2_neg_algorithms(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.mod_power_of_2_neg(u64)", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_neg(pow))
+                no_out!(n.mod_power_of_2_neg(pow));
             }),
             ("(-Natural).mod_power_of_2(u64)", &mut |(n, pow)| {
-                no_out!((-n).mod_power_of_2(pow))
+                no_out!((-n).mod_power_of_2(pow));
             }),
             (
                 "Natural.mod_neg(Natural::power_of_2(u64))",

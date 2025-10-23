@@ -35,8 +35,8 @@ impl Seed {
     /// Seed::from_bytes([10; 32]);
     /// ```
     #[inline]
-    pub const fn from_bytes(bytes: [u8; 32]) -> Seed {
-        Seed { bytes }
+    pub const fn from_bytes(bytes: [u8; 32]) -> Self {
+        Self { bytes }
     }
 
     /// Creates a PRNG from a slice of 32 bytes.
@@ -75,10 +75,10 @@ impl Seed {
     /// );
     /// ```
     #[inline]
-    pub fn next(self) -> Seed {
+    pub fn next(self) -> Self {
         let mut bytes = [0; 32];
         self.get_rng().fill_bytes(&mut bytes);
-        Seed::from_bytes(bytes)
+        Self::from_bytes(bytes)
     }
 
     /// Generates a new `Seed` from this seed. Passing different `key`s will, with very high
@@ -109,7 +109,7 @@ impl Seed {
     ///     ])
     /// );
     /// ```
-    pub fn fork(&self, key: &str) -> Seed {
+    pub fn fork(&self, key: &str) -> Self {
         let mut seed = self.next();
         let forked_seed = &mut seed.bytes;
         let hash = Sha3_256::digest(key.as_bytes());

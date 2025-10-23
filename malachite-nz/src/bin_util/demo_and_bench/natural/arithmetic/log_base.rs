@@ -98,10 +98,10 @@ fn benchmark_natural_floor_log_base_algorithms(
         &mut [
             ("default", &mut |(n, base)| no_out!(n.floor_log_base(&base))),
             ("naive", &mut |(n, base)| {
-                no_out!(floor_log_base_naive(&n, &base))
+                no_out!(floor_log_base_naive(&n, &base));
             }),
             ("by squaring", &mut |(n, base)| {
-                no_out!(floor_log_base_by_squaring(&n, &base))
+                no_out!(floor_log_base_by_squaring(&n, &base));
             }),
         ],
     );
@@ -123,13 +123,13 @@ fn benchmark_natural_ceiling_log_base_algorithms(
         &natural_bit_ratio_bucketer("n", "base"),
         &mut [
             ("default", &mut |(n, base)| {
-                no_out!(n.ceiling_log_base(&base))
+                no_out!(n.ceiling_log_base(&base));
             }),
             ("naive", &mut |(n, base)| {
-                no_out!(ceiling_log_base_naive(&n, &base))
+                no_out!(ceiling_log_base_naive(&n, &base));
             }),
             ("by squaring", &mut |(n, base)| {
-                no_out!(ceiling_log_base_by_squaring(&n, &base))
+                no_out!(ceiling_log_base_by_squaring(&n, &base));
             }),
         ],
     );
@@ -151,13 +151,13 @@ fn benchmark_natural_checked_log_base_algorithms(
         &natural_bit_ratio_bucketer("n", "base"),
         &mut [
             ("default", &mut |(n, base)| {
-                no_out!(n.checked_log_base(&base))
+                no_out!(n.checked_log_base(&base));
             }),
             ("naive", &mut |(n, base)| {
-                no_out!(checked_log_base_naive(&n, &base))
+                no_out!(checked_log_base_naive(&n, &base));
             }),
             ("by squaring", &mut |(n, base)| {
-                no_out!(checked_log_base_by_squaring(&n, &base))
+                no_out!(checked_log_base_by_squaring(&n, &base));
             }),
         ],
     );

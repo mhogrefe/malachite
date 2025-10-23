@@ -90,11 +90,11 @@ fn benchmark_integer_extended_gcd_library_comparison(
         &triple_3_pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| {
-                no_out!(x.extended_gcd(y))
+                no_out!(x.extended_gcd(y));
             }),
             ("num", &mut |((x, y), _, _)| no_out!(x.extended_gcd(&y))),
             ("rug", &mut |(_, (x, y), _)| {
-                no_out!(x.extended_gcd(y, rug::Integer::new()))
+                no_out!(x.extended_gcd(y, rug::Integer::new()));
             }),
         ],
     );
@@ -116,16 +116,16 @@ fn benchmark_integer_extended_gcd_evaluation_strategy(
         &pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Integer.extended_gcd(Integer)", &mut |(x, y)| {
-                no_out!(x.extended_gcd(y))
+                no_out!(x.extended_gcd(y));
             }),
             ("Integer.extended_gcd(&Integer)", &mut |(x, y)| {
-                no_out!(x.extended_gcd(&y))
+                no_out!(x.extended_gcd(&y));
             }),
             ("&Integer.extended_gcd(Integer)", &mut |(x, y)| {
-                no_out!((&x).extended_gcd(y))
+                no_out!((&x).extended_gcd(y));
             }),
             ("&Integer.extended_gcd(&Integer)", &mut |(x, y)| {
-                no_out!((&x).extended_gcd(&y))
+                no_out!((&x).extended_gcd(&y));
             }),
         ],
     );

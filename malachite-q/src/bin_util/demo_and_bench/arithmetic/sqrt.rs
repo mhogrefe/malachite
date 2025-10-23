@@ -48,10 +48,10 @@ fn benchmark_rational_checked_sqrt_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Rational.checked_sqrt()", &mut |x| {
-                no_out!(x.checked_sqrt())
+                no_out!(x.checked_sqrt());
             }),
             ("(&Rational).checked_sqrt()", &mut |x| {
-                no_out!((&x).checked_sqrt())
+                no_out!((&x).checked_sqrt());
             }),
         ],
     );

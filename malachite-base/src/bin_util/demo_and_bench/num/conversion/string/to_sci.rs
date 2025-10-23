@@ -164,7 +164,7 @@ fn benchmark_fmt_sci_valid_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("u"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.fmt_sci_valid(options))
+            no_out!(x.fmt_sci_valid(options));
         })],
     );
 }
@@ -184,7 +184,7 @@ fn benchmark_fmt_sci_valid_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("i"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.fmt_sci_valid(options))
+            no_out!(x.fmt_sci_valid(options));
         })],
     );
 }
@@ -204,7 +204,7 @@ fn benchmark_to_sci_with_options_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("u"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.to_sci_with_options(options).to_string())
+            no_out!(x.to_sci_with_options(options).to_string());
         })],
     );
 }
@@ -224,7 +224,7 @@ fn benchmark_to_sci_with_options_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("u"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.to_sci_with_options(options).to_string())
+            no_out!(x.to_sci_with_options(options).to_string());
         })],
     );
 }

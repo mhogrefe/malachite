@@ -59,10 +59,10 @@ fn benchmark_rational_sequence_from_vec_evaluation_strategy(
         &vec_len_bucketer(),
         &mut [
             ("from_vec", &mut |xs| {
-                no_out!(RationalSequence::from_vec(xs))
+                no_out!(RationalSequence::from_vec(xs));
             }),
             ("from_slice", &mut |xs| {
-                no_out!(RationalSequence::from_slice(&xs))
+                no_out!(RationalSequence::from_slice(&xs));
             }),
         ],
     );

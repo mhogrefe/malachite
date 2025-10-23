@@ -81,7 +81,7 @@ fn demo_express_as_power_unsigned<T: PrimitiveUnsigned + ExpressAsPower>(
     limit: usize,
 ) {
     for u in unsigned_gen::<T>().get(gm, config).take(limit) {
-        println!("{}.express_as_power() = {:?}", u, u.express_as_power())
+        println!("{}.express_as_power() = {:?}", u, u.express_as_power());
     }
 }
 
@@ -91,7 +91,7 @@ fn demo_express_as_power_signed<T: PrimitiveSigned + ExpressAsPower>(
     limit: usize,
 ) {
     for i in signed_gen::<T>().get(gm, config).take(limit) {
-        println!("({}).express_as_power() = {:?}", i, i.express_as_power())
+        println!("({}).express_as_power() = {:?}", i, i.express_as_power());
     }
 }
 
@@ -177,7 +177,7 @@ fn benchmark_is_power_unsigned_algorithms<T: PrimitiveUnsigned + ExpressAsPower 
         &mut [
             ("default", &mut |u| no_out!(u.is_power())),
             ("using express_as_power", &mut |u| {
-                no_out!(u.express_as_power().is_some())
+                no_out!(u.express_as_power().is_some());
             }),
         ],
     );
@@ -201,7 +201,7 @@ fn benchmark_is_power_signed_algorithms<T: PrimitiveSigned + ExpressAsPower + Is
         &mut [
             ("default", &mut |i| no_out!(i.is_power())),
             ("using express_as_power", &mut |i| {
-                no_out!(i.express_as_power().is_some())
+                no_out!(i.express_as_power().is_some());
             }),
         ],
     );

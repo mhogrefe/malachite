@@ -360,13 +360,13 @@ fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("to_string", &mut |(x, base)| {
-                no_out!(x.to_string_base(base))
+                no_out!(x.to_string_base(base));
             }),
             ("using fmt", &mut |(x, base)| {
-                no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
+                no_out!(format!("{}", BaseFmtWrapper::new(x, base)));
             }),
             ("naive", &mut |(x, base)| {
-                no_out!(to_string_base_unsigned_naive(x, base))
+                no_out!(to_string_base_unsigned_naive(x, base));
             }),
         ],
     );
@@ -393,13 +393,13 @@ fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("to_string", &mut |(x, base)| {
-                no_out!(x.to_string_base(base))
+                no_out!(x.to_string_base(base));
             }),
             ("using fmt", &mut |(x, base)| {
-                no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
+                no_out!(format!("{}", BaseFmtWrapper::new(x, base)));
             }),
             ("naive", &mut |(x, base)| {
-                no_out!(to_string_base_signed_naive(x, base))
+                no_out!(to_string_base_signed_naive(x, base));
             }),
         ],
     );
@@ -424,10 +424,10 @@ fn benchmark_to_string_base_upper_algorithms_unsigned<T: PrimitiveUnsigned>(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("to_string", &mut |(x, base)| {
-                no_out!(x.to_string_base_upper(base))
+                no_out!(x.to_string_base_upper(base));
             }),
             ("using fmt", &mut |(x, base)| {
-                no_out!(format!("{:#}", BaseFmtWrapper::new(x, base)))
+                no_out!(format!("{:#}", BaseFmtWrapper::new(x, base)));
             }),
         ],
     );
@@ -452,10 +452,10 @@ fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("to_string", &mut |(x, base)| {
-                no_out!(x.to_string_base(base))
+                no_out!(x.to_string_base(base));
             }),
             ("using fmt", &mut |(x, base)| {
-                no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
+                no_out!(format!("{}", BaseFmtWrapper::new(x, base)));
             }),
         ],
     );
@@ -486,7 +486,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
                 "{:0width$}",
                 BaseFmtWrapper::new(x, base),
                 width = width
-            ))
+            ));
         })],
     );
 }
@@ -516,7 +516,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
                 "{:0width$}",
                 BaseFmtWrapper::new(x, base),
                 width = width
-            ))
+            ));
         })],
     );
 }
@@ -546,7 +546,7 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned
                 "{:#0width$}",
                 BaseFmtWrapper::new(x, base),
                 width = width
-            ))
+            ));
         })],
     );
 }
@@ -576,7 +576,7 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
                 "{:#0width$}",
                 BaseFmtWrapper::new(x, base),
                 width = width
-            ))
+            ));
         })],
     );
 }

@@ -80,9 +80,9 @@ fn from_owned(m: &mut OwnedHalfGcdMatrix) -> HalfGcdMatrix<'_> {
 }
 
 impl OwnedHalfGcdMatrix {
-    pub fn init(n: usize, mut p: Vec<Limb>) -> OwnedHalfGcdMatrix {
+    pub fn init(n: usize, mut p: Vec<Limb>) -> Self {
         let m = HalfGcdMatrix::init(n, &mut p);
-        OwnedHalfGcdMatrix {
+        Self {
             s: m.s,
             two_s: m.two_s,
             three_s: m.three_s,

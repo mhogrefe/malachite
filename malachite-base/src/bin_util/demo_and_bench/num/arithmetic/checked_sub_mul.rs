@@ -68,7 +68,7 @@ fn benchmark_checked_sub_mul_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_max_bit_bucketer("x", "y", "z"),
         &mut [("Malachite", &mut |(x, y, z)| {
-            no_out!(x.checked_sub_mul(y, z))
+            no_out!(x.checked_sub_mul(y, z));
         })],
     );
 }
@@ -88,7 +88,7 @@ fn benchmark_checked_sub_mul_signed<T: PrimitiveSigned>(
         file_name,
         &triple_max_bit_bucketer("x", "y", "z"),
         &mut [("Malachite", &mut |(x, y, z)| {
-            no_out!(x.checked_sub_mul(y, z))
+            no_out!(x.checked_sub_mul(y, z));
         })],
     );
 }

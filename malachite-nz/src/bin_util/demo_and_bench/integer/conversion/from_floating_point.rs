@@ -112,7 +112,7 @@ fn benchmark_integer_rounding_from_float<T: PrimitiveFloat>(
         file_name,
         &pair_1_primitive_float_bucketer("f"),
         &mut [("Malachite", &mut |(f, rm)| {
-            no_out!(Integer::rounding_from(f, rm))
+            no_out!(Integer::rounding_from(f, rm));
         })],
     );
 }
@@ -177,7 +177,7 @@ fn benchmark_integer_convertible_from_float_algorithms<T: PrimitiveFloat>(
         &mut [
             ("standard", &mut |f| no_out!(Integer::convertible_from(f))),
             ("using try_from", &mut |f| {
-                no_out!(Integer::try_from(f).is_ok())
+                no_out!(Integer::try_from(f).is_ok());
             }),
         ],
     );

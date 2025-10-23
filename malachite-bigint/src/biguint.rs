@@ -186,7 +186,7 @@ impl Num for BigUint {
         if s.starts_with('+') {
             let tail = &s[1..];
             if !tail.starts_with('+') {
-                s = tail
+                s = tail;
             }
         }
 
@@ -275,7 +275,7 @@ impl num_integer::Integer for BigUint {
 impl Roots for BigUint {
     #[inline]
     fn nth_root(&self, n: u32) -> Self {
-        (&self.0).floor_root(n as u64).into()
+        (&self.0).floor_root(u64::from(n)).into()
     }
 }
 
@@ -289,6 +289,8 @@ impl FromStr for BigUint {
 }
 
 impl BigUint {
+    // TODO consider passing &[u32] instead (breaking change)
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn new(digits: Vec<u32>) -> Self {
         Self::from_slice(digits.as_slice())
@@ -305,7 +307,7 @@ impl BigUint {
     pub fn assign_from_slice(&mut self, slice: &[u32]) {
         // SAFETY: &[u32] cannot have any digit greater than 2^32
         self.0 = unsafe {
-            Natural::from_power_of_2_digits_asc(32, slice.iter().cloned()).unwrap_unchecked()
+            Natural::from_power_of_2_digits_asc(32, slice.iter().copied()).unwrap_unchecked()
         };
     }
 
@@ -313,7 +315,7 @@ impl BigUint {
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         // SAFETY: &[u8] cannot have any digit greater than 2^8
         Self(unsafe {
-            Natural::from_power_of_2_digits_desc(8, bytes.iter().cloned()).unwrap_unchecked()
+            Natural::from_power_of_2_digits_desc(8, bytes.iter().copied()).unwrap_unchecked()
         })
     }
 
@@ -321,7 +323,7 @@ impl BigUint {
     pub fn from_bytes_le(bytes: &[u8]) -> Self {
         // SAFETY: &[u8] cannot have any digit greater than 2^8
         Self(unsafe {
-            Natural::from_power_of_2_digits_asc(8, bytes.iter().cloned()).unwrap_unchecked()
+            Natural::from_power_of_2_digits_asc(8, bytes.iter().copied()).unwrap_unchecked()
         })
     }
 
@@ -336,7 +338,7 @@ impl BigUint {
         if radix == 256 {
             Some(Self::from_bytes_be(bytes))
         } else {
-            Natural::from_digits_desc(&(radix as u8), bytes.iter().cloned()).map(Self)
+            Natural::from_digits_desc(&(radix as u8), bytes.iter().copied()).map(Self)
         }
     }
 
@@ -345,7 +347,7 @@ impl BigUint {
         if radix == 256 {
             Some(Self::from_bytes_le(bytes))
         } else {
-            Natural::from_digits_asc(&(radix as u8), bytes.iter().cloned()).map(Self)
+            Natural::from_digits_asc(&(radix as u8), bytes.iter().copied()).map(Self)
         }
     }
 
@@ -457,9 +459,9 @@ impl BigUint {
     #[inline]
     pub fn set_bit(&mut self, bit: u64, value: bool) {
         if value {
-            self.0.set_bit(bit)
+            self.0.set_bit(bit);
         } else {
-            self.0.clear_bit(bit)
+            self.0.clear_bit(bit);
         }
     }
 }
@@ -477,6 +479,6 @@ mod test {
     #[test]
     fn test_display_biguint() {
         let x = BigUint::from_str_radix("1234567890", 10).unwrap();
-        assert_eq!(format!("{}", x), "1234567890");
+        assert_eq!(format!("{x}"), "1234567890");
     }
 }

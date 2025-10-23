@@ -43,7 +43,7 @@ fn demo_from_power_of_2_digits_asc<
             T::NAME,
             log_base,
             xs,
-            T::from_power_of_2_digits_asc(log_base, xs.iter().cloned())
+            T::from_power_of_2_digits_asc(log_base, xs.iter().copied())
         );
     }
 }
@@ -65,7 +65,7 @@ fn demo_from_power_of_2_digits_desc<
             T::NAME,
             log_base,
             xs,
-            T::from_power_of_2_digits_desc(log_base, xs.iter().cloned())
+            T::from_power_of_2_digits_desc(log_base, xs.iter().copied())
         );
     }
 }
@@ -87,7 +87,7 @@ fn demo_from_power_of_2_digits_asc_targeted<
             T::NAME,
             log_base,
             xs,
-            T::from_power_of_2_digits_asc(log_base, xs.iter().cloned()).unwrap()
+            T::from_power_of_2_digits_asc(log_base, xs.iter().copied()).unwrap()
         );
     }
 }
@@ -109,7 +109,7 @@ fn demo_from_power_of_2_digits_desc_targeted<
             T::NAME,
             log_base,
             xs,
-            T::from_power_of_2_digits_desc(log_base, xs.iter().cloned()).unwrap()
+            T::from_power_of_2_digits_desc(log_base, xs.iter().copied()).unwrap()
         );
     }
 }
@@ -136,7 +136,7 @@ fn benchmark_from_power_of_2_digits_asc<
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, log_base)| {
-            no_out!(T::from_power_of_2_digits_asc(log_base, xs.into_iter()))
+            no_out!(T::from_power_of_2_digits_asc(log_base, xs.into_iter()));
         })],
     );
 }
@@ -163,7 +163,7 @@ fn benchmark_from_power_of_2_digits_desc<
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, log_base)| {
-            no_out!(T::from_power_of_2_digits_desc(log_base, xs.into_iter()))
+            no_out!(T::from_power_of_2_digits_desc(log_base, xs.into_iter()));
         })],
     );
 }

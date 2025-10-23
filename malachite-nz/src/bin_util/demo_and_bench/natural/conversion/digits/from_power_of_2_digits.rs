@@ -64,7 +64,7 @@ fn demo_from_power_of_2_digits_asc<T: PrimitiveUnsigned>(
             "Natural::from_power_of_2_digits_asc({}, {:?}) = {:?}",
             log_base,
             digits,
-            Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied())
         );
     }
 }
@@ -84,7 +84,7 @@ fn demo_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
             "Natural::from_power_of_2_digits_desc({}, {:?}) = {:?}",
             log_base,
             digits,
-            Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied())
         );
     }
 }
@@ -104,7 +104,7 @@ fn demo_from_power_of_2_digits_asc_targeted<T: PrimitiveUnsigned>(
             "Natural::from_power_of_2_digits_asc({}, {:?}) = {}",
             log_base,
             digits,
-            Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap()
+            Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap()
         );
     }
 }
@@ -124,7 +124,7 @@ fn demo_from_power_of_2_digits_desc_targeted<T: PrimitiveUnsigned>(
             "Natural::from_power_of_2_digits_desc({}, {:?}) = {}",
             log_base,
             digits,
-            Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap()
+            Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap()
         );
     }
 }
@@ -218,13 +218,13 @@ fn benchmark_from_power_of_2_digits_asc_algorithms<T: PrimitiveUnsigned>(
                 no_out!(Natural::from_power_of_2_digits_asc(
                     log_base,
                     digits.into_iter()
-                ))
+                ));
             }),
             ("naive", &mut |(digits, log_base)| {
                 no_out!(Natural::from_power_of_2_digits_asc_naive(
                     log_base,
                     digits.into_iter()
-                ))
+                ));
             }),
         ],
     );
@@ -254,7 +254,7 @@ fn benchmark_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
             no_out!(Natural::from_power_of_2_digits_desc(
                 log_base,
                 digits.into_iter()
-            ))
+            ));
         })],
     );
 }
@@ -278,13 +278,13 @@ fn benchmark_natural_from_power_of_2_digits_asc_natural_algorithms(
                 no_out!(Natural::from_power_of_2_digits_asc(
                     log_base,
                     digits.into_iter()
-                ))
+                ));
             }),
             ("naive", &mut |(digits, log_base)| {
                 no_out!(Natural::from_power_of_2_digits_asc_natural_naive(
                     log_base,
                     digits.into_iter()
-                ))
+                ));
             }),
         ],
     );
@@ -308,7 +308,7 @@ fn benchmark_natural_from_power_of_2_digits_desc_natural(
             no_out!(Natural::from_power_of_2_digits_desc(
                 log_base,
                 digits.into_iter()
-            ))
+            ));
         })],
     );
 }

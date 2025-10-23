@@ -453,11 +453,11 @@ fn benchmark_float_reciprocal_algorithms(
             ("default", &mut |x| no_out!(x.reciprocal())),
             ("naive 1", &mut |x| {
                 let xsb = x.significant_bits();
-                no_out!(reciprocal_prec_round_naive_1(x, xsb, Nearest).0)
+                no_out!(reciprocal_prec_round_naive_1(x, xsb, Nearest).0);
             }),
             ("naive 2", &mut |x| {
                 let xsb = x.significant_bits();
-                no_out!(reciprocal_prec_round_naive_2(x, xsb, Nearest).0)
+                no_out!(reciprocal_prec_round_naive_2(x, xsb, Nearest).0);
             }),
         ],
     );
@@ -478,7 +478,7 @@ fn benchmark_float_reciprocal_assign(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Float.reciprocal_assign()", &mut |mut x| {
-            x.reciprocal_assign()
+            x.reciprocal_assign();
         })],
     );
 }
@@ -499,10 +499,10 @@ fn benchmark_float_reciprocal_prec_evaluation_strategy(
         &pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("Float.reciprocal_prec(u64)", &mut |(x, prec)| {
-                no_out!(x.reciprocal_prec(prec))
+                no_out!(x.reciprocal_prec(prec));
             }),
             ("(&Float).reciprocal_prec_ref(u64)", &mut |(x, prec)| {
-                no_out!(x.reciprocal_prec_ref(prec))
+                no_out!(x.reciprocal_prec_ref(prec));
             }),
         ],
     );
@@ -524,10 +524,10 @@ fn benchmark_float_reciprocal_prec_library_comparison(
         &pair_2_pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, prec))| {
-                no_out!(x.reciprocal_prec_ref(prec))
+                no_out!(x.reciprocal_prec_ref(prec));
             }),
             ("rug", &mut |((x, prec), _)| {
-                no_out!(rug_reciprocal_prec(&x, prec))
+                no_out!(rug_reciprocal_prec(&x, prec));
             }),
         ],
     );
@@ -550,10 +550,10 @@ fn benchmark_float_reciprocal_prec_algorithms(
         &mut [
             ("default", &mut |(x, prec)| no_out!(x.reciprocal_prec(prec))),
             ("naive 1", &mut |(x, prec)| {
-                no_out!(reciprocal_prec_round_naive_1(x, prec, Nearest))
+                no_out!(reciprocal_prec_round_naive_1(x, prec, Nearest));
             }),
             ("naive 2", &mut |(x, prec)| {
-                no_out!(reciprocal_prec_round_naive_2(x, prec, Nearest))
+                no_out!(reciprocal_prec_round_naive_2(x, prec, Nearest));
             }),
         ],
     );
@@ -574,7 +574,7 @@ fn benchmark_float_reciprocal_prec_assign(
         file_name,
         &pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [("Float.reciprocal_prec_assign(u64)", &mut |(mut x, prec)| {
-            no_out!(x.reciprocal_prec_assign(prec))
+            no_out!(x.reciprocal_prec_assign(prec));
         })],
     );
 }
@@ -595,7 +595,7 @@ fn benchmark_float_reciprocal_round_evaluation_strategy(
         &pair_1_float_complexity_bucketer("x"),
         &mut [
             ("Float.reciprocal_round(RoundingMode)", &mut |(x, rm)| {
-                no_out!(x.reciprocal_round(rm))
+                no_out!(x.reciprocal_round(rm));
             }),
             (
                 "(&Float).reciprocal_round_ref(RoundingMode)",
@@ -621,10 +621,10 @@ fn benchmark_float_reciprocal_round_library_comparison(
         &pair_2_pair_1_float_complexity_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, rm))| {
-                no_out!(x.reciprocal_round_ref(rm))
+                no_out!(x.reciprocal_round_ref(rm));
             }),
             ("rug", &mut |((x, rm), _)| {
-                no_out!(rug_reciprocal_round(&x, rm))
+                no_out!(rug_reciprocal_round(&x, rm));
             }),
         ],
     );
@@ -722,10 +722,10 @@ fn benchmark_float_reciprocal_prec_round_library_comparison(
         &pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, prec, rm))| {
-                no_out!(x.reciprocal_prec_round_ref(prec, rm))
+                no_out!(x.reciprocal_prec_round_ref(prec, rm));
             }),
             ("rug", &mut |((x, prec, rm), _)| {
-                no_out!(rug_reciprocal_prec_round(&x, prec, rm))
+                no_out!(rug_reciprocal_prec_round(&x, prec, rm));
             }),
         ],
     );
@@ -747,13 +747,13 @@ fn benchmark_float_reciprocal_prec_round_algorithms(
         &triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [
             ("default", &mut |(x, prec, rm)| {
-                no_out!(x.reciprocal_prec_round(prec, rm))
+                no_out!(x.reciprocal_prec_round(prec, rm));
             }),
             ("naive 1", &mut |(x, prec, rm)| {
-                no_out!(reciprocal_prec_round_naive_1(x, prec, rm))
+                no_out!(reciprocal_prec_round_naive_1(x, prec, rm));
             }),
             ("naive 2", &mut |(x, prec, rm)| {
-                no_out!(reciprocal_prec_round_naive_2(x, prec, rm))
+                no_out!(reciprocal_prec_round_naive_2(x, prec, rm));
             }),
         ],
     );

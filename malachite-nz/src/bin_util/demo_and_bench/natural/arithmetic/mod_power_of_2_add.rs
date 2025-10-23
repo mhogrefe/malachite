@@ -303,7 +303,7 @@ fn benchmark_limbs_mod_power_of_2_add_limb(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, y, pow)| {
-            no_out!(limbs_mod_power_of_2_add_limb(&xs, y, pow))
+            no_out!(limbs_mod_power_of_2_add_limb(&xs, y, pow));
         })],
     );
 }
@@ -325,7 +325,7 @@ fn benchmark_limbs_slice_mod_power_of_2_add_limb_in_place(
         &mut [("Malachite", &mut |(mut xs, y, pow)| {
             no_out!(limbs_slice_mod_power_of_2_add_limb_in_place(
                 &mut xs, y, pow
-            ))
+            ));
         })],
     );
 }
@@ -345,7 +345,7 @@ fn benchmark_limbs_vec_mod_power_of_2_add_limb_in_place(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y, pow)| {
-            limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, y, pow)
+            limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, y, pow);
         })],
     );
 }
@@ -365,7 +365,7 @@ fn benchmark_limbs_mod_power_of_2_add_greater(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, ref ys, pow)| {
-            no_out!(limbs_mod_power_of_2_add_greater(xs, ys, pow))
+            no_out!(limbs_mod_power_of_2_add_greater(xs, ys, pow));
         })],
     );
 }
@@ -385,7 +385,7 @@ fn benchmark_limbs_mod_power_of_2_add(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(ref xs, ref ys, pow)| {
-            no_out!(limbs_mod_power_of_2_add(xs, ys, pow))
+            no_out!(limbs_mod_power_of_2_add(xs, ys, pow));
         })],
     );
 }
@@ -407,7 +407,7 @@ fn benchmark_limbs_slice_mod_power_of_2_add_greater_in_place_left(
         &mut [("Malachite", &mut |(mut xs, ys, pow)| {
             no_out!(limbs_slice_mod_power_of_2_add_greater_in_place_left(
                 &mut xs, &ys, pow
-            ))
+            ));
         })],
     );
 }
@@ -429,7 +429,7 @@ fn benchmark_limbs_vec_mod_power_of_2_add_in_place_left(
         &mut [("Malachite", &mut |(mut xs, ys, pow)| {
             no_out!(limbs_vec_mod_power_of_2_add_in_place_left(
                 &mut xs, &ys, pow
-            ))
+            ));
         })],
     );
 }
@@ -451,7 +451,7 @@ fn benchmark_limbs_mod_power_of_2_add_in_place_either(
         &mut [("Malachite", &mut |(mut xs, mut ys, pow)| {
             no_out!(limbs_mod_power_of_2_add_in_place_either(
                 &mut xs, &mut ys, pow
-            ))
+            ));
         })],
     );
 }
@@ -499,17 +499,17 @@ fn benchmark_natural_mod_power_of_2_add_algorithms(
         &triple_3_bucketer("pow"),
         &mut [
             ("default", &mut |(x, y, pow)| {
-                no_out!(x.mod_power_of_2_add(y, pow))
+                no_out!(x.mod_power_of_2_add(y, pow));
             }),
             ("alt", &mut |(x, y, pow)| {
                 let mut sum = x + y;
                 sum.clear_bit(pow);
             }),
             ("naive", &mut |(x, y, pow)| {
-                no_out!((x + y).mod_power_of_2(pow))
+                no_out!((x + y).mod_power_of_2(pow));
             }),
             ("using mod_add", &mut |(x, y, pow)| {
-                no_out!(x.mod_add(y, Natural::power_of_2(pow)))
+                no_out!(x.mod_add(y, Natural::power_of_2(pow)));
             }),
         ],
     );

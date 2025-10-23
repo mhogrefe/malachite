@@ -139,7 +139,7 @@ fn benchmark_limbs_invert_limb_u32_algorithms(
         &mut [
             ("default", &mut |x| no_out!(limbs_invert_limb_u32(x))),
             ("naive", &mut |x| {
-                no_out!(limbs_invert_limb_naive::<u32, u64>(x))
+                no_out!(limbs_invert_limb_naive::<u32, u64>(x));
             }),
         ],
     );
@@ -162,7 +162,7 @@ fn benchmark_limbs_invert_limb_u64_algorithms(
         &mut [
             ("default", &mut |x| no_out!(limbs_invert_limb_u64(x))),
             ("naive", &mut |x| {
-                no_out!(limbs_invert_limb_naive::<u64, u128>(x))
+                no_out!(limbs_invert_limb_naive::<u64, u128>(x));
             }),
         ],
     );
@@ -193,10 +193,10 @@ fn benchmark_mod_preinverted_double_algorithms<
         &quadruple_1_2_bit_bucketer("x"),
         &mut [
             ("default", &mut |(x_1, x_0, d, d_inv)| {
-                no_out!(mod_preinverted_double::<T, DT>(x_1, x_0, d, d_inv))
+                no_out!(mod_preinverted_double::<T, DT>(x_1, x_0, d, d_inv));
             }),
             ("naive", &mut |(x_1, x_0, d, _)| {
-                no_out!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)))
+                no_out!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)));
             }),
         ],
     );
@@ -249,7 +249,7 @@ fn benchmark_mod_mul_algorithms_with_fast<
                     y,
                     m,
                     T::precompute_mod_mul_data(&m)
-                ))
+                ));
             }),
         ],
     );

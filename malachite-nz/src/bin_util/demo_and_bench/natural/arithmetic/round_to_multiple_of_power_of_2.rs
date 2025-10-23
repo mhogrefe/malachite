@@ -283,7 +283,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_down(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, pow)| {
-            no_out!(limbs_round_to_multiple_of_power_of_2_down(&xs, pow))
+            no_out!(limbs_round_to_multiple_of_power_of_2_down(&xs, pow));
         })],
     );
 }
@@ -303,7 +303,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_up(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, pow)| {
-            no_out!(limbs_round_to_multiple_of_power_of_2_up(&xs, pow))
+            no_out!(limbs_round_to_multiple_of_power_of_2_up(&xs, pow));
         })],
     );
 }
@@ -323,7 +323,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_nearest(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, pow)| {
-            no_out!(limbs_round_to_multiple_of_power_of_2_nearest(&xs, pow))
+            no_out!(limbs_round_to_multiple_of_power_of_2_nearest(&xs, pow));
         })],
     );
 }
@@ -343,7 +343,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, pow, rm)| {
-            no_out!(limbs_round_to_multiple_of_power_of_2(&xs, pow, rm))
+            no_out!(limbs_round_to_multiple_of_power_of_2(&xs, pow, rm));
         })],
     );
 }
@@ -365,7 +365,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_down_in_place(
         &mut [("Malachite", &mut |(mut xs, pow)| {
             no_out!(limbs_round_to_multiple_of_power_of_2_down_in_place(
                 &mut xs, pow
-            ))
+            ));
         })],
     );
 }
@@ -387,7 +387,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_up_in_place(
         &mut [("Malachite", &mut |(mut xs, pow)| {
             no_out!(limbs_round_to_multiple_of_power_of_2_up_in_place(
                 &mut xs, pow
-            ))
+            ));
         })],
     );
 }
@@ -409,7 +409,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_nearest_in_place(
         &mut [("Malachite", &mut |(mut xs, pow)| {
             no_out!(limbs_round_to_multiple_of_power_of_2_nearest_in_place(
                 &mut xs, pow
-            ))
+            ));
         })],
     );
 }
@@ -431,7 +431,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_in_place(
         &mut [("Malachite", &mut |(mut xs, pow, rm)| {
             no_out!(limbs_round_to_multiple_of_power_of_2_in_place(
                 &mut xs, pow, rm
-            ))
+            ));
         })],
     );
 }
@@ -451,7 +451,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_2_assign(
         file_name,
         &triple_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm));
         })],
     );
 }
@@ -473,13 +473,13 @@ fn benchmark_natural_round_to_multiple_of_power_of_2_algorithms(
         &triple_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(x, y, rm)| {
-                no_out!(x.round_to_multiple_of_power_of_2(y, rm))
+                no_out!(x.round_to_multiple_of_power_of_2(y, rm));
             }),
             ("using shr_round", &mut |(x, y, rm)| {
-                no_out!(x.shr_round(y, rm).0 << y)
+                no_out!(x.shr_round(y, rm).0 << y);
             }),
             ("using round_to_multiple", &mut |(x, y, rm)| {
-                no_out!(x.round_to_multiple(Natural::power_of_2(y), rm))
+                no_out!(x.round_to_multiple(Natural::power_of_2(y), rm));
             }),
         ],
     );

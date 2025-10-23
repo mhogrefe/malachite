@@ -347,13 +347,13 @@ fn benchmark_sci_mantissa_and_exponent_algorithms_unsigned<
             ("default", &mut |x| {
                 no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa_and_exponent(
                     x
-                ))
+                ));
             }),
             ("alt", &mut |x| {
                 no_out!((
                     SciMantissaAndExponent::<U, u64>::sci_mantissa(x),
                     SciMantissaAndExponent::<U, u64>::sci_exponent(x)
-                ))
+                ));
             }),
         ],
     );
@@ -379,10 +379,10 @@ fn benchmark_sci_mantissa_algorithms_unsigned<
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |x| {
-                no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa(x))
+                no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa(x));
             }),
             ("alt", &mut |x| {
-                no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa_and_exponent(x).0)
+                no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa_and_exponent(x).0);
             }),
         ],
     );
@@ -408,10 +408,10 @@ fn benchmark_sci_exponent_algorithms_unsigned<
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |x| {
-                no_out!(SciMantissaAndExponent::<U, u64>::sci_exponent(x))
+                no_out!(SciMantissaAndExponent::<U, u64>::sci_exponent(x));
             }),
             ("alt", &mut |x| {
-                no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa_and_exponent(x).1)
+                no_out!(SciMantissaAndExponent::<U, u64>::sci_mantissa_and_exponent(x).1);
             }),
         ],
     );
@@ -439,7 +439,7 @@ fn benchmark_from_sci_mantissa_and_exponent_unsigned<
         file_name,
         &pair_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }
@@ -466,7 +466,7 @@ fn benchmark_from_sci_mantissa_and_exponent_targeted_unsigned<
         file_name,
         &pair_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }
@@ -491,7 +491,7 @@ fn benchmark_from_sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: Primi
         &mut [("Malachite", &mut |(mantissa, exponent, rm)| {
             no_out!(from_sci_mantissa_and_exponent_round::<T, U>(
                 mantissa, exponent, rm
-            ))
+            ));
         })],
     );
 }
@@ -519,7 +519,7 @@ fn benchmark_from_sci_mantissa_and_exponent_round_targeted<
         &mut [("Malachite", &mut |(mantissa, exponent, rm)| {
             no_out!(from_sci_mantissa_and_exponent_round::<T, U>(
                 mantissa, exponent, rm
-            ))
+            ));
         })],
     );
 }
@@ -542,7 +542,7 @@ fn benchmark_sci_mantissa_and_exponent_algorithms_primitive_float<T: PrimitiveFl
         &mut [
             ("default", &mut |x| no_out!(x.sci_mantissa_and_exponent())),
             ("alt", &mut |x| {
-                no_out!((x.sci_mantissa(), x.sci_exponent()))
+                no_out!((x.sci_mantissa(), x.sci_exponent()));
             }),
         ],
     );
@@ -611,7 +611,7 @@ fn benchmark_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
         file_name,
         &pair_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }
@@ -635,7 +635,7 @@ fn benchmark_from_sci_mantissa_and_exponent_targeted_primitive_float<T: Primitiv
         file_name,
         &pair_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_sci_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }

@@ -42,7 +42,7 @@ fn benchmark_x_mul_y_to_zz_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, y)| no_out!(T::x_mul_y_to_zz(x, y))),
             ("explicit", &mut |(x, y)| {
-                no_out!(explicit_x_mul_y_to_zz(x, y))
+                no_out!(explicit_x_mul_y_to_zz(x, y));
             }),
         ],
     );

@@ -255,7 +255,7 @@ fn benchmark_limbs_mod_power_of_2_limb_sub_limbs(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(ys, x, pow)| {
-            no_out!(limbs_mod_power_of_2_limb_sub_limbs(x, &ys, pow))
+            no_out!(limbs_mod_power_of_2_limb_sub_limbs(x, &ys, pow));
         })],
     );
 }
@@ -275,7 +275,7 @@ fn benchmark_limbs_mod_power_of_2_limb_sub_limbs_in_place(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(mut ys, x, pow)| {
-            limbs_mod_power_of_2_limb_sub_limbs_in_place(x, &mut ys, pow)
+            limbs_mod_power_of_2_limb_sub_limbs_in_place(x, &mut ys, pow);
         })],
     );
 }
@@ -295,7 +295,7 @@ fn benchmark_limbs_mod_power_of_2_sub(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(ref xs, ref ys, pow)| {
-            no_out!(limbs_mod_power_of_2_sub(xs, ys, pow))
+            no_out!(limbs_mod_power_of_2_sub(xs, ys, pow));
         })],
     );
 }
@@ -315,7 +315,7 @@ fn benchmark_limbs_mod_power_of_2_sub_in_place_left(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(ref mut xs, ref ys, pow)| {
-            limbs_mod_power_of_2_sub_in_place_left(xs, ys, pow)
+            limbs_mod_power_of_2_sub_in_place_left(xs, ys, pow);
         })],
     );
 }
@@ -335,7 +335,7 @@ fn benchmark_limbs_mod_power_of_2_sub_in_place_right(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(ref xs, ref mut ys, pow)| {
-            limbs_mod_power_of_2_sub_in_place_right(xs, ys, pow)
+            limbs_mod_power_of_2_sub_in_place_right(xs, ys, pow);
         })],
     );
 }
@@ -355,7 +355,7 @@ fn benchmark_limbs_mod_power_of_2_sub_in_place_either(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(ref mut xs, ref mut ys, pow)| {
-            no_out!(limbs_mod_power_of_2_sub_in_place_either(xs, ys, pow))
+            no_out!(limbs_mod_power_of_2_sub_in_place_either(xs, ys, pow));
         })],
     );
 }
@@ -403,7 +403,7 @@ fn benchmark_natural_mod_power_of_2_sub_algorithms(
         &triple_3_bucketer("pow"),
         &mut [
             ("default", &mut |(x, y, pow)| {
-                no_out!(x.mod_power_of_2_sub(y, pow))
+                no_out!(x.mod_power_of_2_sub(y, pow));
             }),
             ("alt", &mut |(x, y, pow)| {
                 if x >= y {
@@ -415,10 +415,10 @@ fn benchmark_natural_mod_power_of_2_sub_algorithms(
                 };
             }),
             ("naive", &mut |(x, y, pow)| {
-                no_out!((Integer::from(x) - Integer::from(y)).mod_power_of_2(pow))
+                no_out!((Integer::from(x) - Integer::from(y)).mod_power_of_2(pow));
             }),
             ("using mod_sub", &mut |(x, y, pow)| {
-                no_out!(x.mod_sub(y, Natural::power_of_2(pow)))
+                no_out!(x.mod_sub(y, Natural::power_of_2(pow)));
             }),
         ],
     );

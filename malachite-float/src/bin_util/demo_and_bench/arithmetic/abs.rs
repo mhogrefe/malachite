@@ -208,10 +208,10 @@ fn benchmark_float_abs_negative_zero_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Rational.abs_negative_zero()", &mut |n| {
-                no_out!(n.abs_negative_zero())
+                no_out!(n.abs_negative_zero());
             }),
             ("(&Rational).abs_negative_zero_ref()", &mut |n| {
-                no_out!(n.abs_negative_zero_ref())
+                no_out!(n.abs_negative_zero_ref());
             }),
         ],
     );

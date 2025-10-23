@@ -220,10 +220,10 @@ fn benchmark_rational_sci_mantissa_and_exponent_evaluation_strategy<T: Primitive
         &rational_bit_bucketer("x"),
         &mut [
             ("Rational.sci_mantissa_and_exponent()", &mut |n| {
-                no_out!(n.sci_mantissa_and_exponent())
+                no_out!(n.sci_mantissa_and_exponent());
             }),
             ("(&Rational).sci_mantissa_and_exponent()", &mut |n| {
-                no_out!((&n).sci_mantissa_and_exponent())
+                no_out!((&n).sci_mantissa_and_exponent());
             }),
         ],
     );
@@ -277,7 +277,7 @@ fn benchmark_rational_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
                 <&Rational as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(
                     m, e
                 )
-            )
+            );
         })],
     );
 }

@@ -88,7 +88,7 @@ fn benchmark_limbs_pow(gm: GenMode, config: &GenConfig, limit: usize, file_name:
         file_name,
         &pair_1_vec_len_times_pair_2_bucketer("xs", "exp"),
         &mut [("Malachite", &mut |(ref xs, exp)| {
-            no_out!(limbs_pow(xs, exp))
+            no_out!(limbs_pow(xs, exp));
         })],
     );
 }
@@ -124,7 +124,7 @@ fn benchmark_natural_pow_algorithms(
             ("default", &mut |(x, exp)| no_out!((&x).pow(exp))),
             ("naive", &mut |(x, exp)| no_out!(natural_pow_naive(&x, exp))),
             ("simple binary", &mut |(x, exp)| {
-                no_out!(natural_pow_simple_binary(&x, exp))
+                no_out!(natural_pow_simple_binary(&x, exp));
             }),
             ("alt", &mut |(x, exp)| no_out!(x.pow_ref_alt(exp))),
         ],
@@ -149,7 +149,7 @@ fn benchmark_natural_pow_library_comparison(
             ("Malachite", &mut |(_, _, (x, exp))| no_out!(x.pow(exp))),
             ("num", &mut |((x, exp), _, _)| no_out!(x.pow(exp))),
             ("rug", &mut |(_, (x, exp), _)| {
-                no_out!(x.pow(u32::exact_from(exp)))
+                no_out!(x.pow(u32::exact_from(exp)));
             }),
         ],
     );
@@ -172,7 +172,7 @@ fn benchmark_natural_pow_evaluation_strategy(
         &mut [
             ("Natural.pow(u64)", &mut |(x, exp)| no_out!(x.pow(exp))),
             ("(&Natural).pow(u64)", &mut |(x, exp)| {
-                no_out!((&x).pow(exp))
+                no_out!((&x).pow(exp));
             }),
         ],
     );

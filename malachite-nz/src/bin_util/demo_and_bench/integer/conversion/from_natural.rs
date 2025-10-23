@@ -50,7 +50,7 @@ fn benchmark_integer_from_natural_evaluation_strategy(
         &mut [
             ("Integer::from(Natural)", &mut |n| no_out!(Integer::from(n))),
             ("Integer::from(&Natural)", &mut |n| {
-                no_out!(Integer::from(&n))
+                no_out!(Integer::from(&n));
             }),
         ],
     );

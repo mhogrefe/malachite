@@ -164,7 +164,7 @@ fn benchmark_limbs_pow_low(gm: GenMode, config: &GenConfig, limit: usize, file_n
         &pair_product_vec_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, es)| {
             let mut scratch = vec![0; xs.len()];
-            limbs_pow_low(&mut xs, &es, &mut scratch)
+            limbs_pow_low(&mut xs, &es, &mut scratch);
         })],
     );
 }
@@ -184,7 +184,7 @@ fn benchmark_limbs_mod_power_of_2_pow(
         file_name,
         &triple_1_2_product_vec_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, es, pow)| {
-            limbs_mod_power_of_2_pow(&mut xs, &es, pow)
+            limbs_mod_power_of_2_pow(&mut xs, &es, pow);
         })],
     );
 }
@@ -232,10 +232,10 @@ fn benchmark_natural_mod_power_of_2_pow_algorithms(
         &triple_2_bits_times_triple_3_bucketer("exp", "pow"),
         &mut [
             ("default", &mut |(x, exp, pow)| {
-                no_out!(x.mod_power_of_2_pow(exp, pow))
+                no_out!(x.mod_power_of_2_pow(exp, pow));
             }),
             ("simple binary", &mut |(x, exp, pow)| {
-                no_out!(simple_binary_mod_power_of_2_pow(&x, &exp, pow))
+                no_out!(simple_binary_mod_power_of_2_pow(&x, &exp, pow));
             }),
         ],
     );

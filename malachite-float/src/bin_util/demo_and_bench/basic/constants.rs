@@ -162,7 +162,7 @@ fn benchmark_float_min_positive_value_prec_library_comparison(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |p| {
-            no_out!(Float::min_positive_value_prec(p))
+            no_out!(Float::min_positive_value_prec(p));
         })],
     );
 }
@@ -182,7 +182,7 @@ fn benchmark_float_max_finite_value_with_prec_library_comparison(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |p| {
-            no_out!(Float::max_finite_value_with_prec(p))
+            no_out!(Float::max_finite_value_with_prec(p));
         })],
     );
 }
@@ -204,7 +204,7 @@ fn benchmark_float_one_prec_library_comparison(
         &mut [
             ("Malachite", &mut |p| no_out!(Float::one_prec(p))),
             ("rug", &mut |p| {
-                no_out!(rug::Float::with_val(u32::exact_from(p), 1.0))
+                no_out!(rug::Float::with_val(u32::exact_from(p), 1.0));
             }),
         ],
     );
@@ -227,7 +227,7 @@ fn benchmark_float_two_prec_library_comparison(
         &mut [
             ("Malachite", &mut |p| no_out!(Float::two_prec(p))),
             ("rug", &mut |p| {
-                no_out!(rug::Float::with_val(u32::exact_from(p), 2.0))
+                no_out!(rug::Float::with_val(u32::exact_from(p), 2.0));
             }),
         ],
     );
@@ -250,7 +250,7 @@ fn benchmark_float_negative_one_prec_library_comparison(
         &mut [
             ("Malachite", &mut |p| no_out!(Float::negative_one_prec(p))),
             ("rug", &mut |p| {
-                no_out!(rug::Float::with_val(u32::exact_from(p), -1.0))
+                no_out!(rug::Float::with_val(u32::exact_from(p), -1.0));
             }),
         ],
     );
@@ -273,7 +273,7 @@ fn benchmark_float_one_half_prec_library_comparison(
         &mut [
             ("Malachite", &mut |p| no_out!(Float::one_half_prec(p))),
             ("rug", &mut |p| {
-                no_out!(rug::Float::with_val(u32::exact_from(p), 0.5))
+                no_out!(rug::Float::with_val(u32::exact_from(p), 0.5));
             }),
         ],
     );

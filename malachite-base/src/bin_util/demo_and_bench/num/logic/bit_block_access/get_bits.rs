@@ -85,10 +85,10 @@ fn benchmark_get_bits_algorithms_unsigned<T: PrimitiveUnsigned>(
         &get_bits_bucketer(),
         &mut [
             ("default", &mut |(n, start, end)| {
-                no_out!(n.get_bits(start, end))
+                no_out!(n.get_bits(start, end));
             }),
             ("naive", &mut |(n, start, end)| {
-                no_out!(get_bits_naive::<T, T>(&n, start, end))
+                no_out!(get_bits_naive::<T, T>(&n, start, end));
             }),
         ],
     );
@@ -113,10 +113,10 @@ fn benchmark_get_bits_algorithms_signed<
         &get_bits_bucketer(),
         &mut [
             ("default", &mut |(n, start, end)| {
-                no_out!(n.get_bits(start, end))
+                no_out!(n.get_bits(start, end));
             }),
             ("naive", &mut |(n, start, end)| {
-                no_out!(get_bits_naive::<S, U>(&n, start, end))
+                no_out!(get_bits_naive::<S, U>(&n, start, end));
             }),
         ],
     );

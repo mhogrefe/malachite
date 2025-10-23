@@ -247,16 +247,16 @@ fn benchmark_integer_checked_div_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.checked_div(Integer)", &mut |(x, y)| {
-                no_out!(x.checked_div(y))
+                no_out!(x.checked_div(y));
             }),
             ("Integer.checked_div(&Integer)", &mut |(x, y)| {
-                no_out!(x.checked_div(&y))
+                no_out!(x.checked_div(&y));
             }),
             ("(&Integer).checked_div(Integer)", &mut |(x, y)| {
-                no_out!((&x).checked_div(y))
+                no_out!((&x).checked_div(y));
             }),
             ("(&Integer).checked_div(&Integer)", &mut |(x, y)| {
-                no_out!((&x).checked_div(&y))
+                no_out!((&x).checked_div(&y));
             }),
         ],
     );

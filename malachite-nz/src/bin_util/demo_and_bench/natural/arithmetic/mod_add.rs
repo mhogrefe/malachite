@@ -201,25 +201,25 @@ fn benchmark_natural_mod_add_evaluation_strategy(
         &triple_3_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_add(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_add(y, m))
+                no_out!(x.mod_add(y, m));
             }),
             ("Natural.mod_add(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_add(y, &m))
+                no_out!(x.mod_add(y, &m));
             }),
             ("Natural.mod_add(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_add(&y, m))
+                no_out!(x.mod_add(&y, m));
             }),
             ("Natural.mod_add(&Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!(x.mod_add(&y, &m))
+                no_out!(x.mod_add(&y, &m));
             }),
             ("(&Natural).mod_add(Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_add(y, m))
+                no_out!((&x).mod_add(y, m));
             }),
             ("(&Natural).mod_add(Natural, &Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_add(y, &m))
+                no_out!((&x).mod_add(y, &m));
             }),
             ("(&Natural).mod_add(&Natural, Natural)", &mut |(x, y, m)| {
-                no_out!((&x).mod_add(&y, m))
+                no_out!((&x).mod_add(&y, m));
             }),
             (
                 "(&Natural).mod_add(&Natural, &Natural)",

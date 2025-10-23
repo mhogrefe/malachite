@@ -122,7 +122,7 @@ fn benchmark_float_rounding_from_integer<
         file_name,
         &pair_1_integer_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, rm)| {
-            no_out!(T::rounding_from(&n, rm))
+            no_out!(T::rounding_from(&n, rm));
         })],
     );
 }

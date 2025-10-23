@@ -331,10 +331,10 @@ fn benchmark_float_integer_mantissa_and_exponent_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.integer_mantissa_and_exponent()", &mut |x| {
-                no_out!(x.integer_mantissa_and_exponent())
+                no_out!(x.integer_mantissa_and_exponent());
             }),
             ("(&Float).integer_mantissa_and_exponent()", &mut |x| {
-                no_out!((&x).integer_mantissa_and_exponent())
+                no_out!((&x).integer_mantissa_and_exponent());
             }),
         ],
     );
@@ -356,10 +356,10 @@ fn benchmark_float_integer_mantissa_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.integer_mantissa()", &mut |x| {
-                no_out!(x.integer_mantissa())
+                no_out!(x.integer_mantissa());
             }),
             ("(&Float).integer_mantissa()", &mut |x| {
-                no_out!((&x).integer_mantissa())
+                no_out!((&x).integer_mantissa());
             }),
         ],
     );
@@ -381,10 +381,10 @@ fn benchmark_float_integer_exponent_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.integer_exponent()", &mut |x| {
-                no_out!(x.integer_exponent())
+                no_out!(x.integer_exponent());
             }),
             ("(&Float).integer_exponent()", &mut |x| {
-                no_out!((&x).integer_exponent())
+                no_out!((&x).integer_exponent());
             }),
         ],
     );
@@ -414,7 +414,7 @@ fn benchmark_float_from_integer_mantissa_and_exponent_evaluation_strategy(
                         Float,
                     >>::from_integer_mantissa_and_exponent(
                         mantissa, exponent
-                    ))
+                    ));
                 },
             ),
             (
@@ -426,7 +426,7 @@ fn benchmark_float_from_integer_mantissa_and_exponent_evaluation_strategy(
                         Float,
                     >>::from_integer_mantissa_and_exponent(
                         mantissa, exponent
-                    ))
+                    ));
                 },
             ),
         ],

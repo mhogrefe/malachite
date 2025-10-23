@@ -53,20 +53,20 @@ pub fn rug_round_exact_from_rounding_mode(rm: RoundingMode) -> Round {
 }
 
 impl From<&rug::Float> for Float {
-    fn from(x: &rug::Float) -> Float {
+    fn from(x: &rug::Float) -> Self {
         if x.is_nan() {
-            Float::NAN
+            Self::NAN
         } else if x.is_infinite() {
             if x.is_sign_positive() {
-                Float::INFINITY
+                Self::INFINITY
             } else {
-                Float::NEGATIVE_INFINITY
+                Self::NEGATIVE_INFINITY
             }
         } else if x.is_zero() {
             if x.is_sign_positive() {
-                Float::ZERO
+                Self::ZERO
             } else {
-                Float::NEGATIVE_ZERO
+                Self::NEGATIVE_ZERO
             }
         } else {
             let mut significand = Natural::exact_from(&*x.get_significand().unwrap());
@@ -75,7 +75,7 @@ impl From<&rug::Float> for Float {
                 // can only happen when 32_bit_limbs is set
                 significand >>= Limb::WIDTH;
             }
-            let result = Float(Finite {
+            let result = Self(Finite {
                 sign: x.is_sign_positive(),
                 exponent: x.get_exp().unwrap(),
                 precision,
@@ -107,7 +107,7 @@ pub fn rug_float_significant_bits(x: &rug::Float) -> u64 {
 impl TryFrom<&Float> for rug::Float {
     type Error = ();
 
-    fn try_from(x: &Float) -> Result<rug::Float, ()> {
+    fn try_from(x: &Float) -> Result<Self, ()> {
         match x {
             float_nan!() => special_float(1, Special::Nan),
             float_infinity!() => special_float(1, Special::Infinity),
@@ -120,7 +120,7 @@ impl TryFrom<&Float> for rug::Float {
                 precision,
                 significand,
             }) => {
-                let mut f = rug::Float::with_val_round(
+                let mut f = Self::with_val_round(
                     convert_prec(*precision)?,
                     rug::Integer::from(significand),
                     Round::Zero,

@@ -128,10 +128,10 @@ fn benchmark_natural_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsigne
         &triple_3_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| {
-                no_out!(x.partial_cmp(&y))
+                no_out!(x.partial_cmp(&y));
             }),
             ("num", &mut |((x, y), _, _)| {
-                no_out!(num_partial_cmp_unsigned(&x, y))
+                no_out!(num_partial_cmp_unsigned(&x, y));
             }),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.partial_cmp(&y))),
         ],

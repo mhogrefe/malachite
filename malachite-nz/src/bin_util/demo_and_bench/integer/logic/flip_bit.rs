@@ -49,7 +49,7 @@ fn benchmark_integer_flip_bit_library_comparison(
         &mut [
             ("Malachite", &mut |(_, (mut n, index))| n.flip_bit(index)),
             ("rug", &mut |((mut n, index), _)| {
-                no_out!(n.toggle_bit(u32::exact_from(index)))
+                no_out!(n.toggle_bit(u32::exact_from(index)));
             }),
         ],
     );

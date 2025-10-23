@@ -31,9 +31,8 @@ fn odd_factorial_table() -> (u64, u64) {
         if x.overflowing_mul_assign(b >> b.trailing_zeros()) {
             limit = b;
             break;
-        } else {
-            xs.push(x);
         }
+        xs.push(x);
     }
     xs.push(x);
     let mut y = Limb::binomial_coefficient(limit, limit >> 1);

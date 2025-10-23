@@ -265,13 +265,13 @@ fn benchmark_float_from_natural_prec_library_comparison(
         &pair_natural_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec)| {
-                no_out!(Float::from_natural_prec(n, prec))
+                no_out!(Float::from_natural_prec(n, prec));
             }),
             ("rug", &mut |(n, prec)| {
                 no_out!(rug::Float::with_val(
                     u32::exact_from(prec),
                     rug::Integer::from(&n),
-                ))
+                ));
             }),
         ],
     );
@@ -320,14 +320,14 @@ fn benchmark_float_from_natural_prec_round_library_comparison(
         &triple_1_2_natural_bit_u64_max_bucketer("n", "prec"),
         &mut [
             ("Malachite", &mut |(n, prec, rm)| {
-                no_out!(Float::from_natural_prec_round(n, prec, rm))
+                no_out!(Float::from_natural_prec_round(n, prec, rm));
             }),
             ("rug", &mut |(n, prec, rm)| {
                 no_out!(rug::Float::with_val_round(
                     u32::exact_from(prec),
                     rug::Integer::from(&n),
                     rug_round_try_from_rounding_mode(rm).unwrap()
-                ))
+                ));
             }),
         ],
     );
@@ -350,10 +350,10 @@ fn benchmark_float_try_from_natural_evaluation_strategy(
         &natural_bit_bucketer("x"),
         &mut [
             ("Float::try_from(Natural)", &mut |x| {
-                no_out!(Float::try_from(x))
+                no_out!(Float::try_from(x));
             }),
             ("Float::try_from(&Natural)", &mut |x| {
-                no_out!(Float::try_from(&x))
+                no_out!(Float::try_from(&x));
             }),
         ],
     );

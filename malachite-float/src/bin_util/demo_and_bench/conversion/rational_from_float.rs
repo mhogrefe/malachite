@@ -114,10 +114,10 @@ fn benchmark_rational_try_from_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Rational::try_from(Float)", &mut |f| {
-                no_out!(Rational::try_from(f))
+                no_out!(Rational::try_from(f));
             }),
             ("Rational::try_from(&Float)", &mut |f| {
-                no_out!(Rational::try_from(&f))
+                no_out!(Rational::try_from(&f));
             }),
         ],
     );
@@ -160,7 +160,7 @@ fn benchmark_rational_convertible_from_float(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Malachite", &mut |f| {
-            no_out!(Rational::convertible_from(&f))
+            no_out!(Rational::convertible_from(&f));
         })],
     );
 }

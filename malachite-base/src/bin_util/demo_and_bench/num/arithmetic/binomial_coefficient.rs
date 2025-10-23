@@ -104,7 +104,7 @@ fn benchmark_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &usize_convertible_pair_max_bucketer("n", "k"),
         &mut [("Malachite", &mut |(n, k)| {
-            no_out!(T::binomial_coefficient(n, k))
+            no_out!(T::binomial_coefficient(n, k));
         })],
     );
 }
@@ -132,7 +132,7 @@ fn benchmark_binomial_coefficient_signed<T: PrimitiveSigned>(
         file_name,
         &abs_usize_convertible_pair_max_bucketer("n", "k"),
         &mut [("Malachite", &mut |(n, k)| {
-            no_out!(T::binomial_coefficient(n, k))
+            no_out!(T::binomial_coefficient(n, k));
         })],
     );
 }
@@ -159,7 +159,7 @@ fn benchmark_checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &usize_convertible_pair_max_bucketer("n", "k"),
         &mut [("Malachite", &mut |(n, k)| {
-            no_out!(T::checked_binomial_coefficient(n, k))
+            no_out!(T::checked_binomial_coefficient(n, k));
         })],
     );
 }
@@ -187,7 +187,7 @@ fn benchmark_checked_binomial_coefficient_signed<T: PrimitiveSigned>(
         file_name,
         &abs_usize_convertible_pair_max_bucketer("n", "k"),
         &mut [("Malachite", &mut |(n, k)| {
-            no_out!(T::checked_binomial_coefficient(n, k))
+            no_out!(T::checked_binomial_coefficient(n, k));
         })],
     );
 }

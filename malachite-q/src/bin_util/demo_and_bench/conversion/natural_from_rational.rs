@@ -110,10 +110,10 @@ fn benchmark_natural_try_from_rational_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Natural::try_from(Rational)", &mut |x| {
-                no_out!(Natural::try_from(x).ok())
+                no_out!(Natural::try_from(x).ok());
             }),
             ("Natural::try_from(&Rational)", &mut |x| {
-                no_out!(Natural::try_from(&x).ok())
+                no_out!(Natural::try_from(&x).ok());
             }),
         ],
     );
@@ -153,10 +153,10 @@ fn benchmark_natural_rounding_from_rational_evaluation_strategy(
         &pair_1_rational_bit_bucketer("x"),
         &mut [
             ("Natural::rounding_from(Rational)", &mut |(x, rm)| {
-                no_out!(Natural::rounding_from(x, rm))
+                no_out!(Natural::rounding_from(x, rm));
             }),
             ("Natural::rounding_from(&Rational)", &mut |(x, rm)| {
-                no_out!(Natural::rounding_from(&x, rm))
+                no_out!(Natural::rounding_from(&x, rm));
             }),
         ],
     );

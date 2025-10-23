@@ -41,7 +41,7 @@ fn demo_from_bits_asc_unsigned<T: PrimitiveUnsigned>(
             "{}::from_bits_asc({:?}) = {}",
             T::NAME,
             bs,
-            T::from_bits_asc(bs.iter().cloned())
+            T::from_bits_asc(bs.iter().copied())
         );
     }
 }
@@ -52,7 +52,7 @@ fn demo_from_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig
             "{}::from_bits_asc({:?}) = {}",
             T::NAME,
             bs,
-            T::from_bits_asc(bs.iter().cloned())
+            T::from_bits_asc(bs.iter().copied())
         );
     }
 }
@@ -67,7 +67,7 @@ fn demo_from_bits_desc_unsigned<T: PrimitiveUnsigned>(
             "{}::from_bits_desc({:?}) = {}",
             T::NAME,
             bs,
-            T::from_bits_desc(bs.iter().cloned())
+            T::from_bits_desc(bs.iter().copied())
         );
     }
 }
@@ -78,7 +78,7 @@ fn demo_from_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfi
             "{}::from_bits_desc({:?}) = {}",
             T::NAME,
             bs,
-            T::from_bits_desc(bs.iter().cloned())
+            T::from_bits_desc(bs.iter().copied())
         );
     }
 }
@@ -99,13 +99,13 @@ fn benchmark_from_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |ref bs| {
-                no_out!(T::from_bits_asc(bs.iter().cloned()))
+                no_out!(T::from_bits_asc(bs.iter().copied()));
             }),
             ("alt", &mut |ref bs| {
-                no_out!(from_bits_asc_alt::<T, _>(bs.iter().cloned()))
+                no_out!(from_bits_asc_alt::<T, _>(bs.iter().copied()));
             }),
             ("naive", &mut |ref bs| {
-                no_out!(from_bits_asc_unsigned_naive::<T, _>(bs.iter().cloned()))
+                no_out!(from_bits_asc_unsigned_naive::<T, _>(bs.iter().copied()));
             }),
         ],
     );
@@ -127,13 +127,13 @@ fn benchmark_from_bits_asc_algorithms_signed<T: PrimitiveSigned>(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |ref bs| {
-                no_out!(T::from_bits_asc(bs.iter().cloned()))
+                no_out!(T::from_bits_asc(bs.iter().copied()));
             }),
             ("alt", &mut |ref bs| {
-                no_out!(from_bits_asc_alt::<T, _>(bs.iter().cloned()))
+                no_out!(from_bits_asc_alt::<T, _>(bs.iter().copied()));
             }),
             ("naive", &mut |ref bs| {
-                no_out!(from_bits_asc_signed_naive::<T, _>(bs.iter().cloned()))
+                no_out!(from_bits_asc_signed_naive::<T, _>(bs.iter().copied()));
             }),
         ],
     );
@@ -155,10 +155,10 @@ fn benchmark_from_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |ref bs| {
-                no_out!(T::from_bits_desc(bs.iter().cloned()))
+                no_out!(T::from_bits_desc(bs.iter().copied()));
             }),
             ("alt", &mut |ref bs| {
-                no_out!(from_bits_desc_alt::<T, _>(bs.iter().cloned()))
+                no_out!(from_bits_desc_alt::<T, _>(bs.iter().copied()));
             }),
         ],
     );
@@ -180,10 +180,10 @@ fn benchmark_from_bits_desc_algorithms_signed<T: PrimitiveSigned>(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |ref bs| {
-                no_out!(T::from_bits_desc(bs.iter().cloned()))
+                no_out!(T::from_bits_desc(bs.iter().copied()));
             }),
             ("alt", &mut |ref bs| {
-                no_out!(from_bits_desc_alt::<T, _>(bs.iter().cloned()))
+                no_out!(from_bits_desc_alt::<T, _>(bs.iter().copied()));
             }),
         ],
     );

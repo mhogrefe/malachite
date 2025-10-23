@@ -73,7 +73,7 @@ fn benchmark_limbs_slice_set_bit(gm: GenMode, config: &GenConfig, limit: usize, 
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut xs, index)| {
-            no_out!(limbs_slice_set_bit(&mut xs, index))
+            no_out!(limbs_slice_set_bit(&mut xs, index));
         })],
     );
 }
@@ -88,7 +88,7 @@ fn benchmark_limbs_vec_set_bit(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(mut xs, index)| {
-            no_out!(limbs_vec_set_bit(&mut xs, index))
+            no_out!(limbs_vec_set_bit(&mut xs, index));
         })],
     );
 }

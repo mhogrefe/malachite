@@ -224,13 +224,13 @@ fn benchmark_rational_sum_library_comparison(
         &triple_3_vec_rational_sum_bits_bucketer(),
         &mut [
             ("Malachite", &mut |(_, _, xs)| {
-                no_out!(Rational::sum(xs.into_iter()))
+                no_out!(Rational::sum(xs.into_iter()));
             }),
             ("num", &mut |(xs, _, _)| {
-                no_out!(BigRational::sum(xs.into_iter()))
+                no_out!(BigRational::sum(xs.into_iter()));
             }),
             ("rug", &mut |(_, xs, _)| {
-                no_out!(rug::Rational::sum(xs.iter()))
+                no_out!(rug::Rational::sum(xs.iter()));
             }),
         ],
     );
@@ -253,7 +253,7 @@ fn benchmark_rational_sum_algorithms(
         &mut [
             ("default", &mut |xs| no_out!(Rational::sum(xs.into_iter()))),
             ("naive", &mut |xs| {
-                no_out!(rational_sum_naive(xs.into_iter()))
+                no_out!(rational_sum_naive(xs.into_iter()));
             }),
         ],
     );
@@ -275,10 +275,10 @@ fn benchmark_rational_sum_evaluation_strategy(
         &vec_rational_sum_bits_bucketer(),
         &mut [
             ("Rational::sum(Iterator<Item=Rational>)", &mut |xs| {
-                no_out!(Rational::sum(xs.into_iter()))
+                no_out!(Rational::sum(xs.into_iter()));
             }),
             ("Rational::sum(Iterator<Item=&Rational>)", &mut |xs| {
-                no_out!(Rational::sum(xs.iter()))
+                no_out!(Rational::sum(xs.iter()));
             }),
         ],
     );

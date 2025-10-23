@@ -74,7 +74,8 @@
     clippy::suspicious_op_assign_impl,
     clippy::too_many_arguments,
     clippy::type_complexity,
-    clippy::upper_case_acronyms
+    clippy::upper_case_acronyms,
+    clippy::multiple_bound_locations
 )]
 #![warn(
     clippy::cast_lossless,
@@ -108,6 +109,7 @@
     clippy::flat_map_option,
     clippy::unnecessary_wraps,
     clippy::unnested_or_patterns,
+    clippy::use_self,
     clippy::trivially_copy_pass_by_ref
 )]
 #![cfg_attr(

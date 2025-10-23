@@ -358,7 +358,7 @@ fn benchmark_limbs_pos_and_limb_neg(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, y)| {
-            no_out!(limbs_pos_and_limb_neg(&xs, y))
+            no_out!(limbs_pos_and_limb_neg(&xs, y));
         })],
     );
 }
@@ -378,7 +378,7 @@ fn benchmark_limbs_pos_and_limb_neg_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, y)| {
-            limbs_pos_and_limb_neg_to_out(&mut out, &xs, y)
+            limbs_pos_and_limb_neg_to_out(&mut out, &xs, y);
         })],
     );
 }
@@ -398,7 +398,7 @@ fn benchmark_limbs_pos_and_limb_neg_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y)| {
-            limbs_pos_and_limb_neg_in_place(&mut xs, y)
+            limbs_pos_and_limb_neg_in_place(&mut xs, y);
         })],
     );
 }
@@ -418,7 +418,7 @@ fn benchmark_limbs_neg_and_limb_neg(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(limbs, limb)| {
-            no_out!(limbs_neg_and_limb_neg(&limbs, limb))
+            no_out!(limbs_neg_and_limb_neg(&limbs, limb));
         })],
     );
 }
@@ -438,7 +438,7 @@ fn benchmark_limbs_neg_and_limb_neg_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, y)| {
-            no_out!(limbs_neg_and_limb_neg_to_out(&mut out, &xs, y))
+            no_out!(limbs_neg_and_limb_neg_to_out(&mut out, &xs, y));
         })],
     );
 }
@@ -458,7 +458,7 @@ fn benchmark_limbs_slice_neg_and_limb_neg_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y)| {
-            no_out!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, y))
+            no_out!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, y));
         })],
     );
 }
@@ -478,7 +478,7 @@ fn benchmark_limbs_vec_neg_and_limb_neg_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y)| {
-            limbs_vec_neg_and_limb_neg_in_place(&mut xs, y)
+            limbs_vec_neg_and_limb_neg_in_place(&mut xs, y);
         })],
     );
 }
@@ -493,7 +493,7 @@ fn benchmark_limbs_and_pos_neg(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, ref ys)| {
-            no_out!(limbs_and_pos_neg(xs, ys))
+            no_out!(limbs_and_pos_neg(xs, ys));
         })],
     );
 }
@@ -513,7 +513,7 @@ fn benchmark_limbs_and_pos_neg_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut out, ref xs, ref ys)| {
-            limbs_and_pos_neg_to_out(out, xs, ys)
+            limbs_and_pos_neg_to_out(out, xs, ys);
         })],
     );
 }
@@ -533,7 +533,7 @@ fn benchmark_limbs_and_pos_neg_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut xs, ref ys)| {
-            limbs_and_pos_neg_in_place_left(xs, ys)
+            limbs_and_pos_neg_in_place_left(xs, ys);
         })],
     );
 }
@@ -553,7 +553,7 @@ fn benchmark_limbs_slice_and_pos_neg_in_place_right(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, ref mut ys)| {
-            limbs_slice_and_pos_neg_in_place_right(xs, ys)
+            limbs_slice_and_pos_neg_in_place_right(xs, ys);
         })],
     );
 }
@@ -573,7 +573,7 @@ fn benchmark_limbs_vec_and_pos_neg_in_place_right(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, ref mut ys)| {
-            limbs_vec_and_pos_neg_in_place_right(xs, ys)
+            limbs_vec_and_pos_neg_in_place_right(xs, ys);
         })],
     );
 }
@@ -588,7 +588,7 @@ fn benchmark_limbs_and_neg_neg(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, ref ys)| {
-            no_out!(limbs_and_neg_neg(xs, ys))
+            no_out!(limbs_and_neg_neg(xs, ys));
         })],
     );
 }
@@ -608,7 +608,7 @@ fn benchmark_limbs_and_neg_neg_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut out, ref xs, ref ys)| {
-            no_out!(limbs_and_neg_neg_to_out(out, xs, ys))
+            no_out!(limbs_and_neg_neg_to_out(out, xs, ys));
         })],
     );
 }
@@ -628,7 +628,7 @@ fn benchmark_limbs_slice_and_neg_neg_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut xs, ref ys)| {
-            no_out!(limbs_slice_and_neg_neg_in_place_left(xs, ys))
+            no_out!(limbs_slice_and_neg_neg_in_place_left(xs, ys));
         })],
     );
 }
@@ -648,7 +648,7 @@ fn benchmark_limbs_vec_and_neg_neg_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut xs, ref ys)| {
-            no_out!(limbs_vec_and_neg_neg_in_place_left(xs, ys))
+            no_out!(limbs_vec_and_neg_neg_in_place_left(xs, ys));
         })],
     );
 }
@@ -668,7 +668,7 @@ fn benchmark_limbs_slice_and_neg_neg_in_place_either(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut xs, ref mut ys)| {
-            no_out!(limbs_slice_and_neg_neg_in_place_either(xs, ys))
+            no_out!(limbs_slice_and_neg_neg_in_place_either(xs, ys));
         })],
     );
 }
@@ -688,7 +688,7 @@ fn benchmark_limbs_vec_and_neg_neg_in_place_either(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref mut xs, ref mut ys)| {
-            no_out!(limbs_vec_and_neg_neg_in_place_either(xs, ys))
+            no_out!(limbs_vec_and_neg_neg_in_place_either(xs, ys));
         })],
     );
 }
@@ -772,10 +772,10 @@ fn benchmark_integer_and_algorithms(
         &mut [
             ("default", &mut |(ref x, ref y)| no_out!(x & y)),
             ("using bits explicitly", &mut |(ref x, ref y)| {
-                no_out!(integer_and_alt_1(x, y))
+                no_out!(integer_and_alt_1(x, y));
             }),
             ("using limbs explicitly", &mut |(ref x, ref y)| {
-                no_out!(integer_and_alt_2(x, y))
+                no_out!(integer_and_alt_2(x, y));
             }),
         ],
     );

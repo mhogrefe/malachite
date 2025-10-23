@@ -116,7 +116,7 @@ fn benchmark_natural_lcm_evaluation_strategy(
             ("Natural.lcm(&Natural)", &mut |(x, y)| no_out!(x.lcm(&y))),
             ("&Natural.lcm(Natural)", &mut |(x, y)| no_out!((&x).lcm(y))),
             ("&Natural.lcm(&Natural)", &mut |(x, y)| {
-                no_out!((&x).lcm(&y))
+                no_out!((&x).lcm(&y));
             }),
         ],
     );

@@ -1585,8 +1585,8 @@ impl Natural {
     pub fn mod_limb_naive(&self, other: Limb) -> Limb {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
-            (Natural(Small(small)), other) => small % other,
-            (Natural(Large(limbs)), other) => limbs_rem_naive(limbs, other),
+            (Self(Small(small)), other) => small % other,
+            (Self(Large(limbs)), other) => limbs_rem_naive(limbs, other),
         }
     }
 

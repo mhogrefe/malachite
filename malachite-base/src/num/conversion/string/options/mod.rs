@@ -31,7 +31,7 @@ impl Default for SciSizeOptions {
 #[cfg(feature = "test_build")]
 impl SciSizeOptions {
     pub const fn is_valid(&self) -> bool {
-        if let SciSizeOptions::Precision(p) = *self {
+        if let Self::Precision(p) = *self {
             p != 0
         } else {
             true

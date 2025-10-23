@@ -139,7 +139,7 @@ fn benchmark_limbs_floor_log_base_power_of_2(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, pow)| {
-            no_out!(limbs_floor_log_base_power_of_2(xs, pow))
+            no_out!(limbs_floor_log_base_power_of_2(xs, pow));
         })],
     );
 }
@@ -159,7 +159,7 @@ fn benchmark_limbs_ceiling_log_base_power_of_2(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, pow)| {
-            no_out!(limbs_ceiling_log_base_power_of_2(xs, pow))
+            no_out!(limbs_ceiling_log_base_power_of_2(xs, pow));
         })],
     );
 }
@@ -179,7 +179,7 @@ fn benchmark_limbs_checked_log_base_power_of_2(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, pow)| {
-            no_out!(limbs_checked_log_base_power_of_2(xs, pow))
+            no_out!(limbs_checked_log_base_power_of_2(xs, pow));
         })],
     );
 }
@@ -199,7 +199,7 @@ fn benchmark_natural_floor_log_base_power_of_2(
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.floor_log_base_power_of_2(pow))
+            no_out!(n.floor_log_base_power_of_2(pow));
         })],
     );
 }
@@ -220,10 +220,10 @@ fn benchmark_natural_ceiling_log_base_power_of_2_algorithms(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, pow)| {
-                no_out!(n.ceiling_log_base_power_of_2(pow))
+                no_out!(n.ceiling_log_base_power_of_2(pow));
             }),
             ("naive", &mut |(ref n, pow)| {
-                no_out!(ceiling_log_base_power_of_2_naive_nz(n, pow))
+                no_out!(ceiling_log_base_power_of_2_naive_nz(n, pow));
             }),
         ],
     );
@@ -244,7 +244,7 @@ fn benchmark_natural_checked_log_base_power_of_2(
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.checked_log_base_power_of_2(pow))
+            no_out!(n.checked_log_base_power_of_2(pow));
         })],
     );
 }

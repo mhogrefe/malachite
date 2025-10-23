@@ -312,7 +312,7 @@ fn benchmark_primitive_int_overflowing_from_integer_algorithms<
         &mut [
             ("standard", &mut |n| no_out!(T::overflowing_from(&n))),
             ("using wrapping_from and convertible_from", &mut |n| {
-                no_out!((T::wrapping_from(&n), !T::convertible_from(&n)))
+                no_out!((T::wrapping_from(&n), !T::convertible_from(&n)));
             }),
         ],
     );

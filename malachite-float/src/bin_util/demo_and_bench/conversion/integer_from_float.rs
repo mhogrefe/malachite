@@ -173,10 +173,10 @@ fn benchmark_integer_rounding_from_float_evaluation_strategy(
         &pair_1_float_complexity_bucketer("x"),
         &mut [
             ("Integer::rounding_from(Float)", &mut |(f, rm)| {
-                no_out!(Integer::rounding_from(f, rm))
+                no_out!(Integer::rounding_from(f, rm));
             }),
             ("Integer::rounding_from(&Float)", &mut |(f, rm)| {
-                no_out!(Integer::rounding_from(&f, rm))
+                no_out!(Integer::rounding_from(&f, rm));
             }),
         ],
     );
@@ -199,10 +199,10 @@ fn benchmark_integer_try_from_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Integer::try_from(Float)", &mut |f| {
-                no_out!(Integer::try_from(f))
+                no_out!(Integer::try_from(f));
             }),
             ("Integer::try_from(&Float)", &mut |f| {
-                no_out!(Integer::try_from(&f))
+                no_out!(Integer::try_from(&f));
             }),
         ],
     );

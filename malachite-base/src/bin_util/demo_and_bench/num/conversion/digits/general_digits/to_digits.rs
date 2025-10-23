@@ -81,7 +81,7 @@ fn benchmark_to_digits_asc<
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, base)| {
-            no_out!(x.to_digits_asc(&base))
+            no_out!(x.to_digits_asc(&base));
         })],
     );
 }
@@ -104,7 +104,7 @@ fn benchmark_to_digits_desc<
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, base)| {
-            no_out!(x.to_digits_desc(&base))
+            no_out!(x.to_digits_desc(&base));
         })],
     );
 }

@@ -110,10 +110,10 @@ fn benchmark_integer_try_from_rational_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Integer::try_from(Rational)", &mut |x| {
-                no_out!(Integer::try_from(x).ok())
+                no_out!(Integer::try_from(x).ok());
             }),
             ("Integer::try_from(&Rational)", &mut |x| {
-                no_out!(Integer::try_from(&x).ok())
+                no_out!(Integer::try_from(&x).ok());
             }),
         ],
     );
@@ -153,10 +153,10 @@ fn benchmark_integer_rounding_from_rational_evaluation_strategy(
         &pair_1_rational_bit_bucketer("x"),
         &mut [
             ("Integer::rounding_from(Rational)", &mut |(x, rm)| {
-                no_out!(Integer::rounding_from(x, rm))
+                no_out!(Integer::rounding_from(x, rm));
             }),
             ("Integer::rounding_from(&Rational)", &mut |(x, rm)| {
-                no_out!(Integer::rounding_from(&x, rm))
+                no_out!(Integer::rounding_from(&x, rm));
             }),
         ],
     );

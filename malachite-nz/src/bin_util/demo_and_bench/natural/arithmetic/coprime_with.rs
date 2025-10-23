@@ -88,16 +88,16 @@ fn benchmark_natural_coprime_with_algorithms(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.coprime_with(y))),
             ("no divisibility check", &mut |(x, y)| {
-                no_out!(x.gcd(y) == 1)
+                no_out!(x.gcd(y) == 1);
             }),
             ("check divisibility by 2", &mut |(x, y)| {
-                no_out!(coprime_with_check_2(x, y))
+                no_out!(coprime_with_check_2(x, y));
             }),
             ("check divisibility by 2 and 3", &mut |(x, y)| {
-                no_out!(coprime_with_check_2_3(x, y))
+                no_out!(coprime_with_check_2_3(x, y));
             }),
             ("check divisibility by 2, 3, and 5", &mut |(x, y)| {
-                no_out!(coprime_with_check_2_3_5(x, y))
+                no_out!(coprime_with_check_2_3_5(x, y));
             }),
         ],
     );
@@ -119,16 +119,16 @@ fn benchmark_natural_coprime_with_evaluation_strategy(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Natural.coprime_with(Natural)", &mut |(x, y)| {
-                no_out!(x.coprime_with(y))
+                no_out!(x.coprime_with(y));
             }),
             ("Natural.coprime_with(&Natural)", &mut |(x, y)| {
-                no_out!(x.coprime_with(&y))
+                no_out!(x.coprime_with(&y));
             }),
             ("&Natural.coprime_with(Natural)", &mut |(x, y)| {
-                no_out!((&x).coprime_with(y))
+                no_out!((&x).coprime_with(y));
             }),
             ("&Natural.coprime_with(&Natural)", &mut |(x, y)| {
-                no_out!((&x).coprime_with(&y))
+                no_out!((&x).coprime_with(&y));
             }),
         ],
     );

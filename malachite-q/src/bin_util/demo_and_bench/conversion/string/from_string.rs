@@ -54,11 +54,11 @@ fn benchmark_rational_from_str_library_comparison(
         &string_len_bucketer(),
         &mut [
             ("Malachite", &mut |s| {
-                no_out!(Rational::from_str(&s).unwrap())
+                no_out!(Rational::from_str(&s).unwrap());
             }),
             ("num", &mut |s| no_out!(BigRational::from_str(&s).unwrap())),
             ("rug", &mut |s| {
-                no_out!(rug::Rational::from_str(&s).unwrap())
+                no_out!(rug::Rational::from_str(&s).unwrap());
             }),
         ],
     );

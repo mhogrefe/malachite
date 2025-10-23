@@ -237,7 +237,7 @@ fn benchmark_limbs_or_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize,
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, y)| {
-            no_out!(limbs_or_limb_to_out(&mut out, &xs, y))
+            no_out!(limbs_or_limb_to_out(&mut out, &xs, y));
         })],
     );
 }
@@ -257,7 +257,7 @@ fn benchmark_limbs_or_limb_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y)| {
-            limbs_or_limb_in_place(&mut xs, y)
+            limbs_or_limb_in_place(&mut xs, y);
         })],
     );
 }
@@ -272,7 +272,7 @@ fn benchmark_limbs_or_same_length(gm: GenMode, config: &GenConfig, limit: usize,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, ys)| {
-            no_out!(limbs_or_same_length(&xs, &ys))
+            no_out!(limbs_or_same_length(&xs, &ys));
         })],
     );
 }
@@ -305,7 +305,7 @@ fn benchmark_limbs_or_same_length_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, ys)| {
-            limbs_or_same_length_to_out(&mut out, &xs, &ys)
+            limbs_or_same_length_to_out(&mut out, &xs, &ys);
         })],
     );
 }
@@ -320,7 +320,7 @@ fn benchmark_limbs_or_to_out(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &triple_2_3_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut out, xs, ys)| {
-            limbs_or_to_out(&mut out, &xs, &ys)
+            limbs_or_to_out(&mut out, &xs, &ys);
         })],
     );
 }
@@ -340,7 +340,7 @@ fn benchmark_limbs_or_same_length_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            limbs_or_same_length_in_place_left(&mut xs, &ys)
+            limbs_or_same_length_in_place_left(&mut xs, &ys);
         })],
     );
 }
@@ -360,7 +360,7 @@ fn benchmark_limbs_or_in_place_left(
         file_name,
         &pair_2_vec_len_bucketer("ys"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            limbs_or_in_place_left(&mut xs, &ys)
+            limbs_or_in_place_left(&mut xs, &ys);
         })],
     );
 }
@@ -380,7 +380,7 @@ fn benchmark_limbs_or_in_place_either(
         file_name,
         &pair_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, mut ys)| {
-            no_out!(limbs_or_in_place_either(&mut xs, &mut ys))
+            no_out!(limbs_or_in_place_either(&mut xs, &mut ys));
         })],
     );
 }
@@ -460,10 +460,10 @@ fn benchmark_natural_or_algorithms(gm: GenMode, config: &GenConfig, limit: usize
         &mut [
             ("default", &mut |(ref x, ref y)| no_out!(x | y)),
             ("using bits explicitly", &mut |(ref x, ref y)| {
-                no_out!(natural_or_alt_1(x, y))
+                no_out!(natural_or_alt_1(x, y));
             }),
             ("using limbs explicitly", &mut |(ref x, ref y)| {
-                no_out!(natural_or_alt_2(x, y))
+                no_out!(natural_or_alt_2(x, y));
             }),
         ],
     );

@@ -687,7 +687,7 @@ fn benchmark_ceiling_root_algorithms_unsigned<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.ceiling_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(ceiling_root_binary(n, exp))
+                no_out!(ceiling_root_binary(n, exp));
             }),
         ],
     );
@@ -764,7 +764,7 @@ fn benchmark_checked_root_algorithms_unsigned<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.checked_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(checked_root_binary(n, exp))
+                no_out!(checked_root_binary(n, exp));
             }),
         ],
     );
@@ -824,7 +824,7 @@ fn benchmark_root_assign_rem<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(mut n, exp)| {
-            no_out!(n.root_assign_rem(exp))
+            no_out!(n.root_assign_rem(exp));
         })],
     );
 }
@@ -849,7 +849,7 @@ fn benchmark_floor_cbrt_algorithms_2_u32(
             ("fast", &mut |n| no_out!(fast_floor_cbrt_u32(n))),
             ("Chebyshev", &mut |n| no_out!(cbrt_chebyshev_approx_u32(n))),
             ("approx and refine", &mut |n| {
-                no_out!(floor_root_approx_and_refine(f64::from, |f| f as u32, n, 3))
+                no_out!(floor_root_approx_and_refine(f64::from, |f| f as u32, n, 3));
             }),
         ],
     );
@@ -880,7 +880,7 @@ fn benchmark_floor_cbrt_algorithms_2_u64(
                     |f| f as u64,
                     n,
                     3
-                ))
+                ));
             }),
         ],
     );
@@ -910,7 +910,7 @@ fn benchmark_floor_root_algorithms_2_u32(
                     |f| f as u32,
                     n,
                     exp
-                ))
+                ));
             }),
         ],
     );
@@ -940,7 +940,7 @@ fn benchmark_floor_root_algorithms_2_u64(
                     |f| f as u64,
                     n,
                     exp
-                ))
+                ));
             }),
         ],
     );
@@ -963,10 +963,10 @@ fn benchmark_ceiling_root_algorithms_2_u32(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.ceiling_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(ceiling_root_binary(n, exp))
+                no_out!(ceiling_root_binary(n, exp));
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(fast_ceiling_root_u32(n, exp))
+                no_out!(fast_ceiling_root_u32(n, exp));
             }),
         ],
     );
@@ -989,10 +989,10 @@ fn benchmark_ceiling_root_algorithms_2_u64(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.ceiling_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(ceiling_root_binary(n, exp))
+                no_out!(ceiling_root_binary(n, exp));
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(fast_ceiling_root_u64(n, exp))
+                no_out!(fast_ceiling_root_u64(n, exp));
             }),
         ],
     );
@@ -1015,10 +1015,10 @@ fn benchmark_checked_root_algorithms_2_u32(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.checked_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(checked_root_binary(n, exp))
+                no_out!(checked_root_binary(n, exp));
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(fast_checked_root_u32(n, exp))
+                no_out!(fast_checked_root_u32(n, exp));
             }),
         ],
     );
@@ -1041,10 +1041,10 @@ fn benchmark_checked_root_algorithms_2_u64(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.checked_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(checked_root_binary(n, exp))
+                no_out!(checked_root_binary(n, exp));
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(fast_checked_root_u64(n, exp))
+                no_out!(fast_checked_root_u64(n, exp));
             }),
         ],
     );

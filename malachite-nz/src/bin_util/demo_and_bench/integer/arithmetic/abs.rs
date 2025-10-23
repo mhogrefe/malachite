@@ -165,10 +165,10 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
         &mut [
             ("Integer.unsigned_abs()", &mut |n| no_out!(n.unsigned_abs())),
             ("(&Integer).unsigned_abs()", &mut |n| {
-                no_out!((&n).unsigned_abs())
+                no_out!((&n).unsigned_abs());
             }),
             ("Integer.unsigned_abs_ref()", &mut |n| {
-                no_out!(n.unsigned_abs_ref())
+                no_out!(n.unsigned_abs_ref());
             }),
         ],
     );
@@ -192,7 +192,7 @@ fn benchmark_integer_mutate_unsigned_abs(
             no_out!(n.mutate_unsigned_abs(|x| {
                 *x = new_abs;
                 out
-            }))
+            }));
         })],
     );
 }

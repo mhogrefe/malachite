@@ -105,7 +105,7 @@ fn benchmark_limbs_hamming_distance_limb(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, y)| {
-            no_out!(limbs_hamming_distance_limb(&xs, y))
+            no_out!(limbs_hamming_distance_limb(&xs, y));
         })],
     );
 }
@@ -125,7 +125,7 @@ fn benchmark_limbs_hamming_distance_same_length(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, ys)| {
-            no_out!(limbs_hamming_distance_same_length(&xs, &ys))
+            no_out!(limbs_hamming_distance_same_length(&xs, &ys));
         })],
     );
 }
@@ -145,7 +145,7 @@ fn benchmark_limbs_hamming_distance(
         file_name,
         &pair_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(xs, ys)| {
-            no_out!(limbs_hamming_distance(&xs, &ys))
+            no_out!(limbs_hamming_distance(&xs, &ys));
         })],
     );
 }
@@ -166,10 +166,10 @@ fn benchmark_natural_hamming_distance_library_comparison(
         &pair_2_pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.hamming_distance(&y))
+                no_out!(x.hamming_distance(&y));
             }),
             ("rug", &mut |((x, y), _)| {
-                no_out!(rug_hamming_distance(&x, &y))
+                no_out!(rug_hamming_distance(&x, &y));
             }),
         ],
     );
@@ -192,10 +192,10 @@ fn benchmark_natural_hamming_distance_algorithms(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.hamming_distance(&y))),
             ("using bits explicitly", &mut |(x, y)| {
-                no_out!(natural_hamming_distance_alt_1(&x, &y))
+                no_out!(natural_hamming_distance_alt_1(&x, &y));
             }),
             ("using limbs explicitly", &mut |(x, y)| {
-                no_out!(natural_hamming_distance_alt_2(&x, &y))
+                no_out!(natural_hamming_distance_alt_2(&x, &y));
             }),
         ],
     );

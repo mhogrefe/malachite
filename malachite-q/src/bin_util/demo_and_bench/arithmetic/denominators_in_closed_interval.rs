@@ -49,7 +49,7 @@ fn benchmark_denominators_in_closed_interval(
         file_name,
         &pair_2_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(a, b)| {
-            no_out!(Rational::denominators_in_closed_interval(a, b))
+            no_out!(Rational::denominators_in_closed_interval(a, b));
         })],
     );
 }

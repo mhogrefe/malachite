@@ -272,7 +272,7 @@ fn benchmark_mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.mod_power_of_2_assign(pow)
+            n.mod_power_of_2_assign(pow);
         })],
     );
 }
@@ -292,7 +292,7 @@ fn benchmark_mod_power_of_2_assign_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.mod_power_of_2_assign(pow)
+            n.mod_power_of_2_assign(pow);
         })],
     );
 }
@@ -350,7 +350,7 @@ fn benchmark_rem_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.rem_power_of_2_assign(pow)
+            n.rem_power_of_2_assign(pow);
         })],
     );
 }
@@ -370,7 +370,7 @@ fn benchmark_rem_power_of_2_assign_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.rem_power_of_2_assign(pow)
+            n.rem_power_of_2_assign(pow);
         })],
     );
 }
@@ -390,7 +390,7 @@ fn benchmark_neg_mod_power_of_2<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.neg_mod_power_of_2(pow))
+            no_out!(n.neg_mod_power_of_2(pow));
         })],
     );
 }
@@ -410,7 +410,7 @@ fn benchmark_neg_mod_power_of_2_assign<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.neg_mod_power_of_2_assign(pow)
+            n.neg_mod_power_of_2_assign(pow);
         })],
     );
 }
@@ -433,7 +433,7 @@ fn benchmark_ceiling_mod_power_of_2<
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.ceiling_mod_power_of_2(pow))
+            no_out!(n.ceiling_mod_power_of_2(pow));
         })],
     );
 }
@@ -456,7 +456,7 @@ fn benchmark_ceiling_mod_power_of_2_assign<
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.ceiling_mod_power_of_2_assign(pow)
+            n.ceiling_mod_power_of_2_assign(pow);
         })],
     );
 }

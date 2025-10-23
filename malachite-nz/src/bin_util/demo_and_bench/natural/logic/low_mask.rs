@@ -67,10 +67,10 @@ fn benchmark_natural_low_mask_algorithms(
         &unsigned_direct_bucketer(),
         &mut [
             ("Natural.low_mask(u64)", &mut |bits| {
-                no_out!(Natural::low_mask(bits))
+                no_out!(Natural::low_mask(bits));
             }),
             ("Natural.power_of_2(u64) - 1", &mut |bits| {
-                no_out!(Natural::power_of_2(bits) - Natural::ONE)
+                no_out!(Natural::power_of_2(bits) - Natural::ONE);
             }),
         ],
     );

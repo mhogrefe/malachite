@@ -49,16 +49,16 @@ fn benchmark_coprime_with_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.coprime_with(y))),
             ("no divisibility check", &mut |(x, y)| {
-                no_out!(x.gcd(y) == T::ONE)
+                no_out!(x.gcd(y) == T::ONE);
             }),
             ("check divisibility by 2", &mut |(x, y)| {
-                no_out!(coprime_with_check_2(x, y))
+                no_out!(coprime_with_check_2(x, y));
             }),
             ("check divisibility by 2 and 3", &mut |(x, y)| {
-                no_out!(coprime_with_check_2_3(x, y))
+                no_out!(coprime_with_check_2_3(x, y));
             }),
             ("check divisibility by 2, 3, and 5", &mut |(x, y)| {
-                no_out!(coprime_with_check_2_3_5(x, y))
+                no_out!(coprime_with_check_2_3_5(x, y));
             }),
         ],
     );

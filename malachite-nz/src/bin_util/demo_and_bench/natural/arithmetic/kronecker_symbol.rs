@@ -197,16 +197,16 @@ fn benchmark_natural_jacobi_symbol_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.jacobi_symbol(Natural)", &mut |(n, m)| {
-                no_out!(n.jacobi_symbol(m))
+                no_out!(n.jacobi_symbol(m));
             }),
             ("Natural.jacobi_symbol(&Natural)", &mut |(n, m)| {
-                no_out!(n.jacobi_symbol(&m))
+                no_out!(n.jacobi_symbol(&m));
             }),
             ("(&Natural).jacobi_symbol(Natural)", &mut |(n, m)| {
-                no_out!((&n).jacobi_symbol(m))
+                no_out!((&n).jacobi_symbol(m));
             }),
             ("(&Natural).jacobi_symbol(&Natural)", &mut |(n, m)| {
-                no_out!((&n).jacobi_symbol(&m))
+                no_out!((&n).jacobi_symbol(&m));
             }),
         ],
     );
@@ -249,7 +249,7 @@ fn benchmark_natural_kronecker_symbol_library_comparison(
         &pair_2_pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.kronecker_symbol(y))
+                no_out!(x.kronecker_symbol(y));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.kronecker(&y))),
         ],
@@ -272,16 +272,16 @@ fn benchmark_natural_kronecker_symbol_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.kronecker_symbol(Natural)", &mut |(n, m)| {
-                no_out!(n.kronecker_symbol(m))
+                no_out!(n.kronecker_symbol(m));
             }),
             ("Natural.kronecker_symbol(&Natural)", &mut |(n, m)| {
-                no_out!(n.kronecker_symbol(&m))
+                no_out!(n.kronecker_symbol(&m));
             }),
             ("(&Natural).kronecker_symbol(Natural)", &mut |(n, m)| {
-                no_out!((&n).kronecker_symbol(m))
+                no_out!((&n).kronecker_symbol(m));
             }),
             ("(&Natural).kronecker_symbol(&Natural)", &mut |(n, m)| {
-                no_out!((&n).kronecker_symbol(&m))
+                no_out!((&n).kronecker_symbol(&m));
             }),
         ],
     );

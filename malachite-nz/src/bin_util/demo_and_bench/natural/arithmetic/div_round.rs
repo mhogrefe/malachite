@@ -166,7 +166,7 @@ fn benchmark_limbs_limb_div_round_limbs(
         file_name,
         &triple_1_vec_len_bucketer("ys"),
         &mut [("Malachite", &mut |(ys, x, rm)| {
-            no_out!(limbs_limb_div_round_limbs(x, &ys, rm))
+            no_out!(limbs_limb_div_round_limbs(x, &ys, rm));
         })],
     );
 }
@@ -187,7 +187,7 @@ fn benchmark_natural_div_round_down_library_comparison(
         &pair_2_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.div_round(y, Down))
+                no_out!(x.div_round(y, Down));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.div_trunc(y))),
         ],
@@ -210,7 +210,7 @@ fn benchmark_natural_div_round_floor_library_comparison(
         &triple_3_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| {
-                no_out!(x.div_round(y, Floor))
+                no_out!(x.div_round(y, Floor));
             }),
             ("num", &mut |((x, y), _, _)| no_out!(x.div_floor(&y))),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.div_floor(y))),
@@ -234,7 +234,7 @@ fn benchmark_natural_div_round_ceiling_library_comparison(
         &pair_2_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.div_round(y, Ceiling))
+                no_out!(x.div_round(y, Ceiling));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.div_ceil(y))),
         ],
@@ -259,7 +259,7 @@ fn benchmark_natural_div_round_ceiling_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.div_round(y, Ceiling))),
             ("using ceiling_div_neg_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_neg_mod(y).0)
+                no_out!(x.ceiling_div_neg_mod(y).0);
             }),
         ],
     );

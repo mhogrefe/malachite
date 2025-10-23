@@ -54,7 +54,7 @@ fn benchmark_rational_try_from_float_simplest<T: PrimitiveFloat>(
         file_name,
         &primitive_float_bucketer("f"),
         &mut [("Malachite", &mut |f| {
-            no_out!(Rational::try_from_float_simplest(f).ok())
+            no_out!(Rational::try_from_float_simplest(f).ok());
         })],
     );
 }

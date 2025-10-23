@@ -125,7 +125,7 @@ fn benchmark_natural_partial_eq_unsigned_library_comparison<T: PrimitiveUnsigned
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| no_out!(x == y)),
             ("num", &mut |((x, y), _, _)| {
-                no_out!(num_partial_eq_unsigned(&x, y))
+                no_out!(num_partial_eq_unsigned(&x, y));
             }),
             ("rug", &mut |(_, (x, y), _)| no_out!(x == y)),
         ],

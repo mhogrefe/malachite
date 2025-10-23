@@ -152,22 +152,22 @@ fn benchmark_jacobi_symbol_unsigned_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.jacobi_symbol(y))),
             ("simple", &mut |(x, y)| {
-                no_out!(jacobi_symbol_unsigned_simple(x, y))
+                no_out!(jacobi_symbol_unsigned_simple(x, y));
             }),
             ("fast 1", &mut |(x, y)| {
-                no_out!(jacobi_symbol_unsigned_fast_1(x, y))
+                no_out!(jacobi_symbol_unsigned_fast_1(x, y));
             }),
             ("fast 2.1", &mut |(x, y)| {
-                no_out!(jacobi_symbol_unsigned_fast_2_1(x, y))
+                no_out!(jacobi_symbol_unsigned_fast_2_1(x, y));
             }),
             ("fast 2.2", &mut |(x, y)| {
-                no_out!(jacobi_symbol_unsigned_fast_2_2(x, y))
+                no_out!(jacobi_symbol_unsigned_fast_2_2(x, y));
             }),
             ("fast 2.3", &mut |(x, y)| {
-                no_out!(jacobi_symbol_unsigned_fast_2_3(x, y))
+                no_out!(jacobi_symbol_unsigned_fast_2_3(x, y));
             }),
             ("fast 2.4", &mut |(x, y)| {
-                no_out!(jacobi_symbol_unsigned_fast_2_4(x, y))
+                no_out!(jacobi_symbol_unsigned_fast_2_4(x, y));
             }),
         ],
     );
@@ -198,13 +198,13 @@ fn benchmark_jacobi_symbol_unsigned_double_algorithms<
         &quadruple_max_bit_bucketer("x1", "x0", "y1", "y0"),
         &mut [
             ("simple", &mut |(x1, x0, y1, y0)| {
-                no_out!(jacobi_symbol_unsigned_double_simple::<T, D>(x1, x0, y1, y0))
+                no_out!(jacobi_symbol_unsigned_double_simple::<T, D>(x1, x0, y1, y0));
             }),
             ("fast 1", &mut |(x1, x0, y1, y0)| {
-                no_out!(jacobi_symbol_unsigned_double_fast_1(x1, x0, y1, y0))
+                no_out!(jacobi_symbol_unsigned_double_fast_1(x1, x0, y1, y0));
             }),
             ("fast 2", &mut |(x1, x0, y1, y0)| {
-                no_out!(jacobi_symbol_unsigned_double_fast_2(x1, x0, y1, y0))
+                no_out!(jacobi_symbol_unsigned_double_fast_2(x1, x0, y1, y0));
             }),
         ],
     );

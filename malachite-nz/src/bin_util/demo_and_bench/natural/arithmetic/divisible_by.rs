@@ -174,13 +174,13 @@ fn benchmark_limbs_divisible_by_limb_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_divisible_by_limb", &mut |(xs, y)| {
-                no_out!(limbs_divisible_by_limb(&xs, y))
+                no_out!(limbs_divisible_by_limb(&xs, y));
             }),
             ("divisibility using limbs_mod_limb", &mut |(xs, y)| {
-                no_out!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, y) == 0)
+                no_out!(limbs_mod_limb::<DoubleLimb, Limb>(&xs, y) == 0);
             }),
             ("combined_limbs_divisible_by_limb", &mut |(xs, y)| {
-                no_out!(combined_limbs_divisible_by_limb(&xs, y))
+                no_out!(combined_limbs_divisible_by_limb(&xs, y));
             }),
         ],
     );
@@ -203,10 +203,10 @@ fn benchmark_limbs_divisible_by_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_divisible_by", &mut |(mut ns, mut ds)| {
-                no_out!(limbs_divisible_by(&mut ns, &mut ds))
+                no_out!(limbs_divisible_by(&mut ns, &mut ds));
             }),
             ("divisibility using limbs_mod", &mut |(ns, ds)| {
-                no_out!(slice_test_zero(&limbs_mod(&ns, &ds)))
+                no_out!(slice_test_zero(&limbs_mod(&ns, &ds)));
             }),
         ],
     );
@@ -266,7 +266,7 @@ fn benchmark_natural_divisible_by_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.divisible_by(y))),
             ("using %", &mut |(x, y)| {
-                no_out!(x == 0 || y != 0 && x % y == 0)
+                no_out!(x == 0 || y != 0 && x % y == 0);
             }),
         ],
     );
@@ -288,16 +288,16 @@ fn benchmark_natural_divisible_by_evaluation_strategy(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Natural.divisible_by(Natural)", &mut |(x, y)| {
-                no_out!(x.divisible_by(y))
+                no_out!(x.divisible_by(y));
             }),
             ("Natural.divisible_by(&Natural)", &mut |(x, y)| {
-                no_out!(x.divisible_by(&y))
+                no_out!(x.divisible_by(&y));
             }),
             ("(&Natural).divisible_by(Natural)", &mut |(x, y)| {
-                no_out!((&x).divisible_by(y))
+                no_out!((&x).divisible_by(y));
             }),
             ("(&Natural).divisible_by(&Natural)", &mut |(x, y)| {
-                no_out!((&x).divisible_by(&y))
+                no_out!((&x).divisible_by(&y));
             }),
         ],
     );
@@ -319,10 +319,10 @@ fn benchmark_natural_divisible_by_library_comparison(
         &triple_3_pair_1_natural_bit_bucketer("n"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| {
-                no_out!(x.divisible_by(y))
+                no_out!(x.divisible_by(y));
             }),
             ("num", &mut |((x, y), _, _)| {
-                no_out!(num_divisible_by(&x, &y))
+                no_out!(num_divisible_by(&x, &y));
             }),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.is_divisible(&y))),
         ],

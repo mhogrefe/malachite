@@ -60,7 +60,7 @@ fn benchmark_limbs_assign_bits(gm: GenMode, config: &GenConfig, limit: usize, fi
             end,
             ref bits,
         )| {
-            limbs_assign_bits(limbs, start, end, bits)
+            limbs_assign_bits(limbs, start, end, bits);
         })],
     );
 }
@@ -81,10 +81,10 @@ fn benchmark_natural_assign_bits_algorithms(
         &quadruple_3_bucketer("end"),
         &mut [
             ("default", &mut |(mut n, start, end, bits)| {
-                n.assign_bits(start, end, &bits)
+                n.assign_bits(start, end, &bits);
             }),
             ("naive", &mut |(mut n, start, end, bits)| {
-                assign_bits_naive::<Natural, Natural>(&mut n, start, end, &bits)
+                assign_bits_naive::<Natural, Natural>(&mut n, start, end, &bits);
             }),
         ],
     );

@@ -68,10 +68,10 @@ fn benchmark_natural_mod_power_of_2_inverse_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.mod_power_of_2_inverse(u64)", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_inverse(pow))
+                no_out!(n.mod_power_of_2_inverse(pow));
             }),
             ("(&Natural).mod_power_of_2_inverse(u64)", &mut |(n, pow)| {
-                no_out!((&n).mod_power_of_2_inverse(pow))
+                no_out!((&n).mod_power_of_2_inverse(pow));
             }),
         ],
     );
@@ -93,10 +93,10 @@ fn benchmark_natural_mod_power_of_2_inverse_algorithms(
         &pair_2_bucketer("pow"),
         &mut [
             ("default", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_inverse(pow))
+                no_out!(n.mod_power_of_2_inverse(pow));
             }),
             ("simple", &mut |(n, pow)| {
-                no_out!(n.mod_inverse(Natural::power_of_2(pow)))
+                no_out!(n.mod_inverse(Natural::power_of_2(pow)));
             }),
         ],
     );

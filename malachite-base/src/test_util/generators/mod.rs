@@ -1264,8 +1264,8 @@ pub fn signed_unsigned_pair_gen_var_18<T: PrimitiveSigned, U: PrimitiveUnsigned>
     )
 }
 
-// All `(T, U)`s where `T` is signed, `U` is unsigned, both `T` and `U` are small, and the `U`
-// is positive.
+// All `(T, U)`s where `T` is signed, `U` is unsigned, both `T` and `U` are small, and the `U` is
+// positive.
 pub fn signed_unsigned_pair_gen_var_19<T: PrimitiveSigned, U: PrimitiveUnsigned>()
 -> Generator<(T, U)> {
     Generator::new_no_special(

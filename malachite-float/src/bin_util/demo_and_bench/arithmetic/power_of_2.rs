@@ -149,10 +149,10 @@ fn benchmark_float_power_of_2_prec_round_algorithms(
         &abs_triple_1_2_usize_convertible_max_bucketer("i", "p"),
         &mut [
             ("default", &mut |(i, p, rm)| {
-                no_out!(Float::power_of_2_prec_round(i, p, rm))
+                no_out!(Float::power_of_2_prec_round(i, p, rm));
             }),
             ("naive", &mut |(i, p, rm)| {
-                no_out!(power_of_2_prec_round_naive(i, p, rm))
+                no_out!(power_of_2_prec_round_naive(i, p, rm));
             }),
         ],
     );
@@ -174,7 +174,7 @@ fn benchmark_float_power_of_2_prec_algorithms(
         &abs_pair_usize_convertible_max_bucketer("i", "p"),
         &mut [
             ("default", &mut |(i, p)| {
-                no_out!(Float::power_of_2_prec(i, p))
+                no_out!(Float::power_of_2_prec(i, p));
             }),
             ("naive", &mut |(i, p)| no_out!(power_of_2_prec_naive(i, p))),
         ],

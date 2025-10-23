@@ -102,7 +102,7 @@ fn benchmark_rational_round_to_multiple_of_power_of_2_assign(
         file_name,
         &triple_1_2_rational_bit_i64_max_bucketer("n", "pow"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm));
         })],
     );
 }
@@ -124,10 +124,10 @@ fn benchmark_rational_round_to_multiple_of_power_of_2_algorithms(
         &triple_1_2_rational_bit_i64_max_bucketer("n", "pow"),
         &mut [
             ("default", &mut |(x, y, rm)| {
-                no_out!(x.round_to_multiple_of_power_of_2(y, rm))
+                no_out!(x.round_to_multiple_of_power_of_2(y, rm));
             }),
             ("using round_to_multiple", &mut |(x, y, rm)| {
-                no_out!(x.round_to_multiple(Rational::power_of_2(y), rm))
+                no_out!(x.round_to_multiple(Rational::power_of_2(y), rm));
             }),
         ],
     );

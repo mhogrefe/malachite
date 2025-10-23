@@ -73,7 +73,7 @@ fn benchmark_divisible_by_power_of_2_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("u"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.divisible_by_power_of_2(y))
+            no_out!(x.divisible_by_power_of_2(y));
         })],
     );
 }
@@ -93,7 +93,7 @@ fn benchmark_divisible_by_power_of_2_signed<T: PrimitiveSigned>(
         file_name,
         &pair_1_bit_bucketer("i"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.divisible_by_power_of_2(y))
+            no_out!(x.divisible_by_power_of_2(y));
         })],
     );
 }

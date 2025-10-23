@@ -287,7 +287,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb(
         file_name,
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(a, b, c)| {
-            no_out!(limbs_overflowing_sub_mul_limb(&a, &b, c))
+            no_out!(limbs_overflowing_sub_mul_limb(&a, &b, c));
         })],
     );
 }
@@ -307,7 +307,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_left(
         file_name,
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut a, b, c)| {
-            no_out!(limbs_overflowing_sub_mul_limb_in_place_left(&mut a, &b, c))
+            no_out!(limbs_overflowing_sub_mul_limb_in_place_left(&mut a, &b, c));
         })],
     );
 }
@@ -327,7 +327,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_right(
         file_name,
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(a, mut b, c)| {
-            no_out!(limbs_overflowing_sub_mul_limb_in_place_right(&a, &mut b, c))
+            no_out!(limbs_overflowing_sub_mul_limb_in_place_right(&a, &mut b, c));
         })],
     );
 }
@@ -349,7 +349,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_either(
         &mut [("Malachite", &mut |(mut a, mut b, c)| {
             no_out!(limbs_overflowing_sub_mul_limb_in_place_either(
                 &mut a, &mut b, c
-            ))
+            ));
         })],
     );
 }
@@ -369,7 +369,7 @@ fn benchmark_limbs_overflowing_sub_mul(
         file_name,
         &triple_vec_max_len_bucketer("xs", "ys", "zs"),
         &mut [("Malachite", &mut |(a, b, c)| {
-            no_out!(limbs_overflowing_sub_mul(&a, &b, &c))
+            no_out!(limbs_overflowing_sub_mul(&a, &b, &c));
         })],
     );
 }
@@ -389,7 +389,7 @@ fn benchmark_limbs_overflowing_sub_mul_in_place_left(
         file_name,
         &triple_vec_max_len_bucketer("xs", "ys", "zs"),
         &mut [("Malachite", &mut |(mut a, b, c)| {
-            no_out!(limbs_overflowing_sub_mul_in_place_left(&mut a, &b, &c))
+            no_out!(limbs_overflowing_sub_mul_in_place_left(&mut a, &b, &c));
         })],
     );
 }
@@ -410,16 +410,16 @@ fn benchmark_integer_sub_mul_evaluation_strategy(
         &triple_integer_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Integer.sub_mul(Integer, Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, c))
+                no_out!(a.sub_mul(b, c));
             }),
             ("Integer.sub_mul(Integer, &Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, &c))
+                no_out!(a.sub_mul(b, &c));
             }),
             ("Integer.sub_mul(&Integer, Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, c))
+                no_out!(a.sub_mul(&b, c));
             }),
             ("Integer.sub_mul(&Integer, &Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, &c))
+                no_out!(a.sub_mul(&b, &c));
             }),
             (
                 "(&Integer).sub_mul(&Integer, &Integer)",
@@ -446,10 +446,10 @@ fn benchmark_integer_sub_mul_algorithms(
         &triple_integer_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Integer.sub_mul(Integer, Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, c))
+                no_out!(a.sub_mul(b, c));
             }),
             ("Integer - Integer * Integer", &mut |(a, b, c)| {
-                no_out!(a - b * c)
+                no_out!(a - b * c);
             }),
         ],
     );
@@ -472,10 +472,10 @@ fn benchmark_integer_sub_mul_val_val_ref_algorithms(
         &triple_integer_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Integer.sub_mul(Integer, &Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(b, &c))
+                no_out!(a.sub_mul(b, &c));
             }),
             ("Integer - Integer * &Integer", &mut |(a, b, c)| {
-                no_out!(a - b * &c)
+                no_out!(a - b * &c);
             }),
         ],
     );
@@ -498,10 +498,10 @@ fn benchmark_integer_sub_mul_val_ref_val_algorithms(
         &triple_integer_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Integer.sub_mul(&Integer, Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, c))
+                no_out!(a.sub_mul(&b, c));
             }),
             ("Integer - &Integer * Integer", &mut |(a, b, c)| {
-                no_out!(a - &b * c)
+                no_out!(a - &b * c);
             }),
         ],
     );
@@ -524,10 +524,10 @@ fn benchmark_integer_sub_mul_val_ref_ref_algorithms(
         &triple_integer_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Integer.sub_mul(&Integer, &Integer)", &mut |(a, b, c)| {
-                no_out!(a.sub_mul(&b, &c))
+                no_out!(a.sub_mul(&b, &c));
             }),
             ("Integer - Integer * Integer", &mut |(a, b, c)| {
-                no_out!(a - &b * &c)
+                no_out!(a - &b * &c);
             }),
         ],
     );
@@ -554,7 +554,7 @@ fn benchmark_integer_sub_mul_ref_ref_ref_algorithms(
                 &mut |(a, b, c)| no_out!((&a).sub_mul(&b, &c)),
             ),
             ("&Integer - Integer * Integer", &mut |(a, b, c)| {
-                no_out!(&a - &b * &c)
+                no_out!(&a - &b * &c);
             }),
         ],
     );
@@ -615,7 +615,7 @@ fn benchmark_integer_sub_mul_assign_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(b, c),
             ),
             ("Integer -= Integer * Integer", &mut |(mut a, b, c)| {
-                a -= b * c
+                a -= b * c;
             }),
         ],
     );
@@ -641,7 +641,7 @@ fn benchmark_integer_sub_mul_assign_val_ref_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(b, &c),
             ),
             ("Integer -= Integer * &Integer", &mut |(mut a, b, c)| {
-                a -= b * &c
+                a -= b * &c;
             }),
         ],
     );
@@ -667,7 +667,7 @@ fn benchmark_integer_sub_mul_assign_ref_val_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(&b, c),
             ),
             ("Integer -= &Integer * Integer", &mut |(mut a, b, c)| {
-                a -= &b * c
+                a -= &b * c;
             }),
         ],
     );
@@ -693,7 +693,7 @@ fn benchmark_integer_sub_mul_assign_ref_ref_algorithms(
                 &mut |(mut a, b, c)| a.sub_mul_assign(&b, &c),
             ),
             ("Integer -= &Integer * &Integer", &mut |(mut a, b, c)| {
-                a -= &b * &c
+                a -= &b * &c;
             }),
         ],
     );

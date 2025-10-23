@@ -59,7 +59,7 @@ fn benchmark_limbs_get_bit_neg(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(xs, index)| {
-            no_out!(limbs_get_bit_neg(&xs, index))
+            no_out!(limbs_get_bit_neg(&xs, index));
         })],
     );
 }
@@ -80,10 +80,10 @@ fn benchmark_integer_get_bit_library_comparison(
         &pair_2_pair_2_bucketer("index"),
         &mut [
             ("Malachite", &mut |(_, (n, index))| {
-                no_out!(n.get_bit(index))
+                no_out!(n.get_bit(index));
             }),
             ("rug", &mut |((n, index), _)| {
-                no_out!(n.get_bit(u32::exact_from(index)))
+                no_out!(n.get_bit(u32::exact_from(index)));
             }),
         ],
     );

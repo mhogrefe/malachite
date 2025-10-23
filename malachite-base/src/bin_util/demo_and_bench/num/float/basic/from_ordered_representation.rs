@@ -48,7 +48,7 @@ fn benchmark_from_ordered_representation<T: PrimitiveFloat>(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |x| {
-            no_out!(T::from_ordered_representation(x))
+            no_out!(T::from_ordered_representation(x));
         })],
     );
 }

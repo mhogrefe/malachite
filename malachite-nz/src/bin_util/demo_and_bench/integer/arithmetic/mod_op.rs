@@ -254,16 +254,16 @@ fn benchmark_integer_mod_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.mod_op(Integer)", &mut |(x, y)| {
-                no_out!(x.mod_op(y))
+                no_out!(x.mod_op(y));
             }),
             ("Integer.mod_op(&Integer)", &mut |(x, y)| {
-                no_out!(x.mod_op(&y))
+                no_out!(x.mod_op(&y));
             }),
             ("(&Integer).mod_op(Integer)", &mut |(x, y)| {
-                no_out!((&x).mod_op(y))
+                no_out!((&x).mod_op(y));
             }),
             ("(&Integer).mod_op(&Integer)", &mut |(x, y)| {
-                no_out!((&x).mod_op(&y))
+                no_out!((&x).mod_op(&y));
             }),
         ],
     );
@@ -285,10 +285,10 @@ fn benchmark_integer_mod_assign_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.mod_assign(Integer)", &mut |(mut x, y)| {
-                no_out!(x.mod_assign(y))
+                no_out!(x.mod_assign(y));
             }),
             ("Integer.mod_assign(&Integer)", &mut |(mut x, y)| {
-                no_out!(x.mod_assign(&y))
+                no_out!(x.mod_assign(&y));
             }),
         ],
     );
@@ -423,7 +423,7 @@ fn benchmark_integer_ceiling_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.ceiling_mod(y))),
             ("using ceiling_div_mod", &mut |(x, y)| {
-                no_out!(x.ceiling_div_mod(y).1)
+                no_out!(x.ceiling_div_mod(y).1);
             }),
         ],
     );
@@ -445,16 +445,16 @@ fn benchmark_integer_ceiling_mod_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.ceiling_mod(Integer)", &mut |(x, y)| {
-                no_out!(x.ceiling_mod(y))
+                no_out!(x.ceiling_mod(y));
             }),
             ("Integer.ceiling_mod(&Integer)", &mut |(x, y)| {
-                no_out!(x.ceiling_mod(&y))
+                no_out!(x.ceiling_mod(&y));
             }),
             ("(&Integer).ceiling_mod(Integer)", &mut |(x, y)| {
-                no_out!((&x).ceiling_mod(y))
+                no_out!((&x).ceiling_mod(y));
             }),
             ("(&Integer).ceiling_mod(&Integer)", &mut |(x, y)| {
-                no_out!((&x).ceiling_mod(&y))
+                no_out!((&x).ceiling_mod(&y));
             }),
         ],
     );
@@ -476,10 +476,10 @@ fn benchmark_integer_ceiling_mod_assign_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.ceiling_mod_assign(Integer)", &mut |(mut x, y)| {
-                no_out!(x.ceiling_mod_assign(y))
+                no_out!(x.ceiling_mod_assign(y));
             }),
             ("Integer.ceiling_mod_assign(&Integer)", &mut |(mut x, y)| {
-                no_out!(x.ceiling_mod_assign(&y))
+                no_out!(x.ceiling_mod_assign(&y));
             }),
         ],
     );

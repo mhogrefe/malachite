@@ -89,10 +89,10 @@ fn benchmark_integer_abs_diff_assign_evaluation_strategy(
         &pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Integer.abs_diff_assign(Integer)", &mut |(mut x, y)| {
-                x.abs_diff_assign(y)
+                x.abs_diff_assign(y);
             }),
             ("Integer.abs_diff_assign(&Integer)", &mut |(mut x, y)| {
-                x.abs_diff_assign(&y)
+                x.abs_diff_assign(&y);
             }),
         ],
     );
@@ -114,16 +114,16 @@ fn benchmark_integer_abs_diff_evaluation_strategy(
         &pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Integer.abs_diff(Integer)", &mut |(x, y)| {
-                no_out!(x.abs_diff(y))
+                no_out!(x.abs_diff(y));
             }),
             ("Integer.abs_diff(&Integer)", &mut |(x, y)| {
-                no_out!(x.abs_diff(&y))
+                no_out!(x.abs_diff(&y));
             }),
             ("&Integer.abs_diff(Integer)", &mut |(x, y)| {
-                no_out!((&x).abs_diff(y))
+                no_out!((&x).abs_diff(y));
             }),
             ("&Integer.abs_diff(&Integer)", &mut |(x, y)| {
-                no_out!((&x).abs_diff(&y))
+                no_out!((&x).abs_diff(&y));
             }),
         ],
     );

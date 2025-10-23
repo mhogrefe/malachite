@@ -251,10 +251,10 @@ fn benchmark_integer_mantissa_and_exponent_algorithms_unsigned<T: PrimitiveUnsig
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |x| {
-                no_out!(x.integer_mantissa_and_exponent())
+                no_out!(x.integer_mantissa_and_exponent());
             }),
             ("alt", &mut |x| {
-                no_out!((x.integer_mantissa(), x.integer_exponent()))
+                no_out!((x.integer_mantissa(), x.integer_exponent()));
             }),
         ],
     );
@@ -323,7 +323,7 @@ fn benchmark_from_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }
@@ -347,7 +347,7 @@ fn benchmark_from_integer_mantissa_and_exponent_targeted_unsigned<T: PrimitiveUn
         file_name,
         &pair_1_bit_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }
@@ -369,10 +369,10 @@ fn benchmark_integer_mantissa_and_exponent_algorithms_primitive_float<T: Primiti
         &primitive_float_bucketer("f"),
         &mut [
             ("default", &mut |x| {
-                no_out!(x.integer_mantissa_and_exponent())
+                no_out!(x.integer_mantissa_and_exponent());
             }),
             ("alt", &mut |x| {
-                no_out!((x.integer_mantissa(), x.integer_exponent()))
+                no_out!((x.integer_mantissa(), x.integer_exponent()));
             }),
         ],
     );
@@ -437,7 +437,7 @@ fn benchmark_from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloa
         file_name,
         &pair_1_bit_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }
@@ -457,7 +457,7 @@ fn benchmark_from_integer_mantissa_and_exponent_targeted_primitive_float<T: Prim
         file_name,
         &pair_1_bit_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_integer_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }

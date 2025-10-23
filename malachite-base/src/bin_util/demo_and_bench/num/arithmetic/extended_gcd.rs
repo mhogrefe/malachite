@@ -69,10 +69,10 @@ fn benchmark_extended_gcd_algorithms_unsigned<
         &mut [
             ("default", &mut |(x, y)| no_out!(x.extended_gcd(y))),
             ("Euclidean", &mut |(x, y)| {
-                no_out!(extended_gcd_unsigned_euclidean::<U, S>(x, y))
+                no_out!(extended_gcd_unsigned_euclidean::<U, S>(x, y));
             }),
             ("binary", &mut |(x, y)| {
-                no_out!(extended_gcd_unsigned_binary::<U, S>(x, y))
+                no_out!(extended_gcd_unsigned_binary::<U, S>(x, y));
             }),
         ],
     );

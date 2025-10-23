@@ -138,16 +138,16 @@ fn benchmark_integer_div_exact_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.div_exact(Integer)", &mut |(x, y)| {
-                no_out!(x.div_exact(y))
+                no_out!(x.div_exact(y));
             }),
             ("Integer.div_exact(&Integer)", &mut |(x, y)| {
-                no_out!(x.div_exact(&y))
+                no_out!(x.div_exact(&y));
             }),
             ("(&Integer).div_exact(Integer)", &mut |(x, y)| {
-                no_out!((&x).div_exact(y))
+                no_out!((&x).div_exact(y));
             }),
             ("(&Integer).div_exact(&Integer)", &mut |(x, y)| {
-                no_out!((&x).div_exact(&y))
+                no_out!((&x).div_exact(&y));
             }),
         ],
     );
@@ -190,10 +190,10 @@ fn benchmark_integer_div_exact_assign_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.div_exact_assign(Integer)", &mut |(mut x, y)| {
-                x.div_exact_assign(y)
+                x.div_exact_assign(y);
             }),
             ("Integer.div_exact_assign(&Integer)", &mut |(mut x, y)| {
-                x.div_exact_assign(&y)
+                x.div_exact_assign(&y);
             }),
         ],
     );

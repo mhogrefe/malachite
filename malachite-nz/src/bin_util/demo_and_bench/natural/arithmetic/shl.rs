@@ -234,7 +234,7 @@ fn benchmark_limbs_shl_to_out(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, bits)| {
-            no_out!(limbs_shl_to_out(&mut out, &xs, bits))
+            no_out!(limbs_shl_to_out(&mut out, &xs, bits));
         })],
     );
 }
@@ -254,7 +254,7 @@ fn benchmark_limbs_slice_shl_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            no_out!(limbs_slice_shl_in_place(&mut xs, bits))
+            no_out!(limbs_slice_shl_in_place(&mut xs, bits));
         })],
     );
 }
@@ -274,7 +274,7 @@ fn benchmark_limbs_vec_shl_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            limbs_vec_shl_in_place(&mut xs, bits)
+            limbs_vec_shl_in_place(&mut xs, bits);
         })],
     );
 }
@@ -295,7 +295,7 @@ fn benchmark_limbs_shl_with_complement_to_out_algorithms(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(mut out, xs, bits)| {
-                no_out!(limbs_shl_with_complement_to_out(&mut out, &xs, bits))
+                no_out!(limbs_shl_with_complement_to_out(&mut out, &xs, bits));
             }),
             (
                 "limbs_shl_to_out and limbs_not_in_place",
@@ -434,10 +434,10 @@ fn benchmark_natural_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             (&format!("Natural << {}", T::NAME), &mut |(x, y)| {
-                no_out!(x << y)
+                no_out!(x << y);
             }),
             (&format!("&Natural << {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x << y)
+                no_out!(&x << y);
             }),
         ],
     );
@@ -483,10 +483,10 @@ fn benchmark_natural_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             (&format!("Natural << {}", T::NAME), &mut |(x, y)| {
-                no_out!(x << y)
+                no_out!(x << y);
             }),
             (&format!("&Natural << {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x << y)
+                no_out!(&x << y);
             }),
         ],
     );

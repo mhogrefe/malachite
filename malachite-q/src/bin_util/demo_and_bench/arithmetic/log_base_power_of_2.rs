@@ -72,7 +72,7 @@ fn benchmark_rational_floor_log_base_power_of_2(
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.floor_log_base_power_of_2(pow))
+            no_out!(n.floor_log_base_power_of_2(pow));
         })],
     );
 }
@@ -92,7 +92,7 @@ fn benchmark_rational_ceiling_log_base_power_of_2(
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.ceiling_log_base_power_of_2(pow))
+            no_out!(n.ceiling_log_base_power_of_2(pow));
         })],
     );
 }
@@ -112,7 +112,7 @@ fn benchmark_rational_checked_log_base_power_of_2(
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.checked_log_base_power_of_2(pow))
+            no_out!(n.checked_log_base_power_of_2(pow));
         })],
     );
 }

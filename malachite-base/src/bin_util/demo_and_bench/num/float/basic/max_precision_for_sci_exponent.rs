@@ -47,7 +47,7 @@ fn benchmark_max_precision_for_sci_exponent<T: PrimitiveFloat>(
         file_name,
         &signed_bit_bucketer(),
         &mut [("Malachite", &mut |exp| {
-            no_out!(T::max_precision_for_sci_exponent(exp))
+            no_out!(T::max_precision_for_sci_exponent(exp));
         })],
     );
 }

@@ -121,7 +121,7 @@ fn benchmark_overflowing_square_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |mut x| {
-            no_out!(x.overflowing_square_assign())
+            no_out!(x.overflowing_square_assign());
         })],
     );
 }
@@ -141,7 +141,7 @@ fn benchmark_overflowing_square_assign_signed<T: PrimitiveSigned>(
         file_name,
         &signed_bit_bucketer(),
         &mut [("Malachite", &mut |mut x| {
-            no_out!(x.overflowing_square_assign())
+            no_out!(x.overflowing_square_assign());
         })],
     );
 }

@@ -2106,7 +2106,7 @@ fn benchmark_float_sub_algorithms(gm: GenMode, config: &GenConfig, limit: usize,
             ("naive", &mut |(x, y)| {
                 let xsb = x.significant_bits();
                 let ysb = y.significant_bits();
-                no_out!(add_prec_round_naive(x, -y, max(xsb, ysb), Nearest).0)
+                no_out!(add_prec_round_naive(x, -y, max(xsb, ysb), Nearest).0);
             }),
         ],
     );
@@ -2149,14 +2149,14 @@ fn benchmark_float_sub_prec_evaluation_strategy(
         &triple_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("Float.sub_prec(Float, u64)", &mut |(x, y, prec)| {
-                no_out!(x.sub_prec(y, prec))
+                no_out!(x.sub_prec(y, prec));
             }),
             ("Float.sub_prec_val_ref(&Float, u64)", &mut |(
                 x,
                 y,
                 prec,
             )| {
-                no_out!(x.sub_prec_val_ref(&y, prec))
+                no_out!(x.sub_prec_val_ref(&y, prec));
             }),
             (
                 "(&Float).sub_prec_ref_val(Float, u64)",
@@ -2186,10 +2186,10 @@ fn benchmark_float_sub_prec_library_comparison(
         &pair_2_triple_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, y, prec))| {
-                no_out!(x.sub_prec_ref_ref(&y, prec))
+                no_out!(x.sub_prec_ref_ref(&y, prec));
             }),
             ("rug", &mut |((x, y, prec), _)| {
-                no_out!(rug_sub_prec(&x, &y, prec))
+                no_out!(rug_sub_prec(&x, &y, prec));
             }),
         ],
     );
@@ -2212,7 +2212,7 @@ fn benchmark_float_sub_prec_algorithms(
         &mut [
             ("default", &mut |(x, y, prec)| no_out!(x.sub_prec(y, prec))),
             ("naive", &mut |(x, y, prec)| {
-                no_out!(add_prec_round_naive(x, -y, prec, Nearest))
+                no_out!(add_prec_round_naive(x, -y, prec, Nearest));
             }),
         ],
     );
@@ -2238,7 +2238,7 @@ fn benchmark_float_sub_prec_assign_evaluation_strategy(
                 y,
                 prec,
             )| {
-                no_out!(x.sub_prec_assign(y, prec))
+                no_out!(x.sub_prec_assign(y, prec));
             }),
             (
                 "Float.sub_prec_assign_ref(&Float, u64)",
@@ -2264,7 +2264,7 @@ fn benchmark_float_sub_round_evaluation_strategy(
         &triple_1_2_float_max_complexity_bucketer("x", "y"),
         &mut [
             ("Float.sub_round(Float, RoundingMode)", &mut |(x, y, rm)| {
-                no_out!(x.sub_round(y, rm))
+                no_out!(x.sub_round(y, rm));
             }),
             (
                 "Float.sub_round_val_ref(&Float, RoundingMode)",
@@ -2298,10 +2298,10 @@ fn benchmark_float_sub_round_library_comparison(
         &pair_2_triple_1_2_float_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y, rm))| {
-                no_out!(x.sub_round_ref_ref(&y, rm))
+                no_out!(x.sub_round_ref_ref(&y, rm));
             }),
             ("rug", &mut |((x, y, rm), _)| {
-                no_out!(rug_sub_round(&x, &y, rm))
+                no_out!(rug_sub_round(&x, &y, rm));
             }),
         ],
     );
@@ -2410,10 +2410,10 @@ fn benchmark_float_sub_prec_round_library_comparison(
         &pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, y, prec, rm))| {
-                no_out!(x.sub_prec_round_ref_ref(&y, prec, rm))
+                no_out!(x.sub_prec_round_ref_ref(&y, prec, rm));
             }),
             ("rug", &mut |((x, y, prec, rm), _)| {
-                no_out!(rug_sub_prec_round(&x, &y, prec, rm))
+                no_out!(rug_sub_prec_round(&x, &y, prec, rm));
             }),
         ],
     );
@@ -2435,10 +2435,10 @@ fn benchmark_float_sub_prec_round_algorithms(
         &quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("default", &mut |(x, y, prec, rm)| {
-                no_out!(x.sub_prec_round(y, prec, rm))
+                no_out!(x.sub_prec_round(y, prec, rm));
             }),
             ("naive", &mut |(x, y, prec, rm)| {
-                no_out!(add_prec_round_naive(x, -y, prec, rm))
+                no_out!(add_prec_round_naive(x, -y, prec, rm));
             }),
         ],
     );
@@ -2537,7 +2537,7 @@ fn benchmark_float_sub_rational_algorithms(
             ("naive", &mut |(x, y)| {
                 let xsb = x.significant_bits();
                 let ysb = y.significant_bits();
-                no_out!(sub_rational_prec_round_naive(x, y, max(xsb, ysb), Nearest).0)
+                no_out!(sub_rational_prec_round_naive(x, y, max(xsb, ysb), Nearest).0);
             }),
         ],
     );
@@ -2661,10 +2661,10 @@ fn benchmark_float_sub_rational_prec_library_comparison(
         &pair_2_triple_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("Malachite", &mut |(_, (x, y, prec))| {
-                no_out!(x.sub_rational_prec_ref_ref(&y, prec))
+                no_out!(x.sub_rational_prec_ref_ref(&y, prec));
             }),
             ("rug", &mut |((x, y, prec), _)| {
-                no_out!(rug_sub_rational_prec(&x, &y, prec))
+                no_out!(rug_sub_rational_prec(&x, &y, prec));
             }),
         ],
     );
@@ -2686,10 +2686,10 @@ fn benchmark_float_sub_rational_prec_algorithms(
         &triple_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("default", &mut |(x, y, prec)| {
-                no_out!(x.sub_rational_prec(y, prec))
+                no_out!(x.sub_rational_prec(y, prec));
             }),
             ("naive", &mut |(x, y, prec)| {
-                no_out!(sub_rational_prec_round_naive(x, y, prec, Nearest))
+                no_out!(sub_rational_prec_round_naive(x, y, prec, Nearest));
             }),
         ],
     );
@@ -2773,10 +2773,10 @@ fn benchmark_float_sub_rational_round_library_comparison(
         &pair_2_triple_1_2_float_rational_max_complexity_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y, rm))| {
-                no_out!(x.sub_rational_round_ref_ref(&y, rm))
+                no_out!(x.sub_rational_round_ref_ref(&y, rm));
             }),
             ("rug", &mut |((x, y, rm), _)| {
-                no_out!(rug_sub_rational_round(&x, &y, rm))
+                no_out!(rug_sub_rational_round(&x, &y, rm));
             }),
         ],
     );
@@ -2798,7 +2798,7 @@ fn benchmark_float_sub_rational_round_algorithms(
         &triple_1_2_float_rational_max_complexity_bucketer("x", "y"),
         &mut [
             ("default", &mut |(x, y, rm)| {
-                no_out!(x.sub_rational_round(y, rm))
+                no_out!(x.sub_rational_round(y, rm));
             }),
             ("naive", &mut |(x, y, rm)| {
                 let ysb = y.significant_bits();
@@ -2888,10 +2888,10 @@ fn benchmark_float_sub_rational_prec_round_library_comparison(
         ),
         &mut [
             ("Malachite", &mut |(_, (x, y, prec, rm))| {
-                no_out!(x.sub_rational_prec_round_ref_ref(&y, prec, rm))
+                no_out!(x.sub_rational_prec_round_ref_ref(&y, prec, rm));
             }),
             ("rug", &mut |((x, y, prec, rm), _)| {
-                no_out!(rug_sub_rational_prec_round(&x, &y, prec, rm))
+                no_out!(rug_sub_rational_prec_round(&x, &y, prec, rm));
             }),
         ],
     );
@@ -2913,10 +2913,10 @@ fn benchmark_float_sub_rational_prec_round_algorithms(
         &quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer("x", "y", "prec"),
         &mut [
             ("default", &mut |(x, y, prec, rm)| {
-                no_out!(x.sub_rational_prec_round(y, prec, rm))
+                no_out!(x.sub_rational_prec_round(y, prec, rm));
             }),
             ("naive", &mut |(x, y, prec, rm)| {
-                no_out!(sub_rational_prec_round_naive(x, y, prec, rm))
+                no_out!(sub_rational_prec_round_naive(x, y, prec, rm));
             }),
         ],
     );
@@ -2944,7 +2944,7 @@ fn benchmark_float_sub_rational_prec_round_assign_evaluation_strategy(
             (
                 "Float.sub_rational_prec_round_assign_ref(&Rational, u64, RoundingMode)",
                 &mut |(mut x, y, prec, rm)| {
-                    no_out!(x.sub_rational_prec_round_assign_ref(&y, prec, rm))
+                    no_out!(x.sub_rational_prec_round_assign_ref(&y, prec, rm));
                 },
             ),
         ],

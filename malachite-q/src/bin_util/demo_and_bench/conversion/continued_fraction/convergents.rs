@@ -79,10 +79,10 @@ fn benchmark_rational_convergents_evaluation_strategy(
         &rational_bit_bucketer("x"),
         &mut [
             ("Rational.convergents()", &mut |x| {
-                no_out!(x.convergents().collect_vec())
+                no_out!(x.convergents().collect_vec());
             }),
             ("(&Rational).convergents()", &mut |x| {
-                no_out!((&x).convergents().collect_vec())
+                no_out!((&x).convergents().collect_vec());
             }),
         ],
     );

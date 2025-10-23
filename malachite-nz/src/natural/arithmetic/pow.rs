@@ -488,43 +488,41 @@ fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
 
 #[cfg(feature = "test_build")]
 impl Natural {
-    pub fn pow_ref_alt(&self, exp: u64) -> Natural {
+    pub fn pow_ref_alt(&self, exp: u64) -> Self {
         match (self, exp) {
-            (_, 0) | (&Natural::ONE, _) => Natural::ONE,
-            (&Natural::ZERO, _) => Natural::ZERO,
+            (_, 0) | (&Self::ONE, _) => Self::ONE,
+            (&Self::ZERO, _) => Self::ZERO,
             (x, 1) => x.clone(),
             (x, 2) => x.square(),
-            (x, exp) if x.is_power_of_2() => Natural::power_of_2((x.significant_bits() - 1) * exp),
-            (Natural(Small(small)), exp) => {
+            (x, exp) if x.is_power_of_2() => Self::power_of_2((x.significant_bits() - 1) * exp),
+            (Self(Small(small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
-                    Natural(Small(small.checked_pow(u32::wrapping_from(exp)).unwrap()))
+                    Self(Small(small.checked_pow(u32::wrapping_from(exp)).unwrap()))
                 } else {
-                    Natural::from_owned_limbs_asc(limb_pow_alt(*small, exp))
+                    Self::from_owned_limbs_asc(limb_pow_alt(*small, exp))
                 }
             }
-            (Natural(Large(limbs)), exp) => {
-                Natural::from_owned_limbs_asc(limbs_pow_alt(limbs, exp))
-            }
+            (Self(Large(limbs)), exp) => Self::from_owned_limbs_asc(limbs_pow_alt(limbs, exp)),
         }
     }
 
     pub fn pow_assign_alt(&mut self, exp: u64) {
         match (&mut *self, exp) {
-            (x, 0) => *x = Natural::ONE,
-            (_, 1) | (&mut (Natural::ZERO | Natural::ONE), _) => {}
+            (x, 0) => *x = Self::ONE,
+            (_, 1) | (&mut (Self::ZERO | Self::ONE), _) => {}
             (x, 2) => x.square_assign(),
             (x, exp) if x.is_power_of_2() => {
-                *x = Natural::power_of_2((x.significant_bits() - 1) * exp);
+                *x = Self::power_of_2((x.significant_bits() - 1) * exp);
             }
-            (Natural(Small(small)), exp) => {
+            (Self(Small(small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
                     *small = small.checked_pow(u32::wrapping_from(exp)).unwrap();
                 } else {
-                    *self = Natural::from_owned_limbs_asc(limb_pow_alt(*small, exp));
+                    *self = Self::from_owned_limbs_asc(limb_pow_alt(*small, exp));
                 }
             }
-            (Natural(Large(limbs)), exp) => {
-                *self = Natural::from_owned_limbs_asc(limbs_pow_alt(limbs, exp));
+            (Self(Large(limbs)), exp) => {
+                *self = Self::from_owned_limbs_asc(limbs_pow_alt(limbs, exp));
             }
         }
     }

@@ -47,7 +47,7 @@ fn benchmark_natural_is_square_algorithms(
         &mut [
             ("default", &mut |n| no_out!(n.is_square())),
             ("using checked_sqrt", &mut |n| {
-                no_out!(n.checked_sqrt().is_some())
+                no_out!(n.checked_sqrt().is_some());
             }),
         ],
     );

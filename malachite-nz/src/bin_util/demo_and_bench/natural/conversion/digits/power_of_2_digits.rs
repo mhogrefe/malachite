@@ -216,7 +216,7 @@ fn benchmark_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
                 T::NAME
             ),
             &mut |(n, log_base)| {
-                no_out!(PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).size_hint())
+                no_out!(PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).size_hint());
             },
         )],
     );
@@ -248,7 +248,7 @@ fn benchmark_natural_power_of_2_digits_get_digit_algorithms<T: PrimitiveUnsigned
                 &mut |(n, log_base, i)| {
                     no_out!(
                         PowerOf2DigitIterable::<T>::power_of_2_digits(&n, log_base).get_digit(i)
-                    )
+                    );
                 },
             ),
             (
@@ -286,7 +286,7 @@ fn benchmark_natural_power_of_2_digits_size_hint_natural(
             &mut |(n, log_base)| {
                 no_out!(
                     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base).size_hint()
-                )
+                );
             },
         )],
     );
@@ -314,7 +314,7 @@ fn benchmark_natural_power_of_2_digits_get_digit_natural_algorithms(
                     no_out!(
                         PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, log_base)
                             .get_digit(i)
-                    )
+                    );
                 },
             ),
             (

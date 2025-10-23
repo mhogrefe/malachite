@@ -430,7 +430,7 @@ fn benchmark_integer_to_string_with_width(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{x:0width$}"))
+            no_out!(format!("{x:0width$}"));
         })],
     );
 }
@@ -494,7 +494,7 @@ fn benchmark_integer_to_binary_string_with_width(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{x:0width$b}"))
+            no_out!(format!("{x:0width$b}"));
         })],
     );
 }
@@ -558,7 +558,7 @@ fn benchmark_integer_to_octal_string_with_width(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{x:0width$o}"))
+            no_out!(format!("{x:0width$o}"));
         })],
     );
 }
@@ -579,7 +579,7 @@ fn benchmark_integer_to_lower_hex_string_library_comparison(
         &triple_3_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, x)| {
-                no_out!(x.to_lower_hex_string())
+                no_out!(x.to_lower_hex_string());
             }),
             ("num", &mut |(x, _, _)| no_out!(x.to_lower_hex_string())),
             ("rug", &mut |(_, x, _)| no_out!(x.to_lower_hex_string())),
@@ -624,7 +624,7 @@ fn benchmark_integer_to_lower_hex_string_with_width(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{x:0width$x}"))
+            no_out!(format!("{x:0width$x}"));
         })],
     );
 }
@@ -645,7 +645,7 @@ fn benchmark_integer_to_upper_hex_string_library_comparison(
         &triple_3_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, x)| {
-                no_out!(x.to_upper_hex_string())
+                no_out!(x.to_upper_hex_string());
             }),
             ("num", &mut |(x, _, _)| no_out!(x.to_upper_hex_string())),
             ("rug", &mut |(_, x, _)| no_out!(x.to_upper_hex_string())),
@@ -669,7 +669,7 @@ fn benchmark_integer_to_upper_hex_string_with_width(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{x:0width$X}"))
+            no_out!(format!("{x:0width$X}"));
         })],
     );
 }
@@ -690,13 +690,13 @@ fn benchmark_integer_to_string_base_library_comparison(
         &triple_3_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, (x, base))| {
-                no_out!(x.to_string_base(base))
+                no_out!(x.to_string_base(base));
             }),
             ("num", &mut |((x, base), _, _)| {
-                no_out!(x.to_str_radix(u32::wrapping_from(base)))
+                no_out!(x.to_str_radix(u32::wrapping_from(base)));
             }),
             ("rug", &mut |(_, (x, base), _)| {
-                no_out!(x.to_string_radix(i32::wrapping_from(base)))
+                no_out!(x.to_string_radix(i32::wrapping_from(base)));
             }),
         ],
     );
@@ -719,10 +719,10 @@ fn benchmark_integer_to_string_base_algorithms(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("to_string", &mut |(x, base)| {
-                no_out!(x.to_string_base(base))
+                no_out!(x.to_string_base(base));
             }),
             ("using fmt", &mut |(x, base)| {
-                no_out!(format!("{}", BaseFmtWrapper::new(&x, base)))
+                no_out!(format!("{}", BaseFmtWrapper::new(&x, base)));
             }),
         ],
     );
@@ -745,10 +745,10 @@ fn benchmark_integer_to_string_base_upper_algorithms(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("to_string", &mut |(x, base)| {
-                no_out!(x.to_string_base_upper(base))
+                no_out!(x.to_string_base_upper(base));
             }),
             ("using fmt", &mut |(x, base)| {
-                no_out!(format!("{:#}", BaseFmtWrapper::new(&x, base)))
+                no_out!(format!("{:#}", BaseFmtWrapper::new(&x, base)));
             }),
         ],
     );
@@ -774,7 +774,7 @@ fn benchmark_integer_base_fmt_wrapper_fmt_with_width(
                 "{:0width$}",
                 BaseFmtWrapper::new(&x, base),
                 width = width
-            ))
+            ));
         })],
     );
 }
@@ -799,7 +799,7 @@ fn benchmark_integer_base_fmt_wrapper_fmt_upper_with_width(
                 "{:#0width$}",
                 BaseFmtWrapper::new(&x, base),
                 width = width
-            ))
+            ));
         })],
     );
 }

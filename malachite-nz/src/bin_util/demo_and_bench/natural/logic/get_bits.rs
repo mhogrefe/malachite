@@ -107,10 +107,10 @@ fn benchmark_limbs_get_bits_evaluation_strategy(
         &triple_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_slice_get_bits", &mut |(xs, start, end)| {
-                no_out!(limbs_slice_get_bits(&xs, start, end))
+                no_out!(limbs_slice_get_bits(&xs, start, end));
             }),
             ("limbs_vec_get_bits", &mut |(xs, start, end)| {
-                no_out!(limbs_vec_get_bits(xs, start, end))
+                no_out!(limbs_vec_get_bits(xs, start, end));
             }),
         ],
     );
@@ -132,10 +132,10 @@ fn benchmark_natural_get_bits_evaluation_strategy(
         &triple_1_natural_bit_bucketer("n"),
         &mut [
             ("get_bits", &mut |(n, start, end)| {
-                no_out!(n.get_bits(start, end))
+                no_out!(n.get_bits(start, end));
             }),
             ("get_bits_owned", &mut |(n, start, end)| {
-                no_out!(n.get_bits_owned(start, end))
+                no_out!(n.get_bits_owned(start, end));
             }),
         ],
     );
@@ -157,10 +157,10 @@ fn benchmark_natural_get_bits_algorithms(
         &triple_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, start, end)| {
-                no_out!(n.get_bits(start, end))
+                no_out!(n.get_bits(start, end));
             }),
             ("naive", &mut |(n, start, end)| {
-                no_out!(get_bits_naive::<Natural, Natural>(&n, start, end))
+                no_out!(get_bits_naive::<Natural, Natural>(&n, start, end));
             }),
         ],
     );

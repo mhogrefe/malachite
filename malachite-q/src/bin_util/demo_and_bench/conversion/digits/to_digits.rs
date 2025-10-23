@@ -122,10 +122,10 @@ fn benchmark_rational_to_digits_evaluation_strategy(
         &pair_1_rational_bit_bucketer("x"),
         &mut [
             ("Rational.into_digits(&base)", &mut |(n, base)| {
-                no_out!(n.into_digits(&base))
+                no_out!(n.into_digits(&base));
             }),
             ("Rational.to_digits(&base)", &mut |(n, base)| {
-                no_out!(n.to_digits(&base))
+                no_out!(n.to_digits(&base));
             }),
         ],
     );

@@ -174,13 +174,13 @@ fn benchmark_binomial_coefficient_limb_limb_algorithms(
         &usize_convertible_pair_max_bucketer("n", "k"),
         &mut [
             ("default", &mut |(n, k)| {
-                no_out!(binomial_coefficient_limb_limb(n, k))
+                no_out!(binomial_coefficient_limb_limb(n, k));
             }),
             ("naive", &mut |(n, k)| {
                 no_out!(Natural::binomial_coefficient(
                     Natural::from(n),
                     Natural::from(k)
-                ))
+                ));
             }),
         ],
     );
@@ -229,13 +229,13 @@ fn benchmark_natural_binomial_coefficient_algorithms(
         &pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("default", &mut |(n, k)| {
-                no_out!(Natural::binomial_coefficient(n, k))
+                no_out!(Natural::binomial_coefficient(n, k));
             }),
             ("naive 1", &mut |(n, k)| {
-                no_out!(binomial_coefficient_naive_1(n, k))
+                no_out!(binomial_coefficient_naive_1(n, k));
             }),
             ("naive 2", &mut |(n, k)| {
-                no_out!(binomial_coefficient_naive_2(n, k))
+                no_out!(binomial_coefficient_naive_2(n, k));
             }),
         ],
     );
@@ -258,7 +258,7 @@ fn benchmark_natural_binomial_coefficient_library_comparison(
         &pair_2_pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (n, k))| {
-                no_out!(Natural::binomial_coefficient(n, k))
+                no_out!(Natural::binomial_coefficient(n, k));
             }),
             ("rug", &mut |((n, k), _)| no_out!(n.binomial(k))),
         ],

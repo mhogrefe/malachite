@@ -228,7 +228,7 @@ fn benchmark_primitive_int_try_from_primitive_float<
         file_name,
         &primitive_float_bucketer("x"),
         &mut [("Malachite", &mut |n| {
-            no_out!(T::try_from(NiceFloat(n)).ok())
+            no_out!(T::try_from(NiceFloat(n)).ok());
         })],
     );
 }
@@ -250,7 +250,7 @@ fn benchmark_primitive_float_try_from_unsigned<T: PrimitiveFloat, U: PrimitiveUn
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |n| {
-            no_out!(NiceFloat::<T>::try_from(n).ok())
+            no_out!(NiceFloat::<T>::try_from(n).ok());
         })],
     );
 }
@@ -272,7 +272,7 @@ fn benchmark_primitive_float_try_from_signed<T: PrimitiveFloat, U: PrimitiveSign
         file_name,
         &signed_bit_bucketer(),
         &mut [("Malachite", &mut |n| {
-            no_out!(NiceFloat::<T>::try_from(n).ok())
+            no_out!(NiceFloat::<T>::try_from(n).ok());
         })],
     );
 }

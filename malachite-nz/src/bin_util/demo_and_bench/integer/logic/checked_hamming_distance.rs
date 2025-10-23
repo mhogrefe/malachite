@@ -96,7 +96,7 @@ fn benchmark_limbs_hamming_distance_limb_neg(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, y)| {
-            no_out!(limbs_hamming_distance_limb_neg(&xs, y))
+            no_out!(limbs_hamming_distance_limb_neg(&xs, y));
         })],
     );
 }
@@ -116,7 +116,7 @@ fn benchmark_limbs_hamming_distance_neg(
         file_name,
         &pair_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(ref xs, ref ys)| {
-            no_out!(limbs_hamming_distance_neg(xs, ys))
+            no_out!(limbs_hamming_distance_neg(xs, ys));
         })],
     );
 }
@@ -137,10 +137,10 @@ fn benchmark_integer_checked_hamming_distance_library_comparison(
         &pair_2_pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.checked_hamming_distance(&y))
+                no_out!(x.checked_hamming_distance(&y));
             }),
             ("rug", &mut |((x, y), _)| {
-                no_out!(rug_checked_hamming_distance(&x, &y))
+                no_out!(rug_checked_hamming_distance(&x, &y));
             }),
         ],
     );
@@ -162,13 +162,13 @@ fn benchmark_integer_checked_hamming_distance_algorithms(
         &pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("default", &mut |(n, other)| {
-                no_out!(n.checked_hamming_distance(&other))
+                no_out!(n.checked_hamming_distance(&other));
             }),
             ("using bits explicitly", &mut |(n, other)| {
-                no_out!(integer_checked_hamming_distance_alt_1(&n, &other))
+                no_out!(integer_checked_hamming_distance_alt_1(&n, &other));
             }),
             ("using limbs explicitly", &mut |(n, other)| {
-                no_out!(integer_checked_hamming_distance_alt_2(&n, &other))
+                no_out!(integer_checked_hamming_distance_alt_2(&n, &other));
             }),
         ],
     );

@@ -90,10 +90,10 @@ fn benchmark_natural_mod_square_assign_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_square_assign(Natural)", &mut |(mut n, m)| {
-                n.mod_square_assign(m)
+                n.mod_square_assign(m);
             }),
             ("Natural.mod_square_assign(&Natural)", &mut |(mut n, m)| {
-                n.mod_square_assign(&m)
+                n.mod_square_assign(&m);
             }),
         ],
     );
@@ -115,16 +115,16 @@ fn benchmark_natural_mod_square_evaluation_strategy(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_square(Natural)", &mut |(n, m)| {
-                no_out!(n.mod_square(m))
+                no_out!(n.mod_square(m));
             }),
             ("Natural.mod_square(&Natural)", &mut |(n, m)| {
-                no_out!(n.mod_square(&m))
+                no_out!(n.mod_square(&m));
             }),
             ("(&Natural).mod_square(Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_square(m))
+                no_out!((&n).mod_square(m));
             }),
             ("(&Natural).mod_square(&Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_square(&m))
+                no_out!((&n).mod_square(&m));
             }),
         ],
     );
@@ -147,13 +147,13 @@ fn benchmark_natural_mod_square_algorithms(
         &pair_2_natural_bit_bucketer("m"),
         &mut [
             ("Natural.mod_square(Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_square(&m))
+                no_out!((&n).mod_square(&m));
             }),
             ("Natural.mod_mul(Natural, Natural)", &mut |(n, m)| {
-                no_out!((&n).mod_mul(&n, &m))
+                no_out!((&n).mod_mul(&n, &m));
             }),
             ("Natural.square() % Natural", &mut |(n, m)| {
-                no_out!((&n).square() % &m)
+                no_out!((&n).square() % &m);
             }),
         ],
     );

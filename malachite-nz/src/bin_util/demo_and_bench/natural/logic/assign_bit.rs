@@ -48,10 +48,10 @@ fn benchmark_natural_assign_bit_library_comparison(
         &pair_2_triple_2_bucketer("index"),
         &mut [
             ("Malachite", &mut |(_, (mut n, index, bit))| {
-                n.assign_bit(index, bit)
+                n.assign_bit(index, bit);
             }),
             ("rug", &mut |((mut n, index, bit), _)| {
-                no_out!(n.set_bit(u32::exact_from(index), bit))
+                no_out!(n.set_bit(u32::exact_from(index), bit));
             }),
         ],
     );

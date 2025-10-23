@@ -207,10 +207,10 @@ fn benchmark_primes_less_than_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::primes_less_than(&n).count())),
             ("using primes", &mut |n| {
-                no_out!(T::primes().take_while(|&p| p < n).count())
+                no_out!(T::primes().take_while(|&p| p < n).count());
             }),
             ("naive", &mut |n| {
-                no_out!(primes_naive::<T>().take_while(|&p| p < n).count())
+                no_out!(primes_naive::<T>().take_while(|&p| p < n).count());
             }),
         ],
     );
@@ -235,7 +235,7 @@ fn benchmark_primes_less_than_algorithms_2<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(T::primes_less_than(&n).count())),
             ("using primes", &mut |n| {
-                no_out!(T::primes().take_while(|&p| p < n).count())
+                no_out!(T::primes().take_while(|&p| p < n).count());
             }),
         ],
     );
@@ -259,13 +259,13 @@ fn benchmark_primes_less_than_or_equal_to_algorithms<T: PrimitiveUnsigned>(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |n| {
-                no_out!(T::primes_less_than_or_equal_to(&n).count())
+                no_out!(T::primes_less_than_or_equal_to(&n).count());
             }),
             ("using primes", &mut |n| {
-                no_out!(T::primes().take_while(|&p| p <= n).count())
+                no_out!(T::primes().take_while(|&p| p <= n).count());
             }),
             ("naive", &mut |n| {
-                no_out!(primes_naive::<T>().take_while(|&p| p <= n).count())
+                no_out!(primes_naive::<T>().take_while(|&p| p <= n).count());
             }),
         ],
     );
@@ -289,10 +289,10 @@ fn benchmark_primes_less_than_or_equal_to_algorithms_2<T: PrimitiveUnsigned>(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |n| {
-                no_out!(T::primes_less_than_or_equal_to(&n).count())
+                no_out!(T::primes_less_than_or_equal_to(&n).count());
             }),
             ("using primes", &mut |n| {
-                no_out!(T::primes().take_while(|&p| p <= n).count())
+                no_out!(T::primes().take_while(|&p| p <= n).count());
             }),
         ],
     );
@@ -313,7 +313,7 @@ fn benchmark_prime_indicator_sequence_less_than(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |n| {
-            no_out!(prime_indicator_sequence_less_than(n).count())
+            no_out!(prime_indicator_sequence_less_than(n).count());
         })],
     );
 }
@@ -333,7 +333,7 @@ fn benchmark_prime_indicator_sequence_less_than_or_equal_to(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |n| {
-            no_out!(prime_indicator_sequence_less_than_or_equal_to(n).count())
+            no_out!(prime_indicator_sequence_less_than_or_equal_to(n).count());
         })],
     );
 }

@@ -297,7 +297,7 @@ fn benchmark_limbs_sub_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, y)| {
-            no_out!(limbs_sub_limb_to_out(&mut out, &xs, y))
+            no_out!(limbs_sub_limb_to_out(&mut out, &xs, y));
         })],
     );
 }
@@ -317,7 +317,7 @@ fn benchmark_limbs_sub_limb_in_place(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, y)| {
-            no_out!(limbs_sub_limb_in_place::<Limb>(&mut xs, y))
+            no_out!(limbs_sub_limb_in_place::<Limb>(&mut xs, y));
         })],
     );
 }
@@ -350,7 +350,7 @@ fn benchmark_limbs_sub_same_length_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, ys)| {
-            no_out!(limbs_sub_same_length_to_out(&mut out, &xs, &ys))
+            no_out!(limbs_sub_same_length_to_out(&mut out, &xs, &ys));
         })],
     );
 }
@@ -370,7 +370,7 @@ fn benchmark_limbs_sub_greater_to_out(
         file_name,
         &triple_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs, ys)| {
-            no_out!(limbs_sub_greater_to_out(&mut out, &xs, &ys))
+            no_out!(limbs_sub_greater_to_out(&mut out, &xs, &ys));
         })],
     );
 }
@@ -390,7 +390,7 @@ fn benchmark_limbs_sub_same_length_in_place_left(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            no_out!(limbs_sub_same_length_in_place_left(&mut xs, &ys))
+            no_out!(limbs_sub_same_length_in_place_left(&mut xs, &ys));
         })],
     );
 }
@@ -410,7 +410,7 @@ fn benchmark_limbs_sub_greater_in_place_left(
         file_name,
         &pair_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(mut xs, ys)| {
-            no_out!(limbs_sub_greater_in_place_left(&mut xs, &ys))
+            no_out!(limbs_sub_greater_in_place_left(&mut xs, &ys));
         })],
     );
 }
@@ -430,7 +430,7 @@ fn benchmark_limbs_sub_same_length_in_place_right(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, mut ys)| {
-            no_out!(limbs_sub_same_length_in_place_right(&xs, &mut ys))
+            no_out!(limbs_sub_same_length_in_place_right(&xs, &mut ys));
         })],
     );
 }
@@ -450,7 +450,7 @@ fn benchmark_limbs_slice_sub_in_place_right(
         file_name,
         &triple_1_2_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(xs, mut ys, len)| {
-            no_out!(limbs_slice_sub_in_place_right(&xs, &mut ys, len))
+            no_out!(limbs_slice_sub_in_place_right(&xs, &mut ys, len));
         })],
     );
 }
@@ -470,7 +470,7 @@ fn benchmark_limbs_vec_sub_in_place_right(
         file_name,
         &pair_vec_min_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(xs, mut ys)| {
-            no_out!(limbs_vec_sub_in_place_right(&xs, &mut ys))
+            no_out!(limbs_vec_sub_in_place_right(&xs, &mut ys));
         })],
     );
 }
@@ -494,13 +494,13 @@ fn benchmark_limbs_sub_same_length_in_place_with_overlap_algorithms(
                 no_out!(limbs_sub_same_length_in_place_with_overlap(
                     &mut xs,
                     right_start
-                ))
+                ));
             }),
             ("naive", &mut |(mut xs, right_start)| {
                 no_out!(limbs_sub_same_length_in_place_with_overlap_naive(
                     &mut xs,
                     right_start
-                ))
+                ));
             }),
         ],
     );
@@ -522,12 +522,12 @@ fn benchmark_limbs_sub_same_length_to_out_with_overlap_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(mut xs, ys)| {
-                no_out!(limbs_sub_same_length_to_out_with_overlap(&mut xs, &ys))
+                no_out!(limbs_sub_same_length_to_out_with_overlap(&mut xs, &ys));
             }),
             ("naive", &mut |(mut xs, ys)| {
                 no_out!(limbs_sub_same_length_to_out_with_overlap_naive(
                     &mut xs, &ys
-                ))
+                ));
             }),
         ],
     );

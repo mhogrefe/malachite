@@ -537,7 +537,7 @@ fn benchmark_limbs_invert_limb(gm: GenMode, config: &GenConfig, limit: usize, fi
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |x| {
-            no_out!(limbs_invert_limb::<DoubleLimb, Limb>(x))
+            no_out!(limbs_invert_limb::<DoubleLimb, Limb>(x));
         })],
     );
 }
@@ -552,7 +552,7 @@ fn benchmark_limbs_div_limb_mod(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, y)| {
-            no_out!(limbs_div_limb_mod(&xs, y))
+            no_out!(limbs_div_limb_mod(&xs, y));
         })],
     );
 }
@@ -573,13 +573,13 @@ fn benchmark_limbs_div_limb_to_out_mod_algorithms(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(mut out, xs, y)| {
-                no_out!(limbs_div_limb_to_out_mod(&mut out, &xs, y))
+                no_out!(limbs_div_limb_to_out_mod(&mut out, &xs, y));
             }),
             ("alt", &mut |(mut out, xs, y)| {
-                no_out!(limbs_div_limb_to_out_mod_alt(&mut out, &xs, y))
+                no_out!(limbs_div_limb_to_out_mod_alt(&mut out, &xs, y));
             }),
             ("naive", &mut |(mut out, xs, y)| {
-                no_out!(limbs_div_limb_to_out_mod_naive(&mut out, &xs, y))
+                no_out!(limbs_div_limb_to_out_mod_naive(&mut out, &xs, y));
             }),
         ],
     );
@@ -601,13 +601,13 @@ fn benchmark_limbs_div_limb_in_place_mod_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(mut xs, y)| {
-                no_out!(limbs_div_limb_in_place_mod(&mut xs, y))
+                no_out!(limbs_div_limb_in_place_mod(&mut xs, y));
             }),
             ("alt", &mut |(mut xs, y)| {
-                no_out!(limbs_div_limb_in_place_mod_alt(&mut xs, y))
+                no_out!(limbs_div_limb_in_place_mod_alt(&mut xs, y));
             }),
             ("naive", &mut |(mut xs, y)| {
-                no_out!(limbs_div_limb_in_place_mod_naive(&mut xs, y))
+                no_out!(limbs_div_limb_in_place_mod_naive(&mut xs, y));
             }),
         ],
     );
@@ -637,7 +637,7 @@ fn benchmark_limbs_div_mod_extra(gm: GenMode, config: &GenConfig, limit: usize, 
                 d,
                 d_inv,
                 shift
-            ))
+            ));
         })],
     );
 }
@@ -669,7 +669,7 @@ fn benchmark_limbs_div_mod_extra_in_place(
                 d,
                 d_inv,
                 shift
-            ))
+            ));
         })],
     );
 }
@@ -689,7 +689,7 @@ fn benchmark_limbs_div_mod_by_two_limb_normalized(
         file_name,
         &triple_2_vec_len_bucketer("ns"),
         &mut [("Malachite", &mut |(mut qs, mut ns, ds)| {
-            no_out!(limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds))
+            no_out!(limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds));
         })],
     );
 }
@@ -709,7 +709,7 @@ fn benchmark_limbs_div_mod_schoolbook(
         file_name,
         &quadruple_2_vec_len_bucketer("ns"),
         &mut [("Malachite", &mut |(mut qs, mut ns, ds, inverse)| {
-            no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+            no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse));
         })],
     );
 }
@@ -731,7 +731,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
         &quadruple_2_3_diff_vec_len_bucketer("ns", "ds"),
         &mut [
             ("Schoolbook", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse));
             }),
             ("divide-and-conquer", &mut |(
                 mut qs,
@@ -741,7 +741,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
             )| {
                 no_out!(limbs_div_mod_divide_and_conquer(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
         ],
     );
@@ -762,7 +762,7 @@ fn benchmark_limbs_invert_basecase_approx(
         file_name,
         &triple_2_vec_len_bucketer("ds"),
         &mut [("Malachite", &mut |(mut is, ds, mut scratch)| {
-            no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+            no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch));
         })],
     );
 }
@@ -784,10 +784,10 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
         &triple_2_vec_len_bucketer("ds"),
         &mut [
             ("basecase", &mut |(mut is, ds, mut scratch)| {
-                no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+                no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch));
             }),
             ("Newton", &mut |(mut is, ds, mut scratch)| {
-                no_out!(limbs_invert_newton_approx(&mut is, &ds, &mut scratch))
+                no_out!(limbs_invert_newton_approx(&mut is, &ds, &mut scratch));
             }),
         ],
     );
@@ -810,10 +810,10 @@ fn benchmark_limbs_invert_approx_algorithms(
         &triple_2_vec_len_bucketer("ds"),
         &mut [
             ("basecase", &mut |(mut is, ds, mut scratch)| {
-                no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+                no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch));
             }),
             ("default", &mut |(mut is, ds, mut scratch)| {
-                no_out!(limbs_invert_approx(&mut is, &ds, &mut scratch))
+                no_out!(limbs_invert_approx(&mut is, &ds, &mut scratch));
             }),
         ],
     );
@@ -836,7 +836,7 @@ fn benchmark_limbs_div_mod_barrett(gm: GenMode, config: &GenConfig, limit: usize
                 &ns,
                 &ds,
                 &mut scratch
-            ))
+            ));
         })],
     );
 }
@@ -866,7 +866,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
                     &mut ns[..q_len << 1],
                     &ds[..q_len],
                     inverse
-                ))
+                ));
             }),
             ("Barrett", &mut |(mut qs, mut ns, mut ds)| {
                 let d_len = ds.len();
@@ -914,7 +914,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
                     &ds,
                     &qs,
                     &mut mul_scratch,
-                ))
+                ));
             }),
             ("limbs_div_barrett_large_product", &mut |(
                 mut scratch,
@@ -924,7 +924,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
                 scratch_len,
                 i_len,
             )| {
-                limbs_div_barrett_large_product(&mut scratch, &ds, &qs, &rs_hi, scratch_len, i_len)
+                limbs_div_barrett_large_product(&mut scratch, &ds, &qs, &rs_hi, scratch_len, i_len);
             }),
         ],
     );
@@ -959,7 +959,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
                     &ns,
                     &ds,
                     &mut scratch
-                ))
+                ));
             }),
             ("limbs_div_mod_barrett_large_helper", &mut |(
                 mut qs,
@@ -975,7 +975,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
                     &ns,
                     &ds,
                     &mut scratch
-                ))
+                ));
             }),
         ],
     );
@@ -991,7 +991,7 @@ fn benchmark_limbs_div_mod(gm: GenMode, config: &GenConfig, limit: usize, file_n
         file_name,
         &pair_1_vec_len_bucketer("ns"),
         &mut [("Malachite", &mut |(ns, ds)| {
-            no_out!(limbs_div_mod(&ns, &ds))
+            no_out!(limbs_div_mod(&ns, &ds));
         })],
     );
 }
@@ -1006,7 +1006,7 @@ fn benchmark_limbs_div_mod_to_out(gm: GenMode, config: &GenConfig, limit: usize,
         file_name,
         &quadruple_3_vec_len_bucketer("ns"),
         &mut [("Malachite", &mut |(mut qs, mut rs, ns, ds)| {
-            limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds)
+            limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds);
         })],
     );
 }
@@ -1027,10 +1027,10 @@ fn benchmark_natural_div_assign_mod_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.div_assign_mod(Natural)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_mod(y))
+                no_out!(x.div_assign_mod(y));
             }),
             ("Natural.div_mod(&Natural)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_mod(&y))
+                no_out!(x.div_assign_mod(&y));
             }),
         ],
     );
@@ -1096,16 +1096,16 @@ fn benchmark_natural_div_mod_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.div_mod(Natural)", &mut |(x, y)| {
-                no_out!(x.div_mod(y))
+                no_out!(x.div_mod(y));
             }),
             ("Natural.div_mod(&Natural)", &mut |(x, y)| {
-                no_out!(x.div_mod(&y))
+                no_out!(x.div_mod(&y));
             }),
             ("(&Natural).div_mod(Natural)", &mut |(x, y)| {
-                no_out!((&x).div_mod(y))
+                no_out!((&x).div_mod(y));
             }),
             ("(&Natural).div_mod(&Natural)", &mut |(x, y)| {
-                no_out!((&x).div_mod(&y))
+                no_out!((&x).div_mod(&y));
             }),
         ],
     );
@@ -1127,10 +1127,10 @@ fn benchmark_natural_div_assign_rem_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.div_assign_rem(Natural)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_rem(y))
+                no_out!(x.div_assign_rem(y));
             }),
             ("Natural.div_assign_rem(&Natural)", &mut |(mut x, y)| {
-                no_out!(x.div_assign_rem(&y))
+                no_out!(x.div_assign_rem(&y));
             }),
         ],
     );
@@ -1174,16 +1174,16 @@ fn benchmark_natural_div_rem_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.div_rem(Natural)", &mut |(x, y)| {
-                no_out!(x.div_rem(y))
+                no_out!(x.div_rem(y));
             }),
             ("Natural.div_rem(&Natural)", &mut |(x, y)| {
-                no_out!(x.div_rem(&y))
+                no_out!(x.div_rem(&y));
             }),
             ("(&Natural).div_rem(Natural)", &mut |(x, y)| {
-                no_out!((&x).div_rem(y))
+                no_out!((&x).div_rem(y));
             }),
             ("(&Natural).div_rem(&Natural)", &mut |(x, y)| {
-                no_out!((&x).div_rem(&y))
+                no_out!((&x).div_rem(&y));
             }),
         ],
     );
@@ -1232,10 +1232,10 @@ fn benchmark_natural_ceiling_div_neg_mod_library_comparison(
         &pair_2_pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.ceiling_div_neg_mod(y))
+                no_out!(x.ceiling_div_neg_mod(y));
             }),
             ("rug", &mut |((x, y), _)| {
-                no_out!(rug_ceiling_div_neg_mod(x, y))
+                no_out!(rug_ceiling_div_neg_mod(x, y));
             }),
         ],
     );
@@ -1281,16 +1281,16 @@ fn benchmark_natural_ceiling_div_neg_mod_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.ceiling_div_neg_mod(Natural)", &mut |(x, y)| {
-                no_out!(x.ceiling_div_neg_mod(y))
+                no_out!(x.ceiling_div_neg_mod(y));
             }),
             ("Natural.ceiling_div_neg_mod(&Natural)", &mut |(x, y)| {
-                no_out!(x.ceiling_div_neg_mod(&y))
+                no_out!(x.ceiling_div_neg_mod(&y));
             }),
             ("(&Natural).ceiling_div_neg_mod(Natural)", &mut |(x, y)| {
-                no_out!((&x).ceiling_div_neg_mod(y))
+                no_out!((&x).ceiling_div_neg_mod(y));
             }),
             ("(&Natural).ceiling_div_neg_mod(&Natural)", &mut |(x, y)| {
-                no_out!((&x).ceiling_div_neg_mod(&y))
+                no_out!((&x).ceiling_div_neg_mod(&y));
             }),
         ],
     );

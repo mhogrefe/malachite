@@ -10,7 +10,7 @@ enum BigIntErrorKind {
 }
 
 impl ParseBigIntError {
-    fn __description(&self) -> &str {
+    const fn __description(&self) -> &str {
         use BigIntErrorKind::*;
         match self.kind {
             Empty => "cannot parse integer from empty string",
@@ -18,13 +18,13 @@ impl ParseBigIntError {
         }
     }
 
-    pub(crate) fn empty() -> Self {
+    pub(crate) const fn empty() -> Self {
         Self {
             kind: BigIntErrorKind::Empty,
         }
     }
 
-    pub(crate) fn invalid() -> Self {
+    pub(crate) const fn invalid() -> Self {
         Self {
             kind: BigIntErrorKind::InvalidDigit,
         }
@@ -49,11 +49,12 @@ pub struct TryFromBigIntError<T> {
 }
 
 impl<T> TryFromBigIntError<T> {
-    pub(crate) fn new(original: T) -> Self {
+    pub(crate) const fn new(original: T) -> Self {
         Self { original }
     }
 
-    fn __description(&self) -> &str {
+    #[allow(clippy::unused_self)]
+    const fn __description(&self) -> &str {
         "out of range conversion regarding big integer attempted"
     }
 

@@ -16,7 +16,8 @@
     clippy::suspicious_op_assign_impl,
     clippy::too_many_arguments,
     clippy::type_complexity,
-    clippy::upper_case_acronyms
+    clippy::upper_case_acronyms,
+    clippy::multiple_bound_locations
 )]
 #![warn(
     clippy::cast_lossless,
@@ -39,7 +40,18 @@
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
     clippy::uninlined_format_args,
-    clippy::unused_self
+    clippy::unused_self,
+    clippy::if_not_else,
+    clippy::manual_assert,
+    clippy::range_plus_one,
+    clippy::redundant_else,
+    clippy::semicolon_if_nothing_returned,
+    clippy::cloned_instead_of_copied,
+    clippy::flat_map_option,
+    clippy::unnecessary_wraps,
+    clippy::unnested_or_patterns,
+    clippy::use_self,
+    clippy::trivially_copy_pass_by_ref
 )]
 
 #[cfg(feature = "bin_build")]

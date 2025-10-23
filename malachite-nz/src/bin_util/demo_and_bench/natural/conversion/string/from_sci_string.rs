@@ -114,7 +114,7 @@ fn benchmark_natural_from_sci_string_with_options(
         file_name,
         &pair_1_string_len_bucketer("s"),
         &mut [("Malachite", &mut |(s, options)| {
-            no_out!(Natural::from_sci_string_with_options(&s, options))
+            no_out!(Natural::from_sci_string_with_options(&s, options));
         })],
     );
 }

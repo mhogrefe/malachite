@@ -301,7 +301,7 @@ fn benchmark_limbs_add_mul_limb(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &triple_1_2_vec_max_len_bucketer("a", "b"),
         &mut [("Malachite", &mut |(a, b, c)| {
-            no_out!(limbs_add_mul_limb(&a, &b, c))
+            no_out!(limbs_add_mul_limb(&a, &b, c));
         })],
     );
 }
@@ -323,7 +323,7 @@ fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_left(
         &mut [("Malachite", &mut |(mut a, b, c)| {
             no_out!(limbs_slice_add_mul_limb_same_length_in_place_left(
                 &mut a, &b, c
-            ))
+            ));
         })],
     );
 }
@@ -345,7 +345,7 @@ fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_right(
         &mut [("Malachite", &mut |(a, mut b, c)| {
             no_out!(limbs_slice_add_mul_limb_same_length_in_place_right(
                 &a, &mut b, c
-            ))
+            ));
         })],
     );
 }
@@ -365,7 +365,7 @@ fn benchmark_limbs_vec_add_mul_limb_in_place_left(
         file_name,
         &triple_1_2_vec_max_len_bucketer("a", "b"),
         &mut [("Malachite", &mut |(mut a, b, c)| {
-            limbs_vec_add_mul_limb_in_place_left(&mut a, &b, c)
+            limbs_vec_add_mul_limb_in_place_left(&mut a, &b, c);
         })],
     );
 }
@@ -385,7 +385,7 @@ fn benchmark_limbs_vec_add_mul_limb_in_place_right(
         file_name,
         &triple_1_2_vec_max_len_bucketer("a", "b"),
         &mut [("Malachite", &mut |(a, mut b, c)| {
-            limbs_vec_add_mul_limb_in_place_right(&a, &mut b, c)
+            limbs_vec_add_mul_limb_in_place_right(&a, &mut b, c);
         })],
     );
 }
@@ -405,7 +405,7 @@ fn benchmark_limbs_vec_add_mul_limb_in_place_either(
         file_name,
         &triple_1_2_vec_max_len_bucketer("a", "b"),
         &mut [("Malachite", &mut |(mut a, b, c)| {
-            limbs_vec_add_mul_limb_in_place_left(&mut a, &b, c)
+            limbs_vec_add_mul_limb_in_place_left(&mut a, &b, c);
         })],
     );
 }
@@ -420,7 +420,7 @@ fn benchmark_limbs_add_mul(gm: GenMode, config: &GenConfig, limit: usize, file_n
         file_name,
         &triple_vec_max_len_bucketer("a", "b", "c"),
         &mut [("Malachite", &mut |(a, b, c)| {
-            no_out!(limbs_add_mul(&a, &b, &c))
+            no_out!(limbs_add_mul(&a, &b, &c));
         })],
     );
 }
@@ -440,7 +440,7 @@ fn benchmark_limbs_add_mul_in_place_left(
         file_name,
         &triple_vec_max_len_bucketer("a", "b", "c"),
         &mut [("Malachite", &mut |(mut a, b, c)| {
-            no_out!(limbs_add_mul_in_place_left(&mut a, &b, &c))
+            no_out!(limbs_add_mul_in_place_left(&mut a, &b, &c));
         })],
     );
 }
@@ -500,7 +500,7 @@ fn benchmark_natural_add_mul_assign_algorithms(
                 &mut |(mut a, b, c)| a.add_mul_assign(b, c),
             ),
             ("Natural += Natural * Natural", &mut |(mut a, b, c)| {
-                a += b * c
+                a += b * c;
             }),
         ],
     );
@@ -526,7 +526,7 @@ fn benchmark_natural_add_mul_assign_val_ref_algorithms(
                 &mut |(mut a, b, c)| a.add_mul_assign(b, &c),
             ),
             ("Natural += Natural * &Natural", &mut |(mut a, b, c)| {
-                a += b * &c
+                a += b * &c;
             }),
         ],
     );
@@ -552,7 +552,7 @@ fn benchmark_natural_add_mul_assign_ref_val_algorithms(
                 &mut |(mut a, b, c)| a.add_mul_assign(&b, c),
             ),
             ("Natural += &Natural * Natural", &mut |(mut a, b, c)| {
-                a += &b * c
+                a += &b * c;
             }),
         ],
     );
@@ -578,7 +578,7 @@ fn benchmark_natural_add_mul_assign_ref_ref_algorithms(
                 &mut |(mut a, b, c)| a.add_mul_assign(&b, &c),
             ),
             ("Natural += &Natural * &Natural", &mut |(mut a, b, c)| {
-                a += &b * &c
+                a += &b * &c;
             }),
         ],
     );
@@ -600,16 +600,16 @@ fn benchmark_natural_add_mul_evaluation_stategy(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.add_mul(Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(b, c))
+                no_out!(a.add_mul(b, c));
             }),
             ("Natural.add_mul(Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(b, &c))
+                no_out!(a.add_mul(b, &c));
             }),
             ("Natural.add_mul(&Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(&b, c))
+                no_out!(a.add_mul(&b, c));
             }),
             ("Natural.add_mul(&Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(&b, &c))
+                no_out!(a.add_mul(&b, &c));
             }),
             (
                 "(&Natural).add_mul(&Natural, &Natural)",
@@ -636,10 +636,10 @@ fn benchmark_natural_add_mul_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.add_mul(Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(b, c))
+                no_out!(a.add_mul(b, c));
             }),
             ("Natural + Natural * Natural", &mut |(a, b, c)| {
-                no_out!(a + b * c)
+                no_out!(a + b * c);
             }),
         ],
     );
@@ -662,10 +662,10 @@ fn benchmark_natural_add_mul_val_val_ref_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.add_mul(Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(b, &c))
+                no_out!(a.add_mul(b, &c));
             }),
             ("Natural + Natural * &Natural", &mut |(a, b, c)| {
-                no_out!(a + b * &c)
+                no_out!(a + b * &c);
             }),
         ],
     );
@@ -688,10 +688,10 @@ fn benchmark_natural_add_mul_val_ref_val_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.add_mul(&Natural, Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(&b, c))
+                no_out!(a.add_mul(&b, c));
             }),
             ("Natural + &Natural * Natural", &mut |(a, b, c)| {
-                no_out!(a + &b * c)
+                no_out!(a + &b * c);
             }),
         ],
     );
@@ -714,10 +714,10 @@ fn benchmark_natural_add_mul_val_ref_ref_algorithms(
         &triple_natural_max_bit_bucketer("a", "b", "c"),
         &mut [
             ("Natural.add_mul(&Natural, &Natural)", &mut |(a, b, c)| {
-                no_out!(a.add_mul(&b, &c))
+                no_out!(a.add_mul(&b, &c));
             }),
             ("Natural + &Natural * &Natural", &mut |(a, b, c)| {
-                no_out!(a + &b * &c)
+                no_out!(a + &b * &c);
             }),
         ],
     );
@@ -744,7 +744,7 @@ fn benchmark_natural_add_mul_ref_ref_ref_algorithms(
                 &mut |(a, b, c)| no_out!((&a).add_mul(&b, &c)),
             ),
             ("(&Natural) + &Natural * &Natural", &mut |(a, b, c)| {
-                no_out!((&a) + &b * &c)
+                no_out!((&a) + &b * &c);
             }),
         ],
     );

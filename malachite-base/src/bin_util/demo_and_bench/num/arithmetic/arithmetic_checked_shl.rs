@@ -130,7 +130,7 @@ fn benchmark_arithmetic_checked_shl_unsigned_unsigned<
         file_name,
         &pair_2_bucketer("other"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.arithmetic_checked_shl(y))
+            no_out!(x.arithmetic_checked_shl(y));
         })],
     );
 }
@@ -155,7 +155,7 @@ fn benchmark_arithmetic_checked_shl_unsigned_signed<
         file_name,
         &pair_2_unsigned_abs_bucketer("other"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.arithmetic_checked_shl(y))
+            no_out!(x.arithmetic_checked_shl(y));
         })],
     );
 }
@@ -180,7 +180,7 @@ fn benchmark_arithmetic_checked_shl_signed_unsigned<
         file_name,
         &pair_2_bucketer("other"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.arithmetic_checked_shl(y))
+            no_out!(x.arithmetic_checked_shl(y));
         })],
     );
 }
@@ -205,7 +205,7 @@ fn benchmark_arithmetic_checked_shl_signed_signed<
         file_name,
         &pair_2_unsigned_abs_bucketer("other"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.arithmetic_checked_shl(y))
+            no_out!(x.arithmetic_checked_shl(y));
         })],
     );
 }

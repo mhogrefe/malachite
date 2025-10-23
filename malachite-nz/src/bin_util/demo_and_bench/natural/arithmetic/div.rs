@@ -427,10 +427,10 @@ fn benchmark_limbs_div_limb_to_out_algorithms(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(mut out, xs, y)| {
-                limbs_div_limb_to_out(&mut out, &xs, y)
+                limbs_div_limb_to_out(&mut out, &xs, y);
             }),
             ("alt", &mut |(mut out, xs, y)| {
-                limbs_div_limb_to_out_alt(&mut out, &xs, y)
+                limbs_div_limb_to_out_alt(&mut out, &xs, y);
             }),
         ],
     );
@@ -452,10 +452,10 @@ fn benchmark_limbs_div_limb_in_place_algorithms(
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("standard", &mut |(mut xs, y)| {
-                limbs_div_limb_in_place(&mut xs, y)
+                limbs_div_limb_in_place(&mut xs, y);
             }),
             ("alt", &mut |(mut xs, y)| {
-                limbs_div_limb_in_place_alt(&mut xs, y)
+                limbs_div_limb_in_place_alt(&mut xs, y);
             }),
         ],
     );
@@ -479,7 +479,7 @@ fn benchmark_limbs_div_divisor_of_limb_max_with_carry_to_out(
             no_out!(limbs_div_divisor_of_limb_max_with_carry_to_out::<
                 DoubleLimb,
                 Limb,
-            >(&mut out, &xs, divisor, carry))
+            >(&mut out, &xs, divisor, carry));
         })],
     );
 }
@@ -501,7 +501,7 @@ fn benchmark_limbs_div_divisor_of_limb_max_with_carry_in_place(
         &mut [("Malachite", &mut |(mut xs, divisor, carry)| {
             no_out!(limbs_div_divisor_of_limb_max_with_carry_in_place(
                 &mut xs, divisor, carry
-            ))
+            ));
         })],
     );
 }
@@ -527,10 +527,10 @@ fn benchmark_limbs_div_schoolbook_algorithms(
                 ds,
                 inverse,
             )| {
-                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse));
             }),
             ("Schoolbook div", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse));
             }),
         ],
     );
@@ -552,7 +552,7 @@ fn benchmark_limbs_div_divide_and_conquer_algorithms(
         &quadruple_2_3_diff_vec_len_bucketer("ns", "ds"),
         &mut [
             ("Schoolbook div", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse));
             }),
             ("divide-and-conquer div/mod", &mut |(
                 mut qs,
@@ -562,7 +562,7 @@ fn benchmark_limbs_div_divide_and_conquer_algorithms(
             )| {
                 no_out!(limbs_div_mod_divide_and_conquer(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
             ("divide-and-conquer div", &mut |(
                 mut qs,
@@ -570,7 +570,7 @@ fn benchmark_limbs_div_divide_and_conquer_algorithms(
                 ds,
                 inverse,
             )| {
-                no_out!(limbs_div_divide_and_conquer(&mut qs, &ns, &ds, inverse))
+                no_out!(limbs_div_divide_and_conquer(&mut qs, &ns, &ds, inverse));
             }),
         ],
     );
@@ -597,7 +597,7 @@ fn benchmark_limbs_div_barrett_algorithms(
                 ds,
                 inverse,
             )| {
-                no_out!(limbs_div_divide_and_conquer(&mut qs, &ns, &ds, inverse))
+                no_out!(limbs_div_divide_and_conquer(&mut qs, &ns, &ds, inverse));
             }),
             ("Barrett div/mod", &mut |(mut qs, ns, ds, _)| {
                 let mut rs = vec![0; ds.len()];
@@ -608,11 +608,11 @@ fn benchmark_limbs_div_barrett_algorithms(
                     &ns,
                     &ds,
                     &mut scratch
-                ))
+                ));
             }),
             ("Barrett div", &mut |(mut qs, ns, ds, _)| {
                 let mut scratch = vec![0; limbs_div_barrett_scratch_len(ns.len(), ds.len())];
-                no_out!(limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
+                no_out!(limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch));
             }),
         ],
     );
@@ -634,10 +634,10 @@ fn benchmark_limbs_div_schoolbook_approx_algorithms(
         &quadruple_2_3_diff_vec_len_bucketer("ns", "ds"),
         &mut [
             ("Schoolbook", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse));
             }),
             ("Schoolbook approx", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse));
             }),
         ],
     );
@@ -659,10 +659,10 @@ fn benchmark_limbs_div_divide_and_conquer_approx_algorithms(
         &quadruple_2_3_diff_vec_len_bucketer("ns", "ds"),
         &mut [
             ("Schoolbook approx", &mut |(mut qs, mut ns, ds, inverse)| {
-                no_out!(limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse));
             }),
             ("divide-and-conquer", &mut |(mut qs, ns, ds, inverse)| {
-                no_out!(limbs_div_divide_and_conquer(&mut qs, &ns, &ds, inverse))
+                no_out!(limbs_div_divide_and_conquer(&mut qs, &ns, &ds, inverse));
             }),
             ("divide-and-conquer approx", &mut |(
                 mut qs,
@@ -672,7 +672,7 @@ fn benchmark_limbs_div_divide_and_conquer_approx_algorithms(
             )| {
                 no_out!(limbs_div_divide_and_conquer_approx(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
         ],
     );
@@ -703,15 +703,15 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
                 let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
                 no_out!(limbs_div_divide_and_conquer_approx(
                     &mut qs, &mut ns, &ds, inverse
-                ))
+                ));
             }),
             ("Barrett", &mut |(mut qs, ns, ds, _)| {
                 let mut scratch = vec![0; limbs_div_barrett_scratch_len(ns.len(), ds.len())];
-                no_out!(limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
+                no_out!(limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch));
             }),
             ("Barrett approx", &mut |(mut qs, ns, ds, _)| {
                 let mut scratch = vec![0; limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
-                no_out!(limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch))
+                no_out!(limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch));
             }),
         ],
     );
@@ -749,10 +749,10 @@ fn benchmark_limbs_div_to_out_balancing_algorithms(
         &limbs_div_to_out_balancing_bucketer(),
         &mut [
             ("unbalanced", &mut |(mut qs, mut ns, mut ds)| {
-                limbs_div_to_out_unbalanced(&mut qs, &mut ns, &mut ds)
+                limbs_div_to_out_unbalanced(&mut qs, &mut ns, &mut ds);
             }),
             ("balanced", &mut |(mut qs, ns, ds)| {
-                limbs_div_to_out_balanced(&mut qs, &ns, &ds)
+                limbs_div_to_out_balanced(&mut qs, &ns, &ds);
             }),
         ],
     );
@@ -809,10 +809,10 @@ fn benchmark_limbs_div_to_out_ref_ref_algorithms(
         &quadruple_3_vec_len_bucketer("ns"),
         &mut [
             ("div_mod", &mut |(mut qs, mut rs, ns, ds)| {
-                limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds)
+                limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds);
             }),
             ("div", &mut |(mut qs, _, ns, ds)| {
-                limbs_div_to_out_ref_ref(&mut qs, &ns, &ds)
+                limbs_div_to_out_ref_ref(&mut qs, &ns, &ds);
             }),
         ],
     );
@@ -945,16 +945,16 @@ fn benchmark_natural_checked_div_evaluation_strategy(
         &pair_1_natural_bit_bucketer("x"),
         &mut [
             ("Natural.checked_div(Natural)", &mut |(x, y)| {
-                no_out!(x.checked_div(y))
+                no_out!(x.checked_div(y));
             }),
             ("Natural.checked_div(&Natural)", &mut |(x, y)| {
-                no_out!(x.checked_div(&y))
+                no_out!(x.checked_div(&y));
             }),
             ("(&Natural).checked_div(Natural)", &mut |(x, y)| {
-                no_out!((&x).checked_div(y))
+                no_out!((&x).checked_div(y));
             }),
             ("(&Natural).checked_div(&Natural)", &mut |(x, y)| {
-                no_out!((&x).checked_div(&y))
+                no_out!((&x).checked_div(&y));
             }),
         ],
     );

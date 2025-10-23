@@ -1984,7 +1984,7 @@ impl Natural {
 
     #[cfg(feature = "test_build")]
     #[inline]
-    pub fn div_limb_naive(mut self, other: Limb) -> Natural {
+    pub fn div_limb_naive(mut self, other: Limb) -> Self {
         self.div_assign_limb_naive(other);
         self
     }
@@ -2006,10 +2006,10 @@ impl Natural {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}
-            (Natural(Small(small)), other) => {
+            (Self(Small(small)), other) => {
                 *small /= other;
             }
-            (Natural(Large(limbs)), other) => {
+            (Self(Large(limbs)), other) => {
                 limbs_div_in_place_naive(limbs, other);
                 self.trim();
             }

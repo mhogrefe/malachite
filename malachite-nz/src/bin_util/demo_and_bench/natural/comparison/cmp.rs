@@ -95,7 +95,7 @@ fn benchmark_limbs_cmp_same_length(gm: GenMode, config: &GenConfig, limit: usize
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, ys)| {
-            no_out!(limbs_cmp_same_length(&xs, &ys))
+            no_out!(limbs_cmp_same_length(&xs, &ys));
         })],
     );
 }
@@ -123,7 +123,7 @@ fn benchmark_limbs_cmp_normalized(gm: GenMode, config: &GenConfig, limit: usize,
         file_name,
         &pair_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(xs, ys)| {
-            no_out!(limbs_cmp_normalized(&xs, &ys))
+            no_out!(limbs_cmp_normalized(&xs, &ys));
         })],
     );
 }
@@ -168,7 +168,7 @@ fn benchmark_natural_cmp_normalized_algorithms(
         &mut [
             ("default", &mut |(x, y)| no_out!(x.cmp_normalized(&y))),
             ("naive", &mut |(x, y)| {
-                no_out!(natural_cmp_normalized_naive(&x, &y))
+                no_out!(natural_cmp_normalized_naive(&x, &y));
             }),
         ],
     );

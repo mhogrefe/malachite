@@ -83,7 +83,7 @@ fn benchmark_arithmetic_checked_shr_unsigned_signed<
         file_name,
         &pair_2_unsigned_abs_bucketer("other"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.arithmetic_checked_shr(y))
+            no_out!(x.arithmetic_checked_shr(y));
         })],
     );
 }
@@ -108,7 +108,7 @@ fn benchmark_arithmetic_checked_shr_signed_signed<
         file_name,
         &pair_2_unsigned_abs_bucketer("other"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(x.arithmetic_checked_shr(y))
+            no_out!(x.arithmetic_checked_shr(y));
         })],
     );
 }

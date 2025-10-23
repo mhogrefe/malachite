@@ -117,7 +117,7 @@ fn benchmark_limbs_slice_next_power_of_2_in_place(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |mut xs| {
-            no_out!(limbs_slice_next_power_of_2_in_place(&mut xs))
+            no_out!(limbs_slice_next_power_of_2_in_place(&mut xs));
         })],
     );
 }
@@ -137,7 +137,7 @@ fn benchmark_limbs_vec_next_power_of_2_in_place(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |mut xs| {
-            limbs_vec_next_power_of_2_in_place(&mut xs)
+            limbs_vec_next_power_of_2_in_place(&mut xs);
         })],
     );
 }
@@ -198,10 +198,10 @@ fn benchmark_natural_next_power_of_2_evaluation_strategy(
         &natural_bit_bucketer("n"),
         &mut [
             ("Natural.next_power_of_2()", &mut |n| {
-                no_out!(n.next_power_of_2())
+                no_out!(n.next_power_of_2());
             }),
             ("(&Natural).next_power_of_2()", &mut |n| {
-                no_out!((&n).next_power_of_2())
+                no_out!((&n).next_power_of_2());
             }),
         ],
     );

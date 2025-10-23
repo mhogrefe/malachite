@@ -96,7 +96,7 @@ fn benchmark_limbs_floor_log_base_2(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |ref xs| {
-            no_out!(limbs_floor_log_base_2(xs))
+            no_out!(limbs_floor_log_base_2(xs));
         })],
     );
 }
@@ -116,7 +116,7 @@ fn benchmark_limbs_ceiling_log_base_2(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |ref xs| {
-            no_out!(limbs_ceiling_log_base_2(xs))
+            no_out!(limbs_ceiling_log_base_2(xs));
         })],
     );
 }
@@ -136,7 +136,7 @@ fn benchmark_limbs_checked_log_base_2(
         file_name,
         &vec_len_bucketer(),
         &mut [("Malachite", &mut |ref xs| {
-            no_out!(limbs_checked_log_base_2(xs))
+            no_out!(limbs_checked_log_base_2(xs));
         })],
     );
 }

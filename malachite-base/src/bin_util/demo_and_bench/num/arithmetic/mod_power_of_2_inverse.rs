@@ -55,13 +55,13 @@ fn benchmark_mod_power_of_2_inverse_algorithms<
         &pair_2_bucketer("pow"),
         &mut [
             ("default", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_inverse(pow))
+                no_out!(n.mod_power_of_2_inverse(pow));
             }),
             ("Euclidean", &mut |(n, pow)| {
-                no_out!(mod_power_of_2_inverse_euclidean::<U, S>(n, pow))
+                no_out!(mod_power_of_2_inverse_euclidean::<U, S>(n, pow));
             }),
             ("fast", &mut |(n, pow)| {
-                no_out!(mod_power_of_2_inverse_fast(n, pow))
+                no_out!(mod_power_of_2_inverse_fast(n, pow));
             }),
         ],
     );

@@ -130,7 +130,7 @@ fn benchmark_mod_power_of_2_shl_unsigned_unsigned<
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(x, y, pow)| {
-            no_out!(x.mod_power_of_2_shl(y, pow))
+            no_out!(x.mod_power_of_2_shl(y, pow));
         })],
     );
 }
@@ -153,7 +153,7 @@ fn benchmark_mod_power_of_2_shl_unsigned_signed<
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(x, y, pow)| {
-            no_out!(x.mod_power_of_2_shl(y, pow))
+            no_out!(x.mod_power_of_2_shl(y, pow));
         })],
     );
 }
@@ -176,7 +176,7 @@ fn benchmark_mod_power_of_2_shl_assign_unsigned_unsigned<
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(mut x, y, pow)| {
-            x.mod_power_of_2_shl_assign(y, pow)
+            x.mod_power_of_2_shl_assign(y, pow);
         })],
     );
 }
@@ -199,7 +199,7 @@ fn benchmark_mod_power_of_2_shl_assign_unsigned_signed<
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(mut x, y, pow)| {
-            x.mod_power_of_2_shl_assign(y, pow)
+            x.mod_power_of_2_shl_assign(y, pow);
         })],
     );
 }

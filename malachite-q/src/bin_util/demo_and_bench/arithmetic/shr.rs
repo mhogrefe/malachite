@@ -187,10 +187,10 @@ fn benchmark_rational_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
         &pair_1_rational_bit_bucketer("n"),
         &mut [
             (&format!("Rational >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(x >> y)
+                no_out!(x >> y);
             }),
             (&format!("&Rational >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x >> y)
+                no_out!(&x >> y);
             }),
         ],
     );
@@ -216,10 +216,10 @@ fn benchmark_rational_shr_signed_evaluation_strategy<T: PrimitiveSigned>(
         &pair_1_rational_bit_bucketer("n"),
         &mut [
             (&format!("Rational >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(x >> y)
+                no_out!(x >> y);
             }),
             (&format!("&Rational >> {}", T::NAME), &mut |(x, y)| {
-                no_out!(&x >> y)
+                no_out!(&x >> y);
             }),
         ],
     );

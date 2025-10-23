@@ -83,7 +83,7 @@ fn benchmark_natural_fmt_sci_valid(gm: GenMode, config: &GenConfig, limit: usize
         file_name,
         &pair_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.fmt_sci_valid(options))
+            no_out!(x.fmt_sci_valid(options));
         })],
     );
 }
@@ -103,7 +103,7 @@ fn benchmark_natural_to_sci_with_options(
         file_name,
         &pair_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(x, options)| {
-            no_out!(x.to_sci_with_options(options).to_string())
+            no_out!(x.to_sci_with_options(options).to_string());
         })],
     );
 }

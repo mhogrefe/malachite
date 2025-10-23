@@ -168,7 +168,7 @@ fn benchmark_floor_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.floor_log_base_power_of_2(pow))
+            no_out!(n.floor_log_base_power_of_2(pow));
         })],
     );
 }
@@ -188,7 +188,7 @@ fn benchmark_floor_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
         file_name,
         &pair_1_primitive_float_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.floor_log_base_power_of_2(pow))
+            no_out!(n.floor_log_base_power_of_2(pow));
         })],
     );
 }
@@ -209,10 +209,10 @@ fn benchmark_ceiling_log_base_power_of_2_algorithms_unsigned<T: PrimitiveUnsigne
         &pair_1_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, pow)| {
-                no_out!(n.ceiling_log_base_power_of_2(pow))
+                no_out!(n.ceiling_log_base_power_of_2(pow));
             }),
             ("naive", &mut |(n, pow)| {
-                no_out!(ceiling_log_base_power_of_2_naive(n, pow))
+                no_out!(ceiling_log_base_power_of_2_naive(n, pow));
             }),
         ],
     );
@@ -233,7 +233,7 @@ fn benchmark_ceiling_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
         file_name,
         &pair_1_primitive_float_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.ceiling_log_base_power_of_2(pow))
+            no_out!(n.ceiling_log_base_power_of_2(pow));
         })],
     );
 }
@@ -253,7 +253,7 @@ fn benchmark_checked_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.checked_log_base_power_of_2(pow))
+            no_out!(n.checked_log_base_power_of_2(pow));
         })],
     );
 }
@@ -273,7 +273,7 @@ fn benchmark_checked_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
         file_name,
         &pair_1_primitive_float_bucketer("x"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.checked_log_base_power_of_2(pow))
+            no_out!(n.checked_log_base_power_of_2(pow));
         })],
     );
 }

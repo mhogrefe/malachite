@@ -169,7 +169,7 @@ fn benchmark_limbs_square_low_basecase(
         file_name,
         &pair_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs)| {
-            limbs_square_low_basecase(&mut out, &xs)
+            limbs_square_low_basecase(&mut out, &xs);
         })],
     );
 }
@@ -190,11 +190,11 @@ fn benchmark_limbs_square_low_divide_and_conquer_algorithms(
         &pair_2_vec_len_bucketer("xs"),
         &mut [
             ("basecase", &mut |(mut out, xs)| {
-                limbs_square_low_basecase_unrestricted(&mut out, &xs)
+                limbs_square_low_basecase_unrestricted(&mut out, &xs);
             }),
             ("divide and conquer", &mut |(mut out, xs)| {
                 let mut scratch = vec![0; limbs_square_low_scratch_len(xs.len())];
-                limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch)
+                limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch);
             }),
         ],
     );
@@ -210,7 +210,7 @@ fn benchmark_limbs_square_low(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &pair_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs)| {
-            limbs_square_low(&mut out, &xs)
+            limbs_square_low(&mut out, &xs);
         })],
     );
 }
@@ -231,13 +231,13 @@ fn benchmark_limbs_mod_power_of_2_square_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("limbs_mod_power_of_2_square", &mut |(ref mut xs, pow)| {
-                no_out!(limbs_mod_power_of_2_square(xs, pow))
+                no_out!(limbs_mod_power_of_2_square(xs, pow));
             }),
             ("limbs_mod_power_of_2_square_ref", &mut |(
                 ref mut xs,
                 pow,
             )| {
-                no_out!(limbs_mod_power_of_2_square_ref(xs, pow))
+                no_out!(limbs_mod_power_of_2_square_ref(xs, pow));
             }),
         ],
     );
@@ -280,10 +280,10 @@ fn benchmark_natural_mod_power_of_2_square_evaluation_strategy(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.mod_power_of_2_square(u64)", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_square(pow))
+                no_out!(n.mod_power_of_2_square(pow));
             }),
             ("(&Natural).mod_power_of_2_square(u64)", &mut |(n, pow)| {
-                no_out!((&n).mod_power_of_2_square(pow))
+                no_out!((&n).mod_power_of_2_square(pow));
             }),
         ],
     );
@@ -305,14 +305,14 @@ fn benchmark_natural_mod_power_of_2_square_algorithms(
         &pair_2_bucketer("pow"),
         &mut [
             ("Natural.mod_power_of_2_square(u64)", &mut |(n, pow)| {
-                no_out!(n.mod_power_of_2_square(pow))
+                no_out!(n.mod_power_of_2_square(pow));
             }),
             (
                 "Natural.mod_power_of_2_mul(Natural, u64)",
                 &mut |(n, pow)| no_out!(n.clone().mod_power_of_2_mul(n, pow)),
             ),
             ("Natural.square().mod_power_of_2(u64)", &mut |(n, pow)| {
-                no_out!(n.square().mod_power_of_2(pow))
+                no_out!(n.square().mod_power_of_2(pow));
             }),
             (
                 "Natural.mod_square(Natural::power_of_2(u64))",

@@ -93,7 +93,7 @@ fn benchmark_bits_size_hint_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [(&format!("{}.bits().size_hint()", T::NAME), &mut |n| {
-            no_out!(n.bits().size_hint())
+            no_out!(n.bits().size_hint());
         })],
     );
 }
@@ -117,7 +117,7 @@ fn benchmark_bits_get_algorithms_unsigned<T: PrimitiveUnsigned>(
         &pair_1_bit_bucketer("n"),
         &mut [
             (&format!("{}.bits()[u]", T::NAME), &mut |(n, u)| {
-                no_out!(n.bits()[u])
+                no_out!(n.bits()[u]);
             }),
             (&format!("{}.to_bits_asc()[u]", T::NAME), &mut |(n, u)| {
                 let bits = n.to_bits_asc();
@@ -151,7 +151,7 @@ fn benchmark_bits_get_algorithms_signed<T: PrimitiveSigned>(
         &pair_1_bit_bucketer("n"),
         &mut [
             (&format!("{}.bits()[u]", T::NAME), &mut |(n, u)| {
-                no_out!(n.bits()[u])
+                no_out!(n.bits()[u]);
             }),
             (&format!("{}.to_bits_asc()[u]", T::NAME), &mut |(n, u)| {
                 let bits = n.to_bits_asc();

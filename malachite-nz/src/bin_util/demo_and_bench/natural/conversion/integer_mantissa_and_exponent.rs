@@ -80,7 +80,7 @@ fn benchmark_natural_integer_mantissa_and_exponent(
         file_name,
         &natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |x| {
-            no_out!(x.integer_mantissa_and_exponent())
+            no_out!(x.integer_mantissa_and_exponent());
         })],
     );
 }
@@ -142,7 +142,7 @@ fn benchmark_natural_from_integer_mantissa_and_exponent(
                 Natural,
             >>::from_integer_mantissa_and_exponent(
                 mantissa, exponent
-            ))
+            ));
         })],
     );
 }

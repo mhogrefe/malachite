@@ -52,10 +52,10 @@ fn benchmark_natural_mod_power_of_2_is_reduced_algorithms(
         &pair_1_natural_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, log_base)| {
-                no_out!(n.mod_power_of_2_is_reduced(log_base))
+                no_out!(n.mod_power_of_2_is_reduced(log_base));
             }),
             ("using mod_is_reduced", &mut |(n, log_base)| {
-                no_out!(n.mod_is_reduced(&Natural::power_of_2(log_base)))
+                no_out!(n.mod_is_reduced(&Natural::power_of_2(log_base)));
             }),
         ],
     );

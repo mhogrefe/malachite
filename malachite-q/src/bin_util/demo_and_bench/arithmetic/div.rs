@@ -269,16 +269,16 @@ fn benchmark_rational_checked_div_evaluation_strategy(
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [
             ("Rational.checked_div(Rational)", &mut |(x, y)| {
-                no_out!(x.checked_div(y))
+                no_out!(x.checked_div(y));
             }),
             ("Rational.checked_div(&Rational)", &mut |(x, y)| {
-                no_out!(x.checked_div(&y))
+                no_out!(x.checked_div(&y));
             }),
             ("(&Rational).checked_div(Rational)", &mut |(x, y)| {
-                no_out!((&x).checked_div(y))
+                no_out!((&x).checked_div(y));
             }),
             ("(&Rational).checked_div(&Rational)", &mut |(x, y)| {
-                no_out!((&x).checked_div(&y))
+                no_out!((&x).checked_div(&y));
             }),
         ],
     );

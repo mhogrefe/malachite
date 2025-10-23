@@ -158,7 +158,7 @@ fn benchmark_limbs_kronecker_symbol(
         file_name,
         &quadruple_1_3_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(x_sign, xs, y_sign, ys)| {
-            no_out!(limbs_kronecker_symbol(x_sign, &xs, y_sign, &ys))
+            no_out!(limbs_kronecker_symbol(x_sign, &xs, y_sign, &ys));
         })],
     );
 }
@@ -200,16 +200,16 @@ fn benchmark_integer_jacobi_symbol_evaluation_strategy(
         &pair_2_integer_bit_bucketer("m"),
         &mut [
             ("Integer.jacobi_symbol(Integer)", &mut |(n, m)| {
-                no_out!(n.jacobi_symbol(m))
+                no_out!(n.jacobi_symbol(m));
             }),
             ("Integer.jacobi_symbol(&Integer)", &mut |(n, m)| {
-                no_out!(n.jacobi_symbol(&m))
+                no_out!(n.jacobi_symbol(&m));
             }),
             ("(&Integer).jacobi_symbol(Integer)", &mut |(n, m)| {
-                no_out!((&n).jacobi_symbol(m))
+                no_out!((&n).jacobi_symbol(m));
             }),
             ("(&Integer).jacobi_symbol(&Integer)", &mut |(n, m)| {
-                no_out!((&n).jacobi_symbol(&m))
+                no_out!((&n).jacobi_symbol(&m));
             }),
         ],
     );
@@ -231,7 +231,7 @@ fn benchmark_integer_kronecker_symbol_library_comparison(
         &pair_2_pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (x, y))| {
-                no_out!(x.kronecker_symbol(y))
+                no_out!(x.kronecker_symbol(y));
             }),
             ("rug", &mut |((x, y), _)| no_out!(x.kronecker(&y))),
         ],
@@ -254,16 +254,16 @@ fn benchmark_integer_kronecker_symbol_evaluation_strategy(
         &pair_2_integer_bit_bucketer("m"),
         &mut [
             ("Integer.kronecker_symbol(Integer)", &mut |(n, m)| {
-                no_out!(n.kronecker_symbol(m))
+                no_out!(n.kronecker_symbol(m));
             }),
             ("Integer.kronecker_symbol(&Integer)", &mut |(n, m)| {
-                no_out!(n.kronecker_symbol(&m))
+                no_out!(n.kronecker_symbol(&m));
             }),
             ("(&Integer).kronecker_symbol(Integer)", &mut |(n, m)| {
-                no_out!((&n).kronecker_symbol(m))
+                no_out!((&n).kronecker_symbol(m));
             }),
             ("(&Integer).kronecker_symbol(&Integer)", &mut |(n, m)| {
-                no_out!((&n).kronecker_symbol(&m))
+                no_out!((&n).kronecker_symbol(&m));
             }),
         ],
     );

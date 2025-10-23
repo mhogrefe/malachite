@@ -183,7 +183,7 @@ fn benchmark_comparable_float_eq(gm: GenMode, config: &GenConfig, limit: usize, 
         file_name,
         &pair_float_max_complexity_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(ComparableFloat(x) == ComparableFloat(y))
+            no_out!(ComparableFloat(x) == ComparableFloat(y));
         })],
     );
 }
@@ -204,7 +204,7 @@ fn benchmark_comparable_float_ref_eq(
         file_name,
         &pair_float_max_complexity_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| {
-            no_out!(ComparableFloatRef(&x) == ComparableFloatRef(&y))
+            no_out!(ComparableFloatRef(&x) == ComparableFloatRef(&y));
         })],
     );
 }

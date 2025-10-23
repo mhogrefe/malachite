@@ -60,7 +60,7 @@ fn benchmark_overflowing_neg_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_bit_bucketer(),
         &mut [("Malachite", &mut |mut i| {
-            no_out!(i.overflowing_neg_assign())
+            no_out!(i.overflowing_neg_assign());
         })],
     );
 }
@@ -80,7 +80,7 @@ fn benchmark_overflowing_neg_assign_signed<T: PrimitiveSigned>(
         file_name,
         &signed_bit_bucketer(),
         &mut [("Malachite", &mut |mut i| {
-            no_out!(i.overflowing_neg_assign())
+            no_out!(i.overflowing_neg_assign());
         })],
     );
 }

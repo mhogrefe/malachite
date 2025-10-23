@@ -299,10 +299,10 @@ fn benchmark_float_raw_mantissa_and_exponent_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.raw_mantissa_and_exponent()", &mut |x| {
-                no_out!(x.raw_mantissa_and_exponent())
+                no_out!(x.raw_mantissa_and_exponent());
             }),
             ("(&Float).raw_mantissa_and_exponent()", &mut |x| {
-                no_out!((&x).raw_mantissa_and_exponent())
+                no_out!((&x).raw_mantissa_and_exponent());
             }),
         ],
     );
@@ -325,7 +325,7 @@ fn benchmark_float_raw_mantissa_evaluation_strategy(
         &mut [
             ("Float.raw_mantissa()", &mut |x| no_out!(x.raw_mantissa())),
             ("(&Float).raw_mantissa()", &mut |x| {
-                no_out!((&x).raw_mantissa())
+                no_out!((&x).raw_mantissa());
             }),
         ],
     );
@@ -348,7 +348,7 @@ fn benchmark_float_raw_exponent_evaluation_strategy(
         &mut [
             ("Float.raw_exponent()", &mut |x| no_out!(x.raw_exponent())),
             ("(&Float).raw_exponent()", &mut |x| {
-                no_out!((&x).raw_exponent())
+                no_out!((&x).raw_exponent());
             }),
         ],
     );
@@ -378,7 +378,7 @@ fn benchmark_float_from_raw_mantissa_and_exponent_evaluation_strategy(
                         Float,
                     >>::from_raw_mantissa_and_exponent(
                         mantissa, exponent
-                    ))
+                    ));
                 },
             ),
             (
@@ -390,7 +390,7 @@ fn benchmark_float_from_raw_mantissa_and_exponent_evaluation_strategy(
                         Float,
                     >>::from_raw_mantissa_and_exponent(
                         mantissa, exponent
-                    ))
+                    ));
                 },
             ),
         ],

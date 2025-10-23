@@ -186,7 +186,7 @@ fn benchmark_natural_mod_power_of_2_shl_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(mut x, y, pow)| {
-            x.mod_power_of_2_shl_assign(y, pow)
+            x.mod_power_of_2_shl_assign(y, pow);
         })],
     );
 }
@@ -239,7 +239,7 @@ fn benchmark_natural_mod_power_of_2_shl_unsigned_algorithms<T: PrimitiveUnsigned
         &triple_3_bucketer("pow"),
         &mut [
             ("default", &mut |(x, y, pow)| {
-                no_out!(x.mod_power_of_2_shl(y, pow))
+                no_out!(x.mod_power_of_2_shl(y, pow));
             }),
             (
                 &format!("(Natural << {}).mod_power_of_2(u64)", T::NAME),
@@ -266,7 +266,7 @@ fn benchmark_natural_mod_power_of_2_shl_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_3_bucketer("pow"),
         &mut [("Malachite", &mut |(mut x, y, pow)| {
-            x.mod_power_of_2_shl_assign(y, pow)
+            x.mod_power_of_2_shl_assign(y, pow);
         })],
     );
 }
@@ -319,7 +319,7 @@ fn benchmark_natural_mod_power_of_2_shl_signed_algorithms<T: PrimitiveSigned>(
         &triple_3_bucketer("pow"),
         &mut [
             ("default", &mut |(x, y, pow)| {
-                no_out!(x.mod_power_of_2_shl(y, pow))
+                no_out!(x.mod_power_of_2_shl(y, pow));
             }),
             (
                 &format!("(Natural << {}).mod_power_of_2(u64)", T::NAME),

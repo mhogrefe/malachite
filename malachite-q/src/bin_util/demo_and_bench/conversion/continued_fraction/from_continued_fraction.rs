@@ -71,10 +71,10 @@ fn benchmark_rational_from_continued_fraction_algorithms(
         &pair_1_vec_natural_sum_bits_bucketer(),
         &mut [
             ("default", &mut |(xs, floor)| {
-                no_out!(Rational::from_continued_fraction(floor, xs.into_iter()))
+                no_out!(Rational::from_continued_fraction(floor, xs.into_iter()));
             }),
             ("alt", &mut |(xs, floor)| {
-                no_out!(from_continued_fraction_alt(floor, xs))
+                no_out!(from_continued_fraction_alt(floor, xs));
             }),
         ],
     );
@@ -98,13 +98,13 @@ fn benchmark_rational_from_continued_fraction_evaluation_strategy(
             (
                 "Rational::from_continued_fraction(Integer, Vec<Natural>)",
                 &mut |(xs, floor)| {
-                    no_out!(Rational::from_continued_fraction(floor, xs.into_iter()))
+                    no_out!(Rational::from_continued_fraction(floor, xs.into_iter()));
                 },
             ),
             (
                 "Rational::from_continued_fraction_ref(&Integer, &[Natural])",
                 &mut |(xs, floor)| {
-                    no_out!(Rational::from_continued_fraction_ref(&floor, xs.iter()))
+                    no_out!(Rational::from_continued_fraction_ref(&floor, xs.iter()));
                 },
             ),
         ],

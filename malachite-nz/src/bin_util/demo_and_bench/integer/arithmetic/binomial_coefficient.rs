@@ -98,7 +98,7 @@ fn benchmark_integer_binomial_coefficient_library_comparison(
         &pair_2_pair_integer_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (n, k))| {
-                no_out!(Integer::binomial_coefficient(n, k))
+                no_out!(Integer::binomial_coefficient(n, k));
             }),
             ("rug", &mut |((n, k), _)| no_out!(n.binomial(k))),
         ],

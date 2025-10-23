@@ -424,13 +424,13 @@ fn benchmark_float_to_significand_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.to_significand()", &mut |x| {
-                no_out!(x.to_significand())
+                no_out!(x.to_significand());
             }),
             ("Float.into_significand()", &mut |x| {
-                no_out!(x.into_significand())
+                no_out!(x.into_significand());
             }),
             ("Float.significand_ref()", &mut |x| {
-                no_out!(x.significand_ref())
+                no_out!(x.significand_ref());
             }),
         ],
     );
@@ -528,10 +528,10 @@ fn benchmark_float_set_prec_round_library_comparison(
         &pair_2_max_triple_1_float_complexity_triple_2_bucketer("x", "precision"),
         &mut [
             ("Malachite", &mut |(_, (mut x, prec, rm))| {
-                no_out!(x.set_prec_round(prec, rm))
+                no_out!(x.set_prec_round(prec, rm));
             }),
             ("rug", &mut |((mut x, prec, rm), _)| {
-                no_out!(x.set_prec_round(u32::exact_from(prec), rm))
+                no_out!(x.set_prec_round(u32::exact_from(prec), rm));
             }),
         ],
     );
@@ -553,17 +553,17 @@ fn benchmark_float_set_prec_round_evaluation_strategy(
         &max_triple_1_float_complexity_triple_2_bucketer("x", "precision"),
         &mut [
             ("Float::set_prec_round", &mut |(mut x, prec, rm)| {
-                no_out!(x.set_prec_round(prec, rm))
+                no_out!(x.set_prec_round(prec, rm));
             }),
             ("Float::from_float_prec_round", &mut |(x, prec, rm)| {
-                no_out!(Float::from_float_prec_round(x, prec, rm))
+                no_out!(Float::from_float_prec_round(x, prec, rm));
             }),
             ("Float::from_float_prec_round_ref", &mut |(x, prec, rm)| {
-                no_out!(Float::from_float_prec_round_ref(&x, prec, rm))
+                no_out!(Float::from_float_prec_round_ref(&x, prec, rm));
             }),
             ("clone and Float::set_prec_round", &mut |(x, prec, rm)| {
                 let mut x = x.clone();
-                no_out!(x.set_prec_round(prec, rm))
+                no_out!(x.set_prec_round(prec, rm));
             }),
         ],
     );
@@ -585,10 +585,10 @@ fn benchmark_float_set_prec_library_comparison(
         &pair_2_max_pair_1_complexity_pair_2_bucketer("x", "precision"),
         &mut [
             ("Malachite", &mut |(_, (mut x, prec))| {
-                no_out!(x.set_prec(prec))
+                no_out!(x.set_prec(prec));
             }),
             ("rug", &mut |((mut x, prec), _)| {
-                no_out!(x.set_prec(u32::exact_from(prec)))
+                no_out!(x.set_prec(u32::exact_from(prec)));
             }),
         ],
     );
@@ -610,13 +610,13 @@ fn benchmark_float_set_prec_evaluation_strategy(
         &max_pair_1_complexity_pair_2_bucketer("x", "precision"),
         &mut [
             ("Float::set_prec", &mut |(mut x, prec)| {
-                no_out!(x.set_prec(prec))
+                no_out!(x.set_prec(prec));
             }),
             ("Float::from_float_prec", &mut |(x, prec)| {
-                no_out!(Float::from_float_prec(x, prec))
+                no_out!(Float::from_float_prec(x, prec));
             }),
             ("Float::from_float_prec_ref", &mut |(x, prec)| {
-                no_out!(Float::from_float_prec_ref(&x, prec))
+                no_out!(Float::from_float_prec_ref(&x, prec));
             }),
             ("clone and Float::set_prec", &mut |(x, prec)| {
                 let mut x = x.clone();

@@ -58,7 +58,7 @@ fn benchmark_mod_power_of_2_square<T: PrimitiveUnsigned>(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(n, pow)| {
-            no_out!(n.mod_power_of_2_square(pow))
+            no_out!(n.mod_power_of_2_square(pow));
         })],
     );
 }
@@ -78,7 +78,7 @@ fn benchmark_mod_power_of_2_square_assign<T: PrimitiveUnsigned>(
         file_name,
         &pair_2_bucketer("pow"),
         &mut [("Malachite", &mut |(mut n, pow)| {
-            n.mod_power_of_2_square_assign(pow)
+            n.mod_power_of_2_square_assign(pow);
         })],
     );
 }

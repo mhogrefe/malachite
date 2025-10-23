@@ -132,7 +132,7 @@ fn benchmark_power_of_2_digits_size_hint<
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, log_base)| {
-            no_out!(PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base).size_hint())
+            no_out!(PowerOf2DigitIterable::<U>::power_of_2_digits(x, log_base).size_hint());
         })],
     );
 }
@@ -162,7 +162,9 @@ fn benchmark_power_of_2_digits_get_digit_algorithms<
             (
                 &format!("power_of_2_digits({}, u64).get_digit(u64)", T::NAME),
                 &mut |(u, log_base, i)| {
-                    no_out!(PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base).get_digit(i))
+                    no_out!(
+                        PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base).get_digit(i)
+                    );
                 },
             ),
             (

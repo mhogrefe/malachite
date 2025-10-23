@@ -89,10 +89,10 @@ fn benchmark_rational_abs_diff_assign_evaluation_strategy(
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [
             ("Rational.abs_diff_assign(Rational)", &mut |(mut x, y)| {
-                x.abs_diff_assign(y)
+                x.abs_diff_assign(y);
             }),
             ("Rational.abs_diff_assign(&Rational)", &mut |(mut x, y)| {
-                x.abs_diff_assign(&y)
+                x.abs_diff_assign(&y);
             }),
         ],
     );
@@ -114,16 +114,16 @@ fn benchmark_rational_abs_diff_evaluation_strategy(
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [
             ("Rational.abs_diff(Rational)", &mut |(x, y)| {
-                no_out!(x.abs_diff(y))
+                no_out!(x.abs_diff(y));
             }),
             ("Rational.abs_diff(&Rational)", &mut |(x, y)| {
-                no_out!(x.abs_diff(&y))
+                no_out!(x.abs_diff(&y));
             }),
             ("&Rational.abs_diff(Rational)", &mut |(x, y)| {
-                no_out!((&x).abs_diff(y))
+                no_out!((&x).abs_diff(y));
             }),
             ("&Rational.abs_diff(&Rational)", &mut |(x, y)| {
-                no_out!((&x).abs_diff(&y))
+                no_out!((&x).abs_diff(&y));
             }),
         ],
     );

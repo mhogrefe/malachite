@@ -74,7 +74,7 @@ fn benchmark_rational_from_digits_evaluation_strategy(
             (
                 "Rational::from_digits(base, Vec<Natural>, RationalSequence<Natural>)",
                 &mut |(base, before_point, after_point)| {
-                    no_out!(Rational::from_digits(&base, before_point, after_point))
+                    no_out!(Rational::from_digits(&base, before_point, after_point));
                 },
             ),
             (
@@ -84,7 +84,7 @@ fn benchmark_rational_from_digits_evaluation_strategy(
                         &base,
                         &before_point,
                         &after_point
-                    ))
+                    ));
                 },
             ),
         ],

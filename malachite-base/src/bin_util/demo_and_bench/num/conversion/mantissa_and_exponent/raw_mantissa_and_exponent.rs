@@ -85,7 +85,7 @@ fn benchmark_raw_mantissa_and_exponent_algorithms<T: PrimitiveFloat>(
         &mut [
             ("default", &mut |x| no_out!(x.raw_mantissa_and_exponent())),
             ("alt", &mut |x| {
-                no_out!((x.raw_mantissa(), x.raw_exponent()))
+                no_out!((x.raw_mantissa(), x.raw_exponent()));
             }),
         ],
     );
@@ -150,7 +150,7 @@ fn benchmark_from_raw_mantissa_and_exponent<T: PrimitiveFloat>(
         file_name,
         &pair_1_bit_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent)| {
-            no_out!(T::from_raw_mantissa_and_exponent(mantissa, exponent))
+            no_out!(T::from_raw_mantissa_and_exponent(mantissa, exponent));
         })],
     );
 }

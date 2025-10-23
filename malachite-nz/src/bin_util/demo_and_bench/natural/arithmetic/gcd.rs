@@ -330,7 +330,7 @@ fn benchmark_half_gcd_matrix_1_mul_vector(
         &mut [("Malachite", &mut |(m, mut out, xs, mut ys)| {
             no_out!(limbs_half_gcd_matrix_1_mul_vector(
                 &m, &mut out, &xs, &mut ys
-            ))
+            ));
         })],
     );
 }
@@ -448,13 +448,13 @@ fn benchmark_limbs_gcd_div_algorithms(
         &quadruple_max_bit_bucketer("n1", "n0", "d1", "d0"),
         &mut [
             ("default", &mut |(n1, n0, d1, d0)| {
-                no_out!(limbs_gcd_div(n1, n0, d1, d0))
+                no_out!(limbs_gcd_div(n1, n0, d1, d0));
             }),
             ("alt", &mut |(n1, n0, d1, d0)| {
-                no_out!(limbs_gcd_div_alt(n1, n0, d1, d0))
+                no_out!(limbs_gcd_div_alt(n1, n0, d1, d0));
             }),
             ("naive", &mut |(n1, n0, d1, d0)| {
-                no_out!(limbs_gcd_div_naive(n1, n0, d1, d0))
+                no_out!(limbs_gcd_div_naive(n1, n0, d1, d0));
             }),
         ],
     );
@@ -540,7 +540,7 @@ fn benchmark_natural_gcd_evaluation_strategy(
             ("Natural.gcd(&Natural)", &mut |(x, y)| no_out!(x.gcd(&y))),
             ("&Natural.gcd(Natural)", &mut |(x, y)| no_out!((&x).gcd(y))),
             ("&Natural.gcd(&Natural)", &mut |(x, y)| {
-                no_out!((&x).gcd(&y))
+                no_out!((&x).gcd(&y));
             }),
         ],
     );
@@ -610,7 +610,7 @@ fn benchmark_natural_gcd_evaluation_strategy_2(
             ("Natural.gcd(&Natural)", &mut |(x, y)| no_out!(x.gcd(&y))),
             ("&Natural.gcd(Natural)", &mut |(x, y)| no_out!((&x).gcd(y))),
             ("&Natural.gcd(&Natural)", &mut |(x, y)| {
-                no_out!((&x).gcd(&y))
+                no_out!((&x).gcd(&y));
             }),
         ],
     );

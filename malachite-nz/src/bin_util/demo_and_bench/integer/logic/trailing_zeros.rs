@@ -41,7 +41,7 @@ fn benchmark_integer_trailing_zeros_algorithms(
         &mut [
             ("default", &mut |n| no_out!(n.trailing_zeros())),
             ("using bits explicitly", &mut |n| {
-                no_out!(integer_trailing_zeros_alt(&n))
+                no_out!(integer_trailing_zeros_alt(&n));
             }),
         ],
     );

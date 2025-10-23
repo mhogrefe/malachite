@@ -175,7 +175,7 @@ fn benchmark_integer_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_integer_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.shr_round_assign(y, rm))
+            no_out!(x.shr_round_assign(y, rm));
         })],
     );
 }
@@ -197,7 +197,7 @@ fn benchmark_integer_shr_round_assign_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_integer_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            no_out!(x.shr_round_assign(y, rm))
+            no_out!(x.shr_round_assign(y, rm));
         })],
     );
 }

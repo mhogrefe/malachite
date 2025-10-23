@@ -68,7 +68,7 @@ fn benchmark_limbs_index_of_next_false_bit_neg(
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(xs, u)| {
-            no_out!(limbs_index_of_next_false_bit_neg(&xs, u))
+            no_out!(limbs_index_of_next_false_bit_neg(&xs, u));
         })],
     );
 }
@@ -90,10 +90,10 @@ fn benchmark_integer_index_of_next_false_bit_algorithms(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("default", &mut |(ref n, u)| {
-                no_out!(n.index_of_next_false_bit(u))
+                no_out!(n.index_of_next_false_bit(u));
             }),
             ("using bits explicitly", &mut |(ref n, u)| {
-                no_out!(integer_index_of_next_false_bit_alt(&n, u))
+                no_out!(integer_index_of_next_false_bit_alt(&n, u));
             }),
         ],
     );

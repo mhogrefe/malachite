@@ -74,7 +74,7 @@ fn benchmark_index_of_next_true_bit_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_2_bucketer("start"),
         &mut [("Malachite", &mut |(n, start)| {
-            no_out!(n.index_of_next_true_bit(start))
+            no_out!(n.index_of_next_true_bit(start));
         })],
     );
 }
@@ -94,7 +94,7 @@ fn benchmark_index_of_next_true_bit_signed<T: PrimitiveSigned>(
         file_name,
         &pair_2_bucketer("index"),
         &mut [("Malachite", &mut |(n, start)| {
-            no_out!(n.index_of_next_true_bit(start))
+            no_out!(n.index_of_next_true_bit(start));
         })],
     );
 }

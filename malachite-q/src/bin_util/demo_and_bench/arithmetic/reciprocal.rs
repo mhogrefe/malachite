@@ -85,7 +85,7 @@ fn benchmark_rational_reciprocal_evaluation_strategy(
         &mut [
             ("Rational.reciprocal()", &mut |n| no_out!(n.reciprocal())),
             ("(&Rational).reciprocal()", &mut |n| {
-                no_out!((&n).reciprocal())
+                no_out!((&n).reciprocal());
             }),
         ],
     );

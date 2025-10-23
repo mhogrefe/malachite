@@ -70,7 +70,7 @@ fn benchmark_floor_log_base<T: PrimitiveUnsigned>(
         file_name,
         &pair_1_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, base)| {
-            no_out!(n.floor_log_base(base))
+            no_out!(n.floor_log_base(base));
         })],
     );
 }
@@ -91,10 +91,10 @@ fn benchmark_ceiling_log_base_algorithms<T: PrimitiveUnsigned>(
         &pair_1_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, base)| {
-                no_out!(n.ceiling_log_base(base))
+                no_out!(n.ceiling_log_base(base));
             }),
             ("naive", &mut |(n, base)| {
-                no_out!(ceiling_log_base_naive(n, base))
+                no_out!(ceiling_log_base_naive(n, base));
             }),
         ],
     );
@@ -116,10 +116,10 @@ fn benchmark_checked_log_base_algorithms<T: PrimitiveUnsigned>(
         &pair_1_bit_bucketer("n"),
         &mut [
             ("default", &mut |(n, base)| {
-                no_out!(n.checked_log_base(base))
+                no_out!(n.checked_log_base(base));
             }),
             ("naive", &mut |(n, base)| {
-                no_out!(checked_log_base_naive(n, base))
+                no_out!(checked_log_base_naive(n, base));
             }),
         ],
     );

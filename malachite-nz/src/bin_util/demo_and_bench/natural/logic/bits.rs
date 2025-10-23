@@ -59,7 +59,7 @@ fn benchmark_natural_bits_size_hint(
         file_name,
         &natural_bit_bucketer("x"),
         &mut [("Natural.bits().size_hint()", &mut |n| {
-            no_out!(n.bits().size_hint())
+            no_out!(n.bits().size_hint());
         })],
     );
 }

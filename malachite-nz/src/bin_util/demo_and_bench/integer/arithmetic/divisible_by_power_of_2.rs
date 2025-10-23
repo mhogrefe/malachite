@@ -57,7 +57,7 @@ fn benchmark_integer_divisible_by_power_of_2_library_comparison(
         &pair_2_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, (n, pow))| {
-                no_out!(n.divisible_by_power_of_2(pow))
+                no_out!(n.divisible_by_power_of_2(pow));
             }),
             ("rug", &mut |((n, pow), _)| {
                 n.is_divisible_2pow(u32::exact_from(pow));
@@ -83,7 +83,7 @@ fn benchmark_integer_divisible_by_power_of_2_algorithms(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.divisible_by_power_of_2(u64)", &mut |(n, pow)| {
-                no_out!(n.divisible_by_power_of_2(pow))
+                no_out!(n.divisible_by_power_of_2(pow));
             }),
             (
                 "Integer.trailing_zeros().map_or(true, |z| z >= u64)",

@@ -87,10 +87,10 @@ fn benchmark_integer_divisible_by_library_comparison(
         &triple_3_pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| {
-                no_out!(x.divisible_by(y))
+                no_out!(x.divisible_by(y));
             }),
             ("num", &mut |((x, y), _, _)| {
-                no_out!(num_divisible_by(&x, &y))
+                no_out!(num_divisible_by(&x, &y));
             }),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.is_divisible(&y))),
         ],
@@ -115,7 +115,7 @@ fn benchmark_integer_divisible_by_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.divisible_by(y))),
             ("using %", &mut |(x, y)| {
-                no_out!(x == 0 || y != 0 && x % y == 0)
+                no_out!(x == 0 || y != 0 && x % y == 0);
             }),
         ],
     );
@@ -137,16 +137,16 @@ fn benchmark_integer_divisible_by_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             ("Integer.divisible_by(Integer)", &mut |(x, y)| {
-                no_out!(x.divisible_by(y))
+                no_out!(x.divisible_by(y));
             }),
             ("Integer.divisible_by(&Integer)", &mut |(x, y)| {
-                no_out!(x.divisible_by(&y))
+                no_out!(x.divisible_by(&y));
             }),
             ("(&Integer).divisible_by(Integer)", &mut |(x, y)| {
-                no_out!((&x).divisible_by(y))
+                no_out!((&x).divisible_by(y));
             }),
             ("(&Integer).divisible_by(&Integer)", &mut |(x, y)| {
-                no_out!((&x).divisible_by(&y))
+                no_out!((&x).divisible_by(&y));
             }),
         ],
     );

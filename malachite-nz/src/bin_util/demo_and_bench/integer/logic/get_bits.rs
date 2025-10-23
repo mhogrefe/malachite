@@ -108,7 +108,7 @@ fn benchmark_limbs_neg_limb_get_bits(
         file_name,
         &triple_3_bucketer("end"),
         &mut [("limbs_neg_limb_get_bits", &mut |(x, start, end)| {
-            no_out!(limbs_neg_limb_get_bits(x, start, end))
+            no_out!(limbs_neg_limb_get_bits(x, start, end));
         })],
     );
 }
@@ -129,10 +129,10 @@ fn benchmark_limbs_neg_get_bits_evaluation_strategy(
         &triple_1_vec_len_bucketer("xs"),
         &mut [
             ("limbs_slice_neg_get_bits", &mut |(xs, start, end)| {
-                no_out!(limbs_slice_neg_get_bits(&xs, start, end))
+                no_out!(limbs_slice_neg_get_bits(&xs, start, end));
             }),
             ("limbs_vec_neg_get_bits", &mut |(xs, start, end)| {
-                no_out!(limbs_vec_neg_get_bits(xs, start, end))
+                no_out!(limbs_vec_neg_get_bits(xs, start, end));
             }),
         ],
     );
@@ -154,10 +154,10 @@ fn benchmark_integer_get_bits_evaluation_strategy(
         &triple_1_integer_bit_bucketer("x"),
         &mut [
             ("get_bits", &mut |(n, start, end)| {
-                no_out!(n.get_bits(start, end))
+                no_out!(n.get_bits(start, end));
             }),
             ("get_bits_owned", &mut |(n, start, end)| {
-                no_out!(n.get_bits_owned(start, end))
+                no_out!(n.get_bits_owned(start, end));
             }),
         ],
     );
@@ -179,10 +179,10 @@ fn benchmark_integer_get_bits_algorithms(
         &triple_1_integer_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, start, end)| {
-                no_out!(n.get_bits(start, end))
+                no_out!(n.get_bits(start, end));
             }),
             ("naive", &mut |(n, start, end)| {
-                no_out!(get_bits_naive::<Integer, Natural>(&n, start, end))
+                no_out!(get_bits_naive::<Integer, Natural>(&n, start, end));
             }),
         ],
     );

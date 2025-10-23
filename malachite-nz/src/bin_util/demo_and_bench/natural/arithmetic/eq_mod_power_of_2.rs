@@ -100,7 +100,7 @@ fn benchmark_limbs_eq_limb_mod_power_of_2(
         file_name,
         &triple_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(ref xs, y, pow)| {
-            no_out!(limbs_eq_limb_mod_power_of_2(xs, y, pow))
+            no_out!(limbs_eq_limb_mod_power_of_2(xs, y, pow));
         })],
     );
 }
@@ -120,7 +120,7 @@ fn benchmark_limbs_eq_mod_power_of_2(
         file_name,
         &triple_1_2_vec_max_len_bucketer("xs", "ys"),
         &mut [("Malachite", &mut |(ref xs, ref ys, pow)| {
-            no_out!(limbs_eq_mod_power_of_2(xs, ys, pow))
+            no_out!(limbs_eq_mod_power_of_2(xs, ys, pow));
         })],
     );
 }
@@ -141,10 +141,10 @@ fn benchmark_natural_eq_mod_power_of_2_library_comparison(
         &pair_2_triple_1_2_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, (ref n, ref u, pow))| {
-                no_out!(n.eq_mod_power_of_2(u, pow))
+                no_out!(n.eq_mod_power_of_2(u, pow));
             }),
             ("rug", &mut |((ref n, ref u, pow), _)| {
-                no_out!(n.is_congruent_2pow(u, u32::exact_from(pow)))
+                no_out!(n.is_congruent_2pow(u, u32::exact_from(pow)));
             }),
         ],
     );

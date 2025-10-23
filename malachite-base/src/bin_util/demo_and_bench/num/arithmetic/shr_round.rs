@@ -301,7 +301,7 @@ fn benchmark_shr_round_assign_unsigned_unsigned<
         file_name,
         &triple_2_bucketer("u"),
         &mut [("Malachite", &mut |(mut n, u, rm)| {
-            no_out!(n.shr_round_assign(u, rm))
+            no_out!(n.shr_round_assign(u, rm));
         })],
     );
 }
@@ -326,7 +326,7 @@ fn benchmark_shr_round_assign_unsigned_signed<
         file_name,
         &triple_2_unsigned_abs_bucketer("i"),
         &mut [("Malachite", &mut |(mut n, i, rm)| {
-            no_out!(n.shr_round_assign(i, rm))
+            no_out!(n.shr_round_assign(i, rm));
         })],
     );
 }
@@ -351,7 +351,7 @@ fn benchmark_shr_round_assign_signed_unsigned<
         file_name,
         &triple_2_bucketer("u"),
         &mut [("Malachite", &mut |(mut n, u, rm)| {
-            no_out!(n.shr_round_assign(u, rm))
+            no_out!(n.shr_round_assign(u, rm));
         })],
     );
 }
@@ -376,7 +376,7 @@ fn benchmark_shr_round_assign_signed_signed<
         file_name,
         &triple_2_unsigned_abs_bucketer("i"),
         &mut [("Malachite", &mut |(mut n, i, rm)| {
-            no_out!(n.shr_round_assign(i, rm))
+            no_out!(n.shr_round_assign(i, rm));
         })],
     );
 }

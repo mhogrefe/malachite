@@ -88,7 +88,7 @@ fn benchmark_limbs_not_to_out(gm: GenMode, config: &GenConfig, limit: usize, fil
         file_name,
         &pair_2_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut out, xs)| {
-            limbs_not_to_out(&mut out, &xs)
+            limbs_not_to_out(&mut out, &xs);
         })],
     );
 }
