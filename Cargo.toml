@@ -4,7 +4,7 @@ resolver = "2"
 
 [workspace.package]
 edition = "2024"
-rust-version = "1.86.0"
+rust-version = "1.90.0"
 
 [workspace.dependencies]
 malachite-base = { version = "0.7.0", path = 'malachite-base', default-features = false }
