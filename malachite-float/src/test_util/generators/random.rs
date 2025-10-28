@@ -3374,7 +3374,7 @@ pub fn random_float_unsigned_rounding_mode_triple_gen_var_3(
             },
             &random_rounding_modes,
         )
-        .filter(|&(ref x, p, rm)| reciprocal_prec_round_valid(x, p, rm)),
+        .filter(|&(ref x, p, rm)| reciprocal_prec_round_valid(x, p, rm, false)),
     )
 }
 
@@ -3615,6 +3615,36 @@ pub fn random_float_unsigned_rounding_mode_triple_gen_var_11(
             &random_rounding_modes,
         )
         .filter(|&(ref x, p, rm)| square_prec_round_valid(x, p, rm, true)),
+    )
+}
+
+pub fn random_float_unsigned_rounding_mode_triple_gen_var_12(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, p, rm)| reciprocal_prec_round_valid(x, p, rm, true)),
     )
 }
 
@@ -4570,7 +4600,7 @@ pub fn random_float_rounding_mode_pair_gen_var_13(config: &GenConfig) -> It<(Flo
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| reciprocal_round_valid(f, *rm)),
+        .filter(|(f, rm)| reciprocal_round_valid(f, *rm, false)),
     )
 }
 
@@ -4581,7 +4611,7 @@ pub fn random_float_rounding_mode_pair_gen_var_14(config: &GenConfig) -> It<(Flo
             &|seed| random_floats_with_precision_inclusive_range(seed, config, 1, Limb::WIDTH - 1),
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| reciprocal_round_valid(f, *rm)),
+        .filter(|(f, rm)| reciprocal_round_valid(f, *rm, false)),
     )
 }
 
@@ -4599,7 +4629,7 @@ pub fn random_float_rounding_mode_pair_gen_var_15(config: &GenConfig) -> It<(Flo
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| reciprocal_round_valid(f, *rm)),
+        .filter(|(f, rm)| reciprocal_round_valid(f, *rm, false)),
     )
 }
 
@@ -4617,7 +4647,7 @@ pub fn random_float_rounding_mode_pair_gen_var_16(config: &GenConfig) -> It<(Flo
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| reciprocal_round_valid(f, *rm)),
+        .filter(|(f, rm)| reciprocal_round_valid(f, *rm, false)),
     )
 }
 
@@ -4634,7 +4664,7 @@ pub fn random_float_rounding_mode_pair_gen_var_17(config: &GenConfig) -> It<(Flo
             },
             &random_rounding_modes,
         )
-        .filter(|(f, rm)| reciprocal_round_valid(f, *rm)),
+        .filter(|(f, rm)| reciprocal_round_valid(f, *rm, false)),
     )
 }
 
@@ -4757,6 +4787,27 @@ pub fn random_float_rounding_mode_pair_gen_var_22(config: &GenConfig) -> It<(Flo
             &random_rounding_modes,
         )
         .filter(|(f, rm)| square_round_valid(f, *rm, true)),
+    )
+}
+
+pub fn random_float_rounding_mode_pair_gen_var_23(config: &GenConfig) -> It<(Float, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(f, rm)| reciprocal_round_valid(f, *rm, true)),
     )
 }
 

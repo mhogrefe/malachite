@@ -33,10 +33,11 @@ use malachite_float::test_util::common::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_11,
-    float_rounding_mode_pair_gen_var_13, float_rounding_mode_pair_gen_var_14,
+    float_gen_var_12, float_rounding_mode_pair_gen_var_13, float_rounding_mode_pair_gen_var_14,
     float_rounding_mode_pair_gen_var_15, float_rounding_mode_pair_gen_var_16,
-    float_rounding_mode_pair_gen_var_17, float_unsigned_pair_gen_var_1,
-    float_unsigned_rounding_mode_triple_gen_var_3,
+    float_rounding_mode_pair_gen_var_17, float_rounding_mode_pair_gen_var_23,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
+    float_unsigned_rounding_mode_triple_gen_var_3, float_unsigned_rounding_mode_triple_gen_var_12,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
@@ -2225,6 +2226,83 @@ fn test_reciprocal_prec_round() {
         "0x1.ffffffffe0000000E-31#64",
         Less,
     );
+    // - exp > Self::MAX_EXPONENT in reciprocal
+    // - exp > Self::MAX_EXPONENT && sign && Ceiling | Up | Nearest in reciprocal
+    test(
+        "too_small",
+        "0x1.8E-268435456#2",
+        2,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // exp > Self::MAX_EXPONENT && sign && Floor | Down in reciprocal
+    test(
+        "too_small",
+        "0x1.8E-268435456#2",
+        2,
+        Floor,
+        "too_big",
+        "0x6.0E+268435455#2",
+        Less,
+    );
+    // - exp > Self::MAX_EXPONENT && !sign && Floor | Up | Nearest
+    test(
+        "-too_small",
+        "-0x1.8E-268435456#2",
+        2,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    // - exp > Self::MAX_EXPONENT && !sign && Ceiling | Down in reciprocal
+    test(
+        "-too_small",
+        "-0x1.8E-268435456#2",
+        2,
+        Ceiling,
+        "-too_big",
+        "-0x6.0E+268435455#2",
+        Greater,
+    );
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        1,
+        Floor,
+        "too_small",
+        "0x4.0E-268435456#1",
+        Equal,
+    );
+    test(
+        "too_big",
+        "0x6.0E+268435455#2",
+        2,
+        Floor,
+        "too_small",
+        "0x2.0E-268435456#2",
+        Less,
+    );
+    test(
+        "too_big",
+        "0x7.0E+268435455#3",
+        3,
+        Floor,
+        "too_small",
+        "0x2.0E-268435456#3",
+        Less,
+    );
+    test(
+        "too_big",
+        "0x7.ffffE+268435455#19",
+        19,
+        Floor,
+        "too_small",
+        "0x2.00000E-268435456#19",
+        Less,
+    );
 }
 
 #[test]
@@ -2246,7 +2324,7 @@ fn reciprocal_prec_round_fail() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
+fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode, extreme: bool) {
     let (reciprocal, o) = x.clone().reciprocal_prec_round(prec, rm);
     assert!(reciprocal.is_valid());
     let (reciprocal_alt, o_alt) = x.reciprocal_prec_round_ref(prec, rm);
@@ -2263,12 +2341,14 @@ fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&reciprocal));
     assert_eq!(o_alt, o);
 
-    let (reciprocal_alt, o_alt) = reciprocal_prec_round_naive_1(x.clone(), prec, rm);
-    assert_eq!(
-        ComparableFloatRef(&reciprocal_alt),
-        ComparableFloatRef(&reciprocal)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (reciprocal_alt, o_alt) = reciprocal_prec_round_naive_1(x.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&reciprocal_alt),
+            ComparableFloatRef(&reciprocal)
+        );
+        assert_eq!(o_alt, o);
+    }
     let (reciprocal_alt, o_alt) = reciprocal_prec_round_naive_2(x.clone(), prec, rm);
     assert_eq!(
         ComparableFloatRef(&reciprocal_alt),
@@ -2304,39 +2384,33 @@ fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode
     );
     assert_eq!(o_alt, o);
 
-    let r_reciprocal = if reciprocal.is_finite() && x.is_finite() {
+    if reciprocal.is_finite() && x.is_finite() {
         if reciprocal.is_normal() {
             assert_eq!(reciprocal.get_prec(), Some(prec));
         }
-        let r_reciprocal = Rational::exact_from(&x).reciprocal();
-        assert_eq!(reciprocal.partial_cmp(&r_reciprocal), Some(o));
-        if o == Less {
-            let mut next = reciprocal.clone();
-            next.increment();
-            assert!(next > r_reciprocal);
-        } else if o == Greater {
-            let mut next = reciprocal.clone();
-            next.decrement();
-            assert!(next < r_reciprocal);
+        if !extreme {
+            let r_reciprocal = Rational::exact_from(&x).reciprocal();
+            assert_eq!(reciprocal.partial_cmp(&r_reciprocal), Some(o));
+            if o == Less {
+                let mut next = reciprocal.clone();
+                next.increment();
+                assert!(next > r_reciprocal);
+            } else if o == Greater {
+                let mut next = reciprocal.clone();
+                next.decrement();
+                assert!(next < r_reciprocal);
+            }
+            match (r_reciprocal >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
+            }
         }
-        Some(r_reciprocal)
-    } else {
-        assert_eq!(o, Equal);
-        None
-    };
-
-    match (
-        r_reciprocal.is_some() && *r_reciprocal.as_ref().unwrap() >= 0u32,
-        rm,
-    ) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
     }
 
     let (mut reciprocal_alt, mut o_alt) = (-&x).reciprocal_prec_round(prec, -rm);
@@ -2365,7 +2439,7 @@ fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode
 #[test]
 fn reciprocal_prec_round_properties() {
     float_unsigned_rounding_mode_triple_gen_var_3().test_properties(|(x, prec, rm)| {
-        reciprocal_prec_round_properties_helper(x, prec, rm);
+        reciprocal_prec_round_properties_helper(x, prec, rm, false);
     });
 
     let mut config = GenConfig::new();
@@ -2374,7 +2448,7 @@ fn reciprocal_prec_round_properties() {
     float_unsigned_rounding_mode_triple_gen_var_3().test_properties_with_config(
         &config,
         |(x, prec, rm)| {
-            reciprocal_prec_round_properties_helper(x, prec, rm);
+            reciprocal_prec_round_properties_helper(x, prec, rm, false);
         },
     );
 
@@ -2385,9 +2459,13 @@ fn reciprocal_prec_round_properties() {
     float_unsigned_rounding_mode_triple_gen_var_3().test_properties_with_config(
         &config,
         |(x, prec, rm)| {
-            reciprocal_prec_round_properties_helper(x, prec, rm);
+            reciprocal_prec_round_properties_helper(x, prec, rm, false);
         },
     );
+
+    float_unsigned_rounding_mode_triple_gen_var_12().test_properties(|(x, prec, rm)| {
+        reciprocal_prec_round_properties_helper(x, prec, rm, true);
+    });
 
     unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
         let (reciprocal, o) = Float::NAN.reciprocal_prec_round(prec, rm);
@@ -2421,7 +2499,7 @@ fn reciprocal_prec_round_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn reciprocal_prec_properties_helper(x: Float, prec: u64) {
+fn reciprocal_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
     let (reciprocal, o) = x.clone().reciprocal_prec(prec);
     assert!(reciprocal.is_valid());
     let (reciprocal_alt, o_alt) = x.reciprocal_prec_ref(prec);
@@ -2438,12 +2516,14 @@ fn reciprocal_prec_properties_helper(x: Float, prec: u64) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&reciprocal));
     assert_eq!(o_alt, o);
 
-    let (reciprocal_alt, o_alt) = reciprocal_prec_round_naive_1(x.clone(), prec, Nearest);
-    assert_eq!(
-        ComparableFloatRef(&reciprocal_alt),
-        ComparableFloatRef(&reciprocal)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (reciprocal_alt, o_alt) = reciprocal_prec_round_naive_1(x.clone(), prec, Nearest);
+        assert_eq!(
+            ComparableFloatRef(&reciprocal_alt),
+            ComparableFloatRef(&reciprocal)
+        );
+        assert_eq!(o_alt, o);
+    }
     let (reciprocal_alt, o_alt) = reciprocal_prec_round_naive_2(x.clone(), prec, Nearest);
     assert_eq!(
         ComparableFloatRef(&reciprocal_alt),
@@ -2469,20 +2549,20 @@ fn reciprocal_prec_properties_helper(x: Float, prec: u64) {
         if reciprocal.is_normal() {
             assert_eq!(reciprocal.get_prec(), Some(prec));
         }
-        let r_reciprocal = Rational::exact_from(&x).reciprocal();
-        assert_eq!(reciprocal.partial_cmp(&r_reciprocal), Some(o));
-        if o == Less {
-            let mut next = reciprocal.clone();
-            next.increment();
-            assert!(next > r_reciprocal);
-        } else if o == Greater {
-            let mut next = reciprocal.clone();
-            next.decrement();
-            assert!(next < r_reciprocal);
+        if !extreme {
+            let r_reciprocal = Rational::exact_from(&x).reciprocal();
+            assert_eq!(reciprocal.partial_cmp(&r_reciprocal), Some(o));
+            if o == Less {
+                let mut next = reciprocal.clone();
+                next.increment();
+                assert!(next > r_reciprocal);
+            } else if o == Greater {
+                let mut next = reciprocal.clone();
+                next.decrement();
+                assert!(next < r_reciprocal);
+            }
         }
-    } else {
-        assert_eq!(o, Equal);
-    };
+    }
 
     let (mut reciprocal_alt, mut o_alt) = (-&x).reciprocal_prec(prec);
     reciprocal_alt.neg_assign();
@@ -2497,14 +2577,14 @@ fn reciprocal_prec_properties_helper(x: Float, prec: u64) {
 #[test]
 fn reciprocal_prec_properties() {
     float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
-        reciprocal_prec_properties_helper(x, prec);
+        reciprocal_prec_properties_helper(x, prec, false);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_unsigned_pair_gen_var_1().test_properties_with_config(&config, |(x, prec)| {
-        reciprocal_prec_properties_helper(x, prec);
+        reciprocal_prec_properties_helper(x, prec, false);
     });
 
     let mut config = GenConfig::new();
@@ -2512,7 +2592,11 @@ fn reciprocal_prec_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     config.insert("mean_small_n", 2048);
     float_unsigned_pair_gen_var_1().test_properties_with_config(&config, |(x, prec)| {
-        reciprocal_prec_properties_helper(x, prec);
+        reciprocal_prec_properties_helper(x, prec, false);
+    });
+
+    float_unsigned_pair_gen_var_4().test_properties(|(x, prec)| {
+        reciprocal_prec_properties_helper(x, prec, true);
     });
 
     unsigned_gen_var_11().test_properties(|prec| {
@@ -2541,7 +2625,7 @@ fn reciprocal_prec_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode) {
+fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
     let (reciprocal, o) = x.clone().reciprocal_round(rm);
     assert!(reciprocal.is_valid());
     let (reciprocal_alt, o_alt) = x.reciprocal_round_ref(rm);
@@ -2558,13 +2642,15 @@ fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&reciprocal));
     assert_eq!(o_alt, o);
 
-    let (reciprocal_alt, o_alt) =
-        reciprocal_prec_round_naive_1(x.clone(), x.significant_bits(), rm);
-    assert_eq!(
-        ComparableFloatRef(&reciprocal_alt),
-        ComparableFloatRef(&reciprocal)
-    );
-    assert_eq!(o_alt, o);
+    if !extreme {
+        let (reciprocal_alt, o_alt) =
+            reciprocal_prec_round_naive_1(x.clone(), x.significant_bits(), rm);
+        assert_eq!(
+            ComparableFloatRef(&reciprocal_alt),
+            ComparableFloatRef(&reciprocal)
+        );
+        assert_eq!(o_alt, o);
+    }
     let (reciprocal_alt, o_alt) =
         reciprocal_prec_round_naive_2(x.clone(), x.significant_bits(), rm);
     assert_eq!(
@@ -2589,39 +2675,33 @@ fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode) {
     );
     assert_eq!(o_alt, o);
 
-    let r_reciprocal = if reciprocal.is_finite() && x.is_finite() {
+    if reciprocal.is_finite() && x.is_finite() {
         if reciprocal.is_normal() {
             assert_eq!(reciprocal.get_prec(), Some(x.significant_bits()));
         }
-        let r_reciprocal = Rational::exact_from(&x).reciprocal();
-        assert_eq!(reciprocal.partial_cmp(&r_reciprocal), Some(o));
-        if o == Less {
-            let mut next = reciprocal.clone();
-            next.increment();
-            assert!(next > r_reciprocal);
-        } else if o == Greater {
-            let mut next = reciprocal.clone();
-            next.decrement();
-            assert!(next < r_reciprocal);
+        if !extreme {
+            let r_reciprocal = Rational::exact_from(&x).reciprocal();
+            assert_eq!(reciprocal.partial_cmp(&r_reciprocal), Some(o));
+            if o == Less {
+                let mut next = reciprocal.clone();
+                next.increment();
+                assert!(next > r_reciprocal);
+            } else if o == Greater {
+                let mut next = reciprocal.clone();
+                next.decrement();
+                assert!(next < r_reciprocal);
+            }
+            match (r_reciprocal >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
+            }
         }
-        Some(r_reciprocal)
-    } else {
-        assert_eq!(o, Equal);
-        None
-    };
-
-    match (
-        r_reciprocal.is_some() && *r_reciprocal.as_ref().unwrap() >= 0u32,
-        rm,
-    ) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
     }
 
     let (mut reciprocal_alt, mut o_alt) = (-&x).reciprocal_round(-rm);
@@ -2650,30 +2730,34 @@ fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode) {
 #[test]
 fn reciprocal_round_properties() {
     float_rounding_mode_pair_gen_var_13().test_properties(|(x, rm)| {
-        reciprocal_round_properties_helper(x, rm);
+        reciprocal_round_properties_helper(x, rm, false);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_rounding_mode_pair_gen_var_13().test_properties_with_config(&config, |(x, rm)| {
-        reciprocal_round_properties_helper(x, rm);
+        reciprocal_round_properties_helper(x, rm, false);
     });
 
     float_rounding_mode_pair_gen_var_14().test_properties(|(x, rm)| {
-        reciprocal_round_properties_helper(x, rm);
+        reciprocal_round_properties_helper(x, rm, false);
     });
 
     float_rounding_mode_pair_gen_var_15().test_properties(|(x, rm)| {
-        reciprocal_round_properties_helper(x, rm);
+        reciprocal_round_properties_helper(x, rm, false);
     });
 
     float_rounding_mode_pair_gen_var_16().test_properties(|(x, rm)| {
-        reciprocal_round_properties_helper(x, rm);
+        reciprocal_round_properties_helper(x, rm, false);
     });
 
     float_rounding_mode_pair_gen_var_17().test_properties(|(x, rm)| {
-        reciprocal_round_properties_helper(x, rm);
+        reciprocal_round_properties_helper(x, rm, false);
+    });
+
+    float_rounding_mode_pair_gen_var_23().test_properties(|(x, rm)| {
+        reciprocal_round_properties_helper(x, rm, true);
     });
 
     rounding_mode_gen().test_properties(|rm| {
@@ -2712,7 +2796,7 @@ where
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn reciprocal_properties_helper(x: Float) {
+fn reciprocal_properties_helper_1(x: Float, extreme: bool) {
     let reciprocal = x.clone().reciprocal();
     assert!(reciprocal.is_valid());
 
@@ -2728,12 +2812,14 @@ fn reciprocal_properties_helper(x: Float) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&reciprocal));
 
-    assert_eq!(
-        ComparableFloatRef(
-            &reciprocal_prec_round_naive_1(x.clone(), x.significant_bits(), Nearest).0
-        ),
-        ComparableFloatRef(&reciprocal)
-    );
+    if !extreme {
+        assert_eq!(
+            ComparableFloatRef(
+                &reciprocal_prec_round_naive_1(x.clone(), x.significant_bits(), Nearest).0
+            ),
+            ComparableFloatRef(&reciprocal)
+        );
+    }
     assert_eq!(
         ComparableFloatRef(
             &reciprocal_prec_round_naive_2(x.clone(), x.significant_bits(), Nearest).0
@@ -2752,8 +2838,22 @@ fn reciprocal_properties_helper(x: Float) {
         ComparableFloatRef(&reciprocal)
     );
 
-    if reciprocal.is_normal() && x.is_finite() {
-        assert_eq!(reciprocal.get_prec(), Some(x.significant_bits()));
+    if reciprocal.is_finite() && x.is_finite() {
+        if reciprocal.is_normal() {
+            assert_eq!(reciprocal.get_prec(), Some(x.significant_bits()));
+        }
+        if !extreme {
+            let r_reciprocal = Rational::exact_from(&x).reciprocal();
+            if reciprocal < r_reciprocal {
+                let mut next = reciprocal.clone();
+                next.increment();
+                assert!(next > r_reciprocal);
+            } else if reciprocal > r_reciprocal {
+                let mut next = reciprocal.clone();
+                next.decrement();
+                assert!(next < r_reciprocal);
+            }
+        }
     }
 
     let mut reciprocal_alt = (-&x).reciprocal();
@@ -2767,30 +2867,34 @@ fn reciprocal_properties_helper(x: Float) {
 #[test]
 fn reciprocal_properties() {
     float_gen().test_properties(|x| {
-        reciprocal_properties_helper(x);
+        reciprocal_properties_helper_1(x, false);
     });
 
     let mut config = GenConfig::new();
     config.insert("mean_precision_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     float_gen().test_properties_with_config(&config, |x| {
-        reciprocal_properties_helper(x);
+        reciprocal_properties_helper_1(x, false);
     });
 
     float_gen_var_6().test_properties(|x| {
-        reciprocal_properties_helper(x);
+        reciprocal_properties_helper_1(x, false);
     });
 
     float_gen_var_7().test_properties(|x| {
-        reciprocal_properties_helper(x);
+        reciprocal_properties_helper_1(x, false);
     });
 
     float_gen_var_8().test_properties(|x| {
-        reciprocal_properties_helper(x);
+        reciprocal_properties_helper_1(x, false);
     });
 
     float_gen_var_11().test_properties(|x| {
-        reciprocal_properties_helper(x);
+        reciprocal_properties_helper_1(x, false);
+    });
+
+    float_gen_var_12().test_properties(|x| {
+        reciprocal_properties_helper_1(x, true);
     });
 
     apply_fn_to_primitive_floats!(reciprocal_properties_helper_2);

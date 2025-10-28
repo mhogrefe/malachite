@@ -7,11 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, float_nan};
+use crate::{Float, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, NegAssign, Reciprocal, ReciprocalAssign,
 };
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -43,6 +44,18 @@ impl Float {
     /// - $f(-\infty,p,m)=-0.0$
     /// - $f(0.0,p,m)=\infty$
     /// - $f(-0.0,p,m)=-\infty$
+    ///
+    /// Overflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    ///
+    /// This function cannot underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::reciprocal_prec`] instead. If
     /// you know that your target precision is the precision of the input, consider using
@@ -123,6 +136,18 @@ impl Float {
     /// - $f(0.0,p,m)=\infty$
     /// - $f(-0.0,p,m)=-\infty$
     ///
+    /// Overflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    ///
+    /// This function cannot underflow.
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::reciprocal_prec_ref`]
     /// instead. If you know that your target precision is the precision of the input, consider
     /// using [`Float::reciprocal_round_ref`] instead. If both of these things are true, consider
@@ -184,7 +209,11 @@ impl Float {
                 significand: x,
             }) => {
                 if x.is_power_of_2() {
-                    let (reciprocal, o) = Self::power_of_2_prec(i64::from(1 - exp), prec);
+                    let (reciprocal, o) = Float::ONE.shl_prec_round(
+                        i64::from(1 - exp),
+                        prec,
+                        if *sign { rm } else { -rm },
+                    );
                     return if *sign {
                         (reciprocal, o)
                     } else {
@@ -194,11 +223,16 @@ impl Float {
                 let sign = *sign;
                 let (reciprocal, exp_offset, o) =
                     reciprocal_float_significand_ref(x, *x_prec, prec, if sign { rm } else { -rm });
-                let exp = 1i32
-                    .checked_sub(*exp)
-                    .unwrap()
-                    .checked_add(i32::exact_from(exp_offset))
-                    .unwrap();
+                let exp = (1 - *exp).checked_add(i32::exact_from(exp_offset)).unwrap();
+                if exp > Self::MAX_EXPONENT {
+                    return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float reciprocation"),
+                        (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
+                        (true, _) => (Self::max_finite_value_with_prec(prec), Less),
+                        (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
+                        (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
+                    };
+                }
                 (
                     Self(Finite {
                         sign,
@@ -236,6 +270,12 @@ impl Float {
     /// - $f(-\infty,p)=-0.0$
     /// - $f(0.0,p)=\infty$
     /// - $f(-0.0,p)=-\infty$
+    ///
+    /// Overflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    ///
+    /// This function cannot underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::reciprocal_prec_round`] instead. If you know that your target precision is the
@@ -292,6 +332,12 @@ impl Float {
     /// - $f(-\infty,p)=-0.0$
     /// - $f(0.0,p)=\infty$
     /// - $f(-0.0,p)=-\infty$
+    ///
+    /// Overflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    ///
+    /// This function cannot underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::reciprocal_prec_round_ref`] instead. If you know that your target precision is the
@@ -350,6 +396,18 @@ impl Float {
     /// - $f(-\infty,m)=-0.0$
     /// - $f(0.0,m)=\infty$
     /// - $f(-0.0,m)=-\infty$
+    ///
+    /// Overflow:
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    ///
+    /// This function cannot underflow.
     ///
     /// If you want to specify an output precision, consider using [`Float::reciprocal_prec_round`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
@@ -418,6 +476,18 @@ impl Float {
     /// - $f(0.0,m)=\infty$
     /// - $f(-0.0,m)=-\infty$
     ///
+    /// Overflow:
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    ///
+    /// This function cannot underflow.
+    ///
     /// If you want to specify an output precision, consider using
     /// [`Float::reciprocal_prec_round_ref`] instead. If you know you'll be using the `Nearest`
     /// rounding mode, consider using `(&Float)::reciprocal()` instead.
@@ -477,7 +547,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::reciprocal_prec_round`] documentation for information on special cases.
+    /// See the [`Float::reciprocal_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::reciprocal_prec_assign`]
     /// instead. If you know that your target precision is the precision of the input, consider
@@ -548,7 +619,11 @@ impl Float {
                 if x.is_power_of_2() {
                     let sign = *sign;
                     let o;
-                    (*self, o) = Self::power_of_2_prec(i64::from(1 - *exp), prec);
+                    (*self, o) = Float::ONE.shl_prec_round(
+                        i64::from(1 - *exp),
+                        prec,
+                        if sign { rm } else { -rm },
+                    );
                     return if sign {
                         o
                     } else {
@@ -559,11 +634,28 @@ impl Float {
                 let sign = *sign;
                 let (reciprocal, exp_offset, o) =
                     reciprocal_float_significand_ref(x, *x_prec, prec, if sign { rm } else { -rm });
-                *exp = 1i32
-                    .checked_sub(*exp)
-                    .unwrap()
-                    .checked_add(i32::exact_from(exp_offset))
-                    .unwrap();
+                *exp = (1 - *exp).checked_add(i32::exact_from(exp_offset)).unwrap();
+                if *exp > Self::MAX_EXPONENT {
+                    return match (sign, rm) {
+                        (_, Exact) => panic!("Inexact Float reciprocation"),
+                        (true, Ceiling | Up | Nearest) => {
+                            *self = float_infinity!();
+                            Greater
+                        }
+                        (true, _) => {
+                            *self = Self::max_finite_value_with_prec(prec);
+                            Less
+                        }
+                        (false, Floor | Up | Nearest) => {
+                            *self = float_negative_infinity!();
+                            Less
+                        }
+                        (false, _) => {
+                            *self = -Self::max_finite_value_with_prec(prec);
+                            Greater
+                        }
+                    };
+                }
                 *x_prec = prec;
                 *x = reciprocal;
                 if sign { o } else { o.reverse() }
@@ -589,7 +681,8 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::reciprocal_prec`] documentation for information on special cases.
+    /// See the [`Float::reciprocal_prec`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::reciprocal_prec_round_assign`] instead. If you know that your target precision is
@@ -642,7 +735,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
-    /// See the [`Float::reciprocal_round`] documentation for information on special cases.
+    /// See the [`Float::reciprocal_round`] documentation for information on special cases,
+    /// overflow, and underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::reciprocal_prec_round_assign`] instead. If you know you'll be using the `Nearest`
@@ -709,6 +803,12 @@ impl Reciprocal for Float {
     /// - $f(0.0)=\infty$
     /// - $f(-0.0)=-\infty$
     ///
+    /// Overflow:
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    ///
+    /// This function cannot underflow.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::reciprocal_prec`] instead. If you want to specify the output precision, consider
     /// using [`Float::reciprocal_round`]. If you want both of these things, consider using
@@ -764,6 +864,12 @@ impl Reciprocal for &Float {
     /// - $f(0.0)=\infty$
     /// - $f(-0.0)=-\infty$
     ///
+    /// Overflow:
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    ///
+    /// This function cannot underflow.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::reciprocal_prec_ref`] instead. If you want to specify the output precision,
     /// consider using [`Float::reciprocal_round_ref`]. If you want both of these things, consider
@@ -810,7 +916,8 @@ impl ReciprocalAssign for Float {
     /// - If $1/x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |1/x|\rfloor-p}$,
     ///   where $p$ is the maximum precision of the inputs.
     ///
-    /// See the [`Float::reciprocal`] documentation for information on special cases.
+    /// See the [`Float::reciprocal`] documentation for information on special cases, overflow, and
+    /// underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::reciprocal_prec_assign`] instead. If you want to specify the output precision,

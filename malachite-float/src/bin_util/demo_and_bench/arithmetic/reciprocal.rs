@@ -25,34 +25,44 @@ use malachite_float::test_util::bench::bucketers::{
     triple_1_2_float_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_rm, float_rounding_mode_pair_gen_var_13,
-    float_rounding_mode_pair_gen_var_13_rm, float_unsigned_pair_gen_var_1,
-    float_unsigned_pair_gen_var_1_rm, float_unsigned_rounding_mode_triple_gen_var_3,
+    float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_13,
+    float_rounding_mode_pair_gen_var_13_rm, float_rounding_mode_pair_gen_var_23,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
+    float_unsigned_rounding_mode_triple_gen_var_3,
     float_unsigned_rounding_mode_triple_gen_var_3_rm,
+    float_unsigned_rounding_mode_triple_gen_var_12,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_reciprocal);
     register_demo!(runner, demo_float_reciprocal_debug);
+    register_demo!(runner, demo_float_reciprocal_extreme);
+    register_demo!(runner, demo_float_reciprocal_extreme_debug);
     register_demo!(runner, demo_float_reciprocal_ref);
     register_demo!(runner, demo_float_reciprocal_ref_debug);
     register_demo!(runner, demo_float_reciprocal_assign);
     register_demo!(runner, demo_float_reciprocal_assign_debug);
     register_demo!(runner, demo_float_reciprocal_prec);
     register_demo!(runner, demo_float_reciprocal_prec_debug);
+    register_demo!(runner, demo_float_reciprocal_prec_extreme);
+    register_demo!(runner, demo_float_reciprocal_prec_extreme_debug);
     register_demo!(runner, demo_float_reciprocal_prec_ref);
     register_demo!(runner, demo_float_reciprocal_prec_ref_debug);
     register_demo!(runner, demo_float_reciprocal_prec_assign);
     register_demo!(runner, demo_float_reciprocal_prec_assign_debug);
     register_demo!(runner, demo_float_reciprocal_round);
     register_demo!(runner, demo_float_reciprocal_round_debug);
+    register_demo!(runner, demo_float_reciprocal_round_extreme);
+    register_demo!(runner, demo_float_reciprocal_round_extreme_debug);
     register_demo!(runner, demo_float_reciprocal_round_ref);
     register_demo!(runner, demo_float_reciprocal_round_ref_debug);
     register_demo!(runner, demo_float_reciprocal_round_assign);
     register_demo!(runner, demo_float_reciprocal_round_assign_debug);
     register_demo!(runner, demo_float_reciprocal_prec_round);
     register_demo!(runner, demo_float_reciprocal_prec_round_debug);
+    register_demo!(runner, demo_float_reciprocal_prec_round_extreme);
+    register_demo!(runner, demo_float_reciprocal_prec_round_extreme_debug);
     register_demo!(runner, demo_float_reciprocal_prec_round_ref);
     register_demo!(runner, demo_float_reciprocal_prec_round_ref_debug);
     register_demo!(runner, demo_float_reciprocal_prec_round_assign);
@@ -91,6 +101,24 @@ fn demo_float_reciprocal(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_reciprocal_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!(
+            "({:#x}).reciprocal() = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(x.reciprocal())
+        );
+    }
+}
+
+fn demo_float_reciprocal_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).reciprocal() = {}", x_old, x.reciprocal());
+    }
+}
+
+fn demo_float_reciprocal_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen_var_12().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!(
             "({:#x}).reciprocal() = {:#x}",
@@ -150,6 +178,32 @@ fn demo_float_reciprocal_prec(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_reciprocal_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let (sum, o) = x.reciprocal_prec(prec);
+        println!(
+            "({:#x}).reciprocal_prec({}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            prec,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_reciprocal_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_4().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!(
+            "({}).reciprocal_prec({}) = {:?}",
+            x_old,
+            prec,
+            x.reciprocal_prec(prec)
+        );
+    }
+}
+
+fn demo_float_reciprocal_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_4().get(gm, config).take(limit) {
         let x_old = x.clone();
         let (sum, o) = x.reciprocal_prec(prec);
         println!(
@@ -225,6 +279,38 @@ fn demo_float_reciprocal_round(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_reciprocal_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_13()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (sum, o) = x.reciprocal_round(rm);
+        println!(
+            "({:#x}).reciprocal_round({}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_reciprocal_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_23()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).reciprocal_round({}) = {:?}",
+            x_old,
+            rm,
+            x.reciprocal_round(rm)
+        );
+    }
+}
+
+fn demo_float_reciprocal_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_23()
         .get(gm, config)
         .take(limit)
     {
@@ -316,6 +402,40 @@ fn demo_float_reciprocal_prec_round(gm: GenMode, config: &GenConfig, limit: usiz
 
 fn demo_float_reciprocal_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (sum, o) = x.reciprocal_prec_round(prec, rm);
+        println!(
+            "({:#x}).reciprocal_prec_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            prec,
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_reciprocal_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).reciprocal_prec_round({}, {}) = {:?}",
+            x_old,
+            prec,
+            rm,
+            x.reciprocal_prec_round(prec, rm)
+        );
+    }
+}
+
+fn demo_float_reciprocal_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_12()
         .get(gm, config)
         .take(limit)
     {
