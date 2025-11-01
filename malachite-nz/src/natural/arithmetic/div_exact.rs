@@ -52,7 +52,7 @@ use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{
     BINV_NEWTON_THRESHOLD, DC_BDIV_Q_THRESHOLD, DC_BDIV_QR_THRESHOLD, DoubleLimb, Limb,
-    MU_BDIV_Q_THRESHOLD,
+    MU_BDIV_Q_THRESHOLD, MU_BDIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
 use core::cmp::{Ordering::*, max, min};
@@ -1588,6 +1588,78 @@ pub_test! {limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scra
         limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
 }}
+
+// This is equivalent to `mpn_bdiv_qr` from `mpn/generic/bdiv_qr.c` GMP 6.3.0.
+pub(crate) fn limbs_modular_div_mod(
+    qp: &mut [Limb], // Quotient output
+    rp: &mut [Limb], // Remainder output
+    np: &[Limb],     // Dividend
+    dp: &[Limb],     // Divisor
+    tp: &mut [Limb], // Scratch workspace
+) -> bool {
+    let nn = np.len();
+    let dn = dp.len();
+    assert!(nn > dn, "Dividend must be larger than divisor");
+
+    let rh: bool;
+
+    if dn < DC_BDIV_QR_THRESHOLD || (nn - dn) < DC_BDIV_QR_THRESHOLD {
+        // **Small divisor case: Use simple binary division**
+        // Copy dividend to scratch space for in-place computation
+        tp[..nn].copy_from_slice(np);
+
+        // Compute modular inverse: di = -D[0]^(-1) mod B
+        let mut di = limbs_modular_invert_limb(dp[0]);
+        di = di.wrapping_neg(); // Negate the inverse
+
+        // Perform simple binary division with precomputed inverse
+        rh = limbs_modular_div_mod_schoolbook(qp, &mut tp[..nn], dp, di);
+
+        // Extract remainder from high limbs of temp buffer
+        rp.copy_from_slice(&tp[nn - dn..nn]);
+    } else if dn < MU_BDIV_QR_THRESHOLD {
+        // **Medium divisor case: Use divide-and-conquer binary division**
+        // Copy dividend to scratch space
+        tp[..nn].copy_from_slice(np);
+
+        // Compute modular inverse
+        let mut di = limbs_modular_invert_limb(dp[0]);
+        di = di.wrapping_neg();
+
+        // Perform divide-and-conquer binary division
+        rh = limbs_modular_div_mod_divide_and_conquer(qp, &mut tp[..nn], dp, di);
+
+        // Extract remainder
+        rp.copy_from_slice(&tp[nn - dn..nn]);
+    } else {
+        // **Large divisor case: Use μ-division algorithm**
+        rh = limbs_modular_div_mod_barrett(qp, rp, np, dp, tp);
+    }
+    rh
+}
+
+// This is equivalent to `mpn_bdiv_qr_itch` from `mpn/generic/bdiv_qr.c`, GMP 6.3.0.
+pub(crate) fn limbs_modular_div_mod_scratch_len(nn: usize, dn: usize) -> usize {
+    if dn < MU_BDIV_QR_THRESHOLD {
+        return nn;
+    }
+    limbs_modular_div_mod_barrett_scratch_len(nn, dn)
+}
+
+// This is equivalent to `mpn_bdiv_qr_wrap` from `mpn/generic/remove.c`, GMP 6.3.0.
+pub(crate) fn limbs_modular_div_mod_wrap(
+    qp: &mut [Limb], // Quotient output
+    rp: &mut [Limb], // Remainder output
+    np: &[Limb],     // Dividend
+    dp: &[Limb],     // Divisor
+) {
+    // Calculate required scratch space
+    let scratch_size = limbs_modular_div_mod_scratch_len(np.len(), dp.len());
+    let mut scratch = vec![0; scratch_size];
+
+    // Perform the division
+    limbs_modular_div_mod(qp, rp, np, dp, &mut scratch);
+}
 
 // # Worst-case complexity
 // Constant time and additional memory.

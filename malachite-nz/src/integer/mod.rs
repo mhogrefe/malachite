@@ -117,6 +117,8 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`Integer`]s without repetition.
 pub mod exhaustive;
+/// Traits for factorization operations.
+pub mod factorization;
 /// Traits for logic and bit manipulation.
 pub mod logic;
 #[cfg(feature = "random")]
