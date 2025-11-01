@@ -163,6 +163,9 @@ pub mod integer {
         pub mod integer_increasing_range;
         pub mod integer_increasing_range_to_infinity;
     }
+    pub mod factorization {
+        pub mod is_power;
+    }
     pub mod logic {
         pub mod and;
         pub mod assign_bit;
@@ -346,6 +349,7 @@ pub mod natural {
         pub mod exhaustive_positive_naturals;
     }
     pub mod factorization {
+        pub mod is_power;
         pub mod is_square;
         pub mod primes;
     }
