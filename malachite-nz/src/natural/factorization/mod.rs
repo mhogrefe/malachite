@@ -9,6 +9,9 @@
 /// An implementation of [`IsSquare`](malachite_base::num::factorization::traits::IsSquare), a trait
 /// for testing if a number if a perfect square.
 pub mod is_square;
+/// An implementation of [`IsPrime`](malachite_base::num::factorization::traits::IsPrime), a trait
+/// for testing if a number is prime.
+pub mod is_prime;
 /// An implementation of [`Primes`](malachite_base::num::factorization::traits::Primes), a trait for
 /// generating prime numbers.
 pub mod primes;
