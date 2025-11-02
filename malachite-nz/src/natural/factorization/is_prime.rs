@@ -13,7 +13,7 @@
 
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
-    Gcd, JacobiSymbol, ModInverse, ModMul, ModPow, ModSub, Parity, PowerOf2,
+    DivisibleBy, Gcd, JacobiSymbol, ModInverse, ModMul, ModPow, ModSub, Parity, PowerOf2,
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -155,7 +155,7 @@ pub fn is_probable_prime_lucas(n: &Natural) -> bool {
             let jacobi = if neg_d {
                 // For negative d, we need to compute (-d | n)
                 // Using the property that (-1 | n) = (-1)^((n-1)/2)
-                let sign_factor = if (n - Natural::ONE) / Natural::TWO % Natural::TWO == Natural::ZERO {
+                let sign_factor = if ((n - Natural::ONE) / Natural::TWO).even() {
                     1
                 } else {
                     -1
@@ -321,7 +321,7 @@ impl IsPrime for Natural {
         let trial_limit = (bits as usize).min(10000);
         
         for p in u64::primes().skip(1).take(trial_limit) {
-            if self % Natural::from(p) == 0 {
+            if self.divisible_by(Natural::from(p)) {
                 return false;
             }
         }
