@@ -17,7 +17,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::num::factorization::traits::IsPrime;
+use malachite_base::num::factorization::traits::{IsPrime, IsSquare, Primes};
 use malachite_base::num::logic::traits::SignificantBits;
 
 /// Tests whether a [`Natural`] is a strong probable prime (Miller-Rabin test) with a given base.
@@ -285,7 +285,7 @@ impl IsPrime for Natural {
     /// probable prime test (Miller-Rabin with base 2) and a Lucas probable prime test. There are
     /// no known composite numbers that pass the BPSW test, making it effectively deterministic for
     /// practical purposes.
-
+    /// TODO: other tests including pocklington, morrison, aprcl, etc.
     ///
     /// # Examples
     /// ```
@@ -306,7 +306,49 @@ impl IsPrime for Natural {
             return u64::wrapping_from(self).is_prime();
         }
 
-        // For multi-limb values, use BPSW test
+        // For multi-limb values, follow FLINT's fmpz_is_prime logic:
+
+        // Check if even
+        if self.even() {
+            return false;
+        }
+
+        // Trial division by small primes
+        // FLINT does trial division by bits(n) primes (starting from index 1, skipping prime 2).
+        // We cap this at 10,000 primes.
+        // TODO: Use a cached prime array for better performance (see FLINT's _flint_primes cache)
+        let bits = self.significant_bits();
+        let trial_limit = (bits as usize).min(10000);
+        
+        for p in u64::primes().skip(1).take(trial_limit) {
+            if self % Natural::from(p) == 0 {
+                return false;
+            }
+        }
+
+        // Quick rejection: check if perfect square
+        // TODO: see FLINT comment: "todo: use fmpz_is_perfect_power?"
+        if self.is_square() {
+            return false;
+        }
+
+        // For numbers less than ~81 bits, use deterministic Miller-Rabin
+        // This certifies primality for n < 3317044064679887385961981
+        // See https://doi.org/10.1090/mcom/3134
+        if self >> 64 < Natural::from(179817u64) {
+            // Use 13 bases for deterministic test
+            const BASES: [u64; 13] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
+            
+            for &base in &BASES {
+                if !is_strong_probable_prime(self, &Natural::from(base)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // For larger multi-limb values, use BPSW test (probabilistic but no known counterexamples)
         is_probable_prime_bpsw(self)
     }
 }
