@@ -350,6 +350,7 @@ pub mod natural {
     }
     pub mod factorization {
         pub mod is_power;
+        pub mod is_prime;
         pub mod is_square;
         pub mod primes;
     }
