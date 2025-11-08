@@ -489,10 +489,10 @@ where
             i >= U::ZERO || n.divisible_by_power_of_2(u64::exact_from(i.unsigned_abs())),
             o == Equal
         );
-        if i < U::ZERO {
-            if let Some(m) = shifted.arithmetic_checked_shr(i) {
-                assert_eq!(m.cmp(&n), o);
-            }
+        if i < U::ZERO
+            && let Some(m) = shifted.arithmetic_checked_shr(i)
+        {
+            assert_eq!(m.cmp(&n), o);
         }
 
         if o == Equal {
@@ -540,10 +540,10 @@ where
             i >= U::ZERO || n.divisible_by_power_of_2(u64::exact_from(i.unsigned_abs())),
             o == Equal
         );
-        if i < U::ZERO {
-            if let Some(m) = shifted.arithmetic_checked_shr(i) {
-                assert_eq!(m.cmp(&n), o);
-            }
+        if i < U::ZERO
+            && let Some(m) = shifted.arithmetic_checked_shr(i)
+        {
+            assert_eq!(m.cmp(&n), o);
         }
 
         if o == Equal {

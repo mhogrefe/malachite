@@ -159,10 +159,10 @@ fn ceiling_log_base_properties_helper<T: PrimitiveUnsigned>() {
         if let Some(pow) = base.checked_pow(ceiling_log) {
             assert!(pow >= n);
         }
-        if n != T::ONE {
-            if let Some(pow) = base.checked_pow(ceiling_log - 1) {
-                assert!(pow < n);
-            }
+        if n != T::ONE
+            && let Some(pow) = base.checked_pow(ceiling_log - 1)
+        {
+            assert!(pow < n);
         }
 
         let floor_log = n.floor_log_base(base);

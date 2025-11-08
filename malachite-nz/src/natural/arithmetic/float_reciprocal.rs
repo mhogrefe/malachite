@@ -56,12 +56,11 @@ pub fn reciprocal_float_significand_in_place(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (u64, Ordering) {
-    if out_prec == x_prec {
-        if let Some((increment_exp, o)) =
+    if out_prec == x_prec
+        && let Some((increment_exp, o)) =
             reciprocal_float_significand_in_place_same_prec(x, out_prec, rm)
-        {
-            return (u64::from(increment_exp), o);
-        }
+    {
+        return (u64::from(increment_exp), o);
     }
     match &mut *x {
         Natural(Small(small_x)) => {
@@ -84,12 +83,11 @@ pub fn reciprocal_float_significand_ref(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (Natural, u64, Ordering) {
-    if out_prec == x_prec {
-        if let Some((reciprocal, increment_exp, o)) =
+    if out_prec == x_prec
+        && let Some((reciprocal, increment_exp, o)) =
             reciprocal_float_significand_same_prec_ref(x, out_prec, rm)
-        {
-            return (reciprocal, u64::from(increment_exp), o);
-        }
+    {
+        return (reciprocal, u64::from(increment_exp), o);
     }
     match x {
         Natural(Small(small_x)) => {

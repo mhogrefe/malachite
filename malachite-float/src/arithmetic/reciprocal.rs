@@ -209,7 +209,7 @@ impl Float {
                 significand: x,
             }) => {
                 if x.is_power_of_2() {
-                    let (reciprocal, o) = Float::ONE.shl_prec_round(
+                    let (reciprocal, o) = Self::ONE.shl_prec_round(
                         i64::from(1 - exp),
                         prec,
                         if *sign { rm } else { -rm },
@@ -619,7 +619,7 @@ impl Float {
                 if x.is_power_of_2() {
                     let sign = *sign;
                     let o;
-                    (*self, o) = Float::ONE.shl_prec_round(
+                    (*self, o) = Self::ONE.shl_prec_round(
                         i64::from(1 - *exp),
                         prec,
                         if sign { rm } else { -rm },

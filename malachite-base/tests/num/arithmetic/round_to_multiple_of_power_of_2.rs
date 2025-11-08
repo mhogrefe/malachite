@@ -166,31 +166,31 @@ fn round_to_multiple_of_power_of_2_properties_helper_unsigned<T: PrimitiveUnsign
     });
 
     unsigned_pair_gen_var_2::<T, u64>().test_properties(|(n, pow)| {
-        if pow < T::WIDTH {
-            if let Some(shifted) = n.arithmetic_checked_shl(pow) {
-                let so = (shifted, Equal);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Down), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Up), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Floor), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Ceiling), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Nearest), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Exact), so);
-            }
+        if pow < T::WIDTH
+            && let Some(shifted) = n.arithmetic_checked_shl(pow)
+        {
+            let so = (shifted, Equal);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Down), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Up), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Floor), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Ceiling), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Nearest), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Exact), so);
         }
     });
 
     unsigned_pair_gen_var_14::<T, u64>().test_properties(|(n, pow)| {
         let down = n.round_to_multiple_of_power_of_2(pow, Down);
         assert_eq!(down.1, Less);
-        if let Some(k) = T::ONE.arithmetic_checked_shl(pow) {
-            if let Some(up) = down.0.checked_add(k) {
-                let up = (up, Greater);
-                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Up), up);
-                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Floor), down);
-                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Ceiling), up);
-                let nearest = n.round_to_multiple_of_power_of_2(pow, Nearest);
-                assert!(nearest == down || nearest == up);
-            }
+        if let Some(k) = T::ONE.arithmetic_checked_shl(pow)
+            && let Some(up) = down.0.checked_add(k)
+        {
+            let up = (up, Greater);
+            assert_eq!(n.round_to_multiple_of_power_of_2(pow, Up), up);
+            assert_eq!(n.round_to_multiple_of_power_of_2(pow, Floor), down);
+            assert_eq!(n.round_to_multiple_of_power_of_2(pow, Ceiling), up);
+            let nearest = n.round_to_multiple_of_power_of_2(pow, Nearest);
+            assert!(nearest == down || nearest == up);
         }
     });
 
@@ -287,40 +287,40 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<
     });
 
     signed_unsigned_pair_gen_var_1::<S, u64>().test_properties(|(n, pow)| {
-        if pow < S::WIDTH {
-            if let Some(shifted) = n.arithmetic_checked_shl(pow) {
-                let so = (shifted, Equal);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Down), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Up), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Floor), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Ceiling), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Nearest), so);
-                assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Exact), so);
-            }
+        if pow < S::WIDTH
+            && let Some(shifted) = n.arithmetic_checked_shl(pow)
+        {
+            let so = (shifted, Equal);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Down), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Up), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Floor), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Ceiling), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Nearest), so);
+            assert_eq!(shifted.round_to_multiple_of_power_of_2(pow, Exact), so);
         }
     });
 
     signed_unsigned_pair_gen_var_8::<S, u64>().test_properties(|(n, pow)| {
         let down = n.round_to_multiple_of_power_of_2(pow, Down);
         assert_eq!(down.1, if n >= S::ZERO { Less } else { Greater });
-        if let Some(k) = S::ONE.arithmetic_checked_shl(pow) {
-            if let Some(up) = if n >= S::ZERO {
+        if let Some(k) = S::ONE.arithmetic_checked_shl(pow)
+            && let Some(up) = if n >= S::ZERO {
                 down.0.checked_add(k)
             } else {
                 down.0.checked_sub(k)
-            } {
-                let up = (up, if n >= S::ZERO { Greater } else { Less });
-                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Up), up);
-                if n >= S::ZERO {
-                    assert_eq!(n.round_to_multiple_of_power_of_2(pow, Floor), down);
-                    assert_eq!(n.round_to_multiple_of_power_of_2(pow, Ceiling), up);
-                } else {
-                    assert_eq!(n.round_to_multiple_of_power_of_2(pow, Floor), up);
-                    assert_eq!(n.round_to_multiple_of_power_of_2(pow, Ceiling), down);
-                }
-                let nearest = n.round_to_multiple_of_power_of_2(pow, Nearest);
-                assert!(nearest == down || nearest == up);
             }
+        {
+            let up = (up, if n >= S::ZERO { Greater } else { Less });
+            assert_eq!(n.round_to_multiple_of_power_of_2(pow, Up), up);
+            if n >= S::ZERO {
+                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Floor), down);
+                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Ceiling), up);
+            } else {
+                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Floor), up);
+                assert_eq!(n.round_to_multiple_of_power_of_2(pow, Ceiling), down);
+            }
+            let nearest = n.round_to_multiple_of_power_of_2(pow, Nearest);
+            assert!(nearest == down || nearest == up);
         }
     });
 

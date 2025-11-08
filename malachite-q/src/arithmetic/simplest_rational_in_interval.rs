@@ -233,41 +233,41 @@ impl SimplestRationalInInterval for Rational {
                 denominator: d,
             };
             update_best(&mut best, x, y, candidate);
-            if let Some(x_n) = ox_n.as_ref() {
-                if cf_x.is_done() {
-                    update_best(
-                        &mut best,
-                        x,
-                        y,
-                        simplest_rational_one_alt_helper(
-                            x_n,
-                            &oy_n,
-                            cf_y.clone(),
-                            &numerator,
-                            &denominator,
-                            &previous_numerator,
-                            &previous_denominator,
-                        ),
-                    );
-                }
+            if let Some(x_n) = ox_n.as_ref()
+                && cf_x.is_done()
+            {
+                update_best(
+                    &mut best,
+                    x,
+                    y,
+                    simplest_rational_one_alt_helper(
+                        x_n,
+                        &oy_n,
+                        cf_y.clone(),
+                        &numerator,
+                        &denominator,
+                        &previous_numerator,
+                        &previous_denominator,
+                    ),
+                );
             }
-            if let Some(y_n) = oy_n.as_ref() {
-                if cf_y.is_done() {
-                    update_best(
-                        &mut best,
-                        x,
-                        y,
-                        simplest_rational_one_alt_helper(
-                            y_n,
-                            &ox_n,
-                            cf_x.clone(),
-                            &numerator,
-                            &denominator,
-                            &previous_numerator,
-                            &previous_denominator,
-                        ),
-                    );
-                }
+            if let Some(y_n) = oy_n.as_ref()
+                && cf_y.is_done()
+            {
+                update_best(
+                    &mut best,
+                    x,
+                    y,
+                    simplest_rational_one_alt_helper(
+                        y_n,
+                        &ox_n,
+                        cf_x.clone(),
+                        &numerator,
+                        &denominator,
+                        &previous_numerator,
+                        &previous_denominator,
+                    ),
+                );
             }
             if ox_n.is_some() && oy_n.is_some() && cf_x.is_done() != cf_y.is_done() {
                 if cf_y.is_done() {

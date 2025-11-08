@@ -1020,11 +1020,11 @@ fn set_prec_round_properties_helper(mut x: Float, prec: u64, rm: RoundingMode) {
         );
     }
 
-    if o == Equal {
-        if let Some(old_precision) = old_x.get_prec() {
-            assert_eq!(x.set_prec_round(old_precision, Exact), Equal);
-            assert_eq!(ComparableFloatRef(&x), ComparableFloatRef(&old_x));
-        }
+    if o == Equal
+        && let Some(old_precision) = old_x.get_prec()
+    {
+        assert_eq!(x.set_prec_round(old_precision, Exact), Equal);
+        assert_eq!(ComparableFloatRef(&x), ComparableFloatRef(&old_x));
     }
 
     let mut x = -old_x;
@@ -1229,11 +1229,11 @@ fn set_prec_properties_helper(mut x: Float, prec: u64) {
         ComparableFloatRef(&Float::from(&rug_x))
     );
 
-    if o == Equal {
-        if let Some(old_precision) = old_x.get_prec() {
-            assert_eq!(x.set_prec_round(old_precision, Exact), Equal);
-            assert_eq!(ComparableFloatRef(&x), ComparableFloatRef(&old_x));
-        }
+    if o == Equal
+        && let Some(old_precision) = old_x.get_prec()
+    {
+        assert_eq!(x.set_prec_round(old_precision, Exact), Equal);
+        assert_eq!(ComparableFloatRef(&x), ComparableFloatRef(&old_x));
     }
 
     let mut x = -old_x;

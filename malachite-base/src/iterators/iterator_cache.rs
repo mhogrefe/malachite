@@ -130,7 +130,7 @@ impl<I: Iterator> IteratorCache<I> {
     /// assert_eq!(xs.known_len(), Some(3));
     /// assert_eq!(xs.get(2), Some(&3));
     /// ```
-    pub fn known_len(&self) -> Option<usize> {
+    pub const fn known_len(&self) -> Option<usize> {
         if self.done {
             Some(self.cache.len())
         } else {

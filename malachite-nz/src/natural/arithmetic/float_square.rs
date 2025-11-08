@@ -47,12 +47,11 @@ pub fn square_float_significand_in_place(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (i32, Ordering) {
-    if out_prec == x_prec {
-        if let Some((decrement_exp, o)) =
+    if out_prec == x_prec
+        && let Some((decrement_exp, o)) =
             square_float_significand_in_place_same_prec(x, out_prec, rm)
-        {
-            return (-i32::from(decrement_exp), o);
-        }
+    {
+        return (-i32::from(decrement_exp), o);
     }
     let (square, exp_offset, o) = match &*x {
         Natural(Small(x)) => square_float_significands_general(&[*x], x_prec, out_prec, rm),
@@ -81,12 +80,11 @@ fn square_float_significand_ref_helper(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (Natural, i32, Ordering) {
-    if out_prec == x_prec {
-        if let Some((square, decrement_exp, o)) =
+    if out_prec == x_prec
+        && let Some((square, decrement_exp, o)) =
             square_float_significand_same_prec_ref(xs, out_prec, rm)
-        {
-            return (square, -i32::from(decrement_exp), o);
-        }
+    {
+        return (square, -i32::from(decrement_exp), o);
     }
     square_float_significands_general(xs, x_prec, out_prec, rm)
 }

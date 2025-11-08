@@ -567,10 +567,10 @@ fn shr_round_properties_helper_unsigned_signed<
             i <= U::ZERO || n.divisible_by_power_of_2(i.exact_into()),
             o == Equal
         );
-        if i >= U::ZERO {
-            if let Some(m) = shifted.arithmetic_checked_shl(i) {
-                assert_eq!(m.cmp(&n), o);
-            }
+        if i >= U::ZERO
+            && let Some(m) = shifted.arithmetic_checked_shl(i)
+        {
+            assert_eq!(m.cmp(&n), o);
         }
 
         if o == Equal {
@@ -717,10 +717,10 @@ fn shr_round_properties_helper_signed_signed<
             i <= U::ZERO || n.divisible_by_power_of_2(i.exact_into()),
             o == Equal
         );
-        if i >= U::ZERO {
-            if let Some(m) = shifted.arithmetic_checked_shl(i) {
-                assert_eq!(m.cmp(&n), o);
-            }
+        if i >= U::ZERO
+            && let Some(m) = shifted.arithmetic_checked_shl(i)
+        {
+            assert_eq!(m.cmp(&n), o);
         }
 
         if o == Equal {

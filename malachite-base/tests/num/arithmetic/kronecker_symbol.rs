@@ -744,48 +744,49 @@ fn kronecker_symbol_properties_helper_signed<
         let n_mod_4: u8 = n.mod_power_of_2(2).wrapping_into();
         if n_mod_4 == 2 {
             if let Some(four_n) = n.checked_mul(S::from(4i8)) {
-                if let Some(b) = a.checked_add(four_n) {
-                    if n > S::ZERO || a.sign() == b.sign() {
-                        assert_eq!(b.kronecker_symbol(n), s);
-                    }
+                if let Some(b) = a.checked_add(four_n)
+                    && (n > S::ZERO || a.sign() == b.sign())
+                {
+                    assert_eq!(b.kronecker_symbol(n), s);
                 }
-                if let Some(b) = a.checked_sub(four_n) {
-                    if n > S::ZERO || a.sign() == b.sign() {
-                        assert_eq!(b.kronecker_symbol(n), s);
-                    }
+                if let Some(b) = a.checked_sub(four_n)
+                    && (n > S::ZERO || a.sign() == b.sign())
+                {
+                    assert_eq!(b.kronecker_symbol(n), s);
                 }
             }
         } else {
-            if let Some(b) = a.checked_add(n) {
-                if n > S::ZERO || a.sign() == b.sign() {
-                    assert_eq!(b.kronecker_symbol(n), s);
-                }
+            if let Some(b) = a.checked_add(n)
+                && (n > S::ZERO || a.sign() == b.sign())
+            {
+                assert_eq!(b.kronecker_symbol(n), s);
             }
-            if let Some(b) = a.checked_sub(n) {
-                if n > S::ZERO || a.sign() == b.sign() {
-                    assert_eq!(b.kronecker_symbol(n), s);
-                }
+            if let Some(b) = a.checked_sub(n)
+                && (n > S::ZERO || a.sign() == b.sign())
+            {
+                assert_eq!(b.kronecker_symbol(n), s);
             }
         }
         let a_mod_4: u8 = a.mod_power_of_2(2).wrapping_into();
-        if a != S::ZERO && a_mod_4 != 3 {
-            if let Some(abs_a) = a.checked_abs() {
-                if a_mod_4 == 2 {
-                    if let Some(four_abs_a) = abs_a.checked_mul(S::from(4i8)) {
-                        if let Some(m) = n.checked_add(four_abs_a) {
-                            assert_eq!(a.kronecker_symbol(m), s);
-                        }
-                        if let Some(m) = n.checked_sub(four_abs_a) {
-                            assert_eq!(a.kronecker_symbol(m), s);
-                        }
-                    }
-                } else {
-                    if let Some(m) = n.checked_add(abs_a) {
+        if a != S::ZERO
+            && a_mod_4 != 3
+            && let Some(abs_a) = a.checked_abs()
+        {
+            if a_mod_4 == 2 {
+                if let Some(four_abs_a) = abs_a.checked_mul(S::from(4i8)) {
+                    if let Some(m) = n.checked_add(four_abs_a) {
                         assert_eq!(a.kronecker_symbol(m), s);
                     }
-                    if let Some(m) = n.checked_sub(abs_a) {
+                    if let Some(m) = n.checked_sub(four_abs_a) {
                         assert_eq!(a.kronecker_symbol(m), s);
                     }
+                }
+            } else {
+                if let Some(m) = n.checked_add(abs_a) {
+                    assert_eq!(a.kronecker_symbol(m), s);
+                }
+                if let Some(m) = n.checked_sub(abs_a) {
+                    assert_eq!(a.kronecker_symbol(m), s);
                 }
             }
         }
@@ -805,13 +806,13 @@ fn kronecker_symbol_properties_helper_signed<
     });
 
     signed_triple_gen::<S>().test_properties(|(x, y, z)| {
-        if !(z == S::NEGATIVE_ONE && (x == S::ZERO && y < S::ZERO || x < S::ZERO && y == S::ZERO)) {
-            if let Some(p) = x.checked_mul(y) {
-                assert_eq!(
-                    p.kronecker_symbol(z),
-                    x.kronecker_symbol(z) * y.kronecker_symbol(z)
-                );
-            }
+        if !(z == S::NEGATIVE_ONE && (x == S::ZERO && y < S::ZERO || x < S::ZERO && y == S::ZERO))
+            && let Some(p) = x.checked_mul(y)
+        {
+            assert_eq!(
+                p.kronecker_symbol(z),
+                x.kronecker_symbol(z) * y.kronecker_symbol(z)
+            );
         }
         let y_odd_mod_4: u8 = if y == S::ZERO {
             0
@@ -825,13 +826,12 @@ fn kronecker_symbol_properties_helper_signed<
         };
         if !(x == S::NEGATIVE_ONE
             && (y == S::ZERO && z_odd_mod_4 == 3 || y_odd_mod_4 == 3 && z == S::ZERO))
+            && let Some(p) = y.checked_mul(z)
         {
-            if let Some(p) = y.checked_mul(z) {
-                assert_eq!(
-                    x.kronecker_symbol(p),
-                    x.kronecker_symbol(y) * x.kronecker_symbol(z)
-                );
-            }
+            assert_eq!(
+                x.kronecker_symbol(p),
+                x.kronecker_symbol(y) * x.kronecker_symbol(z)
+            );
         }
     });
 

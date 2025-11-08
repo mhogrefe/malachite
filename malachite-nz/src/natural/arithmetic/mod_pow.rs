@@ -503,11 +503,9 @@ pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]
                     (Limb::exact_from(0x1213) >> (xs[0].mod_power_of_2(3) << 1)).mod_power_of_2(2);
                 // Note that es[0] * bits might overflow, but that just results in a missed
                 // optimization.
-                if let Ok(t) = Limb::try_from(t) {
-                    if es[0].wrapping_mul(bits) >= t {
+                if let Ok(t) = Limb::try_from(t) && es[0].wrapping_mul(bits) >= t  {
                         slice_set_zero(scratch_lo);
                         do_pow_low = false;
-                    }
                 }
             }
         }

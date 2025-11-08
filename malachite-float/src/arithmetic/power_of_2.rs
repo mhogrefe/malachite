@@ -99,24 +99,23 @@ impl Float {
     /// ```
     pub fn power_of_2_prec_round(pow: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
-        if let Ok(exponent) = i32::try_from(pow) {
-            if let Some(exponent) = exponent.checked_add(1) {
-                if (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&exponent) {
-                    return (
-                        Self(Finite {
-                            sign: true,
-                            exponent,
-                            precision: prec,
-                            significand: Natural::power_of_2(
-                                prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
-                                    .0
-                                    - 1,
-                            ),
-                        }),
-                        Equal,
-                    );
-                }
-            }
+        if let Ok(exponent) = i32::try_from(pow)
+            && let Some(exponent) = exponent.checked_add(1)
+            && (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&exponent)
+        {
+            return (
+                Self(Finite {
+                    sign: true,
+                    exponent,
+                    precision: prec,
+                    significand: Natural::power_of_2(
+                        prec.round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+                            .0
+                            - 1,
+                    ),
+                }),
+                Equal,
+            );
         }
         match (pow > 0, rm) {
             (_, Exact) => panic!("Inexact power_of_2"),
@@ -221,17 +220,16 @@ impl PowerOf2<u64> for Float {
     /// );
     /// ```
     fn power_of_2(pow: u64) -> Self {
-        if let Ok(exponent) = i32::try_from(pow) {
-            if let Some(exponent) = exponent.checked_add(1) {
-                if exponent <= Self::MAX_EXPONENT {
-                    return Self(Finite {
-                        sign: true,
-                        exponent,
-                        precision: 1,
-                        significand: Natural::HIGH_BIT,
-                    });
-                }
-            }
+        if let Ok(exponent) = i32::try_from(pow)
+            && let Some(exponent) = exponent.checked_add(1)
+            && exponent <= Self::MAX_EXPONENT
+        {
+            return Self(Finite {
+                sign: true,
+                exponent,
+                precision: 1,
+                significand: Natural::HIGH_BIT,
+            });
         }
         Self::INFINITY
     }
@@ -271,17 +269,16 @@ impl PowerOf2<i64> for Float {
     /// ```
     #[inline]
     fn power_of_2(pow: i64) -> Self {
-        if let Ok(exponent) = i32::try_from(pow) {
-            if let Some(exponent) = exponent.checked_add(1) {
-                if (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&exponent) {
-                    return Self(Finite {
-                        sign: true,
-                        exponent,
-                        precision: 1,
-                        significand: Natural::HIGH_BIT,
-                    });
-                }
-            }
+        if let Ok(exponent) = i32::try_from(pow)
+            && let Some(exponent) = exponent.checked_add(1)
+            && (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&exponent)
+        {
+            return Self(Finite {
+                sign: true,
+                exponent,
+                precision: 1,
+                significand: Natural::HIGH_BIT,
+            });
         }
         if pow > 0 { Self::INFINITY } else { Self::ZERO }
     }

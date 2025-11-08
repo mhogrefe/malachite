@@ -51,10 +51,10 @@ fn limbs_index_of_next_false_bit<T: PrimitiveUnsigned>(xs: &[T], start: u64) -> 
     if starting_index >= xs.len() {
         return None;
     }
-    if let Some(result) = xs[starting_index].index_of_next_false_bit(start & T::WIDTH_MASK) {
-        if result != T::WIDTH {
-            return Some((u64::wrapping_from(starting_index) << T::LOG_WIDTH) + result);
-        }
+    if let Some(result) = xs[starting_index].index_of_next_false_bit(start & T::WIDTH_MASK)
+        && result != T::WIDTH
+    {
+        return Some((u64::wrapping_from(starting_index) << T::LOG_WIDTH) + result);
     }
     if starting_index == xs.len() - 1 {
         return None;

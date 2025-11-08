@@ -217,20 +217,20 @@ fn binomial_coefficient_helper_signed<T: PrimitiveSigned>() {
         if n >= k {
             assert_eq!(T::binomial_coefficient(n, n - k), b);
         }
-        if n != T::MIN && k != T::ZERO {
-            if let Some(c) = T::checked_binomial_coefficient(n - T::ONE, k) {
-                assert_eq!(c + T::binomial_coefficient(n - T::ONE, k - T::ONE), b);
-            }
+        if n != T::MIN
+            && k != T::ZERO
+            && let Some(c) = T::checked_binomial_coefficient(n - T::ONE, k)
+        {
+            assert_eq!(c + T::binomial_coefficient(n - T::ONE, k - T::ONE), b);
         }
-        if n != T::MIN {
-            if let Some(s) = (n - T::ONE).checked_add(k) {
-                if let Some(mut b_alt) = T::checked_binomial_coefficient(s, k) {
-                    if k.odd() {
-                        b_alt.neg_assign();
-                    }
-                    assert_eq!(T::binomial_coefficient(-n, k), b_alt);
-                }
+        if n != T::MIN
+            && let Some(s) = (n - T::ONE).checked_add(k)
+            && let Some(mut b_alt) = T::checked_binomial_coefficient(s, k)
+        {
+            if k.odd() {
+                b_alt.neg_assign();
             }
+            assert_eq!(T::binomial_coefficient(-n, k), b_alt);
         }
     });
 

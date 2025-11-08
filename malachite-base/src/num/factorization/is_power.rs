@@ -131,7 +131,7 @@ fn get_perfect_power_u32(n: u32) -> Option<(u32, u64)> {
     }
     // Check other powers (exp >= 17, root <= 13 and odd)
     let mut exp = 0;
-    while n % 3 == 0 {
+    while n.is_multiple_of(3) {
         n /= 3;
         exp += 1;
     }
@@ -195,7 +195,7 @@ fn get_perfect_power_u32_bool(n: u32) -> bool {
     }
     // Check other powers (exp >= 17, root <= 13 and odd)
     let mut exp = 0;
-    while n % 3 == 0 {
+    while n.is_multiple_of(3) {
         n /= 3;
         exp += 1;
     }
@@ -268,7 +268,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     }
     // Check other powers (exp >= 17, root <= 13 and odd)
     let mut exp = 0;
-    while n % 3 == 0 {
+    while n.is_multiple_of(3) {
         n /= 3;
         exp += 1;
     }
@@ -286,7 +286,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     }
     // Check powers of 5
     exp = 0;
-    while n % 5 == 0 {
+    while n.is_multiple_of(5) {
         n /= 5;
         exp += 1;
     }
@@ -305,7 +305,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     }
     // Check powers of 7
     exp = 0;
-    while n % 7 == 0 {
+    while n.is_multiple_of(7) {
         n /= 7;
         exp += 1;
     }
@@ -317,7 +317,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     }
     // Check powers of 11
     exp = 0;
-    while n % 11 == 0 {
+    while n.is_multiple_of(11) {
         n /= 11;
         exp += 1;
     }
@@ -329,7 +329,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     }
     // Check powers of 13
     exp = 0;
-    while n % 13 == 0 {
+    while n.is_multiple_of(13) {
         n /= 13;
         exp += 1;
     }
@@ -387,7 +387,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     }
     // Check other powers (exp >= 17, root <= 13 and odd)
     let mut exp = 0;
-    while n % 3 == 0 {
+    while n.is_multiple_of(3) {
         n /= 3;
         exp += 1;
     }
@@ -396,7 +396,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     }
     // Check powers of 5
     exp = 0;
-    while n % 5 == 0 {
+    while n.is_multiple_of(5) {
         n /= 5;
         exp += 1;
     }
@@ -408,7 +408,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     }
     // Check powers of 7
     exp = 0;
-    while n % 7 == 0 {
+    while n.is_multiple_of(7) {
         n /= 7;
         exp += 1;
     }
@@ -417,7 +417,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     }
     // Check powers of 11
     exp = 0;
-    while n % 11 == 0 {
+    while n.is_multiple_of(11) {
         n /= 11;
         exp += 1;
     }
@@ -426,7 +426,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     }
     // Check powers of 13
     exp = 0;
-    while n % 13 == 0 {
+    while n.is_multiple_of(13) {
         n /= 13;
         exp += 1;
     }
@@ -550,6 +550,7 @@ fn is_power_i32(n: i32) -> bool {
         return get_perfect_power_u32_bool(n.unsigned_abs());
     }
     // For negative numbers, we need to check if there's an odd exponent representation
+    //
     // continue until we have largest possible exponent
     let (mut base, mut exp) = if let Some((base, exp)) = get_perfect_power_u32(n.unsigned_abs()) {
         (base, exp)
@@ -586,6 +587,7 @@ fn is_power_i64(n: i64) -> bool {
         return get_perfect_power_u64_bool(n.unsigned_abs());
     }
     // For negative numbers, we need to check if there's an odd exponent representation
+    //
     // continue until we have largest possible exponent
     let (mut base, mut exp) = if let Some((base, exp)) = get_perfect_power_u64(n.unsigned_abs()) {
         (base, exp)

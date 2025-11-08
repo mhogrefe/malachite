@@ -54,10 +54,8 @@ fn test_is_integer() {
 #[allow(clippy::needless_pass_by_value)]
 fn is_integer_properties_helper(x: Float, extreme: bool) {
     assert_eq!(x.is_integer(), (-&x).is_integer());
-    if !extreme {
-        if let Ok(q) = Rational::try_from(&x) {
-            assert_eq!(q.is_integer(), x.is_integer());
-        }
+    if !extreme && let Ok(q) = Rational::try_from(&x) {
+        assert_eq!(q.is_integer(), x.is_integer());
     }
 }
 

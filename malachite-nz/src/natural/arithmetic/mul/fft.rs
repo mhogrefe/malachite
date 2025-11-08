@@ -4133,13 +4133,12 @@ fn sd_ifft_trunc_block(
         return;
     }
     let big_s = s << LG_BLK_SZ;
-    if k == 2 {
-        if let Some(fxn) =
+    if k == 2
+        && let Some(fxn) =
             SD_IFFT_4_MOTH_TRUNC_BLOCK_TABLE[usize::from(f) + ((z - 1 + (n << 2)) << 1)]
-        {
-            fxn(q, j, j.significant_bits(), xs, big_s);
-            return;
-        }
+    {
+        fxn(q, j, j.significant_bits(), xs, big_s);
+        return;
     }
     if k > 1 {
         let k1 = k >> 1;
@@ -4200,13 +4199,12 @@ fn sd_ifft_trunc_block(
         }
         return;
     }
-    if k == 1 {
-        if let Some(fxn) =
+    if k == 1
+        && let Some(fxn) =
             SD_IFFT_2_MOTH_TRUNC_BLOCK_TABLE[usize::from(f) + ((z - 1 + (n << 1)) << 1)]
-        {
-            let (xs0, xs1) = xs.split_at_mut(big_s);
-            fxn(q, j, xs0, xs1);
-        }
+    {
+        let (xs0, xs1) = xs.split_at_mut(big_s);
+        fxn(q, j, xs0, xs1);
     }
 }
 

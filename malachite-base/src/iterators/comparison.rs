@@ -196,10 +196,10 @@ where
         if direction == Equal {
             return false;
         }
-        if let Some(previous) = previous {
-            if direction == previous {
-                return false;
-            }
+        if let Some(previous) = previous
+            && direction == previous
+        {
+            return false;
         }
         previous = Some(direction);
     }

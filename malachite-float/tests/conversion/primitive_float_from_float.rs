@@ -1366,24 +1366,26 @@ fn rounding_from_float_properties() {
     apply_fn_to_primitive_floats!(rounding_from_float_properties_helper);
 
     float_rounding_mode_pair_gen_var_6::<f32>().test_properties(|(x, rm)| {
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
-            if x >= -f32::MAX_FINITE && x <= f32::MAX_FINITE {
-                assert_eq!(
-                    NiceFloat(f32::rounding_from(&x, rm).0),
-                    NiceFloat(rug::Float::exact_from(&x).to_f32_round(rug_rm)),
-                );
-            }
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
+            && x >= -f32::MAX_FINITE
+            && x <= f32::MAX_FINITE
+        {
+            assert_eq!(
+                NiceFloat(f32::rounding_from(&x, rm).0),
+                NiceFloat(rug::Float::exact_from(&x).to_f32_round(rug_rm)),
+            );
         }
     });
 
     float_rounding_mode_pair_gen_var_6::<f64>().test_properties(|(x, rm)| {
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
-            if x >= -f64::MAX_FINITE && x <= f64::MAX_FINITE {
-                assert_eq!(
-                    NiceFloat(f64::rounding_from(&x, rm).0),
-                    NiceFloat(rug::Float::exact_from(&x).to_f64_round(rug_rm)),
-                );
-            }
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
+            && x >= -f64::MAX_FINITE
+            && x <= f64::MAX_FINITE
+        {
+            assert_eq!(
+                NiceFloat(f64::rounding_from(&x, rm).0),
+                NiceFloat(rug::Float::exact_from(&x).to_f64_round(rug_rm)),
+            );
         }
     });
 }

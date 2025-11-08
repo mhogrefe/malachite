@@ -9,7 +9,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{CheckedRoot, DivExactAssign, DivisibleBy, Gcd};
+use malachite_base::num::arithmetic::traits::{
+    CheckedRoot, DivExactAssign, DivisibleBy, Gcd, WrappingMulAssign,
+};
 use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower, IsPrime};
 use malachite_base::num::logic::traits::BitScan;
 
@@ -28,15 +30,13 @@ const PRIMES: [u32; 168] = [
 const SMALLEST_OMITTED_PRIME: u32 = 1009;
 
 // Find ONE perfect power representation for a Natural (not necessarily the smallest base).
+//
 // This function does NOT recurse - it just checks if n can be expressed as some base^exp.
 fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
     use malachite_base::num::basic::traits::One;
 
     // Find largest power of 2 dividing n
-    let mut pow_2 = match n.index_of_next_true_bit(0) {
-        Some(p) => p,
-        None => return None, // Zero - caller should handle
-    };
+    let mut pow_2 = n.index_of_next_true_bit(0)?;
 
     // Two divides exactly once - not a perfect power
     if pow_2 == 1 {
@@ -96,7 +96,7 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
             }
 
             // Early termination optimization
-            if &q < &Natural::from(SMALLEST_OMITTED_PRIME) {
+            if q < SMALLEST_OMITTED_PRIME {
                 return None;
             }
         }
@@ -116,7 +116,7 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
             }
 
             // Early termination optimization
-            if &q < &Natural::from(SMALLEST_OMITTED_PRIME) {
+            if q < SMALLEST_OMITTED_PRIME {
                 return None;
             }
         }
@@ -195,7 +195,7 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
             }
 
             // Early termination optimization
-            if &q < &Natural::from(SMALLEST_OMITTED_PRIME) {
+            if q < SMALLEST_OMITTED_PRIME {
                 return false;
             }
         }
@@ -215,7 +215,7 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
             }
 
             // Early termination optimization
-            if &q < &Natural::from(SMALLEST_OMITTED_PRIME) {
+            if q < SMALLEST_OMITTED_PRIME {
                 return false;
             }
         }
@@ -244,11 +244,11 @@ fn express_as_power_natural(n: &Natural) -> Option<(Natural, u32)> {
     let (mut base, mut exp) = get_perfect_power_natural(n)?;
 
     // Continue until we have the smallest possible base
-    while base > Natural::from(3u32) {
+    while base > 3u32 {
         match get_perfect_power_natural(&base) {
             Some((base2, exp2)) => {
                 base = base2;
-                exp = (exp as u64 * exp2 as u64) as u32;
+                exp.wrapping_mul_assign(exp2);
             }
             None => break,
         }
@@ -267,8 +267,8 @@ fn is_power_natural(n: &Natural) -> bool {
 impl ExpressAsPower for Natural {
     /// Expresses a [`Natural`] as a perfect power if possible.
     ///
-    /// Returns `Some((root, exponent))` where `root^exponent = self` and `exponent > 1`,
-    /// or `None` if the number cannot be expressed as a perfect power.
+    /// Returns `Some((root, exponent))` where `root^exponent = self` and `exponent > 1`, or `None`
+    /// if the number cannot be expressed as a perfect power.
     ///
     /// # Examples
     /// ```
@@ -279,16 +279,16 @@ impl ExpressAsPower for Natural {
     /// assert_eq!(Natural::from(16u32).express_as_power(), Some((Natural::from(2u32), 4)));
     /// assert_eq!(Natural::from(6u32).express_as_power(), None);
     /// ```
-    fn express_as_power(&self) -> Option<(Natural, u64)> {
-        express_as_power_natural(self).map(|(root, exp)| (root, exp as u64))
+    fn express_as_power(&self) -> Option<(Self, u64)> {
+        express_as_power_natural(self).map(|(root, exp)| (root, u64::from(exp)))
     }
 }
 
 impl IsPower for Natural {
     /// Determines whether a [`Natural`] is a perfect power.
     ///
-    /// A perfect power is any number of the form $a^x$ where $x > 1$, with $a$ and $x$
-    /// both integers. In particular, 0 and 1 are considered perfect powers.
+    /// A perfect power is any number of the form $a^x$ where $x > 1$, with $a$ and $x$ both
+    /// integers. In particular, 0 and 1 are considered perfect powers.
     ///
     /// # Examples
     /// ```

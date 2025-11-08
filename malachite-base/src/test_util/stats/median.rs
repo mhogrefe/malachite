@@ -40,10 +40,10 @@ pub fn deleted_uniform_primitive_int_median<T: PrimitiveInt>(
     if lo >= deleted {
         lo += T::ONE;
     }
-    if let Some(hi) = hi.as_mut() {
-        if *hi >= deleted {
-            *hi += T::ONE;
-        }
+    if let Some(hi) = hi.as_mut()
+        && *hi >= deleted
+    {
+        *hi += T::ONE;
     }
     (lo, hi)
 }

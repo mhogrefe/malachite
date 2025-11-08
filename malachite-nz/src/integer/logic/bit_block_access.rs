@@ -217,19 +217,18 @@ impl Natural {
             return;
         }
         let bits_width = end - start;
-        if bits_width <= Limb::WIDTH {
-            if let (&mut Self(Small(ref mut small_self)), &Self(Small(small_bits))) =
+        if bits_width <= Limb::WIDTH
+            && let (&mut Self(Small(ref mut small_self)), &Self(Small(small_bits))) =
                 (&mut *self, bits)
-            {
-                let small_bits = (!small_bits).mod_power_of_2(bits_width);
-                if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
-                    let mut new_small_self = *small_self - 1;
-                    new_small_self.assign_bits(start, end, &small_bits);
-                    let (sum, overflow) = new_small_self.overflowing_add(1);
-                    if !overflow {
-                        *small_self = sum;
-                        return;
-                    }
+        {
+            let small_bits = (!small_bits).mod_power_of_2(bits_width);
+            if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
+                let mut new_small_self = *small_self - 1;
+                new_small_self.assign_bits(start, end, &small_bits);
+                let (sum, overflow) = new_small_self.overflowing_add(1);
+                if !overflow {
+                    *small_self = sum;
+                    return;
                 }
             }
         }

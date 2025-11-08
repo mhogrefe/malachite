@@ -388,17 +388,17 @@ impl Float {
             return (Self::ZERO, Equal);
         }
         let bits = x.significant_bits();
-        if let Ok(bits_i32) = i32::try_from(bits) {
-            if bits_i32 <= Self::MAX_EXPONENT {
-                let mut f = Self(Finite {
-                    sign: true,
-                    exponent: bits_i32,
-                    precision: bits,
-                    significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
-                });
-                let o = f.set_prec_round(prec, rm);
-                return (f, o);
-            }
+        if let Ok(bits_i32) = i32::try_from(bits)
+            && bits_i32 <= Self::MAX_EXPONENT
+        {
+            let mut f = Self(Finite {
+                sign: true,
+                exponent: bits_i32,
+                precision: bits,
+                significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+            });
+            let o = f.set_prec_round(prec, rm);
+            return (f, o);
         }
         match rm {
             Up | Ceiling | Nearest => (Self::INFINITY, Greater),
@@ -469,17 +469,17 @@ impl Float {
         }
         let bits = x.significant_bits();
         if bits <= prec {
-            if let Ok(bits_i32) = i32::try_from(bits) {
-                if bits_i32 <= Self::MAX_EXPONENT {
-                    let mut f = Self(Finite {
-                        sign: true,
-                        exponent: bits_i32,
-                        precision: bits,
-                        significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
-                    });
-                    let o = f.set_prec_round(prec, rm);
-                    return (f, o);
-                }
+            if let Ok(bits_i32) = i32::try_from(bits)
+                && bits_i32 <= Self::MAX_EXPONENT
+            {
+                let mut f = Self(Finite {
+                    sign: true,
+                    exponent: bits_i32,
+                    precision: bits,
+                    significand: x << bits.neg_mod_power_of_2(Limb::LOG_WIDTH),
+                });
+                let o = f.set_prec_round(prec, rm);
+                return (f, o);
             }
             match rm {
                 Up | Ceiling | Nearest => (Self::INFINITY, Greater),

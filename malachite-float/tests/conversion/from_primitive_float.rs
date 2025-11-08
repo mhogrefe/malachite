@@ -1474,11 +1474,11 @@ where
                     && nearest.1 == ceiling.1
         );
         let or_nearest: Result<Rational, _> = TryFrom::try_from(&nearest.0);
-        if let Ok(r_nearest) = or_nearest {
-            if r_nearest != T::ZERO {
-                let rulp: Rational = ExactFrom::exact_from(nearest.0.ulp().unwrap());
-                assert!((r_nearest - Rational::exact_from(x)).le_abs(&(rulp >> 1)));
-            }
+        if let Ok(r_nearest) = or_nearest
+            && r_nearest != T::ZERO
+        {
+            let rulp: Rational = ExactFrom::exact_from(nearest.0.ulp().unwrap());
+            assert!((r_nearest - Rational::exact_from(x)).le_abs(&(rulp >> 1)));
         }
     });
 }

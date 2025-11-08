@@ -34,10 +34,8 @@ pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     if starting_index >= xs.len() {
         return start;
     }
-    if let Some(result) = xs[starting_index].index_of_next_false_bit(start & Limb::WIDTH_MASK) {
-        if result != Limb::WIDTH {
+    if let Some(result) = xs[starting_index].index_of_next_false_bit(start & Limb::WIDTH_MASK) && result != Limb::WIDTH {
             return (u64::wrapping_from(starting_index) << Limb::LOG_WIDTH) + result;
-        }
     }
     if starting_index == xs.len() - 1 {
         return u64::wrapping_from(xs.len()) << Limb::LOG_WIDTH;

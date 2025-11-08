@@ -1822,10 +1822,10 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_4() -> It<(Float, 
 pub fn shl_round_valid<T: PrimitiveInt>(x: &Float, bits: T, rm: RoundingMode) -> bool {
     rm != Exact || !x.is_finite() || x.is_zero() || {
         let exponent = x.get_exponent().unwrap();
-        if let Ok(bits) = bits.try_into() {
-            if let Some(new_exponent) = exponent.checked_add(bits) {
-                return (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent);
-            }
+        if let Ok(bits) = bits.try_into()
+            && let Some(new_exponent) = exponent.checked_add(bits)
+        {
+            return (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent);
         }
         false
     }
@@ -1876,10 +1876,10 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_7<T: PrimitiveUnsi
 pub fn shr_round_valid<T: PrimitiveInt>(x: &Float, bits: T, rm: RoundingMode) -> bool {
     rm != Exact || !x.is_finite() || x.is_zero() || {
         let exponent = x.get_exponent().unwrap();
-        if let Ok(bits) = bits.try_into() {
-            if let Some(new_exponent) = exponent.checked_sub(bits) {
-                return (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent);
-            }
+        if let Ok(bits) = bits.try_into()
+            && let Some(new_exponent) = exponent.checked_sub(bits)
+        {
+            return (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent);
         }
         false
     }

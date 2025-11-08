@@ -32,13 +32,13 @@ impl Float {
         }) = self
         {
             let mut possibly_just_under_min = false;
-            if let Ok(bits) = bits.try_into() {
-                if let Some(new_exponent) = exponent.checked_sub(bits) {
-                    possibly_just_under_min = true;
-                    if (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&new_exponent) {
-                        *exponent = new_exponent;
-                        return previous_o;
-                    }
+            if let Ok(bits) = bits.try_into()
+                && let Some(new_exponent) = exponent.checked_sub(bits)
+            {
+                possibly_just_under_min = true;
+                if (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(&new_exponent) {
+                    *exponent = new_exponent;
+                    return previous_o;
                 }
             }
             assert!(rm != Exact, "Inexact Float right-shift");
@@ -404,20 +404,20 @@ fn shr_round_primitive_int_ref<T: PrimitiveInt>(
     }) = x
     {
         let mut possibly_just_under_min = false;
-        if let Ok(bits) = bits.try_into() {
-            if let Some(new_exponent) = exponent.checked_sub(bits) {
-                possibly_just_under_min = true;
-                if (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent) {
-                    return (
-                        Float(Finite {
-                            significand: significand.clone(),
-                            exponent: new_exponent,
-                            sign: *sign,
-                            precision: *precision,
-                        }),
-                        Equal,
-                    );
-                }
+        if let Ok(bits) = bits.try_into()
+            && let Some(new_exponent) = exponent.checked_sub(bits)
+        {
+            possibly_just_under_min = true;
+            if (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&new_exponent) {
+                return (
+                    Float(Finite {
+                        significand: significand.clone(),
+                        exponent: new_exponent,
+                        sign: *sign,
+                        precision: *precision,
+                    }),
+                    Equal,
+                );
             }
         }
         assert!(rm != Exact, "Inexact Float right-shift");

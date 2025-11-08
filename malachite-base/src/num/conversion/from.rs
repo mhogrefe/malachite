@@ -156,15 +156,15 @@ macro_rules! lossless_conversion {
 fn saturating_from_lossy<A: TryFrom<B> + PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     value: A,
 ) -> B {
-    if let Ok(b_max) = A::try_from(B::MAX) {
-        if value >= b_max {
-            return B::MAX;
-        }
+    if let Ok(b_max) = A::try_from(B::MAX)
+        && value >= b_max
+    {
+        return B::MAX;
     }
-    if let Ok(b_min) = A::try_from(B::MIN) {
-        if value <= b_min {
-            return B::MIN;
-        }
+    if let Ok(b_min) = A::try_from(B::MIN)
+        && value <= b_min
+    {
+        return B::MIN;
     }
     B::wrapping_from(value)
 }

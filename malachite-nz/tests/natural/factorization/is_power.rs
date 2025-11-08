@@ -13,16 +13,10 @@ use malachite_nz::natural::Natural;
 #[test]
 fn test_natural_express_as_power_basic() {
     // Zero case
-    assert_eq!(
-        Natural::ZERO.express_as_power(),
-        Some((Natural::ZERO, 2))
-    );
+    assert_eq!(Natural::ZERO.express_as_power(), Some((Natural::ZERO, 2)));
 
     // One is a perfect square (1 = 1^2)
-    assert_eq!(
-        Natural::ONE.express_as_power(),
-        Some((Natural::ONE, 2))
-    );
+    assert_eq!(Natural::ONE.express_as_power(), Some((Natural::ONE, 2)));
 
     // Small perfect powers
     assert_eq!(
@@ -106,10 +100,7 @@ fn test_natural_express_as_power_large() {
     // Test with very large numbers
     let large_base = Natural::from(12345u32);
     let large_power = &large_base * &large_base * &large_base; // 12345^3
-    assert_eq!(
-        large_power.express_as_power(),
-        Some((large_base, 3))
-    );
+    assert_eq!(large_power.express_as_power(), Some((large_base, 3)));
 }
 
 #[test]
@@ -135,8 +126,7 @@ fn test_natural_express_as_power_edge_cases() {
 
 #[test]
 fn test_natural_express_as_power_highest_exponent() {
-    // Test that we get the highest possible exponent
-    // 64 = 2^6 (not 8^2 or 4^3)
+    // Test that we get the highest possible exponent 64 = 2^6 (not 8^2 or 4^3)
     assert_eq!(
         Natural::from(64u32).express_as_power(),
         Some((Natural::from(2u32), 6))
@@ -190,7 +180,6 @@ fn test_natural_is_power_consistency() {
     for i in 0u32..=200 {
         let n = Natural::from(i);
         let has_power = n.express_as_power().is_some();
-        assert_eq!(n.is_power(), has_power, "Failed for Natural {}", i);
+        assert_eq!(n.is_power(), has_power, "Failed for Natural {i}");
     }
 }
-

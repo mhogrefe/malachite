@@ -907,16 +907,16 @@ fn limbs_modular_div_mod_barrett_unbalanced(
         let tn = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(tn);
         limbs_mul_mod_base_pow_n_minus_1(scratch_lo, tn, ds, qs, scratch_hi);
-        if let Some(wrapped_len) = (d_len + q_len_s).checked_sub(tn) {
-            if wrapped_len != 0 {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(tn);
-                if limbs_sub_same_length_to_out(
-                    scratch_hi,
-                    &scratch_lo[..wrapped_len],
-                    &rs[..wrapped_len],
-                ) {
-                    assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
-                }
+        if let Some(wrapped_len) = (d_len + q_len_s).checked_sub(tn)
+            && wrapped_len != 0
+        {
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(tn);
+            if limbs_sub_same_length_to_out(
+                scratch_hi,
+                &scratch_lo[..wrapped_len],
+                &rs[..wrapped_len],
+            ) {
+                assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
             }
         }
     }
@@ -972,16 +972,16 @@ fn limbs_modular_div_mod_barrett_balanced(
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
         limbs_mul_mod_base_pow_n_minus_1(scratch_lo, mul_size, ds, qs_lo, scratch_hi);
-        if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
-            if wrapped_len != 0 {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
-                if limbs_sub_same_length_to_out(
-                    scratch_hi,
-                    &scratch_lo[..wrapped_len],
-                    &ns[..wrapped_len],
-                ) {
-                    assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
-                }
+        if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size)
+            && wrapped_len != 0
+        {
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
+            if limbs_sub_same_length_to_out(
+                scratch_hi,
+                &scratch_lo[..wrapped_len],
+                &ns[..wrapped_len],
+            ) {
+                assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
             }
         }
     }
@@ -998,16 +998,16 @@ fn limbs_modular_div_mod_barrett_balanced(
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
         limbs_mul_mod_base_pow_n_minus_1(scratch_lo, mul_size, ds, qs_hi, scratch_hi);
-        if let Some(wrapped_len) = (d_len + q_len_s).checked_sub(mul_size) {
-            if wrapped_len != 0 {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
-                if limbs_sub_same_length_to_out(
-                    scratch_hi,
-                    &scratch_lo[..wrapped_len],
-                    &rs[..wrapped_len],
-                ) {
-                    assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
-                }
+        if let Some(wrapped_len) = (d_len + q_len_s).checked_sub(mul_size)
+            && wrapped_len != 0
+        {
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
+            if limbs_sub_same_length_to_out(
+                scratch_hi,
+                &scratch_lo[..wrapped_len],
+                &rs[..wrapped_len],
+            ) {
+                assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
             }
         }
     }
@@ -1442,16 +1442,16 @@ fn limbs_modular_div_barrett_greater(
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
         limbs_mul_mod_base_pow_n_minus_1(scratch_lo, mul_size, ds, qs_lo, scratch_hi);
-        if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
-            if wrapped_len != 0 {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
-                if limbs_sub_same_length_to_out(
-                    scratch_hi,
-                    &scratch_lo[..wrapped_len],
-                    &rs[..wrapped_len],
-                ) {
-                    assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
-                }
+        if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size)
+            && wrapped_len != 0
+        {
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
+            if limbs_sub_same_length_to_out(
+                scratch_hi,
+                &scratch_lo[..wrapped_len],
+                &rs[..wrapped_len],
+            ) {
+                assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
             }
         }
     }
@@ -1604,8 +1604,8 @@ pub(crate) fn limbs_modular_div_mod(
     let rh: bool;
 
     if dn < DC_BDIV_QR_THRESHOLD || (nn - dn) < DC_BDIV_QR_THRESHOLD {
-        // **Small divisor case: Use simple binary division**
-        // Copy dividend to scratch space for in-place computation
+        // **Small divisor case: Use simple binary division** Copy dividend to scratch space for
+        // in-place computation
         tp[..nn].copy_from_slice(np);
 
         // Compute modular inverse: di = -D[0]^(-1) mod B
@@ -1618,8 +1618,8 @@ pub(crate) fn limbs_modular_div_mod(
         // Extract remainder from high limbs of temp buffer
         rp.copy_from_slice(&tp[nn - dn..nn]);
     } else if dn < MU_BDIV_QR_THRESHOLD {
-        // **Medium divisor case: Use divide-and-conquer binary division**
-        // Copy dividend to scratch space
+        // **Medium divisor case: Use divide-and-conquer binary division** Copy dividend to scratch
+        // space
         tp[..nn].copy_from_slice(np);
 
         // Compute modular inverse

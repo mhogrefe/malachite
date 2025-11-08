@@ -588,10 +588,10 @@ impl IsPrime for u8 {
         let n = *self;
         if n < 11 {
             n == 2 || n == 3 || n == 5 || n == 7
-        } else if n % 2 == 0 || n % 3 == 0 || n % 5 == 0 || n % 7 == 0 {
+        } else if n.even() || n.is_multiple_of(3) || n.is_multiple_of(5) || n.is_multiple_of(7) {
             false
         } else {
-            n < 121 || n % 11 != 0 && n % 13 != 0
+            n < 121 || !n.is_multiple_of(11) && !n.is_multiple_of(13)
         }
     }
 }
@@ -629,23 +629,23 @@ impl IsPrime for u16 {
         let n = *self;
         if n < 11 {
             n == 2 || n == 3 || n == 5 || n == 7
-        } else if n % 2 == 0 || n % 3 == 0 || n % 5 == 0 || n % 7 == 0 {
+        } else if n.even() || n.is_multiple_of(3) || n.is_multiple_of(5) || n.is_multiple_of(7) {
             false
         } else if n < 121 {
             // 11*11
             true
-        } else if n % 11 == 0
-            || n % 13 == 0
-            || n % 17 == 0
-            || n % 19 == 0
-            || n % 23 == 0
-            || n % 29 == 0
-            || n % 31 == 0
-            || n % 37 == 0
-            || n % 41 == 0
-            || n % 43 == 0
-            || n % 47 == 0
-            || n % 53 == 0
+        } else if n.is_multiple_of(11)
+            || n.is_multiple_of(13)
+            || n.is_multiple_of(17)
+            || n.is_multiple_of(19)
+            || n.is_multiple_of(23)
+            || n.is_multiple_of(29)
+            || n.is_multiple_of(31)
+            || n.is_multiple_of(37)
+            || n.is_multiple_of(41)
+            || n.is_multiple_of(43)
+            || n.is_multiple_of(47)
+            || n.is_multiple_of(53)
         {
             false
         } else {
@@ -686,48 +686,48 @@ impl IsPrime for u32 {
         let n = *self;
         if n < 11 {
             n == 2 || n == 3 || n == 5 || n == 7
-        } else if n % 2 == 0 || n % 3 == 0 || n % 5 == 0 || n % 7 == 0 {
+        } else if n.even() || n.is_multiple_of(3) || n.is_multiple_of(5) || n.is_multiple_of(7) {
             false
         } else if n < 121 {
             // 11*11
             true
-        } else if n % 11 == 0
-            || n % 13 == 0
-            || n % 17 == 0
-            || n % 19 == 0
-            || n % 23 == 0
-            || n % 29 == 0
-            || n % 31 == 0
-            || n % 37 == 0
-            || n % 41 == 0
-            || n % 43 == 0
-            || n % 47 == 0
-            || n % 53 == 0
+        } else if n.is_multiple_of(11)
+            || n.is_multiple_of(13)
+            || n.is_multiple_of(17)
+            || n.is_multiple_of(19)
+            || n.is_multiple_of(23)
+            || n.is_multiple_of(29)
+            || n.is_multiple_of(31)
+            || n.is_multiple_of(37)
+            || n.is_multiple_of(41)
+            || n.is_multiple_of(43)
+            || n.is_multiple_of(47)
+            || n.is_multiple_of(53)
         {
             false
         } else if n < 3481 {
             // 59*59
             true
         } else if n > 1000000
-            && (n % 59 == 0
-                || n % 61 == 0
-                || n % 67 == 0
-                || n % 71 == 0
-                || n % 73 == 0
-                || n % 79 == 0
-                || n % 83 == 0
-                || n % 89 == 0
-                || n % 97 == 0
-                || n % 101 == 0
-                || n % 103 == 0
-                || n % 107 == 0
-                || n % 109 == 0
-                || n % 113 == 0
-                || n % 127 == 0
-                || n % 131 == 0
-                || n % 137 == 0
-                || n % 139 == 0
-                || n % 149 == 0)
+            && (n.is_multiple_of(59)
+                || n.is_multiple_of(61)
+                || n.is_multiple_of(67)
+                || n.is_multiple_of(71)
+                || n.is_multiple_of(73)
+                || n.is_multiple_of(79)
+                || n.is_multiple_of(83)
+                || n.is_multiple_of(89)
+                || n.is_multiple_of(97)
+                || n.is_multiple_of(101)
+                || n.is_multiple_of(103)
+                || n.is_multiple_of(107)
+                || n.is_multiple_of(109)
+                || n.is_multiple_of(113)
+                || n.is_multiple_of(127)
+                || n.is_multiple_of(131)
+                || n.is_multiple_of(137)
+                || n.is_multiple_of(139)
+                || n.is_multiple_of(149))
         {
             false
         } else {
@@ -769,48 +769,48 @@ impl IsPrime for u64 {
         let n = *self;
         if n < 11 {
             n == 2 || n == 3 || n == 5 || n == 7
-        } else if n % 2 == 0 || n % 3 == 0 || n % 5 == 0 || n % 7 == 0 {
+        } else if n.even() || n.is_multiple_of(3) || n.is_multiple_of(5) || n.is_multiple_of(7) {
             false
         } else if n < 121 {
             // 11*11
             true
-        } else if n % 11 == 0
-            || n % 13 == 0
-            || n % 17 == 0
-            || n % 19 == 0
-            || n % 23 == 0
-            || n % 29 == 0
-            || n % 31 == 0
-            || n % 37 == 0
-            || n % 41 == 0
-            || n % 43 == 0
-            || n % 47 == 0
-            || n % 53 == 0
+        } else if n.is_multiple_of(11)
+            || n.is_multiple_of(13)
+            || n.is_multiple_of(17)
+            || n.is_multiple_of(19)
+            || n.is_multiple_of(23)
+            || n.is_multiple_of(29)
+            || n.is_multiple_of(31)
+            || n.is_multiple_of(37)
+            || n.is_multiple_of(41)
+            || n.is_multiple_of(43)
+            || n.is_multiple_of(47)
+            || n.is_multiple_of(53)
         {
             false
         } else if n < 3481 {
             // 59*59
             true
         } else if n > 1000000
-            && (n % 59 == 0
-                || n % 61 == 0
-                || n % 67 == 0
-                || n % 71 == 0
-                || n % 73 == 0
-                || n % 79 == 0
-                || n % 83 == 0
-                || n % 89 == 0
-                || n % 97 == 0
-                || n % 101 == 0
-                || n % 103 == 0
-                || n % 107 == 0
-                || n % 109 == 0
-                || n % 113 == 0
-                || n % 127 == 0
-                || n % 131 == 0
-                || n % 137 == 0
-                || n % 139 == 0
-                || n % 149 == 0)
+            && (n.is_multiple_of(59)
+                || n.is_multiple_of(61)
+                || n.is_multiple_of(67)
+                || n.is_multiple_of(71)
+                || n.is_multiple_of(73)
+                || n.is_multiple_of(79)
+                || n.is_multiple_of(83)
+                || n.is_multiple_of(89)
+                || n.is_multiple_of(97)
+                || n.is_multiple_of(101)
+                || n.is_multiple_of(103)
+                || n.is_multiple_of(107)
+                || n.is_multiple_of(109)
+                || n.is_multiple_of(113)
+                || n.is_multiple_of(127)
+                || n.is_multiple_of(131)
+                || n.is_multiple_of(137)
+                || n.is_multiple_of(139)
+                || n.is_multiple_of(149))
         {
             false
         } else {

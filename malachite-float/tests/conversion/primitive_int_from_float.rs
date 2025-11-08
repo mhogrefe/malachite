@@ -1150,10 +1150,10 @@ where
             o_ceiling = Some(ceiling);
         }
         let nearest = T::rounding_from(&x, Nearest);
-        if let Some(floor) = o_floor {
-            if let Some(ceiling) = o_ceiling {
-                assert!(nearest == floor || nearest == ceiling);
-            }
+        if let Some(floor) = o_floor
+            && let Some(ceiling) = o_ceiling
+        {
+            assert!(nearest == floor || nearest == ceiling);
         }
         if x >= T::MIN && x <= T::MAX {
             assert!(

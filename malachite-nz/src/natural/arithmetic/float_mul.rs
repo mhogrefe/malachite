@@ -49,12 +49,12 @@ pub fn mul_float_significands_in_place(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (i32, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((decrement_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((decrement_exp, o)) =
             mul_float_significands_in_place_same_prec(x, y, out_prec, rm)
-        {
-            return (-i32::from(decrement_exp), o);
-        }
+    {
+        return (-i32::from(decrement_exp), o);
     }
     let (product, exp_offset, o) = if x_prec >= y_prec {
         match (&mut *x, &mut *y) {
@@ -96,12 +96,12 @@ pub fn mul_float_significands_in_place_ref(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (i32, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((decrement_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((decrement_exp, o)) =
             mul_float_significands_in_place_same_prec_ref(x, y, out_prec, rm)
-        {
-            return (-i32::from(decrement_exp), o);
-        }
+    {
+        return (-i32::from(decrement_exp), o);
     }
     let (product, exp_offset, o) = if x_prec >= y_prec {
         match (&mut *x, y) {
@@ -167,12 +167,12 @@ fn mul_float_significands_ref_ref_helper(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (Natural, i32, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((product, decrement_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((product, decrement_exp, o)) =
             mul_float_significands_same_prec_ref_ref(xs, ys, out_prec, rm)
-        {
-            return (product, -i32::from(decrement_exp), o);
-        }
+    {
+        return (product, -i32::from(decrement_exp), o);
     }
     if x_prec >= y_prec {
         mul_float_significands_general(xs, x_prec, ys, y_prec, out_prec, rm)

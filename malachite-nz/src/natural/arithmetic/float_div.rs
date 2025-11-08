@@ -61,12 +61,12 @@ pub fn div_float_significands_in_place(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (u64, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((increment_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((increment_exp, o)) =
             div_float_significands_in_place_same_prec(x, y, out_prec, rm)
-        {
-            return (u64::from(increment_exp), o);
-        }
+    {
+        return (u64::from(increment_exp), o);
     }
     match (&mut *x, y) {
         (Natural(Small(small_x)), Natural(Small(small_y))) => {
@@ -104,12 +104,12 @@ pub fn div_float_significands_in_place_ref(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (u64, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((increment_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((increment_exp, o)) =
             div_float_significands_in_place_same_prec_ref(x, y, out_prec, rm)
-        {
-            return (u64::from(increment_exp), o);
-        }
+    {
+        return (u64::from(increment_exp), o);
     }
     match (&mut *x, y) {
         (Natural(Small(small_x)), Natural(Small(small_y))) => {
@@ -149,12 +149,12 @@ pub fn div_float_significands_ref_val(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (Natural, u64, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((quotient, increment_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((quotient, increment_exp, o)) =
             div_float_significands_same_prec_ref_val(x, y, out_prec, rm)
-        {
-            return (quotient, u64::from(increment_exp), o);
-        }
+    {
+        return (quotient, u64::from(increment_exp), o);
     }
     match (x, y) {
         (Natural(Small(small_x)), Natural(Small(small_y))) => {
@@ -187,12 +187,12 @@ pub fn div_float_significands_ref_ref(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (Natural, u64, Ordering) {
-    if x_prec == y_prec && out_prec == x_prec {
-        if let Some((quotient, increment_exp, o)) =
+    if x_prec == y_prec
+        && out_prec == x_prec
+        && let Some((quotient, increment_exp, o)) =
             div_float_significands_same_prec_ref_ref(x, y, out_prec, rm)
-        {
-            return (quotient, u64::from(increment_exp), o);
-        }
+    {
+        return (quotient, u64::from(increment_exp), o);
     }
     match (x, y) {
         (Natural(Small(small_x)), Natural(Small(small_y))) => {

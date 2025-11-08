@@ -16,6 +16,7 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::Equal;
 use core::mem::swap;
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::slices::slice_test_zero;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -24,8 +25,9 @@ const LOG: usize = 32; // For 32-bit limbs
 #[cfg(not(feature = "32_bit_limbs"))]
 const LOG: usize = 64; // For 64-bit limbs
 
-// This is `mpn_remove` from GMP 6.3.0.
 // Remove the largest power of V from U that doesn't exceed the given cap
+//
+// This is `mpn_remove` from GMP 6.3.0.
 pub fn limbs_remove(
     wp: &mut Vec<Limb>, // Output: U / V^k
     up: &[Limb],        // Input number U
@@ -37,7 +39,7 @@ pub fn limbs_remove(
 
     assert!(un > 0);
     assert!(vn > 0);
-    assert!(vp[0] % 2 != 0, "V must be odd for 2-adic division");
+    assert!(vp[0].odd(), "V must be odd for 2-adic division");
     assert!(vn > 1 || vp[0] > 1, "V must be > 1 to avoid infinite loop");
 
     // Temporary work buffers
@@ -66,24 +68,14 @@ pub fn limbs_remove(
 
         if current_power_is_vp {
             // Use original vp directly
-            limbs_modular_div_mod_wrap(
-                &mut qp2[..qn - pn + 1],
-                &mut tp[..pn],
-                &qp[..qn],
-                &vp[..pn],
-            );
+            limbs_modular_div_mod_wrap(&mut qp2[..=qn - pn], &mut tp[..pn], &qp[..qn], &vp[..pn]);
             if !slice_test_zero(&tp[..pn]) && limbs_cmp_same_length(&tp[..pn], &vp[..pn]) != Equal {
                 break; // cannot divide
             }
         } else {
             // Access the power from storage without creating a conflicting borrow
             let power_slice = &powers_storage[current_power_offset..current_power_offset + pn];
-            limbs_modular_div_mod_wrap(
-                &mut qp2[..qn - pn + 1],
-                &mut tp[..pn],
-                &qp[..qn],
-                power_slice,
-            );
+            limbs_modular_div_mod_wrap(&mut qp2[..=qn - pn], &mut tp[..pn], &qp[..qn], power_slice);
             if !slice_test_zero(&tp[..pn]) && limbs_cmp_same_length(&tp[..pn], power_slice) != Equal
             {
                 break; // cannot divide
@@ -91,8 +83,8 @@ pub fn limbs_remove(
         }
 
         swap(&mut qp, &mut qp2);
-        qn = qn - pn;
-        limbs_neg_in_place(&mut qp[..qn + 1]);
+        qn -= pn;
+        limbs_neg_in_place(&mut qp[..=qn]);
         if qp[qn] != 0 {
             qn += 1;
         }
@@ -139,9 +131,10 @@ pub fn limbs_remove(
             );
         } else {
             // Square the current power from powers_storage into a new location
+            //
             // need to be careful about overlapping borrows
+            //
             // we can use split_at_mut to get non-overlapping mutable slices
-
             let src_end = current_power_offset + pn;
             if src_end <= np_offset {
                 // Source and destination don't overlap - safe to borrow both
@@ -150,6 +143,7 @@ pub fn limbs_remove(
                 limbs_square_to_out(&mut dst_part[..2 * pn], src, &mut scratch);
             } else {
                 // Fallback: copy source data to avoid overlapping borrows
+                //
                 // This should rarely happen with our offset calculation
                 let src_data: Vec<Limb> = powers_storage[current_power_offset..src_end].to_vec();
                 limbs_square_to_out(

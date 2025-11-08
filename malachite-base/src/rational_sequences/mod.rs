@@ -85,7 +85,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     false
     /// );
     /// ```
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.non_repeating.is_empty() && self.repeating.is_empty()
     }
 
@@ -112,7 +112,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     false
     /// );
     /// ```
-    pub fn is_finite(&self) -> bool {
+    pub const fn is_finite(&self) -> bool {
         self.repeating.is_empty()
     }
 
@@ -142,7 +142,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     None
     /// );
     /// ```
-    pub fn len(&self) -> Option<usize> {
+    pub const fn len(&self) -> Option<usize> {
         if self.repeating.is_empty() {
             Some(self.non_repeating.len())
         } else {
@@ -177,7 +177,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     4
     /// );
     /// ```
-    pub fn component_len(&self) -> usize {
+    pub const fn component_len(&self) -> usize {
         self.non_repeating.len() + self.repeating.len()
     }
 

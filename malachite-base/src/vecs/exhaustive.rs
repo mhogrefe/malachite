@@ -1829,11 +1829,11 @@ where
         if self.first {
             self.first = false;
             self.xs.get(k);
-            if let Some(n) = self.xs.known_len() {
-                if n < k {
-                    self.done = true;
-                    return None;
-                }
+            if let Some(n) = self.xs.known_len()
+                && n < k
+            {
+                self.done = true;
+                return None;
             }
         } else {
             if k == 0 {
@@ -2258,11 +2258,11 @@ where
         if self.first {
             self.first = false;
             self.xs.get(k);
-            if let Some(n) = self.xs.known_len() {
-                if n < k {
-                    self.done = true;
-                    return None;
-                }
+            if let Some(n) = self.xs.known_len()
+                && n < k
+            {
+                self.done = true;
+                return None;
             }
         } else if k == 0 {
             if self.xs.get(0).is_none() {
@@ -3091,7 +3091,7 @@ pub struct UniqueIndices {
 
 impl UniqueIndices {
     #[doc(hidden)]
-    pub fn get_n(&self) -> usize {
+    pub const fn get_n(&self) -> usize {
         self.used.len()
     }
 
@@ -3611,14 +3611,14 @@ where
             self.first = false;
             return self.phase_1_vec.clone();
         }
-        if let Some(prefix) = self.phase_1_vec.as_mut() {
-            if prefix.len() < self.max {
-                if let Some(x) = self.xs_for_prefix.next() {
-                    prefix.push(x);
-                    return Some(prefix.clone());
-                }
-                self.max = prefix.len();
+        if let Some(prefix) = self.phase_1_vec.as_mut()
+            && prefix.len() < self.max
+        {
+            if let Some(x) = self.xs_for_prefix.next() {
+                prefix.push(x);
+                return Some(prefix.clone());
             }
+            self.max = prefix.len();
         }
         if self.phase_1_vec.is_some() {
             for k in self.min..=self.max {

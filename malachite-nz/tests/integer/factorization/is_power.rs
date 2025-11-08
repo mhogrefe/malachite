@@ -48,8 +48,8 @@ fn test_integer_express_as_power_negative() {
         Some((Integer::from(-10), 3))
     );
 
-    // Negative numbers that are perfect even powers should be rejected
-    // (because you can't have an even root of a negative number)
+    // Negative numbers that are perfect even powers should be rejected (because you can't have an
+    // even root of a negative number)
     assert_eq!(Integer::from(-4).express_as_power(), None);
     assert_eq!(Integer::from(-16).express_as_power(), None);
     assert_eq!(Integer::from(-100).express_as_power(), None);
@@ -63,15 +63,9 @@ fn test_integer_express_as_power_negative() {
 #[test]
 fn test_integer_express_as_power_special() {
     // Zero and ±1
-    assert_eq!(
-        Integer::ZERO.express_as_power(),
-        Some((Integer::ZERO, 2))
-    );
+    assert_eq!(Integer::ZERO.express_as_power(), Some((Integer::ZERO, 2)));
     // 1 is a perfect square (1 = 1^2)
-    assert_eq!(
-        Integer::ONE.express_as_power(),
-        Some((Integer::ONE, 2))
-    );
+    assert_eq!(Integer::ONE.express_as_power(), Some((Integer::ONE, 2)));
     // -1 is not a perfect power (no even roots of negative numbers)
     assert_eq!(Integer::from(-1).express_as_power(), None);
 }
@@ -79,6 +73,7 @@ fn test_integer_express_as_power_special() {
 #[test]
 fn test_integer_express_as_power_highest_exponent() {
     // Test that we get the highest possible exponent
+    //
     // 64 = 2^6 (not 8^2 or 4^3)
     assert_eq!(
         Integer::from(64).express_as_power(),
@@ -130,7 +125,6 @@ fn test_integer_is_power_consistency() {
     for i in -100i32..=100 {
         let n = Integer::from(i);
         let has_power = n.express_as_power().is_some();
-        assert_eq!(n.is_power(), has_power, "Failed for Integer {}", i);
+        assert_eq!(n.is_power(), has_power, "Failed for Integer {i}");
     }
 }
-

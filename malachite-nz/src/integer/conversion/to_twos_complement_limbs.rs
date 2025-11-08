@@ -46,11 +46,9 @@ pub_crate_test! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 // # Worst-case complexity
 // Constant time and additional memory.
 pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
-    if let Some(last) = xs.last() {
-        if last.get_highest_bit() {
+    if let Some(last) = xs.last() && last.get_highest_bit() {
             // Sign-extend with an extra 0 limb to indicate a positive Integer
             xs.push(0);
-        }
     }
 }}
 
@@ -85,11 +83,9 @@ pub_crate_test! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 // Panics if `xs` contains only zeros.
 pub_test! {limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(xs));
-    if let Some(last) = xs.last() {
-        if !last.get_highest_bit() {
+    if let Some(last) = xs.last() && !last.get_highest_bit() {
             // Sign-extend with an extra !0 limb to indicate a negative Integer
             xs.push(Limb::MAX);
-        }
     }
 }}
 

@@ -76,12 +76,11 @@ fn partial_cmp_properties_helper(x: Float, y: Float) {
         rug::Float::exact_from(&x).partial_cmp(&rug::Float::exact_from(&y)),
         ord
     );
-    if !x.is_zero() || !y.is_zero() {
-        if let Some(ord) = ord {
-            if ord != Equal {
-                assert_eq!(ComparableFloat(x).cmp(&ComparableFloat(y)), ord);
-            }
-        }
+    if (!x.is_zero() || !y.is_zero())
+        && let Some(ord) = ord
+        && ord != Equal
+    {
+        assert_eq!(ComparableFloat(x).cmp(&ComparableFloat(y)), ord);
     }
 }
 

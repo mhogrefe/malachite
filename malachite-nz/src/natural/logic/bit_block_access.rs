@@ -348,14 +348,14 @@ impl BitBlockAccess for Natural {
         if start == end {
             return;
         }
-        if let Self(Small(small_self)) = self {
-            if let Self(Small(small_bits)) = bits {
-                let bits_width = end - start;
-                let small_bits = small_bits.mod_power_of_2(bits_width);
-                if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
-                    small_self.assign_bits(start, end, &small_bits);
-                    return;
-                }
+        if let Self(Small(small_self)) = self
+            && let Self(Small(small_bits)) = bits
+        {
+            let bits_width = end - start;
+            let small_bits = small_bits.mod_power_of_2(bits_width);
+            if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
+                small_self.assign_bits(start, end, &small_bits);
+                return;
             }
         }
         let limbs = self.promote_in_place();

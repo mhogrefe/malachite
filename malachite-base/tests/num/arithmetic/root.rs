@@ -418,10 +418,10 @@ fn floor_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
             assert_eq!(ceiling_root, root + T::ONE);
         }
         assert!(pow <= n);
-        if exp != 1 {
-            if let Some(next_pow) = (root + T::ONE).checked_pow(exp) {
-                assert!(next_pow > n);
-            }
+        if exp != 1
+            && let Some(next_pow) = (root + T::ONE).checked_pow(exp)
+        {
+            assert!(next_pow > n);
         }
     });
 

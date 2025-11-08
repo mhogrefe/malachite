@@ -121,10 +121,10 @@ fn extended_gcd_properties_helper_unsigned<
                 .wrapping_add(S::wrapping_from(b).wrapping_mul(y)),
             S::wrapping_from(gcd)
         );
-        if let (Ok(a), Ok(b), Ok(gcd)) = (S::try_from(a), S::try_from(b), S::try_from(gcd)) {
-            if let (Some(ax), Some(by)) = (a.checked_mul(x), b.checked_mul(y)) {
-                assert_eq!(ax + by, gcd);
-            }
+        if let (Ok(a), Ok(b), Ok(gcd)) = (S::try_from(a), S::try_from(b), S::try_from(gcd))
+            && let (Some(ax), Some(by)) = (a.checked_mul(x), b.checked_mul(y))
+        {
+            assert_eq!(ax + by, gcd);
         }
 
         // uniqueness
