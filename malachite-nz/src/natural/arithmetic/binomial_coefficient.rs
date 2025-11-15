@@ -458,11 +458,10 @@ limbs_binomial_coefficient_limb_limb_goetgheluck(n: Limb, k: Limb) -> Vec<Limb> 
     assert_ne!(j, 0);
     factors[j] = Limb::wrapping_from(prod);
     j += 1;
-    let mut r = vec![0; j];
-    limbs_product(&mut r, &mut factors[..j]);
-    while *r.last().unwrap() == 0 {
-        r.pop();
-    }
+    let mut r = Vec::new();
+    let (size, new_r) = limbs_product(&mut r, &mut factors[..j]);
+    r = new_r.unwrap();
+    r.truncate(size);
     r
 }}
 

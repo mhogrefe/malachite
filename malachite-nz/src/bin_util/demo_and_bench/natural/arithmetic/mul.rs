@@ -84,9 +84,8 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_triple_gen_var_19, unsigned_vec_triple_gen_var_20, unsigned_vec_triple_gen_var_22,
     unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_58,
 };
-use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
 use malachite_nz::test_util::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
+    limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive, natural_product_naive,
 };
 use num::BigUint;
 use std::iter::Product;
@@ -562,9 +561,10 @@ fn demo_limbs_mul_low_same_length(gm: GenMode, config: &GenConfig, limit: usize)
 fn demo_limbs_product(gm: GenMode, config: &GenConfig, limit: usize) {
     for mut xs in unsigned_vec_gen_var_6().get(gm, config).take(limit) {
         let xs_old = xs.clone();
-        let mut out = vec![0; xs.len() + 1];
-        let out_len = limbs_product(&mut out, &mut xs);
-        out.truncate(out_len);
+        let mut out = Vec::new();
+        let (size, new_out) = limbs_product(&mut out, &mut xs);
+        out = new_out.unwrap();
+        out.truncate(size);
         println!("product_of_limbs({xs_old:?}) = {out:?}");
     }
 }
@@ -1394,9 +1394,10 @@ fn benchmark_limbs_product_algorithms(
         &vec_len_bucketer(),
         &mut [
             ("default", &mut |mut xs| {
-                let mut out = vec![0; xs.len()];
-                let out_len = limbs_product(&mut out, &mut xs);
-                out.truncate(out_len);
+                let mut out = Vec::new();
+                let (size, new_out) = limbs_product(&mut out, &mut xs);
+                out = new_out.unwrap();
+                out.truncate(size);
             }),
             ("naive", &mut |xs| {
                 let mut out = vec![0; xs.len()];

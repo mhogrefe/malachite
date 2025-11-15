@@ -74,7 +74,8 @@ fn limbs_primorial(n: Limb) -> Vec<Limb> {
     factors[j] = prod;
     j += 1;
     sieve.resize(j, 0);
-    let out_len = limbs_product(&mut sieve, &mut factors[..j]);
+    let (out_len, new_sieve) = limbs_product(&mut sieve, &mut factors[..j]);
+    assert!(new_sieve.is_none());
     sieve.truncate(out_len);
     sieve
 }
@@ -96,8 +97,9 @@ fn limbs_product_of_first_n_primes(n: usize) -> Vec<Limb> {
         }
     }
     factors.push(prod);
-    let mut out = vec![0; factors.len() + 1];
-    let out_len = limbs_product(&mut out, &mut factors);
+    let mut out = Vec::new();
+    let (out_len, new_out) = limbs_product(&mut out, &mut factors);
+    out = new_out.unwrap();
     out.truncate(out_len);
     out
 }

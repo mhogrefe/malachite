@@ -287,6 +287,8 @@ pub_crate_test! {limbs_mul_greater_to_out(
     let xs_len = x.len();
     let ys_len = y.len();
     assert!(xs_len >= ys_len);
+    let out_len = xs_len + ys_len;
+    assert!(r.len() >= out_len);
     if xs_len == ys_len {
         limbs_mul_same_length_to_out(r, x, y, scratch);
     } else if ys_len < FFT_MUL_THRESHOLD {

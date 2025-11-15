@@ -11302,9 +11302,10 @@ fn test_limbs_product() {
     fn test(xs: &[Limb], out: &[Limb]) {
         let xs_old = xs;
         let mut xs = xs_old.to_vec();
-        let mut product = vec![0; xs.len()];
-        let out_len = limbs_product(&mut product, &mut xs);
-        product.truncate(out_len);
+        let mut product = Vec::new();
+        let (size, new_product) = limbs_product(&mut product, &mut xs);
+        product = new_product.unwrap();
+        product.truncate(size);
         assert_eq!(product, out);
 
         let xs = xs_old;
@@ -12832,8 +12833,9 @@ fn limbs_product_properties() {
     config.insert("mean_stripe_n", 16);
     unsigned_vec_gen_var_6().test_properties_with_config(&config, |mut xs| {
         let xs_old = xs.clone();
-        let mut out = vec![0; xs.len()];
-        let out_len = limbs_product(&mut out, &mut xs);
+        let mut out = Vec::new();
+        let (out_len, new_out) = limbs_product(&mut out, &mut xs);
+        out = new_out.unwrap();
         out.truncate(out_len);
         let xs = xs_old;
         let mut out_alt = vec![0; xs.len()];

@@ -127,7 +127,7 @@ fn limbs_2_multiswing_odd(
     s = n_to_bit(s);
     assert!(bit_to_n(s + 1).square() > n);
     assert!(s < n_to_bit(n / 3));
-    let start = n_to_bit(5);
+    let start = const { n_to_bit(5) };
     let mut index = usize::exact_from(start >> Limb::LOG_WIDTH);
     let mut mask = Limb::power_of_2(start & Limb::WIDTH_MASK);
     let sieve = &mut x_and_sieve[x_len..];
@@ -153,7 +153,7 @@ fn limbs_2_multiswing_odd(
             index += 1;
         }
     }
-    assert!(max_prod <= Limb::MAX / 3);
+    assert!(max_prod <= const { Limb::MAX / 3 });
     let l_max_prod = max_prod * 3;
     for i in s + 2..=n_to_bit(n / 3) + 1 {
         if sieve[index] & mask == 0 {
@@ -198,7 +198,13 @@ fn limbs_2_multiswing_odd(
     if j != 0 {
         factors[j] = prod;
         j += 1;
-        limbs_product(x_and_sieve, &mut factors[..j])
+        match limbs_product(&mut x_and_sieve[..x_len], &mut factors[..j]) {
+            (size, None) => size,
+            (size, Some(new_x_and_sieve)) => {
+                x_and_sieve[..size].copy_from_slice(&new_x_and_sieve[..size]);
+                size
+            }
+        }
     } else {
         // not triggered by the first billion inputs
         fail_on_untested_path("limbs_2_multiswing_odd, j == 0");
@@ -209,8 +215,17 @@ fn limbs_2_multiswing_odd(
 
 pub(crate) const FAC_DSC_THRESHOLD: usize = 236;
 
+const fn clb2(x: usize) -> usize {
+    let floor_log_base_2 = (usize::WIDTH as usize - x.leading_zeros() as usize) - 1;
+    if x.is_power_of_two() {
+        floor_log_base_2
+    } else {
+        floor_log_base_2 + 1
+    }
+}
+
 const FACTORS_PER_LIMB: usize =
-    (Limb::WIDTH / ((usize::WIDTH - (FAC_DSC_THRESHOLD - 1).leading_zeros() as u64) + 1)) as usize;
+    (Limb::WIDTH << 1) as usize / (clb2(FAC_DSC_THRESHOLD * FAC_DSC_THRESHOLD - 1) + 1) - 1;
 
 // n ^ log <= Limb::MAX: a limb can store log factors less than n.
 //
@@ -246,6 +261,7 @@ pub(crate) fn log_n_max(n: Limb) -> u64 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
 // This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1.
+
 pub_crate_test! {
 #[allow(clippy::redundant_comparisons)]
 limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
@@ -271,26 +287,51 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
         }
         let mut factors = vec![0; m / FACTORS_PER_LIMB + 1];
         assert!(m >= FACTORS_PER_LIMB);
-        assert!(m > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1);
+        const LIMIT_P1: usize = ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1;
+        assert!(m > LIMIT_P1);
         let mut j = 0;
         let mut prod = 1;
-        let mut max_prod = Limb::MAX / Limb::wrapping_from(FAC_DSC_THRESHOLD);
-        while m > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 {
-            let mut i = ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 2;
+        let mut max_prod = const { Limb::MAX / (FAC_DSC_THRESHOLD * FAC_DSC_THRESHOLD) as Limb };
+        assert!(m > LIMIT_P1);
+        loop {
             factors[j] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
             j += 1;
-            while i <= m {
+            let mut diff = (m - ODD_DOUBLEFACTORIAL_TABLE_LIMIT) & const { 2usize.wrapping_neg() };
+            if diff & 2 != 0 {
+                let f = (ODD_DOUBLEFACTORIAL_TABLE_LIMIT + diff) as Limb;
                 if prod > max_prod {
                     factors[j] = prod;
                     j += 1;
-                    prod = Limb::wrapping_from(i);
+                    prod = f;
                 } else {
-                    prod *= Limb::wrapping_from(i);
+                    prod *= f;
                 }
-                i += 2;
+                diff -= 2;
             }
-            max_prod <<= 1;
+            if diff != 0 {
+                let mut fac = (ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 2)
+                    * (ODD_DOUBLEFACTORIAL_TABLE_LIMIT + diff);
+                loop {
+                    let f = fac as Limb;
+                    if prod > max_prod {
+                        factors[j] = prod;
+                        j += 1;
+                        prod = f;
+                    } else {
+                        prod *= f;
+                    }
+                    diff -= 4;
+                    fac += diff << 1;
+                    if diff == 0 {
+                        break;
+                    }
+                }
+            }
+            max_prod <<= 2;
             m >>= 1;
+            if m <= LIMIT_P1 {
+                break;
+            }
         }
         factors[j] = prod;
         j += 1;
@@ -298,9 +339,10 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
         j += 1;
         factors[j] = ONE_LIMB_ODD_FACTORIAL_TABLE[m >> 1];
         j += 1;
-        let mut out = vec![0; j];
-        let size = limbs_product(&mut out, &mut factors[..j]);
-        out.truncate(size);
+        let mut out = Vec::new();
+        let (out_size, new_out) = limbs_product(&mut out, &mut factors[..j]);
+        out = new_out.unwrap();
+        out.truncate(out_size);
         if s != 0 {
             // Use the algorithm described by Peter Luschny in "Divide, Swing and Conquer the
             // Factorial!".
@@ -313,15 +355,12 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
             // Put the sieve on the second half; it will be overwritten by the last
             // `limbs_2_multiswing_odd`.
             let sieve_offset = (size >> 1) + 1;
+            let ss_len = swing_and_sieve.len() - 1;
             #[cfg(feature = "32_bit_limbs")]
-            let count = limbs_prime_sieve_u32(&mut swing_and_sieve[sieve_offset..], n_m_1);
+            let count = limbs_prime_sieve_u32(&mut swing_and_sieve[sieve_offset..ss_len], n_m_1);
             #[cfg(not(feature = "32_bit_limbs"))]
-            let count = limbs_prime_sieve_u64(&mut swing_and_sieve[sieve_offset..], n_m_1);
-            size = usize::exact_from(
-                (count + 1)
-                    / log_n_max(Limb::exact_from(n))
-                    + 1,
-            );
+            let count = limbs_prime_sieve_u64(&mut swing_and_sieve[sieve_offset..ss_len], n_m_1);
+            size = usize::exact_from((count + 1) / log_n_max(Limb::exact_from(n)) + 1);
             let mut factors = vec![0; size];
             let mut out_len = out.len();
             for i in (0..s).rev() {
@@ -329,7 +368,7 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                     &mut swing_and_sieve,
                     sieve_offset,
                     Limb::exact_from(n >> i),
-                    &mut factors
+                    &mut factors,
                 );
                 let mut square;
                 if double && i == 0 {
@@ -435,9 +474,9 @@ impl Factorial for Natural {
             }
             factors[j] = prod;
             j += 1;
-            let mut xs = vec![0; j];
-            let size = limbs_product(&mut xs, &mut factors[..j]);
-            xs.truncate(size);
+            let mut xs = Vec::new();
+            let new_xs = limbs_product(&mut xs, &mut factors[..j]).1;
+            xs = new_xs.unwrap();
             Self::from_owned_limbs_asc(xs)
         } else {
             let count = if n <= TABLE_LIMIT_2N_MINUS_POPC_2N {
@@ -524,9 +563,9 @@ impl DoubleFactorial for Natural {
             }
             factors[j] = prod;
             j += 1;
-            let mut xs = vec![0; j];
-            let size = limbs_product(&mut xs, &mut factors[..j]);
-            xs.truncate(size);
+            let mut xs = Vec::new();
+            let new_xs = limbs_product(&mut xs, &mut factors[..j]).1;
+            xs = new_xs.unwrap();
             Self::from_owned_limbs_asc(xs)
         } else {
             Self::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), true))
@@ -639,9 +678,9 @@ impl Multifactorial for Natural {
                 j += 1;
                 factors[j] = prod;
                 j += 1;
-                let mut xs = vec![0; j];
-                let size = limbs_product(&mut xs, &mut factors[..j]);
-                xs.truncate(size);
+                let mut xs = Vec::new();
+                let new_xs = limbs_product(&mut xs, &mut factors[..j]).1;
+                xs = new_xs.unwrap();
                 let x = Self::from_owned_limbs_asc(xs);
                 if gcd == 1 {
                     x

@@ -1965,6 +1965,22 @@ fn test_factorial() {
         "93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463\
         976156518286253697920827223758251185210916864000000000000000000000000",
     );
+
+    fn big_test(n: u64) {
+        let f = Natural::factorial(n);
+        assert!(f.is_valid());
+        assert_eq!(factorial_naive(n), f);
+        assert_eq!(
+            Natural::exact_from(&rug::Integer::factorial(u32::exact_from(n)).complete()),
+            f
+        );
+    }
+    big_test(162501);
+    big_test(162502);
+    big_test(263338);
+    big_test(263353);
+    big_test(263354);
+    big_test(1000000);
 }
 
 #[test]

@@ -27,16 +27,17 @@ const RECURSIVE_PROD_THRESHOLD: usize = MUL_TOOM22_THRESHOLD;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `factors.len()`.
 //
-// This is equivalent to `mpz_prodlimbs` from `mpz/prodlimbs.c`, GMP 6.2.1, except that the output
-// buffer is provided.
-pub fn limbs_product(out: &mut [Limb], factors: &mut [Limb]) -> usize {
-    let mut factors_len = factors.len();
-    assert!(factors_len > 1);
-    assert!(RECURSIVE_PROD_THRESHOLD > 3);
+// This is equivalent to `mpz_prodlimbs` from `mpz/prodlimbs.c`, GMP 6.3.0. If x is too small to
+// contain the output, a newly-allocated vector containing the output is returned.
+pub fn limbs_product(xs: &mut [Limb], factors: &mut [Limb]) -> (usize, Option<Vec<Limb>>) {
+    let xs_len = xs.len();
+    let factors_len = factors.len();
+    assert_ne!(factors_len, 0);
+    assert!(const { RECURSIVE_PROD_THRESHOLD > 3 });
     if factors_len < RECURSIVE_PROD_THRESHOLD {
-        factors_len -= 1;
+        let j = factors_len - 1;
         let mut size = 1;
-        for i in 1..factors_len {
+        for i in 1..j {
             let factor = factors[i];
             let carry = limbs_slice_mul_limb_in_place(&mut factors[..size], factor);
             factors[size] = carry;
@@ -44,27 +45,50 @@ pub fn limbs_product(out: &mut [Limb], factors: &mut [Limb]) -> usize {
                 size += 1;
             }
         }
-        assert!(out.len() > size);
-        let carry =
-            limbs_mul_limb_to_out::<DoubleLimb, Limb>(out, &factors[..size], factors[factors_len]);
-        out[size] = carry;
-        if carry != 0 {
-            size += 1;
-        }
-        size
-    } else {
-        let half_len = factors_len >> 1;
-        let (factors, xs) = factors.split_at_mut(half_len);
-        let mut ys = vec![0; xs.len()];
-        let ys_len = limbs_product(&mut ys, xs);
-        let xs_len = limbs_product(xs, &mut factors[..half_len]);
-        let size = xs_len + ys_len;
-        assert!(out.len() >= size);
-        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(xs_len, ys_len)];
-        if limbs_mul_to_out(out, &xs[..xs_len], &ys[..ys_len], &mut mul_scratch) == 0 {
-            size - 1
+        let fj = factors[j];
+        let factors = &factors[..size];
+        let sp1 = size + 1;
+        if sp1 > xs_len {
+            let mut prod = vec![0; sp1];
+            prod[..xs_len].copy_from_slice(xs);
+            let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut prod, factors, fj);
+            prod[size] = carry;
+            (size + usize::from(carry != 0), Some(prod))
         } else {
-            size
+            let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(xs, factors, fj);
+            xs[size] = carry;
+            (size + usize::from(carry != 0), None)
+        }
+    } else {
+        let mut i = factors_len >> 1;
+        let mut j = factors_len - i;
+        let mut x2 = vec![0; j];
+        let (factors_lo, x1) = factors.split_at_mut(i);
+        let ox2;
+        (j, ox2) = limbs_product(&mut x2, x1);
+        if let Some(new_x2) = ox2 {
+            x2 = new_x2;
+        }
+        let x2 = &x2[..j];
+        let new_x1;
+        let ox1;
+        (i, ox1) = limbs_product(x1, factors_lo);
+        let x1 = if let Some(new_x1_temp) = ox1 {
+            new_x1 = new_x1_temp;
+            &new_x1[..i]
+        } else {
+            &x1[..i]
+        };
+        let size = i + j;
+        let mut scratch = vec![0; limbs_mul_to_out_scratch_len(i, j)];
+        if size > xs_len {
+            let mut prod = vec![0; size];
+            prod[..xs_len].copy_from_slice(xs);
+            let carry = limbs_mul_to_out(&mut prod, x1, x2, &mut scratch);
+            (size - usize::from(carry == 0), Some(prod))
+        } else {
+            let carry = limbs_mul_to_out(xs, x1, x2, &mut scratch);
+            (size - usize::from(carry == 0), None)
         }
     }
 }
