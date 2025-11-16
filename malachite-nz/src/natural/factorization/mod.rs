@@ -12,7 +12,3 @@ pub mod is_square;
 /// An implementation of [`Primes`](malachite_base::num::factorization::traits::Primes), a trait for
 /// generating prime numbers.
 pub mod primes;
-
-pub mod remove_power;
-
-pub mod is_power;
