@@ -7,10 +7,10 @@ edition = "2024"
 rust-version = "1.90.0"
 
 [workspace.dependencies]
-malachite-base = { version = "0.7.0", path = 'malachite-base', default-features = false }
-malachite-nz = { version = "0.7.0", path = 'malachite-nz', default-features = false }
-malachite-q = { version = "0.7.0", path = 'malachite-q', default-features = false }
-malachite-float = { version = "0.7.0", path = 'malachite-float', default-features = false }
+malachite-base = { version = "0.7.1", path = 'malachite-base', default-features = false }
+malachite-nz = { version = "0.7.1", path = 'malachite-nz', default-features = false }
+malachite-q = { version = "0.7.1", path = 'malachite-q', default-features = false }
+malachite-float = { version = "0.7.1", path = 'malachite-float', default-features = false }
 
 [profile.release]
 lto = "fat"

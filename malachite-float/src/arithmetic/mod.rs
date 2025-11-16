@@ -182,7 +182,6 @@ pub mod shl;
 ///
 /// # shl_prec_assign
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode::*;
 /// use malachite_float::Float;
 /// use std::cmp::Ordering::*;
 ///
@@ -385,7 +384,6 @@ pub mod shr;
 ///
 /// # shr_prec
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode::*;
 /// use malachite_float::Float;
 /// use std::cmp::Ordering::*;
 ///
@@ -416,7 +414,6 @@ pub mod shr;
 ///
 /// # shr_prec_assign
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode::*;
 /// use malachite_float::Float;
 /// use std::cmp::Ordering::*;
 ///

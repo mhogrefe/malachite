@@ -885,8 +885,10 @@ pub mod poly_eval;
 /// multiplication.
 pub mod poly_interpolate;
 #[cfg(feature = "test_build")]
+/// Code for multiplying several limbs together.
 pub mod product_of_limbs;
 #[cfg(not(feature = "test_build"))]
+/// Code for multiplying several limbs together.
 pub(crate) mod product_of_limbs;
 /// Code for Toom-Cook multiplication.
 pub mod toom;

@@ -17,6 +17,7 @@ use crate::natural::arithmetic::mul::{
     MUL_TOOM22_THRESHOLD, limbs_mul_limb_to_out, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
 use crate::platform::{DoubleLimb, Limb};
+use alloc::vec::Vec;
 
 const RECURSIVE_PROD_THRESHOLD: usize = MUL_TOOM22_THRESHOLD;
 
