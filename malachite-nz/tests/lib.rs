@@ -346,6 +346,7 @@ pub mod natural {
         pub mod exhaustive_positive_naturals;
     }
     pub mod factorization {
+        pub mod is_power;
         pub mod is_square;
         pub mod primes;
     }
