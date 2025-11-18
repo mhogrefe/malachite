@@ -8,8 +8,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{CheckedRoot, DivExactAssign, DivisibleBy, Gcd};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower, IsPrime};
 use malachite_base::num::logic::traits::{BitScan, SignificantBits};
 
@@ -29,9 +31,7 @@ const SMALLEST_OMITTED_PRIME: u32 = 1009;
 
 // Find ONE perfect power representation for a Natural (not necessarily the smallest base).
 // This function does NOT recurse - it just checks if n can be expressed as some base^exp.
-fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
-    use malachite_base::num::basic::traits::One;
-
+fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
     // Find largest power of 2 dividing n
     let mut pow_2 = match n.index_of_next_true_bit(0) {
         Some(p) => p,
@@ -48,7 +48,7 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
 
     // If pow_2 is prime, just check if n is a perfect pow_2-th power
     if pow_2.is_prime() {
-        return n.checked_root(pow_2).map(|root| (root, pow_2 as u32));
+        return n.checked_root(pow_2).map(|root| (root, pow_2));
     }
 
     // Factor out powers of small primes
@@ -73,12 +73,12 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
             }
 
             if q == Natural::ONE {
-                return n.checked_root(pow_2).map(|root| (root, pow_2 as u32));
+                return n.checked_root(pow_2).map(|root| (root, pow_2));
             }
 
             // As soon as pow_2 becomes prime, stop factoring
             if pow_2.is_prime() {
-                return n.checked_root(pow_2).map(|root| (root, pow_2 as u32));
+                return n.checked_root(pow_2).map(|root| (root, pow_2));
             }
         }
     }
@@ -98,7 +98,7 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
             }
 
             if let Some(root) = n.checked_root(nth) {
-                return Some((root, nth as u32));
+                return Some((root, nth));
             }
 
             // Early termination optimization
@@ -118,7 +118,7 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
             }
 
             if let Some(root) = n.checked_root(nth) {
-                return Some((root, nth as u32));
+                return Some((root, nth));
             }
 
             // Early termination optimization
@@ -133,10 +133,11 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u32)> {
     None
 }
 
-// Boolean check: is n a perfect power? (avoid computing roots where possible)
+// Boolean check: is n a perfect power?
+// Note: This function computes roots the same number of times as get_perfect_power_natural,
+// but discards the root values, only returning whether a perfect power representation exists.
+// Left here in case we can find a way to optimize out root computations later.
 fn get_perfect_power_natural_bool(n: &Natural) -> bool {
-    use malachite_base::num::basic::traits::One;
-
     // Find largest power of 2 dividing n
     let mut pow_2 = match n.index_of_next_true_bit(0) {
         Some(p) => p,
@@ -239,19 +240,8 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
 }
 
 // Express Natural as a power with the smallest possible base
-fn express_as_power_natural(n: &Natural) -> Option<(Natural, u32)> {
-    use malachite_base::num::basic::traits::{One, Zero};
-
-    // Special case: zero is considered a perfect square (0 = 0^2)
-    if n == &Natural::ZERO {
-        return Some((Natural::ZERO, 2));
-    }
-
-    // Special case: 1 is a perfect square (1 = 1^2)
-    if n == &Natural::ONE {
-        return Some((Natural::ONE, 2));
-    }
-
+// Note: This function is only called for multi-limb numbers (Large variant).
+fn express_as_power_natural(n: &Natural) -> Option<(Natural, u64)> {
     // Get initial representation
     let (mut base, mut exp) = get_perfect_power_natural(n)?;
 
@@ -260,7 +250,7 @@ fn express_as_power_natural(n: &Natural) -> Option<(Natural, u32)> {
         match get_perfect_power_natural(&base) {
             Some((base2, exp2)) => {
                 base = base2;
-                exp = (exp as u64 * exp2 as u64) as u32;
+                exp *= exp2;
             }
             None => break,
         }
@@ -270,10 +260,9 @@ fn express_as_power_natural(n: &Natural) -> Option<(Natural, u32)> {
 }
 
 // Is Natural a perfect power?
+// Note: This function is only called for multi-limb numbers
 fn is_power_natural(n: &Natural) -> bool {
-    use malachite_base::num::basic::traits::One;
-
-    n <= &Natural::ONE || get_perfect_power_natural_bool(n)
+    get_perfect_power_natural_bool(n)
 }
 
 impl ExpressAsPower for Natural {
@@ -292,7 +281,13 @@ impl ExpressAsPower for Natural {
     /// assert_eq!(Natural::from(6u32).express_as_power(), None);
     /// ```
     fn express_as_power(&self) -> Option<(Natural, u64)> {
-        express_as_power_natural(self).map(|(root, exp)| (root, exp as u64))
+        match self {
+            // use the single-limb express_as_power impl for primitive integers
+            Self(Small(small)) => small
+                .express_as_power()
+                .map(|(root, exp)| (Natural::from(root), exp)),
+            Self(Large(_)) => express_as_power_natural(self),
+        }
     }
 }
 
@@ -314,6 +309,10 @@ impl IsPower for Natural {
     /// assert_eq!(Natural::from(8u32).is_power(), true);
     /// ```
     fn is_power(&self) -> bool {
-        is_power_natural(self)
+        match self {
+            // use the single-limb is_power impl for primitive integers
+            Self(Small(small)) => small.is_power(),
+            Self(Large(_)) => is_power_natural(self),
+        }
     }
 }
