@@ -24,8 +24,9 @@ const LOG: usize = 32; // For 32-bit limbs
 #[cfg(not(feature = "32_bit_limbs"))]
 const LOG: usize = 64; // For 64-bit limbs
 
-// This is `mpn_remove` from GMP 6.3.0.
 // Remove the largest power of V from U that doesn't exceed the given cap
+//
+// This is `mpn_remove` from GMP 6.3.0.
 pub fn limbs_remove(
     wp: &mut Vec<Limb>, // Output: U / V^k
     up: &[Limb],        // Input number U
@@ -139,9 +140,10 @@ pub fn limbs_remove(
             );
         } else {
             // Square the current power from powers_storage into a new location
+            //
             // need to be careful about overlapping borrows
+            //
             // we can use split_at_mut to get non-overlapping mutable slices
-
             let src_end = current_power_offset + pn;
             if src_end <= np_offset {
                 // Source and destination don't overlap - safe to borrow both
@@ -150,6 +152,7 @@ pub fn limbs_remove(
                 limbs_square_to_out(&mut dst_part[..2 * pn], src, &mut scratch);
             } else {
                 // Fallback: copy source data to avoid overlapping borrows
+                //
                 // This should rarely happen with our offset calculation
                 let src_data: Vec<Limb> = powers_storage[current_power_offset..src_end].to_vec();
                 limbs_square_to_out(

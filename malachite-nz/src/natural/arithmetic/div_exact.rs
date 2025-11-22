@@ -1605,6 +1605,7 @@ pub(crate) fn limbs_modular_div_mod(
 
     if dn < DC_BDIV_QR_THRESHOLD || (nn - dn) < DC_BDIV_QR_THRESHOLD {
         // **Small divisor case: Use simple binary division**
+        //
         // Copy dividend to scratch space for in-place computation
         tp[..nn].copy_from_slice(np);
 
@@ -1619,6 +1620,7 @@ pub(crate) fn limbs_modular_div_mod(
         rp.copy_from_slice(&tp[nn - dn..nn]);
     } else if dn < MU_BDIV_QR_THRESHOLD {
         // **Medium divisor case: Use divide-and-conquer binary division**
+        //
         // Copy dividend to scratch space
         tp[..nn].copy_from_slice(np);
 

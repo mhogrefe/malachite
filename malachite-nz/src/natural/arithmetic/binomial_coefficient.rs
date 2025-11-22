@@ -315,7 +315,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
     out
 }}
 
-// Returns an approximation of the sqare root of x. It gives:
+// Returns an approximation of the square root of x. It gives:
 // ```
 //   limb_apprsqrt (x) ^ 2 <= x < (limb_apprsqrt (x)+1) ^ 2
 // ```

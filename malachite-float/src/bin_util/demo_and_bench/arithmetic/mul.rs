@@ -44,11 +44,14 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_7, float_float_unsigned_triple_gen_var_1,
     float_float_unsigned_triple_gen_var_1_rm, float_float_unsigned_triple_gen_var_2,
     float_pair_gen, float_pair_gen_rm, float_pair_gen_var_10, float_rational_pair_gen,
-    float_rational_pair_gen_rm, float_rational_rounding_mode_triple_gen_var_3_rm,
-    float_rational_rounding_mode_triple_gen_var_4,
+    float_rational_pair_gen_rm, float_rational_pair_gen_var_2,
+    float_rational_rounding_mode_triple_gen_var_3_rm,
+    float_rational_rounding_mode_triple_gen_var_4, float_rational_rounding_mode_triple_gen_var_9,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_3,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_3_rm,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_8,
     float_rational_unsigned_triple_gen_var_1, float_rational_unsigned_triple_gen_var_1_rm,
+    float_rational_unsigned_triple_gen_var_2,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 use std::cmp::max;
@@ -112,6 +115,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_mul_prec_round_assign_ref_debug);
     register_demo!(runner, demo_float_mul_rational);
     register_demo!(runner, demo_float_mul_rational_debug);
+    register_demo!(runner, demo_float_mul_rational_extreme);
+    register_demo!(runner, demo_float_mul_rational_extreme_debug);
     register_demo!(runner, demo_float_mul_rational_val_ref);
     register_demo!(runner, demo_float_mul_rational_val_ref_debug);
     register_demo!(runner, demo_float_mul_rational_ref_val);
@@ -124,6 +129,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_mul_rational_assign_ref_debug);
     register_demo!(runner, demo_rational_mul_float);
     register_demo!(runner, demo_rational_mul_float_debug);
+    register_demo!(runner, demo_rational_mul_float_extreme);
+    register_demo!(runner, demo_rational_mul_float_extreme_debug);
     register_demo!(runner, demo_rational_mul_float_val_ref);
     register_demo!(runner, demo_rational_mul_float_val_ref_debug);
     register_demo!(runner, demo_rational_mul_float_ref_val);
@@ -132,6 +139,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_mul_float_ref_ref_debug);
     register_demo!(runner, demo_float_mul_rational_prec);
     register_demo!(runner, demo_float_mul_rational_prec_debug);
+    register_demo!(runner, demo_float_mul_rational_prec_extreme);
+    register_demo!(runner, demo_float_mul_rational_prec_extreme_debug);
     register_demo!(runner, demo_float_mul_rational_prec_val_ref);
     register_demo!(runner, demo_float_mul_rational_prec_val_ref_debug);
     register_demo!(runner, demo_float_mul_rational_prec_ref_val);
@@ -144,6 +153,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_mul_rational_prec_assign_ref_debug);
     register_demo!(runner, demo_float_mul_rational_round);
     register_demo!(runner, demo_float_mul_rational_round_debug);
+    register_demo!(runner, demo_float_mul_rational_round_extreme);
+    register_demo!(runner, demo_float_mul_rational_round_extreme_debug);
     register_demo!(runner, demo_float_mul_rational_round_val_ref);
     register_demo!(runner, demo_float_mul_rational_round_val_ref_debug);
     register_demo!(runner, demo_float_mul_rational_round_ref_val);
@@ -156,6 +167,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_mul_rational_round_assign_ref_debug);
     register_demo!(runner, demo_float_mul_rational_prec_round);
     register_demo!(runner, demo_float_mul_rational_prec_round_debug);
+    register_demo!(runner, demo_float_mul_rational_prec_round_extreme);
+    register_demo!(runner, demo_float_mul_rational_prec_round_extreme_debug);
     register_demo!(runner, demo_float_mul_rational_prec_round_val_ref);
     register_demo!(runner, demo_float_mul_rational_prec_round_val_ref_debug);
     register_demo!(runner, demo_float_mul_rational_prec_round_ref_val);
@@ -1113,6 +1126,27 @@ fn demo_float_mul_rational_debug(gm: GenMode, config: &GenConfig, limit: usize) 
     }
 }
 
+fn demo_float_mul_rational_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_rational_pair_gen_var_2().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("{} * {} = {}", x_old, y_old, x * y);
+    }
+}
+
+fn demo_float_mul_rational_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_rational_pair_gen_var_2().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "{:#x} * {} = {:#x}",
+            ComparableFloat(x_old),
+            y_old,
+            ComparableFloat(x * y)
+        );
+    }
+}
+
 fn demo_float_mul_rational_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in float_rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
@@ -1231,6 +1265,27 @@ fn demo_rational_mul_float_debug(gm: GenMode, config: &GenConfig, limit: usize) 
     }
 }
 
+fn demo_rational_mul_float_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x) in float_rational_pair_gen_var_2().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("{} * {} = {}", x_old, y_old, x * y);
+    }
+}
+
+fn demo_rational_mul_float_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x) in float_rational_pair_gen_var_2().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "{} * {:#x} = {:#x}",
+            x_old,
+            ComparableFloat(y_old),
+            ComparableFloat(x * y)
+        );
+    }
+}
+
 fn demo_rational_mul_float_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (y, x) in float_rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
@@ -1305,6 +1360,42 @@ fn demo_float_mul_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_mul_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, prec) in float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (sum, o) = x.mul_rational_prec(y, prec);
+        println!(
+            "({:#x}).mul_rational_prec({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            y_old,
+            prec,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_mul_rational_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).mul_rational_prec({}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            x.mul_rational_prec(y, prec)
+        );
+    }
+}
+
+fn demo_float_mul_rational_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_rational_unsigned_triple_gen_var_2()
         .get(gm, config)
         .take(limit)
     {
@@ -1518,6 +1609,42 @@ fn demo_float_mul_rational_round_debug(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
+fn demo_float_mul_rational_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_rational_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).mul_rational_round({}, {}) = {:?}",
+            x_old,
+            y_old,
+            rm,
+            x.mul_rational_round(y, rm)
+        );
+    }
+}
+
+fn demo_float_mul_rational_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_rational_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (sum, o) = x.mul_rational_round(y, rm);
+        println!(
+            "({:#x}).mul_rational_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            y_old,
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
 fn demo_float_mul_rational_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in float_rational_rounding_mode_triple_gen_var_4()
         .get(gm, config)
@@ -1699,6 +1826,44 @@ fn demo_float_mul_rational_prec_round(gm: GenMode, config: &GenConfig, limit: us
 
 fn demo_float_mul_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (sum, o) = x.mul_rational_prec_round(y, prec, rm);
+        println!(
+            "({:#x}).mul_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            y_old,
+            prec,
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_float_mul_rational_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_8()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).mul_rational_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            rm,
+            x.mul_rational_prec_round(y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_mul_rational_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_8()
         .get(gm, config)
         .take(limit)
     {

@@ -2252,6 +2252,42 @@ pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_7()
     )
 }
 
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_8()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_extreme_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| mul_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_9()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_extreme_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| div_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
 // -- (Float, Rational, Rational) --
 
 pub fn exhaustive_float_rational_rational_triple_gen() -> It<(Float, Rational, Rational)> {
@@ -2440,6 +2476,28 @@ pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_8()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| sub_rational_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_9()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_extreme_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| mul_rational_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_10()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_extreme_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| div_rational_round_valid(x, y, *rm)),
     )
 }
 

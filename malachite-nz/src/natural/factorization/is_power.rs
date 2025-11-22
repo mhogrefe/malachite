@@ -30,6 +30,7 @@ const PRIMES: [u32; 168] = [
 const SMALLEST_OMITTED_PRIME: u32 = 1009;
 
 // Find ONE perfect power representation for a Natural (not necessarily the smallest base).
+//
 // This function does NOT recurse - it just checks if n can be expressed as some base^exp.
 fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
     // Find largest power of 2 dividing n
@@ -134,8 +135,10 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
 }
 
 // Boolean check: is n a perfect power?
-// Note: This function computes roots the same number of times as get_perfect_power_natural,
-// but discards the root values, only returning whether a perfect power representation exists.
+//
+// Note: This function computes roots the same number of times as get_perfect_power_natural, but
+// discards the root values, only returning whether a perfect power representation exists.
+//
 // Left here in case we can find a way to optimize out root computations later.
 fn get_perfect_power_natural_bool(n: &Natural) -> bool {
     // Find largest power of 2 dividing n
@@ -240,6 +243,7 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
 }
 
 // Express Natural as a power with the smallest possible base
+//
 // Note: This function is only called for multi-limb numbers (Large variant).
 fn express_as_power_natural(n: &Natural) -> Option<(Natural, u64)> {
     // Get initial representation
@@ -260,6 +264,7 @@ fn express_as_power_natural(n: &Natural) -> Option<(Natural, u64)> {
 }
 
 // Is Natural a perfect power?
+//
 // Note: This function is only called for multi-limb numbers
 fn is_power_natural(n: &Natural) -> bool {
     get_perfect_power_natural_bool(n)
@@ -268,8 +273,8 @@ fn is_power_natural(n: &Natural) -> bool {
 impl ExpressAsPower for Natural {
     /// Expresses a [`Natural`] as a perfect power if possible.
     ///
-    /// Returns `Some((root, exponent))` where `root^exponent = self` and `exponent > 1`,
-    /// or `None` if the number cannot be expressed as a perfect power.
+    /// Returns `Some((root, exponent))` where `root^exponent = self` and `exponent > 1`, or `None`
+    /// if the number cannot be expressed as a perfect power.
     ///
     /// # Examples
     /// ```
@@ -294,8 +299,8 @@ impl ExpressAsPower for Natural {
 impl IsPower for Natural {
     /// Determines whether a [`Natural`] is a perfect power.
     ///
-    /// A perfect power is any number of the form $a^x$ where $x > 1$, with $a$ and $x$
-    /// both integers. In particular, 0 and 1 are considered perfect powers.
+    /// A perfect power is any number of the form $a^x$ where $x > 1$, with $a$ and $x$ both
+    /// integers. In particular, 0 and 1 are considered perfect powers.
     ///
     /// # Examples
     /// ```
