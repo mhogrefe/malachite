@@ -73,17 +73,16 @@ fn is_power_properties() {
         assert_eq!(
             x.is_power(),
             x.express_as_power().is_some(),
-            "is_power() and express_as_power() inconsistent for {}",
-            x
+            "is_power() and express_as_power() inconsistent for {x}",
         );
 
         // Any number raised to a power >= 2 should be a perfect power
-        if x > Natural::from(1u32) {
+        if x > 1u32 {
             let power_2 = (&x).pow(2);
-            assert!(power_2.is_power(), "{}^2 should be a perfect power", x);
+            assert!(power_2.is_power(), "{x}^2 should be a perfect power");
 
             let power_3 = (&x).pow(3);
-            assert!(power_3.is_power(), "{}^3 should be a perfect power", x);
+            assert!(power_3.is_power(), "{x}^3 should be a perfect power");
         }
     });
 }

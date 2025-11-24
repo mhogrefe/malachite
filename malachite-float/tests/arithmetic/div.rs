@@ -49,13 +49,16 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_8, float_float_unsigned_triple_gen_var_1,
     float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_2,
     float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_8, float_pair_gen_var_9,
-    float_pair_gen_var_10, float_rational_pair_gen, float_rational_rounding_mode_triple_gen_var_5,
-    float_rational_rounding_mode_triple_gen_var_6,
+    float_pair_gen_var_10, float_rational_pair_gen, float_rational_pair_gen_var_2,
+    float_rational_rounding_mode_triple_gen_var_5, float_rational_rounding_mode_triple_gen_var_6,
+    float_rational_rounding_mode_triple_gen_var_10,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_4,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_5,
-    float_rational_unsigned_triple_gen_var_1, float_rounding_mode_pair_gen,
-    float_unsigned_pair_gen_var_1, float_unsigned_rounding_mode_triple_gen_var_1,
-    rational_rounding_mode_pair_gen_var_6, rational_unsigned_rounding_mode_triple_gen_var_1,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_9,
+    float_rational_unsigned_triple_gen_var_1, float_rational_unsigned_triple_gen_var_2,
+    float_rounding_mode_pair_gen, float_unsigned_pair_gen_var_1,
+    float_unsigned_rounding_mode_triple_gen_var_1, rational_rounding_mode_pair_gen_var_6,
+    rational_unsigned_rounding_mode_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
@@ -8960,12 +8963,15 @@ fn test_div_rational() {
             ComparableFloatRef(&quotient)
         );
 
-        let quotient_alt =
-            div_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
+        if x.is_normal() {
+            let quotient_alt =
+                div_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), Nearest)
+                    .0;
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+        }
     };
     test("NaN", "NaN", "123", "NaN", "NaN");
     test("Infinity", "Infinity", "123", "Infinity", "Infinity");
@@ -9037,6 +9043,39 @@ fn test_div_rational() {
         "2.0943951023931953",
         "0x2.182a4705ae6ca#53",
     );
+
+    // n and d both powers of 2 in mul_rational_prec_round_assign_direct
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        "1",
+        "too_big",
+        "0x4.0E+268435455#1",
+    );
+    // - only n a power of 2 in mul_rational_prec_round_assign_direct
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        "2/3",
+        "Infinity",
+        "Infinity",
+    );
+    // - only d a power of 2 in mul_rational_prec_round_assign_direct
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        "3",
+        "too_big",
+        "0x1.0E+268435455#1",
+    );
+    // - neither n nor d a power of 2 in mul_rational_prec_round_assign_direct
+    test(
+        "too_big",
+        "0x4.0E+268435455#1",
+        "5/3",
+        "too_big",
+        "0x2.0E+268435455#1",
+    );
 }
 
 #[test]
@@ -9103,13 +9142,15 @@ fn test_div_rational_prec() {
         );
         assert_eq!(o_alt, o);
 
-        let (quotient_alt, o_alt) =
-            div_rational_prec_round_direct(x.clone(), y.clone(), prec, Nearest);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+        if x.is_normal() {
+            let (quotient_alt, o_alt) =
+                div_rational_prec_round_direct(x.clone(), y.clone(), prec, Nearest);
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+            assert_eq!(o_alt, o);
+        }
 
         let (rug_quotient, rug_o) = rug_div_rational_prec(
             &rug::Float::exact_from(&x),
@@ -9364,13 +9405,15 @@ fn test_div_rational_round() {
         );
         assert_eq!(o_alt, o);
 
-        let (quotient_alt, o_alt) =
-            div_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+        if x.is_normal() {
+            let (quotient_alt, o_alt) =
+                div_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), rm);
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+            assert_eq!(o_alt, o);
+        }
     };
     test("NaN", "NaN", "123", Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "123", Ceiling, "NaN", "NaN", Equal);
@@ -10143,33 +10186,38 @@ fn test_div_rational_prec_round() {
         );
         assert_eq!(o_alt, o);
 
-        let (quotient_alt, o_alt) = div_rational_prec_round_direct(x.clone(), y.clone(), prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+        if x.is_normal() {
+            let (quotient_alt, o_alt) =
+                div_rational_prec_round_direct(x.clone(), y.clone(), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+            assert_eq!(o_alt, o);
 
-        let (quotient_alt, o_alt) = div_rational_prec_round_direct_val_ref(x.clone(), &y, prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+            let (quotient_alt, o_alt) =
+                div_rational_prec_round_direct_val_ref(x.clone(), &y, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+            assert_eq!(o_alt, o);
 
-        let (quotient_alt, o_alt) = div_rational_prec_round_direct_ref_val(&x, y.clone(), prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+            let (quotient_alt, o_alt) =
+                div_rational_prec_round_direct_ref_val(&x, y.clone(), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+            assert_eq!(o_alt, o);
 
-        let (quotient_alt, o_alt) = div_rational_prec_round_direct_ref_ref(&x, &y, prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+            let (quotient_alt, o_alt) = div_rational_prec_round_direct_ref_ref(&x, &y, prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&quotient_alt),
+                ComparableFloatRef(&quotient)
+            );
+            assert_eq!(o_alt, o);
+        }
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_quotient, rug_o) = rug_div_rational_prec_round(
@@ -13818,7 +13866,6 @@ fn div_prec_round_properties_helper(
             assert_eq!(quotient.get_prec(), Some(prec));
         }
         if !extreme {
-            // TODO
             let r_quotient = Rational::exact_from(&x) / Rational::exact_from(&y);
             assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
             if o == Less {
@@ -14820,159 +14867,153 @@ fn div_properties() {
     });
 }
 
-#[test]
-fn div_rational_prec_round_properties() {
-    float_rational_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(
-        |(x, y, prec, rm)| {
-            let (quotient, o) = x.clone().div_rational_prec_round(y.clone(), prec, rm);
-            assert!(quotient.is_valid());
-            let (quotient_alt, o_alt) = x.clone().div_rational_prec_round_val_ref(&y, prec, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
-            let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_val(y.clone(), prec, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
-            let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_ref(&y, prec, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+#[allow(clippy::needless_pass_by_value)]
+fn div_rational_prec_round_properties_helper(
+    x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    let (quotient, o) = x.clone().div_rational_prec_round(y.clone(), prec, rm);
+    assert!(quotient.is_valid());
+    let (quotient_alt, o_alt) = x.clone().div_rational_prec_round_val_ref(&y, prec, rm);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
+    let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_val(y.clone(), prec, rm);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
+    let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_ref(&y, prec, rm);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
 
-            let mut x_alt = x.clone();
-            let o_alt = x_alt.div_rational_prec_round_assign(y.clone(), prec, rm);
-            assert!(x_alt.is_valid());
-            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
-            assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.div_rational_prec_round_assign(y.clone(), prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    assert_eq!(o_alt, o);
 
-            let mut x_alt = x.clone();
-            let o_alt = x_alt.div_rational_prec_round_assign_ref(&y, prec, rm);
-            assert!(x_alt.is_valid());
-            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
-            assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.div_rational_prec_round_assign_ref(&y, prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) =
-                div_rational_prec_round_naive(x.clone(), y.clone(), prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+    if !extreme {
+        let (quotient_alt, o_alt) = div_rational_prec_round_naive(x.clone(), y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) =
-                div_rational_prec_round_naive_val_ref(x.clone(), &y, prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (quotient_alt, o_alt) = div_rational_prec_round_naive_val_ref(x.clone(), &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) =
-                div_rational_prec_round_naive_ref_val(&x, y.clone(), prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (quotient_alt, o_alt) = div_rational_prec_round_naive_ref_val(&x, y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) = div_rational_prec_round_naive_ref_ref(&x, &y, prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (quotient_alt, o_alt) = div_rational_prec_round_naive_ref_ref(&x, &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
 
-            let (quotient_alt, o_alt) =
-                div_rational_prec_round_direct(x.clone(), y.clone(), prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+    if x.is_normal() {
+        let (quotient_alt, o_alt) = div_rational_prec_round_direct(x.clone(), y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) =
-                div_rational_prec_round_direct_val_ref(x.clone(), &y, prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (quotient_alt, o_alt) = div_rational_prec_round_direct_val_ref(x.clone(), &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) =
-                div_rational_prec_round_direct_ref_val(&x, y.clone(), prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (quotient_alt, o_alt) = div_rational_prec_round_direct_ref_val(&x, y.clone(), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) = div_rational_prec_round_direct_ref_ref(&x, &y, prec, rm);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (quotient_alt, o_alt) = div_rational_prec_round_direct_ref_ref(&x, &y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
 
-            if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-                let (rug_quotient, rug_o) = rug_div_rational_prec_round(
-                    &rug::Float::exact_from(&x),
-                    &rug::Rational::exact_from(&y),
-                    prec,
-                    rm,
-                );
-                assert_eq!(
-                    ComparableFloatRef(&Float::from(&rug_quotient)),
-                    ComparableFloatRef(&quotient),
-                );
-                assert_eq!(rug_o, o);
+    if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_quotient, rug_o) = rug_div_rational_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
+            prec,
+            rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_quotient)),
+            ComparableFloatRef(&quotient),
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if o == Equal && quotient.is_finite() && quotient != 0 {
+        assert_eq!(
+            ComparableFloatRef(
+                &quotient
+                    .mul_rational_prec_round_ref_ref(&y, x.significant_bits(), Exact)
+                    .0
+            ),
+            ComparableFloatRef(&x)
+        );
+        // TODO additional test
+    }
+
+    if quotient.is_finite() {
+        if quotient.is_normal() {
+            assert_eq!(quotient.get_prec(), Some(prec));
+        }
+        if !extreme {
+            let r_quotient = Rational::exact_from(&x) / &y;
+            assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
+            if o == Less {
+                let mut next = quotient.clone();
+                next.increment();
+                assert!(next > r_quotient);
+            } else if o == Greater {
+                let mut next = quotient.clone();
+                next.decrement();
+                assert!(next < r_quotient);
             }
-
-            if o == Equal && quotient.is_finite() && quotient != 0 {
-                assert_eq!(
-                    ComparableFloatRef(
-                        &quotient
-                            .mul_rational_prec_round_ref_ref(&y, x.significant_bits(), Exact)
-                            .0
-                    ),
-                    ComparableFloatRef(&x)
-                );
-                // TODO additional test
-            }
-
-            let r_quotient = if quotient.is_finite() {
-                if quotient.is_normal() {
-                    assert_eq!(quotient.get_prec(), Some(prec));
-                }
-                let r_quotient = Rational::exact_from(&x) / &y;
-                assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
-                if o == Less {
-                    let mut next = quotient.clone();
-                    next.increment();
-                    assert!(next > r_quotient);
-                } else if o == Greater {
-                    let mut next = quotient.clone();
-                    next.decrement();
-                    assert!(next < r_quotient);
-                }
-                Some(r_quotient)
-            } else {
-                assert_eq!(o, Equal);
-                None
-            };
-
-            match (
-                r_quotient.is_some() && *r_quotient.as_ref().unwrap() >= 0u32,
-                rm,
-            ) {
+            match (r_quotient >= 0u32, rm) {
                 (_, Floor) | (true, Down) | (false, Up) => {
                     assert_ne!(o, Greater);
                 }
@@ -14982,49 +15023,63 @@ fn div_rational_prec_round_properties() {
                 (_, Exact) => assert_eq!(o, Equal),
                 _ => {}
             }
+        }
+    }
 
-            let (mut quotient_alt, mut o_alt) = x.div_rational_prec_round_ref_val(-&y, prec, -rm);
-            if y != 0 {
-                quotient_alt.neg_assign();
-            }
-            o_alt = o_alt.reverse();
-            assert_eq!(
-                ComparableFloat(quotient_alt.abs_negative_zero()),
-                ComparableFloat(quotient.abs_negative_zero_ref()),
-            );
-            assert_eq!(o_alt, o);
+    let (mut quotient_alt, mut o_alt) = x.div_rational_prec_round_ref_val(-&y, prec, -rm);
+    if y != 0 {
+        quotient_alt.neg_assign();
+    }
+    o_alt = o_alt.reverse();
+    assert_eq!(
+        ComparableFloat(quotient_alt.abs_negative_zero()),
+        ComparableFloat(quotient.abs_negative_zero_ref()),
+    );
+    assert_eq!(o_alt, o);
 
-            let (mut quotient_alt, mut o_alt) =
-                (-&x).div_rational_prec_round_val_ref(&y, prec, -rm);
-            quotient_alt.neg_assign();
-            o_alt = o_alt.reverse();
+    let (mut quotient_alt, mut o_alt) = (-&x).div_rational_prec_round_val_ref(&y, prec, -rm);
+    quotient_alt.neg_assign();
+    o_alt = o_alt.reverse();
+    assert_eq!(
+        ComparableFloat(quotient_alt.abs_negative_zero()),
+        ComparableFloat(quotient.abs_negative_zero_ref())
+    );
+    assert_eq!(o_alt, o);
+
+    if quotient != 0u32 && y != 0 {
+        let (quotient_alt, o_alt) = (-&x).div_rational_prec_round(-&y, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = x.div_rational_prec_round_ref_ref(&y, prec, rm);
             assert_eq!(
-                ComparableFloat(quotient_alt.abs_negative_zero()),
+                ComparableFloat(s.abs_negative_zero_ref()),
                 ComparableFloat(quotient.abs_negative_zero_ref())
             );
-            assert_eq!(o_alt, o);
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(x.div_rational_prec_round_ref_ref(&y, prec, Exact));
+    }
+}
 
-            if quotient != 0u32 && y != 0 {
-                let (quotient_alt, o_alt) = (-&x).div_rational_prec_round(-&y, prec, rm);
-                assert_eq!(
-                    ComparableFloatRef(&quotient_alt),
-                    ComparableFloatRef(&quotient)
-                );
-                assert_eq!(o_alt, o);
-            }
+#[test]
+fn div_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(
+        |(x, y, prec, rm)| {
+            div_rational_prec_round_properties_helper(x, y, prec, rm, false);
+        },
+    );
 
-            if o == Equal {
-                for rm in exhaustive_rounding_modes() {
-                    let (s, oo) = x.div_rational_prec_round_ref_ref(&y, prec, rm);
-                    assert_eq!(
-                        ComparableFloat(s.abs_negative_zero_ref()),
-                        ComparableFloat(quotient.abs_negative_zero_ref())
-                    );
-                    assert_eq!(oo, Equal);
-                }
-            } else {
-                assert_panic!(x.div_rational_prec_round_ref_ref(&y, prec, Exact));
-            }
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_9().test_properties(
+        |(x, y, prec, rm)| {
+            div_rational_prec_round_properties_helper(x, y, prec, rm, true);
         },
     );
 
@@ -15103,45 +15158,44 @@ fn div_rational_prec_round_properties() {
     });
 }
 
-#[test]
-fn div_rational_prec_properties() {
-    float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
-        let (quotient, o) = x.clone().div_rational_prec(y.clone(), prec);
-        assert!(quotient.is_valid());
-        let (quotient_alt, o_alt) = x.clone().div_rational_prec_val_ref(&y, prec);
-        assert!(quotient_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
-        let (quotient_alt, o_alt) = x.div_rational_prec_ref_val(y.clone(), prec);
-        assert!(quotient_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
-        let (quotient_alt, o_alt) = x.div_rational_prec_ref_ref(&y, prec);
-        assert!(quotient_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+fn div_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme: bool) {
+    let (quotient, o) = x.clone().div_rational_prec(y.clone(), prec);
+    assert!(quotient.is_valid());
+    let (quotient_alt, o_alt) = x.clone().div_rational_prec_val_ref(&y, prec);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
+    let (quotient_alt, o_alt) = x.div_rational_prec_ref_val(y.clone(), prec);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
+    let (quotient_alt, o_alt) = x.div_rational_prec_ref_ref(&y, prec);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.div_rational_prec_assign(y.clone(), prec);
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
-        assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.div_rational_prec_assign(y.clone(), prec);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    assert_eq!(o_alt, o);
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.div_rational_prec_assign_ref(&y, prec);
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
-        assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.div_rational_prec_assign_ref(&y, prec);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    assert_eq!(o_alt, o);
 
+    if !extreme {
         let (quotient_alt, o_alt) =
             div_rational_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
         assert_eq!(
@@ -15149,7 +15203,9 @@ fn div_rational_prec_properties() {
             ComparableFloatRef(&quotient)
         );
         assert_eq!(o_alt, o);
+    }
 
+    if x.is_normal() {
         let (quotient_alt, o_alt) =
             div_rational_prec_round_direct(x.clone(), y.clone(), prec, Nearest);
         assert_eq!(
@@ -15157,41 +15213,43 @@ fn div_rational_prec_properties() {
             ComparableFloatRef(&quotient)
         );
         assert_eq!(o_alt, o);
+    }
 
-        let (rug_quotient, rug_o) = rug_div_rational_prec(
-            &rug::Float::exact_from(&x),
-            &rug::Rational::exact_from(&y),
-            prec,
-        );
+    let (rug_quotient, rug_o) = rug_div_rational_prec(
+        &rug::Float::exact_from(&x),
+        &rug::Rational::exact_from(&y),
+        prec,
+    );
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_quotient)),
+        ComparableFloatRef(&quotient),
+    );
+    assert_eq!(rug_o, o);
+
+    if o == Equal && quotient.is_finite() && quotient != 0 {
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_quotient)),
-            ComparableFloatRef(&quotient),
+            ComparableFloatRef(
+                &quotient
+                    .mul_rational_prec_ref_ref(&y, x.significant_bits())
+                    .0
+            ),
+            ComparableFloatRef(&x)
         );
-        assert_eq!(rug_o, o);
+        // TODO additional test
+    }
 
-        if o == Equal && quotient.is_finite() && quotient != 0 {
-            assert_eq!(
-                ComparableFloatRef(
-                    &quotient
-                        .mul_rational_prec_ref_ref(&y, x.significant_bits())
-                        .0
-                ),
-                ComparableFloatRef(&x)
-            );
-            // TODO additional test
+    let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_ref(&y, prec, Nearest);
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
+
+    if quotient.is_finite() {
+        if quotient.is_normal() {
+            assert_eq!(quotient.get_prec(), Some(prec));
         }
-
-        let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_ref(&y, prec, Nearest);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
-
-        if quotient.is_finite() {
-            if quotient.is_normal() {
-                assert_eq!(quotient.get_prec(), Some(prec));
-            }
+        if !extreme {
             let r_quotient = Rational::exact_from(&x) / &y;
             assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
             if o == Less {
@@ -15203,38 +15261,47 @@ fn div_rational_prec_properties() {
                 next.decrement();
                 assert!(next < r_quotient);
             }
-        } else {
-            assert_eq!(o, Equal);
         }
+    }
 
-        if x != 0u32 && y != 0u32 {
-            let (mut quotient_alt, mut o_alt) = x.div_rational_prec_ref_val(-&y, prec);
-            quotient_alt.neg_assign();
-            quotient_alt.abs_negative_zero_assign();
-            o_alt = o_alt.reverse();
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+    if x != 0u32 && y != 0u32 {
+        let (mut quotient_alt, mut o_alt) = x.div_rational_prec_ref_val(-&y, prec);
+        quotient_alt.neg_assign();
+        quotient_alt.abs_negative_zero_assign();
+        o_alt = o_alt.reverse();
+        assert_eq!(
+            ComparableFloat(quotient_alt.abs_negative_zero()),
+            ComparableFloat(quotient.abs_negative_zero_ref())
+        );
+        assert_eq!(o_alt, o);
 
-            let (mut quotient_alt, mut o_alt) = (-&x).div_rational_prec_val_ref(&y, prec);
-            quotient_alt.neg_assign();
-            quotient_alt.abs_negative_zero_assign();
-            o_alt = o_alt.reverse();
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
+        let (mut quotient_alt, mut o_alt) = (-&x).div_rational_prec_val_ref(&y, prec);
+        quotient_alt.neg_assign();
+        quotient_alt.abs_negative_zero_assign();
+        o_alt = o_alt.reverse();
+        assert_eq!(
+            ComparableFloat(quotient_alt.abs_negative_zero()),
+            ComparableFloat(quotient.abs_negative_zero_ref())
+        );
+        assert_eq!(o_alt, o);
 
-            let (quotient_alt, o_alt) = (-x).div_rational_prec(-y, prec);
-            assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient)
-            );
-            assert_eq!(o_alt, o);
-        }
+        let (quotient_alt, o_alt) = (-x).div_rational_prec(-y, prec);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient)
+        );
+        assert_eq!(o_alt, o);
+    }
+}
+
+#[test]
+fn div_rational_prec_properties() {
+    float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
+        div_rational_prec_properties_helper(x, y, prec, false);
+    });
+
+    float_rational_unsigned_triple_gen_var_2().test_properties(|(x, y, prec)| {
+        div_rational_prec_properties_helper(x, y, prec, true);
     });
 
     float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
@@ -15315,45 +15382,45 @@ fn div_rational_prec_properties() {
     });
 }
 
-#[test]
-fn div_rational_round_properties() {
-    float_rational_rounding_mode_triple_gen_var_5().test_properties(|(x, y, rm)| {
-        let (quotient, o) = x.clone().div_rational_round(y.clone(), rm);
-        assert!(quotient.is_valid());
-        let (quotient_alt, o_alt) = x.clone().div_rational_round_val_ref(&y, rm);
-        assert!(quotient_alt.is_valid());
-        assert_eq!(o_alt, o);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        let (quotient_alt, o_alt) = x.div_rational_round_ref_val(y.clone(), rm);
-        assert!(quotient_alt.is_valid());
-        assert_eq!(o_alt, o);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        let (quotient_alt, o_alt) = x.div_rational_round_ref_ref(&y, rm);
-        assert!(quotient_alt.is_valid());
-        assert_eq!(o_alt, o);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
+#[allow(clippy::needless_pass_by_value)]
+fn div_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode, extreme: bool) {
+    let (quotient, o) = x.clone().div_rational_round(y.clone(), rm);
+    assert!(quotient.is_valid());
+    let (quotient_alt, o_alt) = x.clone().div_rational_round_val_ref(&y, rm);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(o_alt, o);
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    let (quotient_alt, o_alt) = x.div_rational_round_ref_val(y.clone(), rm);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(o_alt, o);
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    let (quotient_alt, o_alt) = x.div_rational_round_ref_ref(&y, rm);
+    assert!(quotient_alt.is_valid());
+    assert_eq!(o_alt, o);
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.div_rational_round_assign(y.clone(), rm);
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
-        assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.div_rational_round_assign(y.clone(), rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    assert_eq!(o_alt, o);
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.div_rational_round_assign_ref(&y, rm);
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
-        assert_eq!(o_alt, o);
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.div_rational_round_assign_ref(&y, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    assert_eq!(o_alt, o);
 
+    if !extreme {
         let (quotient_alt, o_alt) =
             div_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), rm);
         assert_eq!(
@@ -15361,7 +15428,9 @@ fn div_rational_round_properties() {
             ComparableFloatRef(&quotient)
         );
         assert_eq!(o_alt, o);
+    }
 
+    if x.is_normal() {
         let (quotient_alt, o_alt) =
             div_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), rm);
         assert_eq!(
@@ -15369,23 +15438,25 @@ fn div_rational_round_properties() {
             ComparableFloatRef(&quotient)
         );
         assert_eq!(o_alt, o);
+    }
 
-        let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_ref(&y, x.significant_bits(), rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
+    let (quotient_alt, o_alt) = x.div_rational_prec_round_ref_ref(&y, x.significant_bits(), rm);
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    assert_eq!(o_alt, o);
 
-        if o == Equal && quotient.is_finite() && quotient != 0 {
-            assert_eq!(quotient.mul_rational_round_ref_ref(&y, Exact).0, x);
-            // TODO additional test
+    if o == Equal && quotient.is_finite() && quotient != 0 {
+        assert_eq!(quotient.mul_rational_round_ref_ref(&y, Exact).0, x);
+        // TODO additional test
+    }
+
+    if quotient.is_finite() {
+        if x.is_normal() && quotient.is_normal() {
+            assert_eq!(quotient.get_prec(), Some(x.get_prec().unwrap()));
         }
-
-        let r_quotient = if quotient.is_finite() {
-            if x.is_normal() && quotient.is_normal() {
-                assert_eq!(quotient.get_prec(), Some(x.get_prec().unwrap()));
-            }
+        if !extreme {
             let r_quotient = Rational::exact_from(&x) / &y;
             assert_eq!(quotient.partial_cmp(&r_quotient), Some(o));
             if o == Less {
@@ -15397,51 +15468,34 @@ fn div_rational_round_properties() {
                 next.decrement();
                 assert!(next < r_quotient);
             }
-            Some(r_quotient)
-        } else {
-            assert_eq!(o, Equal);
-            None
-        };
+            match (r_quotient >= 0u32, rm) {
+                (_, Floor) | (true, Down) | (false, Up) => {
+                    assert_ne!(o, Greater);
+                }
+                (_, Ceiling) | (true, Up) | (false, Down) => {
+                    assert_ne!(o, Less);
+                }
+                (_, Exact) => assert_eq!(o, Equal),
+                _ => {}
+            }
+        }
+    }
 
-        match (
-            r_quotient.is_some() && *r_quotient.as_ref().unwrap() >= 0u32,
+    if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_quotient, rug_o) = rug_div_rational_round(
+            &rug::Float::exact_from(&x),
+            &rug::Rational::exact_from(&y),
             rm,
-        ) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
-        }
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_quotient)),
+            ComparableFloatRef(&quotient),
+        );
+        assert_eq!(rug_o, o);
+    }
 
-        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_quotient, rug_o) = rug_div_rational_round(
-                &rug::Float::exact_from(&x),
-                &rug::Rational::exact_from(&y),
-                rm,
-            );
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_quotient)),
-                ComparableFloatRef(&quotient),
-            );
-            assert_eq!(rug_o, o);
-        }
-
-        if y != 0 {
-            let (mut quotient_alt, mut o_alt) = x.div_rational_round_ref_val(-&y, -rm);
-            quotient_alt.neg_assign();
-            o_alt = o_alt.reverse();
-            assert_eq!(o_alt, o);
-            assert_eq!(
-                ComparableFloat(quotient_alt.abs_negative_zero_ref()),
-                ComparableFloat(quotient.abs_negative_zero_ref())
-            );
-        }
-
-        let (mut quotient_alt, mut o_alt) = (-&x).div_rational_round_val_ref(&y, -rm);
+    if y != 0 {
+        let (mut quotient_alt, mut o_alt) = x.div_rational_round_ref_val(-&y, -rm);
         quotient_alt.neg_assign();
         o_alt = o_alt.reverse();
         assert_eq!(o_alt, o);
@@ -15449,28 +15503,48 @@ fn div_rational_round_properties() {
             ComparableFloat(quotient_alt.abs_negative_zero_ref()),
             ComparableFloat(quotient.abs_negative_zero_ref())
         );
+    }
 
-        if x != 0 && y != 0 {
-            let (quotient_alt, o_alt) = (-&x).div_rational_round(-&y, rm);
+    let (mut quotient_alt, mut o_alt) = (-&x).div_rational_round_val_ref(&y, -rm);
+    quotient_alt.neg_assign();
+    o_alt = o_alt.reverse();
+    assert_eq!(o_alt, o);
+    assert_eq!(
+        ComparableFloat(quotient_alt.abs_negative_zero_ref()),
+        ComparableFloat(quotient.abs_negative_zero_ref())
+    );
+
+    if x != 0 && y != 0 {
+        let (quotient_alt, o_alt) = (-&x).div_rational_round(-&y, rm);
+        assert_eq!(
+            ComparableFloatRef(&quotient_alt),
+            ComparableFloatRef(&quotient),
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = x.div_rational_round_ref_ref(&y, rm);
             assert_eq!(
-                ComparableFloatRef(&quotient_alt),
-                ComparableFloatRef(&quotient),
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(quotient.abs_negative_zero_ref())
             );
-            assert_eq!(o_alt, o);
+            assert_eq!(oo, Equal);
         }
+    } else {
+        assert_panic!(x.div_rational_round_ref_ref(&y, Exact));
+    }
+}
 
-        if o == Equal {
-            for rm in exhaustive_rounding_modes() {
-                let (s, oo) = x.div_rational_round_ref_ref(&y, rm);
-                assert_eq!(
-                    ComparableFloat(s.abs_negative_zero_ref()),
-                    ComparableFloat(quotient.abs_negative_zero_ref())
-                );
-                assert_eq!(oo, Equal);
-            }
-        } else {
-            assert_panic!(x.div_rational_round_ref_ref(&y, Exact));
-        }
+#[test]
+fn div_rational_round_properties() {
+    float_rational_rounding_mode_triple_gen_var_5().test_properties(|(x, y, rm)| {
+        div_rational_round_properties_helper(x, y, rm, false);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_10().test_properties(|(x, y, rm)| {
+        div_rational_round_properties_helper(x, y, rm, true);
     });
 
     float_rounding_mode_pair_gen().test_properties(|(x, rm)| {
@@ -15524,80 +15598,83 @@ fn div_rational_round_properties() {
     });
 }
 
-#[test]
-fn div_rational_properties() {
-    float_rational_pair_gen().test_properties(|(x, y)| {
-        let quotient = x.clone() / y.clone();
-        assert!(quotient.is_valid());
-        let quotient_alt = x.clone() / &y;
-        assert!(quotient_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        let quotient_alt = &x / y.clone();
-        assert!(quotient_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        let quotient_alt = &x / &y;
-        assert!(quotient_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
+fn div_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
+    let quotient = x.clone() / y.clone();
+    assert!(quotient.is_valid());
+    let quotient_alt = x.clone() / &y;
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    let quotient_alt = &x / y.clone();
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    let quotient_alt = &x / &y;
+    assert!(quotient_alt.is_valid());
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
 
-        let mut x_alt = x.clone();
-        x_alt /= y.clone();
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    let mut x_alt = x.clone();
+    x_alt /= y.clone();
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
 
-        let mut x_alt = x.clone();
-        x_alt /= &y;
-        assert!(x_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
+    let mut x_alt = x.clone();
+    x_alt /= &y;
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
 
+    if !extreme {
         let quotient_alt =
             div_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
         assert_eq!(
             ComparableFloatRef(&quotient_alt),
             ComparableFloatRef(&quotient)
         );
+    }
 
+    if x.is_normal() {
         let quotient_alt =
             div_rational_prec_round_direct(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
         assert_eq!(
             ComparableFloatRef(&quotient_alt),
             ComparableFloatRef(&quotient)
         );
+    }
 
-        let quotient_alt = x
-            .div_rational_prec_round_ref_ref(&y, x.significant_bits(), Nearest)
-            .0;
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
+    let quotient_alt = x
+        .div_rational_prec_round_ref_ref(&y, x.significant_bits(), Nearest)
+        .0;
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
 
-        let quotient_alt = x.div_rational_prec_ref_ref(&y, x.significant_bits()).0;
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        let (quotient_alt, o) = x.div_rational_round_ref_ref(&y, Nearest);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
+    let quotient_alt = x.div_rational_prec_ref_ref(&y, x.significant_bits()).0;
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
+    let (quotient_alt, o) = x.div_rational_round_ref_ref(&y, Nearest);
+    assert_eq!(
+        ComparableFloatRef(&quotient_alt),
+        ComparableFloatRef(&quotient)
+    );
 
-        if o == Equal && quotient.is_finite() && quotient != 0 {
-            assert_eq!(&quotient * &y, x);
-            // TODO additional test
-        }
+    if o == Equal && quotient.is_finite() && quotient != 0 {
+        assert_eq!(&quotient * &y, x);
+        // TODO additional test
+    }
 
-        if quotient.is_finite() && x.is_normal() && quotient.is_normal() {
-            assert_eq!(quotient.get_prec(), Some(x.get_prec().unwrap()));
+    if quotient.is_finite() && x.is_normal() && quotient.is_normal() {
+        assert_eq!(quotient.get_prec(), Some(x.get_prec().unwrap()));
+        if !extreme {
             let r_quotient = Rational::exact_from(&x) / &y;
             if quotient < r_quotient {
                 let mut next = quotient.clone();
@@ -15609,29 +15686,40 @@ fn div_rational_properties() {
                 assert!(next < r_quotient);
             }
         }
+    }
 
-        let rug_quotient = rug_div_rational(&rug::Float::exact_from(&x), &rug::Rational::from(&y));
+    let rug_quotient = rug_div_rational(&rug::Float::exact_from(&x), &rug::Rational::from(&y));
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_quotient)),
+        ComparableFloatRef(&quotient),
+    );
+
+    if quotient != 0u32 {
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_quotient)),
-            ComparableFloatRef(&quotient),
+            ComparableFloatRef(&-(-&x / &y)),
+            ComparableFloatRef(&quotient)
         );
-
-        if quotient != 0u32 {
+        if y != 0 {
             assert_eq!(
-                ComparableFloatRef(&-(-&x / &y)),
+                ComparableFloatRef(&-(&x / -&y)),
                 ComparableFloatRef(&quotient)
             );
-            if y != 0 {
-                assert_eq!(
-                    ComparableFloatRef(&-(&x / -&y)),
-                    ComparableFloatRef(&quotient)
-                );
-                assert_eq!(
-                    ComparableFloatRef(&(-x / -y)),
-                    ComparableFloatRef(&quotient)
-                );
-            }
+            assert_eq!(
+                ComparableFloatRef(&(-x / -y)),
+                ComparableFloatRef(&quotient)
+            );
         }
+    }
+}
+
+#[test]
+fn div_rational_properties() {
+    float_rational_pair_gen().test_properties(|(x, y)| {
+        div_rational_properties_helper(x, y, false);
+    });
+
+    float_rational_pair_gen_var_2().test_properties(|(x, y)| {
+        div_rational_properties_helper(x, y, true);
     });
 
     float_gen().test_properties(|x| {

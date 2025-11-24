@@ -16,13 +16,9 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::Equal;
 use core::mem::swap;
+use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::slice_test_zero;
-
-#[cfg(feature = "32_bit_limbs")]
-const LOG: usize = 32; // For 32-bit limbs
-
-#[cfg(not(feature = "32_bit_limbs"))]
-const LOG: usize = 64; // For 64-bit limbs
 
 // Remove the largest power of V from U that doesn't exceed the given cap
 //
@@ -38,7 +34,7 @@ pub fn limbs_remove(
 
     assert!(un > 0);
     assert!(vn > 0);
-    assert!(vp[0] % 2 != 0, "V must be odd for 2-adic division");
+    assert!(vp[0].odd(), "V must be odd for 2-adic division");
     assert!(vn > 1 || vp[0] > 1, "V must be > 1 to avoid infinite loop");
 
     // Temporary work buffers
@@ -51,8 +47,8 @@ pub fn limbs_remove(
     let mut qn = un;
 
     // Store the powers of V
-    let mut pwpsn = Vec::with_capacity(LOG);
-    let mut pwpsp_offsets = Vec::with_capacity(LOG);
+    let mut pwpsn = Vec::with_capacity(Limb::WIDTH as usize);
+    let mut pwpsp_offsets = Vec::with_capacity(Limb::WIDTH as usize);
 
     // All generated powers of V are stored here
     let mut powers_storage = Vec::new();
@@ -67,37 +63,25 @@ pub fn limbs_remove(
 
         if current_power_is_vp {
             // Use original vp directly
-            limbs_modular_div_mod_wrap(
-                &mut qp2[..qn - pn + 1],
-                &mut tp[..pn],
-                &qp[..qn],
-                &vp[..pn],
-            );
+            limbs_modular_div_mod_wrap(&mut qp2[..=qn - pn], &mut tp[..pn], &qp[..qn], &vp[..pn]);
             if !slice_test_zero(&tp[..pn]) && limbs_cmp_same_length(&tp[..pn], &vp[..pn]) != Equal {
                 break; // cannot divide
             }
         } else {
             // Access the power from storage without creating a conflicting borrow
             let power_slice = &powers_storage[current_power_offset..current_power_offset + pn];
-            limbs_modular_div_mod_wrap(
-                &mut qp2[..qn - pn + 1],
-                &mut tp[..pn],
-                &qp[..qn],
-                power_slice,
-            );
+            limbs_modular_div_mod_wrap(&mut qp2[..=qn - pn], &mut tp[..pn], &qp[..qn], power_slice);
             if !slice_test_zero(&tp[..pn]) && limbs_cmp_same_length(&tp[..pn], power_slice) != Equal
             {
                 break; // cannot divide
             }
         }
-
         swap(&mut qp, &mut qp2);
-        qn = qn - pn;
-        limbs_neg_in_place(&mut qp[..qn + 1]);
+        qn -= pn;
+        limbs_neg_in_place(&mut qp[..=qn]);
         if qp[qn] != 0 {
             qn += 1;
         }
-
         // record power
         pwpsp_offsets.push(if current_power_is_vp {
             usize::MAX
@@ -115,12 +99,10 @@ pub fn limbs_remove(
         if nn > qn {
             break;
         }
-
         // allocate powers_storage on first use
         if npowers == 1 {
-            powers_storage = vec![0; qn + LOG];
+            powers_storage = vec![0; qn + Limb::WIDTH as usize];
         }
-
         // compute square of current power into powers_storage
         let np_offset = if npowers == 1 {
             0
@@ -129,9 +111,7 @@ pub fn limbs_remove(
         };
         let np_end = np_offset + 2 * pn;
         powers_storage.resize(np_end, 0);
-
         let mut scratch = vec![0; limbs_square_to_out_scratch_len(pn)];
-
         if current_power_is_vp {
             limbs_square_to_out(
                 &mut powers_storage[np_offset..np_end],

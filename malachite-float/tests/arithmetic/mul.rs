@@ -11028,6 +11028,7 @@ fn mul_properties() {
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn mul_rational_prec_round_properties_helper(
     x: Float,
     y: Rational,
@@ -11145,8 +11146,6 @@ fn mul_rational_prec_round_properties_helper(
         assert_eq!(rug_o, o);
     }
 
-    // TODO put this back once Float / Rational is fixed
-    /*
     if o == Equal && product.is_finite() && product != 0 {
         assert_eq!(
             ComparableFloatRef(
@@ -11157,7 +11156,7 @@ fn mul_rational_prec_round_properties_helper(
             ComparableFloatRef(&x)
         );
         // TODO additional test
-    }*/
+    }
 
     if product.is_finite() {
         if product.is_normal() {
@@ -11375,8 +11374,6 @@ fn mul_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme
     );
     assert_eq!(rug_o, o);
 
-    // TODO put this back once Float / Rational is fixed
-    /*
     if o == Equal && product.is_finite() && product != 0 {
         assert_eq!(
             ComparableFloatRef(
@@ -11387,7 +11384,7 @@ fn mul_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme
             ComparableFloatRef(&x)
         );
         // TODO additional test
-    }*/
+    }
 
     let (product_alt, o_alt) = x.mul_rational_prec_round_ref_ref(&y, prec, Nearest);
     assert_eq!(
@@ -11537,6 +11534,7 @@ fn mul_rational_prec_properties() {
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn mul_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode, extreme: bool) {
     let (product, o) = x.clone().mul_rational_round(y.clone(), rm);
     assert!(product.is_valid());
@@ -11600,12 +11598,10 @@ fn mul_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
         ComparableFloatRef(&product)
     );
     assert_eq!(o_alt, o);
-    // TODO put this back once Float / Rational is fixed
-    /*
     if o == Equal && product.is_finite() && product != 0 {
         assert_eq!(product.div_rational_round_ref_ref(&y, Exact).0, x);
         // TODO additional test
-    }*/
+    }
 
     if product.is_finite() {
         if x.is_normal() && product.is_normal() {
@@ -11842,17 +11838,16 @@ fn mul_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
         ComparableFloatRef(&product_alt),
         ComparableFloatRef(&product)
     );
-    let (product_alt, _o) = x.mul_rational_round_ref_ref(&y, Nearest);
+    let (product_alt, o) = x.mul_rational_round_ref_ref(&y, Nearest);
     assert_eq!(
         ComparableFloatRef(&product_alt),
         ComparableFloatRef(&product)
     );
 
-    // TODO put this back once Float / Rational is fixed
-    /*if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0 {
         assert_eq!(&product / &y, x);
         // TODO additional test
-    }*/
+    }
 
     if product.is_finite() && x.is_normal() && product.is_normal() {
         assert_eq!(product.get_prec(), Some(x.get_prec().unwrap()));

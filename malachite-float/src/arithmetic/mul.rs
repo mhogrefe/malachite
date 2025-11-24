@@ -307,7 +307,7 @@ fn mul_rational_prec_round_assign_direct_ref(
             let x_exp = x.get_exponent().unwrap();
             let n_exp = n.floor_log_base_2();
             *x >>= x_exp;
-            let o = x.mul_prec_round_assign(from_natural_zero_exponent_ref(&n), prec, rm);
+            let o = x.mul_prec_round_assign(from_natural_zero_exponent_ref(n), prec, rm);
             x.shl_prec_round_assign_helper(
                 i128::from(x_exp) + i128::from(n_exp) - i128::from(log_d) + 1,
                 prec,
@@ -319,7 +319,7 @@ fn mul_rational_prec_round_assign_direct_ref(
             let x_exp = x.get_exponent().unwrap();
             let d_exp = d.floor_log_base_2();
             *x >>= x_exp;
-            let o = x.div_prec_round_assign(from_natural_zero_exponent_ref(&d), prec, rm);
+            let o = x.div_prec_round_assign(from_natural_zero_exponent_ref(d), prec, rm);
             x.shl_prec_round_assign_helper(
                 i128::from(x_exp) + i128::from(log_n) - i128::from(d_exp) - 1,
                 prec,
@@ -331,8 +331,8 @@ fn mul_rational_prec_round_assign_direct_ref(
             let x_exp = x.get_exponent().unwrap();
             let n_exp = n.floor_log_base_2();
             let d_exp = d.floor_log_base_2();
-            let n = from_natural_zero_exponent_ref(&n);
-            let d = from_natural_zero_exponent_ref(&d);
+            let n = from_natural_zero_exponent_ref(n);
+            let d = from_natural_zero_exponent_ref(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
             *x >>= x_exp;
             x.mul_prec_round_assign(n, mul_prec, Floor);
@@ -481,7 +481,7 @@ pub_test! {mul_rational_prec_round_direct_ref_ref(
             let x_exp = x.get_exponent().unwrap();
             let n_exp = n.floor_log_base_2();
             let mut x = x >> x_exp;
-            let o = x.mul_prec_round_assign(from_natural_zero_exponent_ref(&n), prec, rm);
+            let o = x.mul_prec_round_assign(from_natural_zero_exponent_ref(n), prec, rm);
             let o = x.shl_prec_round_assign_helper(
                 i128::from(x_exp) + i128::from(n_exp) - i128::from(log_d) + 1,
                 prec,
@@ -494,7 +494,7 @@ pub_test! {mul_rational_prec_round_direct_ref_ref(
             let x_exp = x.get_exponent().unwrap();
             let d_exp = d.floor_log_base_2();
             let mut x = x >> x_exp;
-            let o = x.div_prec_round_assign(from_natural_zero_exponent_ref(&d), prec, rm);
+            let o = x.div_prec_round_assign(from_natural_zero_exponent_ref(d), prec, rm);
             let o = x.shl_prec_round_assign_helper(
                 i128::from(x_exp) + i128::from(log_n) - i128::from(d_exp) - 1,
                 prec,
@@ -507,8 +507,8 @@ pub_test! {mul_rational_prec_round_direct_ref_ref(
             let x_exp = x.get_exponent().unwrap();
             let n_exp = n.floor_log_base_2();
             let d_exp = d.floor_log_base_2();
-            let n = from_natural_zero_exponent_ref(&n);
-            let d = from_natural_zero_exponent_ref(&d);
+            let n = from_natural_zero_exponent_ref(n);
+            let d = from_natural_zero_exponent_ref(d);
             let mul_prec = x.get_min_prec().unwrap_or(1) + n.significant_bits();
             let mut x = x >> x_exp;
             x.mul_prec_round_assign(n, mul_prec, Floor);
