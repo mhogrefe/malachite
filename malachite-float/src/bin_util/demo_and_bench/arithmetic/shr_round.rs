@@ -78,10 +78,6 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_shr_round_assign_unsigned_debug);
     register_signed_demos!(runner, demo_float_shr_round_assign_signed);
     register_signed_demos!(runner, demo_float_shr_round_assign_signed_debug);
-    register_unsigned_demos!(runner, demo_float_shr_round_assign_unsigned);
-    register_unsigned_demos!(runner, demo_float_shr_round_assign_unsigned_debug);
-    register_signed_demos!(runner, demo_float_shr_round_assign_signed);
-    register_signed_demos!(runner, demo_float_shr_round_assign_signed_debug);
     register_unsigned_demos!(runner, demo_float_shr_round_unsigned);
     register_unsigned_demos!(runner, demo_float_shr_round_unsigned_debug);
     register_unsigned_demos!(runner, demo_float_shr_round_unsigned_extreme);

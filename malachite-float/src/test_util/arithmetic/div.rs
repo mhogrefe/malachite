@@ -65,9 +65,9 @@ pub fn rug_div_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x / y, rm);
-    (sum, o)
+    let mut quotient = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = quotient.assign_round(x / y, rm);
+    (quotient, o)
 }
 
 #[inline]
@@ -101,9 +101,9 @@ pub fn rug_div_rational_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x / y, rm);
-    (sum, o)
+    let mut quotient = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = quotient.assign_round(x / y, rm);
+    (quotient, o)
 }
 
 pub fn rug_div_rational_round(
@@ -132,9 +132,9 @@ pub fn rug_rational_div_float_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x / y, rm);
-    (sum, o)
+    let mut quotient = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = quotient.assign_round(x / y, rm);
+    (quotient, o)
 }
 
 pub fn rug_rational_div_float_round(

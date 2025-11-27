@@ -54,12 +54,13 @@ use malachite_float::test_util::generators::{
     float_rational_rounding_mode_triple_gen_var_3_rm,
     float_rational_rounding_mode_triple_gen_var_5, float_rational_rounding_mode_triple_gen_var_6,
     float_rational_rounding_mode_triple_gen_var_6_rm,
-    float_rational_rounding_mode_triple_gen_var_10,
+    float_rational_rounding_mode_triple_gen_var_10, float_rational_rounding_mode_triple_gen_var_11,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_4,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_4_rm,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_5,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_5_rm,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_9,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_10,
     float_rational_unsigned_triple_gen_var_1, float_rational_unsigned_triple_gen_var_1_rm,
     float_rational_unsigned_triple_gen_var_2,
 };
@@ -162,6 +163,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_div_rational_prec_assign_ref_debug);
     register_demo!(runner, demo_rational_div_float_prec);
     register_demo!(runner, demo_rational_div_float_prec_debug);
+    register_demo!(runner, demo_rational_div_float_prec_extreme);
+    register_demo!(runner, demo_rational_div_float_prec_extreme_debug);
     register_demo!(runner, demo_rational_div_float_prec_val_ref);
     register_demo!(runner, demo_rational_div_float_prec_val_ref_debug);
     register_demo!(runner, demo_rational_div_float_prec_ref_val);
@@ -184,6 +187,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_div_rational_round_assign_ref_debug);
     register_demo!(runner, demo_rational_div_float_round);
     register_demo!(runner, demo_rational_div_float_round_debug);
+    register_demo!(runner, demo_rational_div_float_round_extreme);
+    register_demo!(runner, demo_rational_div_float_round_extreme_debug);
     register_demo!(runner, demo_rational_div_float_round_val_ref);
     register_demo!(runner, demo_rational_div_float_round_val_ref_debug);
     register_demo!(runner, demo_rational_div_float_round_ref_val);
@@ -206,6 +211,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_div_rational_prec_round_assign_ref_debug);
     register_demo!(runner, demo_rational_div_float_prec_round);
     register_demo!(runner, demo_rational_div_float_prec_round_debug);
+    register_demo!(runner, demo_rational_div_float_prec_round_extreme);
+    register_demo!(runner, demo_rational_div_float_prec_round_extreme_debug);
     register_demo!(runner, demo_rational_div_float_prec_round_val_ref);
     register_demo!(runner, demo_rational_div_float_prec_round_val_ref_debug);
     register_demo!(runner, demo_rational_div_float_prec_round_ref_val);
@@ -1680,6 +1687,42 @@ fn demo_rational_div_float_prec_debug(gm: GenMode, config: &GenConfig, limit: us
     }
 }
 
+fn demo_rational_div_float_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "rational_div_float_prec({}, {}, {}) = {:?}",
+            y_old,
+            x_old,
+            prec,
+            Float::rational_div_float_prec(y, x, prec)
+        );
+    }
+}
+
+fn demo_rational_div_float_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (sum, o) = Float::rational_div_float_prec(y, x, prec);
+        println!(
+            "rational_div_float_prec({}, {:#x}, {}) = ({:#x}, {:?})",
+            y_old,
+            ComparableFloat(x_old),
+            prec,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
 fn demo_rational_div_float_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (y, x, prec) in float_rational_unsigned_triple_gen_var_1()
         .get(gm, config)
@@ -2042,6 +2085,42 @@ fn demo_rational_div_float_round_debug(gm: GenMode, config: &GenConfig, limit: u
             "rational_div_float_round({}, {:#x}, {}) = ({:#x}, {:?})",
             x_old,
             ComparableFloat(y_old),
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_rational_div_float_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_rational_rounding_mode_triple_gen_var_11()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "rational_div_float_round({}, {}, {}) = {:?}",
+            y_old,
+            x_old,
+            rm,
+            Float::rational_div_float_round(y, x, rm)
+        );
+    }
+}
+
+fn demo_rational_div_float_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_rational_rounding_mode_triple_gen_var_11()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (sum, o) = Float::rational_div_float_round(y, x, rm);
+        println!(
+            "rational_div_float_round({}, {:#x}, {}) = ({:#x}, {:?})",
+            y_old,
+            ComparableFloat(x_old),
             rm,
             ComparableFloat(sum),
             o
@@ -2433,6 +2512,44 @@ fn demo_rational_div_float_prec_round_debug(gm: GenMode, config: &GenConfig, lim
             "rational_div_float_rational_prec_round({}, {:#x}, {}, {}) = ({:#x}, {:?})",
             x_old,
             ComparableFloat(y_old),
+            prec,
+            rm,
+            ComparableFloat(sum),
+            o
+        );
+    }
+}
+
+fn demo_rational_div_float_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "rational_div_float_prec_round({}, {}, {}, {}) = {:?}",
+            y_old,
+            x_old,
+            prec,
+            rm,
+            Float::rational_div_float_prec_round(y, x, prec, rm)
+        );
+    }
+}
+
+fn demo_rational_div_float_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (sum, o) = Float::rational_div_float_prec_round(y, x, prec, rm);
+        println!(
+            "rational_div_float_prec_round({}, ({:#x}), {}, {}) = ({:#x}, {:?})",
+            y_old,
+            ComparableFloat(x_old),
             prec,
             rm,
             ComparableFloat(sum),
