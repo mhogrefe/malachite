@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::CheckedSquare;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::factorization::traits::{ExpressAsPower, Factor, IsPower};
+use malachite_base::num::factorization::traits::{ExpressAsPower, Factor};
 use malachite_base::num::random::random_unsigned_bit_chunks;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::generators::{
@@ -130,7 +130,7 @@ fn test_signed() {
     assert_eq!((-3486784401i64).express_as_power().unwrap(), (-81, 5));
 }
 
-fn express_as_power_properties_helper_unsigned<T: PrimitiveUnsigned + ExpressAsPower>() {
+fn express_as_power_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen::<T>().test_properties(|x| {
         if let Some((p, e)) = x.express_as_power() {
             assert!(e > 1);
@@ -156,7 +156,7 @@ fn express_as_power_properties_helper_unsigned<T: PrimitiveUnsigned + ExpressAsP
     });
 }
 
-fn express_as_power_properties_helper_signed<T: PrimitiveSigned + ExpressAsPower>() {
+fn express_as_power_properties_helper_signed<T: PrimitiveSigned>() {
     signed_gen::<T>().test_properties(|x| {
         if let Some((p, e)) = x.express_as_power() {
             assert!(e > 1);
@@ -184,19 +184,11 @@ fn express_as_power_properties_helper_signed<T: PrimitiveSigned + ExpressAsPower
 
 #[test]
 fn express_as_power_properties() {
-    express_as_power_properties_helper_unsigned::<u8>();
-    express_as_power_properties_helper_unsigned::<u16>();
-    express_as_power_properties_helper_unsigned::<u32>();
-    express_as_power_properties_helper_unsigned::<u64>();
-    express_as_power_properties_helper_unsigned::<usize>();
-    express_as_power_properties_helper_signed::<i8>();
-    express_as_power_properties_helper_signed::<i16>();
-    express_as_power_properties_helper_signed::<i32>();
-    express_as_power_properties_helper_signed::<i64>();
-    express_as_power_properties_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(express_as_power_properties_helper_unsigned);
+    apply_fn_to_signeds!(express_as_power_properties_helper_signed);
 }
 
-fn is_power_properties_helper_unsigned<T: PrimitiveUnsigned + ExpressAsPower + IsPower>() {
+fn is_power_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.is_power(), x.express_as_power().is_some());
     });
@@ -208,7 +200,7 @@ fn is_power_properties_helper_unsigned<T: PrimitiveUnsigned + ExpressAsPower + I
     });
 }
 
-fn is_power_properties_helper_signed<T: PrimitiveSigned + ExpressAsPower + IsPower>() {
+fn is_power_properties_helper_signed<T: PrimitiveSigned>() {
     signed_gen::<T>().test_properties(|x| {
         assert_eq!(x.is_power(), x.express_as_power().is_some());
     });
@@ -222,14 +214,6 @@ fn is_power_properties_helper_signed<T: PrimitiveSigned + ExpressAsPower + IsPow
 
 #[test]
 fn is_power_properties() {
-    is_power_properties_helper_unsigned::<u8>();
-    is_power_properties_helper_unsigned::<u16>();
-    is_power_properties_helper_unsigned::<u32>();
-    is_power_properties_helper_unsigned::<u64>();
-    is_power_properties_helper_unsigned::<usize>();
-    is_power_properties_helper_signed::<i8>();
-    is_power_properties_helper_signed::<i16>();
-    is_power_properties_helper_signed::<i32>();
-    is_power_properties_helper_signed::<i64>();
-    is_power_properties_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(is_power_properties_helper_unsigned);
+    apply_fn_to_signeds!(is_power_properties_helper_signed);
 }

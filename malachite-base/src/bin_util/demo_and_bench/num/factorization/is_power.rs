@@ -8,7 +8,6 @@
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower};
 use malachite_base::test_util::bench::bucketers::{signed_bit_bucketer, unsigned_bit_bucketer};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -16,66 +15,18 @@ use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_generic_demos!(
-        runner,
-        demo_express_as_power_unsigned,
-        u8,
-        u16,
-        u32,
-        u64,
-        usize
-    );
-    register_generic_demos!(
-        runner,
-        demo_express_as_power_signed,
-        i8,
-        i16,
-        i32,
-        i64,
-        isize
-    );
-    register_generic_demos!(runner, demo_is_power_unsigned, u8, u16, u32, u64, usize);
-    register_generic_demos!(runner, demo_is_power_signed, i8, i16, i32, i64, isize);
+    register_unsigned_demos!(runner, demo_express_as_power_unsigned);
+    register_signed_demos!(runner, demo_express_as_power_signed);
+    register_unsigned_demos!(runner, demo_is_power_unsigned);
+    register_signed_demos!(runner, demo_is_power_signed);
 
-    register_generic_benches!(
-        runner,
-        benchmark_express_as_power_unsigned,
-        u8,
-        u16,
-        u32,
-        u64,
-        usize
-    );
-    register_generic_benches!(
-        runner,
-        benchmark_express_as_power_signed,
-        i8,
-        i16,
-        i32,
-        i64,
-        isize
-    );
-    register_generic_benches!(
-        runner,
-        benchmark_is_power_unsigned_algorithms,
-        u8,
-        u16,
-        u32,
-        u64,
-        usize
-    );
-    register_generic_benches!(
-        runner,
-        benchmark_is_power_signed_algorithms,
-        i8,
-        i16,
-        i32,
-        i64,
-        isize
-    );
+    register_unsigned_benches!(runner, benchmark_express_as_power_unsigned);
+    register_signed_benches!(runner, benchmark_express_as_power_signed);
+    register_unsigned_benches!(runner, benchmark_is_power_unsigned_algorithms);
+    register_signed_benches!(runner, benchmark_is_power_signed_algorithms);
 }
 
-fn demo_express_as_power_unsigned<T: PrimitiveUnsigned + ExpressAsPower>(
+fn demo_express_as_power_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -85,21 +36,13 @@ fn demo_express_as_power_unsigned<T: PrimitiveUnsigned + ExpressAsPower>(
     }
 }
 
-fn demo_express_as_power_signed<T: PrimitiveSigned + ExpressAsPower>(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-) {
+fn demo_express_as_power_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("({}).express_as_power() = {:?}", i, i.express_as_power());
     }
 }
 
-fn demo_is_power_unsigned<T: PrimitiveUnsigned + IsPower>(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-) {
+fn demo_is_power_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         if u.is_power() {
             println!("{u} is a perfect power");
@@ -109,11 +52,7 @@ fn demo_is_power_unsigned<T: PrimitiveUnsigned + IsPower>(
     }
 }
 
-fn demo_is_power_signed<T: PrimitiveSigned + IsPower>(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-) {
+fn demo_is_power_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for i in signed_gen::<T>().get(gm, config).take(limit) {
         if i.is_power() {
             println!("{i} is a perfect power");
@@ -123,7 +62,7 @@ fn demo_is_power_signed<T: PrimitiveSigned + IsPower>(
     }
 }
 
-fn benchmark_express_as_power_unsigned<T: PrimitiveUnsigned + ExpressAsPower>(
+fn benchmark_express_as_power_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -141,7 +80,7 @@ fn benchmark_express_as_power_unsigned<T: PrimitiveUnsigned + ExpressAsPower>(
     );
 }
 
-fn benchmark_express_as_power_signed<T: PrimitiveSigned + ExpressAsPower>(
+fn benchmark_express_as_power_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -160,7 +99,7 @@ fn benchmark_express_as_power_signed<T: PrimitiveSigned + ExpressAsPower>(
 }
 
 #[allow(unused_must_use)]
-fn benchmark_is_power_unsigned_algorithms<T: PrimitiveUnsigned + ExpressAsPower + IsPower>(
+fn benchmark_is_power_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -184,7 +123,7 @@ fn benchmark_is_power_unsigned_algorithms<T: PrimitiveUnsigned + ExpressAsPower 
 }
 
 #[allow(unused_must_use)]
-fn benchmark_is_power_signed_algorithms<T: PrimitiveSigned + ExpressAsPower + IsPower>(
+fn benchmark_is_power_signed_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

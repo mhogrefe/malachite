@@ -13,33 +13,37 @@ use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen_var_3};
 use std::str::FromStr;
 
 #[test]
-fn test_is_square_small() {
+fn test_is_square() {
+    let test = |n, out| {
+        assert_eq!(Natural::from_str(n).unwrap().is_square(), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().is_perfect_square(), out);
+    };
     // Test small perfect squares
-    assert!(Natural::from(0u32).is_square());
-    assert!(Natural::from(1u32).is_square());
-    assert!(Natural::from(4u32).is_square());
-    assert!(Natural::from(9u32).is_square());
-    assert!(Natural::from(16u32).is_square());
-    assert!(Natural::from(25u32).is_square());
-    assert!(Natural::from(36u32).is_square());
-    assert!(Natural::from(49u32).is_square());
-    assert!(Natural::from(64u32).is_square());
-    assert!(Natural::from(81u32).is_square());
-    assert!(Natural::from(100u32).is_square());
+    test("0", true);
+    test("1", true);
+    test("4", true);
+    test("9", true);
+    test("16", true);
+    test("25", true);
+    test("36", true);
+    test("49", true);
+    test("64", true);
+    test("81", true);
+    test("100", true);
 
     // Test small non-squares
-    assert!(!Natural::from(2u32).is_square());
-    assert!(!Natural::from(3u32).is_square());
-    assert!(!Natural::from(5u32).is_square());
-    assert!(!Natural::from(6u32).is_square());
-    assert!(!Natural::from(7u32).is_square());
-    assert!(!Natural::from(8u32).is_square());
-    assert!(!Natural::from(10u32).is_square());
-    assert!(!Natural::from(11u32).is_square());
-    assert!(!Natural::from(12u32).is_square());
-    assert!(!Natural::from(13u32).is_square());
-    assert!(!Natural::from(14u32).is_square());
-    assert!(!Natural::from(15u32).is_square());
+    test("2", false);
+    test("3", false);
+    test("5", false);
+    test("6", false);
+    test("7", false);
+    test("8", false);
+    test("10", false);
+    test("11", false);
+    test("12", false);
+    test("13", false);
+    test("14", false);
+    test("15", false);
 }
 
 #[test]
@@ -65,8 +69,10 @@ fn test_is_square_edge_cases() {
 #[test]
 fn is_square_properties() {
     natural_gen().test_properties(|x| {
-        assert_eq!(x.is_square(), (&x).checked_sqrt().is_some());
-        assert!(x.square().is_square());
+        let is_square = x.is_square();
+        assert_eq!(is_square, (&x).checked_sqrt().is_some());
+        assert!((&x).square().is_square());
+        assert_eq!(rug::Integer::from(&x).is_perfect_square(), is_square);
     });
 
     natural_pair_gen_var_3().test_properties(|(a, b)| {

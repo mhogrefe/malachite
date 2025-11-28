@@ -10,12 +10,12 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{
-    CheckedRoot, DivExactAssign, DivisibleBy, GcdAssign,
-};
+use malachite_base::num::arithmetic::traits::{CheckedRoot, DivAssignMod, DivMod, GcdAssign};
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower, IsPrime};
-use malachite_base::num::logic::traits::{BitScan, SignificantBits};
+use malachite_base::num::factorization::traits::{
+    ExpressAsPower, Factor, IsPower, IsPrime, Primes,
+};
+use malachite_base::num::logic::traits::SignificantBits;
 
 const PRIMES: [u32; 168] = [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
@@ -29,90 +29,71 @@ const PRIMES: [u32; 168] = [
     937, 941, 947, 953, 967, 971, 977, 983, 991, 997,
 ];
 
-const SMALLEST_OMITTED_PRIME: u32 = 1009;
-
 // Find ONE perfect power representation for a Natural (not necessarily the smallest base).
 //
 // This function does NOT recurse - it just checks if n can be expressed as some base^exp.
 fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
     // Find largest power of 2 dividing n
-    let mut pow_2 = n.index_of_next_true_bit(0)?;
+    let mut pow_2 = n.trailing_zeros().unwrap();
     // Two divides exactly once - not a perfect power
     if pow_2 == 1 {
         return None;
     }
-
-    // Divide out 2^pow_2 to get the odd part
-    let mut q = if pow_2 > 0 { n >> pow_2 } else { n.clone() };
-
     // If pow_2 is prime, just check if n is a perfect pow_2-th power
     if pow_2.is_prime() {
         return n.checked_root(pow_2).map(|root| (root, pow_2));
     }
-
+    // Divide out 2^pow_2 to get the odd part
+    let mut q = n >> pow_2;
     // Factor out powers of small primes
     for &prime in PRIMES.iter().skip(1) {
-        let prime_nat = Natural::from(prime);
-        if (&q).divisible_by(&prime_nat) {
-            let prime_squared = &prime_nat * &prime_nat;
-            if !(&q).divisible_by(&prime_squared) {
+        let prime = Natural::from(prime);
+        let (new_q, r) = (&q).div_mod(&prime);
+        if r == 0u32 {
+            q = new_q;
+            if q.div_assign_mod(&prime) != 0u32 {
                 return None; // prime divides exactly once, reject
             }
-            q.div_exact_assign(&prime_squared);
             let mut pow_p = 2u64;
-            while (&q).divisible_by(&prime_nat) {
-                q.div_exact_assign(&prime_nat);
-                pow_p += 1;
+            loop {
+                let (new_q, r) = (&q).div_mod(&prime);
+                if r == 0 {
+                    q = new_q;
+                    pow_p += 1;
+                } else {
+                    break;
+                }
             }
             pow_2.gcd_assign(pow_p);
             if pow_2 == 1 {
                 return None; // we have multiplicity 1 of some factor
             }
-            if q == Natural::ONE {
-                return n.checked_root(pow_2).map(|root| (root, pow_2));
-            }
             // As soon as pow_2 becomes prime, stop factoring
-            if pow_2.is_prime() {
+            if q == 1u32 || pow_2.is_prime() {
                 return n.checked_root(pow_2).map(|root| (root, pow_2));
             }
         }
     }
-
     // After factoring, check remaining cases
     if pow_2 == 0 {
         // No factors found above; exhaustively check all prime exponents
         let bits = n.significant_bits();
-        for nth in 2u64.. {
-            if !nth.is_prime() {
-                continue;
-            }
-            // Terminate if exponent exceeds bit length (n^(1/nth) < 2 for nth > bits)
+        for nth in u64::primes() {
+            // Terminate if exponent exceeds bit length (n ^ (1 / nth) < 2 for nth > bits)
             if nth > bits {
                 return None;
             }
             if let Some(root) = n.checked_root(nth) {
                 return Some((root, nth));
             }
-            // Early termination optimization
-            if q <= SMALLEST_OMITTED_PRIME {
-                return None;
-            }
         }
     } else {
         // Found some factors; only check prime divisors of pow_2
-        for nth in 2u64..=pow_2 {
-            if !nth.is_prime() || pow_2 % nth != 0 {
-                continue;
-            }
+        for (nth, _) in pow_2.factor() {
             if let Some(root) = n.checked_root(nth) {
                 return Some((root, nth));
             }
-            // Early termination optimization
-            if q <= SMALLEST_OMITTED_PRIME {
-                return None;
-            }
         }
-        return None;
     }
     None
 }
@@ -125,91 +106,66 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
 // Left here in case we can find a way to optimize out root computations later.
 fn get_perfect_power_natural_bool(n: &Natural) -> bool {
     // Find largest power of 2 dividing n
-    let mut pow_2 = match n.index_of_next_true_bit(0) {
-        Some(p) => p,
-        None => return false, // Zero - caller should handle
-    };
-
+    let mut pow_2 = n.trailing_zeros().unwrap();
     // Two divides exactly once - not a perfect power
     if pow_2 == 1 {
         return false;
     }
-
-    // Divide out 2^pow_2 to get the odd part
-    let mut q = if pow_2 > 0 { n >> pow_2 } else { n.clone() };
-
     // If pow_2 is prime, check if n is a perfect pow_2-th power
     if pow_2.is_prime() {
         return n.checked_root(pow_2).is_some();
     }
-
+    // Divide out 2^pow_2 to get the odd part
+    let mut q = n >> pow_2;
     // Factor out powers of small primes
     for &prime in PRIMES.iter().skip(1) {
-        let prime_nat = Natural::from(prime);
-        if (&q).divisible_by(&prime_nat) {
-            let prime_squared = &prime_nat * &prime_nat;
-            if !(&q).divisible_by(&prime_squared) {
+        let prime = Natural::from(prime);
+        let (new_q, r) = (&q).div_mod(&prime);
+        if r == 0 {
+            q = new_q;
+            if q.div_assign_mod(&prime) != 0u32 {
                 return false; // prime divides exactly once, reject
             }
-            q.div_exact_assign(&prime_squared);
-
             let mut pow_p = 2u64;
-            while (&q).divisible_by(&prime_nat) {
-                q.div_exact_assign(&prime_nat);
-                pow_p += 1;
+            loop {
+                let (new_q, r) = (&q).div_mod(&prime);
+                if r == 0 {
+                    q = new_q;
+                    pow_p += 1;
+                } else {
+                    break;
+                }
             }
-
             pow_2.gcd_assign(pow_p);
             if pow_2 == 1 {
                 return false; // we have multiplicity 1 of some factor
             }
-
-            if q == Natural::ONE {
-                return n.checked_root(pow_2).is_some();
-            }
-
             // As soon as pow_2 becomes prime, stop factoring
-            if pow_2.is_prime() {
+            if q == Natural::ONE || pow_2.is_prime() {
                 return n.checked_root(pow_2).is_some();
             }
         }
     }
-
     // After factoring, check remaining cases
     if pow_2 == 0 {
         // No factors found above; exhaustively check all prime exponents
         let bits = n.significant_bits();
-        for nth in 2u64.. {
-            if !nth.is_prime() {
-                continue;
-            }
-            // Terminate if exponent exceeds bit length (n^(1/nth) < 2 for nth > bits)
+        for nth in u64::primes() {
+            // Terminate if exponent exceeds bit length (n ^ (1 / nth) < 2 for nth > bits)
             if nth > bits {
                 return false;
             }
             if n.checked_root(nth).is_some() {
                 return true;
             }
-            // Early termination optimization
-            if q <= SMALLEST_OMITTED_PRIME {
-                return false;
-            }
         }
     } else {
         // Found some factors; only check prime divisors of pow_2
-        for nth in 2u64..=pow_2 {
-            if !nth.is_prime() || pow_2 % nth != 0 {
-                continue;
-            }
+        for (nth, _) in pow_2.factor() {
             if n.checked_root(nth).is_some() {
                 return true;
             }
-            // Early termination optimization
-            if q <= SMALLEST_OMITTED_PRIME {
-                return false;
-            }
         }
-        return false;
     }
     false
 }
@@ -220,7 +176,6 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
 fn express_as_power_natural(n: &Natural) -> Option<(Natural, u64)> {
     // Get initial representation
     let (mut base, mut exp) = get_perfect_power_natural(n)?;
-
     // Continue until we have the smallest possible base
     while base > 3u32 {
         match get_perfect_power_natural(&base) {
@@ -231,13 +186,13 @@ fn express_as_power_natural(n: &Natural) -> Option<(Natural, u64)> {
             None => break,
         }
     }
-
     Some((base, exp))
 }
 
 // Is Natural a perfect power?
 //
 // Note: This function is only called for multi-limb numbers
+#[inline]
 fn is_power_natural(n: &Natural) -> bool {
     get_perfect_power_natural_bool(n)
 }
@@ -245,8 +200,8 @@ fn is_power_natural(n: &Natural) -> bool {
 impl ExpressAsPower for Natural {
     /// Expresses a [`Natural`] as a perfect power if possible.
     ///
-    /// Returns `Some((root, exponent))` where `root^exponent = self` and `exponent > 1`, or `None`
-    /// if the number cannot be expressed as a perfect power.
+    /// Returns `Some((root, exponent))` where `root ^ exponent = self` and `exponent > 1`, or
+    /// `None` if the number cannot be expressed as a perfect power.
     ///
     /// # Examples
     /// ```

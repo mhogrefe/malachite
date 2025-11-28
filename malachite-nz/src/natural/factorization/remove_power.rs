@@ -23,6 +23,7 @@ use malachite_base::slices::slice_test_zero;
 // Remove the largest power of V from U that doesn't exceed the given cap
 //
 // This is `mpn_remove` from GMP 6.3.0.
+#[doc(hidden)]
 pub fn limbs_remove(
     wp: &mut Vec<Limb>, // Output: U / V^k
     up: &[Limb],        // Input number U

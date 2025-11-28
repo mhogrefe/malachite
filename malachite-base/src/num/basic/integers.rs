@@ -39,8 +39,7 @@ use crate::num::conversion::traits::{
     OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
     ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
-#[cfg(feature = "random")]
-use crate::num::factorization::traits::IsSquare;
+use crate::num::factorization::traits::{ExpressAsPower, IsPower, IsSquare};
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -191,6 +190,7 @@ pub trait PrimitiveInt:
     + ExactInto<u64>
     + ExactInto<u8>
     + ExactInto<usize>
+    + ExpressAsPower
     + ExtendedGcd<Self>
     + FloorRoot<u64, Output = Self>
     + FloorRootAssign<u64>
@@ -203,6 +203,7 @@ pub trait PrimitiveInt:
     + HasRandomPrimitiveInts
     + Hash
     + IsInteger
+    + IsPower
     + IsSquare
     + JacobiSymbol<Self>
     + KroneckerSymbol<Self>
@@ -669,6 +670,7 @@ pub trait PrimitiveInt:
     + ExactInto<u64>
     + ExactInto<u8>
     + ExactInto<usize>
+    + ExpressAsPower
     + ExtendedGcd<Self>
     + FloorRoot<u64, Output = Self>
     + FloorRootAssign<u64>
@@ -680,6 +682,8 @@ pub trait PrimitiveInt:
     + FromStringBase
     + Hash
     + IsInteger
+    + IsPower
+    + IsSquare
     + JacobiSymbol<Self>
     + KroneckerSymbol<Self>
     + LeadingZeros

@@ -6,8 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::CheckedSqrt;
-use malachite_base::num::factorization::traits::IsSquare;
+use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -17,29 +16,37 @@ use malachite_nz::test_util::bench::bucketers::{
 use malachite_nz::test_util::generators::{natural_gen, natural_gen_rm};
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_natural_is_square);
-    register_bench!(runner, benchmark_natural_is_square_library_comparison);
-    register_bench!(runner, benchmark_natural_is_square_algorithms);
+    register_demo!(runner, demo_natural_is_power);
+    register_demo!(runner, demo_natural_express_as_power);
+
+    register_bench!(runner, benchmark_natural_is_power_library_comparison);
+    register_bench!(runner, benchmark_natural_express_as_power);
 }
 
-fn demo_natural_is_square(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_natural_is_power(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in natural_gen().get(gm, config).take(limit) {
-        if n.is_square() {
-            println!("{n} is a perfect square");
+        if n.is_power() {
+            println!("{n} is a perfect power");
         } else {
-            println!("{n} is not a perfect square");
+            println!("{n} is not a perfect power");
         }
     }
 }
 
-fn benchmark_natural_is_square_library_comparison(
+fn demo_natural_express_as_power(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{}.express_as_power() = {:?}", n, n.express_as_power());
+    }
+}
+
+fn benchmark_natural_is_power_library_comparison(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Natural.is_square()",
+        "Natural.is_power()",
         BenchmarkType::LibraryComparison,
         natural_gen_rm().get(gm, config),
         gm.name(),
@@ -47,32 +54,26 @@ fn benchmark_natural_is_square_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(n.is_square())),
-            ("rug", &mut |(n, _)| no_out!(n.is_perfect_square())),
+            ("Malachite", &mut |(_, n)| no_out!(n.is_power())),
+            ("rug", &mut |(n, _)| no_out!(n.is_perfect_power())),
         ],
     );
 }
 
-#[allow(unused_must_use)]
-fn benchmark_natural_is_square_algorithms(
+fn benchmark_natural_express_as_power(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Natural.is_square()",
-        BenchmarkType::Algorithms,
+        "Natural.express_as_power()",
+        BenchmarkType::Single,
         natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &natural_bit_bucketer("n"),
-        &mut [
-            ("default", &mut |n| no_out!(n.is_square())),
-            ("using checked_sqrt", &mut |n| {
-                no_out!(n.checked_sqrt().is_some());
-            }),
-        ],
+        &mut [("Malachite", &mut |n| no_out!(n.express_as_power()))],
     );
 }
