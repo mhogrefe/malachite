@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -26,8 +27,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_le_abs_rational);
     register_demo!(runner, demo_integer_ge_abs_rational);
 
-    register_bench!(runner, benchmark_rational_partial_cmp_abs_integer);
-    register_bench!(runner, benchmark_integer_partial_cmp_abs_rational);
+    register_bench!(
+        runner,
+        benchmark_rational_partial_cmp_abs_integer_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_integer_partial_cmp_abs_rational_algorithms
+    );
     register_bench!(runner, benchmark_rational_lt_abs_integer);
     register_bench!(runner, benchmark_rational_gt_abs_integer);
     register_bench!(runner, benchmark_rational_le_abs_integer);
@@ -138,7 +145,8 @@ fn demo_integer_ge_abs_rational(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
-fn benchmark_rational_partial_cmp_abs_integer(
+#[allow(unused_must_use)]
+fn benchmark_rational_partial_cmp_abs_integer_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -146,17 +154,23 @@ fn benchmark_rational_partial_cmp_abs_integer(
 ) {
     run_benchmark(
         "Rational.partial_cmp_abs(&Integer)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &rational_integer_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
     );
 }
 
-fn benchmark_integer_partial_cmp_abs_rational(
+#[allow(unused_must_use)]
+fn benchmark_integer_partial_cmp_abs_rational_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -164,13 +178,18 @@ fn benchmark_integer_partial_cmp_abs_rational(
 ) {
     run_benchmark(
         "Integer.partial_cmp_abs(&Rational)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &rational_integer_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(y.abs().partial_cmp(&x.abs()));
+            }),
+        ],
     );
 }
 

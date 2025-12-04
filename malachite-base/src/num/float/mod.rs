@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::Abs;
 use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use core::cmp::Ordering::{self, *};
 use core::fmt::{self, Debug, Display, Formatter};
 use core::hash::{Hash, Hasher};
@@ -76,6 +78,19 @@ impl<T: PrimitiveFloat> NiceFloat<T> {
     }
 }
 
+impl Abs for FloatType {
+    type Output = Self;
+
+    fn abs(self) -> Self::Output {
+        match self {
+            Self::NegativeInfinity => Self::PositiveInfinity,
+            Self::NegativeFinite => Self::PositiveFinite,
+            Self::NegativeZero => Self::PositiveZero,
+            t => t,
+        }
+    }
+}
+
 impl<T: PrimitiveFloat> PartialEq<Self> for NiceFloat<T> {
     /// Compares two `NiceFloat`s for equality.
     ///
@@ -107,6 +122,36 @@ impl<T: PrimitiveFloat> PartialEq<Self> for NiceFloat<T> {
 }
 
 impl<T: PrimitiveFloat> Eq for NiceFloat<T> {}
+
+impl<T: PrimitiveFloat> EqAbs for NiceFloat<T> {
+    /// Compares the absolute values of two `NiceFloat`s for equality.
+    ///
+    /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
+    /// respects the expected properties of symmetry, reflexivity, and transitivity. Using
+    /// `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
+    /// concept of signalling `NaN`s.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::comparison::traits::EqAbs;
+    /// use malachite_base::num::float::NiceFloat;
+    ///
+    /// assert!(NiceFloat(0.0).eq_abs(&NiceFloat(0.0)));
+    /// assert!(NiceFloat(f32::NAN).eq_abs(&NiceFloat(f32::NAN)));
+    /// assert!(NiceFloat(f32::NAN).ne_abs(&NiceFloat(0.0)));
+    /// assert!(NiceFloat(0.0).eq_abs(&NiceFloat(-0.0)));
+    /// assert!(NiceFloat(1.0).eq_abs(&NiceFloat(1.0)));
+    /// assert!(NiceFloat(1.0).eq_abs(&NiceFloat(-1.0)));
+    /// ```
+    fn eq_abs(&self, other: &Self) -> bool {
+        let f = self.0;
+        let g = other.0;
+        f.abs().to_bits() == g.abs().to_bits() || f.is_nan() && g.is_nan()
+    }
+}
 
 impl<T: PrimitiveFloat> Hash for NiceFloat<T> {
     /// Computes a hash of a `NiceFloat`.
@@ -172,6 +217,57 @@ impl<T: PrimitiveFloat> PartialOrd<Self> for NiceFloat<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl<T: PrimitiveFloat> OrdAbs for NiceFloat<T> {
+    /// Compares the absolute values of two `NiceFloat`s.
+    ///
+    /// This implementation ignores the IEEE 754 standard in favor of a comparison operation that
+    /// respects the expected properties of antisymmetry, reflexivity, and transitivity. `NiceFloat`
+    /// has a total order. These are the classes of floats, in order of ascending absolute value:
+    ///   - NaN
+    ///   - Positive zero
+    ///   - Positive nonzero finite floats
+    ///   - Positive infinity
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::NegativeInfinity;
+    /// use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
+    /// use malachite_base::num::float::NiceFloat;
+    ///
+    /// assert!(NiceFloat(0.0).eq_abs(&NiceFloat(-0.0)));
+    /// assert!(NiceFloat(f32::NAN).lt_abs(&NiceFloat(0.0)));
+    /// assert!(NiceFloat(f32::NAN).lt_abs(&NiceFloat(-0.0)));
+    /// assert!(NiceFloat(f32::INFINITY).gt_abs(&NiceFloat(f32::NAN)));
+    /// assert!(NiceFloat(f32::NEGATIVE_INFINITY).gt_abs(&NiceFloat(f32::NAN)));
+    /// assert!(NiceFloat(f32::NAN).lt_abs(&NiceFloat(1.0)));
+    /// assert!(NiceFloat(f32::NAN).lt_abs(&NiceFloat(-1.0)));
+    /// ```
+    fn cmp_abs(&self, other: &Self) -> Ordering {
+        let self_type = self.float_type().abs();
+        let other_type = other.float_type().abs();
+        self_type.cmp(&other_type).then_with(|| {
+            if self_type == FloatType::PositiveFinite {
+                self.0.abs().partial_cmp(&other.0.abs()).unwrap()
+            } else {
+                Equal
+            }
+        })
+    }
+}
+
+impl<T: PrimitiveFloat> PartialOrdAbs<Self> for NiceFloat<T> {
+    /// Compares the absolute values of two `NiceFloat`s.
+    ///
+    /// See the documentation for the [`OrdAbs`] implementation.
+    #[inline]
+    fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp_abs(other))
     }
 }
 

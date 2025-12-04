@@ -16,8 +16,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::malachite_base::num::basic::integers::PrimitiveInt;
-use crate::malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
@@ -42,6 +40,8 @@ use malachite_base::num::arithmetic::traits::{
     NegModPowerOf2, OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2, ShrRound,
     WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 

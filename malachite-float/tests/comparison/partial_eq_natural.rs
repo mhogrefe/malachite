@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
@@ -13,7 +14,7 @@ use malachite_float::test_util::generators::{
     float_natural_pair_gen, float_natural_pair_gen_var_1, float_natural_pair_gen_var_2,
 };
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::generators::natural_pair_gen;
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen};
 use malachite_q::Rational;
 use rug;
 use std::str::FromStr;
@@ -167,6 +168,12 @@ fn partial_eq_natural_properties() {
 
     float_natural_pair_gen_var_2().test_properties(|(x, y)| {
         partial_eq_natural_properties_helper(x, y);
+    });
+
+    natural_gen().test_properties(|x| {
+        assert_ne!(x, Float::NAN);
+        assert_ne!(x, Float::INFINITY);
+        assert_ne!(x, Float::NEGATIVE_INFINITY);
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

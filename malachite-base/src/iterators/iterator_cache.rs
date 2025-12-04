@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use alloc::vec::Vec;
+
 /// Remembers values produced by an iterator.
 ///
 /// After wrapping an iterator with an `IteratorCache`, you can retrieve a reference to the $n$th

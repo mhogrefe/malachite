@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
@@ -18,10 +19,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_eq_abs_rational_integer() {
-    let test = |s, t, eq| {
+    let test = |s, t, eq: bool| {
         let u = Rational::from_str(s).unwrap();
         let v = Integer::from_str(t).unwrap();
         assert_eq!(u.eq_abs(&v), eq);
+        assert_eq!(u.ne_abs(&v), !eq);
+        assert_eq!((&u).abs() == (&v).abs(), eq);
         assert_eq!(v.eq_abs(&u), eq);
     };
     test("0", "0", true);
@@ -68,6 +71,8 @@ fn eq_abs_integer_properties() {
     rational_integer_pair_gen().test_properties(|(x, y)| {
         let eq = x.eq_abs(&y);
         assert_eq!(x.eq_abs(&Rational::from(&y)), eq);
+        assert_eq!(x.ne_abs(&y), !eq);
+        assert_eq!((&x).abs() == (&y).abs(), eq);
         assert_eq!(y.eq_abs(&x), eq);
         assert_eq!((-&x).eq_abs(&y), eq);
         assert_eq!(x.eq_abs(&-&y), eq);

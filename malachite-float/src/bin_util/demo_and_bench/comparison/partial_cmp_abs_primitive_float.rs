@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::float::NiceFloat;
@@ -36,8 +37,14 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_primitive_float_partial_cmp_abs_float_extreme_debug
     );
 
-    register_primitive_float_benches!(runner, benchmark_float_partial_cmp_abs_primitive_float);
-    register_primitive_float_benches!(runner, benchmark_primitive_float_partial_cmp_abs_float);
+    register_primitive_float_benches!(
+        runner,
+        benchmark_float_partial_cmp_abs_primitive_float_algorithms
+    );
+    register_primitive_float_benches!(
+        runner,
+        benchmark_primitive_float_partial_cmp_abs_float_algorithms
+    );
 }
 
 fn demo_float_partial_cmp_abs_primitive_float<T: PrimitiveFloat>(
@@ -199,28 +206,35 @@ fn demo_primitive_float_partial_cmp_abs_float_extreme_debug<
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
-fn benchmark_float_partial_cmp_abs_primitive_float<T: PrimitiveFloat>(
+fn benchmark_float_partial_cmp_abs_primitive_float_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Float: PartialOrdAbs<T>,
+    Float: PartialOrdAbs<T> + PartialOrd<T>,
 {
     run_benchmark(
         &format!("Float.partial_cmp_abs(&{})", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         float_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_float_primitive_float_max_complexity_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
     );
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
-fn benchmark_primitive_float_partial_cmp_abs_float<T: PartialOrdAbs<Float> + PrimitiveFloat>(
+fn benchmark_primitive_float_partial_cmp_abs_float_algorithms<
+    T: PartialOrdAbs<Float> + PartialOrd<Float> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -228,12 +242,17 @@ fn benchmark_primitive_float_partial_cmp_abs_float<T: PartialOrdAbs<Float> + Pri
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&Float)", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         float_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_float_primitive_float_max_complexity_bucketer("y", "x"),
-        &mut [("Malachite", &mut |(y, x)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(y, x)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(y, x)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
     );
 }

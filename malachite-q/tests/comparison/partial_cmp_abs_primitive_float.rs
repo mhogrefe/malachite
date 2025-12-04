@@ -23,14 +23,18 @@ use std::str::FromStr;
 
 #[test]
 fn test_partial_cmp_abs_primitive_float() {
-    let test = |u, v: f32, out: Option<Ordering>| {
-        let out_rev = out.map(Ordering::reverse);
-        assert_eq!(Rational::from_str(u).unwrap().partial_cmp_abs(&v), out);
-        assert_eq!(v.partial_cmp_abs(&Rational::from_str(u).unwrap()), out_rev);
+    let test = |u, v: f32, cmp: Option<Ordering>| {
+        let u = Rational::from_str(u).unwrap();
+
+        let cmp_rev = cmp.map(Ordering::reverse);
+        assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v.abs()), cmp);
+        assert_eq!(v.partial_cmp_abs(&u), cmp_rev);
 
         let v = f64::from(v);
-        assert_eq!(Rational::from_str(u).unwrap().partial_cmp_abs(&v), out);
-        assert_eq!(v.partial_cmp_abs(&Rational::from_str(u).unwrap()), out_rev);
+        assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v.abs()), cmp);
+        assert_eq!(v.partial_cmp_abs(&u), cmp_rev);
     };
     test("2/3", f32::NAN, None);
     test("2/3", f32::INFINITY, Some(Less));
@@ -69,7 +73,6 @@ where
         let cmp_abs = n.partial_cmp_abs(&u);
         let cmp_abs_rev = cmp_abs.map(Ordering::reverse);
         assert_eq!(u.partial_cmp_abs(&n), cmp_abs_rev);
-
         assert_eq!((&n).abs().partial_cmp(&u.abs()), cmp_abs);
 
         if u.is_finite() {

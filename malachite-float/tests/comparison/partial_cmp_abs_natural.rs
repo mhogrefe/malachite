@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Abs;
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::Float;
@@ -16,7 +17,7 @@ use malachite_float::test_util::generators::{
     float_natural_pair_gen_var_1, float_natural_pair_gen_var_2,
 };
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::generators::natural_pair_gen;
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen};
 use malachite_q::Rational;
 use rug;
 use std::cmp::Ordering::{self, *};
@@ -30,6 +31,7 @@ fn test_partial_cmp_abs_natural() {
         let v = Natural::from_str(t).unwrap();
 
         assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!((&u).abs().partial_cmp(&v), out);
         assert_eq!(v.partial_cmp_abs(&u), out.map(Ordering::reverse));
         assert_eq!(
             rug::Float::exact_from(&u)
@@ -306,6 +308,14 @@ fn partial_cmp_abs_natural_properties() {
 
     float_natural_pair_gen_var_2().test_properties(|(x, y)| {
         partial_cmp_abs_natural_properties_helper(x, y);
+    });
+
+    natural_gen().test_properties(|x| {
+        assert!(x.partial_cmp_abs(&Float::NAN).is_none());
+        assert!(x.ge_abs(&Float::ZERO));
+        assert!(x.ge_abs(&Float::NEGATIVE_ZERO));
+        assert!(x.lt_abs(&Float::INFINITY));
+        assert!(x.lt_abs(&Float::NEGATIVE_INFINITY));
     });
 
     float_float_natural_triple_gen().test_properties(|(x, z, y)| {

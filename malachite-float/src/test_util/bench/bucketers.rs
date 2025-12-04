@@ -379,6 +379,26 @@ pub fn pair_float_rational_max_complexity_bucketer<'a>(
     }
 }
 
+pub fn pair_float_unsigned_max_complexity_bucketer<'a, T: PrimitiveUnsigned>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.significant_bits())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_float_signed_max_complexity_bucketer<'a, T: PrimitiveSigned>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.significant_bits())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
 pub fn pair_2_pair_float_integer_max_complexity_bucketer<'a, T>(
     x_name: &'a str,
     y_name: &'a str,

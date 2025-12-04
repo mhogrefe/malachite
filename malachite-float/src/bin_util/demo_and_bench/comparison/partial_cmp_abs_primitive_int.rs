@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -17,7 +18,8 @@ use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
 use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_signed_max_complexity_bucketer,
-    pair_2_pair_float_unsigned_max_complexity_bucketer,
+    pair_2_pair_float_unsigned_max_complexity_bucketer, pair_float_signed_max_complexity_bucketer,
+    pair_float_unsigned_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
     float_signed_pair_gen, float_signed_pair_gen_rm, float_signed_pair_gen_var_4,
@@ -47,18 +49,22 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_partial_cmp_abs_unsigned_library_comparison
     );
+    register_unsigned_benches!(runner, benchmark_float_partial_cmp_abs_unsigned_algorithms);
     register_unsigned_benches!(
         runner,
         benchmark_unsigned_partial_cmp_abs_float_library_comparison
     );
+    register_unsigned_benches!(runner, benchmark_unsigned_partial_cmp_abs_float_algorithms);
     register_signed_benches!(
         runner,
         benchmark_float_partial_cmp_abs_signed_library_comparison
     );
+    register_signed_benches!(runner, benchmark_float_partial_cmp_abs_signed_algorithms);
     register_signed_benches!(
         runner,
         benchmark_signed_partial_cmp_abs_float_library_comparison
     );
+    register_signed_benches!(runner, benchmark_signed_partial_cmp_abs_float_algorithms);
 }
 
 fn demo_float_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
@@ -378,6 +384,30 @@ fn benchmark_float_partial_cmp_abs_unsigned_library_comparison<T: PrimitiveUnsig
     );
 }
 
+#[allow(unused_must_use)]
+fn benchmark_float_partial_cmp_abs_unsigned_algorithms<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: PartialOrdAbs<T> + PartialOrd<T>,
+{
+    run_benchmark(
+        &format!("Float.partial_cmp_abs(&{})", T::NAME),
+        BenchmarkType::Algorithms,
+        float_unsigned_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_unsigned_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| no_out!(x.abs().partial_cmp(&y))),
+        ],
+    );
+}
+
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_unsigned_partial_cmp_abs_float_library_comparison<
     T: PartialOrdAbs<Float> + PartialOrd<rug::Float> + PrimitiveUnsigned,
@@ -400,6 +430,30 @@ fn benchmark_unsigned_partial_cmp_abs_float_library_comparison<
                 no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((y, x), _)| no_out!(x.partial_cmp(&y.abs()))),
+        ],
+    );
+}
+
+#[allow(unused_must_use)]
+fn benchmark_unsigned_partial_cmp_abs_float_algorithms<
+    T: PartialOrdAbs<Float> + PartialOrd<Float> + PrimitiveUnsigned,
+>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.partial_cmp_abs(&Float)", T::NAME),
+        BenchmarkType::Algorithms,
+        float_unsigned_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_unsigned_max_complexity_bucketer("y", "x"),
+        &mut [
+            ("default", &mut |(y, x)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(y, x)| no_out!(x.partial_cmp(&y.abs()))),
         ],
     );
 }
@@ -433,6 +487,32 @@ fn benchmark_float_partial_cmp_abs_signed_library_comparison<T: PrimitiveSigned>
     );
 }
 
+#[allow(unused_must_use)]
+fn benchmark_float_partial_cmp_abs_signed_algorithms<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: PartialOrdAbs<T> + PartialOrd<<T as UnsignedAbs>::Output>,
+{
+    run_benchmark(
+        &format!("Float.partial_cmp_abs(&{})", T::NAME),
+        BenchmarkType::Algorithms,
+        float_signed_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_signed_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.unsigned_abs()));
+            }),
+        ],
+    );
+}
+
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_signed_partial_cmp_abs_float_library_comparison<
     T: PartialOrdAbs<Float> + PrimitiveSigned,
@@ -457,6 +537,32 @@ fn benchmark_signed_partial_cmp_abs_float_library_comparison<
                 no_out!(x.partial_cmp_abs(&y));
             }),
             ("rug", &mut |((y, x), _)| {
+                no_out!(x.unsigned_abs().partial_cmp(&y.abs()));
+            }),
+        ],
+    );
+}
+
+#[allow(unused_must_use)]
+fn benchmark_signed_partial_cmp_abs_float_algorithms<T: PartialOrdAbs<Float> + PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    <T as UnsignedAbs>::Output: PartialOrd<Float>,
+{
+    run_benchmark(
+        &format!("{}.partial_cmp_abs(&Float)", T::NAME),
+        BenchmarkType::Algorithms,
+        float_signed_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_signed_max_complexity_bucketer("y", "x"),
+        &mut [
+            ("default", &mut |(y, x)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(y, x)| {
                 no_out!(x.unsigned_abs().partial_cmp(&y.abs()));
             }),
         ],

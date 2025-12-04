@@ -54,7 +54,7 @@ fn saturating_from_helper_primitive_int_unsigned<
             assert_eq!(result, u_u);
         }
         if let Ok(result_t) = U::try_from(result) {
-            assert!(result_t.le_abs(&u));
+            assert!(result_t <= u);
             assert_eq!(result_t == u, T::convertible_from(u));
         }
     });

@@ -304,8 +304,8 @@ pub mod num {
         pub mod constants;
     }
     pub mod comparison {
-        pub mod cmp_abs_partial_cmp_abs_and_comparators;
-        pub mod eq_abs_partial_eq_abs_and_comparators;
+        pub mod cmp_abs;
+        pub mod eq_abs;
     }
     pub mod conversion {
         pub mod digits {
@@ -418,7 +418,9 @@ pub mod num {
         }
         pub mod nice_float {
             pub mod cmp;
+            pub mod cmp_abs;
             pub mod eq;
+            pub mod eq_abs;
             pub mod from_str;
             pub mod hash;
             pub mod to_string;

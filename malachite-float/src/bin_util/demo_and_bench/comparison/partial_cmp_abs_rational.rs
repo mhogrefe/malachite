@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -27,8 +28,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_partial_cmp_abs_float_extreme);
     register_demo!(runner, demo_rational_partial_cmp_abs_float_extreme_debug);
 
-    register_bench!(runner, benchmark_float_partial_cmp_abs_rational);
-    register_bench!(runner, benchmark_rational_partial_cmp_abs_float);
+    register_bench!(runner, benchmark_float_partial_cmp_abs_rational_algorithms);
+    register_bench!(runner, benchmark_rational_partial_cmp_abs_float_algorithms);
 }
 
 fn demo_float_partial_cmp_abs_rational(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -132,7 +133,7 @@ fn demo_rational_partial_cmp_abs_float_extreme_debug(
 }
 
 #[allow(unused_must_use)]
-fn benchmark_float_partial_cmp_abs_rational(
+fn benchmark_float_partial_cmp_abs_rational_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -140,18 +141,23 @@ fn benchmark_float_partial_cmp_abs_rational(
 ) {
     run_benchmark(
         "Float.partial_cmp_abs(&Rational)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         float_rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_float_rational_max_complexity_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
     );
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
-fn benchmark_rational_partial_cmp_abs_float(
+fn benchmark_rational_partial_cmp_abs_float_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -159,12 +165,17 @@ fn benchmark_rational_partial_cmp_abs_float(
 ) {
     run_benchmark(
         "Rational.partial_cmp_abs(&Float)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         float_rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_float_rational_max_complexity_bucketer("y", "x"),
-        &mut [("Malachite", &mut |(y, x)| no_out!(x == y))],
+        &mut [
+            ("default", &mut |(y, x)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(y, x)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
     );
 }

@@ -92,6 +92,9 @@ impl<'a> Ord for ComparableFloatRef<'a> {
     ///   - Positive nonzero finite floats
     ///   - $\infty$
     ///
+    /// When comparing two finite floats with the same numeric value but different precisions, the
+    /// one with greater precision is ordered to be further from zero.
+    ///
     /// For different comparison behavior that follows the IEEE 754 standard, consider just using
     /// [`Float`].
     ///
@@ -192,6 +195,9 @@ impl Ord for ComparableFloat {
     ///   - Positive zero
     ///   - Positive nonzero finite floats
     ///   - $\infty$
+    ///
+    /// When comparing two finite floats with the same numeric value but different precisions, the
+    /// one with greater precision is ordered to be further from zero.
     ///
     /// For different comparison behavior that follows the IEEE 754 standard, consider just using
     /// [`Float`].

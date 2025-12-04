@@ -31,6 +31,7 @@ fn test_ord_abs() {
 fn cmp_abs_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let ord = x.cmp_abs(&y);
+        assert_eq!((&x).abs().cmp(&(&y).abs()), ord);
         assert_eq!(rug::Integer::from(&x).cmp_abs(&rug::Integer::from(&y)), ord);
         assert_eq!((&x).abs().cmp(&(&y).abs()), ord);
         assert_eq!((-x).cmp_abs(&(-y)), ord);

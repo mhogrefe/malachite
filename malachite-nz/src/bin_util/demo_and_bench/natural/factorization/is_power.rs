@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_express_as_power);
 
     register_bench!(runner, benchmark_natural_is_power_library_comparison);
+    register_bench!(runner, benchmark_natural_is_power_algorithms);
     register_bench!(runner, benchmark_natural_express_as_power);
 }
 
@@ -56,6 +57,30 @@ fn benchmark_natural_is_power_library_comparison(
         &mut [
             ("Malachite", &mut |(_, n)| no_out!(n.is_power())),
             ("rug", &mut |(n, _)| no_out!(n.is_perfect_power())),
+        ],
+    );
+}
+
+#[allow(unused_must_use)]
+fn benchmark_natural_is_power_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.is_power()",
+        BenchmarkType::Algorithms,
+        natural_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &natural_bit_bucketer("n"),
+        &mut [
+            ("default", &mut |n| no_out!(n.is_power())),
+            ("using express_as_power", &mut |n| {
+                no_out!(n.express_as_power().is_some());
+            }),
         ],
     );
 }

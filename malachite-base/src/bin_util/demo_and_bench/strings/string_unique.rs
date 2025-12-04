@@ -16,6 +16,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_string_unique);
     register_demo!(runner, demo_string_unique_ascii);
+
     register_bench!(runner, benchmark_string_unique);
 }
 

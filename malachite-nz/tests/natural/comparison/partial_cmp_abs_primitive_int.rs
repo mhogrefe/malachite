@@ -270,15 +270,15 @@ where
 
     natural_unsigned_unsigned_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u.lt_abs(&n) && n.lt_abs(&v) {
-            assert!(u.lt_abs(&v));
+            assert!(u < v);
         } else if u.gt_abs(&n) && n.gt_abs(&v) {
-            assert!(u.gt_abs(&v));
+            assert!(u > v);
         }
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
-        assert_eq!(Natural::from(x).partial_cmp_abs(&y), Some(x.cmp_abs(&y)));
-        assert_eq!(x.partial_cmp_abs(&Natural::from(y)), Some(x.cmp_abs(&y)));
+        assert_eq!(Natural::from(x).partial_cmp_abs(&y), Some(x.cmp(&y)));
+        assert_eq!(x.partial_cmp_abs(&Natural::from(y)), Some(x.cmp(&y)));
     });
 }
 

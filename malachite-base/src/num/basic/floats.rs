@@ -19,7 +19,7 @@ use crate::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, PrimeConstant,
     ThueMorseConstant, Two, Zero,
 };
-use crate::num::comparison::traits::PartialOrdAbs;
+use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
     ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger, RawMantissaAndExponent,
     RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
@@ -127,6 +127,7 @@ pub trait PrimitiveFloat:
     + Display
     + Div<Output = Self>
     + DivAssign
+    + EqAbs<Self>
     + Floor<Output = Self>
     + FloorAssign
     + FloorLogBase2<Output = i64>

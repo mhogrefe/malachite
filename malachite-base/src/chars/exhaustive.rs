@@ -62,7 +62,7 @@ pub const fn chars_increasing() -> RangeInclusive<char> {
     char::MIN..=char::MAX
 }
 
-/// Generates all [`char`]s, in a friendly order, so that more familiar [`char`] come first.
+/// Generates all [`char`]s, in a friendly order, so that more familiar [`char`]s come first.
 ///
 /// The order is
 /// - Lowercase ASCII letters,

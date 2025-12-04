@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
@@ -24,6 +25,7 @@ fn test_partial_cmp_abs_integer_natural() {
         let v = Natural::from_str(t).unwrap();
 
         assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v), cmp);
         assert_eq!(v.partial_cmp_abs(&u).map(Ordering::reverse), cmp);
         assert_eq!(lt, u.lt_abs(&v));
         assert_eq!(gt, u.gt_abs(&v));
@@ -82,6 +84,7 @@ fn test_partial_cmp_abs_integer_natural() {
 fn partial_cmp_abs_natural_properties() {
     integer_natural_pair_gen().test_properties(|(x, y)| {
         let cmp = x.partial_cmp_abs(&y);
+        assert_eq!((&x).abs().partial_cmp_abs(&y), cmp);
         assert_eq!(x.cmp_abs(&Integer::from(&y)), cmp.unwrap());
         assert_eq!(
             Some(rug::Integer::from(&x).cmp_abs(&rug::Integer::from(&y))),

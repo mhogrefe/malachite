@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
@@ -18,10 +19,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_eq_abs_u32() {
-    let test = |u, v: u32, out| {
-        assert_eq!(Integer::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Integer::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Integer::from_str(u).unwrap()), out);
+    let test = |u, v: u32, eq: bool| {
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.eq_abs(&v), eq);
+        assert_eq!(u.ne_abs(&v), !eq);
+        assert_eq!((&u).abs() == v, eq);
+        assert_eq!(v.eq_abs(&u), eq);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -35,10 +38,12 @@ fn test_eq_abs_u32() {
 
 #[test]
 fn test_eq_abs_u64() {
-    let test = |u, v: u64, out| {
-        assert_eq!(Integer::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Integer::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Integer::from_str(u).unwrap()), out);
+    let test = |u, v: u64, eq: bool| {
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.eq_abs(&v), eq);
+        assert_eq!(u.ne_abs(&v), !eq);
+        assert_eq!((&u).abs() == v, eq);
+        assert_eq!(v.eq_abs(&u), eq);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -56,10 +61,12 @@ fn test_eq_abs_u64() {
 
 #[test]
 fn test_eq_abs_i32() {
-    let test = |u, v: i32, out| {
-        assert_eq!(Integer::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Integer::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Integer::from_str(u).unwrap()), out);
+    let test = |u, v: i32, eq: bool| {
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.eq_abs(&v), eq);
+        assert_eq!(u.ne_abs(&v), !eq);
+        assert_eq!((&u).abs() == v.unsigned_abs(), eq);
+        assert_eq!(v.eq_abs(&u), eq);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -75,10 +82,12 @@ fn test_eq_abs_i32() {
 
 #[test]
 fn test_eq_abs_i64() {
-    let test = |u, v: i64, out| {
-        assert_eq!(Integer::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Integer::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Integer::from_str(u).unwrap()), out);
+    let test = |u, v: i64, eq: bool| {
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.eq_abs(&v), eq);
+        assert_eq!(u.ne_abs(&v), !eq);
+        assert_eq!((&u).abs() == v.unsigned_abs(), eq);
+        assert_eq!(v.eq_abs(&u), eq);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -104,12 +113,13 @@ fn eq_abs_primitive_int_properties_helper_unsigned<
 where
     Integer: EqAbs<T> + From<T> + PartialEq<T> + PartialOrdAbs<T>,
 {
-    integer_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
-        let eq = n.eq_abs(&u);
-        assert_ne!(n.ne_abs(&u), eq);
+    integer_unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+        let eq = x.eq_abs(&y);
+        assert_eq!(x.ne_abs(&y), !eq);
+        assert_eq!((&x).abs() == y, eq);
 
-        assert_eq!(u.eq_abs(&n), eq);
-        assert_eq!(n.partial_cmp_abs(&u) == Some(Equal), eq);
+        assert_eq!(y.eq_abs(&x), eq);
+        assert_eq!(x.partial_cmp_abs(&y) == Some(Equal), eq);
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
@@ -120,22 +130,24 @@ where
 
 fn eq_abs_primitive_int_properties_helper_signed<T: EqAbs<Integer> + PrimitiveSigned>()
 where
-    Integer: EqAbs<T> + From<T> + TryFrom<T> + PartialOrdAbs<T>,
+    Integer:
+        EqAbs<T> + From<T> + TryFrom<T> + PartialOrdAbs<T> + PartialEq<<T as UnsignedAbs>::Output>,
 {
-    integer_signed_pair_gen::<T>().test_properties(|(n, i)| {
-        let eq = n.eq_abs(&i);
-        assert_ne!(n.ne_abs(&i), eq);
+    integer_signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let eq = x.eq_abs(&y);
+        assert_eq!(x.ne_abs(&y), !eq);
+        assert_eq!((&x).abs() == y.unsigned_abs(), eq);
         assert_eq!(
-            <Integer as EqAbs<Integer>>::eq_abs(&n, &Integer::from(i)),
+            <Integer as EqAbs<Integer>>::eq_abs(&x, &Integer::from(y)),
             eq
         );
 
-        assert_eq!(i.eq_abs(&n), eq);
+        assert_eq!(y.eq_abs(&x), eq);
         assert_eq!(
-            <Integer as EqAbs<Integer>>::eq_abs(&Integer::from(i), &n),
+            <Integer as EqAbs<Integer>>::eq_abs(&Integer::from(y), &x),
             eq
         );
-        assert_eq!(n.partial_cmp_abs(&i) == Some(Equal), eq);
+        assert_eq!(x.partial_cmp_abs(&y) == Some(Equal), eq);
     });
 
     signed_pair_gen_var_7::<T>().test_properties(|(x, y)| {

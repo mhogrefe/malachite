@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::float::NiceFloat;
@@ -21,8 +22,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_integer_partial_cmp_abs_float);
     register_primitive_float_demos!(runner, demo_float_partial_cmp_abs_integer);
 
-    register_primitive_float_benches!(runner, benchmark_integer_partial_cmp_abs_float);
-    register_primitive_float_benches!(runner, benchmark_float_partial_cmp_abs_integer);
+    register_primitive_float_benches!(runner, benchmark_integer_partial_cmp_abs_float_algorithms);
+    register_primitive_float_benches!(runner, benchmark_float_partial_cmp_abs_integer_algorithms);
 }
 
 fn demo_integer_partial_cmp_abs_float<T: PrimitiveFloat>(
@@ -63,27 +64,36 @@ fn demo_float_partial_cmp_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveFloat
     }
 }
 
-fn benchmark_integer_partial_cmp_abs_float<T: PrimitiveFloat>(
+#[allow(unused_must_use)]
+fn benchmark_integer_partial_cmp_abs_float_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Integer: PartialOrdAbs<T>,
+    Integer: PartialOrdAbs<T> + PartialOrd<T>,
 {
     run_benchmark(
         &format!("Integer.partial_cmp_abs(&{})", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         integer_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_integer_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
     );
 }
 
-fn benchmark_float_partial_cmp_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveFloat>(
+#[allow(unused_must_use)]
+fn benchmark_float_partial_cmp_abs_integer_algorithms<
+    T: PartialOrdAbs<Integer> + PartialOrd<Integer> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -91,12 +101,17 @@ fn benchmark_float_partial_cmp_abs_integer<T: PartialOrdAbs<Integer> + Primitive
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&Integer)", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         integer_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_integer_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(y.abs().partial_cmp(&x.abs()));
+            }),
+        ],
     );
 }

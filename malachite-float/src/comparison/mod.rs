@@ -14,6 +14,66 @@ pub mod cmp;
 pub mod cmp_abs;
 /// Equality of [`Float`](crate::Float)s.
 pub mod eq;
+/// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
+/// comparing the absolute values of numbers by equality) for [`Float`](crate::Float)s.
+pub mod eq_abs;
+/// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
+/// comparing the absolute values of numbers for equality) for [`Float`](crate::Float)s and
+/// [`Integer`](malachite_nz::integer::Integer)s.
+pub mod eq_abs_integer;
+/// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
+/// comparing the absolute values of numbers for equality) for [`Float`](crate::Float)s and
+/// [`Natural`](malachite_nz::natural::Natural)s.
+pub mod eq_abs_natural;
+/// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
+/// comparing the absolute values of numbers for equality) for [`Float`](crate::Float)s and
+/// primitive floats.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::basic::traits::OneHalf;
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_float::Float;
+///
+/// assert!(Float::from(123).eq_abs(&123.0));
+/// assert!(Float::ONE_HALF.eq_abs(&0.5));
+/// assert!(Float::ONE_HALF.eq_abs(&-0.5));
+/// assert!(Float::ONE_HALF.ne_abs(&0.4));
+///
+/// assert!(123.0.eq_abs(&Float::from(123)));
+/// assert!(0.5.eq_abs(&Float::ONE_HALF));
+/// assert!((-0.5).eq_abs(&Float::ONE_HALF));
+/// assert!(0.4.ne_abs(&Float::ONE_HALF));
+/// ```
+pub mod eq_abs_primitive_float;
+/// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
+/// comparing the absolute values of numbers for equality) for [`Float`](crate::Float)s and
+/// primitive integers.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::basic::traits::OneHalf;
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_float::Float;
+///
+/// assert!(Float::from(123).eq_abs(&123u64));
+/// assert!(Float::ONE_HALF.ne_abs(&1u64));
+///
+/// assert!(Float::from(123).eq_abs(&123i64));
+/// assert!(Float::from(-123).eq_abs(&123i64));
+/// assert!(Float::ONE_HALF.ne_abs(&-1i64));
+///
+/// assert!(123u64.eq_abs(&Float::from(123)));
+/// assert!(1u64.ne_abs(&Float::ONE_HALF));
+///
+/// assert!(123i64.eq_abs(&Float::from(123)));
+/// assert!(123i64.eq_abs(&Float::from(-123)));
+/// assert!((-1i64).ne_abs(&Float::ONE_HALF));
+/// ```
+pub mod eq_abs_primitive_int;
+/// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
+/// comparing the absolute values of numbers for equality) for [`Float`](crate::Float)s and
+/// [`Rational`](malachite_q::Rational)s.
 pub mod eq_abs_rational;
 /// Hashing of [`Float`](crate::Float)s.
 pub mod hash;
@@ -32,16 +92,16 @@ pub mod partial_cmp_abs_natural;
 /// # partial_cmp_abs
 /// ```
 /// use malachite_base::num::basic::traits::OneHalf;
-/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 /// use malachite_float::Float;
 ///
 /// assert!(Float::ONE_HALF.gt_abs(&0.4));
 /// assert!(Float::ONE_HALF.lt_abs(&0.6));
-/// // TODO assert!(Float::ONE_HALF.eq_abs(&-0.5));
+/// assert!(Float::ONE_HALF.eq_abs(&-0.5));
 ///
 /// assert!(0.4.lt_abs(&Float::ONE_HALF));
 /// assert!(0.6.gt_abs(&Float::ONE_HALF));
-/// // TODO assert!((-0.5).eq_abs(&Float::ONE_HALF));
+/// assert!((-0.5).eq_abs(&Float::ONE_HALF));
 /// ```
 pub mod partial_cmp_abs_primitive_float;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)

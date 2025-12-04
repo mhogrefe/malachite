@@ -10,14 +10,18 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     cmp::register(runner);
+    cmp_abs::register(runner);
     eq::register(runner);
+    eq_abs::register(runner);
     from_str::register(runner);
     hash::register(runner);
     to_string::register(runner);
 }
 
 mod cmp;
+mod cmp_abs;
 mod eq;
+mod eq_abs;
 mod from_str;
 mod hash;
 mod to_string;

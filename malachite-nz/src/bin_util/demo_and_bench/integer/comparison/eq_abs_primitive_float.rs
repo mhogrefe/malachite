@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::float::NiceFloat;
@@ -20,8 +21,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_integer_eq_abs_primitive_float);
     register_primitive_float_demos!(runner, demo_primitive_float_eq_abs_integer);
 
-    register_primitive_float_benches!(runner, benchmark_integer_eq_abs_primitive_float);
-    register_primitive_float_benches!(runner, benchmark_primitive_float_eq_abs_integer);
+    register_primitive_float_benches!(runner, benchmark_integer_eq_abs_primitive_float_algorithms);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_eq_abs_integer_algorithms);
 }
 
 fn demo_integer_eq_abs_primitive_float<T: PrimitiveFloat>(
@@ -60,27 +61,34 @@ fn demo_primitive_float_eq_abs_integer<T: EqAbs<Integer> + PrimitiveFloat>(
     }
 }
 
-fn benchmark_integer_eq_abs_primitive_float<T: PrimitiveFloat>(
+#[allow(unused_must_use)]
+fn benchmark_integer_eq_abs_primitive_float_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Integer: EqAbs<T>,
+    Integer: EqAbs<T> + PartialEq<T>,
 {
     run_benchmark(
         &format!("Integer.eq_abs(&{})", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         integer_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_integer_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.eq_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.eq_abs(&y))),
+            ("using abs", &mut |(x, y)| no_out!(x.abs() == y)),
+        ],
     );
 }
 
-fn benchmark_primitive_float_eq_abs_integer<T: EqAbs<Integer> + PrimitiveFloat>(
+#[allow(unused_must_use)]
+fn benchmark_primitive_float_eq_abs_integer_algorithms<
+    T: EqAbs<Integer> + PartialEq<Integer> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -88,12 +96,15 @@ fn benchmark_primitive_float_eq_abs_integer<T: EqAbs<Integer> + PrimitiveFloat>(
 ) {
     run_benchmark(
         &format!("{}.eq_abs(&Integer)", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         integer_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_integer_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.eq_abs(&x)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(y.eq_abs(&x))),
+            ("using abs", &mut |(x, y)| no_out!(y == x.abs())),
+        ],
     );
 }

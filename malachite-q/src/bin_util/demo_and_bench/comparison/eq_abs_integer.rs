@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -17,8 +18,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_eq_abs_integer);
     register_demo!(runner, demo_integer_eq_abs_rational);
 
-    register_bench!(runner, benchmark_rational_eq_abs_integer);
-    register_bench!(runner, benchmark_integer_eq_abs_rational);
+    register_bench!(runner, benchmark_rational_eq_abs_integer_algorithms);
+    register_bench!(runner, benchmark_integer_eq_abs_rational_algorithms);
 }
 
 fn demo_rational_eq_abs_integer(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -41,7 +42,8 @@ fn demo_integer_eq_abs_rational(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
-fn benchmark_rational_eq_abs_integer(
+#[allow(unused_must_use)]
+fn benchmark_rational_eq_abs_integer_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -55,11 +57,15 @@ fn benchmark_rational_eq_abs_integer(
         limit,
         file_name,
         &rational_integer_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.eq_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.eq_abs(&y))),
+            ("using abs", &mut |(x, y)| no_out!(x.abs() == y.abs())),
+        ],
     );
 }
 
-fn benchmark_integer_eq_abs_rational(
+#[allow(unused_must_use)]
+fn benchmark_integer_eq_abs_rational_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -73,6 +79,9 @@ fn benchmark_integer_eq_abs_rational(
         limit,
         file_name,
         &rational_integer_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.eq_abs(&x)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(y.eq_abs(&x))),
+            ("using abs", &mut |(x, y)| no_out!(y.abs() == x.abs())),
+        ],
     );
 }

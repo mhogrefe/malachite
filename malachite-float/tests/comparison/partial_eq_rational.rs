@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
@@ -13,6 +14,7 @@ use malachite_float::test_util::generators::{
     float_rational_pair_gen, float_rational_pair_gen_var_1, float_rational_pair_gen_var_2,
 };
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen;
 use rug;
 use std::str::FromStr;
 
@@ -503,6 +505,12 @@ fn partial_eq_rational_properties() {
 
     float_rational_pair_gen_var_2().test_properties(|(x, y)| {
         partial_eq_rational_properties_helper(x, y);
+    });
+
+    rational_gen().test_properties(|x| {
+        assert_ne!(x, Float::NAN);
+        assert_ne!(x, Float::INFINITY);
+        assert_ne!(x, Float::NEGATIVE_INFINITY);
     });
 
     float_rational_pair_gen_var_1().test_properties(|(x, y)| {

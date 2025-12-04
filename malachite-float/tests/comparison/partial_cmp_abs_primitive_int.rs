@@ -8,10 +8,13 @@
 
 use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
+use malachite_base::test_util::generators::{
+    signed_gen, signed_pair_gen, unsigned_gen, unsigned_pair_gen_var_27,
+};
 use malachite_base::{apply_fn_to_signeds, apply_fn_to_unsigneds};
 use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
@@ -30,6 +33,7 @@ fn test_partial_cmp_abs_u32() {
         assert_eq!(u.to_string(), s);
 
         assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!((&u).abs().partial_cmp(&v), out);
         assert_eq!(v.partial_cmp_abs(&u), out.map(Ordering::reverse));
         assert_eq!(rug::Float::exact_from(&u).abs().partial_cmp(&v), out);
     };
@@ -197,6 +201,7 @@ fn test_partial_cmp_abs_u64() {
         assert_eq!(u.to_string(), s);
 
         assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!((&u).abs().partial_cmp(&v), out);
         assert_eq!(v.partial_cmp_abs(&u), out.map(Ordering::reverse));
         assert_eq!(rug::Float::exact_from(&u).abs().partial_cmp(&v), out);
     };
@@ -364,6 +369,7 @@ fn test_partial_cmp_abs_i32() {
         assert_eq!(u.to_string(), s);
 
         assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!((&u).abs().partial_cmp(&v.unsigned_abs()), out);
         assert_eq!(v.partial_cmp_abs(&u), out.map(Ordering::reverse));
         assert_eq!(
             rug::Float::exact_from(&u)
@@ -640,6 +646,7 @@ fn test_partial_cmp_abs_i64() {
         assert_eq!(u.to_string(), s);
 
         assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!((&u).abs().partial_cmp(&v.unsigned_abs()), out);
         assert_eq!(v.partial_cmp_abs(&u), out.map(Ordering::reverse));
         assert_eq!(
             rug::Float::exact_from(&u)
@@ -951,6 +958,14 @@ where
         partial_cmp_abs_primitive_int_properties_helper_unsigned_helper(n, u);
     });
 
+    unsigned_gen::<T>().test_properties(|x| {
+        assert!(x.partial_cmp_abs(&Float::NAN).is_none());
+        assert!(x.ge_abs(&Float::ZERO));
+        assert!(x.ge_abs(&Float::NEGATIVE_ZERO));
+        assert!(x.lt_abs(&Float::INFINITY));
+        assert!(x.lt_abs(&Float::NEGATIVE_INFINITY));
+    });
+
     float_float_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n.lt_abs(&u) && u.lt_abs(&m) {
             assert_eq!(PartialOrdAbs::<Float>::partial_cmp_abs(&n, &m), Some(Less));
@@ -971,8 +986,8 @@ where
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
-        assert_eq!(Float::from(x).partial_cmp_abs(&y), x.partial_cmp_abs(&y));
-        assert_eq!(x.partial_cmp_abs(&Float::from(y)), x.partial_cmp_abs(&y));
+        assert_eq!(Float::from(x).partial_cmp_abs(&y), Some(x.cmp(&y)));
+        assert_eq!(x.partial_cmp_abs(&Float::from(y)), Some(x.cmp(&y)));
     });
 }
 
@@ -1021,6 +1036,14 @@ where
 
     float_signed_pair_gen_var_4::<T>().test_properties(|(n, i)| {
         partial_cmp_abs_primitive_int_properties_helper_signed_helper(n, i);
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        assert!(x.partial_cmp_abs(&Float::NAN).is_none());
+        assert!(x.ge_abs(&Float::ZERO));
+        assert!(x.ge_abs(&Float::NEGATIVE_ZERO));
+        assert!(x.lt_abs(&Float::INFINITY));
+        assert!(x.lt_abs(&Float::NEGATIVE_INFINITY));
     });
 
     float_float_signed_triple_gen::<T>().test_properties(|(n, m, i)| {

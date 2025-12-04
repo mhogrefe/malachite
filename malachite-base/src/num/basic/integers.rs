@@ -33,7 +33,6 @@ use crate::num::arithmetic::traits::{
     WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use crate::num::basic::traits::{One, Two, Zero};
-use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase, IsInteger,
     OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
@@ -163,7 +162,6 @@ pub trait PrimitiveInt:
     + DivisibleBy<Self>
     + DivisibleByPowerOf2
     + Eq
-    + EqAbs<Self>
     + EqMod<Self, Self>
     + EqModPowerOf2<Self>
     + ExactFrom<i128>
@@ -225,7 +223,6 @@ pub trait PrimitiveInt:
     + Octal
     + One
     + Ord
-    + OrdAbs
     + OverflowingAdd<Self, Output = Self>
     + OverflowingAddAssign<Self>
     + OverflowingAddMul<Self, Self, Output = Self>
@@ -271,7 +268,6 @@ pub trait PrimitiveInt:
     + Parity
     + PartialEq<Self>
     + PartialOrd<Self>
-    + PartialOrdAbs<Self>
     + Pow<u64, Output = Self>
     + PowAssign<u64>
     + PowerOf2<u64>
@@ -643,7 +639,6 @@ pub trait PrimitiveInt:
     + DivisibleBy<Self>
     + DivisibleByPowerOf2
     + Eq
-    + EqAbs<Self>
     + EqMod<Self, Self>
     + EqModPowerOf2<Self>
     + ExactFrom<i128>
@@ -704,7 +699,6 @@ pub trait PrimitiveInt:
     + Octal
     + One
     + Ord
-    + OrdAbs
     + OverflowingAdd<Self, Output = Self>
     + OverflowingAddAssign<Self>
     + OverflowingAddMul<Self, Self, Output = Self>
@@ -750,7 +744,6 @@ pub trait PrimitiveInt:
     + Parity
     + PartialEq<Self>
     + PartialOrd<Self>
-    + PartialOrdAbs<Self>
     + Pow<u64, Output = Self>
     + PowAssign<u64>
     + PowerOf2<u64>

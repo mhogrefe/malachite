@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -23,8 +24,8 @@ use std::str::FromStr;
 fn test_partial_cmp_abs_u32() {
     let test = |s, v: u32, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
         let u = Integer::from_str(s).unwrap();
-
         assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v), cmp);
         assert_eq!(v.partial_cmp_abs(&u), cmp.map(Ordering::reverse));
         assert_eq!(lt, u.lt_abs(&v));
         assert_eq!(gt, u.gt_abs(&v));
@@ -66,19 +67,18 @@ fn test_partial_cmp_abs_u32() {
 #[test]
 fn test_partial_cmp_abs_u64() {
     let test = |u, v: u64, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
-        assert_eq!(
-            v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(Ordering::reverse)
-        );
-        assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
-        assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
-        assert_eq!(le, Integer::from_str(u).unwrap().le_abs(&v));
-        assert_eq!(ge, Integer::from_str(u).unwrap().ge_abs(&v));
-        assert_eq!(lt, v.gt_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(gt, v.lt_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(le, v.ge_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(ge, v.le_abs(&Integer::from_str(u).unwrap()));
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v), cmp);
+        assert_eq!(v.partial_cmp_abs(&u), cmp.map(Ordering::reverse));
+        assert_eq!(lt, u.lt_abs(&v));
+        assert_eq!(gt, u.gt_abs(&v));
+        assert_eq!(le, u.le_abs(&v));
+        assert_eq!(ge, u.ge_abs(&v));
+        assert_eq!(lt, v.gt_abs(&u));
+        assert_eq!(gt, v.lt_abs(&u));
+        assert_eq!(le, v.ge_abs(&u));
+        assert_eq!(ge, v.le_abs(&u));
     };
     test("0", 0, Some(Equal), false, false, true, true);
     test("0", 5, Some(Less), true, false, true, false);
@@ -147,19 +147,18 @@ fn test_partial_cmp_abs_u64() {
 #[test]
 fn test_partial_cmp_abs_i32() {
     let test = |u, v: i32, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
-        assert_eq!(
-            v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(Ordering::reverse)
-        );
-        assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
-        assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
-        assert_eq!(le, Integer::from_str(u).unwrap().le_abs(&v));
-        assert_eq!(ge, Integer::from_str(u).unwrap().ge_abs(&v));
-        assert_eq!(lt, v.gt_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(gt, v.lt_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(le, v.ge_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(ge, v.le_abs(&Integer::from_str(u).unwrap()));
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v.unsigned_abs()), cmp);
+        assert_eq!(v.partial_cmp_abs(&u), cmp.map(Ordering::reverse));
+        assert_eq!(lt, u.lt_abs(&v));
+        assert_eq!(gt, u.gt_abs(&v));
+        assert_eq!(le, u.le_abs(&v));
+        assert_eq!(ge, u.ge_abs(&v));
+        assert_eq!(lt, v.gt_abs(&u));
+        assert_eq!(gt, v.lt_abs(&u));
+        assert_eq!(le, v.ge_abs(&u));
+        assert_eq!(ge, v.le_abs(&u));
     };
     test("0", 0, Some(Equal), false, false, true, true);
     test("0", 5, Some(Less), true, false, true, false);
@@ -217,19 +216,18 @@ fn test_partial_cmp_abs_i32() {
 #[test]
 fn test_partial_cmp_abs_i64() {
     let test = |u, v: i64, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
-        assert_eq!(
-            v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(Ordering::reverse)
-        );
-        assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
-        assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
-        assert_eq!(le, Integer::from_str(u).unwrap().le_abs(&v));
-        assert_eq!(ge, Integer::from_str(u).unwrap().ge_abs(&v));
-        assert_eq!(lt, v.gt_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(gt, v.lt_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(le, v.ge_abs(&Integer::from_str(u).unwrap()));
-        assert_eq!(ge, v.le_abs(&Integer::from_str(u).unwrap()));
+        let u = Integer::from_str(u).unwrap();
+        assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v.unsigned_abs()), cmp);
+        assert_eq!(v.partial_cmp_abs(&u), cmp.map(Ordering::reverse));
+        assert_eq!(lt, u.lt_abs(&v));
+        assert_eq!(gt, u.gt_abs(&v));
+        assert_eq!(le, u.le_abs(&v));
+        assert_eq!(ge, u.ge_abs(&v));
+        assert_eq!(lt, v.gt_abs(&u));
+        assert_eq!(gt, v.lt_abs(&u));
+        assert_eq!(le, v.ge_abs(&u));
+        assert_eq!(ge, v.le_abs(&u));
     };
     test("0", 0, Some(Equal), false, false, true, true);
     test("0", 5, Some(Less), true, false, true, false);
@@ -360,16 +358,17 @@ fn partial_cmp_abs_primitive_int_properties_helper_unsigned<
     T: PartialOrdAbs<Integer> + PrimitiveUnsigned,
 >()
 where
-    Integer: From<T> + PartialOrdAbs<T>,
+    Integer: From<T> + PartialOrdAbs<T> + PartialOrd<T>,
 {
-    integer_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
-        let cmp = n.partial_cmp_abs(&u);
-        assert_eq!(Some(n.cmp_abs(&Integer::from(u))), cmp);
+    integer_unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+        let cmp = x.partial_cmp_abs(&y);
+        assert_eq!((&x).abs().partial_cmp(&y), cmp);
+        assert_eq!(Some(x.cmp_abs(&Integer::from(y))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
-        assert_eq!(u.partial_cmp_abs(&n), cmp_rev);
-        assert_eq!(Some(Integer::from(u).cmp_abs(&n)), cmp_rev);
-        assert_eq!((-n).partial_cmp_abs(&u), cmp);
+        assert_eq!(y.partial_cmp_abs(&x), cmp_rev);
+        assert_eq!(Some(Integer::from(y).cmp_abs(&x)), cmp_rev);
+        assert_eq!((-x).partial_cmp_abs(&y), cmp);
     });
 
     integer_integer_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
@@ -382,9 +381,9 @@ where
 
     integer_unsigned_unsigned_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u.lt_abs(&n) && n.lt_abs(&v) {
-            assert!(u.lt_abs(&v));
+            assert!(u < v);
         } else if u.gt_abs(&n) && n.gt_abs(&v) {
-            assert!(u.gt_abs(&v));
+            assert!(u > v);
         }
     });
 
@@ -393,8 +392,8 @@ where
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
-        assert_eq!(Integer::from(x).partial_cmp_abs(&y), Some(x.cmp_abs(&y)));
-        assert_eq!(x.partial_cmp_abs(&Integer::from(y)), Some(x.cmp_abs(&y)));
+        assert_eq!(Integer::from(x).partial_cmp_abs(&y), Some(x.cmp(&y)));
+        assert_eq!(x.partial_cmp_abs(&Integer::from(y)), Some(x.cmp(&y)));
     });
 }
 
@@ -402,19 +401,20 @@ fn partial_cmp_abs_primitive_int_properties_helper_signed<
     T: PartialOrdAbs<Integer> + PartialOrd<rug::Integer> + PrimitiveSigned,
 >()
 where
-    Integer: From<T> + PartialOrdAbs<T>,
+    Integer: From<T> + PartialOrdAbs<T> + PartialOrd<<T as UnsignedAbs>::Output>,
 {
-    integer_signed_pair_gen::<T>().test_properties(|(n, i)| {
-        let cmp = n.partial_cmp_abs(&i);
-        assert_eq!(Some(n.cmp_abs(&Integer::from(i))), cmp);
+    integer_signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let cmp = x.partial_cmp_abs(&y);
+        assert_eq!((&x).abs().partial_cmp(&y.unsigned_abs()), cmp);
+        assert_eq!(Some(x.cmp_abs(&Integer::from(y))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
-        assert_eq!(i.partial_cmp_abs(&n), cmp_rev);
-        assert_eq!(Some(Integer::from(i).cmp_abs(&n)), cmp_rev);
-        assert_eq!((-&n).partial_cmp_abs(&i), cmp);
-        if i != T::MIN {
-            assert_eq!(n.partial_cmp_abs(&-i), cmp);
-            assert_eq!((-n).partial_cmp_abs(&-i), cmp);
+        assert_eq!(y.partial_cmp_abs(&x), cmp_rev);
+        assert_eq!(Some(Integer::from(y).cmp_abs(&x)), cmp_rev);
+        assert_eq!((-&x).partial_cmp_abs(&y), cmp);
+        if y != T::MIN {
+            assert_eq!(x.partial_cmp_abs(&-y), cmp);
+            assert_eq!((-x).partial_cmp_abs(&-y), cmp);
         }
     });
 

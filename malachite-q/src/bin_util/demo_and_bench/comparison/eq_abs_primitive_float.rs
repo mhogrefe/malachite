@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::float::NiceFloat;
@@ -20,8 +21,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_rational_eq_abs_primitive_float);
     register_primitive_float_demos!(runner, demo_primitive_float_eq_abs_rational);
 
-    register_primitive_float_benches!(runner, benchmark_rational_eq_abs_primitive_float);
-    register_primitive_float_benches!(runner, benchmark_primitive_float_eq_abs_rational);
+    register_primitive_float_benches!(runner, benchmark_rational_eq_abs_primitive_float_algorithms);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_eq_abs_rational_algorithms);
 }
 
 fn demo_rational_eq_abs_primitive_float<T: PrimitiveFloat>(
@@ -60,27 +61,34 @@ fn demo_primitive_float_eq_abs_rational<T: EqAbs<Rational> + PrimitiveFloat>(
     }
 }
 
-fn benchmark_rational_eq_abs_primitive_float<T: PrimitiveFloat>(
+#[allow(unused_must_use)]
+fn benchmark_rational_eq_abs_primitive_float_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Rational: EqAbs<T>,
+    Rational: EqAbs<T> + PartialEq<T>,
 {
     run_benchmark(
         &format!("Rational.eq_abs(&{})", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.eq_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.eq_abs(&y))),
+            ("using abs", &mut |(x, y)| no_out!(x.abs() == y.abs())),
+        ],
     );
 }
 
-fn benchmark_primitive_float_eq_abs_rational<T: EqAbs<Rational> + PrimitiveFloat>(
+#[allow(unused_must_use)]
+fn benchmark_primitive_float_eq_abs_rational_algorithms<
+    T: EqAbs<Rational> + PartialEq<Rational> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -88,12 +96,15 @@ fn benchmark_primitive_float_eq_abs_rational<T: EqAbs<Rational> + PrimitiveFloat
 ) {
     run_benchmark(
         &format!("{}.eq_abs(&Rational)", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.eq_abs(&x)))],
+        &mut [
+            ("Malachite", &mut |(x, y)| no_out!(y.eq_abs(&x))),
+            ("using abs", &mut |(x, y)| no_out!(y.abs() == x.abs())),
+        ],
     );
 }

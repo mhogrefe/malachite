@@ -17,6 +17,7 @@ use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_nice_float_cmp);
+
     register_primitive_float_benches!(runner, benchmark_nice_float_cmp_algorithms);
 }
 

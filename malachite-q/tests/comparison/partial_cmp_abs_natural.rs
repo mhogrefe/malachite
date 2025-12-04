@@ -25,6 +25,7 @@ fn test_partial_cmp_abs_rational_natural() {
         let v = Natural::from_str(t).unwrap();
 
         assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&v), cmp);
         assert_eq!(v.partial_cmp_abs(&u).map(Ordering::reverse), cmp);
         assert_eq!(lt, u.lt_abs(&v));
         assert_eq!(gt, u.gt_abs(&v));

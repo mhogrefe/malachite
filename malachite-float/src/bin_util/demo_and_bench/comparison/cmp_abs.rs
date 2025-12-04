@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -32,8 +33,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_comparable_float_ref_partial_cmp_abs_debug);
 
     register_bench!(runner, benchmark_float_partial_cmp_abs_library_comparison);
-    register_bench!(runner, benchmark_comparable_float_cmp_abs);
-    register_bench!(runner, benchmark_comparable_float_ref_cmp_abs);
+    register_bench!(runner, benchmark_float_partial_cmp_abs_algorithms);
+    register_bench!(runner, benchmark_comparable_float_cmp_abs_algorithms);
+    register_bench!(runner, benchmark_comparable_float_ref_cmp_abs_algorithms);
 }
 
 fn demo_float_partial_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -190,7 +192,34 @@ fn benchmark_float_partial_cmp_abs_library_comparison(
     );
 }
 
-fn benchmark_comparable_float_cmp_abs(
+#[allow(unused_must_use)]
+fn benchmark_float_partial_cmp_abs_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer.cmp_abs(&Integer)",
+        BenchmarkType::Algorithms,
+        float_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| {
+                no_out!(x.partial_cmp_abs(&y));
+            }),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.abs()));
+            }),
+        ],
+    );
+}
+
+#[allow(unused_must_use)]
+fn benchmark_comparable_float_cmp_abs_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -198,19 +227,25 @@ fn benchmark_comparable_float_cmp_abs(
 ) {
     run_benchmark(
         "ComparableFloat.cmp_abs(&ComparableFloat)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         float_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_float_max_complexity_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| {
-            no_out!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)));
-        })],
+        &mut [
+            ("default", &mut |(x, y)| {
+                no_out!(ComparableFloat(x).cmp_abs(&ComparableFloat(y)));
+            }),
+            ("using abs", &mut |(x, y)| {
+                no_out!(ComparableFloat(x.abs()).partial_cmp(&ComparableFloat(y.abs())));
+            }),
+        ],
     );
 }
 
-fn benchmark_comparable_float_ref_cmp_abs(
+#[allow(unused_must_use)]
+fn benchmark_comparable_float_ref_cmp_abs_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -218,14 +253,19 @@ fn benchmark_comparable_float_ref_cmp_abs(
 ) {
     run_benchmark(
         "ComparableFloatRef.cmp_abs(&ComparableFloatRef)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         float_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_float_max_complexity_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| {
-            no_out!(ComparableFloatRef(&x).cmp_abs(&ComparableFloatRef(&y)));
-        })],
+        &mut [
+            ("default", &mut |(x, y)| {
+                no_out!(ComparableFloatRef(&x).cmp_abs(&ComparableFloatRef(&y)));
+            }),
+            ("using abs", &mut |(x, y)| {
+                no_out!(ComparableFloatRef(&x.abs()).partial_cmp(&ComparableFloatRef(&y.abs())));
+            }),
+        ],
     );
 }

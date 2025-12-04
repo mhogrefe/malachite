@@ -23,8 +23,6 @@
 /// use malachite_base::num::comparison::traits::OrdAbs;
 /// use std::cmp::Ordering::*;
 ///
-/// assert_eq!(123u32.cmp_abs(&456), Less);
-/// assert_eq!(123u32.cmp_abs(&123), Equal);
 /// assert_eq!(123i32.cmp_abs(&-456), Less);
 /// assert_eq!(123i32.cmp_abs(&-123), Equal);
 /// ```
@@ -35,10 +33,10 @@ pub mod cmp_abs;
 /// ```
 /// use malachite_base::num::comparison::traits::EqAbs;
 ///
-/// assert_eq!(123u32.eq_abs(&456), false);
-/// assert_eq!(123u32.eq_abs(&123), true);
 /// assert_eq!(123i32.eq_abs(&-456), false);
 /// assert_eq!(123i32.eq_abs(&-123), true);
+/// assert_eq!(1.0.eq_abs(&-1.0), true);
+/// assert_eq!(1.0.eq_abs(&f64::NAN), false);
 /// ```
 pub mod eq_abs;
 /// Various traits for comparing numbers.

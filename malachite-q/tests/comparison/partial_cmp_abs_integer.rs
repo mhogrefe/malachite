@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
@@ -24,6 +25,7 @@ fn test_partial_cmp_abs_rational_integer() {
         let v = Integer::from_str(t).unwrap();
 
         assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!((&u).abs().partial_cmp(&(&v).abs()), cmp);
         assert_eq!(v.partial_cmp_abs(&u).map(Ordering::reverse), cmp);
         assert_eq!(lt, u.lt_abs(&v));
         assert_eq!(gt, u.gt_abs(&v));
@@ -141,6 +143,7 @@ fn test_partial_cmp_abs_rational_integer() {
 fn partial_cmp_abs_integer_properties() {
     rational_integer_pair_gen().test_properties(|(x, y)| {
         let cmp = x.partial_cmp_abs(&y);
+        assert_eq!((&x).abs().partial_cmp(&(&y).abs()), cmp);
         assert_eq!(x.cmp_abs(&Rational::from(&y)), cmp.unwrap());
         assert_eq!(y.partial_cmp_abs(&x), cmp.map(Ordering::reverse));
     });

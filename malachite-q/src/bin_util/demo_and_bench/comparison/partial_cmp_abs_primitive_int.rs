@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -39,10 +40,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_unsigned_ge_abs_rational);
     register_signed_demos!(runner, demo_signed_ge_abs_rational);
 
-    register_unsigned_benches!(runner, benchmark_rational_partial_cmp_abs_unsigned);
-    register_signed_benches!(runner, benchmark_rational_partial_cmp_abs_signed);
-    register_unsigned_benches!(runner, benchmark_unsigned_partial_cmp_abs_rational);
-    register_signed_benches!(runner, benchmark_signed_partial_cmp_abs_rational);
+    register_unsigned_benches!(
+        runner,
+        benchmark_rational_partial_cmp_abs_unsigned_algorithms
+    );
+    register_signed_benches!(runner, benchmark_rational_partial_cmp_abs_signed_algorithms);
+    register_unsigned_benches!(
+        runner,
+        benchmark_unsigned_partial_cmp_abs_rational_algorithms
+    );
+    register_signed_benches!(runner, benchmark_signed_partial_cmp_abs_rational_algorithms);
     register_unsigned_benches!(runner, benchmark_rational_lt_abs_unsigned);
     register_signed_benches!(runner, benchmark_rational_lt_abs_signed);
     register_unsigned_benches!(runner, benchmark_rational_gt_abs_unsigned);
@@ -379,47 +386,60 @@ fn demo_signed_ge_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveSigned>(
     }
 }
 
-fn benchmark_rational_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
+#[allow(unused_must_use)]
+fn benchmark_rational_partial_cmp_abs_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Rational: PartialOrdAbs<T>,
+    Rational: PartialOrdAbs<T> + PartialOrd<T>,
 {
     run_benchmark(
         &format!("Rational.partial_cmp_abs(&{})", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_unsigned_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| no_out!(x.abs().partial_cmp(&y))),
+        ],
     );
 }
 
-fn benchmark_rational_partial_cmp_abs_signed<T: PrimitiveSigned>(
+#[allow(unused_must_use)]
+fn benchmark_rational_partial_cmp_abs_signed_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Rational: PartialOrdAbs<T>,
+    Rational: PartialOrdAbs<T> + PartialOrd<<T as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("Rational.partial_cmp_abs(&{})", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(x.abs().partial_cmp(&y.unsigned_abs()));
+            }),
+        ],
     );
 }
 
-fn benchmark_unsigned_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveUnsigned>(
+#[allow(unused_must_use)]
+fn benchmark_unsigned_partial_cmp_abs_rational_algorithms<
+    T: PartialOrdAbs<Rational> + PartialOrd<Rational> + PrimitiveUnsigned,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -427,31 +447,44 @@ fn benchmark_unsigned_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + Prim
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&Rational)", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_unsigned_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x))),
+            ("using abs", &mut |(x, y)| no_out!(y.partial_cmp(&x.abs()))),
+        ],
     );
 }
 
-fn benchmark_signed_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveSigned>(
+#[allow(unused_must_use)]
+fn benchmark_signed_partial_cmp_abs_rational_algorithms<
+    T: PartialOrdAbs<Rational> + PrimitiveSigned,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
-) {
+) where
+    <T as UnsignedAbs>::Output: PartialOrd<Rational>,
+{
     run_benchmark(
         &format!("{}.partial_cmp_abs(&Rational)", T::NAME),
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         rational_signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x)))],
+        &mut [
+            ("default", &mut |(x, y)| no_out!(y.partial_cmp_abs(&x))),
+            ("using abs", &mut |(x, y)| {
+                no_out!(y.unsigned_abs().partial_cmp(&x.abs()));
+            }),
+        ],
     );
 }
 

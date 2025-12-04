@@ -7,9 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
+use malachite_base::test_util::generators::{
+    signed_gen, signed_pair_gen, unsigned_gen, unsigned_pair_gen_var_27,
+};
 use malachite_base::{apply_fn_to_signeds, apply_fn_to_unsigneds};
 use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
@@ -472,6 +475,12 @@ where
         partial_eq_primitive_int_properties_helper_unsigned_helper(n, u);
     });
 
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_ne!(x, Float::NAN);
+        assert_ne!(x, Float::INFINITY);
+        assert_ne!(x, Float::NEGATIVE_INFINITY);
+    });
+
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         assert_eq!(Float::from(x) == y, x == y);
         assert_eq!(x == Float::from(y), x == y);
@@ -512,6 +521,12 @@ where
 
     float_signed_pair_gen_var_4::<T>().test_properties(|(n, i)| {
         partial_eq_primitive_int_properties_helper_signed_helper(n, i);
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        assert_ne!(x, Float::NAN);
+        assert_ne!(x, Float::INFINITY);
+        assert_ne!(x, Float::NEGATIVE_INFINITY);
     });
 
     signed_pair_gen::<T>().test_properties(|(x, y)| {

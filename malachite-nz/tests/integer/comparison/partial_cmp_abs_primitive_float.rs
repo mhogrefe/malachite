@@ -21,13 +21,16 @@ use std::str::FromStr;
 #[test]
 fn test_partial_cmp_abs_primitive_float() {
     let test = |u, v: f32, out: Option<Ordering>| {
+        let u = Integer::from_str(u).unwrap();
+
         let out_rev = out.map(Ordering::reverse);
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), out);
-        assert_eq!(v.partial_cmp_abs(&Integer::from_str(u).unwrap()), out_rev);
+        assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!((&u).abs().partial_cmp_abs(&v.abs()), out);
+        assert_eq!(v.partial_cmp_abs(&u), out_rev);
 
         let v = f64::from(v);
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), out);
-        assert_eq!(v.partial_cmp_abs(&Integer::from_str(u).unwrap()), out_rev);
+        assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!(v.partial_cmp_abs(&u), out_rev);
     };
     test("5", f32::NAN, None);
     test("5", f32::INFINITY, Some(Less));
@@ -67,13 +70,14 @@ fn partial_cmp_abs_primitive_float_properties_helper<T: PartialOrdAbs<Integer> +
 where
     Integer: PartialOrd<T> + PartialOrdAbs<T>,
 {
-    integer_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
-        let cmp_abs = n.partial_cmp_abs(&u);
+    integer_primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
+        let cmp_abs = x.partial_cmp_abs(&y);
         let cmp_abs_rev = cmp_abs.map(Ordering::reverse);
-        assert_eq!(u.partial_cmp_abs(&n), cmp_abs_rev);
+        assert_eq!((&x).abs().partial_cmp_abs(&y.abs()), cmp_abs);
+        assert_eq!(y.partial_cmp_abs(&x), cmp_abs_rev);
 
-        assert_eq!((&n).abs().partial_cmp(&u.abs()), cmp_abs);
-        assert_eq!(n.partial_cmp_abs(&-u), cmp_abs);
+        assert_eq!((&x).abs().partial_cmp(&y.abs()), cmp_abs);
+        assert_eq!(x.partial_cmp_abs(&-y), cmp_abs);
     });
 
     integer_integer_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {
@@ -86,9 +90,9 @@ where
 
     integer_primitive_float_primitive_float_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u.lt_abs(&n) && n.lt_abs(&v) {
-            assert!(u.abs() < v.abs());
+            assert!(u.lt_abs(&v));
         } else if u.gt_abs(&n) && n.gt_abs(&v) {
-            assert!(u.abs() > v.abs());
+            assert!(u.gt_abs(&v));
         }
     });
 

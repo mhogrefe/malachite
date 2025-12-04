@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::*;
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::{EqAbs, OrdAbs};
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::platform::SignedLimb;
@@ -17,10 +18,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_eq_abs() {
-    let test = |s, t, eq| {
+    let test = |s, t, eq: bool| {
         let u = Rational::from_str(s).unwrap();
         let v = Rational::from_str(t).unwrap();
         assert_eq!(u.eq_abs(&v), eq);
+        assert_eq!(u.ne_abs(&v), !eq);
+        assert_eq!((&u).abs() == (&v).abs(), eq);
         assert_eq!(v.eq_abs(&u), eq);
     };
     test("0", "0", true);
@@ -73,6 +76,8 @@ fn eq_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let eq = x.eq_abs(&y);
         assert_eq!(y.eq_abs(&x), eq);
+        assert_eq!(x.ne_abs(&y), !eq);
+        assert_eq!((&x).abs() == (&y).abs(), eq);
         assert_eq!(x.cmp_abs(&y) == Equal, eq);
         assert_eq!(x.eq_abs(&-&y), eq);
         assert_eq!((-&x).eq_abs(&y), eq);

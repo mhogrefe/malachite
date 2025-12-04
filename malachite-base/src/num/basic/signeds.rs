@@ -14,6 +14,7 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::traits::NegativeOne;
+use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use crate::num::logic::traits::CheckedHammingDistance;
 #[cfg(feature = "random")]
 use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
@@ -35,14 +36,17 @@ pub trait PrimitiveSigned:
     + CeilingModPowerOf2Assign
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
+    + EqAbs<Self>
     + ExtendedGcd<Self, Cofactor = Self>
     + From<i8>
     + HasRandomSignedRange
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne
+    + OrdAbs
     + OverflowingAbs<Output = Self>
     + OverflowingAbsAssign
+    + PartialOrdAbs<Self>
     + PrimitiveInt
     + RandomSignedChunkable
     + SaturatingAbs<Output = Self>
@@ -68,13 +72,16 @@ pub trait PrimitiveSigned:
     + CeilingModPowerOf2Assign
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
+    + EqAbs<Self>
     + ExtendedGcd<Self, Cofactor = Self>
     + From<i8>
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne
+    + OrdAbs
     + OverflowingAbs<Output = Self>
     + OverflowingAbsAssign
+    + PartialOrdAbs<Self>
     + PrimitiveInt
     + SaturatingAbs<Output = Self>
     + SaturatingAbsAssign
