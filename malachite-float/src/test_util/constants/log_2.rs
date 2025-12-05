@@ -6,6 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod log_2;
-pub mod prime_constant;
-pub mod thue_morse_constant;
+use malachite_base::num::conversion::traits::ExactFrom;
+use rug;
+use rug::float::{Constant, Round};
+use rug::ops::AssignRound;
+use std::cmp::Ordering;
+
+pub fn rug_log_2_prec_round(prec: u64, rm: Round) -> (rug::Float, Ordering) {
+    let mut log_2 = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = log_2.assign_round(Constant::Log2, rm);
+    (log_2, o)
+}

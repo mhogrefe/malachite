@@ -388,9 +388,8 @@ impl Float {
             return (Self::ZERO, Equal);
         }
         let bits = x.significant_bits();
-        if let Ok(bits_i32) = i32::try_from(bits)
-            && bits_i32 <= Self::MAX_EXPONENT
-        {
+        let bits_i32 = i32::saturating_from(bits);
+        if bits_i32 <= Self::MAX_EXPONENT {
             let mut f = Self(Finite {
                 sign: true,
                 exponent: bits_i32,
@@ -469,9 +468,8 @@ impl Float {
         }
         let bits = x.significant_bits();
         if bits <= prec {
-            if let Ok(bits_i32) = i32::try_from(bits)
-                && bits_i32 <= Self::MAX_EXPONENT
-            {
+            let bits_i32 = i32::saturating_from(bits);
+            if bits_i32 <= Self::MAX_EXPONENT {
                 let mut f = Self(Finite {
                     sign: true,
                     exponent: bits_i32,

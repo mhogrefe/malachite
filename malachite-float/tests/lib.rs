@@ -114,6 +114,7 @@ pub mod comparison {
     pub mod partial_eq_rational;
 }
 pub mod constants {
+    pub mod log_2;
     pub mod prime_constant;
     pub mod thue_morse_constant;
 }

@@ -27,8 +27,40 @@ use malachite_base::slices::slice_test_zero;
 // This is MPFR_CAN_ROUND from mpfr-impl.h, MPFR 4.2.0.
 pub fn float_can_round(x: &Natural, err0: u64, prec: u64, rm: RoundingMode) -> bool {
     match x {
-        Natural(Small(small)) => limbs_float_can_round(&[*small], err0, prec, rm),
+        Natural(Small(small)) => limb_float_can_round(*small, err0, prec, rm),
         Natural(Large(xs)) => limbs_float_can_round(xs, err0, prec, rm),
+    }
+}
+
+pub(crate) fn limb_float_can_round(x: Limb, err0: u64, mut prec: u64, rm: RoundingMode) -> bool {
+    if rm == Nearest {
+        prec += 1;
+    }
+    assert!(x.get_highest_bit());
+    let err = min(err0, u64::power_of_2(Limb::LOG_WIDTH));
+    if err <= prec {
+        return false;
+    }
+    let mut s = Limb::WIDTH - (prec & Limb::WIDTH_MASK);
+    let n = usize::exact_from(err >> Limb::LOG_WIDTH);
+    // Check first limb
+    let mask = Limb::low_mask(s);
+    let mut tmp = x & mask;
+    s = Limb::WIDTH - (err & Limb::WIDTH_MASK);
+    if n == 0 {
+        // prec and error are in the same limb
+        assert!(s < Limb::WIDTH);
+        tmp >>= s;
+        tmp != 0 && tmp != mask >> s
+    } else if tmp == 0 {
+        // Check if error limb is 0
+        s != Limb::WIDTH && x >> s != 0
+    } else if tmp == mask {
+        // Check if error limb is 0
+        s != Limb::WIDTH && x >> s != Limb::MAX >> s
+    } else {
+        // limb is different from 000000 or 1111111
+        true
     }
 }
 
@@ -53,11 +85,7 @@ pub(crate) fn limbs_float_can_round(
     assert!(len > k);
     // Check first limb
     let mut i = len - k - 1;
-    let mask = if s == Limb::WIDTH {
-        Limb::MAX
-    } else {
-        Limb::low_mask(s)
-    };
+    let mask = Limb::low_mask(s);
     let mut tmp = xs[i] & mask;
     i.wrapping_sub_assign(1);
     if n == 0 {
