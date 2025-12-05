@@ -24,7 +24,7 @@ macro_rules! impl_float {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
+            /// See [here](super::cmp_abs_primitive_float#partial_cmp_abs).
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.unsigned_abs().partial_cmp(&other.abs())
             }
@@ -40,7 +40,7 @@ macro_rules! impl_float {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
             ///
-            /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
+            /// See [here](super::cmp_abs_primitive_float#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

@@ -2348,10 +2348,11 @@ pub fn float_rational_rounding_mode_triple_gen_var_9() -> Generator<(Float, Rati
     )
 }
 
+type FRR = Generator<(Float, Rational, RoundingMode)>;
+
 // All `(Float, Rational, RoundingMode)` that are valid inputs to `Float::div_round_rational`, where
 // the `Float` is extreme.
-pub fn float_rational_rounding_mode_triple_gen_var_10() -> Generator<(Float, Rational, RoundingMode)>
-{
+pub fn float_rational_rounding_mode_triple_gen_var_10() -> FRR {
     Generator::new(
         &exhaustive_float_rational_rounding_mode_triple_gen_var_10,
         &random_float_rational_rounding_mode_triple_gen_var_10,
@@ -2361,8 +2362,7 @@ pub fn float_rational_rounding_mode_triple_gen_var_10() -> Generator<(Float, Rat
 
 // All `(Float, Rational, RoundingMode)` that are valid inputs to `Float::rational_div_float_round`,
 // where the `Float` is extreme (with the first two arguments reversed).
-pub fn float_rational_rounding_mode_triple_gen_var_11() -> Generator<(Float, Rational, RoundingMode)>
-{
+pub fn float_rational_rounding_mode_triple_gen_var_11() -> FRR {
     Generator::new(
         &exhaustive_float_rational_rounding_mode_triple_gen_var_11,
         &random_float_rational_rounding_mode_triple_gen_var_11,

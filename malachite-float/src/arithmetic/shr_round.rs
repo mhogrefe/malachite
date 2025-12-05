@@ -150,7 +150,7 @@ impl Float {
     /// exactly with the specified precision.
     ///
     /// # Examples
-    /// See [here](super::shr_prec_round#shr_prec_round).
+    /// See [here](super::shr_round#shr_prec_round).
     pub fn shr_prec_round<T: PrimitiveInt>(
         mut self,
         bits: T,
@@ -194,7 +194,7 @@ impl Float {
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::shr_prec_ref`] instead. If
     /// you know that your target precision is the precision of the input, consider using
-    /// [`Float::shr_round_ref`] instead. If both of these things are true, or you don't care about
+    /// [`Float::shr_round`] instead. If both of these things are true, or you don't care about
     /// overflow or underflow behavior, consider using `>>` instead.
     ///
     /// # Worst-case complexity
@@ -209,7 +209,7 @@ impl Float {
     /// exactly with the specified precision.
     ///
     /// # Examples
-    /// See [here](super::shr_prec_round#shr_prec_round).
+    /// See [here](super::shr_round#shr_prec_round).
     pub fn shr_prec_round_ref<T: PrimitiveInt>(
         &self,
         bits: T,
@@ -269,7 +269,7 @@ impl Float {
     /// exactly with the specified precision.
     ///
     /// # Examples
-    /// See [here](super::shr_prec_round#shr_prec_round).
+    /// See [here](super::shr_round#shr_prec_round).
     pub fn shr_prec_round_assign<T: PrimitiveInt>(
         &mut self,
         bits: T,
@@ -318,7 +318,7 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
-    /// See [here](super::shr_prec#shr_prec).
+    /// See [here](super::shr_round#shr_prec).
     #[inline]
     pub fn shr_prec<T: PrimitiveInt>(self, bits: T, prec: u64) -> (Self, Ordering) {
         self.shr_prec_round(bits, prec, Nearest)
@@ -351,7 +351,7 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
-    /// See [here](super::shr_prec#shr_prec).
+    /// See [here](super::shr_round#shr_prec).
     #[inline]
     pub fn shr_prec_ref<T: PrimitiveInt>(&self, bits: T, prec: u64) -> (Self, Ordering) {
         self.shr_prec_round_ref(bits, prec, Nearest)
@@ -384,7 +384,7 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
-    /// See [here](super::shr_prec#shr_prec).
+    /// See [here](super::shr_round#shr_prec).
     #[inline]
     pub fn shr_prec_assign<T: PrimitiveInt>(&mut self, bits: T, prec: u64) -> Ordering {
         self.shr_prec_round_assign(bits, prec, Nearest)

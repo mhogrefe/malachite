@@ -19,7 +19,7 @@ macro_rules! impl_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
+            /// See [here](super::cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.abs.partial_cmp(other)
@@ -32,7 +32,7 @@ macro_rules! impl_unsigned {
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
-            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
+            /// See [here](super::cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)
@@ -51,7 +51,7 @@ macro_rules! impl_signed {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
+            /// See [here](super::cmp_abs_primitive_int#partial_cmp_abs).
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.abs.partial_cmp(&other.unsigned_abs())
             }
@@ -63,7 +63,7 @@ macro_rules! impl_signed {
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
-            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
+            /// See [here](super::cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

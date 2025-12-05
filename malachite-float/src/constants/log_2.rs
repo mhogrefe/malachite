@@ -13,7 +13,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use alloc::vec;
 use core::cmp::Ordering;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -22,7 +24,6 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
-use std::mem::swap;
 
 // Auxiliary function: Compute the terms from n1 to n2 (excluded) 3 / 4 * sum((-1) ^ n * n! ^ 2 / 2
 // ^ n / (2 * n + 1)!, n = n1...n2 - 1).
@@ -32,14 +33,14 @@ use std::mem::swap;
 // Need 1 + ceil(log(n2 - n1) / log(2)) cells in T[], P[], Q[].
 //
 // This is S from const_log2.c, MPFR 4.2.0.
-fn sum(t: &mut [Integer], p: &mut [Integer], q: &mut [Integer], n1: Limb, n2: Limb, need_p: bool) {
+fn sum(t: &mut [Integer], p: &mut [Integer], q: &mut [Integer], n1: u64, n2: u64, need_p: bool) {
     if n2 == n1 + 1 {
         p[0] = if n1 == 0 {
             const { Integer::const_from_unsigned(3) }
         } else {
             -Integer::from(n1)
         };
-        q[0] = ((Integer::from(n1) << 1) + Integer::ONE) << 2;
+        q[0] = ((Integer::from(n1) << 1u32) + Integer::ONE) << 2u32;
         t[0].clone_from(&p[0]);
     } else {
         let m = (n1 >> 1) + (n2 >> 1) + (n1 & 1 & n2);
