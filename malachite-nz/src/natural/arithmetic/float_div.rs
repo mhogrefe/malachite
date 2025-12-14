@@ -1353,38 +1353,40 @@ fn div_float_significands_general_to_out(
                 // We can round correctly whatever the rounding mode
                 qs.copy_from_slice(&qs_2[1..=qs_len]);
                 qs[0] &= !shift_mask; // put to zero low `shift` bits
-                return if rm == Exact {
-                    panic!("Inexact float division");
-                } else if rm == Nearest {
-                    // round to nearest
-                    //
-                    // We know we can round, thus we are never in the even rule case:
-                    // - if the round bit is 0, we truncate
-                    // - if the round bit is 1, we add 1
-                    let round_bit = if shift == 0 {
-                        qs_2[0].get_highest_bit()
-                    } else {
-                        (qs_2[1] >> (shift - 1)).odd()
-                    };
-                    if round_bit {
+                return match rm {
+                    Exact => panic!("Inexact float division"),
+                    Nearest => {
+                        // round to nearest
+                        //
+                        // We know we can round, thus we are never in the even rule case:
+                        // - if the round bit is 0, we truncate
+                        // - if the round bit is 1, we add 1
+                        let round_bit = if shift == 0 {
+                            qs_2[0].get_highest_bit()
+                        } else {
+                            (qs_2[1] >> (shift - 1)).odd()
+                        };
+                        if round_bit {
+                            if limbs_slice_add_limb_in_place(qs, shift_bit) {
+                                exp_offset += 1;
+                                // else exponent is now incorrect, but one will still get an
+                                // overflow
+                                qs[qs_len - 1] = HIGH_BIT;
+                            }
+                            (exp_offset, Greater)
+                        } else {
+                            (exp_offset, Less)
+                        }
+                    }
+                    Up | Ceiling => {
                         if limbs_slice_add_limb_in_place(qs, shift_bit) {
                             exp_offset += 1;
                             // else exponent is now incorrect, but one will still get an overflow
-                            qs[qs_len - 1] = HIGH_BIT;
+                            *qs.last_mut().unwrap() = HIGH_BIT;
                         }
                         (exp_offset, Greater)
-                    } else {
-                        (exp_offset, Less)
                     }
-                } else if rm == Up || rm == Ceiling {
-                    if limbs_slice_add_limb_in_place(qs, shift_bit) {
-                        exp_offset += 1;
-                        // else exponent is now incorrect, but one will still get an overflow
-                        *qs.last_mut().unwrap() = HIGH_BIT;
-                    }
-                    (exp_offset, Greater)
-                } else {
-                    (exp_offset, Less)
+                    Down | Floor => (exp_offset, Less),
                 };
             }
         }
@@ -1652,59 +1654,62 @@ fn div_float_significands_general_to_out(
                     //
                     // if rm == Nearest, the result is q1 when q1 - 2 >= q1 - 2 ^ (shift - 1), i.e.
                     // shift >= 2, otherwise (shift = 1) it is q1 - 2
-                    (inex, cleanup) = if rm == Exact {
-                        panic!("Inexact float division");
-                    } else if rm == Nearest {
-                        // shift > 0
-                        //
-                        // Case shift = 1: sticky_bit = 0 always, and q1 - round_bit is exactly
-                        // representable, like q1 - round_bit - 2.
-                        // ```
-                        // round_bit action
-                        // 0         subtract two ulps, inex = Less
-                        // 1         truncate, inex = Greater
-                        // ```
-                        //
-                        // Case shift > 1: one ulp is 2 ^ (shift - 1) >= 2
-                        // ```
-                        // round_bit sticky_bit action
-                        // 0         0          truncate, inex = Greater
-                        // 0         1          truncate, inex = Greater
-                        // 1         x          truncate, inex = Less
-                        // ```
-                        if shift == 1 {
-                            if round_bit == 0 {
-                                shift_bit = 1;
-                                (Less, Cleanup::Sub2Ulp)
+                    (inex, cleanup) = match rm {
+                        Exact => {
+                            panic!("Inexact float division");
+                        }
+                        Nearest => {
+                            // shift > 0
+                            //
+                            // Case shift = 1: sticky_bit = 0 always, and q1 - round_bit is exactly
+                            // representable, like q1 - round_bit - 2.
+                            // ```
+                            // round_bit action
+                            // 0         subtract two ulps, inex = Less
+                            // 1         truncate, inex = Greater
+                            // ```
+                            //
+                            // Case shift > 1: one ulp is 2 ^ (shift - 1) >= 2
+                            // ```
+                            // round_bit sticky_bit action
+                            // 0         0          truncate, inex = Greater
+                            // 0         1          truncate, inex = Greater
+                            // 1         x          truncate, inex = Less
+                            // ```
+                            if shift == 1 {
+                                if round_bit == 0 {
+                                    shift_bit = 1;
+                                    (Less, Cleanup::Sub2Ulp)
+                                } else {
+                                    (Greater, Cleanup::TruncateCheckQHigh)
+                                }
                             } else {
-                                (Greater, Cleanup::TruncateCheckQHigh)
+                                (
+                                    if round_bit == 0 { Greater } else { Less },
+                                    Cleanup::TruncateCheckQHigh,
+                                )
                             }
-                        } else {
+                        }
+                        Floor | Down => {
+                            // The result is down(q1 - 2), i.e. subtract one ulp if shift > 0, and
+                            // two ulps if shift = 0
                             (
-                                if round_bit == 0 { Greater } else { Less },
-                                Cleanup::TruncateCheckQHigh,
+                                Less,
+                                if shift == 0 {
+                                    Cleanup::Sub2Ulp
+                                } else {
+                                    Cleanup::Sub1Ulp
+                                },
                             )
                         }
-                    } else if rm == Floor || rm == Down {
-                        // The result is down(q1 - 2), i.e. subtract one ulp if shift > 0, and two
-                        // ulps if shift = 0
-                        (
-                            Less,
-                            if shift == 0 {
-                                Cleanup::Sub2Ulp
-                            } else {
-                                Cleanup::Sub1Ulp
-                            },
-                        )
-                    } else {
-                        (
+                        Ceiling | Up => (
                             Greater,
                             if shift == 0 {
                                 Cleanup::Sub1Ulp
                             } else {
                                 Cleanup::TruncateCheckQHigh
                             },
-                        )
+                        ),
                     };
                 }
             }

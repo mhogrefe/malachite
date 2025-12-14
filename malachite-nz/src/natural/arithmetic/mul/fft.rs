@@ -352,7 +352,6 @@ macro_rules! f64x4_round {
         f64x4::from([round_even!(x0), round_even!(x1), round_even!(x2), round_even!(x3)])
     }};
 }
-pub(crate) use f64x4_round;
 
 macro_rules! f64x8_round {
     ($x: expr) => {{

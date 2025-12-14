@@ -190,14 +190,16 @@ impl Float {
     /// The maximum raw exponent of any [`Float`], equal to $2^{30}-1$, or $1,073,741,823$. This is
     /// one more than the maximum scientific exponent. If we write a [`Float`] as $\pm m2^e$, with
     /// $1\leq m<2$ and $e$ an integer, we must have $e\leq 2^{30}-2$. If the result of a
-    /// calculation would produce a [`Float`] with an exponent larger than this, $\pm\infty$ is
-    /// returned instead.
+    /// calculation would produce a [`Float`] with an exponent larger than this, then $\pm\infty$,
+    /// the maximum finite float of the specified precision, or the minimum finite float of the
+    /// specified pecision is returned instead, depending on the rounding mode.
     pub const MAX_EXPONENT: i32 = 0x3fff_ffff;
     /// The minimum raw exponent of any [`Float`], equal to $-(2^{30}-1)$, or $-1,073,741,823$. This
     /// is one more than the minimum scientific exponent. If we write a [`Float`] as $\pm m2^e$,
     /// with $1\leq m<2$ and $e$ an integer, we must have $e\geq -2^{30}$. If the result of a
-    /// calculation would produce a [`Float`] with an exponent smaller than this, $\pm0.0$ is
-    /// returned instead.
+    /// calculation would produce a [`Float`] with an exponent smaller than this, then $\pm0.0$, the
+    /// minimum positive finite [`Float`], or the maximum negative finite [`Float`] is returned
+    /// instead, depending on the rounding mode.
     pub const MIN_EXPONENT: i32 = -Self::MAX_EXPONENT;
 
     #[cfg(feature = "test_build")]

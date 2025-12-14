@@ -11,6 +11,7 @@ use crate::InnerFloat::Finite;
 use alloc::vec::IntoIter;
 use core::iter::{Chain, Once, once};
 use core::mem::swap;
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
@@ -18,7 +19,7 @@ use malachite_base::num::exhaustive::{
     ExhaustiveSignedRange, PrimitiveIntIncreasingRange, exhaustive_signed_inclusive_range,
     primitive_int_increasing_inclusive_range,
 };
-use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
+use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::num::logic::traits::{LowMask, NotAssign};
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
@@ -269,13 +270,16 @@ fn exhaustive_floats_with_precision_helper(
 ) -> ExhaustiveDependentPairs<
     i32,
     Float,
-    RulerSequence<usize>,
+    BitDistributorSequence,
     FloatsWithPrecisionAndSciExponentGenerator,
     ExhaustiveSignedRange<i32>,
     ExhaustivePositiveFloatsWithSciExponentAndPrecision,
 > {
     exhaustive_dependent_pairs(
-        ruler_sequence(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
         exhaustive_signed_inclusive_range(Float::MIN_EXPONENT, Float::MAX_EXPONENT),
         FloatsWithPrecisionAndSciExponentGenerator { precision: prec },
     )
@@ -290,7 +294,7 @@ pub struct ExhaustivePositiveFloatsWithPrecision(
     ExhaustiveDependentPairs<
         i32,
         Float,
-        RulerSequence<usize>,
+        BitDistributorSequence,
         FloatsWithPrecisionAndSciExponentGenerator,
         ExhaustiveSignedRange<i32>,
         ExhaustivePositiveFloatsWithSciExponentAndPrecision,
@@ -336,9 +340,9 @@ impl Iterator for ExhaustivePositiveFloatsWithPrecision {
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "1.0#1", "2.0#1", "0.5#1", "0.2#1", "4.0#1", "8.0#1", "0.1#1", "3.0e1#1", "2.0e1#1",
-///         "0.06#1", "0.03#1", "0.02#1", "6.0e1#1", "1.0e2#1", "0.008#1", "0.002#1", "3.0e2#1",
-///         "0.004#1", "5.0e2#1", "1.0e3#1"
+///         "1.0#1", "2.0#1", "0.5#1", "4.0#1", "0.2#1", "8.0#1", "0.1#1", "2.0e1#1", "0.06#1",
+///         "3.0e1#1", "0.03#1", "6.0e1#1", "0.02#1", "1.0e2#1", "0.008#1", "3.0e2#1", "0.004#1",
+///         "5.0e2#1", "0.002#1", "1.0e3#1"
 ///     ]
 /// );
 ///
@@ -349,9 +353,26 @@ impl Iterator for ExhaustivePositiveFloatsWithPrecision {
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "1.0#10", "2.0#10", "1.002#10", "0.5#10", "1.004#10", "2.004#10", "1.006#10", "4.0#10",
-///         "1.008#10", "2.008#10", "1.01#10", "0.501#10", "1.012#10", "2.012#10", "1.014#10",
-///         "0.25#10", "1.016#10", "2.016#10", "1.018#10", "0.502#10"
+///         "1.0#10",
+///         "2.0#10",
+///         "1.002#10",
+///         "2.004#10",
+///         "0.5#10",
+///         "4.0#10",
+///         "0.501#10",
+///         "4.01#10",
+///         "1.004#10",
+///         "2.008#10",
+///         "1.006#10",
+///         "2.012#10",
+///         "0.502#10",
+///         "4.016#10",
+///         "0.503#10",
+///         "4.023#10",
+///         "0.25#10",
+///         "8.0#10",
+///         "0.2505#10",
+///         "8.02#10"
 ///     ]
 /// );
 /// ```
@@ -418,9 +439,9 @@ impl Iterator for ExhaustiveFloatsWithPrecision {
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "0.5#1", "-0.5#1", "0.2#1", "-0.2#1", "4.0#1",
-///         "-4.0#1", "8.0#1", "-8.0#1", "0.1#1", "-0.1#1", "3.0e1#1", "-3.0e1#1", "2.0e1#1",
-///         "-2.0e1#1", "0.06#1", "-0.06#1"
+///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "0.5#1", "-0.5#1", "4.0#1", "-4.0#1", "0.2#1",
+///         "-0.2#1", "8.0#1", "-8.0#1", "0.1#1", "-0.1#1", "2.0e1#1", "-2.0e1#1", "0.06#1",
+///         "-0.06#1", "3.0e1#1", "-3.0e1#1"
 ///     ]
 /// );
 ///
@@ -437,18 +458,18 @@ impl Iterator for ExhaustiveFloatsWithPrecision {
 ///         "-2.0#10",
 ///         "1.002#10",
 ///         "-1.002#10",
-///         "0.5#10",
-///         "-0.5#10",
-///         "1.004#10",
-///         "-1.004#10",
 ///         "2.004#10",
 ///         "-2.004#10",
-///         "1.006#10",
-///         "-1.006#10",
+///         "0.5#10",
+///         "-0.5#10",
 ///         "4.0#10",
 ///         "-4.0#10",
-///         "1.008#10",
-///         "-1.008#10",
+///         "0.501#10",
+///         "-0.501#10",
+///         "4.01#10",
+///         "-4.01#10",
+///         "1.004#10",
+///         "-1.004#10",
 ///         "2.008#10",
 ///         "-2.008#10"
 ///     ]
@@ -479,13 +500,16 @@ impl ExhaustiveDependentPairsYsGenerator<i32, Float, ExhaustivePositiveFloatsWit
 fn exhaustive_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
     i32,
     Float,
-    RulerSequence<usize>,
+    BitDistributorSequence,
     ExhaustivePositiveFiniteFloatsGenerator,
     ExhaustiveSignedRange<i32>,
     ExhaustivePositiveFloatsWithSciExponent,
 > {
     exhaustive_dependent_pairs(
-        ruler_sequence(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
         exhaustive_signed_inclusive_range(Float::MIN_EXPONENT, Float::MAX_EXPONENT),
         ExhaustivePositiveFiniteFloatsGenerator,
     )
@@ -500,7 +524,7 @@ pub struct ExhaustivePositiveFiniteFloats(
     ExhaustiveDependentPairs<
         i32,
         Float,
-        RulerSequence<usize>,
+        BitDistributorSequence,
         ExhaustivePositiveFiniteFloatsGenerator,
         ExhaustiveSignedRange<i32>,
         ExhaustivePositiveFloatsWithSciExponent,
@@ -540,9 +564,9 @@ impl Iterator for ExhaustivePositiveFiniteFloats {
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "1.0#1", "2.0#1", "1.0#2", "0.5#1", "1.5#2", "2.0#2", "1.0#3", "4.0#1", "1.2#3",
-///         "3.0#2", "1.5#3", "0.5#2", "1.8#3", "2.0#3", "1.0#4", "0.2#1", "1.1#4", "2.5#3",
-///         "1.2#4", "0.8#2"
+///         "1.0#1", "2.0#1", "1.0#2", "2.0#2", "0.5#1", "4.0#1", "0.5#2", "4.0#2", "1.5#2",
+///         "3.0#2", "1.0#3", "2.0#3", "0.8#2", "6.0#2", "0.5#3", "4.0#3", "0.2#1", "8.0#1",
+///         "0.2#2", "8.0#2"
 ///     ]
 /// );
 /// ```
@@ -591,9 +615,9 @@ impl Iterator for ExhaustiveNegativeFiniteFloats {
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "-1.0#1", "-2.0#1", "-1.0#2", "-0.5#1", "-1.5#2", "-2.0#2", "-1.0#3", "-4.0#1",
-///         "-1.2#3", "-3.0#2", "-1.5#3", "-0.5#2", "-1.8#3", "-2.0#3", "-1.0#4", "-0.2#1",
-///         "-1.1#4", "-2.5#3", "-1.2#4", "-0.8#2"
+///         "-1.0#1", "-2.0#1", "-1.0#2", "-2.0#2", "-0.5#1", "-4.0#1", "-0.5#2", "-4.0#2",
+///         "-1.5#2", "-3.0#2", "-1.0#3", "-2.0#3", "-0.8#2", "-6.0#2", "-0.5#3", "-4.0#3",
+///         "-0.2#1", "-8.0#1", "-0.2#2", "-8.0#2"
 ///     ]
 /// );
 /// ```
@@ -654,8 +678,8 @@ impl Iterator for ExhaustiveNonzeroFiniteFloats {
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "0.5#1", "-0.5#1", "1.5#2",
-///         "-1.5#2", "2.0#2", "-2.0#2", "1.0#3", "-1.0#3", "4.0#1", "-4.0#1", "1.2#3", "-1.2#3",
+///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "2.0#2", "-2.0#2", "0.5#1",
+///         "-0.5#1", "4.0#1", "-4.0#1", "0.5#2", "-0.5#2", "4.0#2", "-4.0#2", "1.5#2", "-1.5#2",
 ///         "3.0#2", "-3.0#2"
 ///     ]
 /// );
@@ -695,9 +719,9 @@ type ExhaustiveNonNegativeFiniteFloats = Chain<Once<Float>, ExhaustivePositiveFi
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "0.0", "1.0#1", "2.0#1", "1.0#2", "0.5#1", "1.5#2", "2.0#2", "1.0#3", "4.0#1", "1.2#3",
-///         "3.0#2", "1.5#3", "0.5#2", "1.8#3", "2.0#3", "1.0#4", "0.2#1", "1.1#4", "2.5#3",
-///         "1.2#4"
+///         "0.0", "1.0#1", "2.0#1", "1.0#2", "2.0#2", "0.5#1", "4.0#1", "0.5#2", "4.0#2", "1.5#2",
+///         "3.0#2", "1.0#3", "2.0#3", "0.8#2", "6.0#2", "0.5#3", "4.0#3", "0.2#1", "8.0#1",
+///         "0.2#2"
 ///     ]
 /// );
 /// ```
@@ -732,9 +756,9 @@ type ExhaustiveNonPositiveFiniteFloats = Chain<Once<Float>, ExhaustiveNegativeFi
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "-0.0", "-1.0#1", "-2.0#1", "-1.0#2", "-0.5#1", "-1.5#2", "-2.0#2", "-1.0#3", "-4.0#1",
-///         "-1.2#3", "-3.0#2", "-1.5#3", "-0.5#2", "-1.8#3", "-2.0#3", "-1.0#4", "-0.2#1",
-///         "-1.1#4", "-2.5#3", "-1.2#4"
+///         "-0.0", "-1.0#1", "-2.0#1", "-1.0#2", "-2.0#2", "-0.5#1", "-4.0#1", "-0.5#2", "-4.0#2",
+///         "-1.5#2", "-3.0#2", "-1.0#3", "-2.0#3", "-0.8#2", "-6.0#2", "-0.5#3", "-4.0#3",
+///         "-0.2#1", "-8.0#1", "-0.2#2"
 ///     ]
 /// );
 /// ```
@@ -767,9 +791,9 @@ type ExhaustiveFloats = Chain<IntoIter<Float>, ExhaustiveNonzeroFiniteFloats>;
 ///         .collect_vec()
 ///         .as_slice(),
 ///     &[
-///         "0.0", "-0.0", "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "0.5#1",
-///         "-0.5#1", "1.5#2", "-1.5#2", "2.0#2", "-2.0#2", "1.0#3", "-1.0#3", "4.0#1", "-4.0#1",
-///         "1.2#3", "-1.2#3"
+///         "0.0", "-0.0", "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "2.0#2",
+///         "-2.0#2", "0.5#1", "-0.5#1", "4.0#1", "-4.0#1", "0.5#2", "-0.5#2", "4.0#2", "-4.0#2",
+///         "1.5#2", "-1.5#2"
 ///     ]
 /// );
 /// ```
@@ -813,45 +837,45 @@ pub fn exhaustive_finite_floats() -> ExhaustiveFloats {
 ///         "-2.0#1",
 ///         "1.0#2",
 ///         "-1.0#2",
-///         "0.5#1",
-///         "-0.5#1",
-///         "1.5#2",
-///         "-1.5#2",
 ///         "2.0#2",
 ///         "-2.0#2",
-///         "1.0#3",
-///         "-1.0#3",
+///         "0.5#1",
+///         "-0.5#1",
 ///         "4.0#1",
 ///         "-4.0#1",
-///         "1.2#3",
-///         "-1.2#3",
-///         "3.0#2",
-///         "-3.0#2",
-///         "1.5#3",
-///         "-1.5#3",
 ///         "0.5#2",
 ///         "-0.5#2",
-///         "1.8#3",
-///         "-1.8#3",
+///         "4.0#2",
+///         "-4.0#2",
+///         "1.5#2",
+///         "-1.5#2",
+///         "3.0#2",
+///         "-3.0#2",
+///         "1.0#3",
+///         "-1.0#3",
 ///         "2.0#3",
 ///         "-2.0#3",
-///         "1.0#4",
-///         "-1.0#4",
-///         "0.2#1",
-///         "-0.2#1",
-///         "1.1#4",
-///         "-1.1#4",
-///         "2.5#3",
-///         "-2.5#3",
-///         "1.2#4",
-///         "-1.2#4",
 ///         "0.8#2",
 ///         "-0.8#2",
-///         "1.4#4",
-///         "-1.4#4",
-///         "3.0#3",
-///         "-3.0#3",
-///         "1.5#4"
+///         "6.0#2",
+///         "-6.0#2",
+///         "0.5#3",
+///         "-0.5#3",
+///         "4.0#3",
+///         "-4.0#3",
+///         "0.2#1",
+///         "-0.2#1",
+///         "8.0#1",
+///         "-8.0#1",
+///         "0.2#2",
+///         "-0.2#2",
+///         "8.0#2",
+///         "-8.0#2",
+///         "0.1#1",
+///         "-0.1#1",
+///         "2.0e1#1",
+///         "-2.0e1#1",
+///         "0.1#2"
 ///     ]
 /// );
 /// ```

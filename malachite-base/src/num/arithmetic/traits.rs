@@ -994,7 +994,7 @@ pub trait NextPowerOf2Assign {
 /// Takes the absolute value of a number.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// occured. If an overflow occurred, then the wrapped number is returned.
+/// occurred. If an overflow occurred, then the wrapped number is returned.
 pub trait OverflowingAbs {
     type Output;
 

@@ -26,7 +26,7 @@ macro_rules! impl_overflowing_add_mul_unsigned {
             /// Adds a number and the product of two other numbers.
             ///
             /// Returns a tuple containing the result and a boolean indicating whether an arithmetic
-            /// overflow occured. If an overflow occurred, then the wrapped value is returned.
+            /// overflow occurred. If an overflow occurred, then the wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

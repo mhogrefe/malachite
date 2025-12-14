@@ -58,7 +58,7 @@ impl Float {
     /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
     /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
@@ -157,7 +157,7 @@ impl Float {
     /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
     /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
@@ -412,7 +412,7 @@ impl Float {
     /// description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x^2+\varepsilon.
+    /// f(x,m) = x^2+\varepsilon.
     /// $$
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
@@ -498,7 +498,7 @@ impl Float {
     /// description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,y,m) = x^2+\varepsilon.
+    /// f(x,m) = x^2+\varepsilon.
     /// $$
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
@@ -858,7 +858,7 @@ impl Square for Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x^2+\varepsilon.
+    /// f(x) = x^2+\varepsilon.
     /// $$
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,
@@ -919,7 +919,7 @@ impl Square for &Float {
     /// rounding mode.
     ///
     /// $$
-    /// f(x,y) = x^2+\varepsilon.
+    /// f(x) = x^2+\varepsilon.
     /// $$
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^2|\rfloor-p}$,

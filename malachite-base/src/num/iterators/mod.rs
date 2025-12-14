@@ -420,7 +420,7 @@ impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
 ///
 /// The $n$th term of this sequence is no greater than $\log_2(n + 1)$. Every number occurs
 /// infinitely many times, and any number's first occurrence is after all smaller numbers have
-/// occured.
+/// occurred.
 ///
 /// The output length is infinite.
 ///
@@ -477,7 +477,7 @@ impl Iterator for BitDistributorSequence {
 /// - The output types cannot both be tiny.
 ///
 /// Every number occurs infinitely many times, and any number's first occurrence is after all
-/// smaller numbers have occured. The sequence increases by no more than 1 at each step, but may
+/// smaller numbers have occurred. The sequence increases by no more than 1 at each step, but may
 /// decrease by an arbitrarily large amount.
 ///
 /// The output length is infinite.

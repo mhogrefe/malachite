@@ -13,6 +13,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
+use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -2478,6 +2479,9 @@ fn square_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode, ex
     assert_eq!(o_alt, o);
 
     if o == Equal {
+        if square.is_finite() {
+            assert!(square.sqrt_prec_round_ref(prec, Exact).0.eq_abs(&x));
+        }
         for rm in exhaustive_rounding_modes() {
             let (s, oo) = x.square_prec_round_ref(prec, rm);
             assert_eq!(
@@ -2592,6 +2596,16 @@ fn square_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
     let (square_alt, o_alt) = (-&x).square_prec(prec);
     assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
     assert_eq!(o_alt, o);
+
+    if o == Equal && square.is_finite() {
+        println!("{:#x} {}", ComparableFloatRef(&square), prec);
+        assert!(
+            square
+                .sqrt_prec_round(x.get_prec().unwrap_or(1), Exact)
+                .0
+                .eq_abs(&x)
+        );
+    }
 }
 
 #[test]
@@ -2710,6 +2724,9 @@ fn square_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
     assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
 
     if o == Equal {
+        if square.is_finite() {
+            assert!(square.sqrt_round_ref(Exact).0.eq_abs(&x));
+        }
         for rm in exhaustive_rounding_modes() {
             let (s, oo) = x.square_round_ref(rm);
             assert_eq!(

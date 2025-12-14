@@ -517,6 +517,104 @@ pub_test! {limbs_sqrt_rem_to_out(
     }
 }}
 
+// This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is not
+// `NULL`, only returning whether the remainder is nonzero, rather than computing it in full.
+pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb]) -> bool {
+    let xs_len = xs.len();
+    let high = xs[xs_len - 1];
+    assert_ne!(high, 0);
+    let mut shift = LeadingZeros::leading_zeros(high) >> 1;
+    let two_shift = shift << 1;
+    match xs_len {
+        1 => {
+            let r_lo = if shift == 0 {
+                let r;
+                (out_sqrt[0], r) = sqrt_rem_newton::<Limb, SignedLimb>(high);
+                r
+            } else {
+                let sqrt = sqrt_rem_newton::<Limb, SignedLimb>(high << two_shift).0 >> shift;
+                out_sqrt[0] = sqrt;
+                high - sqrt.square()
+            };
+            r_lo != 0
+        }
+        2 => {
+            if shift == 0 {
+                let r_hi;
+                let r_0;
+                (out_sqrt[0], r_hi, r_0) = sqrt_rem_2_newton::<Limb, SignedLimb>(xs[1], xs[0]);
+                r_hi || r_0 != 0
+            } else {
+                let mut lo = xs[0];
+                let hi = (high << two_shift) | (lo >> (Limb::WIDTH - two_shift));
+                out_sqrt[0] = sqrt_rem_2_newton::<Limb, SignedLimb>(hi, lo << two_shift).0 >> shift;
+                lo.wrapping_sub_assign(out_sqrt[0].wrapping_square());
+                lo != 0
+            }
+        }
+        _ => {
+            let mut out_len = xs_len.shr_round(1, Ceiling).0;
+            let out_sqrt = &mut out_sqrt[..out_len];
+            let mut out_rem;
+            let mut scratch;
+            let out = if xs_len.odd() || shift != 0 {
+                let scratch_1_len = out_len << 1;
+                scratch = vec![0; scratch_1_len + (out_len >> 1) + 1];
+                let (mut scratch_1, scratch_2) = scratch.split_at_mut(scratch_1_len);
+                // needed only when 2 * out_len > xs_len, but saves a test
+                let shifted_scratch_1 = if xs_len.odd() {
+                    &mut scratch_1[1..]
+                } else {
+                    scratch_1[0] = 0;
+                    &mut *scratch_1
+                };
+                if shift == 0 {
+                    shifted_scratch_1.copy_from_slice(xs);
+                } else {
+                    limbs_shl_to_out(shifted_scratch_1, xs, two_shift);
+                }
+                if xs_len.odd() {
+                    shift += Limb::WIDTH >> 1;
+                }
+                let r_hi = limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
+                let s = out_sqrt[0] & Limb::low_mask(shift);
+                let scratch_1_lo = &mut scratch_1[..out_len];
+                let mut r_lo = limbs_slice_add_mul_limb_same_length_in_place_left(
+                    scratch_1_lo,
+                    out_sqrt,
+                    s << 1,
+                );
+                if r_hi {
+                    r_lo += 1;
+                }
+                let (scratch_1_lo_lo, scratch_1_lo_hi) = scratch_1_lo.split_at_mut(1);
+                let carry = limbs_sub_mul_limb_same_length_in_place_left(scratch_1_lo_lo, &[s], s);
+                if limbs_sub_limb_in_place(scratch_1_lo_hi, carry) {
+                    r_lo -= 1;
+                }
+                limbs_slice_shr_in_place(out_sqrt, shift);
+                scratch_1[out_len] = r_lo;
+                shift <<= 1;
+                if shift < Limb::WIDTH {
+                    out_len += 1;
+                } else {
+                    scratch_1 = &mut scratch_1[1..];
+                }
+                scratch_1
+            } else {
+                let mut scratch = vec![0; (out_len >> 1) + 1];
+                out_rem = xs.to_vec();
+                if limbs_sqrt_rem_helper(out_sqrt, &mut out_rem, 0, &mut scratch) {
+                    out_rem[out_len] = 1;
+                    out_len += 1;
+                }
+                &out_rem[..]
+            };
+            out[..out_len].iter().any(|&x| x != 0)
+        }
+    }
+}
+
 // Computes the floor of the square root of a `Natural`.
 //
 // Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are returned.

@@ -1898,6 +1898,48 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_12() -> Generator<(Float, u64
     )
 }
 
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.sqrt_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_13() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_13,
+        &random_float_unsigned_rounding_mode_triple_gen_var_13,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_13,
+    )
+}
+
+pub fn float_unsigned_rounding_mode_triple_gen_var_13_rm() -> Generator<(
+    (rug::Float, u64, rug::float::Round),
+    (Float, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_t_rounding_mode_triple_rm(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_13(),
+            )
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(random_float_unsigned_rounding_mode_triple_gen_var_13(
+                config,
+            ))
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_13(config),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.sqrt_prec_round`, where the
+// `Float` is extreme.
+pub fn float_unsigned_rounding_mode_triple_gen_var_14() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_14,
+        &random_float_unsigned_rounding_mode_triple_gen_var_14,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_14,
+    )
+}
+
 // -- (Float, Rational) --
 
 pub fn float_rational_pair_gen() -> Generator<(Float, Rational)> {
@@ -2650,6 +2692,75 @@ pub fn float_rounding_mode_pair_gen_var_23() -> Generator<(Float, RoundingMode)>
         &exhaustive_float_rounding_mode_pair_gen_var_23,
         &random_float_rounding_mode_pair_gen_var_23,
         &special_random_float_rounding_mode_pair_gen_var_23,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `sqrt_round`.
+pub fn float_rounding_mode_pair_gen_var_24() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_24,
+        &random_float_rounding_mode_pair_gen_var_24,
+        &special_random_float_rounding_mode_pair_gen_var_24,
+    )
+}
+
+pub fn float_rounding_mode_pair_gen_var_24_rm()
+-> Generator<((rug::Float, rug::float::Round), (Float, RoundingMode))> {
+    Generator::new(
+        &|| float_rounding_mode_pair_rm(exhaustive_float_rounding_mode_pair_gen_var_24()),
+        &|config| float_rounding_mode_pair_rm(random_float_rounding_mode_pair_gen_var_24(config)),
+        &|config| {
+            float_rounding_mode_pair_rm(special_random_float_rounding_mode_pair_gen_var_24(config))
+        },
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `sqrt_round`, where the `Float` has a
+// precision less than `Limb::WIDTH`.
+pub fn float_rounding_mode_pair_gen_var_25() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_25,
+        &random_float_rounding_mode_pair_gen_var_25,
+        &special_random_float_rounding_mode_pair_gen_var_25,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `sqrt_round`, where the `Float` has
+// precision `Limb::WIDTH`.
+pub fn float_rounding_mode_pair_gen_var_26() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_26,
+        &random_float_rounding_mode_pair_gen_var_26,
+        &special_random_float_rounding_mode_pair_gen_var_26,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `sqrt_round`, where the `Float` has a
+// precision greater than `Limb::WIDTH` and less than `Limb::WIDTH` * 2.
+pub fn float_rounding_mode_pair_gen_var_27() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_27,
+        &random_float_rounding_mode_pair_gen_var_27,
+        &special_random_float_rounding_mode_pair_gen_var_27,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `sqrt_round`, where the `Float` has a
+// precision greater than `Limb::WIDTH` * 2.
+pub fn float_rounding_mode_pair_gen_var_28() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_28,
+        &random_float_rounding_mode_pair_gen_var_28,
+        &special_random_float_rounding_mode_pair_gen_var_28,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `sqrt_round`, where the `Float` is extreme.
+pub fn float_rounding_mode_pair_gen_var_29() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_29,
+        &random_float_rounding_mode_pair_gen_var_29,
+        &special_random_float_rounding_mode_pair_gen_var_29,
     )
 }
 

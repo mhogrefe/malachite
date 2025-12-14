@@ -20,7 +20,7 @@ impl Float {
     /// The prime constant is the real number whose $n$th bit is prime if and only if $n$ is prime.
     /// That is,
     /// $$
-    /// P = \sum_{p\ text{prime}\}2^{-p}.
+    /// P = \sum_{p\ \text{prime}\}2^{-p}.
     /// $$
     ///
     /// The constant is irrational.
@@ -75,7 +75,7 @@ impl Float {
     /// The prime constant is the real number whose $n$th bit is prime if and only if $n$ is prime.
     /// That is,
     /// $$
-    /// P = \sum_{p\ text{prime}\}2^{-p}.
+    /// P = \sum_{p\ \text{prime}\}2^{-p}.
     /// $$
     ///
     /// The constant is irrational.

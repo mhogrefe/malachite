@@ -30,7 +30,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_positive_primitive_ints, exhaustive_primitive_floats, exhaustive_signeds,
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
-use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
+use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
@@ -241,16 +241,19 @@ const fn exhaustive_mixed_extreme_exponents() -> ExhaustiveMixedExtremeExponents
 }
 
 #[inline]
-const fn exhaustive_extreme_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
+fn exhaustive_extreme_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
     i32,
     Float,
-    RulerSequence<usize>,
+    BitDistributorSequence,
     ExhaustivePositiveFiniteFloatsGenerator,
     ExhaustiveExtremeExponents,
     ExhaustivePositiveFloatsWithSciExponent,
 > {
     exhaustive_dependent_pairs(
-        ruler_sequence(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
         exhaustive_extreme_exponents(),
         ExhaustivePositiveFiniteFloatsGenerator,
     )
@@ -261,7 +264,7 @@ struct ExhaustiveExtremePositiveFiniteFloats(
     ExhaustiveDependentPairs<
         i32,
         Float,
-        RulerSequence<usize>,
+        BitDistributorSequence,
         ExhaustivePositiveFiniteFloatsGenerator,
         ExhaustiveExtremeExponents,
         ExhaustivePositiveFloatsWithSciExponent,
@@ -278,7 +281,7 @@ impl Iterator for ExhaustiveExtremePositiveFiniteFloats {
 }
 
 #[inline]
-const fn exhaustive_extreme_positive_finite_floats() -> ExhaustiveExtremePositiveFiniteFloats {
+fn exhaustive_extreme_positive_finite_floats() -> ExhaustiveExtremePositiveFiniteFloats {
     ExhaustiveExtremePositiveFiniteFloats(exhaustive_extreme_positive_finite_floats_helper())
 }
 
@@ -307,7 +310,7 @@ impl Iterator for ExhaustiveExtremeNonzeroFiniteFloats {
 }
 
 #[inline]
-const fn exhaustive_extreme_nonzero_finite_floats() -> ExhaustiveExtremeNonzeroFiniteFloats {
+fn exhaustive_extreme_nonzero_finite_floats() -> ExhaustiveExtremeNonzeroFiniteFloats {
     ExhaustiveExtremeNonzeroFiniteFloats {
         toggle: false,
         xs: exhaustive_extreme_positive_finite_floats(),
@@ -331,16 +334,19 @@ fn exhaustive_extreme_floats() -> ExhaustiveExtremeFloats {
 }
 
 #[inline]
-const fn exhaustive_mixed_extreme_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
+fn exhaustive_mixed_extreme_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
     i32,
     Float,
-    RulerSequence<usize>,
+    BitDistributorSequence,
     ExhaustivePositiveFiniteFloatsGenerator,
     ExhaustiveMixedExtremeExponents,
     ExhaustivePositiveFloatsWithSciExponent,
 > {
     exhaustive_dependent_pairs(
-        ruler_sequence(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
         exhaustive_mixed_extreme_exponents(),
         ExhaustivePositiveFiniteFloatsGenerator,
     )
@@ -351,7 +357,7 @@ struct ExhaustiveMixedExtremePositiveFiniteFloats(
     ExhaustiveDependentPairs<
         i32,
         Float,
-        RulerSequence<usize>,
+        BitDistributorSequence,
         ExhaustivePositiveFiniteFloatsGenerator,
         ExhaustiveMixedExtremeExponents,
         ExhaustivePositiveFloatsWithSciExponent,
@@ -368,8 +374,7 @@ impl Iterator for ExhaustiveMixedExtremePositiveFiniteFloats {
 }
 
 #[inline]
-const fn exhaustive_mixed_extreme_positive_finite_floats()
--> ExhaustiveMixedExtremePositiveFiniteFloats {
+fn exhaustive_mixed_extreme_positive_finite_floats() -> ExhaustiveMixedExtremePositiveFiniteFloats {
     ExhaustiveMixedExtremePositiveFiniteFloats(
         exhaustive_mixed_extreme_positive_finite_floats_helper(),
     )
@@ -400,8 +405,7 @@ impl Iterator for ExhaustiveMixedExtremeNonzeroFiniteFloats {
 }
 
 #[inline]
-const fn exhaustive_mixed_extreme_nonzero_finite_floats()
--> ExhaustiveMixedExtremeNonzeroFiniteFloats {
+fn exhaustive_mixed_extreme_nonzero_finite_floats() -> ExhaustiveMixedExtremeNonzeroFiniteFloats {
     ExhaustiveMixedExtremeNonzeroFiniteFloats {
         toggle: false,
         xs: exhaustive_mixed_extreme_positive_finite_floats(),
@@ -439,7 +443,10 @@ impl ExhaustiveDependentPairsYsGenerator<u64, Float, Box<dyn Iterator<Item = Flo
 fn exhaustive_floats_with_precision_inclusive_range(prec_lo: u64, prec_hi: u64) -> It<Float> {
     Box::new(
         exhaustive_dependent_pairs(
-            ruler_sequence(),
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
             primitive_int_increasing_inclusive_range(prec_lo, prec_hi),
             FloatWithPrecisionRangeGenerator,
         )
@@ -470,7 +477,10 @@ fn exhaustive_float_pairs_with_precision_inclusive_range(
 ) -> It<(Float, Float)> {
     Box::new(
         exhaustive_dependent_pairs(
-            ruler_sequence(),
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
             primitive_int_increasing_inclusive_range(prec_lo, prec_hi),
             FloatPairWithPrecisionRangeGenerator,
         )
@@ -499,7 +509,10 @@ impl
 fn exhaustive_float_pairs_with_precisions(precisions: It<(u64, u64)>) -> It<(Float, Float)> {
     Box::new(
         exhaustive_dependent_pairs(
-            ruler_sequence(),
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
             precisions,
             FloatPairWithPrecisionRangesGenerator,
         )
@@ -1955,6 +1968,35 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_12() -> It<(Float,
     ))
 }
 
+pub fn sqrt_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.sqrt_prec_round_ref(prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_13() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| sqrt_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_14() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| sqrt_prec_round_valid(x, p, rm)),
+    ))
+}
+
 // -- (Float, Rational) --
 
 pub fn exhaustive_float_rational_pair_gen() -> It<(Float, Rational)> {
@@ -2853,6 +2895,67 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_23() -> It<(Float, RoundingMo
     Box::new(
         lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
             .filter(|(f, rm)| reciprocal_round_valid(f, *rm, true)),
+    )
+}
+
+pub(crate) fn sqrt_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    rm != Exact || x.sqrt_round_ref(Floor).1 == Equal
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_24() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_25() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_floats_with_precision_inclusive_range(1, Limb::WIDTH - 1),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_26() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_positive_floats_with_precision(Limb::WIDTH),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_27() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_floats_with_precision_inclusive_range(
+                Limb::WIDTH + 1,
+                (Limb::WIDTH << 1) - 1,
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_28() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_floats_with_precision_inclusive_range((Limb::WIDTH << 1) + 1, u64::MAX),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_29() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
     )
 }
 

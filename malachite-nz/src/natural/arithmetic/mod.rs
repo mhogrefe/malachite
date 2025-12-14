@@ -85,6 +85,8 @@ pub mod float_mul;
 #[cfg(feature = "float_helpers")]
 pub mod float_reciprocal;
 #[cfg(feature = "float_helpers")]
+pub mod float_sqrt;
+#[cfg(feature = "float_helpers")]
 pub mod float_square;
 #[cfg(feature = "float_helpers")]
 pub mod float_sub;

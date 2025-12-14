@@ -497,6 +497,7 @@ pub mod shr_round;
 /// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
 /// determining the sign of a number.
 pub mod sign;
+pub mod sqrt;
 /// Squaring of [`Float`](super::Float)s.
 pub mod square;
 /// Subtraction of [`Float`](super::Float)s, of [`Float`](super::Float)s by
