@@ -11,6 +11,7 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::ops::Index;
+use core::slice;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -353,6 +354,45 @@ impl Natural {
                 limbs.reverse();
                 limbs
             }
+        }
+    }
+
+    /// Returns the [limbs](crate#limbs) of a [`Natural`], in ascending order, so that
+    /// less-significant limbs have lower indices in the output slice.
+    ///
+    /// There are no trailing zero limbs.
+    ///
+    /// This function borrows the [`Natural`]. There is no descending order counterpoint,
+    /// but [`to_limbs_desc`](Self::to_limbs_desc) may be used instead.
+    ///
+    /// This function is more efficient than [`to_limbs_asc`](Self::to_limbs_asc) because
+    /// it borrows the underlying memory directly.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::platform::Limb;
+    ///
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert!(Natural::ZERO.as_limbs_asc().is_empty());
+    ///     assert_eq!(Natural::from(123u32).as_limbs_asc(), &[123]);
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).as_limbs_asc(),
+    ///         &[3567587328, 232]
+    ///     );
+    /// }
+    /// ```
+    pub fn as_limbs_asc(&self) -> &[Limb] {
+        match self {
+            Self(Small(small)) => slice::from_ref(small),
+            Self(Large(limbs)) => &limbs,
         }
     }
 
