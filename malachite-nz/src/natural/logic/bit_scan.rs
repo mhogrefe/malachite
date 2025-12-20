@@ -11,10 +11,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
 
@@ -30,17 +29,17 @@ use malachite_base::slices::slice_leading_zeros;
 //
 // This is equivalent to `mpn_scan0` from `mpn/generic/scan0.c`, GMP 6.2.1.
 pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
-    let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let starting_index = bit_to_limb_count_floor(start);
     if starting_index >= xs.len() {
         return start;
     }
     if let Some(result) = xs[starting_index].index_of_next_false_bit(start & Limb::WIDTH_MASK)
         && result != Limb::WIDTH
     {
-        return (u64::wrapping_from(starting_index) << Limb::LOG_WIDTH) + result;
+        return limb_to_bit_count(starting_index) + result;
     }
     if starting_index == xs.len() - 1 {
-        return u64::wrapping_from(xs.len()) << Limb::LOG_WIDTH;
+        return limb_to_bit_count(xs.len());
     }
     let false_index = starting_index
         + 1
@@ -48,7 +47,7 @@ pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
             .iter()
             .take_while(|&&y| y == Limb::MAX)
             .count();
-    let mut result_offset = u64::exact_from(false_index) << Limb::LOG_WIDTH;
+    let mut result_offset = limb_to_bit_count(false_index);
     if false_index != xs.len() {
         result_offset += TrailingZeros::trailing_zeros(!xs[false_index]);
     }
@@ -68,12 +67,12 @@ pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 //
 // This is equivalent to `mpn_scan1` from `mpn/generic/scan1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
-    let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let starting_index = bit_to_limb_count_floor(start);
     if starting_index >= xs.len() {
         None
     } else if let Some(result) = xs[starting_index].index_of_next_true_bit(start & Limb::WIDTH_MASK)
     {
-        Some((u64::wrapping_from(starting_index) << Limb::LOG_WIDTH) + result)
+        Some(limb_to_bit_count(starting_index) + result)
     } else if starting_index == xs.len() - 1 {
         None
     } else {
@@ -81,7 +80,7 @@ pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option
         if true_index == xs.len() {
             None
         } else {
-            let result_offset = u64::wrapping_from(true_index) << Limb::LOG_WIDTH;
+            let result_offset = limb_to_bit_count(true_index);
             Some(
                 result_offset
                     .checked_add(TrailingZeros::trailing_zeros(xs[true_index]))

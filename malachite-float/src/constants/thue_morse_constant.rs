@@ -11,12 +11,11 @@ use crate::InnerFloat::Finite;
 use alloc::vec;
 use core::cmp::Ordering::{self, *};
 use malachite_base::iterators::thue_morse_sequence;
-use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::OneHalf;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::Natural;
+use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling};
 use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -85,7 +84,7 @@ impl Float {
             // TODO implement const_from_unsigned_prec_times_power_of_2
             return (Self::one_half_prec(2), Greater);
         }
-        let len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+        let len = bit_to_limb_count_ceiling(prec);
         let mut limbs = vec![0; len];
         let mut tms = thue_morse_sequence();
         for (i, b) in (0..len).rev().zip(&mut tms) {

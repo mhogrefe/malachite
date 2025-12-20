@@ -7,13 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::{Natural, limb_to_bit_count};
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 
 // Given the limbs of a `Natural`, returns the floor of its base-2 logarithm.
@@ -84,7 +82,7 @@ pub_test! {limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
     if slice_test_zero(xs_init) {
         xs_last
             .checked_log_base_2()
-            .map(|log| log + (u64::exact_from(xs_init.len()) << Limb::LOG_WIDTH))
+            .map(|log| log + limb_to_bit_count(xs_init.len()))
     } else {
         None
     }

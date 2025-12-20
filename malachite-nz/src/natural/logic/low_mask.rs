@@ -7,14 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2Assign, ShrRound};
+use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
 //
@@ -25,9 +23,9 @@ use malachite_base::rounding_modes::RoundingMode::*;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
-    let len = bits.shr_round(Limb::LOG_WIDTH, Ceiling).0;
+    let len = bit_to_limb_count_ceiling(bits);
     let remaining_bits = bits & Limb::WIDTH_MASK;
-    let mut xs = vec![Limb::MAX; usize::exact_from(len)];
+    let mut xs = vec![Limb::MAX; len];
     if remaining_bits != 0 {
         xs.last_mut().unwrap().mod_power_of_2_assign(remaining_bits);
     }

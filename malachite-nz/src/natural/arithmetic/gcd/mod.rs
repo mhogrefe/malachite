@@ -11,19 +11,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use crate::natural::arithmetic::gcd::half_gcd::limbs_gcd_reduced;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::comparison::cmp::limbs_cmp;
+use crate::natural::{Natural, limb_to_bit_count};
 use crate::platform::{BMOD_1_TO_MOD_1_THRESHOLD, DoubleLimb, Limb};
 use core::cmp::{Ordering::*, min};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_leading_zeros;
 
@@ -106,7 +104,7 @@ fn gcd_greater_helper(mut xs: &mut [Limb], mut ys: &mut [Limb]) -> Natural {
         out.resize(out_len, 0);
         Natural::from_owned_limbs_asc(out)
     };
-    n << ((u64::exact_from(common_zero_limbs) << Limb::LOG_WIDTH) + common_zero_bits)
+    n << (limb_to_bit_count(common_zero_limbs) + common_zero_bits)
 }
 
 impl Gcd<Self> for Natural {

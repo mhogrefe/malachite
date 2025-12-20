@@ -7,11 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::logic::bit_scan::limbs_index_of_next_true_bit;
+use crate::natural::{LIMB_HIGH_BIT, Natural};
+use crate::natural::{bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
@@ -26,7 +27,6 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
-const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
 const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 impl Natural {
@@ -121,7 +121,7 @@ impl Natural {
                     most_significant_limbs[2] = xs[len - 1];
                     most_significant_limbs[1] = xs[len - 2];
                     most_significant_limbs[0] = xs[len - 3];
-                    exponent += u64::exact_from(len - 3) << Limb::LOG_WIDTH;
+                    exponent += limb_to_bit_count(len - 3);
                     if !slice_test_zero(&xs[..len - 3]) {
                         if rm == Exact {
                             return None;
@@ -139,10 +139,9 @@ impl Natural {
             Greater => {
                 let mut shift = u64::exact_from(shift);
                 exponent -= shift;
-                let limbs_to_shift = shift >> Limb::LOG_WIDTH;
+                let limbs_to_shift = bit_to_limb_count_floor(shift);
                 if limbs_to_shift != 0 {
                     shift.mod_power_of_2_assign(Limb::LOG_WIDTH);
-                    let limbs_to_shift = usize::wrapping_from(limbs_to_shift);
                     most_significant_limbs.copy_within(..3 - limbs_to_shift, limbs_to_shift);
                     slice_set_zero(&mut most_significant_limbs[..limbs_to_shift]);
                 }
@@ -170,10 +169,10 @@ impl Natural {
                     exact = false;
                 }
                 exponent += shift;
-                let limbs_to_shift = shift >> Limb::LOG_WIDTH;
+                let limbs_to_shift = bit_to_limb_count_floor(shift);
                 if limbs_to_shift != 0 {
                     shift.mod_power_of_2_assign(Limb::LOG_WIDTH);
-                    most_significant_limbs.copy_within(usize::wrapping_from(limbs_to_shift).., 0);
+                    most_significant_limbs.copy_within(limbs_to_shift.., 0);
                 }
                 if shift != 0 {
                     limbs_slice_shr_in_place(&mut most_significant_limbs, shift);
@@ -183,7 +182,7 @@ impl Natural {
                 if !exact && rm == Nearest {
                     // len is at least 4, since the only way `exact` is false at this point is if
                     // xs[..len - 3] is nonzero
-                    half_compare = highest_discarded_limb.cmp(&HIGH_BIT);
+                    half_compare = highest_discarded_limb.cmp(&LIMB_HIGH_BIT);
                 }
             }
         }

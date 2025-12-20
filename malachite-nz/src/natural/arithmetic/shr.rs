@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
@@ -36,7 +36,7 @@ use malachite_base::vecs::vec_delete_left;
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where the result is
 // returned.
 pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
-    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         Vec::new()
     } else {
@@ -133,7 +133,7 @@ pub_crate_test! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bi
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up` and
 // if `cnt` is sufficiently large, limbs are removed from `rp`.
 pub_crate_test! {limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
-    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         xs.clear();
     } else {

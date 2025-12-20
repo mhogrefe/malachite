@@ -12,13 +12,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::arithmetic::shr::{
     limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
 };
 use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -46,7 +46,7 @@ use malachite_base::vecs::vec_delete_left;
 // This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
 // non-negative, `dir == 1`, and the result is returned.
 pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
-    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         (vec![1], Greater)
     } else {
@@ -78,7 +78,7 @@ pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
-    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         (Vec::new(), if slice_test_zero(xs) { Equal } else { Less })
     } else {
@@ -189,7 +189,7 @@ pub_test! {
 // This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
 // non-negative, `dir == 1`, and `w == u`.
 pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
-    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         xs.truncate(1);
         xs[0] = 1;
@@ -219,7 +219,7 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ord
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
-    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         let o = if slice_test_zero(xs) { Equal } else { Less };
         xs.clear();

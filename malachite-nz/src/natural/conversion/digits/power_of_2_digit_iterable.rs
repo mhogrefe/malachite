@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::logic::bit_block_access::limbs_slice_get_bits;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use core::cmp::{Ordering::*, min};
 use core::marker::PhantomData;
@@ -270,7 +270,7 @@ impl<T: PrimitiveUnsigned> ExactSizeIterator for IIterator<'_, T> {}
 impl<T: PrimitiveUnsigned> IIterator<'_, T> {
     fn get_digit(&self, index: u64) -> T {
         let start = index * self.log_base;
-        let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
+        let limb_start = bit_to_limb_count_floor(start);
         let len = self.limbs.len();
         let mut result = T::ZERO;
         if limb_start >= len {

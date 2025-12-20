@@ -11,8 +11,9 @@ use crate::{Float, significand_bits};
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, NegAssign, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::bit_to_limb_count_floor;
 use malachite_nz::platform::Limb;
 
 impl Float {
@@ -178,9 +179,7 @@ impl Float {
             let ulp = Limb::power_of_2(significand_bits(significand) - *precision);
             let limb_count = significand.limb_count();
             significand.add_assign_at_limb(
-                usize::wrapping_from(limb_count)
-                    - 1
-                    - usize::exact_from((*precision - 1) >> Limb::LOG_WIDTH),
+                usize::wrapping_from(limb_count) - 1 - bit_to_limb_count_floor(*precision - 1),
                 ulp,
             );
             if significand.limb_count() > limb_count {
@@ -281,7 +280,7 @@ impl Float {
             significand.sub_assign_at_limb(
                 usize::wrapping_from(significand.limb_count())
                     - 1
-                    - usize::exact_from((*precision - 1) >> Limb::LOG_WIDTH),
+                    - bit_to_limb_count_floor(*precision - 1),
                 ulp,
             );
             if *significand == 0u32 {

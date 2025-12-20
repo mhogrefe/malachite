@@ -14,9 +14,11 @@ use alloc::vec::Vec;
 use embed_doc_image::embed_doc_image;
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
-#[cfg(feature = "float_helpers")]
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_trailing_zeros;
 
 /// A natural (non-negative) integer.
@@ -129,6 +131,29 @@ impl Default for Natural {
 
 // Implements `Named` for `Natural`.
 impl_named!(Natural);
+
+#[doc(hidden)]
+#[inline]
+pub fn limb_to_bit_count(n: usize) -> u64 {
+    u64::wrapping_from(n)
+        .arithmetic_checked_shl(Limb::LOG_WIDTH)
+        .unwrap()
+}
+
+#[doc(hidden)]
+#[inline]
+pub fn bit_to_limb_count_floor(n: u64) -> usize {
+    usize::exact_from(n >> Limb::LOG_WIDTH)
+}
+
+#[doc(hidden)]
+#[inline]
+pub fn bit_to_limb_count_ceiling(n: u64) -> usize {
+    usize::exact_from(n.shr_round(Limb::LOG_WIDTH, Ceiling).0)
+}
+
+#[doc(hidden)]
+pub const LIMB_HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
 
 /// Traits for arithmetic.
 pub mod arithmetic;

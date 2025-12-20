@@ -9,11 +9,8 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_nz::platform::Limb;
-
-const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
+use malachite_nz::natural::LIMB_HIGH_BIT;
 
 impl IsPowerOf2 for Float {
     /// Determines whether a [`Float`] is an integer power of 2.
@@ -56,7 +53,7 @@ impl IsPowerOf2 for Float {
                 let mut first = true;
                 for x in significand.limbs().rev() {
                     if first {
-                        if x != HIGH_BIT {
+                        if x != LIMB_HIGH_BIT {
                             return false;
                         }
                         first = false;
@@ -77,7 +74,7 @@ pub(crate) fn abs_is_power_of_2(x: &Float) -> bool {
             let mut first = true;
             for x in significand.limbs().rev() {
                 if first {
-                    if x != HIGH_BIT {
+                    if x != LIMB_HIGH_BIT {
                         return false;
                     }
                     first = false;
@@ -105,7 +102,7 @@ pub(crate) fn float_is_signed_min<T: PrimitiveSigned>(f: &Float) -> bool {
             let mut first = true;
             for x in significand.limbs().rev() {
                 if first {
-                    if x != HIGH_BIT {
+                    if x != LIMB_HIGH_BIT {
                         return false;
                     }
                     first = false;

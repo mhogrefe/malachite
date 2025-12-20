@@ -12,7 +12,6 @@ use crate::integer::random::{
     StripedRandomIntegers, striped_random_integers, striped_random_natural_integers,
     striped_random_negative_integers, striped_random_nonzero_integers,
 };
-use crate::natural::Natural;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -55,6 +54,7 @@ use crate::natural::random::{
     striped_random_natural_range, striped_random_natural_range_to_infinity,
     striped_random_naturals, striped_random_positive_naturals,
 };
+use crate::natural::{Natural, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
@@ -7201,7 +7201,7 @@ fn special_random_half_gcd_matrix(
     bit_source: &mut StripedBitSource,
 ) -> OwnedHalfGcdMatrix {
     assert!(n <= s);
-    let bits = u64::exact_from(n) << Limb::LOG_WIDTH;
+    let bits = limb_to_bit_count(n);
     let mut m00 = get_striped_unsigned_vec(bit_source, bits);
     let m01 = get_striped_unsigned_vec(bit_source, bits);
     let m10 = get_striped_unsigned_vec(bit_source, bits);
@@ -7251,10 +7251,8 @@ impl Iterator for HalfGcdMatrixAndVecGenerator {
             };
             let m_s = max(m_s_1, m_s_2);
             let m = special_random_half_gcd_matrix(m_s, m_n, &mut self.striped_bit_source);
-            let qs = get_striped_unsigned_vec(
-                &mut self.striped_bit_source,
-                u64::exact_from(qs_len) << Limb::LOG_WIDTH,
-            );
+            let qs =
+                get_striped_unsigned_vec(&mut self.striped_bit_source, limb_to_bit_count(qs_len));
             let column = u8::from(self.bs.next().unwrap());
             return Some((m, qs, column));
         }

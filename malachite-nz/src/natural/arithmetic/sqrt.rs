@@ -519,6 +519,7 @@ pub_test! {limbs_sqrt_rem_to_out(
 
 // This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is not
 // `NULL`, only returning whether the remainder is nonzero, rather than computing it in full.
+#[cfg(feature = "float_helpers")]
 pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];

@@ -8,8 +8,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{
-    Float, float_either_zero, float_infinity, float_nan, float_negative_infinity,
-    float_negative_zero, float_zero,
+    Float, float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero,
 };
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Sqrt, SqrtAssign};
@@ -186,9 +185,8 @@ impl Float {
     pub fn sqrt_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match self {
-            float_nan!() => (float_nan!(), Equal),
+            Self(NaN | Infinity { sign: false }) => (float_nan!(), Equal),
             float_infinity!() => (float_infinity!(), Equal),
-            float_negative_infinity!() => (float_nan!(), Equal),
             float_zero!() => (float_zero!(), Equal),
             float_negative_zero!() => (float_negative_zero!(), Equal),
             Self(Finite {
@@ -217,9 +215,9 @@ impl Float {
 
     /// Computes the square root of a [`Float`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by value. An [`Ordering`] is also returned,
-    /// indicating whether the rounded sqrt is less than, equal to, or greater than the exact square
-    /// root. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// indicating whether the rounded square root is less than, equal to, or greater than the exact
+    /// square root. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// The square root of any nonzero negative number is `NaN`.
     ///
@@ -278,9 +276,9 @@ impl Float {
 
     /// Computes the square root of a [`Float`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by reference. An [`Ordering`] is also returned,
-    /// indicating whether the rounded sqrt is less than, equal to, or greater than the exact square
-    /// root. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
-    /// `NaN` it also returns `Equal`.
+    /// indicating whether the rounded square root is less than, equal to, or greater than the exact
+    /// square root. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// The square root of any nonzero negative number is `NaN`.
     ///
@@ -557,7 +555,7 @@ impl Float {
     pub fn sqrt_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
         assert_ne!(prec, 0);
         match self {
-            float_nan!() | float_infinity!() | float_either_zero!() => Equal,
+            Self(NaN | Infinity { sign: true } | Zero { .. }) => Equal,
             float_negative_infinity!() => {
                 *self = float_nan!();
                 Equal

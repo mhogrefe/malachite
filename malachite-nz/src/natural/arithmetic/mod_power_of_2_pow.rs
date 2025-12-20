@@ -11,23 +11,20 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::mod_pow::{get_bits, get_window_size};
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::limbs_square_low;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Pow, ModPowerOf2PowAssign, PowerOf2, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2Pow, ModPowerOf2PowAssign, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // Raise an n-limb number to a power and return the lowest n limbs of the result.
 //
@@ -117,7 +114,7 @@ pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb
 // # Panics
 // Panics if the exponent has trailing zeros or is 1.
 pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
-    let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let out_len = bit_to_limb_count_ceiling(pow);
     xs.resize(out_len, 0);
     let mut scratch = vec![0; out_len];
     limbs_pow_low(xs, es, &mut scratch);

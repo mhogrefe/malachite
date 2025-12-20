@@ -10,17 +10,13 @@ use crate::Float;
 use crate::InnerFloat::Finite;
 use alloc::vec;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOf2, NegModPowerOf2, PowerOf2, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::Natural;
+use malachite_nz::natural::LIMB_HIGH_BIT;
+use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling};
 use malachite_nz::platform::Limb;
-
-const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
 
 impl Float {
     /// Returns an approximation of a real number, given the number's bits. To avoid troublesome
@@ -116,11 +112,11 @@ impl Float {
     ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         assert_ne!(rm, Exact);
-        let len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+        let len = bit_to_limb_count_ceiling(prec);
         let mut limbs = vec![0; len];
         let mut limbs_it = limbs.iter_mut().rev();
         let mut x = limbs_it.next().unwrap();
-        let mut mask = HIGH_BIT;
+        let mut mask = LIMB_HIGH_BIT;
         let mut seen_one = false;
         let mut exponent: i32 = 0;
         let mut remaining = prec;
@@ -142,7 +138,7 @@ impl Float {
             }
             if mask == 1 {
                 x = limbs_it.next().unwrap();
-                mask = HIGH_BIT;
+                mask = LIMB_HIGH_BIT;
             } else {
                 mask >>= 1;
             }

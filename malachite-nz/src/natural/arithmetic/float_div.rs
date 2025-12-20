@@ -17,7 +17,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -38,13 +37,14 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, NegModPowerOf2, OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2,
-    ShrRound, WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
+    WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -341,8 +341,7 @@ fn div_float_significands_same_prec_ref_ref(
 }
 
 const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const HIGH_BIT: Limb = 1 << WIDTH_M1;
-const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 // This is mpfr_div_1 from mul.c, MPFR 4.3.0.
 fn div_float_significands_same_prec_lt_w(
@@ -410,7 +409,7 @@ fn div_float_significands_same_prec_lt_w(
         round_bit = q & half_shift_bit;
         sticky_bit | (q & (mask >> 1))
     };
-    let quotient = (HIGH_BIT | q) & !mask;
+    let quotient = (LIMB_HIGH_BIT | q) & !mask;
     if round_bit == 0 && sticky_bit == 0 {
         return (quotient, increment_exp, Equal);
     }
@@ -474,7 +473,7 @@ fn div_float_significands_same_prec_w(
     let round_bit;
     let (quotient, sticky_bit) = if increment_exp {
         round_bit = q.odd();
-        (HIGH_BIT | (q >> 1), lo)
+        (LIMB_HIGH_BIT | (q >> 1), lo)
     } else {
         // If "lo + lo < lo", then there is a carry in lo + lo, thus 2 * lo > y. Otherwise if there
         // is no carry, we check whether 2 * lo >= v0.
@@ -633,7 +632,7 @@ fn div_float_significands_same_prec_gt_w_lt_2w(
     if increment_exp {
         sticky_bit |= q_0 & 1;
         q_0 = (q_1 << WIDTH_M1) | (q_0 >> 1);
-        q_1 = HIGH_BIT | (q_1 >> 1);
+        q_1 = LIMB_HIGH_BIT | (q_1 >> 1);
     }
     let round_bit = q_0 & (shift_bit >> 1);
     sticky_bit |= (q_0 & mask) ^ round_bit;
@@ -648,7 +647,7 @@ fn div_float_significands_same_prec_gt_w_lt_2w(
             if round_bit == 0 || (sticky_bit == 0 && (z_0 & shift_bit) == 0) {
                 (z_0, z_1, increment_exp, Less)
             } else if z_0.overflowing_add_assign(shift_bit) && z_1.overflowing_add_assign(1) {
-                (z_0, HIGH_BIT, false, Greater)
+                (z_0, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, increment_exp, Greater)
             }
@@ -656,7 +655,7 @@ fn div_float_significands_same_prec_gt_w_lt_2w(
         Floor | Down => (z_0, z_1, increment_exp, Less),
         Ceiling | Up => {
             if z_0.overflowing_add_assign(shift_bit) && z_1.overflowing_add_assign(1) {
-                (z_0, HIGH_BIT, false, Greater)
+                (z_0, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, increment_exp, Greater)
             }
@@ -739,7 +738,7 @@ fn div_float_significands_long_by_short(
     prec: u64,
     rm: RoundingMode,
 ) -> (Vec<Limb>, u64, Ordering) {
-    let out_len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let out_len = bit_to_limb_count_ceiling(prec);
     let mut out = vec![0; out_len + 1];
     let (exp_offset, o) = div_float_significands_long_by_short_to_out(&mut out, xs, y, prec, rm);
     out.truncate(out_len);
@@ -852,7 +851,7 @@ fn div_float_significands_long_by_short_to_out(
         let w = old_head_2;
         if shift == 0 {
             // round bit is upper bit from w
-            round_bit = w & HIGH_BIT;
+            round_bit = w & LIMB_HIGH_BIT;
             sticky_bit |= (w - round_bit) | c;
         } else {
             round_bit = *out_head & (shift_bit >> 1);
@@ -874,7 +873,7 @@ fn div_float_significands_long_by_short_to_out(
             } else {
                 if limbs_slice_add_limb_in_place(out, shift_bit) {
                     exp_offset += 1;
-                    *out.last_mut().unwrap() = HIGH_BIT;
+                    *out.last_mut().unwrap() = LIMB_HIGH_BIT;
                 }
                 (exp_offset, Greater)
             }
@@ -883,7 +882,7 @@ fn div_float_significands_long_by_short_to_out(
         Ceiling | Up => {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
                 exp_offset += 1;
-                *out.last_mut().unwrap() = HIGH_BIT;
+                *out.last_mut().unwrap() = LIMB_HIGH_BIT;
             }
             (exp_offset, Greater)
         }
@@ -900,7 +899,7 @@ fn div_float_significands_long_by_short_in_place(
     rm: RoundingMode,
 ) -> (u64, Ordering) {
     let xs_len = xs.len();
-    let out_len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let out_len = bit_to_limb_count_ceiling(prec);
     let out_ge_xs = out_len + 1 >= xs_len;
     let diff = (out_len + 1).abs_diff(xs_len);
     let x_lo_nonzero = diff < xs_len && !slice_test_zero(&xs[..diff]);
@@ -1002,7 +1001,7 @@ fn div_float_significands_long_by_short_in_place(
         let w = old_head_2;
         if shift == 0 {
             // round bit is upper bit from w
-            round_bit = w & HIGH_BIT;
+            round_bit = w & LIMB_HIGH_BIT;
             sticky_bit |= (w - round_bit) | c;
         } else {
             round_bit = *xs_head & (shift_bit >> 1);
@@ -1024,7 +1023,7 @@ fn div_float_significands_long_by_short_in_place(
             } else {
                 if limbs_slice_add_limb_in_place(xs, shift_bit) {
                     exp_offset += 1;
-                    *xs.last_mut().unwrap() = HIGH_BIT;
+                    *xs.last_mut().unwrap() = LIMB_HIGH_BIT;
                 }
                 (exp_offset, Greater)
             }
@@ -1033,7 +1032,7 @@ fn div_float_significands_long_by_short_in_place(
         Ceiling | Up => {
             if limbs_slice_add_limb_in_place(xs, shift_bit) {
                 exp_offset += 1;
-                *xs.last_mut().unwrap() = HIGH_BIT;
+                *xs.last_mut().unwrap() = LIMB_HIGH_BIT;
             }
             (exp_offset, Greater)
         }
@@ -1257,7 +1256,7 @@ fn div_float_significands_general(
     prec: u64,
     rm: RoundingMode,
 ) -> (Vec<Limb>, u64, Ordering) {
-    let mut out = vec![0; usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+    let mut out = vec![0; bit_to_limb_count_ceiling(prec)];
     let (exp_offset, o) = div_float_significands_general_to_out(&mut out, xs, ys, prec, rm);
     (out, exp_offset, o)
 }
@@ -1284,7 +1283,7 @@ fn div_float_significands_general_to_out(
 ) -> (u64, Ordering) {
     let ns_len = ns.len();
     let ds_len = ds.len();
-    let qs_len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let qs_len = bit_to_limb_count_ceiling(prec);
     let qs = &mut qs[..qs_len];
     // Determine if an extra bit comes from the division, i.e. if the significand of X (as a
     // fraction in [1/2, 1) ) is larger than that of Y
@@ -1348,7 +1347,7 @@ fn div_float_significands_general_to_out(
         if q_high {
             let qs_2_lo = &mut qs_2[..n];
             limbs_slice_shr_in_place(qs_2_lo, 1);
-            *qs_2_lo.last_mut().unwrap() |= HIGH_BIT;
+            *qs_2_lo.last_mut().unwrap() |= LIMB_HIGH_BIT;
             if round_helper_2(qs_2_lo, p, prec + u64::from(rm == Nearest)) {
                 // We can round correctly whatever the rounding mode
                 qs.copy_from_slice(&qs_2[1..=qs_len]);
@@ -1371,7 +1370,7 @@ fn div_float_significands_general_to_out(
                                 exp_offset += 1;
                                 // else exponent is now incorrect, but one will still get an
                                 // overflow
-                                qs[qs_len - 1] = HIGH_BIT;
+                                qs[qs_len - 1] = LIMB_HIGH_BIT;
                             }
                             (exp_offset, Greater)
                         } else {
@@ -1382,7 +1381,7 @@ fn div_float_significands_general_to_out(
                         if limbs_slice_add_limb_in_place(qs, shift_bit) {
                             exp_offset += 1;
                             // else exponent is now incorrect, but one will still get an overflow
-                            *qs.last_mut().unwrap() = HIGH_BIT;
+                            *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                         }
                         (exp_offset, Greater)
                     }
@@ -1601,7 +1600,10 @@ fn div_float_significands_general_to_out(
                             low_x = false;
                             let kml = k - l;
                             if carry {
-                                carry = limbs_sub_limb_in_place(&mut sp_lo[kml - 1..kml], HIGH_BIT);
+                                carry = limbs_sub_limb_in_place(
+                                    &mut sp_lo[kml - 1..kml],
+                                    LIMB_HIGH_BIT,
+                                );
                             }
                             carry = sub_helper(
                                 &mut sp_lo[kml..],
@@ -1738,7 +1740,7 @@ fn div_float_significands_general_to_out(
                     if limbs_slice_add_limb_in_place(qs, shift_bit) {
                         exp_offset += 1;
                         // else qexp is now incorrect, but one will still get an overflow
-                        *qs.last_mut().unwrap() = HIGH_BIT;
+                        *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                     }
                     (exp_offset, Greater)
                 } else {
@@ -1749,7 +1751,7 @@ fn div_float_significands_general_to_out(
                         if limbs_slice_add_limb_in_place(qs, shift_bit) {
                             exp_offset += 1;
                             // else qexp is now incorrect, but one will still get an overflow
-                            *qs.last_mut().unwrap() = HIGH_BIT;
+                            *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                         }
                         (exp_offset, Greater)
                     }
@@ -1759,7 +1761,7 @@ fn div_float_significands_general_to_out(
                 if limbs_slice_add_limb_in_place(qs, shift_bit) {
                     exp_offset += 1;
                     // else qexp is now incorrect, but one will still get an overflow
-                    *qs.last_mut().unwrap() = HIGH_BIT;
+                    *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                 }
                 (exp_offset, Greater)
             };
@@ -1783,7 +1785,7 @@ fn div_float_significands_general_to_out(
     if q_high {
         exp_offset += 1;
         // else qexp is now incorrect, but one will still get an overflow
-        *qs.last_mut().unwrap() = HIGH_BIT;
+        *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
     }
     (exp_offset, inex)
 }

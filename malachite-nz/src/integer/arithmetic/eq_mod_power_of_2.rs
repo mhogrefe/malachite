@@ -12,13 +12,12 @@
 
 use crate::integer::Integer;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns whether
 // the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`; that is,
@@ -37,7 +36,7 @@ pub_test! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> b
     if y == 0 {
         return limbs_divisible_by_power_of_2(xs, pow);
     }
-    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let i = bit_to_limb_count_floor(pow);
     match i.cmp(&xs.len()) {
         Greater => false,
         Equal => {
@@ -70,7 +69,7 @@ pub_test! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> b
 
 fn limbs_eq_mod_power_of_2_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let xs_len = xs.len();
-    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let i = bit_to_limb_count_floor(pow);
     let small_pow = pow & Limb::WIDTH_MASK;
     if i > xs_len || i == xs_len && small_pow != 0 {
         false

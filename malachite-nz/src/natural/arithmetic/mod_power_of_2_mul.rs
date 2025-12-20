@@ -7,23 +7,21 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::{
     limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref,
 };
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Mul, ModPowerOf2MulAssign, ShrRound,
+    ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Mul, ModPowerOf2MulAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
 // `Vec` of the limbs of the product of the `Natural`s mod `2 ^ pow`. Assumes the inputs are already
@@ -47,7 +45,7 @@ pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow:
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let max_len = bit_to_limb_count_ceiling(pow);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -96,7 +94,7 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let max_len = bit_to_limb_count_ceiling(pow);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -145,7 +143,7 @@ pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) 
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let max_len = bit_to_limb_count_ceiling(pow);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }

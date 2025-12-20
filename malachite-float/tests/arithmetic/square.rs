@@ -24,11 +24,12 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
     unsigned_rounding_mode_pair_gen_var_3,
 };
+use malachite_float::emulate_primitive_float_fn;
 use malachite_float::test_util::arithmetic::square::{
     rug_square, rug_square_prec, rug_square_prec_round, rug_square_round, square_prec_round_naive,
 };
 use malachite_float::test_util::common::{
-    emulate_primitive_float_fn, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_9,
@@ -2598,7 +2599,6 @@ fn square_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
     assert_eq!(o_alt, o);
 
     if o == Equal && square.is_finite() {
-        println!("{:#x} {}", ComparableFloatRef(&square), prec);
         assert!(
             square
                 .sqrt_prec_round(x.get_prec().unwrap_or(1), Exact)

@@ -15,7 +15,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -28,6 +27,7 @@ use crate::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{Natural, limb_to_bit_count};
 use crate::platform::{
     BASES, DoubleLimb, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, Limb, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
@@ -133,7 +133,7 @@ pub_crate_test! {limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
         1
     } else {
         limbs_digit_count_helper(
-            (u64::exact_from(size) << Limb::LOG_WIDTH)
+            limb_to_bit_count(size)
                 - LeadingZeros::leading_zeros(*xs.last().unwrap()),
             base,
         )

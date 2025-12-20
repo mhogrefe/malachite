@@ -1972,6 +1972,10 @@ pub fn sqrt_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || x.sqrt_prec_round_ref(prec, Floor).1 == Equal
 }
 
+pub fn reciprocal_sqrt_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.reciprocal_sqrt_prec_round_ref(prec, Floor).1 == Equal
+}
+
 pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_13() -> It<(Float, u64, RoundingMode)>
 {
     reshape_2_1_to_3(Box::new(
@@ -1994,6 +1998,31 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_14() -> It<(Float,
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, p), rm)| sqrt_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_15() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| reciprocal_sqrt_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_16() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| reciprocal_sqrt_prec_round_valid(x, p, rm)),
     ))
 }
 
@@ -2956,6 +2985,24 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_29() -> It<(Float, RoundingMo
     Box::new(
         lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
             .filter(|(f, rm)| sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub(crate) fn reciprocal_sqrt_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    rm != Exact || x.reciprocal_sqrt_round_ref(Floor).1 == Equal
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_30() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| reciprocal_sqrt_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_31() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| reciprocal_sqrt_round_valid(f, *rm)),
     )
 }
 

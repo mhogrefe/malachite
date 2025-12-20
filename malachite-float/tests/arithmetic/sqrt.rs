@@ -23,11 +23,12 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
     unsigned_rounding_mode_pair_gen_var_3,
 };
+use malachite_float::emulate_primitive_float_fn;
 use malachite_float::test_util::arithmetic::sqrt::{
     rug_sqrt, rug_sqrt_prec, rug_sqrt_prec_round, rug_sqrt_round,
 };
 use malachite_float::test_util::common::{
-    emulate_primitive_float_fn, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_11,
@@ -1817,6 +1818,7 @@ fn sqrt_round_properties() {
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn sqrt_properties_helper_1(x: Float) {
     let sqrt = x.clone().sqrt();
     assert!(sqrt.is_valid());

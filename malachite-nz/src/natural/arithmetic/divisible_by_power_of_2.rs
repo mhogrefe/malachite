@@ -11,11 +11,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
@@ -34,7 +33,7 @@ use malachite_base::slices::slice_test_zero;
 // non-negative.
 pub_crate_test! {limbs_divisible_by_power_of_2(xs: &[Limb], pow: u64) -> bool {
     assert!(!xs.is_empty());
-    let zeros = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let zeros = bit_to_limb_count_floor(pow);
     zeros < xs.len()
         && slice_test_zero(&xs[..zeros])
         && xs[zeros].divisible_by_power_of_2(pow & Limb::WIDTH_MASK)

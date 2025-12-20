@@ -12,17 +12,16 @@
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, NegModPowerOf2, NegModPowerOf2Assign, RemPowerOf2,
-    RemPowerOf2Assign, ShrRound,
+    RemPowerOf2Assign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::slices::slice_set_zero;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -43,7 +42,7 @@ pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
         return Vec::new();
     }
     let leftover_bits = pow & Limb::WIDTH_MASK;
-    let result_size = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let result_size = bit_to_limb_count_floor(pow);
     if result_size >= xs.len() {
         return xs.to_vec();
     }
@@ -70,7 +69,7 @@ pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) 
         slice_set_zero(xs);
         return;
     }
-    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let new_size = bit_to_limb_count_ceiling(pow);
     if new_size > xs.len() {
         return;
     }
@@ -95,7 +94,7 @@ pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64)
         xs.clear();
         return;
     }
-    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let new_size = bit_to_limb_count_ceiling(pow);
     if new_size > xs.len() {
         return;
     }
@@ -139,7 +138,7 @@ pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
 // negative and `res == in`. `xs` is the limbs of `-in`.
 pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
-    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let new_size = bit_to_limb_count_ceiling(pow);
     xs.resize(new_size, 0);
     limbs_twos_complement_in_place(xs);
     let leftover_bits = pow & Limb::WIDTH_MASK;

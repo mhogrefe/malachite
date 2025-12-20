@@ -17,7 +17,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -32,21 +31,20 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    NegModPowerOf2, OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2, ShrRound,
+    NegModPowerOf2, OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2,
     WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const HIGH_BIT: Limb = 1 << WIDTH_M1;
 const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
 
 // This is mpfr_div from div.c, MPFR 4.3.0, specialized for reciprocation.
@@ -172,23 +170,23 @@ fn reciprocal_float_significand_same_prec_lt_w(
     let half_shift_bit = shift_bit >> 1;
     let mask = shift_bit - 1;
     // First try with an approximate reciprocal.
-    let q = HIGH_BIT | (limbs_invert_limb::<DoubleLimb, Limb>(x) >> 1);
-    // round_bit does not exceed the true reciprocal floor(HIGH_BIT * 2 ^ WIDTH / x), with error at
-    // most 2, which means the rational reciprocal q satisfies round_bit <= q < round_bit + 3. We
-    // can round correctly except when the last shift - 1 bits of q0 are 000..000 or 111..111 or
-    // 111..110.
+    let q = LIMB_HIGH_BIT | (limbs_invert_limb::<DoubleLimb, Limb>(x) >> 1);
+    // round_bit does not exceed the true reciprocal floor(LIMB_HIGH_BIT * 2 ^ WIDTH / x), with
+    // error at most 2, which means the rational reciprocal q satisfies round_bit <= q < round_bit +
+    // 3. We can round correctly except when the last shift - 1 bits of q0 are 000..000 or 111..111
+    // or 111..110.
     let (round_bit, sticky_bit) = if (q + 2) & (mask >> 1) > 2 {
         // result cannot be exact in this case
         (q & half_shift_bit, 1)
     } else {
         let (mut hi, mut lo) = Limb::x_mul_y_to_zz(q, x);
-        assert!(hi < HIGH_BIT || (hi == HIGH_BIT && lo == 0));
-        // subtract {hi, lo} from {HIGH_BIT, 0}
-        (hi, lo) = Limb::xx_sub_yy_to_zz(HIGH_BIT, 0, hi, lo);
+        assert!(hi < LIMB_HIGH_BIT || (hi == LIMB_HIGH_BIT && lo == 0));
+        // subtract {hi, lo} from {LIMB_HIGH_BIT, 0}
+        (hi, lo) = Limb::xx_sub_yy_to_zz(LIMB_HIGH_BIT, 0, hi, lo);
         assert!(hi == 0 && lo < x);
         (q & half_shift_bit, lo | (q & (mask >> 1)))
     };
-    let reciprocal = (HIGH_BIT | q) & !mask;
+    let reciprocal = (LIMB_HIGH_BIT | q) & !mask;
     match rm {
         Exact => panic!("Inexact float reciprocation"),
         Nearest => {
@@ -206,20 +204,20 @@ fn reciprocal_float_significand_same_prec_lt_w(
 // x cannot be equal to `2 ^ (WIDTH - 1)`.
 fn reciprocal_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, bool, Ordering) {
     // First compute an approximate reciprocal.
-    let q = HIGH_BIT | (limbs_invert_limb::<DoubleLimb, Limb>(x) >> 1);
+    let q = LIMB_HIGH_BIT | (limbs_invert_limb::<DoubleLimb, Limb>(x) >> 1);
     // round_bit does not exceed the true reciprocal floor(2 ^ WIDTH / x), with error at most 2,
     // which means the rational reciprocal q satisfies round_bit <= q < round_bit + 3, thus the true
     // reciprocal is round_bit, round_bit + 1 or round_bit + 2.
     let (mut hi, mut lo) = Limb::x_mul_y_to_zz(q, x);
-    assert!(hi < HIGH_BIT || (hi == HIGH_BIT && lo == 0));
-    // subtract {hi, lo} from {HIGH_BIT, 0}
-    (hi, lo) = Limb::xx_sub_yy_to_zz(HIGH_BIT, 0, hi, lo);
+    assert!(hi < LIMB_HIGH_BIT || (hi == LIMB_HIGH_BIT && lo == 0));
+    // subtract {hi, lo} from {LIMB_HIGH_BIT, 0}
+    (hi, lo) = Limb::xx_sub_yy_to_zz(LIMB_HIGH_BIT, 0, hi, lo);
     assert!(hi == 0 && lo < x);
-    // now (HIGH_BIT - extra * x) * 2 ^ WIDTH = q * x + lo with 0 <= lo < x
+    // now (LIMB_HIGH_BIT - extra * x) * 2 ^ WIDTH = q * x + lo with 0 <= lo < x
     //
     // If !increment_exp, the reciprocal is q0, the round bit is 1 if l >= x0 / 2, and sticky_bit
-    // are the remaining bits from l. If increment_exp, the reciprocal is HIGH_BIT + (q >> 1), the
-    // round bit is the least significant bit of q, and sticky_bit is lo.
+    // are the remaining bits from l. If increment_exp, the reciprocal is LIMB_HIGH_BIT + (q >> 1),
+    // the round bit is the least significant bit of q, and sticky_bit is lo.
     //
     // If "2 * lo < lo", then there is a carry in 2 * lo, thus 2 * lo > x. Otherwise if there is no
     // carry, we check whether 2 * lo >= y0.
@@ -263,7 +261,7 @@ fn reciprocal_float_2_approx(x_1: Limb, x_0: Limb) -> (Limb, Limb) {
         limbs_invert_limb::<DoubleLimb, Limb>(x_1 + 1)
     };
     // Now inv <= B ^ 2 / (x_1 + 1) - B.
-    let mut q_1 = HIGH_BIT | (inv >> 1);
+    let mut q_1 = LIMB_HIGH_BIT | (inv >> 1);
     // Now q_1 <= x_1 * B / (x_1 + 1) < (x_1 * B + x_0) * B / (x_1 * B + x_0).
     //
     // Compute q_1 * (x_1 * B + x_0) into r_1 : r_0 : xx and subtract from u_1 : x_0 : 0.
@@ -280,7 +278,7 @@ fn reciprocal_float_2_approx(x_1: Limb, x_0: Limb) -> (Limb, Limb) {
     if r_0 == 0 && yy != 0 {
         r_1.wrapping_add_assign(1);
     }
-    r_1 = HIGH_BIT.wrapping_sub(r_1);
+    r_1 = LIMB_HIGH_BIT.wrapping_sub(r_1);
     let carry;
     (r_0, carry) = r_0.overflowing_neg();
     if carry {
@@ -320,7 +318,7 @@ fn reciprocal_float_significand_same_prec_gt_w_lt_2w(
     let shift = TWICE_WIDTH - prec;
     let shift_bit = Limb::power_of_2(shift);
     let mask = shift_bit - 1;
-    assert!(HIGH_BIT < x_1 || (HIGH_BIT == x_1 && x_0 != 0));
+    assert!(LIMB_HIGH_BIT < x_1 || (LIMB_HIGH_BIT == x_1 && x_0 != 0));
     let (mut q_1, mut q_0) = reciprocal_float_2_approx(x_1, x_0);
     // We know q1 * B + q0 is smaller or equal to the exact reciprocal, with difference at most 21.
     let mut sticky_bit = if (q_0.wrapping_add(21)) & (mask >> 1) > 21 {
@@ -378,7 +376,7 @@ fn reciprocal_float_significand_same_prec_gt_w_lt_2w(
             if round_bit == 0 || sticky_bit == 0 && z_0 & shift_bit == 0 {
                 (z_0, z_1, false, Less)
             } else if z_0.overflowing_add_assign(shift_bit) && z_1.overflowing_add_assign(1) {
-                (z_0, HIGH_BIT, false, Greater)
+                (z_0, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, false, Greater)
             }
@@ -386,7 +384,7 @@ fn reciprocal_float_significand_same_prec_gt_w_lt_2w(
         Floor | Down => (z_0, z_1, false, Less),
         Ceiling | Up => {
             if z_0.overflowing_add_assign(shift_bit) && z_1.overflowing_add_assign(1) {
-                (z_0, HIGH_BIT, false, Greater)
+                (z_0, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, false, Greater)
             }
@@ -400,7 +398,7 @@ fn reciprocal_float_significand_short(
     prec: u64,
     rm: RoundingMode,
 ) -> (Vec<Limb>, u64, Ordering) {
-    let out_len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let out_len = bit_to_limb_count_ceiling(prec);
     let mut out = vec![0; out_len + 1];
     let (exp_offset, o) = reciprocal_float_significand_short_to_out(&mut out, y, prec, rm);
     out.truncate(out_len);
@@ -421,7 +419,7 @@ fn limbs_reciprocal_limb_to_out_mod_with_fraction(
     *out_last = 0;
     // Multiply-by-inverse, divisor already normalized.
     let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
-    let mut r = HIGH_BIT;
+    let mut r = LIMB_HIGH_BIT;
     for out_q in out_init[..fraction_len].iter_mut().rev() {
         (*out_q, r) = div_mod_by_preinversion(r, 0, d, d_inv);
     }
@@ -496,7 +494,7 @@ fn reciprocal_float_significand_short_to_out(
             } else {
                 if limbs_slice_add_limb_in_place(out, shift_bit) {
                     exp_offset += 1;
-                    *out.last_mut().unwrap() = HIGH_BIT;
+                    *out.last_mut().unwrap() = LIMB_HIGH_BIT;
                 }
                 (exp_offset, Greater)
             }
@@ -505,7 +503,7 @@ fn reciprocal_float_significand_short_to_out(
         Ceiling | Up => {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
                 exp_offset += 1;
-                *out.last_mut().unwrap() = HIGH_BIT;
+                *out.last_mut().unwrap() = LIMB_HIGH_BIT;
             }
             (exp_offset, Greater)
         }
@@ -518,7 +516,7 @@ fn reciprocal_float_significand_general(
     prec: u64,
     rm: RoundingMode,
 ) -> (Vec<Limb>, u64, Ordering) {
-    let mut out = vec![0; usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+    let mut out = vec![0; bit_to_limb_count_ceiling(prec)];
     let (exp_offset, o) = reciprocal_float_significand_general_to_out(&mut out, ys, prec, rm);
     (out, exp_offset, o)
 }
@@ -534,16 +532,16 @@ fn reciprocal_float_significand_general_to_out(
     rm: RoundingMode,
 ) -> (u64, Ordering) {
     let ds_len = ds.len();
-    let qs_len = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let qs_len = bit_to_limb_count_ceiling(prec);
     let qs = &mut qs[..qs_len];
     // Determine if an extra bit comes from the division, i.e. if the significand of X (as a
     // fraction in [1/2, 1) ) is larger than that of Y
     let ds_last = *ds.last().unwrap();
-    let extra_bit = if ds_last == HIGH_BIT {
+    let extra_bit = if ds_last == LIMB_HIGH_BIT {
         // k = 0: no more dividend limb
         slice_test_zero(&ds[..ds_len - 1])
     } else {
-        HIGH_BIT > ds_last
+        LIMB_HIGH_BIT > ds_last
     };
     let mut exp_offset = u64::from(extra_bit);
     // shift is the number of zero bits in the low limb of the reciprocal
@@ -560,7 +558,7 @@ fn reciprocal_float_significand_general_to_out(
         // since Mulders' short division clobbers the dividend, we have to copy it
         let mut xs = vec![0; two_n];
         // zero-pad the dividend
-        *xs.last_mut().unwrap() = HIGH_BIT;
+        *xs.last_mut().unwrap() = LIMB_HIGH_BIT;
         if ds_len >= n {
             // truncate the divisor
             ys = &mut ds[ds_len - n..];
@@ -580,7 +578,7 @@ fn reciprocal_float_significand_general_to_out(
         if q_high {
             let qs_2_lo = &mut qs_2[..n];
             limbs_slice_shr_in_place(qs_2_lo, 1);
-            *qs_2_lo.last_mut().unwrap() |= HIGH_BIT;
+            *qs_2_lo.last_mut().unwrap() |= LIMB_HIGH_BIT;
             // round_helper_2 would always return false, so no need to call it
         }
     }
@@ -600,7 +598,11 @@ fn reciprocal_float_significand_general_to_out(
     // prepare the dividend
     let mut xs = vec![0; two_qs_2_len];
     // use the full dividend
-    xs[two_qs_2_len - 1] = if extra_bit { HIGH_BIT >> 1 } else { HIGH_BIT };
+    xs[two_qs_2_len - 1] = if extra_bit {
+        LIMB_HIGH_BIT >> 1
+    } else {
+        LIMB_HIGH_BIT
+    };
     // Prepare the divisor
     let (mut k, sticky_y) = if ds_len >= qs_2_len {
         let k = ds_len - qs_2_len;
@@ -829,7 +831,7 @@ fn reciprocal_float_significand_general_to_out(
                     if limbs_slice_add_limb_in_place(qs, shift_bit) {
                         exp_offset += 1;
                         // else qexp is now incorrect, but one will still get an overflow
-                        *qs.last_mut().unwrap() = HIGH_BIT;
+                        *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                     }
                     (exp_offset, Greater)
                 } else {
@@ -843,7 +845,7 @@ fn reciprocal_float_significand_general_to_out(
                         if limbs_slice_add_limb_in_place(qs, shift_bit) {
                             exp_offset += 1;
                             // else qexp is now incorrect, but one will still get an overflow
-                            *qs.last_mut().unwrap() = HIGH_BIT;
+                            *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                         }
                         (exp_offset, Greater)
                     }
@@ -853,7 +855,7 @@ fn reciprocal_float_significand_general_to_out(
                 if limbs_slice_add_limb_in_place(qs, shift_bit) {
                     exp_offset += 1;
                     // else qexp is now incorrect, but one will still get an overflow
-                    *qs.last_mut().unwrap() = HIGH_BIT;
+                    *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
                 }
                 (exp_offset, Greater)
             };
@@ -877,7 +879,7 @@ fn reciprocal_float_significand_general_to_out(
     if q_high {
         exp_offset += 1;
         // else qexp is now incorrect, but one will still get an overflow
-        *qs.last_mut().unwrap() = HIGH_BIT;
+        *qs.last_mut().unwrap() = LIMB_HIGH_BIT;
     }
     (exp_offset, inex)
 }

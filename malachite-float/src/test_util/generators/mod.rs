@@ -1940,6 +1940,48 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_14() -> Generator<(Float, u64
     )
 }
 
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.reciprocal_sqrt_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_15() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_15,
+        &random_float_unsigned_rounding_mode_triple_gen_var_15,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_15,
+    )
+}
+
+pub fn float_unsigned_rounding_mode_triple_gen_var_15_rm() -> Generator<(
+    (rug::Float, u64, rug::float::Round),
+    (Float, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_t_rounding_mode_triple_rm(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_15(),
+            )
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(random_float_unsigned_rounding_mode_triple_gen_var_15(
+                config,
+            ))
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_15(config),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.reciprocal_sqrt_prec_round`,
+// where the `Float` is extreme.
+pub fn float_unsigned_rounding_mode_triple_gen_var_16() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_16,
+        &random_float_unsigned_rounding_mode_triple_gen_var_16,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_16,
+    )
+}
+
 // -- (Float, Rational) --
 
 pub fn float_rational_pair_gen() -> Generator<(Float, Rational)> {
@@ -2761,6 +2803,36 @@ pub fn float_rounding_mode_pair_gen_var_29() -> Generator<(Float, RoundingMode)>
         &exhaustive_float_rounding_mode_pair_gen_var_29,
         &random_float_rounding_mode_pair_gen_var_29,
         &special_random_float_rounding_mode_pair_gen_var_29,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `reciprocal_sqrt_round`.
+pub fn float_rounding_mode_pair_gen_var_30() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_30,
+        &random_float_rounding_mode_pair_gen_var_30,
+        &special_random_float_rounding_mode_pair_gen_var_30,
+    )
+}
+
+pub fn float_rounding_mode_pair_gen_var_30_rm()
+-> Generator<((rug::Float, rug::float::Round), (Float, RoundingMode))> {
+    Generator::new(
+        &|| float_rounding_mode_pair_rm(exhaustive_float_rounding_mode_pair_gen_var_30()),
+        &|config| float_rounding_mode_pair_rm(random_float_rounding_mode_pair_gen_var_30(config)),
+        &|config| {
+            float_rounding_mode_pair_rm(special_random_float_rounding_mode_pair_gen_var_30(config))
+        },
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `reciprocal_sqrt_round`, where the `Float`
+// is extreme.
+pub fn float_rounding_mode_pair_gen_var_31() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_31,
+        &random_float_rounding_mode_pair_gen_var_31,
+        &special_random_float_rounding_mode_pair_gen_var_31,
     )
 }
 

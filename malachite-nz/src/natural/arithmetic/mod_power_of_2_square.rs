@@ -12,7 +12,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
@@ -27,19 +26,19 @@ use crate::natural::arithmetic::square::{
     limbs_square, limbs_square_diagonal, limbs_square_to_out, limbs_square_to_out_basecase,
     limbs_square_to_out_scratch_len,
 };
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::{
     DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQR_TOOM2_THRESHOLD,
     SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD, SQRLO_DC_THRESHOLD,
 };
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Square, ModPowerOf2SquareAssign, Parity, ShrRound, Square, WrappingSquare,
+    ModPowerOf2Square, ModPowerOf2SquareAssign, Parity, Square, WrappingSquare,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -289,7 +288,7 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let max_len = bit_to_limb_count_ceiling(pow);
     if max_len > len << 1 {
         return limbs_square(xs);
     }
@@ -325,7 +324,7 @@ pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Ve
 pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let max_len = bit_to_limb_count_ceiling(pow);
     if max_len > len << 1 {
         return limbs_square(xs);
     }

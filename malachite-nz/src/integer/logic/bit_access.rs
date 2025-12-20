@@ -13,15 +13,14 @@
 
 use crate::integer::Integer;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
@@ -39,7 +38,7 @@ use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 //
 // This is equivalent to `mpz_tstbit` from `mpz/tstbit.c`, GMP 6.2.1, where `d` is negative.
 pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
-    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
+    let x_i = bit_to_limb_count_floor(index);
     if x_i >= xs.len() {
         // We're indexing into the infinite suffix of 1s
         true
@@ -71,7 +70,7 @@ pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 //
 // This is equivalent to `mpz_setbit` from `mpz/setbit.c`, GMP 6.2.1, where `d` is negative.
 pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
-    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
+    let x_i = bit_to_limb_count_floor(index);
     if x_i >= xs.len() {
         return;
     }
@@ -136,7 +135,7 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 // This is equivalent to `mpz_clrbit` from `mpz/clrbit.c`, GMP 6.2.1, where `d` is negative and
 // `bit_idx` small enough that no additional memory needs to be given to `d`.
 pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
-    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
+    let x_i = bit_to_limb_count_floor(index);
     let reduced_index = index & Limb::WIDTH_MASK;
     assert!(
         x_i < xs.len() && !limbs_clear_bit_neg_helper(xs, x_i, reduced_index),
@@ -161,7 +160,7 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 //
 // This is equivalent to `mpz_clrbit` from `mpz/clrbit.c`, GMP 6.2.1, where `d` is negative.
 pub_test! {limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
-    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
+    let x_i = bit_to_limb_count_floor(index);
     let reduced_index = index & Limb::WIDTH_MASK;
     if x_i < xs.len() {
         if limbs_clear_bit_neg_helper(xs, x_i, reduced_index) {

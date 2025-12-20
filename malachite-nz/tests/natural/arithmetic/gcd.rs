@@ -17,7 +17,6 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_11,
     unsigned_vec_unsigned_pair_gen_var_23,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::gcd::half_gcd::{
     HalfGcdMatrix, limbs_gcd_div, limbs_gcd_reduced, limbs_half_gcd_matrix_1_mul_vector,
 };
@@ -25,6 +24,7 @@ use malachite_nz::natural::arithmetic::gcd::limbs_gcd_limb;
 use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
     limbs_matrix_2_2_mul, limbs_matrix_mul_2_2_scratch_len,
 };
+use malachite_nz::natural::{Natural, limb_to_bit_count};
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     large_type_gen_var_5, large_type_gen_var_6, large_type_gen_var_7, large_type_gen_var_8,
@@ -12974,7 +12974,7 @@ fn half_gcd_matrix_1_mul_vector_properties() {
         let a = Natural::from_limbs_asc(&xs);
         let b = Natural::from_limbs_asc(&ys[..n]);
         let out_len = limbs_half_gcd_matrix_1_mul_vector(&m, &mut out, &xs, &mut ys);
-        let bits = (u64::exact_from(n) + 1) << Limb::LOG_WIDTH;
+        let bits = limb_to_bit_count(n + 1);
         assert_eq!(
             Natural::from_limbs_asc(&out[..out_len]),
             (&a * Natural::from(m.data[0][0]) + &b * Natural::from(m.data[1][0]))

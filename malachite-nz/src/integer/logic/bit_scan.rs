@@ -12,14 +12,13 @@
 
 use crate::integer::Integer;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::logic::bit_scan::{
     limbs_index_of_next_false_bit, limbs_index_of_next_true_bit,
 };
+use crate::natural::{Natural, bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, LowMask, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
 
@@ -40,11 +39,11 @@ pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u6
     let n = xs.len();
     let i = slice_leading_zeros(xs);
     assert!(i < n);
-    let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
+    let starting_limb_index = bit_to_limb_count_floor(starting_index);
     if starting_limb_index >= n {
         return None;
     }
-    let after_boundary_offset = (u64::wrapping_from(i) + 1) << Limb::LOG_WIDTH;
+    let after_boundary_offset = limb_to_bit_count(i + 1);
     match starting_limb_index.cmp(&i) {
         Equal => {
             let within_limb_index = starting_index & Limb::WIDTH_MASK;
@@ -53,7 +52,7 @@ pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u6
                 .index_of_next_false_bit(within_limb_index)
             {
                 if result < Limb::WIDTH {
-                    return Some((u64::wrapping_from(i) << Limb::LOG_WIDTH) + result);
+                    return Some(limb_to_bit_count(i) + result);
                 }
                 starting_index = 0;
             }
@@ -85,13 +84,13 @@ pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64
     let n = xs.len();
     let i = slice_leading_zeros(xs);
     assert!(i < n);
-    let mut starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
+    let mut starting_limb_index = bit_to_limb_count_floor(starting_index);
     if starting_limb_index >= n {
         return starting_index;
     }
-    let after_boundary_offset = (u64::wrapping_from(i) + 1) << Limb::LOG_WIDTH;
+    let after_boundary_offset = limb_to_bit_count(i + 1);
     if starting_limb_index < i {
-        starting_index = u64::wrapping_from(i) << Limb::LOG_WIDTH;
+        starting_index = limb_to_bit_count(i);
         starting_limb_index = i;
     }
     if starting_limb_index == i {
@@ -100,7 +99,7 @@ pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64
             .wrapping_neg()
             .index_of_next_true_bit(within_limb_index)
         {
-            return (u64::wrapping_from(i) << Limb::LOG_WIDTH) + result;
+            return limb_to_bit_count(i) + result;
         }
         starting_index = 0;
     } else {

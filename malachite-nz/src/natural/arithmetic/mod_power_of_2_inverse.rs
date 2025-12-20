@@ -8,17 +8,15 @@
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2Inverse, Parity, ShrRound};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2Inverse, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // - out should be just long enough for `pow` bits.
 // - xs should have the same length as out.
@@ -100,13 +98,13 @@ impl ModPowerOf2Inverse for Natural {
                 x.mod_power_of_2_inverse(pow).map(Self::from)
             }
             (Self(Small(x)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+                let len = bit_to_limb_count_ceiling(pow);
                 let mut xs = vec![0; len];
                 xs[0] = x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
             (Self(Large(mut xs)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+                let len = bit_to_limb_count_ceiling(pow);
                 xs.resize(len, 0);
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
@@ -158,15 +156,13 @@ impl ModPowerOf2Inverse for &Natural {
                 x.mod_power_of_2_inverse(pow).map(Natural::from)
             }
             (Natural(Small(x)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
-                let mut xs = vec![0; len];
+                let mut xs = vec![0; bit_to_limb_count_ceiling(pow)];
                 xs[0] = *x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
             (Natural(Large(xs)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
                 let mut xs = xs.clone();
-                xs.resize(len, 0);
+                xs.resize(bit_to_limb_count_ceiling(pow), 0);
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
         }

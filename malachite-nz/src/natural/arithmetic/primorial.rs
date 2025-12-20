@@ -12,9 +12,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::log_n_max;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{PowerOf2, Primorial, RotateLeftAssign};
@@ -52,7 +52,7 @@ fn limbs_primorial(n: Limb) -> Vec<Limb> {
     // Store primes from 5 to n
     let max_prod = Limb::MAX / n;
     let i = n_to_bit(5);
-    let mut index = usize::exact_from(i >> Limb::LOG_WIDTH);
+    let mut index = bit_to_limb_count_floor(i);
     let mut mask = Limb::power_of_2(i & Limb::WIDTH_MASK);
     for i in i + 1..=n_to_bit(n_u64) + 1 {
         if sieve[index] & mask == 0 {

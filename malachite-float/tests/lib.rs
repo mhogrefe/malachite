@@ -69,6 +69,7 @@ pub mod arithmetic {
     pub mod neg;
     pub mod power_of_2;
     pub mod reciprocal;
+    pub mod reciprocal_sqrt;
     pub mod shl;
     pub mod shl_round;
     pub mod shr;

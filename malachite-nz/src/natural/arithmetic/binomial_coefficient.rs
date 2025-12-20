@@ -12,7 +12,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::Natural;
 use crate::natural::arithmetic::div::limbs_hensel_div_limb_in_place;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_schoolbook_in_place, limbs_modular_invert_limb,
@@ -24,6 +23,7 @@ use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::{
     CENTRAL_BINOMIAL_2FAC_TABLE, Limb, ODD_CENTRAL_BINOMIAL_OFFSET,
     ODD_CENTRAL_BINOMIAL_TABLE_LIMIT, ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT,
@@ -203,7 +203,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k(n: Limb, k: Limb) -> Vec
         ];
     }
     let alloc =
-        usize::exact_from((n.significant_bits() * u64::exact_from(k)) >> Limb::LOG_WIDTH) + 3;
+        bit_to_limb_count_floor(n.significant_bits() * u64::exact_from(k)) + 3;
     let mut out = vec![0; alloc];
     out[0] = apply_mul_func(n_max, i);
     let mut out_len = 1;
@@ -436,7 +436,7 @@ limbs_binomial_coefficient_limb_limb_goetgheluck(n: Limb, k: Limb) -> Vec<Limb> 
     let n_minus_k_bit = n_to_bit(n_64 - k_64);
     assert!(n_minus_k_bit < n_bit);
     let i = n_minus_k_bit + 1;
-    let mut index = usize::exact_from(i >> Limb::LOG_WIDTH);
+    let mut index = bit_to_limb_count_floor(i);
     let mut mask = Limb::power_of_2(i & Limb::WIDTH_MASK);
     for i in i + 1..=n_bit + 1 {
         if sieve[index] & mask == 0 {

@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
@@ -37,7 +37,7 @@ use malachite_base::vecs::vec_pad_left;
 // returned.
 pub_crate_test! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
-    let mut out = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
+    let mut out = vec![0; bit_to_limb_count_floor(bits)];
     if small_bits == 0 {
         out.extend_from_slice(xs);
     } else {
@@ -129,7 +129,7 @@ pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     } else {
         limbs_slice_shl_in_place(xs, small_bits)
     };
-    vec_pad_left(xs, usize::exact_from(bits >> Limb::LOG_WIDTH), 0);
+    vec_pad_left(xs, bit_to_limb_count_floor(bits), 0);
     if remaining_bits != 0 {
         xs.push(remaining_bits);
     }

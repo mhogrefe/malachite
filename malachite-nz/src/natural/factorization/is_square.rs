@@ -14,6 +14,7 @@ use crate::natural::arithmetic::sqrt::limbs_checked_sqrt;
 use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::IsSquare;
 
 const MOD34_BITS: Limb = ((Limb::WIDTH as Limb) / 4) * 3;
@@ -178,7 +179,8 @@ fn limbs_is_square(limbs: &[Limb]) -> bool {
     //
     // This just checks the particular bit in the bitmask SQR_MOD256_U64 encoding where the input
     // can be a perfect square mod 256.
-    if (SQR_MOD256[(idx >> Limb::LOG_WIDTH) as usize] >> (idx & const { Limb::WIDTH_MASK as Limb }))
+    if (SQR_MOD256[usize::exact_from(idx >> Limb::LOG_WIDTH)]
+        >> (idx & const { Limb::WIDTH_MASK as Limb }))
         & 1
         == 0
     {

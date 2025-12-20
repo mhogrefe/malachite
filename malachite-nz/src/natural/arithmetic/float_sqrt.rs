@@ -13,19 +13,20 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::sqrt::limbs_sqrt_to_out_return_inexact;
+use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{NegModPowerOf2, Parity, PowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::{NegModPowerOf2, Parity, PowerOf2};
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingSubAssign, XMulYToZZ, XXAddYYToZZ, XXSubYYToZZ, XXXSubYYYToZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // For 257 <= d10 <= 1024, T[d10-257] = floor(sqrt(2 ^ 30 / d10)).
@@ -34,7 +35,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 //
 // T = [floor(sqrt(2 ^ 30 / d10)) for d10 in [257..1024]]
 //
-// This is T from src/invsqrt_limb.c, MPFR 4.3.0.
+// This is T from invsqrt_limb.c, MPFR 4.3.0.
 #[cfg(not(feature = "32_bit_limbs"))]
 const T: [u16; 768] = [
     2044, 2040, 2036, 2032, 2028, 2024, 2020, 2016, 2012, 2009, 2005, 2001, 1997, 1994, 1990, 1986,
@@ -89,7 +90,7 @@ const T: [u16; 768] = [
 
 // table of v0^3
 //
-// This is T from src/invsqrt_limb.c, MPFR 4.3.0.
+// This is T from invsqrt_limb.c, MPFR 4.3.0.
 #[cfg(not(feature = "32_bit_limbs"))]
 const T3: [u64; 768] = [
     8539701184, 8489664000, 8439822656, 8390176768, 8340725952, 8291469824, 8242408000, 8193540096,
@@ -190,6 +191,8 @@ const T3: [u64; 768] = [
     1083206683, 1083206683, 1080045576, 1080045576, 1076890625, 1076890625, 1073741824, 1073741824,
 ];
 
+// This is mpfr_sqrt from sqrt.c, MPFR 4.3.0.
+#[cfg(not(feature = "32_bit_limbs"))]
 pub fn sqrt_float_significand_in_place(
     x: &mut Natural,
     x_exp: i32,
@@ -197,12 +200,34 @@ pub fn sqrt_float_significand_in_place(
     out_prec: u64,
     rm: RoundingMode,
 ) -> (i32, Ordering) {
-    let (x_out, i, o) = match x {
+    if out_prec == x_prec
+        && let Some((exp, o)) = sqrt_float_significand_in_place_same_prec(x, x_exp, out_prec, rm)
+    {
+        return (exp, o);
+    }
+    let (sqrt, exp, o) = match &*x {
         Natural(Small(x)) => sqrt_float_significand_ref_helper(&[*x], x_exp, x_prec, out_prec, rm),
         Natural(Large(xs)) => sqrt_float_significand_ref_helper(xs, x_exp, x_prec, out_prec, rm),
     };
-    *x = x_out;
-    (i, o)
+    *x = sqrt;
+    (exp, o)
+}
+
+// This is mpfr_sqrt from sqrt.c, MPFR 4.3.0.
+#[cfg(feature = "32_bit_limbs")]
+pub fn sqrt_float_significand_in_place(
+    x: &mut Natural,
+    x_exp: i32,
+    x_prec: u64,
+    out_prec: u64,
+    rm: RoundingMode,
+) -> (i32, Ordering) {
+    let (sqrt, exp, o) = match &*x {
+        Natural(Small(x)) => sqrt_float_significand_ref_helper(&[*x], x_exp, x_prec, out_prec, rm),
+        Natural(Large(xs)) => sqrt_float_significand_ref_helper(xs, x_exp, x_prec, out_prec, rm),
+    };
+    *x = sqrt;
+    (exp, o)
 }
 
 // This is mpfr_sqrt from sqrt.c, MPFR 4.3.0.
@@ -233,6 +258,36 @@ fn sqrt_float_significand_ref_helper(
         return out;
     }
     sqrt_float_significands_general(xs, x_exp, out_prec, rm)
+}
+
+#[cfg(not(feature = "32_bit_limbs"))]
+fn sqrt_float_significand_in_place_same_prec(
+    x: &mut Natural,
+    x_exp: i32,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(i32, Ordering)> {
+    match x {
+        Natural(Small(x)) => {
+            let (sqrt, exp, o) = if prec == Limb::WIDTH {
+                sqrt_float_significand_same_prec_w(*x, x_exp, rm)
+            } else {
+                sqrt_float_significand_same_prec_lt_w(*x, x_exp, prec, rm)
+            };
+            *x = sqrt;
+            Some((exp, o))
+        }
+        Natural(Large(xs)) => match xs.as_mut_slice() {
+            [x_0, x_1] if prec != const { Limb::WIDTH << 1 } => {
+                let (sqrt_0, sqrt_1, exp, o) =
+                    sqrt_float_significand_same_prec_gt_w_lt_2w(*x_0, *x_1, x_exp, prec, rm);
+                *x_0 = sqrt_0;
+                *x_1 = sqrt_1;
+                Some((exp, o))
+            }
+            _ => None,
+        },
+    }
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -274,16 +329,16 @@ fn sqrt_float_significand_same_prec_ref(
 
 // given 2 ^ 62 <= d < 2 ^ 64, return a 32-bit approximation r of sqrt(2 ^ 126 / d)
 //
-// This is __gmpfr_invsqrt_halflimb_approx from src/invsqrt_limb.c, MPFR 4.3.0, returning r.
+// This is __gmpfr_invsqrt_halflimb_approx from invsqrt_limb.c, MPFR 4.3.0, returning r.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn half_limb_inverse_sqrt_approx(d: Limb) -> Limb {
-    let i = usize::exact_from((d >> 54) - 256);
+    let i = usize::wrapping_from((d >> 54) - 256);
     // i = d10 - 256
     let v0 = Limb::from(T[i]);
     let d37 = 1 + (d >> 27);
     let e0 = T3[i].wrapping_mul(d37);
     // the value (v0 << 57) - e0 is less than 2 ^ 61
-    let v1 = (v0 << 11) + (((v0 << 57).wrapping_sub(e0)) >> 47);
+    let v1 = (v0 << 11) + ((v0 << 57).wrapping_sub(e0) >> 47);
     let e1 = v1.wrapping_neg().wrapping_mul(v1).wrapping_mul(d37);
     let h = Limb::x_mul_y_to_zz(v1, e1).0;
     // h = floor(e1 * v1 / 2 ^ 64)
@@ -293,7 +348,7 @@ fn half_limb_inverse_sqrt_approx(d: Limb) -> Limb {
 // given 2^62 <= n < 2^64, put in s an approximation of sqrt(2^64*n), with: s <= floor(sqrt(2^64*n))
 // <= s + 7
 //
-// This is __gmpfr_sqrt_limb_approx from src/invsqrt_limb.c, MPFR 4.3.0, returning s.
+// This is __gmpfr_sqrt_limb_approx from invsqrt_limb.c, MPFR 4.3.0, returning s.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn limb_sqrt_approx(n: Limb) -> Limb {
     let x = half_limb_inverse_sqrt_approx(n);
@@ -321,28 +376,26 @@ fn limb_sqrt_approx(n: Limb) -> Limb {
     (y << 32) + ((x * z) >> 32)
 }
 
-const LIMB_HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
-
 // Special code for prec(r) = prec(u) < Limb::WIDTH. We cannot have prec(u) = Limb::WIDTH here,
 // since when the exponent of u is odd, we need to shift u by one bit to the right without losing
 // any bit.
 //
-// This is mpfr_sqrt1 from src/sqrt.c, MPFR 4.3.0.
+// This is mpfr_sqrt1 from sqrt.c, MPFR 4.3.0.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn sqrt_float_significand_same_prec_lt_w(
     mut x: Limb,
-    mut exp_u: i32,
+    mut x_exp: i32,
     prec: u64,
     rm: RoundingMode,
 ) -> (Limb, i32, Ordering) {
     let shift = Limb::WIDTH - prec;
     let shift_bit = Limb::power_of_2(shift);
     let mask = shift_bit - 1;
-    if exp_u.odd() {
+    if x_exp.odd() {
         x >>= 1;
-        exp_u += 1;
+        x_exp += 1;
     }
-    let mut exp_r = exp_u >> 1;
+    let mut exp_r = x_exp >> 1;
     // then compute an approximation of the integer square root of x * 2 ^ Limb::WIDTH
     let mut r0 = limb_sqrt_approx(x);
     // when we can round correctly with the approximation, the sticky bit is non-zero
@@ -423,22 +476,22 @@ fn sqrt_float_significand_same_prec_lt_w(
     }
 }
 
-// This is mpfr_sqrt1n from src/sqrt.c, MPFR 4.3.0.
+// This is mpfr_sqrt1n from sqrt.c, MPFR 4.3.0.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn sqrt_float_significand_same_prec_w(
     mut x: Limb,
-    mut exp_u: i32,
+    mut x_exp: i32,
     rm: RoundingMode,
 ) -> (Limb, i32, Ordering) {
-    let low = if exp_u.odd() {
+    let low = if x_exp.odd() {
         let low = x << (Limb::WIDTH - 1);
         x >>= 1;
-        exp_u += 1;
+        x_exp += 1;
         low
     } else {
         0
     };
-    let mut exp_r = exp_u >> 1;
+    let mut exp_r = x_exp >> 1;
     // then compute an approximation of the integer square root of x*2 ^ Limb::WIDTH
     let mut r0 = limb_sqrt_approx(x);
     // the exact square root is in [r0, r0 + 7]
@@ -507,7 +560,7 @@ fn sqrt_float_significand_same_prec_w(
 // given 2^62 <= d < 2^64, return  an approximation of s = floor(2^96/sqrt(d)) - 2^64, with r <= s
 // <= r + 15
 //
-// This is __gmpfr_invsqrt_limb_approx from src/invsqrt_limb.c, MPFR 4.3.0, returning r.
+// This is __gmpfr_invsqrt_limb_approx from invsqrt_limb.c, MPFR 4.3.0, returning r.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn limb_inverse_sqrt_approx(d: Limb) -> Limb {
     let i = ((d >> 54) - 256) as usize;
@@ -533,7 +586,7 @@ fn limb_inverse_sqrt_approx(d: Limb) -> Limb {
 // 2^64*u - s^2 = 2^64*rh + rl, with 2^64*rh + rl <= 2*s, and in invs the approximation of
 // 2^96/sqrt(u)
 //
-// This is __gmpfr_sqrt_limb from src/invsqrt_limb.c, MPFR 4.3.0, returning s, rh, rl, and invs.
+// This is __gmpfr_sqrt_limb from invsqrt_limb.c, MPFR 4.3.0, returning s, rh, rl, and invs.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn limb_sqrt(u: Limb) -> (Limb, Limb, Limb, Limb) {
     let invs = limb_inverse_sqrt_approx(u);
@@ -579,7 +632,7 @@ fn limb_sqrt(u: Limb) -> (Limb, Limb, Limb, Limb) {
 // np[1] * 2 ^ 64 + np[0] < 2 ^ 128. We have: {rp, 2} - 4 <= floor(sqrt(2 ^ 128 * n)) <= {rp, 2} +
 // 26.
 //
-// This is mpfr_sqrt2_approx from src/sqrt.c, MPFR 4.3.0.
+// This is mpfr_sqrt2_approx from sqrt.c, MPFR 4.3.0.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn limbs_2_sqrt_approx(n0: Limb, n1: Limb) -> (Limb, Limb) {
     let (mut r1, mut h, mut l, x) = limb_sqrt(n1);
@@ -621,24 +674,24 @@ fn two_limbs_square(x_1: Limb, x_0: Limb) -> (Limb, Limb, Limb) {
     (x_1.wrapping_mul(x_1).wrapping_add(x_01_1), x_01_0, x_00_0)
 }
 
-// This is mpfr_sqrt2 from src/sqrt.c, MPFR 4.3.0.
+// This is mpfr_sqrt2 from sqrt.c, MPFR 4.3.0.
 #[cfg(not(feature = "32_bit_limbs"))]
 fn sqrt_float_significand_same_prec_gt_w_lt_2w(
     x_0: Limb,
     x_1: Limb,
-    mut exp_u: i32,
+    mut x_exp: i32,
     prec: u64,
     rm: RoundingMode,
 ) -> (Limb, Limb, i32, Ordering) {
     let shift = const { Limb::WIDTH << 1 } - prec;
-    let (n3, n2, n1) = if exp_u.odd() {
+    let (n3, n2, n1) = if x_exp.odd() {
         const SHIFT: u64 = Limb::WIDTH - 1;
-        exp_u += 1;
+        x_exp += 1;
         (x_1 >> 1, (x_1 << SHIFT) | (x_0 >> 1), x_0 << SHIFT)
     } else {
         (x_1, x_0, 0)
     };
-    let mut exp_r = exp_u >> 1;
+    let mut exp_r = x_exp >> 1;
     let (mut r0, mut r1) = limbs_2_sqrt_approx(n2, n3);
     // with n = np[3]*2^64+np[2], we have: {rp, 2} - 4 <= floor(sqrt(2^128*n)) <= {rp, 2} + 26, thus
     // we can round correctly except when the number formed by the last shift-1 bits of rp[0] is in
@@ -738,7 +791,7 @@ fn sqrt_float_significands_general(
         // ugly case
         shift = Limb::WIDTH;
     }
-    let mut rsize = usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let mut rsize = bit_to_limb_count_ceiling(out_prec);
     if shift == Limb::WIDTH {
         rsize += 1;
     }

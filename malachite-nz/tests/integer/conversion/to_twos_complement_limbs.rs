@@ -17,7 +17,7 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-use malachite_nz::natural::Natural;
+use malachite_nz::natural::{LIMB_HIGH_BIT, Natural};
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
     integer_bool_vec_pair_gen_var_1, integer_gen, integer_unsigned_pair_gen_var_2,
@@ -395,8 +395,6 @@ fn twos_complement_limbs_properties() {
         assert_eq!(Integer::ZERO.twos_complement_limbs().get_limb(u), 0);
     });
 }
-
-const LIMB_HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
 
 #[test]
 fn twos_complement_limb_count_properties() {

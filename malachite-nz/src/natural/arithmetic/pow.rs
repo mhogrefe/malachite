@@ -11,7 +11,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
@@ -21,6 +20,9 @@ use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 #[cfg(feature = "test_build")]
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::{
+    Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+};
 #[cfg(feature = "test_build")]
 use crate::platform::DoubleLimb;
 use crate::platform::Limb;
@@ -30,7 +32,7 @@ use malachite_base::num::arithmetic::traits::{
     EqModPowerOf2, Parity, Pow, PowAssign, Square, SquareAssign,
 };
 #[cfg(feature = "test_build")]
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 #[cfg(feature = "test_build")]
@@ -41,8 +43,6 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::num::logic::traits::{
     BitIterable, CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
 };
-#[cfg(feature = "test_build")]
-use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_leading_zeros;
 
 /// This is equivalent to `GMP_NUMB_HALFMAX` from `mpz/n_pow_ui.c`, GMP 6.2.1.
@@ -113,7 +113,7 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
     let trailing_zero_bits_in = TrailingZeros::trailing_zeros(x);
     x >>= trailing_zero_bits_in;
     let mut trailing_zero_bits_out = exp * trailing_zero_bits_in;
-    leading_zeros_out += usize::exact_from(trailing_zero_bits_out >> Limb::LOG_WIDTH);
+    leading_zeros_out += bit_to_limb_count_floor(trailing_zero_bits_out);
     trailing_zero_bits_out &= Limb::WIDTH_MASK;
     let mut out_0 = 1;
     let mut scratch;
@@ -160,10 +160,9 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
     // bits the worst case is 2 ^ 16 + 1 treated as 17 bits when it will power up as just over 16,
     // an overestimate of 17/16 = 6.25%. For a 64-bit limb it's half that.
     assert_ne!(x, 0);
-    let mut out_alloc = usize::exact_from(
-        (((u64::exact_from(len) << Limb::LOG_WIDTH) - LeadingZeros::leading_zeros(x)) * exp)
-            >> Limb::LOG_WIDTH,
-    ) + 5;
+    let mut out_alloc =
+        bit_to_limb_count_floor((limb_to_bit_count(len) - LeadingZeros::leading_zeros(x)) * exp)
+            + 5;
     out.resize(out_alloc + leading_zeros_out, 0);
     // Low zero limbs resulting from powers of 2.
     let out_original = out;
@@ -284,11 +283,7 @@ fn exp_predecessor(exp: u64) -> u64 {
 // Constant time and additional memory.
 #[cfg(feature = "test_build")]
 fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
-    usize::exact_from(
-        (x.significant_bits() * exp)
-            .shr_round(Limb::LOG_WIDTH, Ceiling)
-            .0,
-    )
+    bit_to_limb_count_ceiling(x.significant_bits() * exp)
 }
 
 // # Worst-case complexity
@@ -384,11 +379,7 @@ fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
 // Constant time and additional memory.
 #[cfg(feature = "test_build")]
 fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
-    usize::exact_from(
-        (limbs_significant_bits(xs) * exp)
-            .shr_round(Limb::LOG_WIDTH, Ceiling)
-            .0,
-    )
+    bit_to_limb_count_ceiling(limbs_significant_bits(xs) * exp)
 }
 
 // # Worst-case complexity

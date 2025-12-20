@@ -8,7 +8,6 @@
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::{
     limbs_neg_mod_power_of_2, limbs_neg_mod_power_of_2_in_place,
     limbs_slice_mod_power_of_2_in_place,
@@ -20,17 +19,16 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::logic::low_mask::limbs_low_mask;
 use crate::natural::logic::not::limbs_not_in_place;
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ShrRound,
+    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -39,10 +37,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
-    xs.resize(
-        usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0),
-        Limb::MAX,
-    );
+    xs.resize(bit_to_limb_count_ceiling(pow), Limb::MAX);
 }
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the

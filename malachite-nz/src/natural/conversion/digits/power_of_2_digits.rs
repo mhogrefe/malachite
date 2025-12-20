@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::{Ordering::*, min};
@@ -538,7 +538,7 @@ impl PowerOf2Digits<Self> for Natural {
                 }
                 Greater => {
                     let mut offset = 0;
-                    let chunk_size = usize::wrapping_from(log_base >> Limb::LOG_WIDTH);
+                    let chunk_size = bit_to_limb_count_floor(log_base);
                     for digit in digits {
                         if digit.significant_bits() > log_base {
                             return None;
@@ -652,7 +652,7 @@ impl PowerOf2Digits<Self> for Natural {
                 Greater => {
                     let digits = digits.collect_vec();
                     let mut offset = 0;
-                    let chunk_size = usize::wrapping_from(log_base >> Limb::LOG_WIDTH);
+                    let chunk_size = bit_to_limb_count_floor(log_base);
                     for digit in digits.iter().rev() {
                         if digit.significant_bits() > log_base {
                             return None;

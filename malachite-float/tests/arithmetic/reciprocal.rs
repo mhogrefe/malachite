@@ -24,12 +24,13 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
     unsigned_rounding_mode_pair_gen_var_3,
 };
+use malachite_float::emulate_primitive_float_fn;
 use malachite_float::test_util::arithmetic::reciprocal::{
     reciprocal_prec_round_naive_1, reciprocal_prec_round_naive_2, rug_reciprocal,
     rug_reciprocal_prec, rug_reciprocal_prec_round, rug_reciprocal_round,
 };
 use malachite_float::test_util::common::{
-    emulate_primitive_float_fn, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_11,
@@ -140,7 +141,7 @@ fn test_reciprocal() {
     // - x.is_power_of_2() in reciprocal_prec_round
     // - !x.is_power_of_2() in reciprocal_prec_round
     // - in reciprocal_float_significand_same_prec_lt_w
-    // - x != HIGH_BIT in reciprocal_float_significand_same_prec_lt_w
+    // - x != LIMB_HIGH_BIT in reciprocal_float_significand_same_prec_lt_w
     // - (q + 2) & (mask >> 1) > 2 in reciprocal_float_significand_same_prec_lt_w;
     // - round_bit != 0 || sticky_bit != 0 in reciprocal_float_significand_same_prec_lt_w
     // - rm == Nearest in reciprocal_float_significand_same_prec_lt_w
@@ -160,7 +161,7 @@ fn test_reciprocal() {
         "0x4.a410e30d72ea318E-6#61",
     );
     // - in reciprocal_float_significand_same_prec_w
-    // - x != HIGH_BIT in reciprocal_float_significand_same_prec_w
+    // - x != LIMB_HIGH_BIT in reciprocal_float_significand_same_prec_w
     // - hi == 0 && lo < x first time in reciprocal_float_significand_same_prec_w
     // - hi == 0 && lo < x second time in reciprocal_float_significand_same_prec_w
     // - !round_bit in reciprocal_float_significand_same_prec_w
@@ -184,7 +185,7 @@ fn test_reciprocal() {
         "0x8.d49dbba4a843592#64",
     );
     // - in reciprocal_float_significand_same_prec_gt_w_lt_2w
-    // - x_0 != 0 || x_1 != HIGH_BIT in reciprocal_float_significand_same_prec_gt_w_lt_2w
+    // - x_0 != 0 || x_1 != LIMB_HIGH_BIT in reciprocal_float_significand_same_prec_gt_w_lt_2w
     // - in reciprocal_float_2_approx
     // - x_1 != Limb::MAX in reciprocal_float_2_approx
     // - yy == 0 in reciprocal_float_2_approx
@@ -1233,7 +1234,7 @@ fn test_reciprocal_round() {
     // - x.is_power_of_2() in reciprocal_prec_round
     // - !x.is_power_of_2() in reciprocal_prec_round
     // - in reciprocal_float_significand_same_prec_lt_w
-    // - x != HIGH_BIT in reciprocal_float_significand_same_prec_lt_w
+    // - x != LIMB_HIGH_BIT in reciprocal_float_significand_same_prec_lt_w
     // - (q + 2) & (mask >> 1) > 2 in reciprocal_float_significand_same_prec_lt_w;
     // - round_bit != 0 || sticky_bit != 0 in reciprocal_float_significand_same_prec_lt_w
     // - rm == Nearest in reciprocal_float_significand_same_prec_lt_w
@@ -1255,7 +1256,7 @@ fn test_reciprocal_round() {
         Less,
     );
     // - in reciprocal_float_significand_same_prec_w
-    // - x != HIGH_BIT in reciprocal_float_significand_same_prec_w
+    // - x != LIMB_HIGH_BIT in reciprocal_float_significand_same_prec_w
     // - hi == 0 && lo < x first time in reciprocal_float_significand_same_prec_w
     // - hi == 0 && lo < x second time in reciprocal_float_significand_same_prec_w
     // - !round_bit in reciprocal_float_significand_same_prec_w
@@ -1283,7 +1284,7 @@ fn test_reciprocal_round() {
         Greater,
     );
     // - in reciprocal_float_significand_same_prec_gt_w_lt_2w
-    // - x_0 != 0 || x_1 != HIGH_BIT in reciprocal_float_significand_same_prec_gt_w_lt_2w
+    // - x_0 != 0 || x_1 != LIMB_HIGH_BIT in reciprocal_float_significand_same_prec_gt_w_lt_2w
     // - in reciprocal_float_2_approx
     // - x_1 != Limb::MAX in reciprocal_float_2_approx
     // - yy == 0 in reciprocal_float_2_approx

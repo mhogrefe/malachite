@@ -39,7 +39,7 @@ use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::*;
 use wide::{f64x4, f64x8, u64x4};
 
-// This is nmod_t from src/flint.h, FLINT 3.3.0-dev.
+// This is nmod_t from flint.h, FLINT 3.3.0-dev.
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub(crate) struct ModData {
     pub(crate) n: u64,
@@ -75,7 +75,7 @@ impl SerializedFFTContext {
     }
 }
 
-// This is sd_fft_ctx_struct from src/fft_small.h, FLINT 3.3.0-dev.
+// This is sd_fft_ctx_struct from fft_small.h, FLINT 3.3.0-dev.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct FFTContext {
     pub(crate) p: f64,
@@ -125,7 +125,7 @@ impl SerializedCRTData {
     }
 }
 
-// This is crt_data_struct from src/fft_small.h, FLINT 3.3.0-dev.
+// This is crt_data_struct from fft_small.h, FLINT 3.3.0-dev.
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub(crate) struct CRTData {
     pub(crate) prime: u64,
@@ -135,7 +135,7 @@ pub(crate) struct CRTData {
 }
 
 impl CRTData {
-    // This is crt_data_co_prime_red from src/fft_small.h, FLINT 3.3.0-dev, read-only.
+    // This is crt_data_co_prime_red from fft_small.h, FLINT 3.3.0-dev, read-only.
     #[inline]
     fn co_prime_red(&self, i: usize) -> u64 {
         assert!(i < self.nprimes);
@@ -144,7 +144,7 @@ impl CRTData {
 
     // return mpn of length C->coeff_len
     //
-    // This is crt_data_co_prime from src/fft_small.h, FLINT 3.3.0-dev, read-only.
+    // This is crt_data_co_prime from fft_small.h, FLINT 3.3.0-dev, read-only.
     #[inline]
     pub(crate) fn co_prime(&mut self, i: usize) -> &mut [u64] {
         assert!(i < self.nprimes);
@@ -157,7 +157,7 @@ impl CRTData {
     }
 }
 
-// This is profile_entry_struct from src/fft_small.h, FLINT 3.3.0-dev.
+// This is profile_entry_struct from fft_small.h, FLINT 3.3.0-dev.
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub(crate) struct ProfileEntry {
     pub(crate) np: usize,
@@ -244,7 +244,7 @@ impl SerializedContext {
     }}
 }
 
-// This is mpn_ctx_struct from src/fft_small.h, FLINT 3.3.0-dev.
+// This is mpn_ctx_struct from fft_small.h, FLINT 3.3.0-dev.
 pub_test_struct! {
     #[derive(Debug, Default, Clone, PartialEq)]
 Context {
@@ -260,7 +260,7 @@ Context {
     pub(crate) buffer_alloc: usize,
 }}
 
-// This is vec1d_reduce_pm1n_to_pmhn from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec1d_reduce_pm1n_to_pmhn from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_reduce_pm1n_to_pmhn {
     ($a: expr, $n: expr) => {{
         let a = $a;
@@ -276,7 +276,7 @@ macro_rules! f64_reduce_pm1n_to_pmhn {
 }
 pub(crate) use f64_reduce_pm1n_to_pmhn;
 
-// This is vec4d_reduce_pm1n_to_pmhn from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_reduce_pm1n_to_pmhn from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_reduce_pm1n_to_pmhn {
     ($a: expr, $n: expr) => {{
         let [a0, a1, a2, a3] = $a.to_array();
@@ -290,7 +290,7 @@ macro_rules! f64x4_reduce_pm1n_to_pmhn {
     }};
 }
 
-// This is vec8d_reduce_pm1n_to_pmhn from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec8d_reduce_pm1n_to_pmhn from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x8_reduce_pm1n_to_pmhn {
     ($a: expr, $n: expr) => {{
         let [a0, a1, a2, a3, a4, a5, a6, a7] = $a.to_array();
@@ -310,7 +310,7 @@ macro_rules! f64x8_reduce_pm1n_to_pmhn {
 
 // [0,n] -> [-n/2, n/2]
 //
-// This is f64_reduce_0n_to_pmhn from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is f64_reduce_0n_to_pmhn from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_reduce_0n_to_pmhn {
     ($a: expr, $n: expr) => {{
         let a = $a;
@@ -322,7 +322,7 @@ pub(crate) use f64_reduce_0n_to_pmhn;
 
 // return a mod n in [0,n) assuming a in (-n,n)
 //
-// This is vec1d_reduce_pm1no_to_0n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec1d_reduce_pm1no_to_0n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_reduce_pm1no_to_0n {
     ($a: expr, $n: expr) => {{
         let a = $a;
@@ -332,7 +332,7 @@ macro_rules! f64_reduce_pm1no_to_0n {
 
 // return a mod n in [0,n) assuming a in (-n,n)
 //
-// This is vec4d_reduce_pm1no_to_0n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_reduce_pm1no_to_0n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_reduce_pm1no_to_0n {
     ($a: expr, $n: expr) => {{
         let [a0, a1, a2, a3] = $a.to_array();
@@ -439,7 +439,7 @@ macro_rules! f64x8_mul_add {
 
 // return a mod n in (-n,n)
 //
-// This is vec4d_reduce_to_pm1no from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_reduce_to_pm1no from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_reduce_to_pm1no {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -449,7 +449,7 @@ macro_rules! f64x4_reduce_to_pm1no {
 
 // return a mod n in (-n,n)
 //
-// This is vec1d_reduce_to_pm1no from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec1d_reduce_to_pm1no from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_reduce_to_pm1no {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -459,7 +459,7 @@ macro_rules! f64_reduce_to_pm1no {
 
 // return a mod n in [0,n)
 //
-// This is vec4d_reduce_to_0n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_reduce_to_0n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_reduce_to_0n {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let n = $n;
@@ -469,7 +469,7 @@ macro_rules! f64x4_reduce_to_0n {
 
 // return a mod n in [0,n)
 //
-// This is vec1d_reduce_to_0n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec1d_reduce_to_0n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_reduce_to_0n {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let n = $n;
@@ -477,7 +477,7 @@ macro_rules! f64_reduce_to_0n {
     }};
 }
 
-// This is vec1d_mulmod from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec1d_mulmod from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_mulmod {
     ($a: expr, $b: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -488,7 +488,7 @@ macro_rules! f64_mulmod {
 }
 pub(crate) use f64_mulmod;
 
-// This is vec4d_mulmod from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_mulmod from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_mulmod {
     ($a: expr, $b: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -498,7 +498,7 @@ macro_rules! f64x4_mulmod {
     }};
 }
 
-// This is vec8d_mulmod from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec8d_mulmod from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x8_mulmod {
     ($a: expr, $b: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -508,7 +508,7 @@ macro_rules! f64x8_mulmod {
     }};
 }
 
-// This is vec4d_nmulmod from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_nmulmod from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_nmulmod {
     ($a: expr, $b: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -518,7 +518,7 @@ macro_rules! f64x4_nmulmod {
     }};
 }
 
-// This is vec4d_nmulmod from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_nmulmod from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x8_nmulmod {
     ($a: expr, $b: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -528,7 +528,7 @@ macro_rules! f64x8_nmulmod {
     }};
 }
 
-// This is vec1d_reduce_to_pm1n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec1d_reduce_to_pm1n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64_reduce_to_pm1n {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -536,7 +536,7 @@ macro_rules! f64_reduce_to_pm1n {
     }};
 }
 
-// This is vec4d_reduce_to_pm1n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec4d_reduce_to_pm1n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x4_reduce_to_pm1n {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -544,7 +544,7 @@ macro_rules! f64x4_reduce_to_pm1n {
     }};
 }
 
-// This is vec8d_reduce_to_pm1n from src/machine_vectors.h, FLINT 3.3.0-dev.
+// This is vec8d_reduce_to_pm1n from machine_vectors.h, FLINT 3.3.0-dev.
 macro_rules! f64x8_reduce_to_pm1n {
     ($a: expr, $n: expr, $ninv: expr) => {{
         let a = $a;
@@ -2489,7 +2489,7 @@ fn sd_fft_ctx_fit_depth_with_lock(q: &mut FFTContext, depth: u64) {
     }
 }
 
-// This is sd_fft_ctx_fit_depth from src/fft_small.h, FLINT 3.3.0-dev.
+// This is sd_fft_ctx_fit_depth from fft_small.h, FLINT 3.3.0-dev.
 fn sd_fft_ctx_fit_depth(q: &mut FFTContext, depth: u64) {
     if q.w2tab_depth < depth {
         sd_fft_ctx_fit_depth_with_lock(q, depth);
@@ -4518,7 +4518,7 @@ fn process_mod(
     }
 }
 
-// This is NMOD_RED2 from src/nmod.h, FLINT 3.3.0-dev.
+// This is NMOD_RED2 from nmod.h, FLINT 3.3.0-dev.
 macro_rules! nmod_red2 {
     ($a_hi: expr, $a_lo: expr, $mod_data: expr) => {{
         let a_lo = $a_lo;

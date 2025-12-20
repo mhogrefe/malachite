@@ -13,12 +13,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::Natural;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::{
     Limb, NTH_ROOT_NUMB_MASK_TABLE, ODD_DOUBLEFACTORIAL_TABLE_LIMIT, ODD_DOUBLEFACTORIAL_TABLE_MAX,
     ODD_FACTORIAL_TABLE_LIMIT, ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_TABLE,
@@ -128,7 +128,7 @@ fn limbs_2_multiswing_odd(
     assert!(bit_to_n(s + 1).square() > n);
     assert!(s < n_to_bit(n / 3));
     let start = const { n_to_bit(5) };
-    let mut index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let mut index = bit_to_limb_count_floor(start);
     let mut mask = Limb::power_of_2(start & Limb::WIDTH_MASK);
     let sieve = &mut x_and_sieve[x_len..];
     for i in start + 1..=s + 1 {
@@ -176,7 +176,7 @@ fn limbs_2_multiswing_odd(
     }
     // Store primes from (n + 1) / 2 to n
     let start = n_to_bit(n >> 1) + 1;
-    let mut index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let mut index = bit_to_limb_count_floor(start);
     let mut mask = Limb::power_of_2(start & Limb::WIDTH_MASK);
     for i in start + 1..=n_to_bit(n) + 1 {
         if sieve[index] & mask == 0 {

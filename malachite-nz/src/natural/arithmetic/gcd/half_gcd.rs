@@ -33,6 +33,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
@@ -1276,12 +1277,9 @@ fn limbs_half_gcd_approx(
             // We can truncate and discard the lower p bits whenever n <= 2 * s - p. To account for
             // the truncation error, we must adjust s <- s + 1 - p, rather than just sbits <- sbits
             // - p. This adjustment makes the produced matrix slightly smaller than it could be.
-            let lhs = ((n + 1) << Limb::LOG_WIDTH) + (usize::exact_from(extra_bits) << 1);
-            let rhs = s << (Limb::LOG_WIDTH + 1);
-            if lhs <= rhs {
-                let p = ((((s << 1) - n) << Limb::LOG_WIDTH)
-                    - (usize::exact_from(extra_bits) << 1))
-                    >> Limb::LOG_WIDTH;
+            if limb_to_bit_count(n + 1) + (extra_bits << 1) <= limb_to_bit_count(s << 1) {
+                let p =
+                    bit_to_limb_count_floor(limb_to_bit_count((s << 1) - n) - (extra_bits << 1));
                 if extra_bits == 0 {
                     // We cross a limb boundary and bump s. We can't do that if the result is that
                     // it makes makes min(X, Y) smaller than 2^W * s.

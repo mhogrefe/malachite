@@ -113,7 +113,7 @@ pub fn natural_product_naive<I: Iterator<Item = Natural>>(xs: I) -> Natural {
 }
 
 impl CRTData {
-    // This is crt_data_init from src/fft_small.h, FLINT 3.3.0-dev, returning CRTData.
+    // This is crt_data_init from fft_small.h, FLINT 3.3.0-dev, returning CRTData.
     fn new(prime: u64, coeff_len: usize, nprimes: usize) -> Self {
         Self {
             prime,
@@ -123,14 +123,14 @@ impl CRTData {
         }
     }
 
-    // This is crt_data_co_prime_red from src/fft_small.h, FLINT 3.3.0-dev, writing a value.
+    // This is crt_data_co_prime_red from fft_small.h, FLINT 3.3.0-dev, writing a value.
     #[inline]
     fn co_prime_red_write(&mut self, i: usize, val: u64) {
         assert!(i < self.nprimes);
         self.data[self.nprimes * self.coeff_len + self.coeff_len + i] = val;
     }
 
-    // This is crt_data_co_prime from src/fft_small.h, FLINT 3.3.0-dev, writing a value.
+    // This is crt_data_co_prime from fft_small.h, FLINT 3.3.0-dev, writing a value.
     #[inline]
     fn co_prime_write(&mut self, i: usize, val: u64) {
         assert!(i < self.nprimes);
@@ -139,7 +139,7 @@ impl CRTData {
 
     // return mpn of length C->coeff_len
     //
-    // This is crt_data_prod_primes from src/fft_small.h, FLINT 3.3.0-dev.
+    // This is crt_data_prod_primes from fft_small.h, FLINT 3.3.0-dev.
     #[inline]
     fn prod_primes(&mut self) -> &mut [u64] {
         &mut self.data[self.nprimes * self.coeff_len..]
@@ -180,7 +180,7 @@ fn fft_small_mulmod_satisfies_bounds(nn: u64) -> bool {
     limit2 < 0.99 && limit4 < 1.49
 }
 
-// This is nmod_init from src/nmod.h, FLINT 3.3.0-dev, but returning `mod`.
+// This is nmod_init from nmod.h, FLINT 3.3.0-dev, but returning `mod`.
 fn nmod_init(n: u64) -> ModData {
     let norm = LeadingZeros::leading_zeros(n);
     let shifted = n << norm;
@@ -203,7 +203,7 @@ fn next_fft_number(p: u64) -> u64 {
     }
 }
 
-// This is sd_fft_ctx_init_prime from src/fft_small/sd_fft_ctx.c, FLINT 3.3.0-dev, returning q.
+// This is sd_fft_ctx_init_prime from fft_small/sd_fft_ctx.c, FLINT 3.3.0-dev, returning q.
 fn sd_fft_ctx_init_prime(pp: u64) -> FFTContext {
     assert!(
         fft_small_mulmod_satisfies_bounds(pp),
@@ -243,7 +243,7 @@ fn sd_fft_ctx_init_prime(pp: u64) -> FFTContext {
 
 // fill x[i] = 2 ^ i mod p for 0 <= i < len
 //
-// This is fill_slow_two_pow_tab from src/fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+// This is fill_slow_two_pow_tab from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
 fn fill_slow_two_pow_tab(xs: &mut [f64], p: f64, pinv: f64) {
     let mut t = 1.0;
     let (xs_head, xs_tail) = xs.split_first_mut().unwrap();
@@ -258,7 +258,7 @@ fn fill_slow_two_pow_tab(xs: &mut [f64], p: f64, pinv: f64) {
 // fill in  d[i * nvs + k / VEC_SZ][k % VEC_SZ] = 2 ^ i mod Rffts[k].p for 0 <= k < VEC_SZ * nvs and
 // 0 <= i < len.
 //
-// This is fill_vec_two_pow_tab from src/fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+// This is fill_vec_two_pow_tab from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
 fn fill_vec_two_pow_tab(xs: &mut [f64x4], rffts: &mut [FFTContext], len: usize, nvs: usize) {
     let mut ps = vec![f64x4::ZERO; nvs << 1];
     for l in 0..nvs {

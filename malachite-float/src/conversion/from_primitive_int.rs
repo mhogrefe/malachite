@@ -79,20 +79,15 @@ impl Float {
             return Self::ZERO;
         }
         let bits = const_limb_significant_bits(x);
-        let bits_i32 = bits as i32;
-        let exponent = bits_i32.saturating_add(pow);
+        let exponent = (bits as i32).saturating_add(pow);
         assert!(exponent <= Self::MAX_EXPONENT);
         assert!(exponent >= Self::MIN_EXPONENT);
         let prec = bits - x.trailing_zeros() as u64;
-        let mut limbs = prec >> Limb::LOG_WIDTH;
-        if prec & Limb::WIDTH_MASK != 0 {
-            limbs += 1;
-        }
         Self(Finite {
             sign: true,
             exponent,
             precision: prec,
-            significand: Natural::const_from(x << ((limbs << Limb::LOG_WIDTH) - bits)),
+            significand: Natural::const_from(x << (Limb::WIDTH - bits)),
         })
     }
 
@@ -196,20 +191,15 @@ impl Float {
         }
         let x_abs = x.unsigned_abs();
         let bits = const_limb_significant_bits(x_abs);
-        let bits_i32 = bits as i32;
-        let exponent = bits_i32.saturating_add(pow);
+        let exponent = (bits as i32).saturating_add(pow);
         assert!(exponent <= Self::MAX_EXPONENT);
         assert!(exponent >= Self::MIN_EXPONENT);
         let prec = bits - x_abs.trailing_zeros() as u64;
-        let mut limbs = prec >> Limb::LOG_WIDTH;
-        if prec & Limb::WIDTH_MASK != 0 {
-            limbs += 1;
-        }
         Self(Finite {
             sign: x > 0,
             exponent,
             precision: prec,
-            significand: Natural::const_from(x_abs << ((limbs << Limb::LOG_WIDTH) - bits)),
+            significand: Natural::const_from(x_abs << (Limb::WIDTH - bits)),
         })
     }
 

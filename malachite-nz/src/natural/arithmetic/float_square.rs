@@ -13,7 +13,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -26,17 +25,18 @@ use crate::natural::arithmetic::square::{
     SQR_FFT_THRESHOLD, limbs_square_to_out, limbs_square_to_out_basecase,
     limbs_square_to_out_scratch_len,
 };
+use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CeilingLogBase2, OverflowingAddAssign, Parity, PowerOf2, ShrRound, Sign,
+    ArithmeticCheckedShl, CeilingLogBase2, OverflowingAddAssign, Parity, PowerOf2, Sign,
     WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
+use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_leading_zeros;
 
@@ -158,8 +158,7 @@ fn square_float_significand_same_prec_ref(
 }
 
 const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const HIGH_BIT: Limb = 1 << WIDTH_M1;
-const COMP_HIGH_BIT: Limb = !HIGH_BIT;
+const COMP_HIGH_BIT: Limb = !LIMB_HIGH_BIT;
 
 // This is mpfr_sqr_1 from sqr.c, MPFR 4.3.0.
 fn square_float_significand_same_prec_lt_w(
@@ -189,7 +188,7 @@ fn square_float_significand_same_prec_lt_w(
             if round_bit == 0 || (sticky_bit == 0 && square & shift_bit == 0) {
                 (square, decrement_exp, Less)
             } else if square.overflowing_add_assign(shift_bit) {
-                (HIGH_BIT, false, Greater)
+                (LIMB_HIGH_BIT, false, Greater)
             } else {
                 (square, decrement_exp, Greater)
             }
@@ -197,7 +196,7 @@ fn square_float_significand_same_prec_lt_w(
         Floor | Down => (square, decrement_exp, Less),
         Ceiling | Up => {
             if square.overflowing_add_assign(shift_bit) {
-                (HIGH_BIT, false, Greater)
+                (LIMB_HIGH_BIT, false, Greater)
             } else {
                 (square, decrement_exp, Greater)
             }
@@ -214,7 +213,7 @@ fn square_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, boo
         z |= sticky_bit >> WIDTH_M1;
         sticky_bit <<= 1;
     }
-    let round_bit = sticky_bit & HIGH_BIT;
+    let round_bit = sticky_bit & LIMB_HIGH_BIT;
     sticky_bit &= COMP_HIGH_BIT;
     let mut square = z;
     if round_bit == 0 && sticky_bit == 0 {
@@ -226,7 +225,7 @@ fn square_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, boo
             if round_bit == 0 || (sticky_bit == 0 && square.even()) {
                 (square, decrement_exp, Less)
             } else if square.overflowing_add_assign(1) {
-                (HIGH_BIT, false, Greater)
+                (LIMB_HIGH_BIT, false, Greater)
             } else {
                 (square, decrement_exp, Greater)
             }
@@ -234,7 +233,7 @@ fn square_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, boo
         Floor | Down => (square, decrement_exp, Less),
         Ceiling | Up => {
             if square.overflowing_add_assign(1) {
-                (HIGH_BIT, false, Greater)
+                (LIMB_HIGH_BIT, false, Greater)
             } else {
                 (square, decrement_exp, Greater)
             }
@@ -310,7 +309,7 @@ fn square_float_significand_same_prec_gt_w_lt_2w(
             if round_bit == 0 || sticky_bit == 0 && (z_0 & shift_bit) == 0 {
                 (z_0, z_1, decrement_exp, Less)
             } else if z_0.overflowing_add_assign(shift_bit) && z_1.overflowing_add_assign(1) {
-                (z_0, HIGH_BIT, false, Greater)
+                (z_0, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, decrement_exp, Greater)
             }
@@ -318,7 +317,7 @@ fn square_float_significand_same_prec_gt_w_lt_2w(
         Floor | Down => (z_0, z_1, decrement_exp, Less),
         Ceiling | Up => {
             if z_0.overflowing_add_assign(shift_bit) && z_1.overflowing_add_assign(1) {
-                (z_0, HIGH_BIT, false, Greater)
+                (z_0, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, decrement_exp, Greater)
             }
@@ -437,7 +436,7 @@ fn square_float_significand_same_prec_gt_2w_lt_3w(
                     z_2.wrapping_add_assign(1);
                 }
                 if z_2 == 0 {
-                    (z_0, z_1, HIGH_BIT, false, Greater)
+                    (z_0, z_1, LIMB_HIGH_BIT, false, Greater)
                 } else {
                     (z_0, z_1, z_2, decrement_exp, Greater)
                 }
@@ -452,7 +451,7 @@ fn square_float_significand_same_prec_gt_2w_lt_3w(
                 z_2.wrapping_add_assign(1);
             }
             if z_2 == 0 {
-                (z_0, z_1, HIGH_BIT, false, Greater)
+                (z_0, z_1, LIMB_HIGH_BIT, false, Greater)
             } else {
                 (z_0, z_1, z_2, decrement_exp, Greater)
             }
@@ -560,13 +559,7 @@ fn square_float_significands_general(
     let orig_xs = xs;
     let mut xs = xs;
     let k = xs_len.arithmetic_checked_shl(1).unwrap();
-    let tmp_len = usize::wrapping_from(
-        x_prec
-            .arithmetic_checked_shl(1u32)
-            .unwrap()
-            .shr_round(Limb::LOG_WIDTH, Ceiling)
-            .0,
-    );
+    let tmp_len = bit_to_limb_count_ceiling(x_prec.arithmetic_checked_shl(1u32).unwrap());
     assert!(tmp_len <= k);
     let mut tmp_vec: Vec<Limb>;
     let mut tmp: &mut [Limb];
@@ -620,18 +613,15 @@ fn square_float_significands_general(
             assert_ne!(xs_leading_zeros, xs_len);
             return square_float_significand_ref_helper(
                 &xs[xs_leading_zeros..],
-                u64::exact_from((xs_len - xs_leading_zeros) << Limb::LOG_WIDTH),
+                limb_to_bit_count(xs_len - xs_leading_zeros),
                 out_prec,
                 rm,
             );
         }
         // Compute estimated precision of sqrhigh.
-        let mut len = min(
-            usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0) + 1,
-            xs_len,
-        );
+        let mut len = min(bit_to_limb_count_ceiling(out_prec) + 1, xs_len);
         assert!(len >= 1 && len << 1 <= k && len <= xs_len);
-        let mut p = u64::exact_from(len << Limb::LOG_WIDTH) - (len + 2).ceiling_log_base_2();
+        let mut p = limb_to_bit_count(len) - (len + 2).ceiling_log_base_2();
         // Check if sqrhigh can produce a roundable result. We may lose 1 bit due to Nearest, 1 due
         // to final shift.
         let mut tmp_alloc = k;
@@ -653,7 +643,7 @@ fn square_float_significands_general(
                 len += 1;
                 // ceil(log_2(len + 2)) takes into account the lost bits due to Mulders' short
                 // product.
-                p = u64::exact_from(len << Limb::LOG_WIDTH) - (len + 2).ceiling_log_base_2();
+                p = limb_to_bit_count(len) - (len + 2).ceiling_log_base_2();
                 // Due to some nasty reasons we can have only 4 bits
                 assert!(out_prec <= p - 4);
                 let twice_len = len << 1;
@@ -724,7 +714,7 @@ fn square_float_significands_general(
             limbs_slice_shl_in_place(&mut tmp[..tmp_len], 1);
         }
     }
-    let mut out = vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
     let (inexact, increment_exp) = round_helper_raw(
         &mut out,
         out_prec,

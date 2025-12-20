@@ -11,13 +11,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns whether
 // the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether the `pow`
@@ -33,7 +33,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
-    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let i = bit_to_limb_count_floor(pow);
     if i >= xs.len() {
         false
     } else if i == 0 {
@@ -46,7 +46,7 @@ pub_test! {limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool 
 
 // xs.len() == ys.len()
 fn limbs_eq_mod_power_of_2_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let i = bit_to_limb_count_floor(pow);
     let len = xs.len();
     if i >= len {
         xs == ys
@@ -59,7 +59,7 @@ fn limbs_eq_mod_power_of_2_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bo
 
 // xs.len() > ys.len()
 fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let i = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     let ys_len = ys.len();
     if i >= xs_len {

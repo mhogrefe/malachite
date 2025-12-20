@@ -13,13 +13,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::natural::arithmetic::add::limbs_add_limb_to_out;
+use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::Limb;
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
@@ -42,7 +41,7 @@ pub(crate) fn limb_float_can_round(x: Limb, err0: u64, mut prec: u64, rm: Roundi
         return false;
     }
     let mut s = Limb::WIDTH - (prec & Limb::WIDTH_MASK);
-    let n = usize::exact_from(err >> Limb::LOG_WIDTH);
+    let n = bit_to_limb_count_floor(err);
     // Check first limb
     let mask = Limb::low_mask(s);
     let mut tmp = x & mask;
@@ -64,24 +63,19 @@ pub(crate) fn limb_float_can_round(x: Limb, err0: u64, mut prec: u64, rm: Roundi
     }
 }
 
-pub(crate) fn limbs_float_can_round(
-    xs: &[Limb],
-    err0: u64,
-    mut prec: u64,
-    rm: RoundingMode,
-) -> bool {
+pub fn limbs_float_can_round(xs: &[Limb], err0: u64, mut prec: u64, rm: RoundingMode) -> bool {
     if rm == Nearest {
         prec += 1;
     }
     let len = xs.len();
     assert!(xs[len - 1].get_highest_bit());
-    let err = min(err0, u64::exact_from(len << Limb::LOG_WIDTH));
+    let err = min(err0, limb_to_bit_count(len));
     if err <= prec {
         return false;
     }
-    let k = usize::exact_from(prec >> Limb::LOG_WIDTH);
+    let k = bit_to_limb_count_floor(prec);
     let mut s = Limb::WIDTH - (prec & Limb::WIDTH_MASK);
-    let n = usize::exact_from(err >> Limb::LOG_WIDTH) - k;
+    let n = bit_to_limb_count_floor(err) - k;
     assert!(len > k);
     // Check first limb
     let mut i = len - k - 1;
@@ -96,30 +90,28 @@ pub(crate) fn limbs_float_can_round(
         tmp != 0 && tmp != mask >> s
     } else if tmp == 0 {
         // Check if all (n - 1) limbs are 0
-        let j = i + 1 - n;
-        if xs[j + 1..=i].iter().any(|&x| x != 0) {
+        let j = i.wrapping_add(2) - n;
+        if n > 1 && xs[j..=i].iter().any(|&x| x != 0) {
             return true;
         }
         // Check if final error limb is 0
         s = Limb::WIDTH - (err & Limb::WIDTH_MASK);
-        s != Limb::WIDTH && xs[j] >> s != 0
+        s != Limb::WIDTH && xs[j - 1] >> s != 0
     } else if tmp == mask {
         // Check if all (n - 1) limbs are 11111111111111111
-        let j = i + 1 - n;
-        if xs[j + 1..=i].iter().any(|&x| x != Limb::MAX) {
+        let j = i.wrapping_add(2) - n;
+        if n > 1 && xs[j..=i].iter().any(|&x| x != Limb::MAX) {
             return true;
         }
         // Check if final error limb is 0
         s = Limb::WIDTH - (err & Limb::WIDTH_MASK);
-        s != Limb::WIDTH && xs[j] >> s != Limb::MAX >> s
+        s != Limb::WIDTH && xs[j - 1] >> s != Limb::MAX >> s
     } else {
         // First limb is different from 000000 or 1111111
         true
     }
 }
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const HIGH_BIT: Limb = 1 << WIDTH_M1;
 const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
 pub(crate) const MPFR_EVEN_INEX: i8 = 2;
 
@@ -141,7 +133,7 @@ pub(crate) fn round_helper_even(
         } else {
             let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
             if increment {
-                *out.last_mut().unwrap() = HIGH_BIT;
+                *out.last_mut().unwrap() = LIMB_HIGH_BIT;
             }
             out[0] &= ulp_mask;
             (MPFR_EVEN_INEX, increment)
@@ -167,7 +159,7 @@ pub fn round_helper_raw(
         } else {
             let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
             if increment {
-                *out.last_mut().unwrap() = HIGH_BIT;
+                *out.last_mut().unwrap() = LIMB_HIGH_BIT;
             }
             out[0] &= ulp_mask;
             (1, increment)
@@ -224,7 +216,7 @@ fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
             assert!(out_len < xs_len);
             // Compute rounding bit and sticky bit - see note above
             let x = xs[i - 1];
-            round_bit = x & HIGH_BIT;
+            round_bit = x & LIMB_HIGH_BIT;
             sticky_bit = x & WIDTH_M1_MASK;
             if rm == Nearest || round_bit == 0 {
                 let mut to = i - 1;
@@ -253,7 +245,7 @@ fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
                 } else {
                     let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
                     if increment {
-                        out[out_len - 1] = HIGH_BIT;
+                        out[out_len - 1] = LIMB_HIGH_BIT;
                     }
                     out[0] &= ulp_mask;
                     (1, increment)
@@ -269,7 +261,7 @@ fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
                 } else {
                     let increment = limbs_add_limb_to_out(out, xs_hi, ulp);
                     if increment {
-                        out[out_len - 1] = HIGH_BIT;
+                        out[out_len - 1] = LIMB_HIGH_BIT;
                     }
                     out[0] &= ulp_mask;
                     (1, increment)
@@ -287,7 +279,7 @@ fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
 pub(crate) fn round_helper_2(xs: &[Limb], err0: i32, prec: u64) -> bool {
     let len = xs.len();
     assert!(xs.last().unwrap().get_highest_bit());
-    let mut err = u64::exact_from(len << Limb::LOG_WIDTH);
+    let mut err = limb_to_bit_count(len);
     if err0 <= 0 {
         return false;
     }
@@ -296,8 +288,8 @@ pub(crate) fn round_helper_2(xs: &[Limb], err0: i32, prec: u64) -> bool {
         return false;
     }
     err = min(err, err0);
-    let k = usize::exact_from(prec >> Limb::LOG_WIDTH);
-    let n = usize::exact_from(err >> Limb::LOG_WIDTH) - k;
+    let k = bit_to_limb_count_floor(prec);
+    let n = bit_to_limb_count_floor(err) - k;
     assert!(len > k);
     // Check first limb
     let xs = &xs[len - k - n - 1..];
@@ -333,4 +325,9 @@ pub(crate) fn round_helper_2(xs: &[Limb], err0: i32, prec: u64) -> bool {
         // First limb is different from 000000 or 1111111
         true
     }
+}
+
+#[inline]
+pub fn limbs_significand_slice_add_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
+    limbs_slice_add_limb_in_place(xs, y)
 }

@@ -7,22 +7,20 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left, limbs_vec_add_in_place_left,
 };
 use crate::natural::logic::bit_access::limbs_clear_bit;
+use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ShrRound,
+    ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the sum of the `Natural` and a `Limb`, mod `2 ^ pow`. Assumes the input is already
@@ -35,7 +33,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0) {
+    if xs.len() < bit_to_limb_count_ceiling(pow) {
         limbs_add_limb(xs, y)
     } else {
         let mut out = xs.to_vec();
@@ -61,7 +59,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
     y: Limb,
     pow: u64
 ) -> bool {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0) {
+    if xs.len() < bit_to_limb_count_ceiling(pow) {
         limbs_slice_add_limb_in_place(xs, y)
     } else {
         if !limbs_slice_add_limb_in_place(xs, y) {
@@ -150,7 +148,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
     ys: &[Limb],
     pow: u64,
 ) -> bool {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0) {
+    if xs.len() < bit_to_limb_count_ceiling(pow) {
         limbs_slice_add_greater_in_place_left(xs, ys)
     } else {
         if !limbs_slice_add_greater_in_place_left(xs, ys) {
@@ -174,7 +172,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
 pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let max_len =bit_to_limb_count_ceiling(pow);
     if xs_len < max_len && ys_len < max_len {
         limbs_vec_add_in_place_left(xs, ys);
     } else {

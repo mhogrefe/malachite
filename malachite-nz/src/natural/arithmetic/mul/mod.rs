@@ -279,25 +279,25 @@ pub_const_crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
 //
 // This is _flint_mpn_mul from mpn_extras/mul.c, FLINT 3.3.0-dev.
 pub_crate_test! {limbs_mul_greater_to_out(
-    r: &mut [Limb],
-    x: &[Limb],
-    y: &[Limb],
+    out: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
     scratch: &mut [Limb],
 ) -> Limb {
-    let xs_len = x.len();
-    let ys_len = y.len();
+    let xs_len = xs.len();
+    let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     let out_len = xs_len + ys_len;
-    assert!(r.len() >= out_len);
+    assert!(out.len() >= out_len);
     if xs_len == ys_len {
-        limbs_mul_same_length_to_out(r, x, y, scratch);
+        limbs_mul_same_length_to_out(out, xs, ys, scratch);
     } else if ys_len < FFT_MUL_THRESHOLD {
         let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
-        limbs_mul_greater_to_out_old(r, x, y, &mut scratch);
+        limbs_mul_greater_to_out_old(out, xs, ys, &mut scratch);
     } else {
-        mpn_mul_default_mpn_ctx(r, x, y, false);
+        mpn_mul_default_mpn_ctx(out, xs, ys, false);
     }
-    r[xs_len + ys_len - 1]
+    out[xs_len + ys_len - 1]
 }}
 
 pub_crate_test! {limbs_mul_greater_to_out_old(

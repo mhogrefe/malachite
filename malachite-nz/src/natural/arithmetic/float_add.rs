@@ -13,7 +13,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out_aliased_2,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -21,12 +20,14 @@ use crate::natural::arithmetic::add::{
 use crate::natural::arithmetic::float_add::RoundBit::*;
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
+use crate::natural::{
+    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    NegModPowerOf2, OverflowingAddAssign, Parity, PowerOf2, SaturatingAddAssign, ShrRound,
-    WrappingAddAssign,
+    NegModPowerOf2, OverflowingAddAssign, Parity, PowerOf2, SaturatingAddAssign, WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -66,8 +67,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -98,8 +98,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -130,8 +129,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         xs,
@@ -156,8 +154,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, false)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, xs, *x_exp, ys, y_exp, out_prec, rm,
                     );
@@ -185,8 +182,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -217,8 +213,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         ys,
@@ -249,8 +244,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -275,8 +269,7 @@ pub fn add_float_significands_in_place(
                     *x_exp = out_exp;
                     (o, true)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, ys, y_exp, xs, *x_exp, out_prec, rm,
                     );
@@ -319,8 +312,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -351,8 +343,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_x],
@@ -383,8 +374,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         xs,
@@ -409,8 +399,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, xs, *x_exp, ys, y_exp, out_prec, rm,
                     );
@@ -438,8 +427,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -470,8 +458,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         ys,
@@ -502,8 +489,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*small_y],
@@ -528,8 +514,7 @@ pub fn add_float_significands_in_place_ref(
                     *x_exp = out_exp;
                     o
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, ys, y_exp, xs, *x_exp, out_prec, rm,
                     );
@@ -575,8 +560,7 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*x],
@@ -603,8 +587,7 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         &[*x],
@@ -631,8 +614,7 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out,
                         xs,
@@ -653,8 +635,7 @@ pub fn add_float_significands_ref_ref<'a>(
                     );
                     (Natural(Small(out[0])), out_exp, o)
                 } else {
-                    let mut out =
-                        vec![0; usize::exact_from(out_prec.shr_round(Limb::LOG_WIDTH, Ceiling).0)];
+                    let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
                     let (out_exp, o) = add_float_significands_general(
                         &mut out, xs, x_exp, ys, y_exp, out_prec, rm,
                     );
@@ -836,7 +817,6 @@ fn add_float_significands_same_prec_ref_ref(
 }
 
 const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const HIGH_BIT: Limb = 1 << WIDTH_M1;
 
 // This is mpfr_add1sp1 from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_same_prec_lt_w(
@@ -853,7 +833,7 @@ fn add_float_significands_same_prec_lt_w(
     let (mut sum, sticky_bit, round_bit) = if x_exp == y_exp {
         // The following line is probably better than
         // ```
-        // sum = HIGH_BIT | ((x + y) >> 1);
+        // sum = LIMB_HIGH_BIT | ((x + y) >> 1);
         // ```
         // as it has less dependency and doesn't need a long constant on some processors. On ARM, it
         // can also probably benefit from shift-and-op in a better way. Timings cannot be
@@ -877,7 +857,7 @@ fn add_float_significands_same_prec_lt_w(
             if overflow {
                 // carry
                 assert!(sum.even());
-                sum = HIGH_BIT | (sum >> 1);
+                sum = LIMB_HIGH_BIT | (sum >> 1);
                 x_exp.saturating_add_assign(1);
             }
             let round_bit = sum & (shift_bit >> 1);
@@ -889,7 +869,7 @@ fn add_float_significands_same_prec_lt_w(
             if overflow {
                 // carry
                 sticky_bit |= sum & 1;
-                sum = HIGH_BIT | (sum >> 1);
+                sum = LIMB_HIGH_BIT | (sum >> 1);
                 x_exp.saturating_add_assign(1);
             }
             let round_bit = sum & (shift_bit >> 1);
@@ -914,7 +894,7 @@ fn add_float_significands_same_prec_lt_w(
                 if round_bit == 0 || (sticky_bit == 0 && (sum & shift_bit) == 0) {
                     (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(shift_bit) {
-                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -922,7 +902,7 @@ fn add_float_significands_same_prec_lt_w(
             Floor | Down => (sum, x_exp, Less),
             Ceiling | Up => {
                 if sum.overflowing_add_assign(shift_bit) {
-                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -943,7 +923,7 @@ fn add_float_significands_same_prec_w(
         let sum = x.wrapping_add(y);
         x_exp.saturating_add_assign(1);
         // since x + y fits on Limb::WIDTH + 1 bits, the sticky bit is zero
-        (HIGH_BIT | (sum >> 1), 0, sum & 1)
+        (LIMB_HIGH_BIT | (sum >> 1), 0, sum & 1)
     } else {
         if x_exp < y_exp {
             swap(&mut x, &mut y);
@@ -958,15 +938,19 @@ fn add_float_significands_same_prec_w(
             if overflow {
                 // carry
                 x_exp.saturating_add_assign(1);
-                (HIGH_BIT | (sum >> 1), sticky_bit, sum & 1)
+                (LIMB_HIGH_BIT | (sum >> 1), sticky_bit, sum & 1)
             } else {
                 // no carry
-                (sum, sticky_bit & !HIGH_BIT, sticky_bit & HIGH_BIT)
+                (sum, sticky_bit & !LIMB_HIGH_BIT, sticky_bit & LIMB_HIGH_BIT)
             }
         } else {
             let round = exp_diff == Limb::WIDTH;
             // exp_diff >= Limb::WIDTH
-            (x, Limb::from(!round || y != HIGH_BIT), Limb::from(round))
+            (
+                x,
+                Limb::from(!round || y != LIMB_HIGH_BIT),
+                Limb::from(round),
+            )
         }
     };
     if round_bit == 0 && sticky_bit == 0 {
@@ -978,7 +962,7 @@ fn add_float_significands_same_prec_w(
                 if round_bit == 0 || (sticky_bit == 0 && (sum & 1) == 0) {
                     (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -986,7 +970,7 @@ fn add_float_significands_same_prec_w(
             Floor | Down => (sum, x_exp, Less),
             Ceiling | Up => {
                 if sum.overflowing_add_assign(1) {
-                    (HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum, x_exp, Greater)
                 }
@@ -1010,7 +994,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
     let shift_bit = Limb::power_of_2(shift);
     let shift_m1_bit = shift_bit >> 1;
     let (mut sum_0, mut sum_1, round_bit, sticky_bit) = if x_exp == y_exp {
-        // since x_1, y_1 >= HIGH_BIT, a carry always occurs
+        // since x_1, y_1 >= LIMB_HIGH_BIT, a carry always occurs
         let (mut a0, overflow) = x_0.overflowing_add(y_0);
         let mut a1 = x_1.wrapping_add(y_1);
         if overflow {
@@ -1020,7 +1004,12 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
         x_exp.saturating_add_assign(1);
         let round_bit = a0 & shift_m1_bit;
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
-        (a0 ^ round_bit, HIGH_BIT | (a1 >> 1), a0 & shift_m1_bit, 0)
+        (
+            a0 ^ round_bit,
+            LIMB_HIGH_BIT | (a1 >> 1),
+            a0 & shift_m1_bit,
+            0,
+        )
     } else {
         if x_exp < y_exp {
             swap(&mut x_0, &mut y_0);
@@ -1044,7 +1033,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
-                HIGH_BIT | (a1 >> 1)
+                LIMB_HIGH_BIT | (a1 >> 1)
             } else {
                 a1
             };
@@ -1076,7 +1065,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                 let round_bit = a0 & shift_m1_bit;
                 (
                     a0 & !mask,
-                    HIGH_BIT | (a1 >> 1),
+                    LIMB_HIGH_BIT | (a1 >> 1),
                     a0 & shift_m1_bit,
                     sticky_bit | (a0 & mask) ^ round_bit,
                 )
@@ -1106,7 +1095,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                     (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(shift_bit) && sum_1.overflowing_add_assign(1)
                 {
-                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (sum_0, LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1114,7 +1103,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
             Floor | Down => (sum_0, sum_1, x_exp, Less),
             Ceiling | Up => {
                 if sum_0.overflowing_add_assign(shift_bit) && sum_1.overflowing_add_assign(1) {
-                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (sum_0, LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1134,7 +1123,7 @@ fn add_float_significands_same_prec_2w(
     rm: RoundingMode,
 ) -> (Limb, Limb, i32, Ordering) {
     let (mut sum_0, mut sum_1, round_bit, sticky_bit) = if x_exp == y_exp {
-        // Since x_1, y_1 >= HIGH_BIT, a carry always occurs.
+        // Since x_1, y_1 >= LIMB_HIGH_BIT, a carry always occurs.
         let (a0, overflow) = x_0.overflowing_add(y_0);
         let mut a1 = x_1.wrapping_add(y_1);
         if overflow {
@@ -1144,7 +1133,7 @@ fn add_float_significands_same_prec_2w(
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
         (
             (a1 << WIDTH_M1) | (a0 >> 1),
-            HIGH_BIT | (a1 >> 1),
+            LIMB_HIGH_BIT | (a1 >> 1),
             a0 & 1,
             0,
         )
@@ -1157,7 +1146,7 @@ fn add_float_significands_same_prec_2w(
         let exp_diff = u64::exact_from(x_exp - y_exp);
         if exp_diff >= TWICE_WIDTH {
             if exp_diff == TWICE_WIDTH {
-                (x_0, x_1, 1, Limb::from(y_0 != 0 || y_1 > HIGH_BIT))
+                (x_0, x_1, 1, Limb::from(y_0 != 0 || y_1 > LIMB_HIGH_BIT))
             } else {
                 (x_0, x_1, 0, 1)
             }
@@ -1199,12 +1188,12 @@ fn add_float_significands_same_prec_2w(
                 x_exp.saturating_add_assign(1);
                 (
                     (sum_1 << WIDTH_M1) | (sum_0 >> 1),
-                    HIGH_BIT | (sum_1 >> 1),
+                    LIMB_HIGH_BIT | (sum_1 >> 1),
                     round_bit,
                     sticky_bit,
                 )
             } else {
-                (sum_0, sum_1, sticky_bit & HIGH_BIT, sticky_bit << 1)
+                (sum_0, sum_1, sticky_bit & LIMB_HIGH_BIT, sticky_bit << 1)
             }
         }
     };
@@ -1217,7 +1206,7 @@ fn add_float_significands_same_prec_2w(
                 if round_bit == 0 || (sticky_bit == 0 && (sum_0 & 1) == 0) {
                     (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
-                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (sum_0, LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1225,7 +1214,7 @@ fn add_float_significands_same_prec_2w(
             Floor | Down => (sum_0, sum_1, x_exp, Less),
             Ceiling | Up => {
                 if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
-                    (sum_0, HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (sum_0, LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
                 } else {
                     (sum_0, sum_1, x_exp, Greater)
                 }
@@ -1251,7 +1240,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
     let shift_bit = Limb::power_of_2(shift);
     let shift_m1_bit = shift_bit >> 1;
     let (mut sum_0, mut sum_1, mut sum_2, round_bit, sticky_bit) = if x_exp == y_exp {
-        // Since x_2, y_2 >= HIGH_BIT, a carry always occurs
+        // Since x_2, y_2 >= LIMB_HIGH_BIT, a carry always occurs
         let (mut a0, overflow_1) = x_0.overflowing_add(y_0);
         let (mut a1, mut overflow_2) = x_1.overflowing_add(y_1);
         if overflow_1 {
@@ -1269,7 +1258,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
         (
             a0 ^ round_bit,
             (a2 << WIDTH_M1) | (a1 >> 1),
-            HIGH_BIT | (a2 >> 1),
+            LIMB_HIGH_BIT | (a2 >> 1),
             round_bit,
             0,
         )
@@ -1301,7 +1290,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                 // shift a by 1
                 a0 = (a1 << WIDTH_M1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
-                ((a2 << WIDTH_M1) | (a1 >> 1), HIGH_BIT | (a2 >> 1))
+                ((a2 << WIDTH_M1) | (a1 >> 1), LIMB_HIGH_BIT | (a2 >> 1))
             } else {
                 (a1, a2)
             };
@@ -1345,7 +1334,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                 (
                     a0 & !mask,
                     (a2 << WIDTH_M1) | (a1 >> 1),
-                    HIGH_BIT | (a2 >> 1),
+                    LIMB_HIGH_BIT | (a2 >> 1),
                     round_bit,
                     sticky_bit,
                 )
@@ -1378,7 +1367,7 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                 (
                     a0 & !mask,
                     (a2 << WIDTH_M1) | (a1 >> 1),
-                    HIGH_BIT | (a2 >> 1),
+                    LIMB_HIGH_BIT | (a2 >> 1),
                     round_bit,
                     sticky_bit,
                 )
@@ -1410,7 +1399,13 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                         sum_2.wrapping_add_assign(1);
                     }
                     if sum_2 == 0 {
-                        (sum_0, sum_1, HIGH_BIT, x_exp.saturating_add(1), Greater)
+                        (
+                            sum_0,
+                            sum_1,
+                            LIMB_HIGH_BIT,
+                            x_exp.saturating_add(1),
+                            Greater,
+                        )
                     } else {
                         (sum_0, sum_1, sum_2, x_exp, Greater)
                     }
@@ -1425,7 +1420,13 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
                     sum_2.wrapping_add_assign(1);
                 }
                 if sum_2 == 0 {
-                    (sum_0, sum_1, HIGH_BIT, x_exp.saturating_add(1), Greater)
+                    (
+                        sum_0,
+                        sum_1,
+                        LIMB_HIGH_BIT,
+                        x_exp.saturating_add(1),
+                        Greater,
+                    )
                 } else {
                     (sum_0, sum_1, sum_2, x_exp, Greater)
                 }
@@ -1480,7 +1481,7 @@ fn add_significands_rsh_to_out(
         (low, carry_2)
     } else {
         // exp_diff >= Limb::WIDTH
-        let q = usize::exact_from(exp_diff >> Limb::LOG_WIDTH);
+        let q = bit_to_limb_count_floor(exp_diff);
         let r = exp_diff & Limb::WIDTH_MASK;
         if r == 0 {
             assert_ne!(q, 0);
@@ -1577,7 +1578,7 @@ fn add_significands_rsh_mut_ref(xs: &mut [Limb], ys: &[Limb], exp_diff: u64) -> 
         (low, carry_2)
     } else {
         // exp_diff >= Limb::WIDTH
-        let q = usize::exact_from(exp_diff >> Limb::LOG_WIDTH);
+        let q = bit_to_limb_count_floor(exp_diff);
         let r = exp_diff & Limb::WIDTH_MASK;
         if r == 0 {
             assert_ne!(q, 0);
@@ -1665,7 +1666,7 @@ fn add_significands_rsh_ref_mut(xs: &[Limb], ys: &mut [Limb], exp_diff: u64) -> 
         (low, carry_2)
     } else {
         // exp_diff >= Limb::WIDTH
-        let q = usize::exact_from(exp_diff >> Limb::LOG_WIDTH);
+        let q = bit_to_limb_count_floor(exp_diff);
         let r = exp_diff & Limb::WIDTH_MASK;
         let nmq = n - q;
         if r == 0 {
@@ -1751,7 +1752,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
         assert!(limbs_add_same_length_to_out(out, xs, ys));
         round_bit = out[0] & shift_bit;
         limbs_slice_shr_in_place(out, 1);
-        out[last_index] |= HIGH_BIT;
+        out[last_index] |= LIMB_HIGH_BIT;
         out[0] &= !(shift_bit - 1);
         if round_bit == 0 {
             (x_exp, Equal)
@@ -1764,7 +1765,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                     } else {
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            out[last_index] = HIGH_BIT;
+                            out[last_index] = LIMB_HIGH_BIT;
                         }
                         (x_exp, Greater)
                     }
@@ -1773,7 +1774,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        out[last_index] = HIGH_BIT;
+                        out[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -1791,7 +1792,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                     out.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        out[last_index] = HIGH_BIT;
+                        out[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -1808,7 +1809,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                         out.copy_from_slice(xs);
                         if limbs_slice_add_limb_in_place(out, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            out[last_index] = HIGH_BIT;
+                            out[last_index] = LIMB_HIGH_BIT;
                         }
                         (x_exp, Greater)
                     }
@@ -1821,7 +1822,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                     out.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        out[last_index] = HIGH_BIT;
+                        out[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -1842,8 +1843,8 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
             sticky_bit |= out[0] & (shift_m1_bit - 1);
         } else {
             // The round bit and possibly a part of the sticky bit are in sticky_bit
-            round_bit = sticky_bit & HIGH_BIT;
-            sticky_bit &= !HIGH_BIT;
+            round_bit = sticky_bit & LIMB_HIGH_BIT;
+            sticky_bit &= !LIMB_HIGH_BIT;
         }
         out[0] &= mask;
         // Check for carry out
@@ -1852,7 +1853,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
             round_bit = out[0] & shift_bit;
             limbs_slice_shr_in_place(out, 1);
             x_exp.saturating_add_assign(1);
-            out[last_index] |= HIGH_BIT;
+            out[last_index] |= LIMB_HIGH_BIT;
             out[0] &= mask;
         }
         match rm {
@@ -1864,7 +1865,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 } else {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        out[last_index] = HIGH_BIT;
+                        out[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -1881,7 +1882,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        out[last_index] = HIGH_BIT;
+                        out[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 } else {
@@ -1933,7 +1934,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
         assert!(limbs_slice_add_same_length_in_place_left(xs, ys));
         round_bit = xs[0] & shift_bit;
         limbs_slice_shr_in_place(xs, 1);
-        xs[last_index] |= HIGH_BIT;
+        xs[last_index] |= LIMB_HIGH_BIT;
         xs[0] &= !(shift_bit - 1);
         if round_bit == 0 {
             (x_exp, Equal)
@@ -1946,7 +1947,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            xs[last_index] = HIGH_BIT;
+                            xs[last_index] = LIMB_HIGH_BIT;
                         }
                         (x_exp, Greater)
                     }
@@ -1955,7 +1956,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        xs[last_index] = HIGH_BIT;
+                        xs[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -1969,7 +1970,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        xs[last_index] = HIGH_BIT;
+                        xs[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -1984,7 +1985,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                     } else {
                         if limbs_slice_add_limb_in_place(xs, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            xs[last_index] = HIGH_BIT;
+                            xs[last_index] = LIMB_HIGH_BIT;
                         }
                         (x_exp, Greater)
                     }
@@ -1993,7 +1994,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        xs[last_index] = HIGH_BIT;
+                        xs[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -2014,8 +2015,8 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
             sticky_bit |= xs[0] & (shift_m1_bit - 1);
         } else {
             // The round bit and possibly a part of the sticky bit are in sticky_bit
-            round_bit = sticky_bit & HIGH_BIT;
-            sticky_bit &= !HIGH_BIT;
+            round_bit = sticky_bit & LIMB_HIGH_BIT;
+            sticky_bit &= !LIMB_HIGH_BIT;
         }
         xs[0] &= mask;
         // Check for carry out
@@ -2024,7 +2025,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
             round_bit = xs[0] & shift_bit;
             limbs_slice_shr_in_place(xs, 1);
             x_exp.saturating_add_assign(1);
-            xs[last_index] |= HIGH_BIT;
+            xs[last_index] |= LIMB_HIGH_BIT;
             xs[0] &= mask;
         }
         match rm {
@@ -2036,7 +2037,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 } else {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        xs[last_index] = HIGH_BIT;
+                        xs[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -2053,7 +2054,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(xs, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        xs[last_index] = HIGH_BIT;
+                        xs[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 } else {
@@ -2086,7 +2087,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
         assert!(limbs_slice_add_same_length_in_place_left(ys, xs));
         round_bit = ys[0] & shift_bit;
         limbs_slice_shr_in_place(ys, 1);
-        ys[last_index] |= HIGH_BIT;
+        ys[last_index] |= LIMB_HIGH_BIT;
         ys[0] &= !(shift_bit - 1);
         if round_bit == 0 {
             (x_exp, Equal)
@@ -2099,7 +2100,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                     } else {
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            ys[last_index] = HIGH_BIT;
+                            ys[last_index] = LIMB_HIGH_BIT;
                         }
                         (x_exp, Greater)
                     }
@@ -2108,7 +2109,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 Ceiling | Up => {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        ys[last_index] = HIGH_BIT;
+                        ys[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -2126,7 +2127,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                     ys.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        ys[last_index] = HIGH_BIT;
+                        ys[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -2143,7 +2144,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                         ys.copy_from_slice(xs);
                         if limbs_slice_add_limb_in_place(ys, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            ys[last_index] = HIGH_BIT;
+                            ys[last_index] = LIMB_HIGH_BIT;
                         }
                         (x_exp, Greater)
                     }
@@ -2156,7 +2157,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                     ys.copy_from_slice(xs);
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        ys[last_index] = HIGH_BIT;
+                        ys[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -2177,8 +2178,8 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
             sticky_bit |= ys[0] & (shift_m1_bit - 1);
         } else {
             // The round bit and possibly a part of the sticky bit are in sticky_bit
-            round_bit = sticky_bit & HIGH_BIT;
-            sticky_bit &= !HIGH_BIT;
+            round_bit = sticky_bit & LIMB_HIGH_BIT;
+            sticky_bit &= !LIMB_HIGH_BIT;
         }
         ys[0] &= mask;
         // Check for carry out
@@ -2187,7 +2188,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
             round_bit = ys[0] & shift_bit;
             limbs_slice_shr_in_place(ys, 1);
             x_exp.saturating_add_assign(1);
-            ys[last_index] |= HIGH_BIT;
+            ys[last_index] |= LIMB_HIGH_BIT;
             ys[0] &= mask;
         }
         match rm {
@@ -2199,7 +2200,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 } else {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        ys[last_index] = HIGH_BIT;
+                        ys[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 }
@@ -2216,7 +2217,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
                 if round_bit != 0 || sticky_bit != 0 {
                     if limbs_slice_add_limb_in_place(ys, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        ys[last_index] = HIGH_BIT;
+                        ys[last_index] = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 } else {
@@ -2270,7 +2271,7 @@ fn add_float_significands_general_round(
                 if out[0] & shift_bit != 0 {
                     if limbs_slice_add_limb_in_place(out, shift_bit) {
                         x_exp.saturating_add_assign(1);
-                        *out.last_mut().unwrap() = HIGH_BIT;
+                        *out.last_mut().unwrap() = LIMB_HIGH_BIT;
                     }
                     (x_exp, Greater)
                 } else {
@@ -2281,7 +2282,7 @@ fn add_float_significands_general_round(
             } else {
                 if limbs_slice_add_limb_in_place(out, shift_bit) {
                     x_exp.saturating_add_assign(1);
-                    *out.last_mut().unwrap() = HIGH_BIT;
+                    *out.last_mut().unwrap() = LIMB_HIGH_BIT;
                 }
                 (x_exp, Greater)
             }
@@ -2290,7 +2291,7 @@ fn add_float_significands_general_round(
         Ceiling | Up => {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
                 x_exp.saturating_add_assign(1);
-                *out.last_mut().unwrap() = HIGH_BIT;
+                *out.last_mut().unwrap() = LIMB_HIGH_BIT;
             }
             (x_exp, Greater)
         }
@@ -2308,13 +2309,13 @@ fn add_float_significands_general(
 ) -> (i32, Ordering) {
     assert!(x_exp >= y_exp);
     let out_len = out.len();
-    let out_bits = u64::exact_from(out_len << Limb::LOG_WIDTH);
+    let out_bits = limb_to_bit_count(out_len);
     let shift = out_bits - out_prec; // non-significant bits in low limb
     let shift_bit = Limb::power_of_2(shift);
     let xs_len = xs.len();
     let ys_len = ys.len();
     let exp_diff = u64::exact_from(x_exp - y_exp);
-    let k = usize::exact_from(exp_diff >> Limb::LOG_WIDTH);
+    let k = bit_to_limb_count_floor(exp_diff);
     // Compute the significant part out', the non-significant bits of out are taken into account.
     //
     // Perform the rounding. At each iteration, we remember:
@@ -2343,8 +2344,7 @@ fn add_float_significands_general(
         // - y overlaps with out'
         // - copy y (shifted) into out
         // overlap is the number of limbs of y which overlap with out'
-        let mut overlap =
-            usize::exact_from((out_bits - exp_diff).shr_round(Limb::LOG_WIDTH, Ceiling).0);
+        let mut overlap = bit_to_limb_count_ceiling(out_bits - exp_diff);
         // only the highest overlap limbs from y have to be considered
         if overlap > ys_len {
             // y doesn't have enough limbs
@@ -2386,7 +2386,7 @@ fn add_float_significands_general(
                 }
             }
             limbs_slice_shr_in_place(out, 1);
-            out[out_len - 1] |= HIGH_BIT;
+            out[out_len - 1] |= LIMB_HIGH_BIT;
             if shift != 0 && following_bits == Uninitialized {
                 return add_float_significands_general_round(
                     out,
@@ -2459,7 +2459,7 @@ fn add_float_significands_general(
             } else {
                 if round_bit == Uninitialized {
                     round_bit = RoundBit::from(x >> (Limb::WIDTH - 1) != 0);
-                    x |= HIGH_BIT;
+                    x |= LIMB_HIGH_BIT;
                 }
                 following_bits = True;
                 if x != Limb::MAX {
@@ -2506,7 +2506,7 @@ fn add_float_significands_general(
                         && limbs_slice_add_limb_in_place(out, shift_bit)
                     {
                         x_exp.saturating_add_assign(1);
-                        out[out_len - 1] = HIGH_BIT;
+                        out[out_len - 1] = LIMB_HIGH_BIT;
                         round_bit = False;
                     }
                     if round_bit == Uninitialized {
@@ -2563,7 +2563,7 @@ fn add_float_significands_general(
                         round_bit.flip_assign();
                         if round_bit == False && limbs_slice_add_limb_in_place(out, shift_bit) {
                             x_exp.saturating_add_assign(1);
-                            out[out_len - 1] = HIGH_BIT;
+                            out[out_len - 1] = LIMB_HIGH_BIT;
                         }
                     }
                     if following_bits == False && x != 0 {
@@ -2622,7 +2622,7 @@ fn add_float_significands_general(
                 let mut x = xs[xi];
                 if round_bit == Uninitialized {
                     round_bit = RoundBit::from(x >> (Limb::WIDTH - 1) != 0);
-                    x &= !HIGH_BIT;
+                    x &= !LIMB_HIGH_BIT;
                 }
                 following_bits = RoundBit::from(x != 0);
             }
@@ -2676,7 +2676,7 @@ fn add_float_significands_general(
                 };
                 if round_bit == Uninitialized {
                     round_bit = RoundBit::from(y >> (Limb::WIDTH - 1) != 0);
-                    y &= !HIGH_BIT;
+                    y &= !LIMB_HIGH_BIT;
                 }
                 while y == 0 {
                     if yi == 0 {

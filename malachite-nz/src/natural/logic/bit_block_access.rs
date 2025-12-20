@@ -7,18 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::logic::not::limbs_not_in_place;
+use crate::natural::{Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
 
@@ -39,12 +37,12 @@ use malachite_base::vecs::vec_delete_left;
 // Panics if `start > end`.
 pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let small_start = bit_to_limb_count_floor(start);
     let len = xs.len();
     if small_start >= len {
         return Vec::new();
     }
-    let small_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
+    let small_end = bit_to_limb_count_floor(end) + 1;
     let mut out = (if small_end >= len {
         &xs[small_start..]
     } else {
@@ -76,7 +74,7 @@ pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<
 // Panics if `start > end`.
 pub_test! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let small_start = bit_to_limb_count_floor(start);
     if small_start >= xs.len() {
         return Vec::new();
     }
@@ -121,9 +119,9 @@ pub(crate) fn limbs_assign_bits_helper(
     mut bits: &[Limb],
     invert: bool,
 ) {
-    let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
-    let small_end = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
-    let width = usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, Ceiling).0);
+    let small_start = bit_to_limb_count_floor(start);
+    let small_end = bit_to_limb_count_floor(end - 1) + 1;
+    let width = bit_to_limb_count_ceiling(end - start);
     if width < bits.len() {
         bits = &bits[..width];
     }

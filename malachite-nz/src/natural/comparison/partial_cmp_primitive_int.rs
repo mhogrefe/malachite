@@ -7,14 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
 
 macro_rules! impl_partial_ord_limb {
     ($u: ident) => {
@@ -120,16 +118,13 @@ macro_rules! impl_partial_ord_larger_than_limb {
             /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
-                let limb_count = other
-                    .significant_bits()
-                    .shr_round(Limb::LOG_WIDTH, Ceiling)
-                    .0;
-                let limb_count_cmp = self.limb_count().cmp(&limb_count);
+                let limb_count = bit_to_limb_count_ceiling(other.significant_bits());
+                let limb_count_cmp = usize::wrapping_from(self.limb_count()).cmp(&limb_count);
                 if limb_count_cmp != Equal || limb_count == 0 {
                     return Some(limb_count_cmp);
                 }
                 let width = Limb::WIDTH;
-                let mut i = limb_count << Limb::LOG_WIDTH;
+                let mut i = limb_to_bit_count(limb_count);
                 let mut mask = $u::from(Limb::MAX) << (i - width);
                 for limb in self.limbs().rev() {
                     i -= width;

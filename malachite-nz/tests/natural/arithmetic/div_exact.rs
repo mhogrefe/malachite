@@ -6,13 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, DivRound, EqModPowerOf2, ModPowerOf2, ModPowerOf2Neg,
+    DivExact, DivExactAssign, DivMod, DivRound, EqModPowerOf2, ModPowerOf2, ModPowerOf2Neg,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::common::rle_decode;
 use malachite_base::test_util::generators::common::GenConfig;
@@ -20,7 +19,6 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_22, unsigned_pair_gen_var_11, unsigned_vec_pair_gen_var_12,
 };
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::div_exact::{
     limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out,
     limbs_div_exact_limb, limbs_div_exact_limb_in_place,
@@ -35,6 +33,7 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_scratch_len, limbs_modular_invert, limbs_modular_invert_limb,
     limbs_modular_invert_scratch_len, test_invert_limb_table,
 };
+use malachite_nz::natural::{Natural, limb_to_bit_count};
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,
@@ -296,7 +295,7 @@ fn limbs_div_exact_3_to_out_fail_2() {
 fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
     let d = Natural::from_limbs_asc(ds);
     let i = Natural::from_limbs_asc(is);
-    let pow = u64::wrapping_from(ds.len()) << Limb::LOG_WIDTH;
+    let pow = limb_to_bit_count(ds.len());
     assert!((d * i).eq_mod_power_of_2(&Natural::ONE, pow));
 }
 
@@ -862,10 +861,10 @@ fn verify_limbs_modular_div_mod(ns: &[Limb], ds: &[Limb], borrow: bool, qs: &[Li
     let q_len = n_len - d_len;
     let qd = q * d;
     assert_eq!(n < qd, borrow);
-    assert!(qd.eq_mod_power_of_2(&n, u64::wrapping_from(q_len) << Limb::LOG_WIDTH));
+    assert!(qd.eq_mod_power_of_2(&n, limb_to_bit_count(q_len)));
     let expected_r = (Integer::from(n) - Integer::from(qd))
-        .mod_power_of_2(u64::wrapping_from(n_len) << Limb::LOG_WIDTH)
-        >> (u64::wrapping_from(q_len) << Limb::LOG_WIDTH);
+        .mod_power_of_2(limb_to_bit_count(n_len))
+        >> limb_to_bit_count(q_len);
     assert_eq!(expected_r, r);
 }
 
@@ -2147,17 +2146,14 @@ fn verify_limbs_modular_div(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     let n = Natural::from_limbs_asc(ns);
     let d = Natural::from_limbs_asc(ds);
     let q = Natural::from_limbs_asc(qs);
-    assert_eq!(
-        (q * d).mod_power_of_2(u64::wrapping_from(ns.len()) << Limb::LOG_WIDTH),
-        n
-    );
+    assert_eq!((q * d).mod_power_of_2(limb_to_bit_count(ns.len())), n);
 }
 
 fn verify_limbs_modular_div_neg(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     let n = Natural::from_limbs_asc(ns);
     let d = Natural::from_limbs_asc(ds);
     let q = Natural::from_limbs_asc(qs);
-    let p = u64::wrapping_from(ns.len()) << Limb::LOG_WIDTH;
+    let p = limb_to_bit_count(ns.len());
     assert_eq!((q * d).mod_power_of_2(p).mod_power_of_2_neg(p), n);
 }
 

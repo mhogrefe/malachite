@@ -17,6 +17,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
+use malachite_float::emulate_primitive_float_fn_2;
 use malachite_float::test_util::arithmetic::add::add_prec_round_naive;
 use malachite_float::test_util::arithmetic::sub::sub_rational_prec_round_naive;
 use malachite_float::test_util::arithmetic::sub::{
@@ -24,7 +25,7 @@ use malachite_float::test_util::arithmetic::sub::{
     rug_sub_rational_prec_round, rug_sub_rational_round, rug_sub_round,
 };
 use malachite_float::test_util::common::{
-    emulate_primitive_float_fn_2, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_2, float_float_rounding_mode_triple_gen_var_10,
@@ -323,7 +324,7 @@ fn test_sub() {
     //   0 in sub_float_significands_same_prec_lt_w
     test("1.5", "0x1.8#2", "0.1", "0x0.2#2", "1.5", "0x1.8#2");
     // - exp_diff >= Limb::WIDTH in sub_float_significands_same_prec_lt_w
-    // - x <= HIGH_BIT in sub_float_significands_same_prec_lt_w
+    // - x <= LIMB_HIGH_BIT in sub_float_significands_same_prec_lt_w
     test(
         "1.0e9",
         "0x4.0E+7#1",
@@ -332,7 +333,7 @@ fn test_sub() {
         "1.0e9",
         "0x4.0E+7#1",
     );
-    // - x > HIGH_BIT in sub_float_significands_same_prec_lt_w
+    // - x > LIMB_HIGH_BIT in sub_float_significands_same_prec_lt_w
     test(
         "9.2047171e-27",
         "0x2.d945d78E-22#27",
@@ -429,7 +430,7 @@ fn test_sub() {
         "-0x4.13459164c75d56b8E-28#64",
     );
     // - exp_diff >= Limb::WIDTH in sub_float_significands_same_prec_w
-    // - x > HIGH_BIT in sub_float_significands_same_prec_w
+    // - x > LIMB_HIGH_BIT in sub_float_significands_same_prec_w
     test(
         "5.9376349676904431794e-6",
         "0x0.0000639df2b03f3e49a70#64",
@@ -438,8 +439,8 @@ fn test_sub() {
         "5.9376349676904431794e-6",
         "0x0.0000639df2b03f3e49a70#64",
     );
-    // - x <= HIGH_BIT in sub_float_significands_same_prec_w
-    // - exp_diff != Limb::WIDTH || y <= HIGH_BIT in sub_float_significands_same_prec_w
+    // - x <= LIMB_HIGH_BIT in sub_float_significands_same_prec_w
+    // - exp_diff != Limb::WIDTH || y <= LIMB_HIGH_BIT in sub_float_significands_same_prec_w
     // - rm == Nearest && round_bit != 0 && (sticky_bit != 0 || (diff & 1) != 0) &&
     //   diff.overflowing_add_assign(1) in sub_float_significands_same_prec_w
     test(
@@ -459,7 +460,7 @@ fn test_sub() {
         "-3.4694469519536141888e-18",
         "-0x4.0000000000000000E-15#64",
     );
-    // - exp_diff == Limb::WIDTH && y > HIGH_BIT in sub_float_significands_same_prec_w
+    // - exp_diff == Limb::WIDTH && y > LIMB_HIGH_BIT in sub_float_significands_same_prec_w
     test(
         "4.656578456163629198e-10",
         "0x1.ffff07fffffffffeE-8#64",
@@ -566,7 +567,7 @@ fn test_sub() {
     );
     // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_gt_w_lt_2w
     // - Limb::WIDTH < exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_gt_w_lt_2w
-    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 >= HIGH_BIT in
+    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_w_lt_2w
     test(
         "1.44020837962004126031156726e28",
@@ -586,7 +587,7 @@ fn test_sub() {
         "-0xd82.90d132013519297e1e08#91",
     );
     // - exp_diff >= Limb::WIDTH * 2 in sub_float_significands_same_prec_gt_w_lt_2w
-    // - exp_diff >= Limb::WIDTH * 2 && a1 >= HIGH_BIT in
+    // - exp_diff >= Limb::WIDTH * 2 && a1 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_w_lt_2w
     test(
         "4.8545822922649671226e27",
@@ -605,7 +606,7 @@ fn test_sub() {
         "-372369974082165972883205.481495834785",
         "-0x4eda377c7f0d747f5705.7b434f9f90#116",
     );
-    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 < HIGH_BIT in
+    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 < LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_w_lt_2w
     // - rm == Nearest && round_bit != 0 && (sticky_bit != 0 || (diff_0 & shift_bit) != 0) &&
     //   overflow in sub_float_significands_same_prec_gt_w_lt_2w
@@ -617,7 +618,8 @@ fn test_sub() {
         "9.9035203142830421991929938e27",
         "0x2.000000000000000000000E+23#85",
     );
-    // - exp_diff >= Limb::WIDTH * 2 && a1 < HIGH_BIT in sub_float_significands_same_prec_gt_w_lt_2w
+    // - exp_diff >= Limb::WIDTH * 2 && a1 < LIMB_HIGH_BIT in
+    //   sub_float_significands_same_prec_gt_w_lt_2w
     test(
         "5.3455294200288159103345444e-51",
         "0x1.ffffffffc000000000000E-42#83",
@@ -724,7 +726,7 @@ fn test_sub() {
         "-0x4.30058688b3d4326d3e6fcb96a2fce178E-28#128",
     );
     // - exp_diff >= Limb::WIDTH * 2 in sub_float_significands_same_prec_2w
-    // - x_1 > HIGH_BIT || x_0 > 0 in sub_float_significands_same_prec_2w
+    // - x_1 > LIMB_HIGH_BIT || x_0 > 0 in sub_float_significands_same_prec_2w
     test(
         "5.80991149045382428948889299639419733262e-6",
         "0x0.00006179613d776a1c835894818a219f488e8#128",
@@ -735,7 +737,7 @@ fn test_sub() {
     );
     // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_2w
     // - Limb::WIDTH < exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_2w
-    // - a1 >= HIGH_BIT in sub_float_significands_same_prec_2w
+    // - a1 >= LIMB_HIGH_BIT in sub_float_significands_same_prec_2w
     test(
         "4354249796990942.35435357526597783143164",
         "0xf782ac869b7de.5ab6ea78fcf0cc5079f#128",
@@ -762,7 +764,7 @@ fn test_sub() {
         "-148.054913367700296533946811280266669483",
         "-0x94.0e0ecd6e62d0a804b7b02b85098c9c#128",
     );
-    // - x_1 <= HIGH_BIT && x_0 <= 0 in sub_float_significands_same_prec_2w
+    // - x_1 <= LIMB_HIGH_BIT && x_0 <= 0 in sub_float_significands_same_prec_2w
     // - exp_diff != TWICE_WIDTH || tst in sub_float_significands_same_prec_2w
     // - rm == Nearest && round_bit != 0 && (sticky_bit != 0 || (diff_0 & 1) != 0) && overflow in
     //   sub_float_significands_same_prec_2w
@@ -774,7 +776,7 @@ fn test_sub() {
         "3.83123885216472214589586756787577295905e53",
         "0x4.00000000000000000000000000000000E+44#128",
     );
-    // - a1 < HIGH_BIT in sub_float_significands_same_prec_2w
+    // - a1 < LIMB_HIGH_BIT in sub_float_significands_same_prec_2w
     test(
         "0.000473141670219947088192358501321236008969",
         "0x0.001f01fffffe001ffe000000000003ffff0#128",
@@ -955,7 +957,7 @@ fn test_sub() {
     );
     // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
     // - TWICE_WIDTH < exp_diff < THRICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
-    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 >= HIGH_BIT in
+    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "2.024076700393272432111968987625898501371897741e-29",
@@ -966,7 +968,8 @@ fn test_sub() {
         "-0xcb68a4d1611415054400fa.e7e94b94b8791630#149",
     );
     // - exp_diff >= THRICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
-    // - exp_diff >= THRICE_WIDTH && a2 >= HIGH_BIT in sub_float_significands_same_prec_gt_2w_lt_3w
+    // - exp_diff >= THRICE_WIDTH && a2 >= LIMB_HIGH_BIT in
+    //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "4.397610888919711045634814958598336677777534377e47",
         "0x4.d0791b9428a6b4fc52e44e537ab5a0f269ad60E+39#155",
@@ -998,7 +1001,7 @@ fn test_sub() {
     // - Limb::WIDTH < exp_diff < TWICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
     // - Limb::WIDTH < exp_diff < TWICE_WIDTH && sticky_bit != 0 in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
-    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 >= HIGH_BIT in
+    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "4.2850537238606374652351877988811796373898773e-22",
@@ -1045,7 +1048,7 @@ fn test_sub() {
         "-4262448175090788889226.053679181660481592",
         "-0xe71159efd3a67e728a.0dbdeb39b533210#130",
     );
-    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 < HIGH_BIT in
+    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 < LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     // - rm == Nearest && diff_2 == 0 in sub_float_significands_same_prec_gt_2w_lt_3w
     test(
@@ -1056,7 +1059,7 @@ fn test_sub() {
         "0.0001220703125",
         "0x0.0008000000000000000000000000000000000000#145",
     );
-    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 < HIGH_BIT in
+    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 < LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "0.0156250000000000000000000000252435487789932816416198",
@@ -1066,7 +1069,8 @@ fn test_sub() {
         "0.0156249999999999999997882417884299736942262010164499",
         "0x0.03ffffffffffffffff000001ffffffc00000000003f0#167",
     );
-    // - exp_diff >= THRICE_WIDTH && a2 < HIGH_BIT in sub_float_significands_same_prec_gt_2w_lt_3w
+    // - exp_diff >= THRICE_WIDTH && a2 < LIMB_HIGH_BIT in
+    //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "1.028440348325753776346855739098344065614209916020987e62",
         "0x4.000000000000000000000000000000000000000000E+51#168",
@@ -1112,7 +1116,7 @@ fn test_sub() {
     // - x_exp > y_exp in sub_float_significands_same_prec_ge_3w
     // - exp_diff == 1 in sub_float_significands_same_prec_ge_3w
     // - !goto_sub_d1_no_lose && !goto_sub_d1_lose in sub_float_significands_same_prec_ge_3w
-    // - limb < HIGH_BIT in sub_float_significands_same_prec_ge_3w
+    // - limb < LIMB_HIGH_BIT in sub_float_significands_same_prec_ge_3w
     // - exp_diff == 0 in sub_float_significands_same_prec_ge_3w
     // - goto_exact_normalize in sub_float_significands_same_prec_ge_3w
     // - limb != 0 in sub_float_significands_same_prec_ge_3w
@@ -1289,7 +1293,7 @@ fn test_sub() {
         "29249291732025621624535078208.59212499364958152526111994335",
         "0x5e827271f9e9d261e7cb5540.979580eade814aae28ae9d3c8#192",
     );
-    // - limb > HIGH_BIT in sub_float_significands_same_prec_ge_3w
+    // - limb > LIMB_HIGH_BIT in sub_float_significands_same_prec_ge_3w
     // - y0 != 0 in sub_float_significands_same_prec_ge_3w
     test(
         "1958139908729.1847354007541959640287427302874567071533816044",
@@ -1336,7 +1340,7 @@ fn test_sub() {
         "1.6849966666969146159452711670928107852024276704905067469395e66",
         "0xf.ffffffffffff01fffff00000000000000000000000000000E+54#193",
     );
-    // - limb == HIGH_BIT in sub_float_significands_same_prec_ge_3w
+    // - limb == LIMB_HIGH_BIT in sub_float_significands_same_prec_ge_3w
     // - l >= 0 first time in sub_float_significands_same_prec_ge_3w
     // - xs[l] != yl_shifted in sub_float_significands_same_prec_ge_3w
     // - l >= 0 && xs[l] <= yl_shifted in sub_float_significands_same_prec_ge_3w
@@ -4542,7 +4546,7 @@ fn test_sub_round() {
         "1.5", "0x1.8#2", "0.1", "0x0.2#2", Nearest, "1.5", "0x1.8#2", Greater,
     );
     // - exp_diff >= Limb::WIDTH in sub_float_significands_same_prec_lt_w
-    // - x <= HIGH_BIT in sub_float_significands_same_prec_lt_w
+    // - x <= LIMB_HIGH_BIT in sub_float_significands_same_prec_lt_w
     test(
         "1.0e9",
         "0x4.0E+7#1",
@@ -4553,7 +4557,7 @@ fn test_sub_round() {
         "0x4.0E+7#1",
         Greater,
     );
-    // - x > HIGH_BIT in sub_float_significands_same_prec_lt_w
+    // - x > LIMB_HIGH_BIT in sub_float_significands_same_prec_lt_w
     test(
         "9.2047171e-27",
         "0x2.d945d78E-22#27",
@@ -4682,7 +4686,7 @@ fn test_sub_round() {
         Greater,
     );
     // - exp_diff >= Limb::WIDTH in sub_float_significands_same_prec_w
-    // - x > HIGH_BIT in sub_float_significands_same_prec_w
+    // - x > LIMB_HIGH_BIT in sub_float_significands_same_prec_w
     test(
         "5.9376349676904431794e-6",
         "0x0.0000639df2b03f3e49a70#64",
@@ -4693,8 +4697,8 @@ fn test_sub_round() {
         "0x0.0000639df2b03f3e49a70#64",
         Greater,
     );
-    // - x <= HIGH_BIT in sub_float_significands_same_prec_w
-    // - exp_diff != Limb::WIDTH || y <= HIGH_BIT in sub_float_significands_same_prec_w
+    // - x <= LIMB_HIGH_BIT in sub_float_significands_same_prec_w
+    // - exp_diff != Limb::WIDTH || y <= LIMB_HIGH_BIT in sub_float_significands_same_prec_w
     // - rm == Nearest && round_bit != 0 && (sticky_bit != 0 || (diff & 1) != 0) &&
     //   diff.overflowing_add_assign(1) in sub_float_significands_same_prec_w
     test(
@@ -4718,7 +4722,7 @@ fn test_sub_round() {
         "-0x4.0000000000000000E-15#64",
         Equal,
     );
-    // - exp_diff == Limb::WIDTH && y > HIGH_BIT in sub_float_significands_same_prec_w
+    // - exp_diff == Limb::WIDTH && y > LIMB_HIGH_BIT in sub_float_significands_same_prec_w
     test(
         "4.656578456163629198e-10",
         "0x1.ffff07fffffffffeE-8#64",
@@ -4882,7 +4886,7 @@ fn test_sub_round() {
     );
     // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_gt_w_lt_2w
     // - Limb::WIDTH < exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_gt_w_lt_2w
-    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 >= HIGH_BIT in
+    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_w_lt_2w
     test(
         "1.44020837962004126031156726e28",
@@ -4906,7 +4910,7 @@ fn test_sub_round() {
         Less,
     );
     // - exp_diff >= Limb::WIDTH * 2 in sub_float_significands_same_prec_gt_w_lt_2w
-    // - exp_diff >= Limb::WIDTH * 2 && a1 >= HIGH_BIT in
+    // - exp_diff >= Limb::WIDTH * 2 && a1 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_w_lt_2w
     test(
         "4.8545822922649671226e27",
@@ -4929,7 +4933,7 @@ fn test_sub_round() {
         "-0x4eda377c7f0d747f5705.7b434f9f90#116",
         Less,
     );
-    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 < HIGH_BIT in
+    // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 && a1 < LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_w_lt_2w
     // - rm == Nearest && round_bit != 0 && (sticky_bit != 0 || (diff_0 & shift_bit) != 0) &&
     //   overflow in sub_float_significands_same_prec_gt_w_lt_2w
@@ -4943,7 +4947,8 @@ fn test_sub_round() {
         "0x2.000000000000000000000E+23#85",
         Greater,
     );
-    // - exp_diff >= Limb::WIDTH * 2 && a1 < HIGH_BIT in sub_float_significands_same_prec_gt_w_lt_2w
+    // - exp_diff >= Limb::WIDTH * 2 && a1 < LIMB_HIGH_BIT in
+    //   sub_float_significands_same_prec_gt_w_lt_2w
     test(
         "5.3455294200288159103345444e-51",
         "0x1.ffffffffc000000000000E-42#83",
@@ -5105,7 +5110,7 @@ fn test_sub_round() {
         Greater,
     );
     // - exp_diff >= Limb::WIDTH * 2 in sub_float_significands_same_prec_2w
-    // - x_1 > HIGH_BIT || x_0 > 0 in sub_float_significands_same_prec_2w
+    // - x_1 > LIMB_HIGH_BIT || x_0 > 0 in sub_float_significands_same_prec_2w
     test(
         "5.80991149045382428948889299639419733262e-6",
         "0x0.00006179613d776a1c835894818a219f488e8#128",
@@ -5118,7 +5123,7 @@ fn test_sub_round() {
     );
     // - Limb::WIDTH <= exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_2w
     // - Limb::WIDTH < exp_diff < Limb::WIDTH * 2 in sub_float_significands_same_prec_2w
-    // - a1 >= HIGH_BIT in sub_float_significands_same_prec_2w
+    // - a1 >= LIMB_HIGH_BIT in sub_float_significands_same_prec_2w
     test(
         "4354249796990942.35435357526597783143164",
         "0xf782ac869b7de.5ab6ea78fcf0cc5079f#128",
@@ -5151,7 +5156,7 @@ fn test_sub_round() {
         "-0x94.0e0ecd6e62d0a804b7b02b85098c9c#128",
         Greater,
     );
-    // - x_1 <= HIGH_BIT && x_0 <= 0 in sub_float_significands_same_prec_2w
+    // - x_1 <= LIMB_HIGH_BIT && x_0 <= 0 in sub_float_significands_same_prec_2w
     // - exp_diff != TWICE_WIDTH || tst in sub_float_significands_same_prec_2w
     // - rm == Nearest && round_bit != 0 && (sticky_bit != 0 || (diff_0 & 1) != 0) && overflow in
     //   sub_float_significands_same_prec_2w
@@ -5165,7 +5170,7 @@ fn test_sub_round() {
         "0x4.00000000000000000000000000000000E+44#128",
         Greater,
     );
-    // - a1 < HIGH_BIT in sub_float_significands_same_prec_2w
+    // - a1 < LIMB_HIGH_BIT in sub_float_significands_same_prec_2w
     test(
         "0.000473141670219947088192358501321236008969",
         "0x0.001f01fffffe001ffe000000000003ffff0#128",
@@ -5466,7 +5471,7 @@ fn test_sub_round() {
     );
     // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
     // - TWICE_WIDTH < exp_diff < THRICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
-    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 >= HIGH_BIT in
+    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "2.024076700393272432111968987625898501371897741e-29",
@@ -5479,7 +5484,8 @@ fn test_sub_round() {
         Less,
     );
     // - exp_diff >= THRICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
-    // - exp_diff >= THRICE_WIDTH && a2 >= HIGH_BIT in sub_float_significands_same_prec_gt_2w_lt_3w
+    // - exp_diff >= THRICE_WIDTH && a2 >= LIMB_HIGH_BIT in
+    //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "4.397610888919711045634814958598336677777534377e47",
         "0x4.d0791b9428a6b4fc52e44e537ab5a0f269ad60E+39#155",
@@ -5517,7 +5523,7 @@ fn test_sub_round() {
     // - Limb::WIDTH < exp_diff < TWICE_WIDTH in sub_float_significands_same_prec_gt_2w_lt_3w
     // - Limb::WIDTH < exp_diff < TWICE_WIDTH && sticky_bit != 0 in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
-    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 >= HIGH_BIT in
+    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 >= LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "4.2850537238606374652351877988811796373898773e-22",
@@ -5574,7 +5580,7 @@ fn test_sub_round() {
         "-0xe71159efd3a67e728a.0dbdeb39b533210#130",
         Less,
     );
-    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 < HIGH_BIT in
+    // - TWICE_WIDTH <= exp_diff < THRICE_WIDTH && a2 < LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     // - rm == Nearest && diff_2 == 0 in sub_float_significands_same_prec_gt_2w_lt_3w
     test(
@@ -5587,7 +5593,7 @@ fn test_sub_round() {
         "0x0.0008000000000000000000000000000000000000#145",
         Greater,
     );
-    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 < HIGH_BIT in
+    // - Limb::WIDTH < exp_diff < TWICE_WIDTH && a2 < LIMB_HIGH_BIT in
     //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "0.0156250000000000000000000000252435487789932816416198",
@@ -5599,7 +5605,8 @@ fn test_sub_round() {
         "0x0.03ffffffffffffffff000001ffffffc00000000003f0#167",
         Less,
     );
-    // - exp_diff >= THRICE_WIDTH && a2 < HIGH_BIT in sub_float_significands_same_prec_gt_2w_lt_3w
+    // - exp_diff >= THRICE_WIDTH && a2 < LIMB_HIGH_BIT in
+    //   sub_float_significands_same_prec_gt_2w_lt_3w
     test(
         "1.028440348325753776346855739098344065614209916020987e62",
         "0x4.000000000000000000000000000000000000000000E+51#168",
@@ -5653,7 +5660,7 @@ fn test_sub_round() {
     // - x_exp > y_exp in sub_float_significands_same_prec_ge_3w
     // - exp_diff == 1 in sub_float_significands_same_prec_ge_3w
     // - !goto_sub_d1_no_lose && !goto_sub_d1_lose in sub_float_significands_same_prec_ge_3w
-    // - limb < HIGH_BIT in sub_float_significands_same_prec_ge_3w
+    // - limb < LIMB_HIGH_BIT in sub_float_significands_same_prec_ge_3w
     // - exp_diff == 0 in sub_float_significands_same_prec_ge_3w
     // - goto_exact_normalize in sub_float_significands_same_prec_ge_3w
     // - limb != 0 in sub_float_significands_same_prec_ge_3w
@@ -5864,7 +5871,7 @@ fn test_sub_round() {
         "0x5e827271f9e9d261e7cb5540.979580eade814aae28ae9d3c8#192",
         Greater,
     );
-    // - limb > HIGH_BIT in sub_float_significands_same_prec_ge_3w
+    // - limb > LIMB_HIGH_BIT in sub_float_significands_same_prec_ge_3w
     // - y0 != 0 in sub_float_significands_same_prec_ge_3w
     test(
         "1958139908729.1847354007541959640287427302874567071533816044",
@@ -5921,7 +5928,7 @@ fn test_sub_round() {
         "0xf.ffffffffffff01fffff00000000000000000000000000000E+54#193",
         Greater,
     );
-    // - limb == HIGH_BIT in sub_float_significands_same_prec_ge_3w
+    // - limb == LIMB_HIGH_BIT in sub_float_significands_same_prec_ge_3w
     // - l >= 0 first time in sub_float_significands_same_prec_ge_3w
     // - xs[l] != yl_shifted in sub_float_significands_same_prec_ge_3w
     // - l >= 0 && xs[l] <= yl_shifted in sub_float_significands_same_prec_ge_3w

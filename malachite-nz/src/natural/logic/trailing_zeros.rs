@@ -7,11 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
+use crate::natural::{Natural, limb_to_bit_count};
 use crate::platform::Limb;
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_leading_zeros;
 
@@ -31,7 +29,7 @@ use malachite_base::slices::slice_leading_zeros;
 pub_crate_test! {limbs_trailing_zeros(xs: &[Limb]) -> u64 {
     let zeros = slice_leading_zeros(xs);
     let remaining_zeros = TrailingZeros::trailing_zeros(xs[zeros]);
-    (u64::wrapping_from(zeros) << Limb::LOG_WIDTH) + remaining_zeros
+    limb_to_bit_count(zeros)+ remaining_zeros
 }}
 
 impl Natural {

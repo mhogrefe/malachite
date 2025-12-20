@@ -31,13 +31,14 @@ use malachite_float::arithmetic::div::{
     rational_div_float_prec_round_naive, rational_div_float_prec_round_naive_ref_ref,
     rational_div_float_prec_round_naive_ref_val, rational_div_float_prec_round_naive_val_ref,
 };
+use malachite_float::emulate_primitive_float_fn_2;
 use malachite_float::test_util::arithmetic::div::{
     div_prec_round_naive, rug_div, rug_div_prec, rug_div_prec_round, rug_div_rational,
     rug_div_rational_prec, rug_div_rational_prec_round, rug_div_rational_round, rug_div_round,
     rug_rational_div_float_prec, rug_rational_div_float_prec_round, rug_rational_div_float_round,
 };
 use malachite_float::test_util::common::{
-    emulate_primitive_float_fn_2, parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_23, float_float_rounding_mode_triple_gen_var_24,

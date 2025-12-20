@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -20,7 +20,6 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
@@ -36,7 +35,7 @@ use malachite_base::slices::{slice_set_zero, slice_test_zero};
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {
     limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> (Vec<Limb>, Ordering) {
-    let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     if clear_count >= xs_len {
         (Vec::new(), if slice_test_zero(xs) {Equal} else {Less})
@@ -67,7 +66,7 @@ pub_test! {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {
     limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> (Vec<Limb>, Ordering) {
-    let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     let mut out;
     let small_pow = pow & Limb::WIDTH_MASK;
@@ -106,7 +105,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
     xs: &[Limb],
     pow: u64,
 ) -> (Vec<Limb>, Ordering) {
-    let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     if clear_count >= xs_len {
         (Vec::new(), if slice_test_zero(xs) { Equal } else { Less })
@@ -200,7 +199,7 @@ pub_test! {limbs_round_to_multiple_of_power_of_2(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {
     limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) -> Ordering {
-    let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     let mut exact;
     if clear_count >= xs_len {
@@ -233,7 +232,7 @@ pub_test! {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {
     limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) -> Ordering {
-    let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     let small_pow = pow & Limb::WIDTH_MASK;
     if clear_count >= xs_len {
@@ -268,7 +267,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
     xs: &mut Vec<Limb>,
     pow: u64,
 ) -> Ordering {
-    let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
     if clear_count >= xs_len {
         let exact = slice_test_zero(xs);

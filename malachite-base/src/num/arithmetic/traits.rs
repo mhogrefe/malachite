@@ -1221,6 +1221,18 @@ pub trait ReciprocalAssign {
     fn reciprocal_assign(&mut self);
 }
 
+/// Takes the reciprocal of the square root of a number.
+pub trait ReciprocalSqrt {
+    type Output;
+
+    fn reciprocal_sqrt(self) -> Self::Output;
+}
+
+/// Replaces a number with the reciprocal of its square root.
+pub trait ReciprocalSqrtAssign {
+    fn reciprocal_sqrt_assign(&mut self);
+}
+
 /// Finds the floor of the $n$th root of a number.
 pub trait FloorRoot<POW> {
     type Output;

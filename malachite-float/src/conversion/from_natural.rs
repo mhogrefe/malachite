@@ -11,14 +11,14 @@ use crate::InnerFloat::Finite;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOf2, FloorLogBase2, ModPowerOf2, NegModPowerOf2, PowerOf2,
-    RoundToMultipleOfPowerOf2Assign, SaturatingSubAssign, ShrRound,
+    RoundToMultipleOfPowerOf2Assign, SaturatingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::Natural;
+use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling};
 use malachite_nz::platform::Limb;
 use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
 
@@ -44,7 +44,7 @@ fn from_natural_prec_round_helper(
     let mut needed_limbs = 1;
     needed_bits.saturating_sub_assign(sig_bits_in_highest_limb);
     if needed_bits != 0 {
-        needed_limbs += needed_bits.shr_round(Limb::LOG_WIDTH, Ceiling).0;
+        needed_limbs += bit_to_limb_count_ceiling(needed_bits);
     }
     let mut rev_limbs = x.limbs().rev();
     let mut significand = Natural::from_owned_limbs_desc(
@@ -147,14 +147,11 @@ fn from_natural_prec_round_helper_zero_exponent(
     let mut needed_limbs = 1;
     needed_bits.saturating_sub_assign(sig_bits_in_highest_limb);
     if needed_bits != 0 {
-        needed_limbs += needed_bits.shr_round(Limb::LOG_WIDTH, Ceiling).0;
+        needed_limbs += bit_to_limb_count_ceiling(needed_bits);
     }
     let mut rev_limbs = x.limbs().rev();
-    let mut significand = Natural::from_owned_limbs_desc(
-        (&mut rev_limbs)
-            .take(usize::exact_from(needed_limbs))
-            .collect(),
-    );
+    let mut significand =
+        Natural::from_owned_limbs_desc((&mut rev_limbs).take(needed_limbs).collect());
     significand <<= significand
         .significant_bits()
         .neg_mod_power_of_2(Limb::LOG_WIDTH);
@@ -244,14 +241,11 @@ fn from_natural_prec_round_helper_no_round_zero_exponent(
     let mut needed_limbs = 1;
     needed_bits.saturating_sub_assign(sig_bits_in_highest_limb);
     if needed_bits != 0 {
-        needed_limbs += needed_bits.shr_round(Limb::LOG_WIDTH, Ceiling).0;
+        needed_limbs += bit_to_limb_count_ceiling(needed_bits);
     }
     let mut rev_limbs = x.limbs().rev();
-    let mut significand = Natural::from_owned_limbs_desc(
-        (&mut rev_limbs)
-            .take(usize::exact_from(needed_limbs))
-            .collect(),
-    );
+    let mut significand =
+        Natural::from_owned_limbs_desc((&mut rev_limbs).take(needed_limbs).collect());
     significand <<= significand
         .significant_bits()
         .neg_mod_power_of_2(Limb::LOG_WIDTH);

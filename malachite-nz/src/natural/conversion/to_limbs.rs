@@ -362,11 +362,11 @@ impl Natural {
     ///
     /// There are no trailing zero limbs.
     ///
-    /// This function borrows the [`Natural`]. There is no descending order counterpoint,
-    /// but [`to_limbs_desc`](Self::to_limbs_desc) may be used instead.
+    /// This function borrows the [`Natural`]. There is no descending order counterpoint, but
+    /// [`to_limbs_desc`](Self::to_limbs_desc) may be used instead.
     ///
-    /// This function is more efficient than [`to_limbs_asc`](Self::to_limbs_asc) because
-    /// it borrows the underlying memory directly.
+    /// This function is more efficient than [`to_limbs_asc`](Self::to_limbs_asc) because it borrows
+    /// the underlying memory directly.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -392,7 +392,7 @@ impl Natural {
     pub fn as_limbs_asc(&self) -> &[Limb] {
         match self {
             Self(Small(small)) => slice::from_ref(small),
-            Self(Large(limbs)) => &limbs,
+            Self(Large(limbs)) => limbs,
         }
     }
 

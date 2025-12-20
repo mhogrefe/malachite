@@ -14,7 +14,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
 use crate::natural::arithmetic::div::{limbs_div_limb_to_out, limbs_div_to_out};
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
@@ -28,6 +27,7 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_to_out,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{Natural, bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
@@ -191,7 +191,7 @@ fn limbs_root_to_out_internal(
     let mut xs_len = xs.len();
     let mut xs_hi = xs[xs_len - 1];
     let leading_zeros = LeadingZeros::leading_zeros(xs_hi) + 1;
-    let bit_count = (u64::exact_from(xs_len) << Limb::LOG_WIDTH) - leading_zeros;
+    let bit_count = limb_to_bit_count(xs_len) - leading_zeros;
     let out_rem_is_some = out_rem.is_some();
     if bit_count < exp {
         // root is 1
@@ -298,7 +298,7 @@ fn limbs_root_to_out_internal(
         // take another (exp - 1) * next_bits bits from the input.
         input_bits -= (exp - 1) * next_bits;
         // &rs[..rs_len] = floor(&xs[..xs_len] / 2 ^ input_bits)
-        let input_len = usize::exact_from(input_bits >> Limb::LOG_WIDTH);
+        let input_len = bit_to_limb_count_floor(input_bits);
         let input_bits_rem = input_bits & Limb::WIDTH_MASK;
         shr_helper(rs, &xs[input_len..xs_len], input_bits_rem);
         rs_len = xs_len - input_len;
@@ -342,10 +342,10 @@ fn limbs_root_to_out_internal(
         // next_bits is the number of bits to compute in the next iteration.
         next_bits = sizes[i - 1] - sizes[i];
         // next_len is the lowest limb from the high part of rs, after shift.
-        let next_len = usize::exact_from(next_bits >> Limb::LOG_WIDTH);
+        let next_len = bit_to_limb_count_floor(next_bits);
         let next_bits_rem = next_bits & Limb::WIDTH_MASK;
         input_bits -= next_bits;
-        let input_len = usize::exact_from(input_bits >> Limb::LOG_WIDTH);
+        let input_len = bit_to_limb_count_floor(input_bits);
         let input_bits_rem = input_bits & Limb::WIDTH_MASK;
         // - n_len is the number of limbs in x which contain bits
         // - [input_bits, input_bits + next_bits - 1]
@@ -355,8 +355,7 @@ fn limbs_root_to_out_internal(
         // where B is `Limb::WIDTH`.
         //
         // Thus, since n_len is an integer: n_len <= 2 + floor(next_bits / B) <= 2 + next_len.
-        let n_len =
-            usize::exact_from((input_bits + next_bits - 1) >> Limb::LOG_WIDTH) + 1 - input_len;
+        let n_len = bit_to_limb_count_floor(input_bits + next_bits - 1) + 1 - input_len;
         // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
         // - R = R - Q = floor(X / 2 ^ input_bits) - S ^ exp
         if pow_cmp == Equal {
@@ -410,7 +409,7 @@ fn limbs_root_to_out_internal(
         save_1 = ss[next_len];
         // Number of limbs used by next_bits bits, when least significant bit is aligned to least
         // limb
-        let b_rem = usize::exact_from((next_bits - 1) >> Limb::LOG_WIDTH) + 1;
+        let b_rem = bit_to_limb_count_floor(next_bits - 1) + 1;
         // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
         // - Now divide &rs[..rs_len] by &ws[..ws_len] to get the low part of the root
         if rs_len < ws_len {
