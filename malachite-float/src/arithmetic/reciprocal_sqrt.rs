@@ -1,5 +1,11 @@
 // Copyright © 2025 Mikhail Hogrefe
 //
+// Uses code adopted from the GNU MPFR Library.
+//
+//      Copyright 2008-2024 Free Software Foundation, Inc.
+//
+//      Contributed by the AriC and Caramba projects, INRIA.
+//
 // This file is part of Malachite.
 //
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -7,8 +13,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::emulate_primitive_float_fn;
-use crate::{Float, float_either_zero, float_infinity, float_nan, float_zero};
+use crate::{
+    Float, emulate_primitive_float_fn, float_either_zero, float_infinity, float_nan, float_zero,
+};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
@@ -42,9 +49,9 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p+1}$.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p}$.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -127,9 +134,9 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p+1}$.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p}$.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -285,7 +292,7 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |1/\sqrt{x}|\rfloor-p}$.
+    ///   1/\sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -346,7 +353,7 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |1/\sqrt{x}|\rfloor-p}$.
+    ///   1/\sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -406,9 +413,9 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p+1}$, where $p$ is the precision of the input.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$, where $p$ is the precision of the input.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p}$, where $p$ is the precision of the input.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
@@ -478,9 +485,9 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p+1}$, where $p$ is the precision of the input.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$, where $p$ is the precision of the input.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p}$, where $p$ is the precision of the input.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
@@ -551,7 +558,7 @@ impl Float {
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p}$.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -630,7 +637,7 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |1/\sqrt{x}|\rfloor-p}$.
+    ///   1/\sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -684,11 +691,10 @@ impl Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p+1}$, where $p$ is the maximum precision of the
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
     /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |1/\sqrt{x}|\rfloor-p}$, where $p$ is the maximum precision of the
-    ///   inputs.
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the precision of the input.
     ///
@@ -754,7 +760,7 @@ impl ReciprocalSqrt for Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |1/\sqrt{x}|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///   1/\sqrt{x}\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
     /// - $f(\text{NaN})=\text{NaN}$
@@ -814,7 +820,7 @@ impl ReciprocalSqrt for &Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |1/\sqrt{x}|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///   1/\sqrt{x}\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// Special cases:
     /// - $f(\text{NaN})=\text{NaN}$
@@ -872,7 +878,7 @@ impl ReciprocalSqrtAssign for Float {
     /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
     ///   0.
     /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |1/\sqrt{x}|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///   1/\sqrt{x}\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// See the [`Float::reciprocal_sqrt`] documentation for information on special cases, overflow,
     /// and underflow.
@@ -936,7 +942,7 @@ impl ReciprocalSqrtAssign for Float {
 /// $$
 /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
 /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-///   |1/\sqrt{x}|\rfloor-p}$, where $p$ is precision of the output (typically 24, but less if the
+///   1/\sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 24, but less if the
 ///   output is subnormal).
 ///
 /// Special cases:
@@ -987,7 +993,7 @@ pub fn f32_reciprocal_sqrt(x: f32) -> f32 {
 /// $$
 /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
 /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-///   |1/\sqrt{x}|\rfloor-p}$, where $p$ is precision of the output (typically 53, but less if the
+///   1/\sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 53, but less if the
 ///   output is subnormal).
 ///
 /// Special cases:

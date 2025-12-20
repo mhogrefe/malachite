@@ -91,7 +91,7 @@ impl Float {
     /// L = \log 2.
     /// $$
     ///
-    /// The constant is irrational.
+    /// The constant is irrational and transcendental.
     ///
     /// The output has precision `prec`.
     ///
@@ -155,7 +155,7 @@ impl Float {
     /// L = \log 2.
     /// $$
     ///
-    /// The constant is irrational.
+    /// The constant is irrational and transcendental.
     ///
     /// The output has precision `prec`.
     ///
