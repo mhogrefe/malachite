@@ -38,8 +38,8 @@ fn test_char_type() {
             (CharType::AsciiUpper, 26),
             (CharType::AsciiNumeric, 10),
             (CharType::AsciiNonAlphanumericGraphic, 33),
-            (CharType::NonAsciiGraphic, 152619),
-            (CharType::NonGraphic, 959350)
+            (CharType::NonAsciiGraphic, 157383),
+            (CharType::NonGraphic, 954586)
         ]
     );
 
@@ -77,7 +77,7 @@ fn test_char_type() {
             (CharType::AsciiUpper, 'Z'),
             (CharType::AsciiNumeric, '9'),
             (CharType::AsciiNonAlphanumericGraphic, '~'),
-            (CharType::NonAsciiGraphic, '𲎯'),
+            (CharType::NonAsciiGraphic, '𳑹'),
             (CharType::NonGraphic, '\u{10ffff}')
         ]
     );
