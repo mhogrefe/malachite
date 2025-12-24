@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    rug_round_try_from_rounding_mode, test_constant, to_hex_string,
+};
 use malachite_float::test_util::constants::log_2::rug_log_2_prec_round;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -308,6 +310,7 @@ fn log_2_prec_properties() {
         let (log_2, o) = Float::log_2_prec(prec);
         assert!(log_2.is_valid());
         assert_eq!(log_2.get_prec(), Some(prec));
+        assert_eq!(log_2.get_exponent(), Some(0));
         assert_ne!(o, Equal);
         if o == Less {
             let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Ceiling);
@@ -344,6 +347,14 @@ fn log_2_prec_round_properties() {
         let (log_2, o) = Float::log_2_prec_round(prec, rm);
         assert!(log_2.is_valid());
         assert_eq!(log_2.get_prec(), Some(prec));
+        assert_eq!(
+            log_2.get_exponent(),
+            Some(if prec == 1 && (rm == Ceiling || rm == Up) {
+                1
+            } else {
+                0
+            })
+        );
         assert_ne!(o, Equal);
         if o == Less {
             let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Ceiling);
@@ -374,4 +385,6 @@ fn log_2_prec_round_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         assert_panic!(Float::log_2_prec_round(prec, Exact));
     });
+
+    test_constant(Float::log_2_prec_round, 10000);
 }

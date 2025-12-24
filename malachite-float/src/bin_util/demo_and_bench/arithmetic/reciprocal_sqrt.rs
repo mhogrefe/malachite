@@ -7,9 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{ReciprocalSqrt, ReciprocalSqrtAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_float::arithmetic::reciprocal_sqrt::primitive_float_reciprocal_sqrt;
 use malachite_float::test_util::arithmetic::reciprocal_sqrt::{
     rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec, rug_reciprocal_sqrt_prec_round,
     rug_reciprocal_sqrt_round,
@@ -30,7 +36,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_15_rm,
     float_unsigned_rounding_mode_triple_gen_var_16,
 };
-use malachite_float::{ComparableFloat, ComparableFloatRef};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_reciprocal_sqrt);
@@ -65,6 +71,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_reciprocal_sqrt_prec_round_ref_debug);
     register_demo!(runner, demo_float_reciprocal_sqrt_prec_round_assign);
     register_demo!(runner, demo_float_reciprocal_sqrt_prec_round_assign_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_reciprocal_sqrt);
 
     register_bench!(runner, benchmark_float_reciprocal_sqrt_evaluation_strategy);
     register_bench!(runner, benchmark_float_reciprocal_sqrt_library_comparison);
@@ -96,6 +103,7 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_reciprocal_sqrt_prec_round_library_comparison
     );
     register_bench!(runner, benchmark_float_reciprocal_sqrt_prec_round_assign);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_reciprocal_sqrt);
 }
 
 fn demo_float_reciprocal_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -267,8 +275,6 @@ fn demo_float_reciprocal_sqrt_prec_assign_debug(gm: GenMode, config: &GenConfig,
         );
     }
 }
-
-// TODO QQQ
 
 fn demo_float_reciprocal_sqrt_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_30()
@@ -525,6 +531,23 @@ fn demo_float_reciprocal_sqrt_prec_round_assign_debug(
             rm,
             o,
             ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_primitive_float_reciprocal_sqrt<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_reciprocal_sqrt({}) = {}",
+            NiceFloat(x),
+            NiceFloat(primitive_float_reciprocal_sqrt(x))
         );
     }
 }
@@ -821,5 +844,28 @@ fn benchmark_float_reciprocal_sqrt_prec_round_assign(
             "Float.reciprocal_sqrt_prec_round_assign(u64, RoundingMode)",
             &mut |(mut x, prec, rm)| no_out!(x.reciprocal_sqrt_prec_round_assign(prec, rm)),
         )],
+    );
+}
+
+fn benchmark_primitive_float_reciprocal_sqrt<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_reciprocal_sqrt({})", T::NAME),
+        BenchmarkType::EvaluationStrategy,
+        primitive_float_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &primitive_float_bucketer("x"),
+        &mut [("malachite", &mut |x| {
+            no_out!(primitive_float_reciprocal_sqrt(x));
+        })],
     );
 }

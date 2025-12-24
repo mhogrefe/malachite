@@ -31,7 +31,7 @@ use malachite_float::arithmetic::div::{
     rational_div_float_prec_round_naive, rational_div_float_prec_round_naive_ref_ref,
     rational_div_float_prec_round_naive_ref_val, rational_div_float_prec_round_naive_val_ref,
 };
-use malachite_float::emulate_primitive_float_fn_2;
+use malachite_float::emulate_float_float_to_float_fn;
 use malachite_float::test_util::arithmetic::div::{
     div_prec_round_naive, rug_div, rug_div_prec, rug_div_prec_round, rug_div_rational,
     rug_div_rational_prec, rug_div_rational_prec_round, rug_div_rational_round, rug_div_round,
@@ -14793,7 +14793,7 @@ where
 {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
         let quotient_1 = x / y;
-        let quotient_2 = emulate_primitive_float_fn_2(|x, y, prec| x.div_prec(y, prec).0, x, y);
+        let quotient_2 = emulate_float_float_to_float_fn(|x, y, prec| x.div_prec(y, prec).0, x, y);
         assert_eq!(NiceFloat(quotient_1), NiceFloat(quotient_2));
     });
 }

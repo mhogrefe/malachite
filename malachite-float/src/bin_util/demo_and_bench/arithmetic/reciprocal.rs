@@ -7,15 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Reciprocal, ReciprocalAssign};
-use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_base::test_util::bench::bucketers::primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_base::test_util::runner::Runner;
-use malachite_float::arithmetic::reciprocal_sqrt::{f32_reciprocal_sqrt, f64_reciprocal_sqrt};
 use malachite_float::test_util::arithmetic::reciprocal::{
     reciprocal_prec_round_naive_1, reciprocal_prec_round_naive_2, rug_reciprocal,
     rug_reciprocal_prec, rug_reciprocal_prec_round, rug_reciprocal_round,
@@ -71,8 +67,6 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_reciprocal_prec_round_ref_debug);
     register_demo!(runner, demo_float_reciprocal_prec_round_assign);
     register_demo!(runner, demo_float_reciprocal_prec_round_assign_debug);
-    register_demo!(runner, demo_f32_reciprocal_sqrt);
-    register_demo!(runner, demo_f64_reciprocal_sqrt);
 
     register_bench!(runner, benchmark_float_reciprocal_evaluation_strategy);
     register_bench!(runner, benchmark_float_reciprocal_library_comparison);
@@ -96,8 +90,6 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_bench!(runner, benchmark_float_reciprocal_prec_round_algorithms);
     register_bench!(runner, benchmark_float_reciprocal_prec_round_assign);
-    register_bench!(runner, benchmark_f32_reciprocal_sqrt);
-    register_bench!(runner, benchmark_f64_reciprocal_sqrt);
 }
 
 fn demo_float_reciprocal(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -521,26 +513,6 @@ fn demo_float_reciprocal_prec_round_assign_debug(gm: GenMode, config: &GenConfig
     }
 }
 
-fn demo_f32_reciprocal_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
-    for f in primitive_float_gen().get(gm, config).take(limit) {
-        println!(
-            "f32_reciprocal_sqrt({}) = {}",
-            NiceFloat(f),
-            NiceFloat(f32_reciprocal_sqrt(f))
-        );
-    }
-}
-
-fn demo_f64_reciprocal_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
-    for f in primitive_float_gen().get(gm, config).take(limit) {
-        println!(
-            "f32_reciprocal_sqrt({}) = {}",
-            NiceFloat(f),
-            NiceFloat(f64_reciprocal_sqrt(f))
-        );
-    }
-}
-
 fn benchmark_float_reciprocal_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
@@ -925,31 +897,5 @@ fn benchmark_float_reciprocal_prec_round_assign(
             "Float.reciprocal_prec_round_assign(u64, RoundingMode)",
             &mut |(mut x, prec, rm)| no_out!(x.reciprocal_prec_round_assign(prec, rm)),
         )],
-    );
-}
-
-fn benchmark_f32_reciprocal_sqrt(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
-    run_benchmark(
-        "f32_reciprocal_sqrt(f32)",
-        BenchmarkType::Single,
-        primitive_float_gen().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &primitive_float_bucketer("f"),
-        &mut [("Malachite", &mut |f| no_out!(f32_reciprocal_sqrt(f)))],
-    );
-}
-
-fn benchmark_f64_reciprocal_sqrt(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
-    run_benchmark(
-        "f64_reciprocal_sqrt(f64)",
-        BenchmarkType::Single,
-        primitive_float_gen().get(gm, config),
-        gm.name(),
-        limit,
-        file_name,
-        &primitive_float_bucketer("f"),
-        &mut [("Malachite", &mut |f| no_out!(f64_reciprocal_sqrt(f)))],
     );
 }

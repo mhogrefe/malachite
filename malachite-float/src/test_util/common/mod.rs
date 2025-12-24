@@ -13,11 +13,12 @@ use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase};
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug::float::{Round, Special};
+use std::cmp::Ordering;
 
 // Can't have From impl due to orphan rule. We could define an impl in malachite-base where
 // RoundingMode is defined, but pulling in rug::float just for that purpose seems overkill.
@@ -233,3 +234,23 @@ pub const ORDERED_F64S: [f64; 17] = [
     std::f64::consts::PI,
     f64::INFINITY,
 ];
+
+// Tests that rounding with Floor and gradually increasing precision preserves all previous bits.
+pub fn test_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(f: F, limit: u64) {
+    let mut bit_index = Limb::WIDTH - 1;
+    let mut significand = Natural::ZERO;
+    for prec in 1..limit {
+        let x = f(prec, Floor).0;
+        let x_sig = x.significand_ref().unwrap();
+        if *x_sig != significand {
+            significand.set_bit(bit_index);
+            assert_eq!(*x_sig, significand);
+        }
+        if bit_index == 0 {
+            significand <<= Limb::WIDTH;
+            bit_index = Limb::WIDTH - 1;
+        } else {
+            bit_index -= 1;
+        }
+    }
+}

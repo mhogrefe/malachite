@@ -14,14 +14,16 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{
-    Float, emulate_primitive_float_fn, float_either_zero, float_infinity, float_nan, float_zero,
+    Float, emulate_float_to_float_fn, float_either_zero, float_infinity, float_nan, float_zero,
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, Parity, PowerOf2, ReciprocalSqrt, ReciprocalSqrtAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::LIMB_HIGH_BIT;
@@ -38,6 +40,9 @@ impl Float {
     /// An [`Ordering`] is also returned, indicating whether the rounded reciprocal square root is
     /// less than, equal to, or greater than the exact square root. Although `NaN`s are not
     /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
@@ -112,9 +117,8 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn reciprocal_sqrt_prec_round(mut self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        let o = self.reciprocal_sqrt_prec_round_assign(prec, rm);
-        (self, o)
+    pub fn reciprocal_sqrt_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.reciprocal_sqrt_prec_round_ref(prec, rm)
     }
 
     /// Computes the reciprocal of the square root of a [`Float`], rounding the result to the
@@ -125,6 +129,9 @@ impl Float {
     /// `Equal`.
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -282,6 +289,9 @@ impl Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// If the reciprocal square root is equidistant from two [`Float`]s with the specified
     /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
     /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
@@ -343,6 +353,9 @@ impl Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// If the reciprocal square root is equidistant from two [`Float`]s with the specified
     /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
     /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
@@ -403,6 +416,9 @@ impl Float {
     /// this function returns a `NaN` it also returns `Equal`.
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
     ///
     /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
     /// description of the possible rounding modes.
@@ -476,6 +492,9 @@ impl Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
     /// description of the possible rounding modes.
     ///
@@ -547,6 +566,9 @@ impl Float {
     /// this function sets the [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -627,6 +649,9 @@ impl Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// If the reciprocal square root is equidistant from two [`Float`]s with the specified
     /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
     /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
@@ -681,6 +706,9 @@ impl Float {
     /// [`Float`] to `NaN` it also returns `Equal`.
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
     ///
     /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
     /// description of the possible rounding modes.
@@ -754,6 +782,9 @@ impl ReciprocalSqrt for Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// $$
     /// f(x) = 1/\sqrt{x}+\varepsilon.
     /// $$
@@ -814,6 +845,9 @@ impl ReciprocalSqrt for &Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// $$
     /// f(x) = 1/\sqrt{x}+\varepsilon.
     /// $$
@@ -872,6 +906,9 @@ impl ReciprocalSqrtAssign for Float {
     ///
     /// The reciprocal square root of any nonzero negative number is `NaN`.
     ///
+    /// Using this function is more accurate than taking the square root and then the reciprocal, or
+    /// vice versa.
+    ///
     /// $$
     /// x\gets = 1/\sqrt{x}+\varepsilon.
     /// $$
@@ -928,12 +965,13 @@ impl ReciprocalSqrtAssign for Float {
     }
 }
 
-/// Computes the reciprocal of the square root of a [`f32`]. Using this function is more accurate
-/// than using `powf(0.5)` or taking the square root and then the reciprocal, or vice versa.
+/// Computes the reciprocal of the square root of a primitive float. Using this function is more
+/// accurate than using `powf(0.5)` or taking the square root and then the reciprocal, or vice
+/// versa.
 ///
-/// If the reciprocal square root is equidistant from two [`f32`]s, the [`f32`] with fewer 1s in its
-/// binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding
-/// mode.
+/// If the reciprocal square root is equidistant from two primitive floats, the primitive float with
+/// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+/// `Nearest` rounding mode.
 ///
 /// The reciprocal square root of any nonzero negative number is `NaN`.
 ///
@@ -942,8 +980,8 @@ impl ReciprocalSqrtAssign for Float {
 /// $$
 /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
 /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-///   1/\sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 24, but less if the
-///   output is subnormal).
+///   1/\sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`]
+///   and 53 if `T` is a [`f64`], but less if the output is subnormal).
 ///
 /// Special cases:
 /// - $f(\text{NaN})=\text{NaN}$
@@ -961,71 +999,25 @@ impl ReciprocalSqrtAssign for Float {
 /// ```
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::reciprocal_sqrt::f32_reciprocal_sqrt;
+/// use malachite_float::arithmetic::reciprocal_sqrt::primitive_float_reciprocal_sqrt;
 ///
-/// assert!(f32_reciprocal_sqrt(f32::NAN).is_nan());
+/// assert!(primitive_float_reciprocal_sqrt(f32::NAN).is_nan());
 /// assert_eq!(
-///     NiceFloat(f32_reciprocal_sqrt(f32::INFINITY)),
+///     NiceFloat(primitive_float_reciprocal_sqrt(f32::INFINITY)),
 ///     NiceFloat(0.0)
 /// );
-/// assert!(f32_reciprocal_sqrt(f32::NEGATIVE_INFINITY).is_nan());
+/// assert!(primitive_float_reciprocal_sqrt(f32::NEGATIVE_INFINITY).is_nan());
 /// assert_eq!(
-///     NiceFloat(f32_reciprocal_sqrt(3.0f32)),
+///     NiceFloat(primitive_float_reciprocal_sqrt(3.0f32)),
 ///     NiceFloat(0.57735026)
 /// );
-/// assert!(f32_reciprocal_sqrt(-3.0f32).is_nan());
+/// assert!(primitive_float_reciprocal_sqrt(-3.0f32).is_nan());
 /// ```
-pub fn f32_reciprocal_sqrt(x: f32) -> f32 {
-    emulate_primitive_float_fn(|x, prec| x.reciprocal_sqrt_prec(prec).0, x)
-}
-
-/// Computes the reciprocal of the square root of a [`f64`]. Using this function is more accurate
-/// than using `powf(0.5)` or taking the square root and then the reciprocal, or vice versa.
-///
-/// If the reciprocal square root is equidistant from two [`f64`]s, the [`f64`] with fewer 1s in its
-/// binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding
-/// mode.
-///
-/// The reciprocal square root of any nonzero negative number is `NaN`.
-///
-/// $$
-/// f(x) = 1/\sqrt{x}+\varepsilon.
-/// $$
-/// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-/// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-///   1/\sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 53, but less if the
-///   output is subnormal).
-///
-/// Special cases:
-/// - $f(\text{NaN})=\text{NaN}$
-/// - $f(\infty)=0.0$
-/// - $f(-\infty)=\text{NaN}$
-/// - $f(0.0)=\infty$
-/// - $f(-0.0)=\infty$
-///
-/// Neither overflow nor underflow is possible.
-///
-/// # Worst-case complexity
-/// Constant time and additional memory.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::basic::traits::NegativeInfinity;
-/// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::reciprocal_sqrt::f64_reciprocal_sqrt;
-///
-/// assert!(f64_reciprocal_sqrt(f64::NAN).is_nan());
-/// assert_eq!(
-///     NiceFloat(f64_reciprocal_sqrt(f64::INFINITY)),
-///     NiceFloat(0.0)
-/// );
-/// assert!(f64_reciprocal_sqrt(f64::NEGATIVE_INFINITY).is_nan());
-/// assert_eq!(
-///     NiceFloat(f64_reciprocal_sqrt(3.0f64)),
-///     NiceFloat(0.5773502691896257)
-/// );
-/// assert!(f64_reciprocal_sqrt(-3.0f64).is_nan());
-/// ```
-pub fn f64_reciprocal_sqrt(x: f64) -> f64 {
-    emulate_primitive_float_fn(|x, prec| x.reciprocal_sqrt_prec(prec).0, x)
+#[inline]
+pub fn primitive_float_reciprocal_sqrt<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| x.reciprocal_sqrt_prec(prec).0, x)
 }

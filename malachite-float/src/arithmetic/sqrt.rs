@@ -7,16 +7,93 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::conversion::from_natural::{from_natural_zero_exponent, from_natural_zero_exponent_ref};
 use crate::{
-    Float, float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero,
+    Float, emulate_rational_to_float_fn, float_infinity, float_nan, float_negative_infinity,
+    float_negative_zero, float_zero,
 };
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Sqrt, SqrtAssign};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase2, CheckedSqrt, FloorLogBase2, Parity, Sqrt, SqrtAssign,
+};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::NaN as NanTrait;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::natural::arithmetic::float_sqrt::{
     sqrt_float_significand_in_place, sqrt_float_significand_ref,
 };
+use malachite_nz::platform::Limb;
+use malachite_q::Rational;
+
+pub_crate_test! {
+generic_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut working_prec = prec << 1;
+    let mut increment = Limb::WIDTH;
+    let mut end_shift = x.floor_log_base_2();
+    let x2;
+    let reduced_x: &Rational;
+    if end_shift.gt_abs(&0x3fff_0000) {
+        end_shift &= !1;
+        x2 = x >> end_shift;
+        reduced_x = &x2;
+    } else {
+        end_shift = 0;
+        reduced_x = &x;
+    }
+    loop {
+        let fx = Float::from_rational_prec_round_ref(reduced_x, working_prec, Floor).0;
+        let sqrt = fx.sqrt_prec(working_prec).0;
+        // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the
+        // square root is bounded by (c_sqrt + k_fx)ulp(sqrt) <= 2ulp(sqrt).
+        //
+        // Experiments suggest that `working_prec` is low enough (that is, that the error is at most
+        // 1 ulp), but I can only prove `working_prec - 1`.
+        if float_can_round(sqrt.significand_ref().unwrap(), working_prec - 1, prec, rm) {
+            let (mut sqrt, mut o) = Float::from_float_prec_round(sqrt, prec, rm);
+            if end_shift != 0 {
+                o = sqrt.shl_prec_round_assign_helper(end_shift >> 1, prec, rm, o);
+            }
+            return (sqrt, o);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}}
+
+fn generic_sqrt_rational(mut x: Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut working_prec = prec << 1;
+    let mut increment = Limb::WIDTH;
+    let mut end_shift = x.floor_log_base_2();
+    if end_shift.gt_abs(&0x3fff_0000) {
+        end_shift &= !1;
+        x >>= end_shift;
+    } else {
+        end_shift = 0;
+    }
+    loop {
+        let fx = Float::from_rational_prec_round_ref(&x, working_prec, Floor).0;
+        let sqrt = fx.sqrt_prec(working_prec).0;
+        // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the
+        // square root is bounded by (c_sqrt + k_fx)ulp(sqrt) <= 2ulp(sqrt).
+        //
+        // Experiments suggest that `working_prec` is low enough (that is, that the error is at most
+        // 1 ulp), but I can only prove `working_prec - 1`.
+        if float_can_round(sqrt.significand_ref().unwrap(), working_prec - 1, prec, rm) {
+            let (mut sqrt, mut o) = Float::from_float_prec_round(sqrt, prec, rm);
+            if end_shift != 0 {
+                o = sqrt.shl_prec_round_assign_helper(end_shift >> 1, prec, rm, o);
+            }
+            return (sqrt, o);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
 
 impl Float {
     /// Computes the square root of a [`Float`], rounding the result to the specified precision and
@@ -699,6 +776,113 @@ impl Float {
         let prec = self.significant_bits();
         self.sqrt_prec_round_assign(prec, rm)
     }
+
+    #[inline]
+    pub fn sqrt_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if x < 0u32 {
+            return (Float::NAN, Equal);
+        }
+        if let Some(sqrt) = (&x).checked_sqrt() {
+            return Float::from_rational_prec_round(sqrt, prec, rm);
+        }
+        let (n, d) = x.numerator_and_denominator_ref();
+        match (n.checked_log_base_2(), d.checked_log_base_2()) {
+            (_, Some(log_d)) if log_d.even() => {
+                let n = x.into_numerator();
+                let n_exp = n.significant_bits();
+                let mut n = from_natural_zero_exponent(n);
+                if n_exp.odd() {
+                    n <<= 1u32;
+                }
+                let (mut sqrt, o) = Float::exact_from(n).sqrt_prec_round(prec, rm);
+                let o = sqrt.shr_prec_round_assign_helper(
+                    i128::from(log_d >> 1) - i128::from(n_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (sqrt, o)
+            }
+            (Some(log_n), _) if log_n.even() => {
+                let d = x.into_denominator();
+                let d_exp = d.significant_bits();
+                let mut d = from_natural_zero_exponent(d);
+                if d_exp.odd() {
+                    d <<= 1u32;
+                }
+                let (mut reciprocal_sqrt, o) =
+                    Float::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
+                let o = reciprocal_sqrt.shl_prec_round_assign_helper(
+                    i128::from(log_n >> 1) - i128::from(d_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (reciprocal_sqrt, o)
+            }
+            _ => generic_sqrt_rational(x, prec, rm),
+        }
+    }
+
+    pub fn sqrt_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x < 0u32 {
+            return (Float::NAN, Equal);
+        }
+        if let Some(sqrt) = x.checked_sqrt() {
+            return Float::from_rational_prec_round(sqrt, prec, rm);
+        }
+        let (n, d) = x.numerator_and_denominator_ref();
+        match (n.checked_log_base_2(), d.checked_log_base_2()) {
+            (_, Some(log_d)) if log_d.even() => {
+                let n_exp = n.significant_bits();
+                let mut n = from_natural_zero_exponent_ref(n);
+                if n_exp.odd() {
+                    n <<= 1u32;
+                }
+                let (mut sqrt, o) = Float::exact_from(n).sqrt_prec_round(prec, rm);
+                let o = sqrt.shr_prec_round_assign_helper(
+                    i128::from(log_d >> 1) - i128::from(n_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (sqrt, o)
+            }
+            (Some(log_n), _) if log_n.even() => {
+                let d_exp = d.significant_bits();
+                let mut d = from_natural_zero_exponent_ref(d);
+                if d_exp.odd() {
+                    d <<= 1u32;
+                }
+                let (mut reciprocal_sqrt, o) =
+                    Float::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
+                let o = reciprocal_sqrt.shl_prec_round_assign_helper(
+                    i128::from(log_n >> 1) - i128::from(d_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (reciprocal_sqrt, o)
+            }
+            _ => generic_sqrt_rational_ref(x, prec, rm),
+        }
+    }
+
+    #[inline]
+    pub fn sqrt_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::sqrt_rational_prec_round(x, prec, Nearest)
+    }
+
+    #[inline]
+    pub fn sqrt_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::sqrt_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl Sqrt for Float {
@@ -884,4 +1068,67 @@ impl SqrtAssign for Float {
         let prec = self.significant_bits();
         self.sqrt_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes the square root of a [`Rational`], returning a primitive float result.
+///
+/// If the square root is equidistant from two primitive floats, the primitive float with fewer 1s
+/// in its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest`
+/// rounding mode.
+///
+/// The square root of any negative number is `NaN`.
+///
+/// $$
+/// f(x) = \sqrt{x}+\varepsilon.
+/// $$
+/// - If $\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   \sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`]
+///   and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=\infty$
+///
+/// Overflow:
+/// - If the absolute value of the result is too large to represent, $\infty$ is returned instead.
+/// - If the absolute value of the result is too small to represent, 0.0 is returned instead.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::sqrt::primitive_float_sqrt_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_sqrt_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sqrt_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.5773502691896257)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sqrt_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(100.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sqrt_rational::<f64>(&Rational::from(
+///         -10000
+///     ))),
+///     NiceFloat(f64::NAN)
+/// );
+/// ```
+#[inline]
+pub fn primitive_float_sqrt_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(|x, prec| Float::sqrt_rational_prec_ref(x, prec).0, x)
 }

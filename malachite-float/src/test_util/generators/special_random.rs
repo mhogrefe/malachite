@@ -17,6 +17,7 @@ use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_xxyz, random_triples, random_triples_from_single,
     random_triples_xxy, random_triples_xyy,
 };
+use crate::test_util::generators::exhaustive::sqrt_rational_prec_round_valid;
 use crate::test_util::generators::{
     RandomExtremeFiniteFloats, RandomExtremeNonNegativeFiniteFloats,
     RandomExtremeNonzeroFiniteFloats, RandomExtremePositiveFiniteFloats,
@@ -6096,6 +6097,34 @@ pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_3(
         },
         &|seed| random_rounding_modes(seed).filter(|rm| *rm != Exact),
     ))
+}
+
+pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| sqrt_rational_prec_round_valid(n, prec, rm)),
+    )
 }
 
 // -- (Rational, RoundingMode) --

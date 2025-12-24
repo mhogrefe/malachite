@@ -24,7 +24,7 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
     unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::emulate_primitive_float_fn;
+use malachite_float::emulate_float_to_float_fn;
 use malachite_float::test_util::arithmetic::reciprocal::{
     reciprocal_prec_round_naive_1, reciprocal_prec_round_naive_2, rug_reciprocal,
     rug_reciprocal_prec, rug_reciprocal_prec_round, rug_reciprocal_round,
@@ -2791,7 +2791,7 @@ where
 {
     primitive_float_gen::<T>().test_properties(|x| {
         let reciprocal_1 = x.reciprocal();
-        let reciprocal_2 = emulate_primitive_float_fn(|x, prec| x.reciprocal_prec(prec).0, x);
+        let reciprocal_2 = emulate_float_to_float_fn(|x, prec| x.reciprocal_prec(prec).0, x);
         assert_eq!(NiceFloat(reciprocal_1), NiceFloat(reciprocal_2));
     });
 }

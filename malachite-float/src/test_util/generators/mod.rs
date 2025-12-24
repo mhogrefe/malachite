@@ -3001,12 +3001,20 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_1() -> GT3 {
 
 // All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::from_rational_prec_round`,
 // excluding those with `Exact`.
-type GT4 = Generator<(Rational, u64, RoundingMode)>;
-pub fn rational_unsigned_rounding_mode_triple_gen_var_2() -> GT4 {
+pub fn rational_unsigned_rounding_mode_triple_gen_var_2() -> GT3 {
     Generator::new(
         &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_2,
         &random_rational_unsigned_rounding_mode_triple_gen_var_2,
         &special_random_rational_unsigned_rounding_mode_triple_gen_var_3,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::sqrt_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_3() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_3,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_3,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_4,
     )
 }
 

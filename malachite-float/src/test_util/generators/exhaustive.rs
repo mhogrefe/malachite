@@ -3203,6 +3203,21 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_2()
     )))
 }
 
+pub fn sqrt_rational_prec_round_valid(x: &Rational, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::sqrt_rational_prec_round_ref(x, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_3()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| sqrt_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
 // -- (Rational, RoundingMode) --
 
 // vars 1 through 5 are in malachite-q.

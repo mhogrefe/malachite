@@ -151,7 +151,7 @@ impl CheckedSqrt for &Rational {
             sqrt_n = Integer::from_sign_and_abs_ref(*self >= 0, n).checked_sqrt()?;
         }
         Some(Rational {
-            sign: sqrt_n >= 0,
+            sign: true,
             numerator: sqrt_n.unsigned_abs(),
             denominator: sqrt_d,
         })

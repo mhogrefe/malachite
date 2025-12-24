@@ -519,7 +519,6 @@ pub_test! {limbs_sqrt_rem_to_out(
 
 // This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is not
 // `NULL`, only returning whether the remainder is nonzero, rather than computing it in full.
-#[cfg(feature = "float_helpers")]
 pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
@@ -678,12 +677,10 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 pub_crate_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
-    let mut out_rem = vec![0; xs_len];
-    let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
-    if slice_test_zero(&out_rem[..rem_len]) {
-        Some(out_sqrt)
-    } else {
+    if limbs_sqrt_to_out_return_inexact(&mut out_sqrt, xs) {
         None
+    } else {
+        Some(out_sqrt)
     }
 }}
 

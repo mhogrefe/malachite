@@ -17,7 +17,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::emulate_primitive_float_fn_2;
+use malachite_float::emulate_float_float_to_float_fn;
 use malachite_float::test_util::arithmetic::add::add_prec_round_naive;
 use malachite_float::test_util::arithmetic::sub::sub_rational_prec_round_naive;
 use malachite_float::test_util::arithmetic::sub::{
@@ -11835,7 +11835,7 @@ where
 {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
         let diff_1 = x - y;
-        let diff_2 = emulate_primitive_float_fn_2(|x, y, prec| x.sub_prec(y, prec).0, x, y);
+        let diff_2 = emulate_float_float_to_float_fn(|x, y, prec| x.sub_prec(y, prec).0, x, y);
         assert_eq!(NiceFloat(diff_1), NiceFloat(diff_2));
     });
 }

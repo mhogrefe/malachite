@@ -24,7 +24,7 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
     unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::emulate_primitive_float_fn;
+use malachite_float::emulate_float_to_float_fn;
 use malachite_float::test_util::arithmetic::square::{
     rug_square, rug_square_prec, rug_square_prec_round, rug_square_round, square_prec_round_naive,
 };
@@ -2856,7 +2856,7 @@ where
 {
     primitive_float_gen::<T>().test_properties(|x| {
         let square_1 = x.square();
-        let square_2 = emulate_primitive_float_fn(|x, prec| x.square_prec(prec).0, x);
+        let square_2 = emulate_float_to_float_fn(|x, prec| x.square_prec(prec).0, x);
         assert_eq!(NiceFloat(square_1), NiceFloat(square_2));
     });
 }
