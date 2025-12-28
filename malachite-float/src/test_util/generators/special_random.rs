@@ -17,23 +17,25 @@ use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_xxyz, random_triples, random_triples_from_single,
     random_triples_xxy, random_triples_xyy,
 };
-use crate::test_util::generators::exhaustive::sqrt_rational_prec_round_valid;
-use crate::test_util::generators::{
+use crate::test_util::generators::exhaustive::{
+    add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
+    div_prec_round_valid, div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
+    from_primitive_float_prec_round_valid, integer_rounding_from_float_valid, mul_prec_round_valid,
+    mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
+    natural_rounding_from_float_valid, rational_div_float_prec_round_valid,
+    rational_div_float_round_valid, reciprocal_prec_round_valid, reciprocal_round_valid,
+    reciprocal_sqrt_prec_round_valid, reciprocal_sqrt_rational_prec_round_valid,
+    reciprocal_sqrt_round_valid, set_prec_round_valid, shl_prec_round_valid, shl_round_valid,
+    shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
+    sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    unsigned_rounding_from_float_valid,
+};
+use crate::test_util::generators::random::{
     RandomExtremeFiniteFloats, RandomExtremeNonNegativeFiniteFloats,
     RandomExtremeNonzeroFiniteFloats, RandomExtremePositiveFiniteFloats,
     RandomMixedExtremeFiniteFloats, RandomMixedExtremeNonNegativeFiniteFloats,
-    RandomMixedExtremePositiveFiniteFloats, add_prec_round_valid, add_rational_prec_round_valid,
-    add_rational_round_valid, add_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
-    div_rational_round_valid, div_round_valid, from_primitive_float_prec_round_valid,
-    integer_rounding_from_float_valid, mul_prec_round_valid, mul_rational_prec_round_valid,
-    mul_rational_round_valid, mul_round_valid, natural_rounding_from_float_valid,
-    rational_div_float_prec_round_valid, rational_div_float_round_valid,
-    reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
-    reciprocal_sqrt_round_valid, set_prec_round_valid, shl_prec_round_valid, shl_round_valid,
-    shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
-    sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
-    unsigned_rounding_from_float_valid,
+    RandomMixedExtremePositiveFiniteFloats,
 };
 use malachite_base::bools::random::{random_bools, weighted_random_bools};
 use malachite_base::iterators::{WithSpecialValues, with_special_values};
@@ -6124,6 +6126,34 @@ pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_4(
             &random_rounding_modes,
         )
         .filter(|&(ref n, prec, rm)| sqrt_rational_prec_round_valid(n, prec, rm)),
+    )
+}
+
+pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| reciprocal_sqrt_rational_prec_round_valid(n, prec, rm)),
     )
 }
 

@@ -24,11 +24,11 @@ macro_rules! float_impls {
             /// - If the rounding mode is `Floor` the largest float less than or equal to the
             ///   [`Integer`] is returned. If the [`Integer`] is greater than the maximum finite
             ///   float, then the maximum finite float is returned. If it is smaller than the
-            ///   minimum finite float, then negative infinity is returned.
+            ///   minimum finite float, then $-\infty$ is returned.
             /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to the
             ///   [`Integer`] is returned. If the [`Integer`] is greater than the maximum finite
-            ///   float, then positive infinity is returned. If it is smaller than the minimum
-            ///   finite float, then the minimum finite float is returned.
+            ///   float, then $\infty$ is returned. If it is smaller than the minimum finite float,
+            ///   then the minimum finite float is returned.
             /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
             ///   [`Integer`] is non-negative and as with `Ceiling` if the [`Integer`] is negative.
             /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling` if the
@@ -36,7 +36,8 @@ macro_rules! float_impls {
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Integer`] is exactly between two floats, the float with the zero
             ///   least-significant bit in its representation is selected. If the [`Integer`] is
-            ///   greater than the maximum finite float, then the maximum finite float is returned.
+            ///   greater than the maximum finite float, then $\infty$ is returned. If the
+            ///   [`Integer`] is smaller than the minimum finite float, then $-\infty$ is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

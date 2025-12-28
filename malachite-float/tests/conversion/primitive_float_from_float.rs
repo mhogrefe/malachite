@@ -470,7 +470,7 @@ fn test_rounding_from_float() {
     test_helper::<f32>("7.0e240", "0x1.0E+200#1", Ceiling, "Infinity", Greater);
     test_helper::<f32>("7.0e240", "0x1.0E+200#1", Down, "3.4028235e38", Less);
     test_helper::<f32>("7.0e240", "0x1.0E+200#1", Up, "Infinity", Greater);
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Nearest, "3.4028235e38", Less);
+    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Nearest, "Infinity", Greater);
 
     test_helper::<f64>(
         "7.0e240",
@@ -519,7 +519,7 @@ fn test_rounding_from_float() {
     test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Ceiling, "Infinity", Greater);
     test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Down, "3.4028235e38", Less);
     test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Up, "Infinity", Greater);
-    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Nearest, "3.4028235e38", Less);
+    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Nearest, "Infinity", Greater);
 
     test_helper::<f64>(
         "2.0e2408",
@@ -537,13 +537,7 @@ fn test_rounding_from_float() {
         Less,
     );
     test_helper::<f64>("2.0e2408", "0x1.0E+2000#1", Up, "Infinity", Greater);
-    test_helper::<f64>(
-        "2.0e2408",
-        "0x1.0E+2000#1",
-        Nearest,
-        "1.7976931348623157e308",
-        Less,
-    );
+    test_helper::<f64>("2.0e2408", "0x1.0E+2000#1", Nearest, "Infinity", Greater);
     test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Floor, "0.0", Less);
     test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Ceiling, "1.0e-45", Greater);
     test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Down, "0.0", Less);
@@ -619,8 +613,8 @@ fn test_rounding_from_float() {
         "too_big",
         "0x4.0E+268435455#1",
         Nearest,
-        "3.4028235e38",
-        Less,
+        "Infinity",
+        Greater,
     );
 
     test_helper::<f64>(
@@ -649,8 +643,8 @@ fn test_rounding_from_float() {
         "too_big",
         "0x4.0E+268435455#1",
         Nearest,
-        "1.7976931348623157e308",
-        Less,
+        "Infinity",
+        Greater,
     );
 
     test_helper::<f32>("too_small", "0x1.0E-268435456#1", Floor, "0.0", Less);
@@ -912,13 +906,7 @@ fn test_rounding_from_float() {
     );
     test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Down, "-3.4028235e38", Greater);
     test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Up, "-Infinity", Less);
-    test_helper::<f32>(
-        "-7.0e240",
-        "-0x1.0E+200#1",
-        Nearest,
-        "-3.4028235e38",
-        Greater,
-    );
+    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Nearest, "-Infinity", Less);
 
     test_helper::<f64>(
         "-7.0e240",
@@ -979,13 +967,7 @@ fn test_rounding_from_float() {
         Greater,
     );
     test_helper::<f32>("-2.0e2408", "-0x1.0E+2000#1", Up, "-Infinity", Less);
-    test_helper::<f32>(
-        "-2.0e2408",
-        "-0x1.0E+2000#1",
-        Nearest,
-        "-3.4028235e38",
-        Greater,
-    );
+    test_helper::<f32>("-2.0e2408", "-0x1.0E+2000#1", Nearest, "-Infinity", Less);
 
     test_helper::<f64>("-2.0e2408", "-0x1.0E+2000#1", Floor, "-Infinity", Less);
     test_helper::<f64>(
@@ -1003,13 +985,7 @@ fn test_rounding_from_float() {
         Greater,
     );
     test_helper::<f64>("-2.0e2408", "-0x1.0E+2000#1", Up, "-Infinity", Less);
-    test_helper::<f64>(
-        "-2.0e2408",
-        "-0x1.0E+2000#1",
-        Nearest,
-        "-1.7976931348623157e308",
-        Greater,
-    );
+    test_helper::<f64>("-2.0e2408", "-0x1.0E+2000#1", Nearest, "-Infinity", Less);
 
     test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Floor, "-1.0e-45", Less);
     test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Ceiling, "-0.0", Greater);
@@ -1092,8 +1068,8 @@ fn test_rounding_from_float() {
         "-too_big",
         "-0x4.0E+268435455#1",
         Nearest,
-        "-3.4028235e38",
-        Greater,
+        "-Infinity",
+        Less,
     );
 
     test_helper::<f64>("-too_big", "-0x4.0E+268435455#1", Floor, "-Infinity", Less);
@@ -1116,8 +1092,8 @@ fn test_rounding_from_float() {
         "-too_big",
         "-0x4.0E+268435455#1",
         Nearest,
-        "-1.7976931348623157e308",
-        Greater,
+        "-Infinity",
+        Less,
     );
 
     test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Floor, "-1.0e-45", Less);
@@ -1366,10 +1342,7 @@ fn rounding_from_float_properties() {
     apply_fn_to_primitive_floats!(rounding_from_float_properties_helper);
 
     float_rounding_mode_pair_gen_var_6::<f32>().test_properties(|(x, rm)| {
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
-            && x >= -f32::MAX_FINITE
-            && x <= f32::MAX_FINITE
-        {
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             assert_eq!(
                 NiceFloat(f32::rounding_from(&x, rm).0),
                 NiceFloat(rug::Float::exact_from(&x).to_f32_round(rug_rm)),
@@ -1378,10 +1351,7 @@ fn rounding_from_float_properties() {
     });
 
     float_rounding_mode_pair_gen_var_6::<f64>().test_properties(|(x, rm)| {
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
-            && x >= -f64::MAX_FINITE
-            && x <= f64::MAX_FINITE
-        {
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             assert_eq!(
                 NiceFloat(f64::rounding_from(&x, rm).0),
                 NiceFloat(rug::Float::exact_from(&x).to_f64_round(rug_rm)),

@@ -13,26 +13,245 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::sqrt::generic_sqrt_rational;
+use crate::conversion::from_natural::{
+    from_natural_prec_round_zero_exponent_ref, from_natural_zero_exponent,
+    from_natural_zero_exponent_ref,
+};
+use crate::conversion::from_rational::FROM_RATIONAL_THRESHOLD;
 use crate::{
-    Float, emulate_float_to_float_fn, float_either_zero, float_infinity, float_nan, float_zero,
+    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
+    float_infinity, float_nan, float_zero, significand_bits,
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    IsPowerOf2, Parity, PowerOf2, ReciprocalSqrt, ReciprocalSqrtAssign,
+    CheckedLogBase2, CheckedSqrt, FloorLogBase2, IsPowerOf2, NegAssign, NegModPowerOf2, Parity,
+    PowerOf2, Reciprocal, ReciprocalAssign, ReciprocalSqrt, ReciprocalSqrtAssign,
+    RoundToMultipleOfPowerOf2, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::basic::traits::{
+    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
+};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::LIMB_HIGH_BIT;
 use malachite_nz::natural::arithmetic::float_extras::{
-    limbs_float_can_round, limbs_significand_slice_add_limb_in_place,
+    float_can_round, limbs_float_can_round, limbs_significand_slice_add_limb_in_place,
 };
 use malachite_nz::natural::arithmetic::float_reciprocal_sqrt::limbs_reciprocal_sqrt;
 use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
+
+fn from_reciprocal_rational_prec_round_ref_direct(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    let sign = *x >= 0;
+    if let Some(pow) = x.numerator_ref().checked_log_base_2() {
+        let n = x.denominator_ref();
+        let n_bits = n.significant_bits();
+        let (mut y, mut o) =
+            from_natural_prec_round_zero_exponent_ref(n, prec, if sign { rm } else { -rm });
+        o = y.shr_prec_round_assign_helper(
+            i128::from(pow) - i128::from(n_bits),
+            prec,
+            if sign { rm } else { -rm },
+            o,
+        );
+        assert!(
+            rm != Exact || o == Equal,
+            "Inexact conversion from Rational to Float"
+        );
+        if sign { (y, o) } else { (-y, o.reverse()) }
+    } else {
+        let x = x.reciprocal();
+        let mut exponent = i32::saturating_from(x.floor_log_base_2_abs());
+        if exponent >= Float::MAX_EXPONENT {
+            return match (sign, rm) {
+                (true, Up | Ceiling | Nearest) => (Float::INFINITY, Greater),
+                (true, Floor | Down) => (Float::max_finite_value_with_prec(prec), Less),
+                (false, Up | Floor | Nearest) => (Float::NEGATIVE_INFINITY, Less),
+                (false, Ceiling | Down) => (-Float::max_finite_value_with_prec(prec), Greater),
+                (_, Exact) => panic!("Inexact conversion from Rational to Float"),
+            };
+        }
+        let (significand, o) =
+            Integer::rounding_from(x << (i128::exact_from(prec) - i128::from(exponent) - 1), rm);
+        let sign = significand >= 0;
+        let mut significand = significand.unsigned_abs();
+        let away_from_0 = if sign { Greater } else { Less };
+        if o == away_from_0 && significand.is_power_of_2() {
+            exponent += 1;
+            if exponent >= Float::MAX_EXPONENT {
+                return if sign {
+                    (Float::INFINITY, Greater)
+                } else {
+                    (Float::NEGATIVE_INFINITY, Less)
+                };
+            }
+        }
+        exponent += 1;
+        if exponent < Float::MIN_EXPONENT {
+            assert!(rm != Exact, "Inexact conversion from Rational to Float");
+            return if rm == Nearest
+                && exponent == Float::MIN_EXPONENT - 1
+                && (o == away_from_0.reverse() || !significand.is_power_of_2())
+            {
+                if sign {
+                    (Float::min_positive_value_prec(prec), Greater)
+                } else {
+                    (-Float::min_positive_value_prec(prec), Less)
+                }
+            } else {
+                match (sign, rm) {
+                    (true, Up | Ceiling) => (Float::min_positive_value_prec(prec), Greater),
+                    (true, Floor | Down | Nearest) => (Float::ZERO, Less),
+                    (false, Up | Floor) => (-Float::min_positive_value_prec(prec), Less),
+                    (false, Ceiling | Down | Nearest) => (Float::NEGATIVE_ZERO, Greater),
+                    (_, Exact) => unreachable!(),
+                }
+            };
+        }
+        significand <<= significand
+            .significant_bits()
+            .neg_mod_power_of_2(Limb::LOG_WIDTH);
+        let target_bits = prec
+            .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+            .0;
+        let current_bits = significand_bits(&significand);
+        if current_bits > target_bits {
+            significand >>= current_bits - target_bits;
+        }
+        (
+            Float(Finite {
+                sign,
+                exponent,
+                precision: prec,
+                significand,
+            }),
+            o,
+        )
+    }
+}
+
+fn from_reciprocal_rational_prec_round_ref_using_div(
+    x: &Rational,
+    prec: u64,
+    mut rm: RoundingMode,
+) -> (Float, Ordering) {
+    let sign = *x >= 0;
+    if !sign {
+        rm.neg_assign();
+    }
+    let (d, n) = x.numerator_and_denominator_ref();
+    let is_zero = *n == 0;
+    let (f, o) = match (
+        if is_zero {
+            None
+        } else {
+            n.checked_log_base_2()
+        },
+        d.checked_log_base_2(),
+    ) {
+        (Some(log_n), Some(log_d)) => Float::power_of_2_prec_round(
+            i64::saturating_from(i128::from(log_n) - i128::from(log_d)),
+            prec,
+            rm,
+        ),
+        (None, Some(log_d)) => {
+            let (mut f, mut o) = from_natural_prec_round_zero_exponent_ref(n, prec, rm);
+            o = f.shr_prec_round_assign_helper(
+                i128::from(log_d) - i128::from(n.significant_bits()),
+                prec,
+                rm,
+                o,
+            );
+            (f, o)
+        }
+        (Some(log_n), None) => {
+            let (mut f, mut o) = from_natural_zero_exponent_ref(d).reciprocal_prec_round(prec, rm);
+            o = f.shl_prec_round_assign_helper(
+                i128::from(log_n) - i128::from(d.significant_bits()),
+                prec,
+                rm,
+                o,
+            );
+            (f, o)
+        }
+        (None, None) => {
+            let (mut f, mut o) = from_natural_zero_exponent_ref(n).div_prec_round(
+                from_natural_zero_exponent_ref(d),
+                prec,
+                rm,
+            );
+            o = f.shl_prec_round_assign_helper(
+                i128::from(n.significant_bits()) - i128::from(d.significant_bits()),
+                prec,
+                rm,
+                o,
+            );
+            (f, o)
+        }
+    };
+    if sign { (f, o) } else { (-f, o.reverse()) }
+}
+
+#[inline]
+fn from_reciprocal_rational_prec_round_ref(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    if max(x.significant_bits(), prec) < FROM_RATIONAL_THRESHOLD {
+        from_reciprocal_rational_prec_round_ref_direct(x, prec, rm)
+    } else {
+        from_reciprocal_rational_prec_round_ref_using_div(x, prec, rm)
+    }
+}
+
+pub_crate_test! {
+generic_reciprocal_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut working_prec = prec << 1;
+    let mut increment = Limb::WIDTH;
+    let mut end_shift = x.floor_log_base_2();
+    let x2;
+    let reduced_x: &Rational;
+    if end_shift.gt_abs(&0x3fff_0000) {
+        end_shift &= !1;
+        x2 = x >> end_shift;
+        reduced_x = &x2;
+    } else {
+        end_shift = 0;
+        reduced_x = &x;
+    }
+    loop {
+        let fx = from_reciprocal_rational_prec_round_ref(reduced_x, working_prec, Floor).0;
+        let sqrt = fx.sqrt_prec(working_prec).0;
+        // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the
+        // square root is bounded by (c_sqrt + k_fx)ulp(sqrt) <= 2ulp(sqrt).
+        //
+        // Experiments suggest that `working_prec` is low enough (that is, that the error is at most
+        // 1 ulp), but I can only prove `working_prec - 1`.
+        if float_can_round(sqrt.significand_ref().unwrap(), working_prec - 1, prec, rm) {
+            let (mut sqrt, mut o) = Float::from_float_prec_round(sqrt, prec, rm);
+            if end_shift != 0 {
+                o = sqrt.shr_prec_round_assign_helper(end_shift >> 1, prec, rm, o);
+            }
+            return (sqrt, o);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}}
 
 impl Float {
     /// Computes the reciprocal of the square root of a [`Float`], rounding the result to the
@@ -768,6 +987,495 @@ impl Float {
         let prec = self.significant_bits();
         self.reciprocal_sqrt_prec_round_assign(prec, rm)
     }
+
+    /// Computes the reciprocal of the square root of a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded reciprocal square root is less than, equal to, or greater than the exact
+    /// reciprocal square root. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = 1/\sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$.
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p,m)=\infty$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::rational_reciprocal_sqrt_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) =
+    ///     Float::reciprocal_sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(sqrt.to_string(), "1.25");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::reciprocal_sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(sqrt.to_string(), "1.290993");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn reciprocal_sqrt_rational_prec_round(
+        mut x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if x == 0u32 {
+            return (Float::INFINITY, Equal);
+        } else if x < 0u32 {
+            return (Float::NAN, Equal);
+        }
+        x.reciprocal_assign();
+        if let Some(sqrt) = (&x).checked_sqrt() {
+            return Float::from_rational_prec_round(sqrt, prec, rm);
+        }
+        let (n, d) = x.numerator_and_denominator_ref();
+        match (n.checked_log_base_2(), d.checked_log_base_2()) {
+            (_, Some(log_d)) if log_d.even() => {
+                let n = x.into_numerator();
+                let n_exp = n.significant_bits();
+                let mut n = from_natural_zero_exponent(n);
+                if n_exp.odd() {
+                    n <<= 1u32;
+                }
+                let (mut sqrt, o) = Float::exact_from(n).sqrt_prec_round(prec, rm);
+                let o = sqrt.shr_prec_round_assign_helper(
+                    i128::from(log_d >> 1) - i128::from(n_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (sqrt, o)
+            }
+            (Some(log_n), _) if log_n.even() => {
+                let d = x.into_denominator();
+                let d_exp = d.significant_bits();
+                let mut d = from_natural_zero_exponent(d);
+                if d_exp.odd() {
+                    d <<= 1u32;
+                }
+                let (mut reciprocal_sqrt, o) =
+                    Float::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
+                let o = reciprocal_sqrt.shl_prec_round_assign_helper(
+                    i128::from(log_n >> 1) - i128::from(d_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (reciprocal_sqrt, o)
+            }
+            _ => generic_sqrt_rational(x, prec, rm),
+        }
+    }
+
+    /// Computes the reciprocal of the square root of a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded reciprocal square root is less than, equal to, or greater
+    /// than the exact reciprocal square root. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = 1/\sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $1/\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p+1}$.
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 1/\sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p,m)=\infty$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::rational_reciprocal_sqrt_prec_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Floor,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.25");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Floor,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.290993");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn reciprocal_sqrt_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            return (Float::INFINITY, Equal);
+        } else if *x < 0u32 {
+            return (Float::NAN, Equal);
+        }
+        if let Some(sqrt) = x.checked_sqrt() {
+            return Float::from_rational_prec_round(sqrt.reciprocal(), prec, rm);
+        }
+        let (d, n) = x.numerator_and_denominator_ref();
+        match (n.checked_log_base_2(), d.checked_log_base_2()) {
+            (_, Some(log_d)) if log_d.even() => {
+                let n_exp = n.significant_bits();
+                let mut n = from_natural_zero_exponent_ref(n);
+                if n_exp.odd() {
+                    n <<= 1u32;
+                }
+                let (mut sqrt, o) = Float::exact_from(n).sqrt_prec_round(prec, rm);
+                let o = sqrt.shr_prec_round_assign_helper(
+                    i128::from(log_d >> 1) - i128::from(n_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (sqrt, o)
+            }
+            (Some(log_n), _) if log_n.even() => {
+                let d_exp = d.significant_bits();
+                let mut d = from_natural_zero_exponent_ref(d);
+                if d_exp.odd() {
+                    d <<= 1u32;
+                }
+                let (mut reciprocal_sqrt, o) =
+                    Float::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
+                let o = reciprocal_sqrt.shl_prec_round_assign_helper(
+                    i128::from(log_n >> 1) - i128::from(d_exp >> 1),
+                    prec,
+                    rm,
+                    o,
+                );
+                (reciprocal_sqrt, o)
+            }
+            _ => generic_reciprocal_sqrt_rational_ref(x, prec, rm),
+        }
+    }
+
+    /// Computes the reciprocal of the square root of a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded reciprocal square root is less than, equal to, or greater than the exact reciprocal
+    /// square root. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// If the reciprocal square root is equidistant from two [`Float`]s with the specified
+    /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
+    /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = 1/\sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   1/\sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p)=\infty$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::reciprocal_sqrt_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn reciprocal_sqrt_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::reciprocal_sqrt_rational_prec_round(x, prec, Nearest)
+    }
+
+    /// Computes the reciprocal of the square root of a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded reciprocal square root is less than, equal to, or greater than the exact reciprocal
+    /// square root. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The reciprocal square root of any nonzero negative number is `NaN`.
+    ///
+    /// If the reciprocal square root is equidistant from two [`Float`]s with the specified
+    /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
+    /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = 1/\sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   1/\sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p)=\infty$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::reciprocal_sqrt_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) =
+    ///     Float::reciprocal_sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::reciprocal_sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn reciprocal_sqrt_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::reciprocal_sqrt_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl ReciprocalSqrt for Float {
@@ -1019,5 +1727,76 @@ where
     Float: From<T> + PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
-    emulate_float_to_float_fn(|x, prec| x.reciprocal_sqrt_prec(prec).0, x)
+    emulate_float_to_float_fn(|x, prec| x.reciprocal_sqrt_prec(prec), x)
+}
+
+/// Computes the reciprocal of the square root of a [`Rational`], returning a primitive float
+/// result.
+///
+/// If the reciprocal square root is equidistant from two primitive floats, the primitive float with
+/// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+/// `Nearest` rounding mode.
+///
+/// The reciprocal square root of any negative number is `NaN`.
+///
+/// $$
+/// f(x) = 1/\sqrt{x}+\varepsilon.
+/// $$
+/// - If $1/\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $1/\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   1/\sqrt{x}\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`]
+///   and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=\infty$
+///
+/// Overflow:
+/// - If the absolute value of the result is too large to represent, $\infty$ is returned instead.
+/// - If the absolute value of the result is too small to represent, 0.0 is returned instead.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::reciprocal_sqrt::primitive_float_reciprocal_sqrt_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_reciprocal_sqrt_rational::<f64>(
+///         &Rational::ZERO
+///     )),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_reciprocal_sqrt_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(1.7320508075688772)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_reciprocal_sqrt_rational::<f64>(
+///         &Rational::from(10000)
+///     )),
+///     NiceFloat(0.01)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_reciprocal_sqrt_rational::<f64>(
+///         &Rational::from(-10000)
+///     )),
+///     NiceFloat(f64::NAN)
+/// );
+/// ```
+#[inline]
+pub fn primitive_float_reciprocal_sqrt_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::reciprocal_sqrt_rational_prec_ref(x, prec),
+        x,
+    )
 }

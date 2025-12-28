@@ -3018,6 +3018,16 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_3() -> GT3 {
     )
 }
 
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::reciprocal_sqrt_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_4() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_4,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_4,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_5,
+    )
+}
+
 // -- (Rational, RoundingMode) --
 
 // vars 1 through 5 are in malachite-q.

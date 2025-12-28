@@ -322,7 +322,6 @@ macro_rules! impl_fmt_ryu_string {
 }
 
 impl_fmt_ryu_string!(f32);
-
 impl_fmt_ryu_string!(f64);
 
 impl<T: PrimitiveFloat> Display for NiceFloat<T> {

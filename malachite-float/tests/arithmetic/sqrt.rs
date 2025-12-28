@@ -44,7 +44,9 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{
+    rational_gen, rational_pair_gen, rational_unsigned_pair_gen_var_3,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -3394,7 +3396,7 @@ where
 {
     primitive_float_gen::<T>().test_properties(|x| {
         let sqrt_1 = x.sqrt();
-        let sqrt_2 = emulate_float_to_float_fn(|x, prec| x.sqrt_prec(prec).0, x);
+        let sqrt_2 = emulate_float_to_float_fn(|x, prec| x.sqrt_prec(prec), x);
         assert_eq!(NiceFloat(sqrt_1), NiceFloat(sqrt_2));
     });
 }
@@ -3463,9 +3465,7 @@ fn sqrt_rational_prec_properties() {
             } else if x < 1u32 && o > Less {
                 assert!(sqrt > x);
             }
-        }
 
-        if sqrt.is_normal() {
             let square = Rational::exact_from(&sqrt).square();
             match o {
                 Equal => assert_eq!(square, x),
@@ -3571,4 +3571,44 @@ fn sqrt_rational_prec_round_properties() {
         |prec, rm| Float::sqrt_rational_prec_round(X, prec, rm),
         10000,
     );
+}
+
+fn primitive_float_sqrt_rational_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    Rational: ExactFrom<T>,
+{
+    rational_gen().test_properties(|x| {
+        let sqrt = primitive_float_sqrt_rational::<T>(&x);
+        if sqrt.is_normal() {
+            let square = Rational::exact_from(sqrt).square();
+            match square.cmp(&x) {
+                Less => {
+                    assert!(Rational::exact_from(sqrt.next_higher()).square() > x);
+                }
+                Greater => {
+                    assert!(Rational::exact_from(sqrt.next_lower()).square() < x);
+                }
+                _ => {}
+            }
+        }
+    });
+
+    rational_pair_gen().test_properties(|(x, y)| {
+        let sqrt_x = NiceFloat(primitive_float_sqrt_rational::<T>(&x));
+        let sqrt_y = NiceFloat(primitive_float_sqrt_rational::<T>(&y));
+        if !sqrt_x.0.is_nan() && !sqrt_y.0.is_nan() {
+            match x.partial_cmp(&y).unwrap() {
+                Equal => assert_eq!(sqrt_x, sqrt_y),
+                Less => assert!(sqrt_x <= sqrt_y),
+                Greater => assert!(sqrt_x >= sqrt_y),
+            }
+        }
+    });
+}
+
+#[test]
+fn primitive_float_sqrt_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sqrt_rational_helper);
 }

@@ -97,9 +97,11 @@ extern crate itertools;
 
 #[cfg(feature = "test_build")]
 use crate::InnerFloat::Finite;
+use core::cmp::Ordering::{self, *};
 use core::ops::Deref;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
+use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SciMantissaAndExponent};
@@ -311,22 +313,32 @@ impl Deref for ComparableFloatRef<'_> {
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
-pub fn emulate_float_to_float_fn<T: PrimitiveFloat, F: Fn(Float, u64) -> Float>(f: F, x: T) -> T
+pub fn emulate_float_to_float_fn<T: PrimitiveFloat, F: Fn(Float, u64) -> (Float, Ordering)>(
+    f: F,
+    x: T,
+) -> T
 where
     Float: From<T> + PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     let x = Float::from(x);
-    let mut result = f(x.clone(), T::MANTISSA_WIDTH + 1);
+    let (mut result, o) = f(x.clone(), T::MANTISSA_WIDTH + 1);
     if !result.is_normal() {
         return T::exact_from(&result);
     }
     let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
-            return T::rounding_from(&result, Nearest).0;
+            let rm =
+                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
+                    let down = if result > T::ZERO { Less } else { Greater };
+                    if o == down { Up } else { Down }
+                } else {
+                    Nearest
+                };
+            return T::rounding_from(&result, rm).0;
         }
-        result = f(x, T::max_precision_for_sci_exponent(e));
+        result = f(x, T::max_precision_for_sci_exponent(e)).0;
     }
     if result > T::MAX_FINITE {
         T::INFINITY
@@ -339,7 +351,10 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
-pub fn emulate_float_float_to_float_fn<T: PrimitiveFloat, F: Fn(Float, Float, u64) -> Float>(
+pub fn emulate_float_float_to_float_fn<
+    T: PrimitiveFloat,
+    F: Fn(Float, Float, u64) -> (Float, Ordering),
+>(
     f: F,
     x: T,
     y: T,
@@ -350,16 +365,23 @@ where
 {
     let x = Float::from(x);
     let y = Float::from(y);
-    let mut result = f(x.clone(), y.clone(), T::MANTISSA_WIDTH + 1);
+    let (mut result, o) = f(x.clone(), y.clone(), T::MANTISSA_WIDTH + 1);
     if !result.is_normal() {
         return T::exact_from(&result);
     }
     let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
-            return T::rounding_from(&result, Nearest).0;
+            let rm =
+                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
+                    let down = if result > T::ZERO { Less } else { Greater };
+                    if o == down { Up } else { Down }
+                } else {
+                    Nearest
+                };
+            return T::rounding_from(&result, rm).0;
         }
-        result = f(x, y, T::max_precision_for_sci_exponent(e));
+        result = f(x, y, T::max_precision_for_sci_exponent(e)).0;
     }
     if result > T::MAX_FINITE {
         T::INFINITY
@@ -372,7 +394,7 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
-pub fn emulate_rational_to_float_fn<T: PrimitiveFloat, F: Fn(&Rational, u64) -> Float>(
+pub fn emulate_rational_to_float_fn<T: PrimitiveFloat, F: Fn(&Rational, u64) -> (Float, Ordering)>(
     f: F,
     x: &Rational,
 ) -> T
@@ -380,16 +402,24 @@ where
     Float: PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
-    let mut result = f(x, T::MANTISSA_WIDTH + 1);
+    let (mut result, o) = f(x, T::MANTISSA_WIDTH + 1);
     if !result.is_normal() {
         return T::exact_from(&result);
     }
     let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
     if e < T::MIN_NORMAL_EXPONENT {
         if e < T::MIN_EXPONENT {
-            return T::rounding_from(&result, Nearest).0;
+            let rm =
+                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
+                    let down = if result > T::ZERO { Less } else { Greater };
+                    if o == down { Up } else { Down }
+                } else {
+                    Nearest
+                };
+            return T::rounding_from(&result, rm).0;
+        } else {
+            result = f(x, T::max_precision_for_sci_exponent(e)).0;
         }
-        result = f(x, T::max_precision_for_sci_exponent(e));
     }
     if result > T::MAX_FINITE {
         T::INFINITY

@@ -196,8 +196,8 @@ fn test_striped_random_nonzero_integers() {
     ];
     let sample_median = ("1", None);
     let sample_moment_stats = MomentStats {
-        mean: NiceFloat(-1.7976931348623025e302),
-        standard_deviation: NiceFloat(f64::INFINITY),
+        mean: NiceFloat(f64::NAN),
+        standard_deviation: NiceFloat(f64::NAN),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };

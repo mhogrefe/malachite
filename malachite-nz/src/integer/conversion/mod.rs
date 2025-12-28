@@ -262,7 +262,7 @@ pub mod natural_from_integer;
 ///         &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
 ///         Nearest
 ///     ),
-///     (3.4028235e38, Less)
+///     (f32::INFINITY, Greater)
 /// );
 /// ```
 ///

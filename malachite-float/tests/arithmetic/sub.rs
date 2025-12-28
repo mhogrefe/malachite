@@ -11835,7 +11835,7 @@ where
 {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
         let diff_1 = x - y;
-        let diff_2 = emulate_float_float_to_float_fn(|x, y, prec| x.sub_prec(y, prec).0, x, y);
+        let diff_2 = emulate_float_float_to_float_fn(|x, y, prec| x.sub_prec(y, prec), x, y);
         assert_eq!(NiceFloat(diff_1), NiceFloat(diff_2));
     });
 }

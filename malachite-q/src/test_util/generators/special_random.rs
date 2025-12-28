@@ -903,6 +903,30 @@ pub fn special_random_rational_unsigned_pair_gen_var_4(config: &GenConfig) -> It
     ))
 }
 
+pub fn special_random_rational_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Rational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_nonzero_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn special_random_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(
@@ -1063,6 +1087,16 @@ pub fn special_random_rational_pair_gen_var_5(config: &GenConfig) -> It<(Rationa
             .filter(|q| (q - Rational::ONE).gt_abs(&Rational::from_signeds(1, 1000)))
         },
     ))
+}
+
+pub fn special_random_rational_pair_gen_var_6(config: &GenConfig) -> It<(Rational, Rational)> {
+    Box::new(random_pairs_from_single(striped_random_nonzero_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
 }
 
 // -- (Rational, Rational, Integer) --

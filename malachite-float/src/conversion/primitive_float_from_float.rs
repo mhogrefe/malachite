@@ -49,8 +49,8 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                     }
                 } else if exponent > T::MAX_EXPONENT {
                     match abs_rm {
-                        Floor | Down | Nearest => (T::MAX_FINITE, Less),
-                        Ceiling | Up => (T::INFINITY, Greater),
+                        Floor | Down => (T::MAX_FINITE, Less),
+                        Ceiling | Up | Nearest => (T::INFINITY, Greater),
                         Exact => panic!("Float too large for exact conversion"),
                     }
                 } else {
@@ -62,9 +62,8 @@ fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
                     if mantissa.significant_bits() > target_prec {
                         if exponent == T::MAX_EXPONENT {
                             match abs_rm {
-                                Floor | Down | Nearest => (T::MAX_FINITE, Less),
-                                Ceiling | Up => (T::INFINITY, Greater),
-
+                                Floor | Down => (T::MAX_FINITE, Less),
+                                Ceiling | Up | Nearest => (T::INFINITY, Greater),
                                 Exact => {
                                     panic!("Float too large for exact conversion")
                                 }
@@ -130,8 +129,8 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                     }
                 } else if exponent > T::MAX_EXPONENT {
                     match abs_rm {
-                        Floor | Down | Nearest => (T::MAX_FINITE, Less),
-                        Ceiling | Up => (T::INFINITY, Greater),
+                        Floor | Down => (T::MAX_FINITE, Less),
+                        Ceiling | Up | Nearest => (T::INFINITY, Greater),
                         Exact => panic!("Float too large for exact conversion"),
                     }
                 } else {
@@ -143,8 +142,8 @@ fn primitive_float_rounding_from_float_ref<T: PrimitiveFloat>(
                     if mantissa.significant_bits() > target_prec {
                         if exponent == T::MAX_EXPONENT {
                             match abs_rm {
-                                Floor | Down | Nearest => (T::MAX_FINITE, Less),
-                                Ceiling | Up => (T::INFINITY, Greater),
+                                Floor | Down => (T::MAX_FINITE, Less),
+                                Ceiling | Up | Nearest => (T::INFINITY, Greater),
 
                                 Exact => {
                                     panic!("Float too large for exact conversion")
@@ -293,6 +292,36 @@ macro_rules! impl_primitive_float_from {
             /// (Although a NaN is not comparable to any [`Float`], converting a NaN to a NaN will
             /// also return `Equal`, indicating an exact conversion.)
             ///
+            /// Overflow and underflow:
+            /// - If the rounding mode is `Floor`, the largest primitive float less than or equal to
+            ///   the [`Float`] is returned. If the [`Float`] is greater than the maximum finite
+            ///   primitive float, then the maximum finite primitive float is returned. If it is
+            ///   smaller than the minimum finite primitive float, then $-\infty$ is returned. If it
+            ///   is between zero and the minimum positive primitive float, then positive zero is
+            ///   returned.
+            /// - If the rounding mode is `Ceiling`, the smallest primitive float greater than or
+            ///   equal to the [`Float`] is returned. If the [`Float`] is greater than the maximum
+            ///   finite primitive float, then $\infty$ is returned. If it is smaller than the
+            ///   minimum finite primitive float, then the minimum finite primitive float is
+            ///   returned. If it is between zero and the maximum negative primitive float, then
+            ///   negative zero is returned.
+            /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
+            ///   [`Float`] is non-negative and as with `Ceiling` if the [`Float`] is negative. If
+            ///   the [`Float`] is between the maximum negative primitive float and the minimum
+            ///   positive primitive float, then positive zero is returned when the [`Float`] is
+            ///   non-negative and negative zero otherwise.
+            /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling` if the
+            ///   [`Float`] is non-negative and as with `Floor` if the [`Float`] is negative. Zero
+            ///   is only returned when the [`Float`] is zero.
+            /// - If the rounding mode is `Nearest`, then the nearest primitive float is returned.
+            ///   If the [`Float`] is exactly between two primitive floats, the primitive float with
+            ///   the zero least-significant bit in its representation is selected. If the [`Float`]
+            ///   is greater than the maximum finite primitive float, then $\infty$ is returned. If
+            ///   the [`Float`] is smaller than the minimum finite primitive float, then $-\infty$
+            ///   is returned. If the [`Float`] is closer to zero than to any other primitive float
+            ///   (or if there is a tie between zero and another float), then positive or negative
+            ///   zero is returned, depending on the [`Float`]'s sign.
+            ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
@@ -314,6 +343,36 @@ macro_rules! impl_primitive_float_from {
             /// whether the returned value is less than, equal to, or greater than the original
             /// value. (Although a NaN is not comparable to any [`Float`], converting a NaN to a NaN
             /// will also return `Equal`, indicating an exact conversion.)
+            ///
+            /// Overflow and underflow:
+            /// - If the rounding mode is `Floor`, the largest primitive float less than or equal to
+            ///   the [`Float`] is returned. If the [`Float`] is greater than the maximum finite
+            ///   primitive float, then the maximum finite primitive float is returned. If it is
+            ///   smaller than the minimum finite primitive float, then $-\infty$ is returned. If it
+            ///   is between zero and the minimum positive primitive float, then positive zero is
+            ///   returned.
+            /// - If the rounding mode is `Ceiling`, the smallest primitive float greater than or
+            ///   equal to the [`Float`] is returned. If the [`Float`] is greater than the maximum
+            ///   finite primitive float, then $\infty$ is returned. If it is smaller than the
+            ///   minimum finite primitive float, then the minimum finite primitive float is
+            ///   returned. If it is between zero and the maximum negative primitive float, then
+            ///   negative zero is returned.
+            /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
+            ///   [`Float`] is non-negative and as with `Ceiling` if the [`Float`] is negative. If
+            ///   the [`Float`] is between the maximum negative primitive float and the minimum
+            ///   positive primitive float, then positive zero is returned when the [`Float`] is
+            ///   non-negative and negative zero otherwise.
+            /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling` if the
+            ///   [`Float`] is non-negative and as with `Floor` if the [`Float`] is negative. Zero
+            ///   is only returned when the [`Float`] is zero.
+            /// - If the rounding mode is `Nearest`, then the nearest primitive float is returned.
+            ///   If the [`Float`] is exactly between two primitive floats, the primitive float with
+            ///   the zero least-significant bit in its representation is selected. If the [`Float`]
+            ///   is greater than the maximum finite primitive float, then $\infty$ is returned. If
+            ///   the [`Float`] is smaller than the minimum finite primitive float, then $-\infty$
+            ///   is returned. If the [`Float`] is closer to zero than to any other primitive float
+            ///   (or if there is a tie between zero and another float), then positive or negative
+            ///   zero is returned, depending on the [`Float`]'s sign.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

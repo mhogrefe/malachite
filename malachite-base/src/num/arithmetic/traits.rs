@@ -11,7 +11,7 @@ use crate::rounding_modes::RoundingMode;
 use core::cmp::Ordering;
 
 /// Takes the absolute value of a number. Assumes that the number has a representable absolute
-/// number.
+/// value.
 pub trait Abs {
     type Output;
 
@@ -19,7 +19,7 @@ pub trait Abs {
 }
 
 /// Replaces a number with its absolute value. Assumes that the number has a representable absolute
-/// number.
+/// value.
 pub trait AbsAssign {
     fn abs_assign(&mut self);
 }

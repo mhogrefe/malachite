@@ -32,11 +32,11 @@ macro_rules! float_impls {
             ///   float, then the maximum finite float is returned.
             /// - If the rounding mode is `Ceiling` or `Up`, the smallest float greater than or
             ///   equal to the [`Natural`] is returned. If the [`Natural`] is greater than the
-            ///   maximum finite float, then positive infinity is returned.
+            ///   maximum finite float, then $\infty$ is returned.
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Natural`] is exactly between two floats, the float with the zero
             ///   least-significant bit in its representation is selected. If the [`Natural`] is
-            ///   greater than the maximum finite float, then the maximum finite float is returned.
+            ///   greater than the maximum finite float, then $\infty$ is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -66,7 +66,7 @@ macro_rules! float_impls {
                             Exact => {
                                 panic!("Value cannot be represented exactly as an {}", $f::NAME)
                             }
-                            Floor | Down | Nearest => ($f::MAX_FINITE, Less),
+                            Floor | Down => ($f::MAX_FINITE, Less),
                             _ => ($f::INFINITY, Greater),
                         }
                     }

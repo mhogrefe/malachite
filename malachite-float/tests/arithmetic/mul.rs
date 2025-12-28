@@ -10931,7 +10931,7 @@ where
 {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
         let product_1 = x * y;
-        let product_2 = emulate_float_float_to_float_fn(|x, y, prec| x.mul_prec(y, prec).0, x, y);
+        let product_2 = emulate_float_float_to_float_fn(|x, y, prec| x.mul_prec(y, prec), x, y);
         assert_eq!(NiceFloat(product_1), NiceFloat(product_2));
     });
 }

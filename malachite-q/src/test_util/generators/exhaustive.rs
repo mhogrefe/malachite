@@ -348,6 +348,13 @@ pub fn exhaustive_rational_unsigned_pair_gen_var_4() -> It<(Rational, u8)> {
     ))
 }
 
+pub fn exhaustive_rational_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> It<(Rational, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_nonzero_rationals(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>()
@@ -407,6 +414,10 @@ pub fn exhaustive_rational_pair_gen_var_5() -> It<(Rational, Rational)> {
         exhaustive_positive_rationals()
             .filter(|q| (q - Rational::ONE).gt_abs(&Rational::from_signeds(1, 1000))),
     ))
+}
+
+pub fn exhaustive_rational_pair_gen_var_6() -> It<(Rational, Rational)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_nonzero_rationals()))
 }
 
 // -- (Rational, Rational, Integer) --

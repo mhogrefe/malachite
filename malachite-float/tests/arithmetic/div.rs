@@ -14793,7 +14793,7 @@ where
 {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
         let quotient_1 = x / y;
-        let quotient_2 = emulate_float_float_to_float_fn(|x, y, prec| x.div_prec(y, prec).0, x, y);
+        let quotient_2 = emulate_float_float_to_float_fn(|x, y, prec| x.div_prec(y, prec), x, y);
         assert_eq!(NiceFloat(quotient_1), NiceFloat(quotient_2));
     });
 }

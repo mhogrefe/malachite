@@ -10019,7 +10019,7 @@ where
 {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
         let sum_1 = x + y;
-        let sum_2 = emulate_float_float_to_float_fn(|x, y, prec| x.add_prec(y, prec).0, x, y);
+        let sum_2 = emulate_float_float_to_float_fn(|x, y, prec| x.add_prec(y, prec), x, y);
         assert_eq!(NiceFloat(sum_1), NiceFloat(sum_2));
     });
 }

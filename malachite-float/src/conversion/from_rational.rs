@@ -349,7 +349,7 @@ pub_test! {from_rational_prec_round_ref_using_div(
     }
 }}
 
-const FROM_RATIONAL_THRESHOLD: u64 = 100;
+pub(crate) const FROM_RATIONAL_THRESHOLD: u64 = 100;
 
 impl Float {
     /// Converts a [`Rational`] to a [`Float`], taking the [`Rational`] by value. If the [`Float`]

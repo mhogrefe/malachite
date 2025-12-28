@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_float::conversion::from_rational::{
     from_rational_prec_round_direct, from_rational_prec_round_ref_direct,
@@ -18,7 +20,7 @@ use malachite_float::conversion::from_rational::{
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
 use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::generators::rational_unsigned_rounding_mode_triple_gen_var_1;
-use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float, emulate_rational_to_float_fn};
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
 use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
@@ -29,6 +31,19 @@ use std::str::FromStr;
 
 #[test]
 fn test_from_rational_prec() {
+    fn float_helper<T: PrimitiveFloat>(x: &Rational)
+    where
+        Float: PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float> + RoundingFrom<&'a Rational>,
+        Rational: TryFrom<T>,
+    {
+        let xf = emulate_rational_to_float_fn::<T, _>(
+            |x, prec| Float::from_rational_prec_ref(x, prec),
+            x,
+        );
+        assert_eq!(NiceFloat(xf), NiceFloat(T::rounding_from(x, Nearest).0));
+    }
+
     let test = |s, prec, out, out_hex, out_o| {
         let u = Rational::from_str(s).unwrap();
 
@@ -72,6 +87,9 @@ fn test_from_rational_prec() {
         let x = Float::exact_from(&rug_x);
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
+
+        float_helper::<f32>(&u);
+        float_helper::<f64>(&u);
     };
     test("0", 1, "0.0", "0x0.0", Equal);
     test("0", 10, "0.0", "0x0.0", Equal);
@@ -148,7 +166,69 @@ fn test_from_rational_prec() {
         let x = Float::exact_from(&rug_x);
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
+
+        float_helper::<f32>(&u);
+        float_helper::<f64>(&u);
     };
+
+    test_big(
+        Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
+        10,
+        "1.401e-45",
+        "0x8.00E-38#10",
+        Equal,
+    );
+    test_big(
+        Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1,
+        10,
+        "7.01e-46",
+        "0x4.00E-38#10",
+        Equal,
+    );
+    test_big(
+        (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1) + Rational::power_of_2(-1000i64),
+        10,
+        "7.01e-46",
+        "0x4.00E-38#10",
+        Less,
+    );
+    test_big(
+        (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1) - Rational::power_of_2(-1000i64),
+        10,
+        "7.01e-46",
+        "0x4.00E-38#10",
+        Greater,
+    );
+
+    test_big(
+        Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL),
+        10,
+        "4.94e-324",
+        "0x4.00E-269#10",
+        Equal,
+    );
+    test_big(
+        Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1,
+        10,
+        "2.47e-324",
+        "0x2.00E-269#10",
+        Equal,
+    );
+    test_big(
+        (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1) + Rational::power_of_2(-2000i64),
+        10,
+        "2.47e-324",
+        "0x2.00E-269#10",
+        Less,
+    );
+    test_big(
+        (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1) - Rational::power_of_2(-2000i64),
+        10,
+        "2.47e-324",
+        "0x2.00E-269#10",
+        Greater,
+    );
+
     test_big(
         Rational::power_of_2(1000i64),
         10,
@@ -3857,6 +3937,21 @@ fn test_convertible_from_rational() {
     );
 }
 
+fn from_rational_prec_properties_helper<T: PrimitiveFloat>()
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float> + RoundingFrom<&'a Rational>,
+    Rational: TryFrom<T>,
+{
+    rational_gen().test_properties(|x| {
+        let xf = emulate_rational_to_float_fn::<T, _>(
+            |x, prec| Float::from_rational_prec_ref(x, prec),
+            &x,
+        );
+        assert_eq!(NiceFloat(xf), NiceFloat(T::rounding_from(&x, Nearest).0));
+    });
+}
+
 #[test]
 fn from_rational_prec_properties() {
     rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
@@ -3922,6 +4017,8 @@ fn from_rational_prec_properties() {
             );
         }
     });
+
+    apply_fn_to_primitive_floats!(from_rational_prec_properties_helper);
 }
 
 #[test]

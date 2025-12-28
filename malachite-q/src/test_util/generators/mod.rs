@@ -501,6 +501,15 @@ pub fn rational_unsigned_pair_gen_var_6() -> Generator<(Rational, u8)> {
     )
 }
 
+// All `(Rational, T)` where the `Rational` is nonzero and the `T` is small, unsigned, and positive.
+pub fn rational_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Rational, T)> {
+    Generator::new(
+        &exhaustive_rational_unsigned_pair_gen_var_5,
+        &random_rational_unsigned_pair_gen_var_7,
+        &special_random_rational_unsigned_pair_gen_var_5,
+    )
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(Rational, T, T)>
@@ -642,6 +651,15 @@ pub fn rational_pair_gen_var_7() -> Generator<(Rational, Rational)> {
         &exhaustive_rational_pair_gen_var_5,
         &random_rational_pair_gen_var_7,
         &special_random_rational_pair_gen_var_5,
+    )
+}
+
+// All pairs of nonzero `Rational`s.
+pub fn rational_pair_gen_var_8() -> Generator<(Rational, Rational)> {
+    Generator::new(
+        &exhaustive_rational_pair_gen_var_6,
+        &random_rational_pair_gen_var_8,
+        &special_random_rational_pair_gen_var_6,
     )
 }
 

@@ -65,7 +65,11 @@ generic_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, 
     }
 }}
 
-fn generic_sqrt_rational(mut x: Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn generic_sqrt_rational(
+    mut x: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
     let mut working_prec = prec << 1;
     let mut increment = Limb::WIDTH;
     let mut end_shift = x.floor_log_base_2();
@@ -777,7 +781,103 @@ impl Float {
         self.sqrt_prec_round_assign(prec, rm)
     }
 
-    #[inline]
+    /// Computes the square root of a [`Rational`], rounding the result to the specified precision
+    /// and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded square root is less than, equal to, or greater than the exact square root. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// The square root of any nonzero negative number is `NaN`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$.
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p,m)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::rational_sqrt_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(sqrt.to_string(), "0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Nearest);
+    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(sqrt.to_string(), "0.774597");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Nearest);
+    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn sqrt_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if x < 0u32 {
@@ -825,6 +925,105 @@ impl Float {
         }
     }
 
+    /// Computes the square root of a [`Rational`], rounding the result to the specified precision
+    /// and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded square root is less than, equal to, or greater than the exact square root. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// The square root of any nonzero negative number is `NaN`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$.
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p,m)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::rational_sqrt_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(sqrt.to_string(), "0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Nearest);
+    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(sqrt.to_string(), "0.774597");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) =
+    ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Nearest);
+    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn sqrt_rational_prec_round_ref(
         x: &Rational,
         prec: u64,
@@ -874,11 +1073,153 @@ impl Float {
         }
     }
 
+    /// Computes the square root of a [`Rational`], rounding the result to the nearest value of the
+    /// specified precision and returning the result as a [`Float`]. The [`Rational`] is taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded square root is less
+    /// than, equal to, or greater than the exact square root. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The square root of any nonzero negative number is `NaN`.
+    ///
+    /// If the square root is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   \sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sqrt_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn sqrt_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
         Self::sqrt_rational_prec_round(x, prec, Nearest)
     }
 
+    /// Computes the square root of a [`Rational`], rounding the result to the nearest value of the
+    /// specified precision and returning the result as a [`Float`]. The [`Rational`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded square root is
+    /// less than, equal to, or greater than the exact square root. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The square root of any nonzero negative number is `NaN`.
+    ///
+    /// If the square root is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \sqrt{x}+\varepsilon.
+    /// $$
+    /// - If $\sqrt{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\sqrt{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   \sqrt{x}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0.0,p)=0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
+    ///   instead.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead, where `p` is the precision of the input.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sqrt_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn sqrt_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::sqrt_rational_prec_round_ref(x, prec, Nearest)
@@ -1087,7 +1428,7 @@ impl SqrtAssign for Float {
 ///   and 53 if `T` is a [`f64`], but less if the output is subnormal).
 ///
 /// Special cases:
-/// - $f(0)=\infty$
+/// - $f(0)=0.0$
 ///
 /// Overflow:
 /// - If the absolute value of the result is too large to represent, $\infty$ is returned instead.
@@ -1130,5 +1471,5 @@ where
     Float: PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
-    emulate_rational_to_float_fn(|x, prec| Float::sqrt_rational_prec_ref(x, prec).0, x)
+    emulate_rational_to_float_fn(|x, prec| Float::sqrt_rational_prec_ref(x, prec), x)
 }

@@ -39,13 +39,13 @@ macro_rules! float_impls {
             /// - If the rounding mode is `Floor`, the largest float less than or equal to the
             ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
             ///   float, then the maximum finite float is returned. If it is smaller than the
-            ///   minimum finite float, then negative infinity is returned. If it is between zero
-            ///   and the minimum positive float, then positive zero is returned.
+            ///   minimum finite float, then $-\infty$ is returned. If it is between zero and the
+            ///   minimum positive float, then positive zero is returned.
             /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to the
             ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
-            ///   float, then positive infinity is returned. If it is smaller than the minimum
-            ///   finite float, then the minimum finite float is returned. If it is between zero and
-            ///   the maximum negative float, then negative zero is returned.
+            ///   float, then $\infty$ is returned. If it is smaller than the minimum finite float,
+            ///   then the minimum finite float is returned. If it is between zero and the maximum
+            ///   negative float, then negative zero is returned.
             /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
             ///   [`Rational`] is non-negative and as with `Ceiling` if the [`Rational`] is
             ///   negative. If the [`Rational`] is between the maximum negative float and the
@@ -58,9 +58,10 @@ macro_rules! float_impls {
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Rational`] is exactly between two floats, the float with the zero
             ///   least-significant bit in its representation is selected. If the [`Rational`] is
-            ///   greater than the maximum finite float, then the maximum finite float is returned.
-            ///   If the [`Rational`] is closer to zero than to any float (or if there is a tie
-            ///   between zero and another float), then positive or negative zero is returned,
+            ///   greater than the maximum finite float, then $\infty$ is returned. If the
+            ///   [`Rational`] is smaller than the minimum finite float, then $-\infty$ is returned.
+            ///   If the [`Rational`] is closer to zero than to any other float (or if there is a
+            ///   tie between zero and another float), then positive or negative zero is returned,
             ///   depending on the [`Rational`]'s sign.
             ///
             /// # Worst-case complexity
@@ -89,7 +90,7 @@ macro_rules! float_impls {
                             Exact => {
                                 panic!("Value cannot be represented exactly as a float")
                             }
-                            Floor | Down | Nearest => ($f::MAX_FINITE, Less),
+                            Floor | Down => ($f::MAX_FINITE, Less),
                             _ => ($f::INFINITY, Greater),
                         }
                     } else if exponent >= $f::MIN_NORMAL_EXPONENT {
@@ -112,7 +113,7 @@ macro_rules! float_impls {
                                 Exact => {
                                     panic!("Value cannot be represented exactly as a float")
                                 }
-                                Floor | Down | Nearest => ($f::MAX_FINITE, Less),
+                                Floor | Down => ($f::MAX_FINITE, Less),
                                 _ => ($f::INFINITY, Greater),
                             }
                         } else {
@@ -238,13 +239,13 @@ macro_rules! float_impls {
             /// - If the rounding mode is `Floor`, the largest float less than or equal to the
             ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
             ///   float, then the maximum finite float is returned. If it is smaller than the
-            ///   minimum finite float, then negative infinity is returned. If it is between zero
-            ///   and the minimum positive float, then positive zero is returned.
+            ///   minimum finite float, then $-\infty$ is returned. If it is between zero and the
+            ///   minimum positive float, then positive zero is returned.
             /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to the
             ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
-            ///   float, then positive infinity is returned. If it is smaller than the minimum
-            ///   finite float, then the minimum finite float is returned. If it is between zero and
-            ///   the maximum negative float, then negative zero is returned.
+            ///   float, then $\infty$is returned. If it is smaller than the minimum finite float,
+            ///   then the minimum finite float is returned. If it is between zero and the maximum
+            ///   negative float, then negative zero is returned.
             /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
             ///   [`Rational`] is non-negative and as with `Ceiling` if the [`Rational`] is
             ///   negative. If the [`Rational`] is between the maximum negative float and the
@@ -257,7 +258,8 @@ macro_rules! float_impls {
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Rational`] is exactly between two floats, the float with the zero
             ///   least-significant bit in its representation is selected. If the [`Rational`] is
-            ///   greater than the maximum finite float, then the maximum finite float is returned.
+            ///   greater than the maximum finite float, then $\infty$ is returned. If the
+            ///   [`Rational`] is smaller than the minimum finite float, then $-\infty$ is returned.
             ///   If the [`Rational`] is closer to zero than to any float (or if there is a tie
             ///   between zero and another float), then positive or negative zero is returned,
             ///   depending on the [`Rational`]'s sign.
@@ -287,7 +289,7 @@ macro_rules! float_impls {
                             Exact => {
                                 panic!("Value cannot be represented exactly as a float")
                             }
-                            Floor | Down | Nearest => ($f::MAX_FINITE, Less),
+                            Floor | Down => ($f::MAX_FINITE, Less),
                             _ => ($f::INFINITY, Greater),
                         }
                     } else if exponent >= $f::MIN_NORMAL_EXPONENT {
@@ -310,7 +312,7 @@ macro_rules! float_impls {
                                 Exact => {
                                     panic!("Value cannot be represented exactly as a float")
                                 }
-                                Floor | Down | Nearest => ($f::MAX_FINITE, Less),
+                                Floor | Down => ($f::MAX_FINITE, Less),
                                 _ => ($f::INFINITY, Greater),
                             }
                         } else {
