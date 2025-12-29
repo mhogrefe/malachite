@@ -46,7 +46,7 @@ impl From<&Natural> for BigUint {
 impl From<&Natural> for BigUint {
     #[inline]
     fn from(n: &Natural) -> Self {
-        Self::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
+        Self::new(u32::vec_from_other_type_slice(n.as_limbs_asc()))
     }
 }
 
@@ -67,7 +67,7 @@ impl From<&Natural> for BigInt {
     fn from(n: &Natural) -> Self {
         Self::from_biguint(
             if *n == 0 { Sign::NoSign } else { Sign::Plus },
-            BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc())),
+            BigUint::new(u32::vec_from_other_type_slice(n.as_limbs_asc())),
         )
     }
 }
@@ -88,7 +88,7 @@ impl TryFrom<&rug::Integer> for Natural {
 impl From<&Natural> for rug::Integer {
     #[inline]
     fn from(n: &Natural) -> Self {
-        Self::from_digits(&n.to_limbs_asc(), Order::Lsf)
+        Self::from_digits(n.as_limbs_asc(), Order::Lsf)
     }
 }
 

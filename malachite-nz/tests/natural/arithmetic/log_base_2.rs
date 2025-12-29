@@ -204,7 +204,7 @@ fn floor_log_base_2_properties() {
         let floor_log_base_2 = x.floor_log_base_2();
         assert_eq!(x <= Limb::MAX, floor_log_base_2 < Limb::WIDTH);
         assert_eq!(floor_log_base_2, x.significant_bits() - 1);
-        assert_eq!(floor_log_base_2, limbs_floor_log_base_2(&x.to_limbs_asc()));
+        assert_eq!(floor_log_base_2, limbs_floor_log_base_2(x.as_limbs_asc()));
         assert!(Natural::power_of_2(floor_log_base_2) <= x);
         assert!(x < Natural::power_of_2(floor_log_base_2 + 1));
     });
@@ -224,7 +224,7 @@ fn ceiling_log_base_2_properties() {
         );
         assert_eq!(
             ceiling_log_base_2,
-            limbs_ceiling_log_base_2(&x.to_limbs_asc())
+            limbs_ceiling_log_base_2(x.as_limbs_asc())
         );
         if ceiling_log_base_2 != 0 {
             assert!(Natural::power_of_2(ceiling_log_base_2 - 1) < x);
@@ -246,7 +246,7 @@ fn checked_log_base_2_properties() {
         let checked_log_base_2 = x.checked_log_base_2();
         assert_eq!(
             checked_log_base_2,
-            limbs_checked_log_base_2(&x.to_limbs_asc())
+            limbs_checked_log_base_2(x.as_limbs_asc())
         );
         assert_eq!(checked_log_base_2.is_some(), x.is_power_of_2());
         if let Some(log_base_2) = checked_log_base_2 {

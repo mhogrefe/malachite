@@ -79,13 +79,13 @@ fn from_limbs_asc_properties() {
             .skip_while(|&limb| limb == 0)
             .collect_vec();
         trimmed_limbs.reverse();
-        assert_eq!(x.to_limbs_asc(), trimmed_limbs);
+        assert_eq!(x.as_limbs_asc(), trimmed_limbs);
         assert_eq!(
             Natural::from_limbs_desc(&xs.iter().copied().rev().collect_vec()),
             x
         );
         if !xs.is_empty() && *xs.last().unwrap() != 0 {
-            assert_eq!(x.to_limbs_asc(), xs);
+            assert_eq!(x.as_limbs_asc(), xs);
         }
         assert_eq!(slice_test_zero(&xs), x == 0);
     });

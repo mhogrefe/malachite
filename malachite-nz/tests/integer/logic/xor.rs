@@ -917,7 +917,8 @@ fn limbs_slice_pos_xor_limb_neg_in_place_properties() {
             ^ Integer::from_owned_twos_complement_limbs_asc(vec![y, Limb::MAX]);
         let carry = limbs_slice_pos_xor_limb_neg_in_place(&mut xs, y);
         if carry {
-            let result = Natural::exact_from(-n).to_limbs_asc();
+            let result = Natural::exact_from(-n);
+            let result = result.as_limbs_asc();
             assert_eq!(xs, &result[..xs.len()]);
         } else {
             assert_eq!(Natural::from_owned_limbs_asc(xs), Natural::exact_from(-n));

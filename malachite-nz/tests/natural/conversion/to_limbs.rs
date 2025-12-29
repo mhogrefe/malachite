@@ -26,6 +26,7 @@ fn test_to_limbs_asc() {
         assert_eq!(n.limbs().collect_vec(), out);
         assert_eq!(n.to_limbs_asc(), out);
         assert_eq!(n.into_limbs_asc(), out);
+        assert_eq!(n.as_limbs_asc(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -93,6 +94,7 @@ fn to_limbs_asc_properties() {
     natural_gen().test_properties(|x| {
         let limbs = x.to_limbs_asc();
         assert_eq!(x.clone().into_limbs_asc(), limbs);
+        assert_eq!(x.as_limbs_asc(), limbs);
         assert_eq!(x.limbs().collect_vec(), limbs);
         assert_eq!(Natural::from_limbs_asc(&limbs), x);
         if x != 0 {

@@ -321,7 +321,7 @@ fn to_power_of_2_digits_asc_properties() {
     natural_gen().test_properties(|ref n| {
         assert_eq!(
             PowerOf2Digits::<Limb>::to_power_of_2_digits_asc(n, Limb::WIDTH),
-            n.to_limbs_asc()
+            n.as_limbs_asc()
         );
     });
 }

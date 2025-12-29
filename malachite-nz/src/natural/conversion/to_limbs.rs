@@ -391,6 +391,7 @@ impl Natural {
     /// ```
     pub fn as_limbs_asc(&self) -> &[Limb] {
         match self {
+            Self(Small(0)) => &[],
             Self(Small(small)) => slice::from_ref(small),
             Self(Large(limbs)) => limbs,
         }

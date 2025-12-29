@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_to_limbs_desc);
     register_demo!(runner, demo_natural_into_limbs_asc);
     register_demo!(runner, demo_natural_into_limbs_desc);
+    register_demo!(runner, demo_natural_as_limbs_asc);
     register_demo!(runner, demo_natural_limbs);
     register_demo!(runner, demo_natural_limbs_rev);
     register_demo!(runner, demo_natural_limbs_size_hint);
@@ -54,6 +55,12 @@ fn demo_natural_into_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_natural_into_limbs_desc(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in natural_gen().get(gm, config).take(limit) {
         println!("into_limbs_desc({}) = {:?}", n, n.clone().into_limbs_desc());
+    }
+}
+
+fn demo_natural_as_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("as_limbs_asc({}) = {:?}", n, n.as_limbs_asc());
     }
 }
 
@@ -108,6 +115,9 @@ fn benchmark_natural_limbs_evaluation_strategy(
             ("Natural.to_limbs_asc()", &mut |n| no_out!(n.to_limbs_asc())),
             ("Natural.into_limbs_asc()", &mut |n| {
                 no_out!(n.into_limbs_asc());
+            }),
+            ("Natural.as_limbs_asc()", &mut |n| {
+                no_out!(n.as_limbs_asc());
             }),
             ("Natural.limbs().collect_vec()", &mut |n| {
                 no_out!(n.limbs().collect_vec());
