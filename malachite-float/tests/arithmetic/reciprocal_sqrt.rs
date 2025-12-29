@@ -30,8 +30,9 @@ use malachite_float::arithmetic::reciprocal_sqrt::{
     primitive_float_reciprocal_sqrt, primitive_float_reciprocal_sqrt_rational,
 };
 use malachite_float::test_util::arithmetic::reciprocal_sqrt::{
-    reciprocal_sqrt_rational_prec_round_generic, rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec,
-    rug_reciprocal_sqrt_prec_round, rug_reciprocal_sqrt_round,
+    reciprocal_sqrt_rational_prec_round_generic, reciprocal_sqrt_rational_prec_round_simple,
+    rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec, rug_reciprocal_sqrt_prec_round,
+    rug_reciprocal_sqrt_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, test_constant, to_hex_string,
@@ -1162,6 +1163,7 @@ fn test_reciprocal_sqrt_prec_round() {
 }
 
 #[test]
+#[allow(clippy::type_repetition_in_bounds)]
 fn test_primitive_float_reciprocal_sqrt() {
     fn test<T: PrimitiveFloat>(x: T, out: T)
     where
@@ -1220,6 +1222,12 @@ fn test_reciprocal_sqrt_rational_prec() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, Nearest);
+        assert!(reciprocal_sqrt.is_valid());
+        assert_eq!(reciprocal_sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, Nearest);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -1297,6 +1305,12 @@ fn test_reciprocal_sqrt_rational_prec() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, Nearest);
+        assert!(reciprocal_sqrt.is_valid());
+        assert_eq!(reciprocal_sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, Nearest);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -1478,6 +1492,12 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, rm);
+        assert!(reciprocal_sqrt.is_valid());
+        assert_eq!(reciprocal_sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -1841,6 +1861,12 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, rm);
+        assert!(reciprocal_sqrt.is_valid());
+        assert_eq!(reciprocal_sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -2611,6 +2637,7 @@ fn reciprocal_sqrt_rational_prec_round_ref_fail() {
 }
 
 #[test]
+#[allow(clippy::type_repetition_in_bounds)]
 fn test_primitive_float_reciprocal_sqrt_rational() {
     fn test<T: PrimitiveFloat>(s: &str, out: T)
     where
@@ -2640,7 +2667,7 @@ fn test_primitive_float_reciprocal_sqrt_rational() {
     }
     test::<f32>("0", f32::INFINITY);
     test::<f32>("1", 1.0);
-    test::<f32>("1/2", 1.4142135);
+    test::<f32>("1/2", f32::consts::SQRT_2);
     test::<f32>("1/3", 1.7320508);
     test::<f32>("22/7", 0.56407607);
     test::<f32>("1/225", 15.0);
@@ -2651,7 +2678,7 @@ fn test_primitive_float_reciprocal_sqrt_rational() {
 
     test::<f64>("0", f64::INFINITY);
     test::<f64>("1", 1.0);
-    test::<f64>("1/2", 1.4142135623730951);
+    test::<f64>("1/2", f64::consts::SQRT_2);
     test::<f64>("1/3", 1.7320508075688772);
     test::<f64>("22/7", 0.5640760748177662);
     test::<f64>("1/225", 15.0);
@@ -2660,6 +2687,7 @@ fn test_primitive_float_reciprocal_sqrt_rational() {
     test::<f64>("-1/3", f64::NAN);
     test::<f64>("-22/7", f64::NAN);
 
+    #[allow(clippy::needless_pass_by_value)]
     fn test_big<T: PrimitiveFloat>(u: Rational, out: T)
     where
         Float: From<T> + PartialOrd<T>,
@@ -3203,6 +3231,7 @@ fn reciprocal_sqrt_properties() {
     });
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn primitive_float_reciprocal_sqrt_properties_helper<T: PrimitiveFloat>()
 where
     Float: From<T> + PartialOrd<T>,
@@ -3254,6 +3283,15 @@ fn reciprocal_sqrt_rational_prec_properties() {
 
         let (reciprocal_sqrt_alt, o_alt) =
             reciprocal_sqrt_rational_prec_round_generic(&x, prec, Nearest);
+        assert!(reciprocal_sqrt_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&reciprocal_sqrt_alt),
+            ComparableFloatRef(&reciprocal_sqrt)
+        );
+        assert_eq!(o, o_alt);
+
+        let (reciprocal_sqrt_alt, o_alt) =
+            reciprocal_sqrt_rational_prec_round_simple(&x, prec, Nearest);
         assert!(reciprocal_sqrt_alt.is_valid());
         assert_eq!(
             ComparableFloatRef(&reciprocal_sqrt_alt),
@@ -3340,6 +3378,14 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
         );
         assert_eq!(o, o_alt);
 
+        let (reciprocal_sqrt_alt, o_alt) = reciprocal_sqrt_rational_prec_round_simple(&x, prec, rm);
+        assert!(reciprocal_sqrt_alt.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&reciprocal_sqrt_alt),
+            ComparableFloatRef(&reciprocal_sqrt)
+        );
+        assert_eq!(o, o_alt);
+
         if !reciprocal_sqrt.is_nan() {
             assert_eq!(
                 reciprocal_sqrt.get_prec(),
@@ -3407,6 +3453,7 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
     );
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn primitive_float_reciprocal_sqrt_rational_helper<T: PrimitiveFloat>()
 where
     Float: From<T> + PartialOrd<T>,

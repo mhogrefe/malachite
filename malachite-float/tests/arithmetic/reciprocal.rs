@@ -2791,7 +2791,7 @@ where
 {
     primitive_float_gen::<T>().test_properties(|x| {
         let reciprocal_1 = x.reciprocal();
-        let reciprocal_2 = emulate_float_to_float_fn(|x, prec| x.reciprocal_prec(prec), x);
+        let reciprocal_2 = emulate_float_to_float_fn(Float::reciprocal_prec, x);
         assert_eq!(NiceFloat(reciprocal_1), NiceFloat(reciprocal_2));
     });
 }

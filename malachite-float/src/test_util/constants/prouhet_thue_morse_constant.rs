@@ -6,11 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod ln_2;
-pub mod log_2_e;
-pub mod prime_constant;
-pub mod prouhet_thue_morse_constant;
-pub mod sqrt_2;
-pub mod sqrt_2_over_2;
-pub mod sqrt_3;
-pub mod sqrt_3_over_3;
+use crate::Float;
+use malachite_base::iterators::thue_morse_sequence;
+use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
+
+pub fn prouhet_thue_morse_constant_prec_round_naive(
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    Float::non_dyadic_from_bits_prec_round(thue_morse_sequence(), prec, rm)
+}

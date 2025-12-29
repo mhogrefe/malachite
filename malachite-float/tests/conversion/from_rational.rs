@@ -30,6 +30,7 @@ use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
+#[allow(clippy::type_repetition_in_bounds)]
 fn test_from_rational_prec() {
     fn float_helper<T: PrimitiveFloat>(x: &Rational)
     where
@@ -37,10 +38,7 @@ fn test_from_rational_prec() {
         for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float> + RoundingFrom<&'a Rational>,
         Rational: TryFrom<T>,
     {
-        let xf = emulate_rational_to_float_fn::<T, _>(
-            |x, prec| Float::from_rational_prec_ref(x, prec),
-            x,
-        );
+        let xf = emulate_rational_to_float_fn::<T, _>(Float::from_rational_prec_ref, x);
         assert_eq!(NiceFloat(xf), NiceFloat(T::rounding_from(x, Nearest).0));
     }
 
@@ -3937,6 +3935,7 @@ fn test_convertible_from_rational() {
     );
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn from_rational_prec_properties_helper<T: PrimitiveFloat>()
 where
     Float: PartialOrd<T>,
@@ -3944,10 +3943,7 @@ where
     Rational: TryFrom<T>,
 {
     rational_gen().test_properties(|x| {
-        let xf = emulate_rational_to_float_fn::<T, _>(
-            |x, prec| Float::from_rational_prec_ref(x, prec),
-            &x,
-        );
+        let xf = emulate_rational_to_float_fn::<T, _>(Float::from_rational_prec_ref, &x);
         assert_eq!(NiceFloat(xf), NiceFloat(T::rounding_from(&x, Nearest).0));
     });
 }

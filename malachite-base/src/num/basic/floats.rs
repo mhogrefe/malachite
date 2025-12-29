@@ -16,8 +16,8 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, PrimeConstant,
-    ThueMorseConstant, Two, Zero,
+    Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Phi,
+    PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Two, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -140,7 +140,9 @@ pub trait PrimitiveFloat:
     + Into<f64>
     + IsInteger
     + IsPowerOf2
+    + Log2E
     + Ln
+    + Ln2
     + LowerExp
     + Min
     + Max
@@ -159,6 +161,7 @@ pub trait PrimitiveFloat:
     + PartialEq<Self>
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
+    + Phi
     + Pow<i64, Output = Self>
     + Pow<Self, Output = Self>
     + PowAssign<i64>
@@ -202,6 +205,10 @@ pub trait PrimitiveFloat:
     + Sized
     + Sqrt<Output = Self>
     + SqrtAssign
+    + Sqrt2
+    + Sqrt2Over2
+    + Sqrt3
+    + Sqrt3Over3
     + Square<Output = Self>
     + SquareAssign
     + Sub<Output = Self>
@@ -209,7 +216,7 @@ pub trait PrimitiveFloat:
     + SubMul<Output = Self>
     + SubMulAssign<Self, Self>
     + Sum<Self>
-    + ThueMorseConstant
+    + ProuhetThueMorseConstant
     + Two
     + UpperExp
     + Zero
@@ -593,8 +600,11 @@ macro_rules! impl_basic_traits_primitive_float {
         $min_positive_subnormal: expr,
         $max_subnormal: expr,
         $min_positive_normal: expr,
-        $thue_morse_constant: expr,
-        $prime_constant: expr
+        $prouhet_thue_morse_constant: expr,
+        $prime_constant: expr,
+        $sqrt_3: expr,
+        $sqrt_3_over_3: expr,
+        $phi: expr
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
@@ -713,14 +723,49 @@ macro_rules! impl_basic_traits_primitive_float {
             const MAX: $t = $t::INFINITY;
         }
 
-        /// The Thue-Morse constant.
-        impl ThueMorseConstant for $t {
-            const THUE_MORSE_CONSTANT: $t = $thue_morse_constant;
+        /// The Prouhet-Thue-Morse constant.
+        impl ProuhetThueMorseConstant for $t {
+            const PROUHET_THUE_MORSE_CONSTANT: $t = $prouhet_thue_morse_constant;
         }
 
         /// The prime constant.
         impl PrimeConstant for $t {
             const PRIME_CONSTANT: $t = $prime_constant;
+        }
+
+        /// $\ln 2$.
+        impl Ln2 for $t {
+            const LN_2: $t = core::$t::consts::LN_2;
+        }
+
+        /// $\log_2 e$.
+        impl Log2E for $t {
+            const LOG_2_E: $t = core::$t::consts::LOG2_E;
+        }
+
+        /// $\sqrt{2}$.
+        impl Sqrt2 for $t {
+            const SQRT_2: $t = core::$t::consts::SQRT_2;
+        }
+
+        /// $\sqrt{3}$.
+        impl Sqrt3 for $t {
+            const SQRT_3: $t = $sqrt_3;
+        }
+
+        /// $\sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}$.
+        impl Sqrt2Over2 for $t {
+            const SQRT_2_OVER_2: $t = core::$t::consts::FRAC_1_SQRT_2;
+        }
+
+        /// $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
+        impl Sqrt3Over3 for $t {
+            const SQRT_3_OVER_3: $t = $sqrt_3_over_3;
+        }
+
+        /// $\varphi$, the golden ratio.
+        impl Phi for $t {
+            const PHI: $t = $phi;
         }
     };
 }
@@ -731,7 +776,10 @@ impl_basic_traits_primitive_float!(
     1.1754942e-38,
     1.1754944e-38,
     0.41245404,
-    0.4146825
+    0.4146825,
+    1.7320508,
+    0.57735026,
+    1.618034
 );
 impl_basic_traits_primitive_float!(
     f64,
@@ -740,5 +788,8 @@ impl_basic_traits_primitive_float!(
     2.225073858507201e-308,
     2.2250738585072014e-308,
     0.4124540336401076,
-    0.41468250985111166
+    0.41468250985111166,
+    1.7320508075688772,
+    0.5773502691896257,
+    1.618033988749895
 );

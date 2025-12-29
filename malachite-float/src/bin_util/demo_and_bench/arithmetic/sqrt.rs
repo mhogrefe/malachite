@@ -16,6 +16,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::arithmetic::sqrt::primitive_float_sqrt_rational;
 use malachite_float::test_util::arithmetic::sqrt::{
     rug_sqrt, rug_sqrt_prec, rug_sqrt_prec_round, rug_sqrt_round, sqrt_rational_prec_round_generic,
+    sqrt_rational_prec_round_simple,
 };
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer, pair_2_float_complexity_bucketer,
@@ -630,6 +631,7 @@ fn demo_float_sqrt_rational_prec_round_ref_debug(gm: GenMode, config: &GenConfig
     }
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_sqrt_rational<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -992,10 +994,14 @@ fn benchmark_float_sqrt_rational_prec_round_algorithms(
             ("generic", &mut |(n, prec, rm)| {
                 no_out!(sqrt_rational_prec_round_generic(&n, prec, rm));
             }),
+            ("simple", &mut |(n, prec, rm)| {
+                no_out!(sqrt_rational_prec_round_simple(&n, prec, rm));
+            }),
         ],
     );
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn benchmark_primitive_float_sqrt_rational<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -1017,7 +1023,7 @@ fn benchmark_primitive_float_sqrt_rational<T: PrimitiveFloat>(
         file_name,
         &rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |x| {
-            no_out!(primitive_float_sqrt_rational::<T>(&x))
+            no_out!(primitive_float_sqrt_rational::<T>(&x));
         })],
     );
 }

@@ -6,11 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
-use malachite_base::iterators::thue_morse_sequence;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::num::conversion::traits::ExactFrom;
+use rug;
+use rug::float::Round;
+use rug::ops::AssignRound;
 use std::cmp::Ordering;
 
-pub fn thue_morse_constant_prec_round_naive(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    Float::non_dyadic_from_bits_prec_round(thue_morse_sequence(), prec, rm)
+pub fn rug_sqrt_2_over_2_prec_round(prec: u64, rm: Round) -> (rug::Float, Ordering) {
+    let mut sqrt = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = sqrt.assign_round(rug::Float::with_val(1, 2).sqrt_ref(), rm);
+    (sqrt >> 1, o)
 }

@@ -28,6 +28,7 @@ use malachite_float::arithmetic::sqrt::primitive_float_sqrt_rational;
 use malachite_float::emulate_float_to_float_fn;
 use malachite_float::test_util::arithmetic::sqrt::{
     rug_sqrt, rug_sqrt_prec, rug_sqrt_prec_round, rug_sqrt_round, sqrt_rational_prec_round_generic,
+    sqrt_rational_prec_round_simple,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, test_constant, to_hex_string,
@@ -1549,6 +1550,12 @@ fn test_sqrt_rational_prec() {
         assert_eq!(to_hex_string(&sqrt), out_hex);
         assert_eq!(o, out_o);
 
+        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, Nearest);
+        assert!(sqrt.is_valid());
+        assert_eq!(sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&sqrt), out_hex);
+        assert_eq!(o, out_o);
+
         if sqrt.is_normal() {
             let square = Rational::exact_from(&sqrt).square();
             match o {
@@ -1616,6 +1623,12 @@ fn test_sqrt_rational_prec() {
         assert_eq!(o, out_o);
 
         let (sqrt, o) = sqrt_rational_prec_round_generic(&u, prec, Nearest);
+        assert!(sqrt.is_valid());
+        assert_eq!(sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, Nearest);
         assert!(sqrt.is_valid());
         assert_eq!(sqrt.to_string(), out);
         assert_eq!(to_hex_string(&sqrt), out_hex);
@@ -1787,6 +1800,12 @@ fn test_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (sqrt, o) = sqrt_rational_prec_round_generic(&u, prec, rm);
+        assert!(sqrt.is_valid());
+        assert_eq!(sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(sqrt.is_valid());
         assert_eq!(sqrt.to_string(), out);
         assert_eq!(to_hex_string(&sqrt), out_hex);
@@ -2146,6 +2165,12 @@ fn test_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (sqrt, o) = sqrt_rational_prec_round_generic(&u, prec, rm);
+        assert!(sqrt.is_valid());
+        assert_eq!(sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&sqrt), out_hex);
+        assert_eq!(o, out_o);
+
+        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(sqrt.is_valid());
         assert_eq!(sqrt.to_string(), out);
         assert_eq!(to_hex_string(&sqrt), out_hex);
@@ -2904,6 +2929,7 @@ fn sqrt_rational_prec_round_ref_fail() {
 }
 
 #[test]
+#[allow(clippy::type_repetition_in_bounds)]
 fn test_primitive_float_sqrt_rational() {
     fn test<T: PrimitiveFloat>(s: &str, out: T)
     where
@@ -2947,7 +2973,7 @@ fn test_primitive_float_sqrt_rational() {
 
     test::<f64>("0", 0.0);
     test::<f64>("1", 1.0);
-    test::<f64>("1/2", 0.7071067811865476);
+    test::<f64>("1/2", f64::consts::FRAC_1_SQRT_2);
     test::<f64>("1/3", 0.5773502691896257);
     test::<f64>("22/7", 1.7728105208558367);
     test::<f64>("225", 15.0);
@@ -2956,6 +2982,7 @@ fn test_primitive_float_sqrt_rational() {
     test::<f64>("-1/3", f64::NAN);
     test::<f64>("-22/7", f64::NAN);
 
+    #[allow(clippy::needless_pass_by_value)]
     fn test_big<T: PrimitiveFloat>(u: Rational, out: T)
     where
         Float: From<T> + PartialOrd<T>,
@@ -3396,7 +3423,7 @@ where
 {
     primitive_float_gen::<T>().test_properties(|x| {
         let sqrt_1 = x.sqrt();
-        let sqrt_2 = emulate_float_to_float_fn(|x, prec| x.sqrt_prec(prec), x);
+        let sqrt_2 = emulate_float_to_float_fn(Float::sqrt_prec, x);
         assert_eq!(NiceFloat(sqrt_1), NiceFloat(sqrt_2));
     });
 }
@@ -3447,6 +3474,11 @@ fn sqrt_rational_prec_properties() {
         assert_eq!(o, o_alt);
 
         let (sqrt_alt, o_alt) = sqrt_rational_prec_round_generic(&x, prec, Nearest);
+        assert!(sqrt_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
+        assert_eq!(o, o_alt);
+
+        let (sqrt_alt, o_alt) = sqrt_rational_prec_round_simple(&x, prec, Nearest);
         assert!(sqrt_alt.is_valid());
         assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
         assert_eq!(o, o_alt);
@@ -3515,6 +3547,11 @@ fn sqrt_rational_prec_round_properties() {
         assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
         assert_eq!(o, o_alt);
 
+        let (sqrt_alt, o_alt) = sqrt_rational_prec_round_simple(&x, prec, rm);
+        assert!(sqrt_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
+        assert_eq!(o, o_alt);
+
         if !sqrt.is_nan() {
             assert_eq!(sqrt.get_prec(), if x == 0u32 { None } else { Some(prec) });
         }
@@ -3573,6 +3610,7 @@ fn sqrt_rational_prec_round_properties() {
     );
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn primitive_float_sqrt_rational_helper<T: PrimitiveFloat>()
 where
     Float: From<T> + PartialOrd<T>,

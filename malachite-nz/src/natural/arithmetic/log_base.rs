@@ -26,7 +26,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 impl Natural {
     /// Calculates the approximate natural logarithm of a nonzero [`Natural`].
     ///
-    /// $f(x) = (1+\varepsilon)(\log x)$, where $|\varepsilon| < 2^{-52}.$
+    /// $f(x) = (1+\varepsilon)(\ln x)$, where $|\varepsilon| < 2^{-52}.$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -42,17 +42,17 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     NiceFloat(Natural::from(10u32).approx_log()),
+    ///     NiceFloat(Natural::from(10u32).approx_ln()),
     ///     NiceFloat(2.3025850929940455)
     /// );
     /// assert_eq!(
-    ///     NiceFloat(Natural::from(10u32).pow(10000).approx_log()),
+    ///     NiceFloat(Natural::from(10u32).pow(10000).approx_ln()),
     ///     NiceFloat(23025.850929940454)
     /// );
     /// ```
     ///
     /// This is equivalent to `fmpz_dlog` from `fmpz/dlog.c`, FLINT 2.7.1.
-    pub fn approx_log(&self) -> f64 {
+    pub fn approx_ln(&self) -> f64 {
         assert_ne!(*self, 0);
         let (mantissa, exponent): (f64, u64) = self.sci_mantissa_and_exponent();
         libm::log(mantissa) + (exponent as f64) * core::f64::consts::LN_2
@@ -73,7 +73,7 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     } else if x < base {
         return (0, false);
     }
-    let mut log = u64::rounding_from(x.approx_log() / base.approx_log(), Floor).0;
+    let mut log = u64::rounding_from(x.approx_ln() / base.approx_ln(), Floor).0;
     let mut power = base.pow(log);
     match power.cmp(x) {
         Equal => (log, true),
@@ -124,7 +124,7 @@ pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, boo
     } else if x < base {
         return (0, false, Natural::ONE, 0);
     }
-    let mut log = (x.approx_log() / base.approx_log()) as u64;
+    let mut log = (x.approx_ln() / base.approx_ln()) as u64;
     let mut power = base.pow(log);
     match power.cmp(x) {
         Equal => (log, true, power, log),

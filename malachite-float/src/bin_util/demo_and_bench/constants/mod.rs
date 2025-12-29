@@ -9,11 +9,23 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    log_2::register(runner);
+    ln_2::register(runner);
+    log_2_e::register(runner);
+    phi::register(runner);
     prime_constant::register(runner);
-    thue_morse_constant::register(runner);
+    prouhet_thue_morse_constant::register(runner);
+    sqrt_2::register(runner);
+    sqrt_2_over_2::register(runner);
+    sqrt_3::register(runner);
+    sqrt_3_over_3::register(runner);
 }
 
-mod log_2;
+mod ln_2;
+mod log_2_e;
+mod phi;
 mod prime_constant;
-mod thue_morse_constant;
+mod prouhet_thue_morse_constant;
+mod sqrt_2;
+mod sqrt_2_over_2;
+mod sqrt_3;
+mod sqrt_3_over_3;

@@ -417,9 +417,8 @@ where
                     Nearest
                 };
             return T::rounding_from(&result, rm).0;
-        } else {
-            result = f(x, T::max_precision_for_sci_exponent(e)).0;
         }
+        result = f(x, T::max_precision_for_sci_exponent(e)).0;
     }
     if result > T::MAX_FINITE {
         T::INFINITY

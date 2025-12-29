@@ -19,8 +19,9 @@ use malachite_float::arithmetic::reciprocal_sqrt::{
     primitive_float_reciprocal_sqrt, primitive_float_reciprocal_sqrt_rational,
 };
 use malachite_float::test_util::arithmetic::reciprocal_sqrt::{
-    reciprocal_sqrt_rational_prec_round_generic, rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec,
-    rug_reciprocal_sqrt_prec_round, rug_reciprocal_sqrt_round,
+    reciprocal_sqrt_rational_prec_round_generic, reciprocal_sqrt_rational_prec_round_simple,
+    rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec, rug_reciprocal_sqrt_prec_round,
+    rug_reciprocal_sqrt_round,
 };
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_1_float_complexity_bucketer, pair_2_float_complexity_bucketer,
@@ -568,6 +569,7 @@ fn demo_float_reciprocal_sqrt_prec_round_assign_debug(
     }
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_reciprocal_sqrt<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -722,6 +724,7 @@ fn demo_float_reciprocal_sqrt_rational_prec_round_ref_debug(
     }
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_reciprocal_sqrt_rational<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -1034,6 +1037,7 @@ fn benchmark_float_reciprocal_sqrt_prec_round_assign(
     );
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn benchmark_primitive_float_reciprocal_sqrt<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -1102,13 +1106,13 @@ fn benchmark_float_reciprocal_sqrt_rational_prec_round_evaluation_strategy(
             (
                 "Float::reciprocal_sqrt_rational_prec(Rational, u64, RoundingMode)",
                 &mut |(n, prec, rm)| {
-                    no_out!(Float::reciprocal_sqrt_rational_prec_round(n, prec, rm))
+                    no_out!(Float::reciprocal_sqrt_rational_prec_round(n, prec, rm));
                 },
             ),
             (
                 "Float::reciprocal_sqrt_rational_prec_ref(&Rational, u64, RoundingMode)",
                 &mut |(n, prec, rm)| {
-                    no_out!(Float::reciprocal_sqrt_rational_prec_round_ref(&n, prec, rm))
+                    no_out!(Float::reciprocal_sqrt_rational_prec_round_ref(&n, prec, rm));
                 },
             ),
         ],
@@ -1136,10 +1140,14 @@ fn benchmark_float_reciprocal_sqrt_rational_prec_round_algorithms(
             ("generic", &mut |(n, prec, rm)| {
                 no_out!(reciprocal_sqrt_rational_prec_round_generic(&n, prec, rm));
             }),
+            ("simple", &mut |(n, prec, rm)| {
+                no_out!(reciprocal_sqrt_rational_prec_round_simple(&n, prec, rm));
+            }),
         ],
     );
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn benchmark_primitive_float_reciprocal_sqrt_rational<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -1161,7 +1169,7 @@ fn benchmark_primitive_float_reciprocal_sqrt_rational<T: PrimitiveFloat>(
         file_name,
         &rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |x| {
-            no_out!(primitive_float_reciprocal_sqrt_rational::<T>(&x))
+            no_out!(primitive_float_reciprocal_sqrt_rational::<T>(&x));
         })],
     );
 }

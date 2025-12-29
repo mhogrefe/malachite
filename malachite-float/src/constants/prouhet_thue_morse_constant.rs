@@ -65,15 +65,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (tmc, o) = Float::thue_morse_constant_prec_round(100, Floor);
+    /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec_round(100, Floor);
     /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682584");
     /// assert_eq!(o, Less);
     ///
-    /// let (tmc, o) = Float::thue_morse_constant_prec_round(100, Ceiling);
+    /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec_round(100, Ceiling);
     /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682588");
     /// assert_eq!(o, Greater);
     /// ```
-    pub fn thue_morse_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+    pub fn prouhet_thue_morse_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         assert_ne!(rm, Exact);
         // If the result is 1/2 then the exponent is 0 rather than -1, so we handle that case
@@ -164,20 +164,20 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (tmc, o) = Float::thue_morse_constant_prec(1);
+    /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec(1);
     /// assert_eq!(tmc.to_string(), "0.5");
     /// assert_eq!(o, Greater);
     ///
-    /// let (tmc, o) = Float::thue_morse_constant_prec(10);
+    /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec(10);
     /// assert_eq!(tmc.to_string(), "0.4126");
     /// assert_eq!(o, Greater);
     ///
-    /// let (tmc, o) = Float::thue_morse_constant_prec(100);
+    /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec(100);
     /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682584");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn thue_morse_constant_prec(prec: u64) -> (Self, Ordering) {
-        Self::thue_morse_constant_prec_round(prec, Nearest)
+    pub fn prouhet_thue_morse_constant_prec(prec: u64) -> (Self, Ordering) {
+        Self::prouhet_thue_morse_constant_prec_round(prec, Nearest)
     }
 }

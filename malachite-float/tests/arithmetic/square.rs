@@ -2856,7 +2856,7 @@ where
 {
     primitive_float_gen::<T>().test_properties(|x| {
         let square_1 = x.square();
-        let square_2 = emulate_float_to_float_fn(|x, prec| x.square_prec(prec), x);
+        let square_2 = emulate_float_to_float_fn(Float::square_prec, x);
         assert_eq!(NiceFloat(square_1), NiceFloat(square_2));
     });
 }

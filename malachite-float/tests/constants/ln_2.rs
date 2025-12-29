@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
+use malachite_base::num::basic::traits::Ln2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
@@ -14,20 +15,20 @@ use malachite_base::test_util::generators::{
 use malachite_float::test_util::common::{
     rug_round_try_from_rounding_mode, test_constant, to_hex_string,
 };
-use malachite_float::test_util::constants::log_2::rug_log_2_prec_round;
+use malachite_float::test_util::constants::ln_2::rug_ln_2_prec_round;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
-fn test_log_2_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) {
-    let (x, o) = Float::log_2_prec(prec);
+fn test_ln_2_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) {
+    let (x, o) = Float::ln_2_prec(prec);
     assert!(x.is_valid());
     assert_eq!(x.to_string(), out);
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
 
     let (rug_x, rug_o) =
-        rug_log_2_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
+        rug_ln_2_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
     assert_eq!(
         ComparableFloatRef(&Float::from(&rug_x)),
         ComparableFloatRef(&x)
@@ -36,8 +37,8 @@ fn test_log_2_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) 
 }
 
 #[test]
-pub fn test_log_2_prec() {
-    // - in log_2_prec_round
+pub fn test_ln_2_prec() {
+    // - in ln_2_prec_round
     // - in sum
     // - n2 != n1 + 1 in sum
     // - n2 == n1 + 1 in sum
@@ -45,7 +46,7 @@ pub fn test_log_2_prec() {
     // - n1 != 0 in sum
     // - !need_p first time in sum
     // - v == 0 first time in sum
-    // - can't round in log_2_prec_round
+    // - can't round in ln_2_prec_round
     // - need_p first time in sum
     // - v != 0 first time in sum
     // - w < v first time in sum
@@ -58,24 +59,24 @@ pub fn test_log_2_prec() {
     // - w >= v second time in sum
     // - !need_p second time in sum
     // - !need_p third time in sum
-    // - can round in log_2_prec_round
-    test_log_2_prec_helper(1, "0.5", "0x0.8#1", Less);
-    test_log_2_prec_helper(2, "0.8", "0x0.c#2", Greater);
-    test_log_2_prec_helper(3, "0.8", "0x0.c#3", Greater);
-    test_log_2_prec_helper(4, "0.7", "0x0.b#4", Less);
-    test_log_2_prec_helper(5, "0.69", "0x0.b0#5", Less);
-    test_log_2_prec_helper(6, "0.69", "0x0.b0#6", Less);
-    test_log_2_prec_helper(7, "0.695", "0x0.b2#7", Greater);
-    test_log_2_prec_helper(8, "0.691", "0x0.b1#8", Less);
-    test_log_2_prec_helper(9, "0.693", "0x0.b18#9", Greater);
-    test_log_2_prec_helper(10, "0.693", "0x0.b18#10", Greater);
-    test_log_2_prec_helper(
+    // - can round in ln_2_prec_round
+    test_ln_2_prec_helper(1, "0.5", "0x0.8#1", Less);
+    test_ln_2_prec_helper(2, "0.8", "0x0.c#2", Greater);
+    test_ln_2_prec_helper(3, "0.8", "0x0.c#3", Greater);
+    test_ln_2_prec_helper(4, "0.7", "0x0.b#4", Less);
+    test_ln_2_prec_helper(5, "0.69", "0x0.b0#5", Less);
+    test_ln_2_prec_helper(6, "0.69", "0x0.b0#6", Less);
+    test_ln_2_prec_helper(7, "0.695", "0x0.b2#7", Greater);
+    test_ln_2_prec_helper(8, "0.691", "0x0.b1#8", Less);
+    test_ln_2_prec_helper(9, "0.693", "0x0.b18#9", Greater);
+    test_ln_2_prec_helper(10, "0.693", "0x0.b18#10", Greater);
+    test_ln_2_prec_helper(
         100,
         "0.693147180559945309417232121458",
         "0x0.b17217f7d1cf79abc9e3b3980#100",
         Less,
     );
-    test_log_2_prec_helper(
+    test_ln_2_prec_helper(
         1000,
         "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863\
         326996418687542001481020570685733685520235758130557032670751635075961930727570828371435190\
@@ -86,7 +87,7 @@ pub fn test_log_2_prec() {
         b256fa0ec7657f74b72ce87b19d6548caf5dfa6bd38303248655fa1872f20e3a2da2d97c50f#1000",
         Less,
     );
-    test_log_2_prec_helper(
+    test_ln_2_prec_helper(
         10000,
         "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863\
         326996418687542001481020570685733685520235758130557032670751635075961930727570828371435190\
@@ -153,32 +154,32 @@ pub fn test_log_2_prec() {
         Less,
     );
 
-    let log_2_f32 = Float::log_2_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(log_2_f32.to_string(), "0.69314718");
-    assert_eq!(to_hex_string(&log_2_f32), "0x0.b17218#24");
-    assert_eq!(log_2_f32, std::f32::consts::LN_2);
+    let ln_2_f32 = Float::ln_2_prec(u64::from(f32::MANTISSA_DIGITS)).0;
+    assert_eq!(ln_2_f32.to_string(), "0.69314718");
+    assert_eq!(to_hex_string(&ln_2_f32), "0x0.b17218#24");
+    assert_eq!(ln_2_f32, f32::LN_2);
 
-    let log_2_f64 = Float::log_2_prec(u64::from(f64::MANTISSA_DIGITS)).0;
-    assert_eq!(log_2_f64.to_string(), "0.6931471805599453");
-    assert_eq!(to_hex_string(&log_2_f64), "0x0.b17217f7d1cf78#53");
-    assert_eq!(log_2_f64, std::f64::consts::LN_2);
+    let ln_2_f64 = Float::ln_2_prec(u64::from(f64::MANTISSA_DIGITS)).0;
+    assert_eq!(ln_2_f64.to_string(), "0.6931471805599453");
+    assert_eq!(to_hex_string(&ln_2_f64), "0x0.b17217f7d1cf78#53");
+    assert_eq!(ln_2_f64, f64::LN_2);
 }
 
-fn test_log_2_prec_round_helper(
+fn test_ln_2_prec_round_helper(
     prec: u64,
     rm: RoundingMode,
     out: &str,
     out_hex: &str,
     out_o: Ordering,
 ) {
-    let (x, o) = Float::log_2_prec_round(prec, rm);
+    let (x, o) = Float::ln_2_prec_round(prec, rm);
     assert!(x.is_valid());
     assert_eq!(x.to_string(), out);
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-        let (rug_x, rug_o) = rug_log_2_prec_round(prec, rm);
+        let (rug_x, rug_o) = rug_ln_2_prec_round(prec, rm);
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_x)),
             ComparableFloatRef(&x)
@@ -188,96 +189,96 @@ fn test_log_2_prec_round_helper(
 }
 
 #[test]
-pub fn test_log_2_prec_round() {
-    test_log_2_prec_round_helper(1, Floor, "0.5", "0x0.8#1", Less);
-    test_log_2_prec_round_helper(1, Ceiling, "1.0", "0x1.0#1", Greater);
-    test_log_2_prec_round_helper(1, Down, "0.5", "0x0.8#1", Less);
-    test_log_2_prec_round_helper(1, Up, "1.0", "0x1.0#1", Greater);
-    test_log_2_prec_round_helper(1, Nearest, "0.5", "0x0.8#1", Less);
+pub fn test_ln_2_prec_round() {
+    test_ln_2_prec_round_helper(1, Floor, "0.5", "0x0.8#1", Less);
+    test_ln_2_prec_round_helper(1, Ceiling, "1.0", "0x1.0#1", Greater);
+    test_ln_2_prec_round_helper(1, Down, "0.5", "0x0.8#1", Less);
+    test_ln_2_prec_round_helper(1, Up, "1.0", "0x1.0#1", Greater);
+    test_ln_2_prec_round_helper(1, Nearest, "0.5", "0x0.8#1", Less);
 
-    test_log_2_prec_round_helper(2, Floor, "0.5", "0x0.8#2", Less);
-    test_log_2_prec_round_helper(2, Ceiling, "0.8", "0x0.c#2", Greater);
-    test_log_2_prec_round_helper(2, Down, "0.5", "0x0.8#2", Less);
-    test_log_2_prec_round_helper(2, Up, "0.8", "0x0.c#2", Greater);
-    test_log_2_prec_round_helper(2, Nearest, "0.8", "0x0.c#2", Greater);
+    test_ln_2_prec_round_helper(2, Floor, "0.5", "0x0.8#2", Less);
+    test_ln_2_prec_round_helper(2, Ceiling, "0.8", "0x0.c#2", Greater);
+    test_ln_2_prec_round_helper(2, Down, "0.5", "0x0.8#2", Less);
+    test_ln_2_prec_round_helper(2, Up, "0.8", "0x0.c#2", Greater);
+    test_ln_2_prec_round_helper(2, Nearest, "0.8", "0x0.c#2", Greater);
 
-    test_log_2_prec_round_helper(3, Floor, "0.6", "0x0.a#3", Less);
-    test_log_2_prec_round_helper(3, Ceiling, "0.8", "0x0.c#3", Greater);
-    test_log_2_prec_round_helper(3, Down, "0.6", "0x0.a#3", Less);
-    test_log_2_prec_round_helper(3, Up, "0.8", "0x0.c#3", Greater);
-    test_log_2_prec_round_helper(3, Nearest, "0.8", "0x0.c#3", Greater);
+    test_ln_2_prec_round_helper(3, Floor, "0.6", "0x0.a#3", Less);
+    test_ln_2_prec_round_helper(3, Ceiling, "0.8", "0x0.c#3", Greater);
+    test_ln_2_prec_round_helper(3, Down, "0.6", "0x0.a#3", Less);
+    test_ln_2_prec_round_helper(3, Up, "0.8", "0x0.c#3", Greater);
+    test_ln_2_prec_round_helper(3, Nearest, "0.8", "0x0.c#3", Greater);
 
-    test_log_2_prec_round_helper(4, Floor, "0.7", "0x0.b#4", Less);
-    test_log_2_prec_round_helper(4, Ceiling, "0.75", "0x0.c#4", Greater);
-    test_log_2_prec_round_helper(4, Down, "0.7", "0x0.b#4", Less);
-    test_log_2_prec_round_helper(4, Up, "0.75", "0x0.c#4", Greater);
-    test_log_2_prec_round_helper(4, Nearest, "0.7", "0x0.b#4", Less);
+    test_ln_2_prec_round_helper(4, Floor, "0.7", "0x0.b#4", Less);
+    test_ln_2_prec_round_helper(4, Ceiling, "0.75", "0x0.c#4", Greater);
+    test_ln_2_prec_round_helper(4, Down, "0.7", "0x0.b#4", Less);
+    test_ln_2_prec_round_helper(4, Up, "0.75", "0x0.c#4", Greater);
+    test_ln_2_prec_round_helper(4, Nearest, "0.7", "0x0.b#4", Less);
 
-    test_log_2_prec_round_helper(5, Floor, "0.69", "0x0.b0#5", Less);
-    test_log_2_prec_round_helper(5, Ceiling, "0.72", "0x0.b8#5", Greater);
-    test_log_2_prec_round_helper(5, Down, "0.69", "0x0.b0#5", Less);
-    test_log_2_prec_round_helper(5, Up, "0.72", "0x0.b8#5", Greater);
-    test_log_2_prec_round_helper(5, Nearest, "0.69", "0x0.b0#5", Less);
+    test_ln_2_prec_round_helper(5, Floor, "0.69", "0x0.b0#5", Less);
+    test_ln_2_prec_round_helper(5, Ceiling, "0.72", "0x0.b8#5", Greater);
+    test_ln_2_prec_round_helper(5, Down, "0.69", "0x0.b0#5", Less);
+    test_ln_2_prec_round_helper(5, Up, "0.72", "0x0.b8#5", Greater);
+    test_ln_2_prec_round_helper(5, Nearest, "0.69", "0x0.b0#5", Less);
 
-    test_log_2_prec_round_helper(6, Floor, "0.69", "0x0.b0#6", Less);
-    test_log_2_prec_round_helper(6, Ceiling, "0.7", "0x0.b4#6", Greater);
-    test_log_2_prec_round_helper(6, Down, "0.69", "0x0.b0#6", Less);
-    test_log_2_prec_round_helper(6, Up, "0.7", "0x0.b4#6", Greater);
-    test_log_2_prec_round_helper(6, Nearest, "0.69", "0x0.b0#6", Less);
+    test_ln_2_prec_round_helper(6, Floor, "0.69", "0x0.b0#6", Less);
+    test_ln_2_prec_round_helper(6, Ceiling, "0.7", "0x0.b4#6", Greater);
+    test_ln_2_prec_round_helper(6, Down, "0.69", "0x0.b0#6", Less);
+    test_ln_2_prec_round_helper(6, Up, "0.7", "0x0.b4#6", Greater);
+    test_ln_2_prec_round_helper(6, Nearest, "0.69", "0x0.b0#6", Less);
 
-    test_log_2_prec_round_helper(7, Floor, "0.69", "0x0.b0#7", Less);
-    test_log_2_prec_round_helper(7, Ceiling, "0.695", "0x0.b2#7", Greater);
-    test_log_2_prec_round_helper(7, Down, "0.69", "0x0.b0#7", Less);
-    test_log_2_prec_round_helper(7, Up, "0.695", "0x0.b2#7", Greater);
-    test_log_2_prec_round_helper(7, Nearest, "0.695", "0x0.b2#7", Greater);
+    test_ln_2_prec_round_helper(7, Floor, "0.69", "0x0.b0#7", Less);
+    test_ln_2_prec_round_helper(7, Ceiling, "0.695", "0x0.b2#7", Greater);
+    test_ln_2_prec_round_helper(7, Down, "0.69", "0x0.b0#7", Less);
+    test_ln_2_prec_round_helper(7, Up, "0.695", "0x0.b2#7", Greater);
+    test_ln_2_prec_round_helper(7, Nearest, "0.695", "0x0.b2#7", Greater);
 
-    test_log_2_prec_round_helper(8, Floor, "0.691", "0x0.b1#8", Less);
-    test_log_2_prec_round_helper(8, Ceiling, "0.695", "0x0.b2#8", Greater);
-    test_log_2_prec_round_helper(8, Down, "0.691", "0x0.b1#8", Less);
-    test_log_2_prec_round_helper(8, Up, "0.695", "0x0.b2#8", Greater);
-    test_log_2_prec_round_helper(8, Nearest, "0.691", "0x0.b1#8", Less);
+    test_ln_2_prec_round_helper(8, Floor, "0.691", "0x0.b1#8", Less);
+    test_ln_2_prec_round_helper(8, Ceiling, "0.695", "0x0.b2#8", Greater);
+    test_ln_2_prec_round_helper(8, Down, "0.691", "0x0.b1#8", Less);
+    test_ln_2_prec_round_helper(8, Up, "0.695", "0x0.b2#8", Greater);
+    test_ln_2_prec_round_helper(8, Nearest, "0.691", "0x0.b1#8", Less);
 
-    test_log_2_prec_round_helper(9, Floor, "0.691", "0x0.b10#9", Less);
-    test_log_2_prec_round_helper(9, Ceiling, "0.693", "0x0.b18#9", Greater);
-    test_log_2_prec_round_helper(9, Down, "0.691", "0x0.b10#9", Less);
-    test_log_2_prec_round_helper(9, Up, "0.693", "0x0.b18#9", Greater);
-    test_log_2_prec_round_helper(9, Nearest, "0.693", "0x0.b18#9", Greater);
+    test_ln_2_prec_round_helper(9, Floor, "0.691", "0x0.b10#9", Less);
+    test_ln_2_prec_round_helper(9, Ceiling, "0.693", "0x0.b18#9", Greater);
+    test_ln_2_prec_round_helper(9, Down, "0.691", "0x0.b10#9", Less);
+    test_ln_2_prec_round_helper(9, Up, "0.693", "0x0.b18#9", Greater);
+    test_ln_2_prec_round_helper(9, Nearest, "0.693", "0x0.b18#9", Greater);
 
-    test_log_2_prec_round_helper(10, Floor, "0.692", "0x0.b14#10", Less);
-    test_log_2_prec_round_helper(10, Ceiling, "0.693", "0x0.b18#10", Greater);
-    test_log_2_prec_round_helper(10, Down, "0.692", "0x0.b14#10", Less);
-    test_log_2_prec_round_helper(10, Up, "0.693", "0x0.b18#10", Greater);
-    test_log_2_prec_round_helper(10, Nearest, "0.693", "0x0.b18#10", Greater);
+    test_ln_2_prec_round_helper(10, Floor, "0.692", "0x0.b14#10", Less);
+    test_ln_2_prec_round_helper(10, Ceiling, "0.693", "0x0.b18#10", Greater);
+    test_ln_2_prec_round_helper(10, Down, "0.692", "0x0.b14#10", Less);
+    test_ln_2_prec_round_helper(10, Up, "0.693", "0x0.b18#10", Greater);
+    test_ln_2_prec_round_helper(10, Nearest, "0.693", "0x0.b18#10", Greater);
 
-    test_log_2_prec_round_helper(
+    test_ln_2_prec_round_helper(
         100,
         Floor,
         "0.693147180559945309417232121458",
         "0x0.b17217f7d1cf79abc9e3b3980#100",
         Less,
     );
-    test_log_2_prec_round_helper(
+    test_ln_2_prec_round_helper(
         100,
         Ceiling,
         "0.693147180559945309417232121459",
         "0x0.b17217f7d1cf79abc9e3b3981#100",
         Greater,
     );
-    test_log_2_prec_round_helper(
+    test_ln_2_prec_round_helper(
         100,
         Down,
         "0.693147180559945309417232121458",
         "0x0.b17217f7d1cf79abc9e3b3980#100",
         Less,
     );
-    test_log_2_prec_round_helper(
+    test_ln_2_prec_round_helper(
         100,
         Up,
         "0.693147180559945309417232121459",
         "0x0.b17217f7d1cf79abc9e3b3981#100",
         Greater,
     );
-    test_log_2_prec_round_helper(
+    test_ln_2_prec_round_helper(
         100,
         Nearest,
         "0.693147180559945309417232121458",
@@ -288,67 +289,67 @@ pub fn test_log_2_prec_round() {
 
 #[test]
 #[should_panic]
-fn log_2_prec_round_fail_1() {
-    Float::log_2_prec_round(0, Floor);
+fn ln_2_prec_round_fail_1() {
+    Float::ln_2_prec_round(0, Floor);
 }
 
 #[test]
 #[should_panic]
-fn log_2_prec_round_fail_2() {
-    Float::log_2_prec_round(1, Exact);
+fn ln_2_prec_round_fail_2() {
+    Float::ln_2_prec_round(1, Exact);
 }
 
 #[test]
 #[should_panic]
-fn log_2_prec_round_fail_3() {
-    Float::log_2_prec_round(1000, Exact);
+fn ln_2_prec_round_fail_3() {
+    Float::ln_2_prec_round(1000, Exact);
 }
 
 #[test]
-fn log_2_prec_properties() {
+fn ln_2_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
-        let (log_2, o) = Float::log_2_prec(prec);
-        assert!(log_2.is_valid());
-        assert_eq!(log_2.get_prec(), Some(prec));
-        assert_eq!(log_2.get_exponent(), Some(0));
+        let (ln_2, o) = Float::ln_2_prec(prec);
+        assert!(ln_2.is_valid());
+        assert_eq!(ln_2.get_prec(), Some(prec));
+        assert_eq!(ln_2.get_exponent(), Some(0));
         assert_ne!(o, Equal);
         if o == Less {
-            let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Ceiling);
-            let mut next_upper = log_2.clone();
+            let (ln_2_alt, o_alt) = Float::ln_2_prec_round(prec, Ceiling);
+            let mut next_upper = ln_2.clone();
             next_upper.increment();
             if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(log_2_alt), ComparableFloat(next_upper));
+                assert_eq!(ComparableFloat(ln_2_alt), ComparableFloat(next_upper));
                 assert_eq!(o_alt, Greater);
             }
-        } else if !log_2.is_power_of_2() {
-            let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Floor);
-            let mut next_lower = log_2.clone();
+        } else if !ln_2.is_power_of_2() {
+            let (ln_2_alt, o_alt) = Float::ln_2_prec_round(prec, Floor);
+            let mut next_lower = ln_2.clone();
             next_lower.decrement();
-            assert_eq!(ComparableFloat(log_2_alt), ComparableFloat(next_lower));
+            assert_eq!(ComparableFloat(ln_2_alt), ComparableFloat(next_lower));
             assert_eq!(o_alt, Less);
         }
-        let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Nearest);
-        assert_eq!(ComparableFloatRef(&log_2_alt), ComparableFloatRef(&log_2));
+        let (ln_2_alt, o_alt) = Float::ln_2_prec_round(prec, Nearest);
+        assert_eq!(ComparableFloatRef(&ln_2_alt), ComparableFloatRef(&ln_2));
         assert_eq!(o_alt, o);
 
-        let (rug_log_2, rug_o) =
-            rug_log_2_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
+        let (rug_ln_2, rug_o) =
+            rug_ln_2_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_log_2)),
-            ComparableFloatRef(&log_2)
+            ComparableFloatRef(&Float::from(&rug_ln_2)),
+            ComparableFloatRef(&ln_2)
         );
         assert_eq!(rug_o, o);
     });
 }
 
 #[test]
-fn log_2_prec_round_properties() {
+fn ln_2_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
-        let (log_2, o) = Float::log_2_prec_round(prec, rm);
-        assert!(log_2.is_valid());
-        assert_eq!(log_2.get_prec(), Some(prec));
+        let (ln_2, o) = Float::ln_2_prec_round(prec, rm);
+        assert!(ln_2.is_valid());
+        assert_eq!(ln_2.get_prec(), Some(prec));
         assert_eq!(
-            log_2.get_exponent(),
+            ln_2.get_exponent(),
             Some(if prec == 1 && (rm == Ceiling || rm == Up) {
                 1
             } else {
@@ -357,34 +358,34 @@ fn log_2_prec_round_properties() {
         );
         assert_ne!(o, Equal);
         if o == Less {
-            let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Ceiling);
-            let mut next_upper = log_2.clone();
+            let (ln_2_alt, o_alt) = Float::ln_2_prec_round(prec, Ceiling);
+            let mut next_upper = ln_2.clone();
             next_upper.increment();
             if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(log_2_alt), ComparableFloat(next_upper));
+                assert_eq!(ComparableFloat(ln_2_alt), ComparableFloat(next_upper));
                 assert_eq!(o_alt, Greater);
             }
-        } else if !log_2.is_power_of_2() {
-            let (log_2_alt, o_alt) = Float::log_2_prec_round(prec, Floor);
-            let mut next_lower = log_2.clone();
+        } else if !ln_2.is_power_of_2() {
+            let (ln_2_alt, o_alt) = Float::ln_2_prec_round(prec, Floor);
+            let mut next_lower = ln_2.clone();
             next_lower.decrement();
-            assert_eq!(ComparableFloat(log_2_alt), ComparableFloat(next_lower));
+            assert_eq!(ComparableFloat(ln_2_alt), ComparableFloat(next_lower));
             assert_eq!(o_alt, Less);
         }
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_log_2, rug_o) = rug_log_2_prec_round(prec, rm);
+            let (rug_ln_2, rug_o) = rug_ln_2_prec_round(prec, rm);
             assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_log_2)),
-                ComparableFloatRef(&log_2)
+                ComparableFloatRef(&Float::from(&rug_ln_2)),
+                ComparableFloatRef(&ln_2)
             );
             assert_eq!(rug_o, o);
         }
     });
 
     unsigned_gen_var_11().test_properties(|prec| {
-        assert_panic!(Float::log_2_prec_round(prec, Exact));
+        assert_panic!(Float::ln_2_prec_round(prec, Exact));
     });
 
-    test_constant(Float::log_2_prec_round, 10000);
+    test_constant(Float::ln_2_prec_round, 10000);
 }

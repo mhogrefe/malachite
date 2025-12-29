@@ -25,10 +25,10 @@ use malachite_nz::test_util::natural::arithmetic::log_base::{
 use std::str::FromStr;
 
 #[test]
-fn test_approx_log() {
+fn test_approx_ln() {
     let test = |s, out| {
         assert_eq!(
-            NiceFloat(Natural::from_str(s).unwrap().approx_log()),
+            NiceFloat(Natural::from_str(s).unwrap().approx_ln()),
             NiceFloat(out)
         );
     };
@@ -46,8 +46,8 @@ fn test_approx_log() {
 
 #[test]
 #[should_panic]
-fn approx_log_fail() {
-    Natural::ZERO.approx_log();
+fn approx_ln_fail() {
+    Natural::ZERO.approx_ln();
 }
 
 #[test]
@@ -225,9 +225,9 @@ fn checked_log_base_fail_3() {
 }
 
 #[test]
-fn approx_log_properties() {
+fn approx_ln_properties() {
     natural_gen_var_2().test_properties(|n| {
-        let log = n.approx_log();
+        let log = n.approx_ln();
         assert!(log.is_sign_positive());
         assert!(log.is_finite());
         assert!(!log.is_nan());

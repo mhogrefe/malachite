@@ -32,7 +32,7 @@ use malachite_q::Rational;
 
 pub_crate_test! {
 generic_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    let mut working_prec = prec << 1;
+    let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     let mut end_shift = x.floor_log_base_2();
     let x2;
@@ -43,11 +43,10 @@ generic_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, 
         reduced_x = &x2;
     } else {
         end_shift = 0;
-        reduced_x = &x;
+        reduced_x = x;
     }
     loop {
-        let fx = Float::from_rational_prec_round_ref(reduced_x, working_prec, Floor).0;
-        let sqrt = fx.sqrt_prec(working_prec).0;
+        let sqrt = Float::from_rational_prec_round_ref(reduced_x, working_prec, Floor).0.sqrt();
         // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the
         // square root is bounded by (c_sqrt + k_fx)ulp(sqrt) <= 2ulp(sqrt).
         //
@@ -70,7 +69,7 @@ pub(crate) fn generic_sqrt_rational(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let mut working_prec = prec << 1;
+    let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     let mut end_shift = x.floor_log_base_2();
     if end_shift.gt_abs(&0x3fff_0000) {
@@ -80,8 +79,9 @@ pub(crate) fn generic_sqrt_rational(
         end_shift = 0;
     }
     loop {
-        let fx = Float::from_rational_prec_round_ref(&x, working_prec, Floor).0;
-        let sqrt = fx.sqrt_prec(working_prec).0;
+        let sqrt = Float::from_rational_prec_round_ref(&x, working_prec, Floor)
+            .0
+            .sqrt();
         // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the
         // square root is bounded by (c_sqrt + k_fx)ulp(sqrt) <= 2ulp(sqrt).
         //
@@ -881,10 +881,10 @@ impl Float {
     pub fn sqrt_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if x < 0u32 {
-            return (Float::NAN, Equal);
+            return (Self::NAN, Equal);
         }
         if let Some(sqrt) = (&x).checked_sqrt() {
-            return Float::from_rational_prec_round(sqrt, prec, rm);
+            return Self::from_rational_prec_round(sqrt, prec, rm);
         }
         let (n, d) = x.numerator_and_denominator_ref();
         match (n.checked_log_base_2(), d.checked_log_base_2()) {
@@ -895,7 +895,7 @@ impl Float {
                 if n_exp.odd() {
                     n <<= 1u32;
                 }
-                let (mut sqrt, o) = Float::exact_from(n).sqrt_prec_round(prec, rm);
+                let (mut sqrt, o) = Self::exact_from(n).sqrt_prec_round(prec, rm);
                 let o = sqrt.shr_prec_round_assign_helper(
                     i128::from(log_d >> 1) - i128::from(n_exp >> 1),
                     prec,
@@ -912,7 +912,7 @@ impl Float {
                     d <<= 1u32;
                 }
                 let (mut reciprocal_sqrt, o) =
-                    Float::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
+                    Self::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
                 let o = reciprocal_sqrt.shl_prec_round_assign_helper(
                     i128::from(log_n >> 1) - i128::from(d_exp >> 1),
                     prec,
@@ -1031,10 +1031,10 @@ impl Float {
     ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if *x < 0u32 {
-            return (Float::NAN, Equal);
+            return (Self::NAN, Equal);
         }
         if let Some(sqrt) = x.checked_sqrt() {
-            return Float::from_rational_prec_round(sqrt, prec, rm);
+            return Self::from_rational_prec_round(sqrt, prec, rm);
         }
         let (n, d) = x.numerator_and_denominator_ref();
         match (n.checked_log_base_2(), d.checked_log_base_2()) {
@@ -1044,7 +1044,7 @@ impl Float {
                 if n_exp.odd() {
                     n <<= 1u32;
                 }
-                let (mut sqrt, o) = Float::exact_from(n).sqrt_prec_round(prec, rm);
+                let (mut sqrt, o) = Self::exact_from(n).sqrt_prec_round(prec, rm);
                 let o = sqrt.shr_prec_round_assign_helper(
                     i128::from(log_d >> 1) - i128::from(n_exp >> 1),
                     prec,
@@ -1060,7 +1060,7 @@ impl Float {
                     d <<= 1u32;
                 }
                 let (mut reciprocal_sqrt, o) =
-                    Float::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
+                    Self::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
                 let o = reciprocal_sqrt.shl_prec_round_assign_helper(
                     i128::from(log_n >> 1) - i128::from(d_exp >> 1),
                     prec,
@@ -1466,10 +1466,11 @@ impl SqrtAssign for Float {
 /// );
 /// ```
 #[inline]
+#[allow(clippy::type_repetition_in_bounds)]
 pub fn primitive_float_sqrt_rational<T: PrimitiveFloat>(x: &Rational) -> T
 where
     Float: PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
-    emulate_rational_to_float_fn(|x, prec| Float::sqrt_rational_prec_ref(x, prec), x)
+    emulate_rational_to_float_fn(Float::sqrt_rational_prec_ref, x)
 }

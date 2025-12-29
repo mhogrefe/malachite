@@ -116,9 +116,15 @@ pub mod comparison {
     pub mod partial_eq_rational;
 }
 pub mod constants {
-    pub mod log_2;
+    pub mod ln_2;
+    pub mod log_2_e;
+    pub mod phi;
     pub mod prime_constant;
-    pub mod thue_morse_constant;
+    pub mod prouhet_thue_morse_constant;
+    pub mod sqrt_2;
+    pub mod sqrt_2_over_2;
+    pub mod sqrt_3;
+    pub mod sqrt_3_over_3;
 }
 pub mod conversion {
     pub mod clone;

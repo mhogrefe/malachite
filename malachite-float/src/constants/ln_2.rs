@@ -26,7 +26,7 @@ use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 
 // Auxiliary function: Compute the terms from n1 to n2 (excluded) 3 / 4 * sum((-1) ^ n * n! ^ 2 / 2
-// ^ n / (2 * n + 1)!, n = n1...n2 - 1).
+// ^ n / (2 * n + 1)!, n = n1...n2 - 1).s
 //
 // Numerator is T[0], denominator is Q[0], Compute P[0] only when need_P is non-zero.
 //
@@ -88,7 +88,7 @@ impl Float {
     /// constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// L = \log 2.
+    /// L = \ln 2.
     /// $$
     ///
     /// The constant is irrational and transcendental.
@@ -111,17 +111,17 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (l2, o) = Float::log_2_prec_round(100, Floor);
+    /// let (l2, o) = Float::ln_2_prec_round(100, Floor);
     /// assert_eq!(l2.to_string(), "0.693147180559945309417232121458");
     /// assert_eq!(o, Less);
     ///
-    /// let (l2, o) = Float::log_2_prec_round(100, Ceiling);
+    /// let (l2, o) = Float::ln_2_prec_round(100, Ceiling);
     /// assert_eq!(l2.to_string(), "0.693147180559945309417232121459");
     /// assert_eq!(o, Greater);
     /// ```
     ///
     /// This is mpfr_const_log2_internal from const_log2.c, MPFR 4.2.0.
-    pub fn log_2_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+    pub fn ln_2_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let mut working_prec = prec + prec.ceiling_log_base_2() + 3;
         let mut increment = Limb::WIDTH;
         loop {
@@ -136,10 +136,10 @@ impl Float {
             let mut q0 = Integer::ZERO;
             swap(&mut t0, &mut t[0]);
             swap(&mut q0, &mut q[0]);
-            let log_2 = Self::from_integer_prec(t0, working_prec).0
+            let ln_2 = Self::from_integer_prec(t0, working_prec).0
                 / Self::from_integer_prec(q0, working_prec).0;
-            if float_can_round(log_2.significand_ref().unwrap(), working_prec - 2, prec, rm) {
-                return Self::from_float_prec_round(log_2, prec, rm);
+            if float_can_round(ln_2.significand_ref().unwrap(), working_prec - 2, prec, rm) {
+                return Self::from_float_prec_round(ln_2, prec, rm);
             }
             working_prec += increment;
             increment = working_prec >> 1;
@@ -152,7 +152,7 @@ impl Float {
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// L = \log 2.
+    /// L = \ln 2.
     /// $$
     ///
     /// The constant is irrational and transcendental.
@@ -174,20 +174,20 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (l2, o) = Float::log_2_prec(1);
+    /// let (l2, o) = Float::ln_2_prec(1);
     /// assert_eq!(l2.to_string(), "0.5");
     /// assert_eq!(o, Less);
     ///
-    /// let (l2, o) = Float::log_2_prec(10);
+    /// let (l2, o) = Float::ln_2_prec(10);
     /// assert_eq!(l2.to_string(), "0.693");
     /// assert_eq!(o, Greater);
     ///
-    /// let (l2, o) = Float::log_2_prec(100);
+    /// let (l2, o) = Float::ln_2_prec(100);
     /// assert_eq!(l2.to_string(), "0.693147180559945309417232121458");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn log_2_prec(prec: u64) -> (Self, Ordering) {
-        Self::log_2_prec_round(prec, Nearest)
+    pub fn ln_2_prec(prec: u64) -> (Self, Ordering) {
+        Self::ln_2_prec_round(prec, Nearest)
     }
 }

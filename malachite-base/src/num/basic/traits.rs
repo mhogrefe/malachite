@@ -64,15 +64,50 @@ pub trait NaN {
     const NAN: Self;
 }
 
-/// Provides the Thue-Morse constant, whose bits are the Thue-Morse sequence.
-pub trait ThueMorseConstant {
-    const THUE_MORSE_CONSTANT: Self;
+/// Provides the Prouhet-Thue-Morse constant, whose bits are the Thue-Morse sequence.
+pub trait ProuhetThueMorseConstant {
+    const PROUHET_THUE_MORSE_CONSTANT: Self;
 }
 
 /// Provides the prime constant, whose $n$th bit (starting from $n=1$) is true if and only if $n$ is
 /// prime.
 pub trait PrimeConstant {
     const PRIME_CONSTANT: Self;
+}
+
+/// Provides $\ln 2$.
+pub trait Ln2 {
+    const LN_2: Self;
+}
+
+/// Provides $\log_2 e$.
+pub trait Log2E {
+    const LOG_2_E: Self;
+}
+
+/// Provides $\sqrt{2}$.
+pub trait Sqrt2 {
+    const SQRT_2: Self;
+}
+
+/// Provides $\sqrt{3}$.
+pub trait Sqrt3 {
+    const SQRT_3: Self;
+}
+
+/// Provides $\sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}$.
+pub trait Sqrt2Over2 {
+    const SQRT_2_OVER_2: Self;
+}
+
+/// Provides $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
+pub trait Sqrt3Over3 {
+    const SQRT_3_OVER_3: Self;
+}
+
+/// Provides $\varphi$, the golden ratio.
+pub trait Phi {
+    const PHI: Self;
 }
 
 // Implementation for `NonZero*` types:

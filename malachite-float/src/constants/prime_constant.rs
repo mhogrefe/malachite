@@ -23,7 +23,8 @@ impl Float {
     /// P = \sum_{p\ \text{prime}\}2^{-p}.
     /// $$
     ///
-    /// The constant is irrational.
+    /// The constant is irrational. It is unknown whether it is transcendental; see
+    /// https://mathoverflow.net/questions/114905.
     ///
     /// The output has precision `prec`.
     ///
@@ -78,7 +79,8 @@ impl Float {
     /// P = \sum_{p\ \text{prime}\}2^{-p}.
     /// $$
     ///
-    /// The constant is irrational.
+    /// The constant is irrational. It is unknown whether it is transcendental; see
+    /// https://mathoverflow.net/questions/114905.
     ///
     /// The output has precision `prec`.
     ///

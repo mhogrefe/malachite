@@ -19,19 +19,19 @@ use malachite_nz::test_util::natural::arithmetic::log_base::{
 };
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_natural_approx_log);
+    register_demo!(runner, demo_natural_approx_ln);
     register_demo!(runner, demo_natural_floor_log_base);
     register_demo!(runner, demo_natural_ceiling_log_base);
     register_demo!(runner, demo_natural_checked_log_base);
-    register_bench!(runner, benchmark_approx_log);
+    register_bench!(runner, benchmark_approx_ln);
     register_bench!(runner, benchmark_natural_floor_log_base_algorithms);
     register_bench!(runner, benchmark_natural_ceiling_log_base_algorithms);
     register_bench!(runner, benchmark_natural_checked_log_base_algorithms);
 }
 
-fn demo_natural_approx_log(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_natural_approx_ln(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in natural_gen_var_2().get(gm, config).take(limit) {
-        println!("log({}) ≈ {}", n, NiceFloat(n.approx_log()));
+        println!("ln({}) ≈ {}", n, NiceFloat(n.approx_ln()));
     }
 }
 
@@ -68,16 +68,16 @@ fn demo_natural_checked_log_base(gm: GenMode, config: &GenConfig, limit: usize) 
     }
 }
 
-fn benchmark_approx_log(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+fn benchmark_approx_ln(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "(&Natural).approx_log()",
+        "(&Natural).approx_ln()",
         BenchmarkType::Single,
         natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &natural_bit_bucketer("n"),
-        &mut [("default", &mut |n| no_out!(n.approx_log()))],
+        &mut [("default", &mut |n| no_out!(n.approx_ln()))],
     );
 }
 

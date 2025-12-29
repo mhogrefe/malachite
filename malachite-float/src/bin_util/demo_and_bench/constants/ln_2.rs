@@ -17,40 +17,40 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
 use malachite_float::test_util::common::rug_round_exact_from_rounding_mode;
-use malachite_float::test_util::constants::log_2::rug_log_2_prec_round;
+use malachite_float::test_util::constants::ln_2::rug_ln_2_prec_round;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_float_log_2_prec_round);
-    register_demo!(runner, demo_float_log_2_prec_round_debug);
-    register_demo!(runner, demo_float_log_2_prec);
-    register_demo!(runner, demo_float_log_2_prec_debug);
+    register_demo!(runner, demo_float_ln_2_prec_round);
+    register_demo!(runner, demo_float_ln_2_prec_round_debug);
+    register_demo!(runner, demo_float_ln_2_prec);
+    register_demo!(runner, demo_float_ln_2_prec_debug);
 
-    register_bench!(runner, benchmark_float_log_2_prec_round_library_comparison);
-    register_bench!(runner, benchmark_float_log_2_prec_library_comparison);
+    register_bench!(runner, benchmark_float_ln_2_prec_round_library_comparison);
+    register_bench!(runner, benchmark_float_ln_2_prec_library_comparison);
 }
 
-fn demo_float_log_2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_ln_2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
     {
         println!(
-            "log_2_prec_round({}, {}) = {:?}",
+            "ln_2_prec_round({}, {}) = {:?}",
             p,
             rm,
-            Float::log_2_prec_round(p, rm)
+            Float::ln_2_prec_round(p, rm)
         );
     }
 }
 
-fn demo_float_log_2_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_ln_2_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
     {
-        let (pc, o) = Float::log_2_prec_round(p, rm);
+        let (pc, o) = Float::ln_2_prec_round(p, rm);
         println!(
-            "log_2_prec_round({}, {}) = ({:#x}, {:?})",
+            "ln_2_prec_round({}, {}) = ({:#x}, {:?})",
             p,
             rm,
             ComparableFloat(pc),
@@ -59,27 +59,27 @@ fn demo_float_log_2_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usi
     }
 }
 
-fn demo_float_log_2_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_ln_2_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
-        println!("log_2_prec({}) = {:?}", p, Float::log_2_prec(p));
+        println!("ln_2_prec({}) = {:?}", p, Float::ln_2_prec(p));
     }
 }
 
-fn demo_float_log_2_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_ln_2_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
-        let (pc, o) = Float::log_2_prec(p);
-        println!("log_2_prec({}) = ({:#x}, {:?})", p, ComparableFloat(pc), o);
+        let (pc, o) = Float::ln_2_prec(p);
+        println!("ln_2_prec({}) = ({:#x}, {:?})", p, ComparableFloat(pc), o);
     }
 }
 
-fn benchmark_float_log_2_prec_round_library_comparison(
+fn benchmark_float_ln_2_prec_round_library_comparison(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::log_2_prec_round(u64, RoundingMode)",
+        "Float::ln_2_prec_round(u64, RoundingMode)",
         BenchmarkType::LibraryComparison,
         unsigned_rounding_mode_pair_gen_var_4().get(gm, config),
         gm.name(),
@@ -88,10 +88,10 @@ fn benchmark_float_log_2_prec_round_library_comparison(
         &pair_1_bucketer("prec"),
         &mut [
             ("Malachite", &mut |(p, rm)| {
-                no_out!(Float::log_2_prec_round(p, rm));
+                no_out!(Float::ln_2_prec_round(p, rm));
             }),
             ("rug", &mut |(p, rm)| {
-                no_out!(rug_log_2_prec_round(
+                no_out!(rug_ln_2_prec_round(
                     p,
                     rug_round_exact_from_rounding_mode(rm)
                 ));
@@ -100,14 +100,14 @@ fn benchmark_float_log_2_prec_round_library_comparison(
     );
 }
 
-fn benchmark_float_log_2_prec_library_comparison(
+fn benchmark_float_ln_2_prec_library_comparison(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::log_2_prec(u64)",
+        "Float::ln_2_prec(u64)",
         BenchmarkType::LibraryComparison,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
@@ -115,9 +115,9 @@ fn benchmark_float_log_2_prec_library_comparison(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [
-            ("Malachite", &mut |p| no_out!(Float::log_2_prec(p))),
+            ("Malachite", &mut |p| no_out!(Float::ln_2_prec(p))),
             ("rug", &mut |p| {
-                no_out!(rug_log_2_prec_round(
+                no_out!(rug_ln_2_prec_round(
                     p,
                     rug_round_exact_from_rounding_mode(Nearest)
                 ));
