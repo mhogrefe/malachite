@@ -61,58 +61,52 @@ extern crate rand;
 extern crate rand_chacha;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 
-fn get_sample_output_types(len: usize) -> Vec<Vec<BitDistributorOutputType>> {
-    if len == 2 {
-        vec![
-            vec![BitDistributorOutputType::normal(1); 2],
-            vec![BitDistributorOutputType::normal(2); 2],
-            vec![BitDistributorOutputType::normal(1), BitDistributorOutputType::normal(2)],
-            vec![BitDistributorOutputType::normal(1), BitDistributorOutputType::tiny()],
-        ]
-    } else if len == 3 {
-        vec![
-            vec![BitDistributorOutputType::normal(1); 3],
-            vec![BitDistributorOutputType::normal(2); 3],
-            vec![
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(2),
-                BitDistributorOutputType::normal(3),
-            ],
-            vec![
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-            ],
-            vec![
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::normal(1),
-            ],
-            vec![
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::tiny(),
-            ],
-            vec![
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::tiny(),
-            ],
-            vec![
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::tiny(),
-            ],
-            vec![
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::normal(1),
-            ],
-        ]
-    } else {
-        panic!()
-    }
-}
+const SAMPLE_OUTPUT_TYPES_2: [[BitDistributorOutputType; 2]; 4] = [
+    [BitDistributorOutputType::normal(1); 2],
+    [BitDistributorOutputType::normal(2); 2],
+    [BitDistributorOutputType::normal(1), BitDistributorOutputType::normal(2)],
+    [BitDistributorOutputType::normal(1), BitDistributorOutputType::tiny()],
+];
+
+const SAMPLE_OUTPUT_TYPES_3: [[BitDistributorOutputType; 3]; 9] = [
+    [BitDistributorOutputType::normal(1); 3],
+    [BitDistributorOutputType::normal(2); 3],
+    [
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(2),
+        BitDistributorOutputType::normal(3),
+    ],
+    [
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+    ],
+    [
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::normal(1),
+    ],
+    [
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ],
+    [
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ],
+    [
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ],
+    [
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::normal(1),
+    ],
+];
 
 pub mod bools {
     pub mod constants;

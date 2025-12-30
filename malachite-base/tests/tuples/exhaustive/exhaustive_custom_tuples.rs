@@ -6,11 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::SAMPLE_OUTPUT_TYPES_3;
 use crate::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
     exhaustive_triples_xyx, exhaustive_triples_xyx_custom_output,
 };
-use crate::get_sample_output_types;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
@@ -37,7 +37,7 @@ fn exhaustive_triples_xxy_helper<
     assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
 
-    let output_types = get_sample_output_types(3);
+    let output_types = SAMPLE_OUTPUT_TYPES_3;
     let ts = exhaustive_triples_xxy_custom_output(
         xs.clone(),
         ys.clone(),
@@ -221,7 +221,7 @@ fn exhaustive_triples_xyx_helper<
     assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
 
-    let output_types = get_sample_output_types(3);
+    let output_types = SAMPLE_OUTPUT_TYPES_3;
     let ts = exhaustive_triples_xyx_custom_output(
         xs.clone(),
         ys.clone(),

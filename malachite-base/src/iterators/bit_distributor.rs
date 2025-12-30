@@ -33,8 +33,8 @@ impl BitDistributorOutputType {
     ///
     /// The corresponding element grows as a power of $i$. See the [`BitDistributor`] documentation
     /// for more.
-    pub fn normal(weight: usize) -> Self {
-        assert_ne!(weight, 0);
+    pub const fn normal(weight: usize) -> Self {
+        assert!(weight != 0);
         Self {
             weight,
             max_bits: None,

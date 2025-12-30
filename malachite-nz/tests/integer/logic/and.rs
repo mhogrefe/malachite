@@ -185,18 +185,18 @@ fn limbs_vec_neg_and_limb_neg_in_place_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_and_pos_neg() {
-    let test = |xs, ys, out| {
+    let test = |xs, ys, out: &[Limb]| {
         assert_eq!(limbs_and_pos_neg(xs, ys), out);
     };
-    test(&[2], &[3], vec![0]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 1, 0]);
-    test(&[6, 7], &[1, 2, 3], vec![6, 5]);
-    test(&[1, 2, 3], &[6, 7], vec![0, 0, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![0, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![0, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 0]);
+    test(&[2], &[3], &[0]);
+    test(&[1, 1, 1], &[1, 2, 3], &[1, 1, 0]);
+    test(&[6, 7], &[1, 2, 3], &[6, 5]);
+    test(&[1, 2, 3], &[6, 7], &[0, 0, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], &[0, 0, 2]);
+    test(&[0, 0, 1], &[3], &[0, 0, 1]);
+    test(&[3], &[0, 0, 1], &[]);
+    test(&[0, 3, 3], &[0, 0, 3], &[0, 0, 1]);
+    test(&[0, 0, 3], &[0, 3, 3], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -221,50 +221,50 @@ fn test_limbs_and_pos_neg_to_out() {
         limbs_and_pos_neg_to_out(&mut out, xs, ys);
         assert_eq!(out, out_after);
     };
-    test(&[2], &[3], &[10, 10, 10, 10], vec![0, 10, 10, 10]);
-    test(&[1, 1, 1], &[1, 2, 3], &[10, 10, 10, 10], vec![1, 1, 0, 10]);
-    test(&[6, 7], &[1, 2, 3], &[10, 10, 10, 10], vec![6, 5, 10, 10]);
-    test(&[1, 2, 3], &[6, 7], &[10, 10, 10, 10], vec![0, 0, 3, 10]);
+    test(&[2], &[3], &[10, 10, 10, 10], &[0, 10, 10, 10]);
+    test(&[1, 1, 1], &[1, 2, 3], &[10, 10, 10, 10], &[1, 1, 0, 10]);
+    test(&[6, 7], &[1, 2, 3], &[10, 10, 10, 10], &[6, 5, 10, 10]);
+    test(&[1, 2, 3], &[6, 7], &[10, 10, 10, 10], &[0, 0, 3, 10]);
     test(
         &[100, 101, 102],
         &[102, 101, 100],
         &[10, 10, 10, 10],
-        vec![0, 0, 2, 10],
+        &[0, 0, 2, 10],
     );
-    test(&[0, 0, 1], &[3], &[10, 10, 10, 10], vec![0, 0, 1, 10]);
-    test(&[3], &[0, 0, 1], &[10, 10, 10, 10], vec![0, 10, 10, 10]);
-    test(&[0, 3, 3], &[0, 0, 3], &[10, 10, 10, 10], vec![0, 0, 1, 10]);
-    test(&[0, 0, 3], &[0, 3, 3], &[10, 10, 10, 10], vec![0, 0, 0, 10]);
+    test(&[0, 0, 1], &[3], &[10, 10, 10, 10], &[0, 0, 1, 10]);
+    test(&[3], &[0, 0, 1], &[10, 10, 10, 10], &[0, 10, 10, 10]);
+    test(&[0, 3, 3], &[0, 0, 3], &[10, 10, 10, 10], &[0, 0, 1, 10]);
+    test(&[0, 0, 3], &[0, 3, 3], &[10, 10, 10, 10], &[0, 0, 0, 10]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_and_pos_neg_to_out_fail_1() {
-    let mut out = vec![10, 10, 10, 10];
-    limbs_and_pos_neg_to_out(&mut out, &[0, 0, 0], &[3]);
+    let out = &mut [10, 10, 10, 10];
+    limbs_and_pos_neg_to_out(out, &[0, 0, 0], &[3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_and_pos_neg_to_out_fail_2() {
-    let mut out = vec![10, 10, 10, 10];
-    limbs_and_pos_neg_to_out(&mut out, &[3], &[0, 0, 0]);
+    let out = &mut [10, 10, 10, 10];
+    limbs_and_pos_neg_to_out(out, &[3], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_and_pos_neg_to_out_fail_3() {
-    let mut out = vec![10];
-    limbs_and_pos_neg_to_out(&mut out, &[6, 7], &[1, 2]);
+    let out = &mut [10];
+    limbs_and_pos_neg_to_out(out, &[6, 7], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_pos_neg_in_place_left_and_limbs_vec_and_pos_neg_in_place_right() {
-    let test = |xs: &[Limb], ys, out| {
+    let test = |xs: &[Limb], ys, out: &[Limb]| {
         {
             let mut mut_xs = xs.to_vec();
             limbs_and_pos_neg_in_place_left(&mut mut_xs, ys);
@@ -276,15 +276,15 @@ fn test_limbs_pos_neg_in_place_left_and_limbs_vec_and_pos_neg_in_place_right() {
             assert_eq!(mut_ys, out);
         }
     };
-    test(&[2], &[3], vec![0]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 1, 0]);
-    test(&[6, 7], &[1, 2, 3], vec![6, 5]);
-    test(&[1, 2, 3], &[6, 7], vec![0, 0, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![0, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![0, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 0]);
+    test(&[2], &[3], &[0]);
+    test(&[1, 1, 1], &[1, 2, 3], &[1, 1, 0]);
+    test(&[6, 7], &[1, 2, 3], &[6, 5]);
+    test(&[1, 2, 3], &[6, 7], &[0, 0, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], &[0, 0, 2]);
+    test(&[0, 0, 1], &[3], &[0, 0, 1]);
+    test(&[3], &[0, 0, 1], &[0]);
+    test(&[0, 3, 3], &[0, 0, 3], &[0, 0, 1]);
+    test(&[0, 0, 3], &[0, 3, 3], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -320,20 +320,20 @@ fn limbs_vec_and_pos_neg_in_place_right_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_and_pos_neg_in_place_right() {
-    let test = |xs, ys_before: &[Limb], ys_after| {
+    let test = |xs, ys_before: &[Limb], ys_after: &[Limb]| {
         let mut ys = ys_before.to_vec();
         limbs_slice_and_pos_neg_in_place_right(xs, &mut ys);
         assert_eq!(ys, ys_after);
     };
-    test(&[2], &[3], vec![0]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 1, 0]);
-    test(&[6, 7], &[1, 2, 3], vec![6, 5, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![0, 0]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![0, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![0]);
-    test(&[3], &[0, 0, 1], vec![0, 0, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 1]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 0]);
+    test(&[2], &[3], &[0]);
+    test(&[1, 1, 1], &[1, 2, 3], &[1, 1, 0]);
+    test(&[6, 7], &[1, 2, 3], &[6, 5, 3]);
+    test(&[1, 2, 3], &[6, 7], &[0, 0]);
+    test(&[100, 101, 102], &[102, 101, 100], &[0, 0, 2]);
+    test(&[0, 0, 1], &[3], &[0]);
+    test(&[3], &[0, 0, 1], &[0, 0, 0]);
+    test(&[0, 3, 3], &[0, 0, 3], &[0, 0, 1]);
+    test(&[0, 0, 3], &[0, 3, 3], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -353,24 +353,24 @@ fn limbs_slice_and_pos_neg_in_place_right_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_and_neg_neg_and_limbs_vec_and_neg_neg_in_place_left() {
-    let test = |xs, ys, out| {
+    let test = |xs, ys, out: &[Limb]| {
         assert_eq!(limbs_and_neg_neg(xs, ys), out);
 
         let mut mut_xs = xs.to_vec();
         limbs_vec_and_neg_neg_in_place_left(&mut mut_xs, ys);
         assert_eq!(mut_xs, out);
     };
-    test(&[2], &[3], vec![4]);
-    test(&[1, 1, 1], &[1, 2, 3], vec![1, 3, 3]);
-    test(&[6, 7], &[1, 2, 3], vec![6, 7, 3]);
-    test(&[1, 2, 3], &[6, 7], vec![6, 7, 3]);
-    test(&[100, 101, 102], &[102, 101, 100], vec![104, 101, 102]);
-    test(&[0, 0, 1], &[3], vec![0, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![0, 0, 1]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0, 4]);
-    test(&[0, 0, 3], &[0, 3, 3], vec![0, 0, 4]);
-    test(&[0, 2, 1], &[0, u32::MAX, u32::MAX], vec![0, 0, 0, 1]);
-    test(&[0, 2], &[0, u32::MAX, u32::MAX], vec![0, 0, 0, 1]);
+    test(&[2], &[3], &[4]);
+    test(&[1, 1, 1], &[1, 2, 3], &[1, 3, 3]);
+    test(&[6, 7], &[1, 2, 3], &[6, 7, 3]);
+    test(&[1, 2, 3], &[6, 7], &[6, 7, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], &[104, 101, 102]);
+    test(&[0, 0, 1], &[3], &[0, 0, 1]);
+    test(&[3], &[0, 0, 1], &[0, 0, 1]);
+    test(&[0, 3, 3], &[0, 0, 3], &[0, 0, 4]);
+    test(&[0, 0, 3], &[0, 3, 3], &[0, 0, 4]);
+    test(&[0, 2, 1], &[0, u32::MAX, u32::MAX], &[0, 0, 0, 1]);
+    test(&[0, 2], &[0, u32::MAX, u32::MAX], &[0, 0, 0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -409,71 +409,59 @@ fn test_limbs_and_neg_neg_to_out() {
         assert_eq!(limbs_and_neg_neg_to_out(&mut out, xs, ys), b);
         assert_eq!(out, out_after);
     };
-    test(&[2], &[3], &[10, 10, 10, 10], true, vec![4, 10, 10, 10]);
+    test(&[2], &[3], &[10, 10, 10, 10], true, &[4, 10, 10, 10]);
     test(
         &[1, 1, 1],
         &[1, 2, 3],
         &[10, 10, 10, 10],
         true,
-        vec![1, 3, 3, 10],
+        &[1, 3, 3, 10],
     );
-    test(
-        &[6, 7],
-        &[1, 2, 3],
-        &[10, 10, 10, 10],
-        true,
-        vec![6, 7, 3, 10],
-    );
-    test(
-        &[1, 2, 3],
-        &[6, 7],
-        &[10, 10, 10, 10],
-        true,
-        vec![6, 7, 3, 10],
-    );
+    test(&[6, 7], &[1, 2, 3], &[10, 10, 10, 10], true, &[6, 7, 3, 10]);
+    test(&[1, 2, 3], &[6, 7], &[10, 10, 10, 10], true, &[6, 7, 3, 10]);
     test(
         &[100, 101, 102],
         &[102, 101, 100],
         &[10, 10, 10, 10],
         true,
-        vec![104, 101, 102, 10],
+        &[104, 101, 102, 10],
     );
-    test(&[0, 0, 1], &[3], &[10, 10, 10, 10], true, vec![0, 0, 1, 10]);
-    test(&[3], &[0, 0, 1], &[10, 10, 10, 10], true, vec![0, 0, 1, 10]);
+    test(&[0, 0, 1], &[3], &[10, 10, 10, 10], true, &[0, 0, 1, 10]);
+    test(&[3], &[0, 0, 1], &[10, 10, 10, 10], true, &[0, 0, 1, 10]);
     test(
         &[0, 3, 3],
         &[0, 0, 3],
         &[10, 10, 10, 10],
         true,
-        vec![0, 0, 4, 10],
+        &[0, 0, 4, 10],
     );
     test(
         &[0, 0, 3],
         &[0, 3, 3],
         &[10, 10, 10, 10],
         true,
-        vec![0, 0, 4, 10],
+        &[0, 0, 4, 10],
     );
     test(
         &[0, 2],
         &[0, u32::MAX],
         &[10, 10, 10, 10],
         false,
-        vec![0, 0, 10, 10],
+        &[0, 0, 10, 10],
     );
     test(
         &[0, 2, 1],
         &[0, u32::MAX, u32::MAX],
         &[10, 10, 10, 10],
         false,
-        vec![0, 0, 0, 10],
+        &[0, 0, 0, 10],
     );
     test(
         &[0, 2],
         &[0, u32::MAX, u32::MAX],
         &[10, 10, 10, 10],
         false,
-        vec![0, 0, 0, 10],
+        &[0, 0, 0, 10],
     );
 }
 
@@ -481,56 +469,51 @@ fn test_limbs_and_neg_neg_to_out() {
 #[test]
 #[should_panic]
 fn limbs_and_neg_neg_to_out_fail_1() {
-    let mut out = vec![10, 10, 10, 10];
-    limbs_and_neg_neg_to_out(&mut out, &[0, 0, 0], &[3]);
+    let out = &mut [10, 10, 10, 10];
+    limbs_and_neg_neg_to_out(out, &[0, 0, 0], &[3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_and_neg_neg_to_out_fail_2() {
-    let mut out = vec![10, 10, 10, 10];
-    limbs_and_neg_neg_to_out(&mut out, &[3], &[0, 0, 0]);
+    let out = &mut [10, 10, 10, 10];
+    limbs_and_neg_neg_to_out(out, &[3], &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_and_neg_neg_to_out_fail_3() {
-    let mut out = vec![10, 10];
-    limbs_and_neg_neg_to_out(&mut out, &[6, 7, 8], &[1, 2]);
+    let out = &mut [10, 10];
+    limbs_and_neg_neg_to_out(out, &[6, 7, 8], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_and_neg_neg_to_out_fail_4() {
-    let mut out = vec![10, 10];
-    limbs_and_neg_neg_to_out(&mut out, &[6, 7], &[1, 2, 3]);
+    let out = &mut [10, 10];
+    limbs_and_neg_neg_to_out(out, &[6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_and_neg_neg_in_place_left() {
-    let test = |xs_before: &[Limb], ys, b, xs_after| {
+    let test = |xs_before: &[Limb], ys, b, xs_after: &[Limb]| {
         let mut xs = xs_before.to_vec();
         assert_eq!(limbs_slice_and_neg_neg_in_place_left(&mut xs, ys), b);
         assert_eq!(xs, xs_after);
     };
-    test(&[2], &[3], true, vec![4]);
-    test(&[1, 1, 1], &[1, 2, 3], true, vec![1, 3, 3]);
-    test(&[1, 2, 3], &[6, 7], true, vec![6, 7, 3]);
-    test(
-        &[100, 101, 102],
-        &[102, 101, 100],
-        true,
-        vec![104, 101, 102],
-    );
-    test(&[0, 0, 1], &[3], true, vec![0, 0, 1]);
-    test(&[0, 3, 3], &[0, 0, 3], true, vec![0, 0, 4]);
-    test(&[0, 0, 3], &[0, 3, 3], true, vec![0, 0, 4]);
-    test(&[0, 2], &[0, u32::MAX], false, vec![0, 0]);
-    test(&[0, 2, 1], &[0, u32::MAX, u32::MAX], false, vec![0, 0, 0]);
+    test(&[2], &[3], true, &[4]);
+    test(&[1, 1, 1], &[1, 2, 3], true, &[1, 3, 3]);
+    test(&[1, 2, 3], &[6, 7], true, &[6, 7, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], true, &[104, 101, 102]);
+    test(&[0, 0, 1], &[3], true, &[0, 0, 1]);
+    test(&[0, 3, 3], &[0, 0, 3], true, &[0, 0, 4]);
+    test(&[0, 0, 3], &[0, 3, 3], true, &[0, 0, 4]);
+    test(&[0, 2], &[0, u32::MAX], false, &[0, 0]);
+    test(&[0, 2, 1], &[0, u32::MAX, u32::MAX], false, &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -557,72 +540,66 @@ fn limbs_slice_and_neg_neg_in_place_left_fail_3() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_and_neg_neg_in_place_either() {
-    let test = |xs_before: &[Limb], ys_before: &[Limb], p, xs_after, ys_after| {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], p, xs_after: &[Limb], ys_after: &[Limb]| {
         let mut xs = xs_before.to_vec();
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys), p);
         assert_eq!(xs, xs_after);
         assert_eq!(ys, ys_after);
     };
-    test(&[2], &[3], (false, true), vec![4], vec![3]);
+    test(&[2], &[3], (false, true), &[4], &[3]);
     test(
         &[1, 1, 1],
         &[1, 2, 3],
         (false, true),
-        vec![1, 3, 3],
-        vec![1, 2, 3],
-    );
-    test(
+        &[1, 3, 3],
         &[1, 2, 3],
-        &[6, 7],
-        (false, true),
-        vec![6, 7, 3],
-        vec![6, 7],
     );
-    test(&[6, 7], &[1, 2, 3], (true, true), vec![6, 7], vec![6, 7, 3]);
+    test(&[1, 2, 3], &[6, 7], (false, true), &[6, 7, 3], &[6, 7]);
+    test(&[6, 7], &[1, 2, 3], (true, true), &[6, 7], &[6, 7, 3]);
     test(
         &[100, 101, 102],
         &[102, 101, 100],
         (false, true),
-        vec![104, 101, 102],
-        vec![102, 101, 100],
+        &[104, 101, 102],
+        &[102, 101, 100],
     );
-    test(&[0, 0, 1], &[3], (false, true), vec![0, 0, 1], vec![3]);
-    test(&[3], &[0, 0, 1], (true, true), vec![3], vec![0, 0, 1]);
+    test(&[0, 0, 1], &[3], (false, true), &[0, 0, 1], &[3]);
+    test(&[3], &[0, 0, 1], (true, true), &[3], &[0, 0, 1]);
     test(
         &[0, 3, 3],
         &[0, 0, 3],
         (false, true),
-        vec![0, 0, 4],
-        vec![0, 0, 3],
+        &[0, 0, 4],
+        &[0, 0, 3],
     );
     test(
         &[0, 0, 3],
         &[0, 3, 3],
         (false, true),
-        vec![0, 0, 4],
-        vec![0, 3, 3],
+        &[0, 0, 4],
+        &[0, 3, 3],
     );
     test(
         &[0, 2],
         &[0, u32::MAX],
         (false, false),
-        vec![0, 0],
-        vec![0, u32::MAX],
+        &[0, 0],
+        &[0, u32::MAX],
     );
     test(
         &[0, 2, 1],
         &[0, u32::MAX, u32::MAX],
         (false, false),
-        vec![0, 0, 0],
-        vec![0, u32::MAX, u32::MAX],
+        &[0, 0, 0],
+        &[0, u32::MAX, u32::MAX],
     );
     test(
         &[0, 2],
         &[0, u32::MAX, u32::MAX],
         (true, false),
-        vec![0, 2],
-        vec![0, 0, 0],
+        &[0, 2],
+        &[0, 0, 0],
     );
 }
 
@@ -643,48 +620,42 @@ fn limbs_slice_and_neg_neg_in_place_either_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_vec_and_neg_neg_in_place_either() {
-    let test = |xs_before: &[Limb], ys_before: &[Limb], b, xs_after, ys_after| {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], b, xs_after: &[Limb], ys_after: &[Limb]| {
         let mut xs = xs_before.to_vec();
         let mut ys = ys_before.to_vec();
         assert_eq!(limbs_vec_and_neg_neg_in_place_either(&mut xs, &mut ys), b);
         assert_eq!(xs, xs_after);
         assert_eq!(ys, ys_after);
     };
-    test(&[2], &[3], false, vec![4], vec![3]);
-    test(&[1, 1, 1], &[1, 2, 3], false, vec![1, 3, 3], vec![1, 2, 3]);
-    test(&[1, 2, 3], &[6, 7], false, vec![6, 7, 3], vec![6, 7]);
-    test(&[6, 7], &[1, 2, 3], true, vec![6, 7], vec![6, 7, 3]);
+    test(&[2], &[3], false, &[4], &[3]);
+    test(&[1, 1, 1], &[1, 2, 3], false, &[1, 3, 3], &[1, 2, 3]);
+    test(&[1, 2, 3], &[6, 7], false, &[6, 7, 3], &[6, 7]);
+    test(&[6, 7], &[1, 2, 3], true, &[6, 7], &[6, 7, 3]);
     test(
         &[100, 101, 102],
         &[102, 101, 100],
         false,
-        vec![104, 101, 102],
-        vec![102, 101, 100],
+        &[104, 101, 102],
+        &[102, 101, 100],
     );
-    test(&[0, 0, 1], &[3], false, vec![0, 0, 1], vec![3]);
-    test(&[3], &[0, 0, 1], true, vec![3], vec![0, 0, 1]);
-    test(&[0, 3, 3], &[0, 0, 3], false, vec![0, 0, 4], vec![0, 0, 3]);
-    test(&[0, 0, 3], &[0, 3, 3], false, vec![0, 0, 4], vec![0, 3, 3]);
-    test(
-        &[0, 2],
-        &[0, u32::MAX],
-        false,
-        vec![0, 0, 1],
-        vec![0, u32::MAX],
-    );
+    test(&[0, 0, 1], &[3], false, &[0, 0, 1], &[3]);
+    test(&[3], &[0, 0, 1], true, &[3], &[0, 0, 1]);
+    test(&[0, 3, 3], &[0, 0, 3], false, &[0, 0, 4], &[0, 0, 3]);
+    test(&[0, 0, 3], &[0, 3, 3], false, &[0, 0, 4], &[0, 3, 3]);
+    test(&[0, 2], &[0, u32::MAX], false, &[0, 0, 1], &[0, u32::MAX]);
     test(
         &[0, 2, 1],
         &[0, u32::MAX, u32::MAX],
         false,
-        vec![0, 0, 0, 1],
-        vec![0, u32::MAX, u32::MAX],
+        &[0, 0, 0, 1],
+        &[0, u32::MAX, u32::MAX],
     );
     test(
         &[0, 2],
         &[0, u32::MAX, u32::MAX],
         true,
-        vec![0, 2],
-        vec![0, 0, 0, 1],
+        &[0, 2],
+        &[0, 0, 0, 1],
     );
 }
 

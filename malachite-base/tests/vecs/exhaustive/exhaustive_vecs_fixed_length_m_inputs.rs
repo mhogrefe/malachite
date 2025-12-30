@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::get_sample_output_types;
+use crate::{SAMPLE_OUTPUT_TYPES_2, SAMPLE_OUTPUT_TYPES_3};
 use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -26,8 +26,12 @@ fn exhaustive_vecs_fixed_length_1_input_helper<T, I: Clone + Iterator<Item = T>>
 ) where
     T: Clone + Debug + Eq,
 {
-    let output_types = get_sample_output_types(len);
-    let xss = exhaustive_vecs_fixed_length_1_input(xs.clone(), &output_types[0]);
+    let xss = if len == 2 {
+        exhaustive_vecs_fixed_length_1_input(xs.clone(), &SAMPLE_OUTPUT_TYPES_2[0])
+    } else {
+        assert_eq!(len, 3);
+        exhaustive_vecs_fixed_length_1_input(xs.clone(), &SAMPLE_OUTPUT_TYPES_3[0])
+    };
     let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
@@ -40,11 +44,22 @@ fn exhaustive_vecs_fixed_length_1_input_helper<T, I: Clone + Iterator<Item = T>>
     if let Some(out_len) = out_len {
         assert_eq!(xss.count(), out_len);
     }
-    for alt_output_types in &output_types[1..] {
-        let xss = exhaustive_vecs_fixed_length_1_input(xs.clone(), alt_output_types);
-        xss.clone().take(20).for_each(drop);
-        if let Some(out_len) = out_len {
-            assert_eq!(xss.count(), out_len);
+    if len == 2 {
+        for alt_output_types in &SAMPLE_OUTPUT_TYPES_2[1..] {
+            let xss = exhaustive_vecs_fixed_length_1_input(xs.clone(), alt_output_types);
+            xss.clone().take(20).for_each(drop);
+            if let Some(out_len) = out_len {
+                assert_eq!(xss.count(), out_len);
+            }
+        }
+    } else {
+        assert_eq!(len, 3);
+        for alt_output_types in &SAMPLE_OUTPUT_TYPES_3[1..] {
+            let xss = exhaustive_vecs_fixed_length_1_input(xs.clone(), alt_output_types);
+            xss.clone().take(20).for_each(drop);
+            if let Some(out_len) = out_len {
+                assert_eq!(xss.count(), out_len);
+            }
         }
     }
 }
@@ -192,12 +207,19 @@ fn exhaustive_vecs_fixed_length_2_inputs_helper<
 ) where
     T: Clone + Debug + Eq,
 {
-    let output_types = get_sample_output_types(len);
-    let output_configs: Vec<(BitDistributorOutputType, usize)> = output_types[0]
-        .iter()
-        .copied()
-        .zip(input_indices.iter().copied())
-        .collect();
+    let output_configs: Vec<(BitDistributorOutputType, usize)> = if len == 2 {
+        SAMPLE_OUTPUT_TYPES_2[0]
+            .iter()
+            .copied()
+            .zip(input_indices.iter().copied())
+            .collect()
+    } else {
+        SAMPLE_OUTPUT_TYPES_3[0]
+            .iter()
+            .copied()
+            .zip(input_indices.iter().copied())
+            .collect()
+    };
     let xss = exhaustive_vecs_fixed_length_2_inputs(xs.clone(), ys.clone(), &output_configs);
     let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
@@ -211,16 +233,34 @@ fn exhaustive_vecs_fixed_length_2_inputs_helper<
     if let Some(out_len) = out_len {
         assert_eq!(xss.count(), out_len);
     }
-    for alt_output_types in &output_types[1..] {
-        let output_configs: Vec<(BitDistributorOutputType, usize)> = alt_output_types
-            .iter()
-            .copied()
-            .zip(input_indices.iter().copied())
-            .collect();
-        let xss = exhaustive_vecs_fixed_length_2_inputs(xs.clone(), ys.clone(), &output_configs);
-        xss.clone().take(20).for_each(drop);
-        if let Some(out_len) = out_len {
-            assert_eq!(xss.count(), out_len);
+    if len == 2 {
+        for alt_output_types in &SAMPLE_OUTPUT_TYPES_2[1..] {
+            let output_configs: Vec<(BitDistributorOutputType, usize)> = alt_output_types
+                .iter()
+                .copied()
+                .zip(input_indices.iter().copied())
+                .collect();
+            let xss =
+                exhaustive_vecs_fixed_length_2_inputs(xs.clone(), ys.clone(), &output_configs);
+            xss.clone().take(20).for_each(drop);
+            if let Some(out_len) = out_len {
+                assert_eq!(xss.count(), out_len);
+            }
+        }
+    } else {
+        assert_eq!(len, 3);
+        for alt_output_types in &SAMPLE_OUTPUT_TYPES_3[1..] {
+            let output_configs: Vec<(BitDistributorOutputType, usize)> = alt_output_types
+                .iter()
+                .copied()
+                .zip(input_indices.iter().copied())
+                .collect();
+            let xss =
+                exhaustive_vecs_fixed_length_2_inputs(xs.clone(), ys.clone(), &output_configs);
+            xss.clone().take(20).for_each(drop);
+            if let Some(out_len) = out_len {
+                assert_eq!(xss.count(), out_len);
+            }
         }
     }
 }

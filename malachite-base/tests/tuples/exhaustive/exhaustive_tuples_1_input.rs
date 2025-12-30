@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::extra_variadic::exhaustive_triples_1_input;
-use crate::get_sample_output_types;
+use crate::{SAMPLE_OUTPUT_TYPES_2, SAMPLE_OUTPUT_TYPES_3};
 use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
@@ -22,7 +22,7 @@ fn exhaustive_pairs_1_input_helper<T, I: Clone + Iterator<Item = T>>(
 ) where
     T: Clone + Debug + Eq,
 {
-    let output_types = get_sample_output_types(2);
+    let output_types = SAMPLE_OUTPUT_TYPES_2;
     let ps = exhaustive_pairs_1_input(xs.clone(), output_types[0][0], output_types[0][1]);
     assert_eq!(ps.clone().take(20).collect_vec(), out);
     if let Some(out_len) = out_len {
@@ -116,7 +116,7 @@ fn exhaustive_triples_1_input_helper<T, I: Clone + Iterator<Item = T>>(
 ) where
     T: Clone + Debug + Eq,
 {
-    let output_types = get_sample_output_types(3);
+    let output_types = SAMPLE_OUTPUT_TYPES_3;
     let ps = exhaustive_triples_1_input(
         xs.clone(),
         output_types[0][0],

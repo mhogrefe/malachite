@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::extra_variadic::exhaustive_triples_from_single;
-use crate::get_sample_output_types;
+use crate::{SAMPLE_OUTPUT_TYPES_2, SAMPLE_OUTPUT_TYPES_3};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
@@ -38,7 +38,7 @@ fn exhaustive_pairs_helper<
     assert_eq!(ps.clone().take(20).collect_vec(), out);
     assert_eq!(ps.count(), out_len);
 
-    let output_types = get_sample_output_types(2);
+    let output_types = SAMPLE_OUTPUT_TYPES_2;
     let ps = exhaustive_pairs_custom_output(
         xs.clone(),
         ys.clone(),
@@ -198,7 +198,7 @@ fn exhaustive_triples_helper<
     assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
 
-    let output_types = get_sample_output_types(3);
+    let output_types = SAMPLE_OUTPUT_TYPES_3;
     let ts = exhaustive_triples_custom_output(
         xs.clone(),
         ys.clone(),
