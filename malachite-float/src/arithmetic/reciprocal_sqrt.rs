@@ -220,7 +220,11 @@ from_reciprocal_rational_prec_round_ref(
 }}
 
 pub_crate_test! {
-generic_reciprocal_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+generic_reciprocal_sqrt_rational_ref(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode
+) -> (Float, Ordering) {
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     let mut end_shift = x.floor_log_base_2();
@@ -456,7 +460,7 @@ impl Float {
                 let mut out;
                 loop {
                     let working_limbs = bit_to_limb_count_ceiling(working_prec);
-                    out = vec![0; working_limbs];
+                    out = alloc::vec![0; working_limbs];
                     limbs_reciprocal_sqrt(
                         &mut out,
                         working_prec,
@@ -1037,7 +1041,7 @@ impl Float {
     ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using
-    /// [`Float::rational_reciprocal_sqrt_prec`] instead.
+    /// [`Float::reciprocal_sqrt_rational_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -1202,7 +1206,7 @@ impl Float {
     ///   returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using
-    /// [`Float::rational_reciprocal_sqrt_prec_ref`] instead.
+    /// [`Float::reciprocal_sqrt_rational_prec_ref`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

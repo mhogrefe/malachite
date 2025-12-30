@@ -829,7 +829,7 @@ impl Float {
     /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
     ///   returned instead.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::rational_sqrt_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using [`Float::sqrt_rational_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -973,7 +973,7 @@ impl Float {
     /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
     ///   returned instead.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::rational_sqrt_prec_ref`]
+    /// If you know you'll be using `Nearest`, consider using [`Float::sqrt_rational_prec_ref`]
     /// instead.
     ///
     /// # Worst-case complexity

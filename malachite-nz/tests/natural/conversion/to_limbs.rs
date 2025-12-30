@@ -12,6 +12,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::common::test_double_ended_iterator_size_hint;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_bool_vec_pair_gen_var_1, natural_gen, natural_unsigned_pair_gen_var_4,
 };
@@ -21,24 +23,21 @@ use std::str::FromStr;
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_to_limbs_asc() {
-    let test = |n, out| {
+    let test = |n, out: &[Limb]| {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(n.limbs().collect_vec(), out);
         assert_eq!(n.to_limbs_asc(), out);
-        assert_eq!(n.into_limbs_asc(), out);
         assert_eq!(n.as_limbs_asc(), out);
+        assert_eq!(n.into_limbs_asc(), out);
     };
-    test("0", vec![]);
-    test("123", vec![123]);
-    test("1000000000000", vec![3567587328, 232]);
-    test(
-        "1701411834921604967429270619762735448065",
-        vec![1, 2, 3, 4, 5],
-    );
-    test("4294967295", vec![u32::MAX]);
-    test("4294967296", vec![0, 1]);
-    test("18446744073709551615", vec![u32::MAX, u32::MAX]);
-    test("18446744073709551616", vec![0, 0, 1]);
+    test("0", &[]);
+    test("123", &[123]);
+    test("1000000000000", &[3567587328, 232]);
+    test("1701411834921604967429270619762735448065", &[1, 2, 3, 4, 5]);
+    test("4294967295", &[u32::MAX]);
+    test("4294967296", &[0, 1]);
+    test("18446744073709551615", &[u32::MAX, u32::MAX]);
+    test("18446744073709551616", &[0, 0, 1]);
 
     let n = Natural::from_str("1701411834921604967429270619762735448065").unwrap();
     let mut limbs = n.limbs();
@@ -70,23 +69,20 @@ fn test_to_limbs_asc() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_to_limbs_desc() {
-    let test = |n, out| {
+    let test = |n, out: &[Limb]| {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(n.limbs().rev().collect_vec(), out);
         assert_eq!(n.to_limbs_desc(), out);
         assert_eq!(n.into_limbs_desc(), out);
     };
-    test("0", vec![]);
-    test("123", vec![123]);
-    test("1000000000000", vec![232, 3567587328]);
-    test(
-        "1701411834921604967429270619762735448065",
-        vec![5, 4, 3, 2, 1],
-    );
-    test("4294967295", vec![u32::MAX]);
-    test("4294967296", vec![1, 0]);
-    test("18446744073709551615", vec![u32::MAX, u32::MAX]);
-    test("18446744073709551616", vec![1, 0, 0]);
+    test("0", &[]);
+    test("123", &[123]);
+    test("1000000000000", &[232, 3567587328]);
+    test("1701411834921604967429270619762735448065", &[5, 4, 3, 2, 1]);
+    test("4294967295", &[u32::MAX]);
+    test("4294967296", &[1, 0]);
+    test("18446744073709551615", &[u32::MAX, u32::MAX]);
+    test("18446744073709551616", &[1, 0, 0]);
 }
 
 #[test]

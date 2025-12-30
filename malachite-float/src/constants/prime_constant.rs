@@ -24,7 +24,7 @@ impl Float {
     /// $$
     ///
     /// The constant is irrational. It is unknown whether it is transcendental; see
-    /// https://mathoverflow.net/questions/114905.
+    /// <https://mathoverflow.net/questions/114905>.
     ///
     /// The output has precision `prec`.
     ///
@@ -80,7 +80,7 @@ impl Float {
     /// $$
     ///
     /// The constant is irrational. It is unknown whether it is transcendental; see
-    /// https://mathoverflow.net/questions/114905.
+    /// <https://mathoverflow.net/questions/114905>.
     ///
     /// The output has precision `prec`.
     ///

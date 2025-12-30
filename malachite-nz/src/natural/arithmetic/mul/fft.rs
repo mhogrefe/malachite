@@ -274,6 +274,7 @@ macro_rules! f64_reduce_pm1n_to_pmhn {
         }
     }};
 }
+#[cfg(feature = "test_build")]
 pub(crate) use f64_reduce_pm1n_to_pmhn;
 
 // This is vec4d_reduce_pm1n_to_pmhn from machine_vectors.h, FLINT 3.3.0-dev.
@@ -318,6 +319,7 @@ macro_rules! f64_reduce_0n_to_pmhn {
         if a > 0.5 * n { a - n } else { a }
     }};
 }
+#[cfg(feature = "test_build")]
 pub(crate) use f64_reduce_0n_to_pmhn;
 
 // return a mod n in [0,n) assuming a in (-n,n)
@@ -397,6 +399,7 @@ macro_rules! f64x4_mul_add {
 macro_rules! f64x4_mul_add {
     ($a: expr, $b: expr, $c: expr) => {{ $a.mul_add($b, $c) }};
 }
+#[cfg(feature = "test_build")]
 pub(crate) use f64x4_mul_add;
 
 // In this case f64x8::mul_add is not perfectly accurate, so we must fall back to a slower, more
@@ -486,6 +489,7 @@ macro_rules! f64_mulmod {
         fma!(-round_even!(h * $ninv), $n, h) - fma!(-a, b, h)
     }};
 }
+#[cfg(feature = "test_build")]
 pub(crate) use f64_mulmod;
 
 // This is vec4d_mulmod from machine_vectors.h, FLINT 3.3.0-dev.

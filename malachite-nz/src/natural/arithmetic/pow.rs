@@ -19,10 +19,10 @@ use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 #[cfg(feature = "test_build")]
+use crate::natural::bit_to_limb_count_ceiling;
+#[cfg(feature = "test_build")]
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::{
-    Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
-};
+use crate::natural::{Natural, bit_to_limb_count_floor, limb_to_bit_count};
 #[cfg(feature = "test_build")]
 use crate::platform::DoubleLimb;
 use crate::platform::Limb;
