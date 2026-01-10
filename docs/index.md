@@ -157,4 +157,4 @@ flags.
   {% endfor %}
 </ul>
 
-Copyright © 2025 Mikhail Hogrefe
+Copyright © 2026 Mikhail Hogrefe

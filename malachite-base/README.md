@@ -92,4 +92,4 @@ browsing through
 
 Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, shekohex, and skycloudd for additional contributions.
 
-Copyright © 2025 Mikhail Hogrefe
+Copyright © 2026 Mikhail Hogrefe

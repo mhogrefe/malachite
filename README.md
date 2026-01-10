@@ -13,4 +13,4 @@ Malachite is developed by Mikhail Hogrefe. Thanks to 43615, b4D8, coolreader18, 
 
 <https://malachite.rs/>
 
-Copyright © 2025 Mikhail Hogrefe
+Copyright © 2026 Mikhail Hogrefe
