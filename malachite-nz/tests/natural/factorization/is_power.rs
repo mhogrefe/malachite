@@ -1,4 +1,4 @@
-// Copyright © 2025 William Youmans and Mikhail Hogrefe
+// Copyright © 2026 William Youmans and Mikhail Hogrefe
 //
 // This file is part of Malachite.
 //

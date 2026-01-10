@@ -1,4 +1,4 @@
-// Copyright © 2025 William Youmans
+// Copyright © 2026 William Youmans
 //
 // This file is part of Malachite.
 //

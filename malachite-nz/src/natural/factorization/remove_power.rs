@@ -1,4 +1,4 @@
-// Copyright © 2025 William Youmans
+// Copyright © 2026 William Youmans
 //
 // Uses code adopted from the FLINT Library.
 //
