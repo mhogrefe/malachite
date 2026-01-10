@@ -427,7 +427,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     ///
-    /// This is mpfr_mpn_rec_sqrt from rec_sqrt.c, MPFR 4.3.0.
+    /// This is mpfr_rec_sqrt from rec_sqrt.c, MPFR 4.3.0.
     #[inline]
     pub fn reciprocal_sqrt_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);

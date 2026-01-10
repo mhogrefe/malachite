@@ -11,11 +11,14 @@ pub mod abs;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;
+/// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
+/// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
+pub mod agm;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.
 pub mod div;
-/// An implementations of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
+/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with

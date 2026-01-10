@@ -3306,7 +3306,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
 }
 
 // This is mpfr_cmp2 from cmp2.c, MPFR 4.2.0, returning `cancel` along with `sign`.
-fn exponent_shift_compare<'a>(
+pub fn exponent_shift_compare<'a>(
     mut xs: &'a [Limb],
     mut x_exp: i32,
     mut x_prec: u64,

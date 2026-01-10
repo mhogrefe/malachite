@@ -65,9 +65,9 @@ pub fn rug_mul_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x * y, rm);
-    (sum, o)
+    let mut product = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = product.assign_round(x * y, rm);
+    (product, o)
 }
 
 #[inline]
@@ -101,9 +101,9 @@ pub fn rug_mul_rational_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x * y, rm);
-    (sum, o)
+    let mut product = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = product.assign_round(x * y, rm);
+    (product, o)
 }
 
 pub fn rug_mul_rational_round(

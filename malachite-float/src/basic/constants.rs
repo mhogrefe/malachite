@@ -11,14 +11,14 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
-    NegModPowerOf2, PowerOf2, RoundToMultipleOfPowerOf2,
+    IsPowerOf2, NegModPowerOf2, PowerOf2, RoundToMultipleOfPowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeOne, NegativeZero, One,
     OneHalf, Two, Zero as ZeroTrait,
 };
-use malachite_base::num::logic::traits::LowMask;
+use malachite_base::num::logic::traits::{BitScan, LowMask};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -258,13 +258,40 @@ impl Float {
         })
     }
 
+    /// Returns whether the absolute value of a `Float` is equal to the minimum representable
+    /// positive value, or $2^{-2^{30}}$.
+    ///
+    /// $$
+    /// f(x) = (|x|=2^{-2^{30}}).
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert!(Float::min_positive_value_prec(100).abs_is_min_positive_value());
+    /// assert!((-Float::min_positive_value_prec(100)).abs_is_min_positive_value());
+    /// assert!(!(Float::min_positive_value_prec(100) << 1u32).abs_is_min_positive_value());
+    /// ```
+    pub fn abs_is_min_positive_value(&self) -> bool {
+        self.get_exponent() == Some(Self::MIN_EXPONENT)
+            && self.significand_ref().unwrap().is_power_of_2()
+    }
+
     /// There is no maximum finite [`Float`], but there is one for any given precision. This
     /// function returns that [`Float`].
     ///
     /// $$
     /// f(p) = (1-(1/2)^p)2^{2^{30}-1},
     /// $$
-    /// where $p$ is the `prec`. The output has precision `prec`.
+    /// where $p$ is `prec`. The output has precision `prec`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -299,6 +326,46 @@ impl Float {
             precision: prec,
             significand: Natural::low_mask(prec) << prec.neg_mod_power_of_2(Limb::LOG_WIDTH),
         })
+    }
+
+    /// Returns whether the absolute value of a `Float` is equal to the maximum representable finite
+    /// value with that precision.
+    ///
+    /// $$
+    /// f(x) = (|x|=(1-(1/2)^p)2^{2^{30}-1}),
+    /// $$
+    /// where $p$ is the precision of the $x$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert!(Float::max_finite_value_with_prec(100).abs_is_max_finite_value_with_prec());
+    /// assert!((-Float::max_finite_value_with_prec(100)).abs_is_max_finite_value_with_prec());
+    /// assert!(
+    ///     !(Float::max_finite_value_with_prec(100) >> 1u32).abs_is_max_finite_value_with_prec()
+    /// );
+    /// ```
+    pub fn abs_is_max_finite_value_with_prec(&self) -> bool {
+        if self.get_exponent() != Some(Self::MAX_EXPONENT) {
+            return false;
+        }
+        let prec = self.get_prec().unwrap();
+        let lowest_1_index = prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
+        self.significand_ref()
+            .unwrap()
+            .index_of_next_false_bit(lowest_1_index)
+            .unwrap()
+            == prec
+                .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
+                .0
     }
 
     /// Returns the number 1, with the given precision.

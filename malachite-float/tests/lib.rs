@@ -63,6 +63,7 @@ extern crate malachite_base;
 pub mod arithmetic {
     pub mod abs;
     pub mod add;
+    pub mod agm;
     pub mod div;
     pub mod is_power_of_2;
     pub mod mul;
@@ -85,6 +86,7 @@ pub mod basic {
     pub mod constants;
     pub mod get_and_set;
     pub mod named;
+    pub mod overflow_and_underflow;
     pub mod size;
     pub mod ulp;
 }

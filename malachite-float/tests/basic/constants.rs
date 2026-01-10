@@ -6,13 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_gen_var_11;
-use malachite_float::test_util::common::to_hex_string;
+use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use rug::float::Special;
 
@@ -106,6 +109,80 @@ fn min_positive_value_prec_fail() {
 }
 
 #[test]
+fn min_positive_value_prec_properties() {
+    unsigned_gen_var_11().test_properties(|p| {
+        let min = Float::min_positive_value_prec(p);
+        assert!(min.is_valid());
+        assert_eq!(min.get_prec(), Some(p));
+        assert!(min.is_power_of_2());
+    });
+}
+
+#[test]
+fn test_abs_is_min_positive_value_properties() {
+    let test = |s, s_hex, out: bool| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        assert_eq!(x.abs_is_min_positive_value(), out);
+    };
+    test("too_small", "0x1.0E-268435456#1", true);
+    test("too_small", "0x1.0E-268435456#2", true);
+    test("too_small", "0x1.0E-268435456#3", true);
+    test("too_small", "0x1.000E-268435456#10", true);
+    test(
+        "too_small",
+        "0x1.0000000000000000000000000E-268435456#100",
+        true,
+    );
+
+    test("-too_small", "-0x1.0E-268435456#1", true);
+    test("-too_small", "-0x1.0E-268435456#2", true);
+    test("-too_small", "-0x1.0E-268435456#3", true);
+    test("-too_small", "-0x1.000E-268435456#10", true);
+    test(
+        "-too_small",
+        "-0x1.0000000000000000000000000E-268435456#100",
+        true,
+    );
+
+    test("NaN", "NaN", false);
+    test("Infinity", "Infinity", false);
+    test("-Infinity", "-Infinity", false);
+    test("0.0", "0x0.0", false);
+    test("-0.0", "-0x0.0", false);
+    test("1.0", "0x1.0#1", false);
+    test("-1.0", "-0x1.0#1", false);
+
+    test("too_small", "0x1.8E-268435456#2", false);
+    test("too_small", "0x2.0E-268435456#1", false);
+    test("too_small", "0x1.0E-268435455#1", false);
+    test("-too_small", "-0x1.8E-268435456#2", false);
+    test("-too_small", "-0x2.0E-268435456#1", false);
+    test("-too_small", "-0x1.0E-268435455#1", false);
+}
+
+fn abs_is_min_positive_value_properties_helper(x: Float) {
+    let is_min = x.abs_is_min_positive_value();
+    assert_eq!(
+        is_min,
+        x.is_normal() && x.eq_abs(&Float::min_positive_value_prec(x.get_prec().unwrap()))
+    );
+    assert_eq!((-x).abs_is_min_positive_value(), is_min);
+}
+
+#[test]
+fn abs_is_min_positive_value_properties() {
+    float_gen().test_properties(|x| {
+        abs_is_min_positive_value_properties_helper(x);
+    });
+
+    float_gen_var_12().test_properties(|x| {
+        abs_is_min_positive_value_properties_helper(x);
+    });
+}
+
+#[test]
 fn test_max_finite_value_with_prec() {
     let test = |p, out, out_hex| {
         let max_finite = Float::max_finite_value_with_prec(p);
@@ -128,6 +205,80 @@ fn test_max_finite_value_with_prec() {
 #[should_panic]
 fn max_finite_value_with_prec_fail() {
     Float::max_finite_value_with_prec(0);
+}
+
+#[test]
+fn max_finite_value_with_prec_properties() {
+    unsigned_gen_var_11().test_properties(|p| {
+        let max = Float::max_finite_value_with_prec(p);
+        assert!(max.is_valid());
+        assert_eq!(max.get_prec(), Some(p));
+        assert!(max > 0u32);
+    });
+}
+
+#[test]
+fn test_abs_is_max_finite_value_with_prec() {
+    let test = |s, s_hex, out: bool| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        assert_eq!(x.abs_is_max_finite_value_with_prec(), out);
+    };
+    test("too_big", "0x4.0E+268435455#1", true);
+    test("too_big", "0x6.0E+268435455#2", true);
+    test("too_big", "0x7.0E+268435455#3", true);
+    test("too_big", "0x7.feE+268435455#10", true);
+    test(
+        "too_big",
+        "0x7.ffffffffffffffffffffffff8E+268435455#100",
+        true,
+    );
+
+    test("-too_big", "-0x4.0E+268435455#1", true);
+    test("-too_big", "-0x6.0E+268435455#2", true);
+    test("-too_big", "-0x7.0E+268435455#3", true);
+    test("-too_big", "-0x7.feE+268435455#10", true);
+    test(
+        "-too_big",
+        "-0x7.ffffffffffffffffffffffff8E+268435455#100",
+        true,
+    );
+
+    test("NaN", "NaN", false);
+    test("Infinity", "Infinity", false);
+    test("-Infinity", "-Infinity", false);
+    test("0.0", "0x0.0", false);
+    test("-0.0", "-0x0.0", false);
+    test("1.0", "0x1.0#1", false);
+    test("-1.0", "-0x1.0#1", false);
+
+    test("too_big", "0x2.0E+268435455#1", false);
+    test("too_big", "0x4.0E+268435455#2", false);
+    test("too_big", "0x4.0E+268435454#2", false);
+    test("-too_big", "-0x2.0E+268435455#1", false);
+    test("-too_big", "-0x4.0E+268435455#2", false);
+    test("-too_big", "-0x4.0E+268435454#2", false);
+}
+
+fn abs_is_max_finite_value_with_prec_properties_helper(x: Float) {
+    let is_max = x.abs_is_max_finite_value_with_prec();
+    assert_eq!(
+        is_max,
+        x.is_normal() && x.eq_abs(&Float::max_finite_value_with_prec(x.get_prec().unwrap()))
+    );
+    assert_eq!((-x).abs_is_max_finite_value_with_prec(), is_max);
+}
+
+#[test]
+fn abs_is_max_finite_value_with_prec_properties() {
+    float_gen().test_properties(|x| {
+        abs_is_max_finite_value_with_prec_properties_helper(x);
+    });
+
+    float_gen_var_12().test_properties(|x| {
+        abs_is_max_finite_value_with_prec_properties_helper(x);
+    });
 }
 
 #[test]

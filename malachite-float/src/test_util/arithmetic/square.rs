@@ -19,9 +19,9 @@ pub fn square_prec_round_naive(x: Float, prec: u64, rm: RoundingMode) -> (Float,
 }
 
 pub fn rug_square_prec_round(x: &rug::Float, prec: u64, rm: Round) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x.square_ref(), rm);
-    (sum, o)
+    let mut square = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = square.assign_round(x.square_ref(), rm);
+    (square, o)
 }
 
 pub fn rug_square_prec(x: &rug::Float, prec: u64) -> (rug::Float, Ordering) {

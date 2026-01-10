@@ -24,9 +24,9 @@ pub fn rug_sub_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x - y, rm);
-    (sum, o)
+    let mut diff = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = diff.assign_round(x - y, rm);
+    (diff, o)
 }
 
 #[inline]
@@ -60,9 +60,9 @@ pub fn rug_sub_rational_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let mut sum = rug::Float::with_val(u32::exact_from(prec), 0);
-    let o = sum.assign_round(x - y, rm);
-    (sum, o)
+    let mut diff = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = diff.assign_round(x - y, rm);
+    (diff, o)
 }
 
 pub fn rug_sub_rational_round(
@@ -103,12 +103,12 @@ pub fn sub_rational_prec_round_naive(
         }
         (float_zero!(), y) => Float::from_rational_prec_round(-y, prec, rm),
         (x, y) => {
-            let (mut sum, o) =
+            let (mut diff, o) =
                 Float::from_rational_prec_round(Rational::exact_from(x) - y, prec, rm);
-            if rm == Floor && sum == 0u32 {
-                sum.neg_assign();
+            if rm == Floor && diff == 0u32 {
+                diff.neg_assign();
             }
-            (sum, o)
+            (diff, o)
         }
     }
 }

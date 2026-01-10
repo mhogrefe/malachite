@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     abs::register(runner);
     add::register(runner);
+    agm::register(runner);
     div::register(runner);
     is_power_of_2::register(runner);
     mul::register(runner);
@@ -30,6 +31,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod abs;
 mod add;
+mod agm;
 mod div;
 mod is_power_of_2;
 mod mul;

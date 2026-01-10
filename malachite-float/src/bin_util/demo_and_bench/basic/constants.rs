@@ -14,12 +14,18 @@ use malachite_base::test_util::generators::unsigned_gen_var_11;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
+use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
+use malachite_float::test_util::generators::float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_min_positive_value_prec);
     register_demo!(runner, demo_float_min_positive_value_prec_debug);
+    register_demo!(runner, demo_float_abs_is_min_positive_value);
+    register_demo!(runner, demo_float_abs_is_min_positive_value_debug);
     register_demo!(runner, demo_float_max_finite_value_with_prec);
     register_demo!(runner, demo_float_max_finite_value_with_prec_debug);
+    register_demo!(runner, demo_float_abs_is_max_finite_value_with_prec);
+    register_demo!(runner, demo_float_abs_is_max_finite_value_with_prec_debug);
     register_demo!(runner, demo_float_one_prec);
     register_demo!(runner, demo_float_one_prec_debug);
     register_demo!(runner, demo_float_two_prec);
@@ -29,14 +35,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_one_half_prec);
     register_demo!(runner, demo_float_one_half_prec_debug);
 
-    register_bench!(
-        runner,
-        benchmark_float_min_positive_value_prec_library_comparison
-    );
-    register_bench!(
-        runner,
-        benchmark_float_max_finite_value_with_prec_library_comparison
-    );
+    register_bench!(runner, benchmark_float_min_positive_value_prec);
+    register_bench!(runner, benchmark_float_abs_is_min_positive_value);
+    register_bench!(runner, benchmark_float_max_finite_value_with_prec);
+    register_bench!(runner, benchmark_float_abs_is_max_finite_value_with_prec);
     register_bench!(runner, benchmark_float_one_prec_library_comparison);
     register_bench!(runner, benchmark_float_two_prec_library_comparison);
     register_bench!(runner, benchmark_float_negative_one_prec_library_comparison);
@@ -63,6 +65,29 @@ fn demo_float_min_positive_value_prec_debug(gm: GenMode, config: &GenConfig, lim
     }
 }
 
+fn demo_float_abs_is_min_positive_value(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        if x.abs_is_min_positive_value() {
+            println!("|{x}| is the minimum positive value");
+        } else {
+            println!("|{x}| is not the minimum positive value");
+        }
+    }
+}
+
+fn demo_float_abs_is_min_positive_value_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        if x.abs_is_min_positive_value() {
+            println!("|{:#x}| is the minimum positive value", ComparableFloat(x),);
+        } else {
+            println!(
+                "|{:#x}| is not the minimum positive value",
+                ComparableFloat(x),
+            );
+        }
+    }
+}
+
 fn demo_float_max_finite_value_with_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
         println!(
@@ -80,6 +105,36 @@ fn demo_float_max_finite_value_with_prec_debug(gm: GenMode, config: &GenConfig, 
             p,
             ComparableFloat(Float::max_finite_value_with_prec(p))
         );
+    }
+}
+
+fn demo_float_abs_is_max_finite_value_with_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        if x.abs_is_max_finite_value_with_prec() {
+            println!("|{x}| is the maximum positive value with its precision");
+        } else {
+            println!("|{x}| is not the maximum positive value with its precision");
+        }
+    }
+}
+
+fn demo_float_abs_is_max_finite_value_with_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in float_gen().get(gm, config).take(limit) {
+        if x.abs_is_max_finite_value_with_prec() {
+            println!(
+                "|{:#x}| is the maximum positive value with its precision",
+                ComparableFloat(x)
+            );
+        } else {
+            println!(
+                "|{:#x}| is not the maximum positive value with its precision",
+                ComparableFloat(x)
+            );
+        }
     }
 }
 
@@ -147,7 +202,7 @@ fn demo_float_one_half_prec_debug(gm: GenMode, config: &GenConfig, limit: usize)
     }
 }
 
-fn benchmark_float_min_positive_value_prec_library_comparison(
+fn benchmark_float_min_positive_value_prec(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -167,7 +222,27 @@ fn benchmark_float_min_positive_value_prec_library_comparison(
     );
 }
 
-fn benchmark_float_max_finite_value_with_prec_library_comparison(
+fn benchmark_float_abs_is_min_positive_value(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.abs_is_min_positive_value()",
+        BenchmarkType::Single,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [("Malachite", &mut |x| {
+            no_out!(x.abs_is_min_positive_value());
+        })],
+    );
+}
+
+fn benchmark_float_max_finite_value_with_prec(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -183,6 +258,26 @@ fn benchmark_float_max_finite_value_with_prec_library_comparison(
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |p| {
             no_out!(Float::max_finite_value_with_prec(p));
+        })],
+    );
+}
+
+fn benchmark_float_abs_is_max_finite_value_with_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.abs_is_max_positive_value_with_prec()",
+        BenchmarkType::Single,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [("Malachite", &mut |x| {
+            no_out!(x.abs_is_max_finite_value_with_prec());
         })],
     );
 }

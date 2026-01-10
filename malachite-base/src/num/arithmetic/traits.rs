@@ -55,6 +55,18 @@ pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
 
+/// Calculates the AGM (arithmetic-geometric mean) of two numbers.
+pub trait Agm<RHS = Self> {
+    type Output;
+
+    fn agm(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a number with the AGM (arithmetic-geometric mean) of it and another number.
+pub trait AgmAssign<RHS = Self> {
+    fn agm_assign(&mut self, other: RHS);
+}
+
 /// Left-shifts a number (multiplies it by a power of 2), returning `None` if the result is not
 /// representable.
 pub trait ArithmeticCheckedShl<RHS> {
