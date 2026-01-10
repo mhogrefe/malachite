@@ -17,6 +17,9 @@ num-integer = { version = "0.1.46", default-features = false, features = ["i128"
 paste = "1.0.15"
 num-bigint = { version = "0.4", default-features = false, optional = true }
 
+[dev-dependencies]
+num-bigint = "0.4"
+
 [features]
 default = ["std"]
 std = ["malachite-base/std", "malachite-nz/std"]

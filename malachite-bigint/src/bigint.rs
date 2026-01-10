@@ -659,6 +659,239 @@ mod test {
     }
 
     #[test]
+    fn test_to_f64() {
+        use num_traits::ToPrimitive as NumToPrimitive;
+
+        let test_cases = [
+            "123456789012345678901234567890",
+            "999999999999999999999999999999",
+            "170141183460469231731687303715884105727",
+            "340282366920938463463374607431768211455",
+            "12345678901234567890123456789012345678901234567890",
+            "-123456789012345678901234567890",
+            "-999999999999999999999999999999",
+            "-170141183460469231731687303715884105728",
+            "-12345678901234567890123456789012345678901234567890",
+            "1208925819614629174706176",
+            "1329227995784915872903807060280344576",
+            "-1208925819614629174706176",
+            "-1329227995784915872903807060280344576",
+            // Overflow cases
+            "999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+            "-999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+        ];
+
+        for test_str in &test_cases {
+            let malachite_val = BigInt::from_str(test_str).unwrap();
+            let num_bigint_val = num_bigint::BigInt::from_str(test_str).unwrap();
+
+            assert_eq!(
+                malachite_val.to_f64(),
+                num_bigint_val.to_f64(),
+                "to_f64 mismatch for {}",
+                test_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_to_f32() {
+        use num_traits::ToPrimitive as NumToPrimitive;
+
+        let test_cases = [
+            "12345678901234567890",
+            "999999999999999999999999",
+            "-12345678901234567890",
+            "-999999999999999999999999",
+            "340282366920938463463374607431768211455",
+        ];
+
+        for test_str in &test_cases {
+            let malachite_val = BigInt::from_str(test_str).unwrap();
+            let num_bigint_val = num_bigint::BigInt::from_str(test_str).unwrap();
+
+            assert_eq!(
+                malachite_val.to_f32(),
+                num_bigint_val.to_f32(),
+                "to_f32 mismatch for {}",
+                test_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_to_i64() {
+        use num_traits::ToPrimitive as NumToPrimitive;
+
+        let test_cases = [
+            "0",
+            "123",
+            "-456",
+            "9223372036854775807",  // i64::MAX
+            "-9223372036854775808", // i64::MIN
+            "9223372036854775808",  // overflow
+            "-9223372036854775809", // overflow
+        ];
+
+        for test_str in &test_cases {
+            let malachite_val = BigInt::from_str(test_str).unwrap();
+            let num_bigint_val = num_bigint::BigInt::from_str(test_str).unwrap();
+
+            assert_eq!(
+                malachite_val.to_i64(),
+                num_bigint_val.to_i64(),
+                "to_i64 mismatch for {}",
+                test_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_to_u64() {
+        use num_traits::ToPrimitive as NumToPrimitive;
+
+        let test_cases = [
+            "0",
+            "123",
+            "18446744073709551615", // u64::MAX
+            "18446744073709551616", // overflow
+            "-1",                   // negative
+        ];
+
+        for test_str in &test_cases {
+            let malachite_val = BigInt::from_str(test_str).unwrap();
+            let num_bigint_val = num_bigint::BigInt::from_str(test_str).unwrap();
+
+            assert_eq!(
+                malachite_val.to_u64(),
+                num_bigint_val.to_u64(),
+                "to_u64 mismatch for {}",
+                test_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_arithmetic() {
+        let test_cases = [
+            ("123456789", "987654321"),
+            ("999999999999999999", "1"),
+            ("-123456789", "987654321"),
+            ("123456789", "-987654321"),
+            ("-123456789", "-987654321"),
+        ];
+
+        for (a_str, b_str) in &test_cases {
+            let ma = BigInt::from_str(a_str).unwrap();
+            let mb = BigInt::from_str(b_str).unwrap();
+            let na = num_bigint::BigInt::from_str(a_str).unwrap();
+            let nb = num_bigint::BigInt::from_str(b_str).unwrap();
+
+            assert_eq!((&ma + &mb).to_string(), (&na + &nb).to_string(), "add");
+            assert_eq!((&ma - &mb).to_string(), (&na - &nb).to_string(), "sub");
+            assert_eq!((&ma * &mb).to_string(), (&na * &nb).to_string(), "mul");
+            if *b_str != "0" {
+                assert_eq!((&ma / &mb).to_string(), (&na / &nb).to_string(), "div");
+                assert_eq!((&ma % &mb).to_string(), (&na % &nb).to_string(), "rem");
+            }
+        }
+    }
+
+    #[test]
+    fn test_checked_arithmetic() {
+        let test_cases = [
+            ("123456789", "987654321"),
+            ("999999999999999999", "1"),
+            ("-123456789", "987654321"),
+        ];
+
+        for (a_str, b_str) in &test_cases {
+            let ma = BigInt::from_str(a_str).unwrap();
+            let mb = BigInt::from_str(b_str).unwrap();
+            let na = num_bigint::BigInt::from_str(a_str).unwrap();
+            let nb = num_bigint::BigInt::from_str(b_str).unwrap();
+
+            assert_eq!(
+                ma.checked_add(&mb).map(|v| v.to_string()),
+                na.checked_add(&nb).map(|v| v.to_string()),
+                "checked_add"
+            );
+            assert_eq!(
+                ma.checked_sub(&mb).map(|v| v.to_string()),
+                na.checked_sub(&nb).map(|v| v.to_string()),
+                "checked_sub"
+            );
+            assert_eq!(
+                ma.checked_mul(&mb).map(|v| v.to_string()),
+                na.checked_mul(&nb).map(|v| v.to_string()),
+                "checked_mul"
+            );
+            assert_eq!(
+                ma.checked_div(&mb).map(|v| v.to_string()),
+                na.checked_div(&nb).map(|v| v.to_string()),
+                "checked_div"
+            );
+        }
+    }
+
+    #[test]
+    fn test_sign() {
+        use num_traits::Signed;
+
+        let test_cases = [
+            "0",
+            "123",
+            "-456",
+            "999999999999999999",
+            "-999999999999999999",
+        ];
+
+        for test_str in &test_cases {
+            let ma = BigInt::from_str(test_str).unwrap();
+            let na = num_bigint::BigInt::from_str(test_str).unwrap();
+
+            assert_eq!(
+                ma.is_positive(),
+                na.is_positive(),
+                "is_positive for {}",
+                test_str
+            );
+            assert_eq!(
+                ma.is_negative(),
+                na.is_negative(),
+                "is_negative for {}",
+                test_str
+            );
+            assert_eq!(
+                ma.abs().to_string(),
+                na.abs().to_string(),
+                "abs for {}",
+                test_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_pow() {
+        use num_traits::Pow;
+
+        let test_cases = [("2", 10u32), ("10", 20u32), ("-3", 5u32), ("123", 4u32)];
+
+        for (base_str, exp) in &test_cases {
+            let ma = BigInt::from_str(base_str).unwrap();
+            let na = num_bigint::BigInt::from_str(base_str).unwrap();
+
+            assert_eq!(
+                ma.pow(*exp).to_string(),
+                na.pow(*exp).to_string(),
+                "pow for {}^{}",
+                base_str,
+                exp
+            );
+        }
+    }
+
+    #[test]
     fn test_to_signed_bytes() {
         let sysmax = i64::MAX;
         let i = BigInt::from(sysmax);

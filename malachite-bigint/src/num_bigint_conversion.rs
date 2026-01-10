@@ -2,7 +2,7 @@ use crate::{
     BigInt, BigUint,
     Sign::{self, Minus, NoSign, Plus},
 };
-use malachite::Natural;
+use malachite_nz::natural::Natural;
 use num_traits::ToPrimitive;
 
 impl From<num_bigint::BigUint> for BigUint {
