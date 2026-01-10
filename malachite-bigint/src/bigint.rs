@@ -688,8 +688,7 @@ mod test {
             assert_eq!(
                 malachite_val.to_f64(),
                 num_bigint_val.to_f64(),
-                "to_f64 mismatch for {}",
-                test_str
+                "to_f64 mismatch for {test_str}",
             );
         }
     }
@@ -713,8 +712,7 @@ mod test {
             assert_eq!(
                 malachite_val.to_f32(),
                 num_bigint_val.to_f32(),
-                "to_f32 mismatch for {}",
-                test_str
+                "to_f32 mismatch for {test_str}",
             );
         }
     }
@@ -740,8 +738,7 @@ mod test {
             assert_eq!(
                 malachite_val.to_i64(),
                 num_bigint_val.to_i64(),
-                "to_i64 mismatch for {}",
-                test_str
+                "to_i64 mismatch for {test_str}",
             );
         }
     }
@@ -765,8 +762,7 @@ mod test {
             assert_eq!(
                 malachite_val.to_u64(),
                 num_bigint_val.to_u64(),
-                "to_u64 mismatch for {}",
-                test_str
+                "to_u64 mismatch for {test_str}",
             );
         }
     }
@@ -853,20 +849,17 @@ mod test {
             assert_eq!(
                 ma.is_positive(),
                 na.is_positive(),
-                "is_positive for {}",
-                test_str
+                "is_positive for {test_str}",
             );
             assert_eq!(
                 ma.is_negative(),
                 na.is_negative(),
-                "is_negative for {}",
-                test_str
+                "is_negative for {test_str}",
             );
             assert_eq!(
                 ma.abs().to_string(),
                 na.abs().to_string(),
-                "abs for {}",
-                test_str
+                "abs for {test_str}",
             );
         }
     }
@@ -884,9 +877,7 @@ mod test {
             assert_eq!(
                 ma.pow(*exp).to_string(),
                 na.pow(*exp).to_string(),
-                "pow for {}^{}",
-                base_str,
-                exp
+                "pow for {base_str}^{exp}",
             );
         }
     }
