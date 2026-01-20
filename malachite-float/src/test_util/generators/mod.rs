@@ -3197,6 +3197,29 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_4() -> GT3 {
     )
 }
 
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::from_rational_prec_round`,
+// and the `Rational` is non-negative.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_5() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_5,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_5,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_6,
+    )
+}
+
+// -- (Rational, Rational, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Rational, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::agm_rational_prec_round`.
+pub fn rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Rational, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
 // -- (Rational, RoundingMode) --
 
 // vars 1 through 5 are in malachite-q.

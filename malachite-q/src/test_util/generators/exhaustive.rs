@@ -355,6 +355,13 @@ pub fn exhaustive_rational_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> It
     ))
 }
 
+pub fn exhaustive_rational_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(Rational, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_non_negative_rationals(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>()
@@ -488,6 +495,19 @@ pub fn exhaustive_rational_rational_natural_natural_quadruple_gen_var_1()
         exhaustive_rationals(),
         exhaustive_naturals(),
         exhaustive_positive_naturals(),
+    ))
+}
+
+// -- (Rational, Rational, PrimitiveInt) --
+
+pub fn exhaustive_rational_rational_primitive_int_triple_gen_var_1<T: PrimitiveInt>()
+-> It<(Rational, Rational, T)> {
+    Box::new(exhaustive_triples_xxy_custom_output(
+        exhaustive_rationals(),
+        exhaustive_positive_primitive_ints::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
     ))
 }
 

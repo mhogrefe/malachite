@@ -19,17 +19,17 @@ use crate::test_util::extra_variadic::{
 };
 use crate::test_util::generators::exhaustive::{
     add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
-    agm_prec_round_valid, agm_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
-    div_rational_round_valid, div_round_valid, from_primitive_float_prec_round_valid,
-    integer_rounding_from_float_valid, mul_prec_round_valid, mul_rational_prec_round_valid,
-    mul_rational_round_valid, mul_round_valid, natural_rounding_from_float_valid,
-    rational_div_float_prec_round_valid, rational_div_float_round_valid,
-    reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
-    reciprocal_sqrt_rational_prec_round_valid, reciprocal_sqrt_round_valid, set_prec_round_valid,
-    shl_prec_round_valid, shl_round_valid, shr_prec_round_valid, shr_round_valid,
-    signed_rounding_from_float_valid, sqrt_prec_round_valid, sqrt_rational_prec_round_valid,
-    sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid, div_prec_round_valid,
+    div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
+    from_primitive_float_prec_round_valid, integer_rounding_from_float_valid, mul_prec_round_valid,
+    mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
+    natural_rounding_from_float_valid, rational_div_float_prec_round_valid,
+    rational_div_float_round_valid, reciprocal_prec_round_valid, reciprocal_round_valid,
+    reciprocal_sqrt_prec_round_valid, reciprocal_sqrt_rational_prec_round_valid,
+    reciprocal_sqrt_round_valid, set_prec_round_valid, shl_prec_round_valid, shl_round_valid,
+    shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
+    sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
     unsigned_rounding_from_float_valid,
 };
 use malachite_base::bools::random::{
@@ -67,7 +67,7 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::random::random_rationals;
+use malachite_q::random::{random_non_negative_rationals, random_rationals};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
@@ -6011,7 +6011,65 @@ pub fn random_rational_unsigned_rounding_mode_triple_gen_var_4(
     )
 }
 
-// -- (Rational, PrimitiveUnsigned, RoundingMode) --
+pub fn random_rational_unsigned_rounding_mode_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_non_negative_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| {
+            rm != Exact
+                || n.denominator_ref().is_power_of_2()
+                    && n.numerator_ref().significant_bits() <= prec
+        }),
+    )
+}
+
+// -- (Rational, Rational, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Rational, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| agm_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+// -- (Rational, RoundingMode) --
 
 // vars 1 through 5 are in malachite-q.
 

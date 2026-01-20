@@ -6,18 +6,20 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Agm, AgmAssign, Square};
+use malachite_base::num::arithmetic::traits::{Agm, AgmAssign, PowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Zero,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::arithmetic::agm::primitive_float_agm;
+use malachite_float::arithmetic::agm::{primitive_float_agm, primitive_float_agm_rational};
 use malachite_float::test_util::arithmetic::agm::{
-    rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
+    agm_prec_round_extended, rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -32,14 +34,19 @@ use malachite_float::test_util::generators::{
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_6, float_unsigned_pair_gen_var_7,
     float_unsigned_rounding_mode_triple_gen_var_1, float_unsigned_rounding_mode_triple_gen_var_17,
     float_unsigned_rounding_mode_triple_gen_var_18,
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    rational_unsigned_rounding_mode_triple_gen_var_5,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use std::cmp::{
-    Ordering::{self, *},
-    max,
+use malachite_q::test_util::generators::{
+    rational_pair_gen, rational_rational_unsigned_triple_gen_var_2,
+    rational_unsigned_pair_gen_var_8,
 };
+use std::cmp::Ordering::{self, *};
+use std::cmp::max;
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_agm() {
@@ -81,6 +88,10 @@ fn test_agm() {
             ))),
             ComparableFloatRef(&agm),
         );
+
+        let prec = max(x.significant_bits(), y.significant_bits());
+        let agm_alt = agm_prec_round_extended(x, y, prec, Nearest).0;
+        assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
     };
     test("NaN", "NaN", "NaN", "NaN", "NaN", "NaN");
     test("NaN", "NaN", "Infinity", "Infinity", "NaN", "NaN");
@@ -320,6 +331,10 @@ fn test_agm_prec() {
             ComparableFloatRef(&agm)
         );
         assert_eq!(rug_o, o);
+
+        let (agm_alt, o_alt) = agm_prec_round_extended(x, y, prec, Nearest);
+        assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
+        assert_eq!(o_alt, o);
     };
     test("NaN", "NaN", "NaN", "NaN", 1, "NaN", "NaN", Equal);
     test("NaN", "NaN", "Infinity", "Infinity", 1, "NaN", "NaN", Equal);
@@ -847,6 +862,11 @@ fn test_agm_round() {
             );
             assert_eq!(rug_o, o);
         }
+
+        let prec = max(x.significant_bits(), y.significant_bits());
+        let (agm_alt, o_alt) = agm_prec_round_extended(x, y, prec, rm);
+        assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
+        assert_eq!(o_alt, o);
     };
     test("NaN", "NaN", "NaN", "NaN", Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "NaN", "NaN", Ceiling, "NaN", "NaN", Equal);
@@ -2357,6 +2377,10 @@ fn test_agm_prec_round() {
             );
             assert_eq!(rug_o, o);
         }
+
+        let (agm_alt, o_alt) = agm_prec_round_extended(x, y, prec, rm);
+        assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
+        assert_eq!(o_alt, o);
     };
     test("NaN", "NaN", "NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
     test("NaN", "NaN", "NaN", "NaN", 1, Ceiling, "NaN", "NaN", Equal);
@@ -4287,6 +4311,756 @@ fn test_primitive_float_agm() {
     test::<f64>(24.0, 6.0, 13.458171481725616);
 }
 
+#[test]
+fn test_agm_rational_prec_xxx() {
+    let test = |s, t, prec, out, out_hex, out_o| {
+        let u = Rational::from_str(s).unwrap();
+        let v = Rational::from_str(t).unwrap();
+
+        let (agm, o) = Float::agm_rational_prec(u.clone(), v.clone(), prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_val_ref(u.clone(), &v, prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_ref_val(&u, v.clone(), prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_ref_ref(&u, &v, prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+    };
+    // - in agm_rational_prec_round
+    // - x == 0 || y == 0 in agm_rational_prec_round
+    test("0", "0", 1, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, "0.0", "0x0.0", Equal);
+    test("0", "0", 100, "0.0", "0x0.0", Equal);
+
+    test("0", "22/7", 1, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 100, "0.0", "0x0.0", Equal);
+
+    test("-1", "22/7", 1, "NaN", "NaN", Equal);
+    test("-1", "22/7", 10, "NaN", "NaN", Equal);
+    test("-1", "22/7", 100, "NaN", "NaN", Equal);
+
+    test("22/7", "-1", 1, "NaN", "NaN", Equal);
+    test("22/7", "-1", 10, "NaN", "NaN", Equal);
+    test("22/7", "-1", 100, "NaN", "NaN", Equal);
+
+    test("22/7", "22/7", 1, "4.0", "0x4.0#1", Greater);
+    test("22/7", "22/7", 10, "3.145", "0x3.25#10", Greater);
+    test(
+        "22/7",
+        "22/7",
+        100,
+        "3.142857142857142857142857142858",
+        "0x3.2492492492492492492492494#100",
+        Greater,
+    );
+
+    test("1", "2", 1, "1.0", "0x1.0#1", Less);
+    test("1", "2", 10, "1.457", "0x1.750#10", Greater);
+    test(
+        "1",
+        "2",
+        100,
+        "1.456791031046906869186432383265",
+        "0x1.74f041cb73dca72066c53853e#100",
+        Less,
+    );
+
+    test("1", "4/3", 1, "1.0", "0x1.0#1", Less);
+    test("1", "4/3", 10, "1.16", "0x1.290#10", Less);
+    test(
+        "1",
+        "4/3",
+        100,
+        "1.160675892119856802207320983052",
+        "0x1.29220e25e91091bea1ecae6de#100",
+        Less,
+    );
+
+    test("4/3", "2", 1, "2.0", "0x2.0#1", Greater);
+    test("4/3", "2", 10, "1.65", "0x1.a68#10", Greater);
+    test(
+        "4/3",
+        "2",
+        100,
+        "1.649786957490869641737773069062",
+        "0x1.a6587023ca668d7d15d42a6a8#100",
+        Greater,
+    );
+
+    test("4/3", "22/7", 1, "2.0", "0x2.0#1", Less);
+    test("4/3", "22/7", 10, "2.141", "0x2.24#10", Less);
+    test(
+        "4/3",
+        "22/7",
+        100,
+        "2.141515087948159535688532991751",
+        "0x2.243a5532a0bea4119018af58c#100",
+        Greater,
+    );
+
+    // - x < 0 || y < 0 in agm_rational_prec_round
+    // - x >= 0 && y >= 0 in agm_rational_prec_round
+    // - x == y in agm_rational_prec_round
+    test("1", "1", 1, "1.0", "0x1.0#1", Equal);
+    // - x != y in agm_rational_prec_round
+    // - no overflow or underflow in agm_rational_prec_round
+    // - in agm_rational_helper
+    // - x_o == Equal && y_o == Equal in agm_rational_helper
+    test("1", "1/2", 1, "0.5", "0x0.8#1", Less);
+    // - x_o != Equal || y_o != Equal in agm_rational_helper
+    // - x_o == Equal in agm_rational_helper
+    // - y_o != Equal in agm_rational_helper
+    // - o_lo != Equal in agm_rational_helper
+    // - o_hi != Equal in agm_rational_helper
+    // - o_lo == o_hi && agm_lo == agm_hi in agm_rational_helper
+    test("1", "1/3", 1, "0.5", "0x0.8#1", Less);
+    // - x_o != Equal in agm_rational_helper
+    // - y_o == Equal in agm_rational_helper
+    test("1/3", "1", 1, "0.5", "0x0.8#1", Less);
+    // - o_lo != o_hi || agm_lo != agm_hi in agm_rational_helper
+    test(
+        "558514310918953/444252178279",
+        "81626687/1727294",
+        36,
+        "422.994593993",
+        "0x1a6.fe9db64#36",
+        Greater,
+    );
+    // - o_lo == Equal in agm_rational_helper
+    test("1/2", "5000001/10000000", 1, "0.5", "0x0.8#1", Less);
+    // - o_hi == Equal in agm_rational_helper
+    test("1/2", "4999999/10000000", 1, "0.5", "0x0.8#1", Greater);
+
+    let test_big = |u: Rational, v: Rational, prec, out, out_hex, out_o| {
+        let (agm, o) = Float::agm_rational_prec(u.clone(), v.clone(), prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_val_ref(u.clone(), &v, prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_ref_val(&u, v.clone(), prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_ref_ref(&u, &v, prec);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+    };
+    let max_exp = i64::from(Float::MAX_EXPONENT);
+    let min_exp = i64::from(Float::MIN_EXPONENT);
+    // - just overflow in agm_rational_prec_round
+    test_big(
+        Rational::power_of_2(max_exp),
+        Rational::power_of_2(max_exp + 1),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - just underflow in agm_rational_prec_round
+    test_big(
+        Rational::power_of_2(min_exp - 4),
+        Rational::power_of_2(min_exp - 3),
+        1,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - just underflow (borderline) in agm_rational_prec_round
+    test_big(
+        Rational::power_of_2(min_exp - 3),
+        Rational::power_of_2(min_exp - 2),
+        1,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - partial overflow or underflow in agm_rational_prec_round
+    // - in agm_rational_helper_extended
+    // - x_o == Equal && y_o == Equal in agm_rational_helper_extended
+    test_big(
+        Rational::power_of_2(min_exp - 4),
+        Rational::power_of_2(max_exp + 1),
+        1,
+        "too_big",
+        "0x4.0E+268435448#1",
+        Less,
+    );
+    // - x_o != Equal || y_o != Equal in agm_rational_helper_extended
+    // - x_o == Equal in agm_rational_helper_extended
+    // - y_o != Equal in agm_rational_helper_extended
+    // - o_lo != Equal in agm_rational_helper_extended
+    // - o_hi != Equal in agm_rational_helper_extended
+    // - o_lo == o_hi && agm_lo == agm_hi in agm_rational_helper_extended
+    test_big(
+        Rational::ONE,
+        Rational::power_of_2(max_exp + 1) * Rational::from_unsigneds(4u8, 3),
+        1,
+        "too_big",
+        "0x1.0E+268435449#1",
+        Greater,
+    );
+    // - x_o != Equal in agm_rational_helper_extended
+    // - y_o == Equal in agm_rational_helper_extended
+    test_big(
+        Rational::power_of_2(max_exp + 1) * Rational::from_unsigneds(4u8, 3),
+        Rational::ONE,
+        1,
+        "too_big",
+        "0x1.0E+268435449#1",
+        Greater,
+    );
+    // - o_lo != o_hi || agm_lo != agm_hi in agm_rational_helper_extended
+    test_big(
+        Rational::from_unsigneds(558514310918953u64, 444252178279) << (max_exp - 6),
+        Rational::from_unsigneds(81626687u32, 1727294) << (max_exp - 6),
+        36,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - no overflow or underflow (borderline) in agm_rational_prec_round
+    // - o_lo == Equal in agm_rational_helper_extended
+    test_big(
+        Rational::ONE_HALF << max_exp,
+        Rational::from_unsigneds(5000001u32, 10000000) << max_exp,
+        1,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+}
+
+#[test]
+fn agm_ratonal_prec_fail() {
+    assert_panic!(Float::agm_rational_prec(Rational::ONE, Rational::ONE, 0));
+    assert_panic!(Float::agm_rational_prec_val_ref(
+        Rational::ONE,
+        &Rational::ONE,
+        0
+    ));
+    assert_panic!(Float::agm_rational_prec_ref_val(
+        &Rational::ONE,
+        Rational::ONE,
+        0
+    ));
+    assert_panic!(Float::agm_rational_prec_ref_ref(
+        &Rational::ONE,
+        &Rational::ONE,
+        0
+    ));
+}
+
+#[test]
+fn test_agm_rational_prec_round() {
+    let test = |s, t, prec, rm, out, out_hex, out_o| {
+        let u = Rational::from_str(s).unwrap();
+        let v = Rational::from_str(t).unwrap();
+
+        let (agm, o) = Float::agm_rational_prec_round(u.clone(), v.clone(), prec, rm);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_round_val_ref(u.clone(), &v, prec, rm);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_round_ref_val(&u, v.clone(), prec, rm);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+
+        let (agm, o) = Float::agm_rational_prec_round_ref_ref(&u, &v, prec, rm);
+        assert!(agm.is_valid());
+        assert_eq!(agm.to_string(), out);
+        assert_eq!(to_hex_string(&agm), out_hex);
+        assert_eq!(o, out_o);
+    };
+    test("0", "0", 1, Floor, "0.0", "0x0.0", Equal);
+    test("0", "0", 1, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "0", 1, Down, "0.0", "0x0.0", Equal);
+    test("0", "0", 1, Up, "0.0", "0x0.0", Equal);
+    test("0", "0", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "0", 1, Exact, "0.0", "0x0.0", Equal);
+
+    test("0", "0", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Exact, "0.0", "0x0.0", Equal);
+
+    test("0", "0", 100, Floor, "0.0", "0x0.0", Equal);
+    test("0", "0", 100, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "0", 100, Down, "0.0", "0x0.0", Equal);
+    test("0", "0", 100, Up, "0.0", "0x0.0", Equal);
+    test("0", "0", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "0", 100, Exact, "0.0", "0x0.0", Equal);
+
+    test("0", "22/7", 1, Floor, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 1, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 1, Down, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 1, Up, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 1, Exact, "0.0", "0x0.0", Equal);
+
+    test("0", "22/7", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Exact, "0.0", "0x0.0", Equal);
+
+    test("0", "22/7", 100, Floor, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 100, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 100, Down, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 100, Up, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 100, Exact, "0.0", "0x0.0", Equal);
+
+    test("-1", "22/7", 1, Floor, "NaN", "NaN", Equal);
+    test("-1", "22/7", 1, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "22/7", 1, Down, "NaN", "NaN", Equal);
+    test("-1", "22/7", 1, Up, "NaN", "NaN", Equal);
+    test("-1", "22/7", 1, Nearest, "NaN", "NaN", Equal);
+    test("-1", "22/7", 1, Exact, "NaN", "NaN", Equal);
+
+    test("-1", "22/7", 10, Floor, "NaN", "NaN", Equal);
+    test("-1", "22/7", 10, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "22/7", 10, Down, "NaN", "NaN", Equal);
+    test("-1", "22/7", 10, Up, "NaN", "NaN", Equal);
+    test("-1", "22/7", 10, Nearest, "NaN", "NaN", Equal);
+    test("-1", "22/7", 10, Exact, "NaN", "NaN", Equal);
+
+    test("-1", "22/7", 100, Floor, "NaN", "NaN", Equal);
+    test("-1", "22/7", 100, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "22/7", 100, Down, "NaN", "NaN", Equal);
+    test("-1", "22/7", 100, Up, "NaN", "NaN", Equal);
+    test("-1", "22/7", 100, Nearest, "NaN", "NaN", Equal);
+    test("-1", "22/7", 100, Exact, "NaN", "NaN", Equal);
+
+    test("22/7", "-1", 1, Floor, "NaN", "NaN", Equal);
+    test("22/7", "-1", 1, Ceiling, "NaN", "NaN", Equal);
+    test("22/7", "-1", 1, Down, "NaN", "NaN", Equal);
+    test("22/7", "-1", 1, Up, "NaN", "NaN", Equal);
+    test("22/7", "-1", 1, Nearest, "NaN", "NaN", Equal);
+    test("22/7", "-1", 1, Exact, "NaN", "NaN", Equal);
+
+    test("22/7", "-1", 10, Floor, "NaN", "NaN", Equal);
+    test("22/7", "-1", 10, Ceiling, "NaN", "NaN", Equal);
+    test("22/7", "-1", 10, Down, "NaN", "NaN", Equal);
+    test("22/7", "-1", 10, Up, "NaN", "NaN", Equal);
+    test("22/7", "-1", 10, Nearest, "NaN", "NaN", Equal);
+    test("22/7", "-1", 10, Exact, "NaN", "NaN", Equal);
+
+    test("22/7", "-1", 100, Floor, "NaN", "NaN", Equal);
+    test("22/7", "-1", 100, Ceiling, "NaN", "NaN", Equal);
+    test("22/7", "-1", 100, Down, "NaN", "NaN", Equal);
+    test("22/7", "-1", 100, Up, "NaN", "NaN", Equal);
+    test("22/7", "-1", 100, Nearest, "NaN", "NaN", Equal);
+    test("22/7", "-1", 100, Exact, "NaN", "NaN", Equal);
+
+    test("22/7", "22/7", 1, Floor, "2.0", "0x2.0#1", Less);
+    test("22/7", "22/7", 1, Ceiling, "4.0", "0x4.0#1", Greater);
+    test("22/7", "22/7", 1, Down, "2.0", "0x2.0#1", Less);
+    test("22/7", "22/7", 1, Up, "4.0", "0x4.0#1", Greater);
+    test("22/7", "22/7", 1, Nearest, "4.0", "0x4.0#1", Greater);
+
+    test("22/7", "22/7", 10, Floor, "3.141", "0x3.24#10", Less);
+    test("22/7", "22/7", 10, Ceiling, "3.145", "0x3.25#10", Greater);
+    test("22/7", "22/7", 10, Down, "3.141", "0x3.24#10", Less);
+    test("22/7", "22/7", 10, Up, "3.145", "0x3.25#10", Greater);
+    test("22/7", "22/7", 10, Nearest, "3.145", "0x3.25#10", Greater);
+
+    test(
+        "22/7",
+        "22/7",
+        100,
+        Floor,
+        "3.142857142857142857142857142855",
+        "0x3.2492492492492492492492490#100",
+        Less,
+    );
+    test(
+        "22/7",
+        "22/7",
+        100,
+        Ceiling,
+        "3.142857142857142857142857142858",
+        "0x3.2492492492492492492492494#100",
+        Greater,
+    );
+    test(
+        "22/7",
+        "22/7",
+        100,
+        Down,
+        "3.142857142857142857142857142855",
+        "0x3.2492492492492492492492490#100",
+        Less,
+    );
+    test(
+        "22/7",
+        "22/7",
+        100,
+        Up,
+        "3.142857142857142857142857142858",
+        "0x3.2492492492492492492492494#100",
+        Greater,
+    );
+    test(
+        "22/7",
+        "22/7",
+        100,
+        Nearest,
+        "3.142857142857142857142857142858",
+        "0x3.2492492492492492492492494#100",
+        Greater,
+    );
+
+    test("1", "2", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("1", "2", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("1", "2", 1, Down, "1.0", "0x1.0#1", Less);
+    test("1", "2", 1, Up, "2.0", "0x2.0#1", Greater);
+    test("1", "2", 1, Nearest, "1.0", "0x1.0#1", Less);
+
+    test("1", "2", 10, Floor, "1.455", "0x1.748#10", Less);
+    test("1", "2", 10, Ceiling, "1.457", "0x1.750#10", Greater);
+    test("1", "2", 10, Down, "1.455", "0x1.748#10", Less);
+    test("1", "2", 10, Up, "1.457", "0x1.750#10", Greater);
+    test("1", "2", 10, Nearest, "1.457", "0x1.750#10", Greater);
+
+    test(
+        "1",
+        "2",
+        100,
+        Floor,
+        "1.456791031046906869186432383265",
+        "0x1.74f041cb73dca72066c53853e#100",
+        Less,
+    );
+    test(
+        "1",
+        "2",
+        100,
+        Ceiling,
+        "1.456791031046906869186432383266",
+        "0x1.74f041cb73dca72066c538540#100",
+        Greater,
+    );
+    test(
+        "1",
+        "2",
+        100,
+        Down,
+        "1.456791031046906869186432383265",
+        "0x1.74f041cb73dca72066c53853e#100",
+        Less,
+    );
+    test(
+        "1",
+        "2",
+        100,
+        Up,
+        "1.456791031046906869186432383266",
+        "0x1.74f041cb73dca72066c538540#100",
+        Greater,
+    );
+    test(
+        "1",
+        "2",
+        100,
+        Nearest,
+        "1.456791031046906869186432383265",
+        "0x1.74f041cb73dca72066c53853e#100",
+        Less,
+    );
+
+    test("1", "4/3", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("1", "4/3", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("1", "4/3", 1, Down, "1.0", "0x1.0#1", Less);
+    test("1", "4/3", 1, Up, "2.0", "0x2.0#1", Greater);
+    test("1", "4/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+
+    test("1", "4/3", 10, Floor, "1.16", "0x1.290#10", Less);
+    test("1", "4/3", 10, Ceiling, "1.162", "0x1.298#10", Greater);
+    test("1", "4/3", 10, Down, "1.16", "0x1.290#10", Less);
+    test("1", "4/3", 10, Up, "1.162", "0x1.298#10", Greater);
+    test("1", "4/3", 10, Nearest, "1.16", "0x1.290#10", Less);
+
+    test(
+        "1",
+        "4/3",
+        100,
+        Floor,
+        "1.160675892119856802207320983052",
+        "0x1.29220e25e91091bea1ecae6de#100",
+        Less,
+    );
+    test(
+        "1",
+        "4/3",
+        100,
+        Ceiling,
+        "1.160675892119856802207320983053",
+        "0x1.29220e25e91091bea1ecae6e0#100",
+        Greater,
+    );
+    test(
+        "1",
+        "4/3",
+        100,
+        Down,
+        "1.160675892119856802207320983052",
+        "0x1.29220e25e91091bea1ecae6de#100",
+        Less,
+    );
+    test(
+        "1",
+        "4/3",
+        100,
+        Up,
+        "1.160675892119856802207320983053",
+        "0x1.29220e25e91091bea1ecae6e0#100",
+        Greater,
+    );
+    test(
+        "1",
+        "4/3",
+        100,
+        Nearest,
+        "1.160675892119856802207320983052",
+        "0x1.29220e25e91091bea1ecae6de#100",
+        Less,
+    );
+
+    test("4/3", "2", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("4/3", "2", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("4/3", "2", 1, Down, "1.0", "0x1.0#1", Less);
+    test("4/3", "2", 1, Up, "2.0", "0x2.0#1", Greater);
+    test("4/3", "2", 1, Nearest, "2.0", "0x2.0#1", Greater);
+
+    test("4/3", "2", 10, Floor, "1.648", "0x1.a60#10", Less);
+    test("4/3", "2", 10, Ceiling, "1.65", "0x1.a68#10", Greater);
+    test("4/3", "2", 10, Down, "1.648", "0x1.a60#10", Less);
+    test("4/3", "2", 10, Up, "1.65", "0x1.a68#10", Greater);
+    test("4/3", "2", 10, Nearest, "1.65", "0x1.a68#10", Greater);
+
+    test(
+        "4/3",
+        "2",
+        100,
+        Floor,
+        "1.64978695749086964173777306906",
+        "0x1.a6587023ca668d7d15d42a6a6#100",
+        Less,
+    );
+    test(
+        "4/3",
+        "2",
+        100,
+        Ceiling,
+        "1.649786957490869641737773069062",
+        "0x1.a6587023ca668d7d15d42a6a8#100",
+        Greater,
+    );
+    test(
+        "4/3",
+        "2",
+        100,
+        Down,
+        "1.64978695749086964173777306906",
+        "0x1.a6587023ca668d7d15d42a6a6#100",
+        Less,
+    );
+    test(
+        "4/3",
+        "2",
+        100,
+        Up,
+        "1.649786957490869641737773069062",
+        "0x1.a6587023ca668d7d15d42a6a8#100",
+        Greater,
+    );
+    test(
+        "4/3",
+        "2",
+        100,
+        Nearest,
+        "1.649786957490869641737773069062",
+        "0x1.a6587023ca668d7d15d42a6a8#100",
+        Greater,
+    );
+
+    test("4/3", "22/7", 1, Floor, "2.0", "0x2.0#1", Less);
+    test("4/3", "22/7", 1, Ceiling, "4.0", "0x4.0#1", Greater);
+    test("4/3", "22/7", 1, Down, "2.0", "0x2.0#1", Less);
+    test("4/3", "22/7", 1, Up, "4.0", "0x4.0#1", Greater);
+    test("4/3", "22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+
+    test("4/3", "22/7", 10, Floor, "2.141", "0x2.24#10", Less);
+    test("4/3", "22/7", 10, Ceiling, "2.145", "0x2.25#10", Greater);
+    test("4/3", "22/7", 10, Down, "2.141", "0x2.24#10", Less);
+    test("4/3", "22/7", 10, Up, "2.145", "0x2.25#10", Greater);
+    test("4/3", "22/7", 10, Nearest, "2.141", "0x2.24#10", Less);
+
+    test(
+        "4/3",
+        "22/7",
+        100,
+        Floor,
+        "2.141515087948159535688532991747",
+        "0x2.243a5532a0bea4119018af588#100",
+        Less,
+    );
+    test(
+        "4/3",
+        "22/7",
+        100,
+        Ceiling,
+        "2.141515087948159535688532991751",
+        "0x2.243a5532a0bea4119018af58c#100",
+        Greater,
+    );
+    test(
+        "4/3",
+        "22/7",
+        100,
+        Down,
+        "2.141515087948159535688532991747",
+        "0x2.243a5532a0bea4119018af588#100",
+        Less,
+    );
+    test(
+        "4/3",
+        "22/7",
+        100,
+        Up,
+        "2.141515087948159535688532991751",
+        "0x2.243a5532a0bea4119018af58c#100",
+        Greater,
+    );
+    test(
+        "4/3",
+        "22/7",
+        100,
+        Nearest,
+        "2.141515087948159535688532991751",
+        "0x2.243a5532a0bea4119018af58c#100",
+        Greater,
+    );
+}
+
+#[test]
+fn agm_ratonal_prec_round_fail() {
+    assert_panic!(Float::agm_rational_prec_round(
+        Rational::ONE,
+        Rational::ONE,
+        0,
+        Floor
+    ));
+    assert_panic!(Float::agm_rational_prec_round_val_ref(
+        Rational::ONE,
+        &Rational::ONE,
+        0,
+        Floor
+    ));
+    assert_panic!(Float::agm_rational_prec_round_ref_val(
+        &Rational::ONE,
+        Rational::ONE,
+        0,
+        Floor
+    ));
+    assert_panic!(Float::agm_rational_prec_round_ref_ref(
+        &Rational::ONE,
+        &Rational::ONE,
+        0,
+        Floor
+    ));
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_agm_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, t: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        let v = Rational::from_str(t).unwrap();
+
+        assert_eq!(
+            NiceFloat(primitive_float_agm_rational(&u, &v)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", "0", 0.0);
+    test::<f32>("123", "0", 0.0);
+    test::<f32>("-123", "0", 0.0);
+    test::<f32>("0", "123", 0.0);
+    test::<f32>("0", "-123", 0.0);
+
+    test::<f32>("-1", "-2", f32::NAN);
+    test::<f32>("1", "2", 1.456791);
+    test::<f32>("24", "6", 13.458172);
+    test::<f32>("-1", "22/7", f32::NAN);
+    test::<f32>("22/7", "-1", f32::NAN);
+    test::<f32>("22/7", "22/7", 3.142857);
+    test::<f32>("1", "2", 1.456791);
+    test::<f32>("1", "4/3", 1.1606759);
+    test::<f32>("4/3", "2", 1.649787);
+    test::<f32>("4/3", "22/7", 2.141515);
+
+    test::<f64>("0", "0", 0.0);
+    test::<f64>("123", "0", 0.0);
+    test::<f64>("-123", "0", 0.0);
+    test::<f64>("0", "123", 0.0);
+    test::<f64>("0", "-123", 0.0);
+
+    test::<f64>("-1", "-2", f64::NAN);
+    test::<f64>("1", "2", 1.4567910310469068);
+    test::<f64>("24", "6", 13.458171481725616);
+    test::<f64>("-1", "22/7", f64::NAN);
+    test::<f64>("22/7", "-1", f64::NAN);
+    test::<f64>("22/7", "22/7", 3.142857142857143);
+    test::<f64>("1", "2", 1.4567910310469068);
+    test::<f64>("1", "4/3", 1.1606758921198568);
+    test::<f64>("4/3", "2", 1.6497869574908697);
+    test::<f64>("4/3", "22/7", 2.1415150879481595);
+}
+
 #[allow(clippy::needless_pass_by_value)]
 fn agm_prec_round_properties_helper(
     x: Float,
@@ -4336,6 +5110,12 @@ fn agm_prec_round_properties_helper(
         assert_eq!(rug_o, o);
     }
 
+    if !extreme {
+        let (agm_alt, o_alt) = agm_prec_round_extended(x.clone(), y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+    }
+
     if x < 0u32 && y != 0u32 || y < 0u32 && x != 0u32 {
         assert!(agm.is_nan());
     }
@@ -4344,7 +5124,8 @@ fn agm_prec_round_properties_helper(
         let (min, max) = if x <= y { (&x, &y) } else { (&y, &x) };
         if o != Greater {
             assert!(agm <= *max);
-        } else if o != Less {
+        }
+        if o != Less {
             assert!(agm >= *min);
         }
         if !extreme {
@@ -4352,9 +5133,10 @@ fn agm_prec_round_properties_helper(
             let rx = Rational::exact_from(&x);
             let ry = Rational::exact_from(&y);
             if o != Greater {
-                let arith = (rx + ry) >> 1u32;
+                let arith = (&rx + &ry) >> 1u32;
                 assert!(agm <= arith);
-            } else if o != Less {
+            }
+            if o != Less {
                 let geom_squared = rx * ry;
                 assert!(Rational::exact_from(&agm).square() >= geom_squared);
             }
@@ -4487,6 +5269,12 @@ fn agm_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     );
     assert_eq!(rug_o, o);
 
+    if !extreme {
+        let (agm_alt, o_alt) = agm_prec_round_extended(x.clone(), y.clone(), prec, Nearest);
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+    }
+
     if x < 0u32 && y != 0u32 || y < 0u32 && x != 0u32 {
         assert!(agm.is_nan());
     }
@@ -4495,7 +5283,8 @@ fn agm_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
         let (min, max) = if x <= y { (&x, &y) } else { (&y, &x) };
         if o != Greater {
             assert!(agm <= *max);
-        } else if o != Less {
+        }
+        if o != Less {
             assert!(agm >= *min);
         }
         assert_eq!(agm.get_prec(), Some(prec));
@@ -4503,9 +5292,10 @@ fn agm_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
             let rx = Rational::exact_from(&x);
             let ry = Rational::exact_from(&y);
             if o != Greater {
-                let arith = (rx + ry) >> 1u32;
+                let arith = (&rx + &ry) >> 1u32;
                 assert!(agm <= arith);
-            } else if o != Less {
+            }
+            if o != Less {
                 let geom_squared = rx * ry;
                 assert!(Rational::exact_from(&agm).square() >= geom_squared);
             }
@@ -4619,7 +5409,8 @@ fn agm_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
         let (min_xy, max_xy) = if x <= y { (&x, &y) } else { (&y, &x) };
         if o != Greater {
             assert!(agm <= *max_xy);
-        } else if o != Less {
+        }
+        if o != Less {
             assert!(agm >= *min_xy);
         }
         if !extreme {
@@ -4630,9 +5421,10 @@ fn agm_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
             let rx = Rational::exact_from(&x);
             let ry = Rational::exact_from(&y);
             if o != Greater {
-                let arith = (rx + ry) >> 1u32;
+                let arith = (&rx + &ry) >> 1u32;
                 assert!(agm <= arith);
-            } else if o != Less {
+            }
+            if o != Less {
                 let geom_squared = rx * ry;
                 assert!(Rational::exact_from(&agm).square() >= geom_squared);
             }
@@ -4653,6 +5445,13 @@ fn agm_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
             ComparableFloatRef(&agm)
         );
         assert_eq!(rug_o, o);
+    }
+
+    if !extreme {
+        let prec = max(x.significant_bits(), y.significant_bits());
+        let (agm_alt, o_alt) = agm_prec_round_extended(x.clone(), y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
     }
 
     if x < 0u32 && y != 0u32 || y < 0u32 && x != 0u32 {
@@ -4741,7 +5540,7 @@ fn agm_round_properties() {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn agm_properties_helper(x: Float, y: Float) {
+fn agm_properties_helper(x: Float, y: Float, extreme: bool) {
     let agm = x.clone().agm(y.clone());
     assert!(agm.is_valid());
     let agm_alt = x.clone().agm(&y);
@@ -4781,6 +5580,12 @@ fn agm_properties_helper(x: Float, y: Float) {
         ComparableFloatRef(&agm),
     );
 
+    if !extreme {
+        let prec = max(x.significant_bits(), y.significant_bits());
+        let agm_alt = agm_prec_round_extended(x.clone(), y.clone(), prec, Nearest).0;
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+    }
+
     if x < 0u32 && y != 0u32 || y < 0u32 && x != 0u32 {
         assert!(agm.is_nan());
     }
@@ -4792,11 +5597,11 @@ fn agm_properties_helper(x: Float, y: Float) {
 #[test]
 fn agm_properties() {
     float_pair_gen().test_properties(|(x, y)| {
-        agm_properties_helper(x, y);
+        agm_properties_helper(x, y, false);
     });
 
     float_pair_gen_var_10().test_properties(|(x, y)| {
-        agm_properties_helper(x, y);
+        agm_properties_helper(x, y, true);
     });
 
     float_gen().test_properties(|x| {
@@ -4854,4 +5659,163 @@ where
 #[test]
 fn primitive_float_agm_properties() {
     apply_fn_to_primitive_floats!(primitive_float_agm_properties_helper);
+}
+
+#[test]
+fn agm_rational_prec_round_properties_zzz() {
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(x, y, prec, rm)| {
+            let (agm, o) = Float::agm_rational_prec_round(x.clone(), y.clone(), prec, rm);
+            assert!(agm.is_valid());
+            let (agm_alt, o_alt) = Float::agm_rational_prec_round_val_ref(x.clone(), &y, prec, rm);
+            assert!(agm_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+            assert_eq!(o_alt, o);
+            let (agm_alt, o_alt) = Float::agm_rational_prec_round_ref_val(&x, y.clone(), prec, rm);
+            assert!(agm_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+            assert_eq!(o_alt, o);
+            let (agm_alt, o_alt) = Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm);
+            assert!(agm_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+            assert_eq!(o_alt, o);
+
+            if x < 0u32 && y != 0u32 || y < 0u32 && x != 0u32 {
+                assert!(agm.is_nan());
+            }
+
+            if agm.is_normal() && agm > 0u32 {
+                let (min, max) = if x <= y { (&x, &y) } else { (&y, &x) };
+                if o != Greater {
+                    assert!(agm <= *max);
+                }
+                if o != Less {
+                    assert!(agm >= *min);
+                }
+                assert_eq!(agm.get_prec(), Some(prec));
+                if o != Greater {
+                    let arith = (&x + &y) >> 1u32;
+                    assert!(agm <= arith);
+                }
+                if o != Less {
+                    let geom_squared = &x * &y;
+                    assert!(Rational::exact_from(&agm).square() >= geom_squared);
+                }
+            } else {
+                assert_eq!(o, Equal);
+            }
+
+            let (agm_alt, o_alt) = Float::agm_rational_prec_round_ref_ref(&y, &x, prec, rm);
+            assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+            assert_eq!(o_alt, o);
+
+            if o == Equal {
+                for rm in exhaustive_rounding_modes() {
+                    let (s, oo) = Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm);
+                    assert_eq!(
+                        ComparableFloat(s.abs_negative_zero_ref()),
+                        ComparableFloat(agm.abs_negative_zero_ref())
+                    );
+                    assert_eq!(oo, Equal);
+                }
+            } else {
+                assert_panic!(Float::agm_rational_prec_round_ref_ref(&x, &y, prec, Exact));
+            }
+        },
+    );
+
+    rational_unsigned_rounding_mode_triple_gen_var_5().test_properties(|(x, prec, rm)| {
+        let (agm, o) = Float::agm_rational_prec_round_ref_ref(&x, &x, prec, rm);
+        let (agm_alt, o_alt) = Float::from_rational_prec_round_ref(&x, prec, rm);
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+
+        let (agm, o) = Float::agm_rational_prec_round_ref_val(&x, Rational::ZERO, prec, rm);
+        assert_eq!(ComparableFloatRef(&agm), ComparableFloatRef(&Float::ZERO));
+        assert_eq!(o, Equal);
+
+        let (agm, o) = Float::agm_rational_prec_round_val_ref(Rational::ZERO, &x, prec, rm);
+        assert_eq!(ComparableFloatRef(&agm), ComparableFloatRef(&Float::ZERO));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[test]
+fn agm_rational_prec_properties() {
+    rational_rational_unsigned_triple_gen_var_2().test_properties(|(x, y, prec)| {
+        let (agm, o) = Float::agm_rational_prec(x.clone(), y.clone(), prec);
+        assert!(agm.is_valid());
+        let (agm_alt, o_alt) = Float::agm_rational_prec_val_ref(x.clone(), &y, prec);
+        assert!(agm_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+        let (agm_alt, o_alt) = Float::agm_rational_prec_ref_val(&x, y.clone(), prec);
+        assert!(agm_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+        let (agm_alt, o_alt) = Float::agm_rational_prec_ref_ref(&x, &y, prec);
+        assert!(agm_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+
+        if x < 0u32 && y != 0u32 || y < 0u32 && x != 0u32 {
+            assert!(agm.is_nan());
+        }
+
+        if agm.is_normal() && agm > 0u32 {
+            let (min, max) = if x <= y { (&x, &y) } else { (&y, &x) };
+            if o != Greater {
+                assert!(agm <= *max);
+            }
+            if o != Less {
+                assert!(agm >= *min);
+            }
+            assert_eq!(agm.get_prec(), Some(prec));
+            if o != Greater {
+                let arith = (&x + &y) >> 1u32;
+                assert!(agm <= arith);
+            }
+            if o != Less {
+                let geom_squared = &x * &y;
+                assert!(Rational::exact_from(&agm).square() >= geom_squared);
+            }
+        } else {
+            assert_eq!(o, Equal);
+        }
+
+        let (agm_alt, o_alt) = Float::agm_rational_prec_ref_ref(&y, &x, prec);
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+    });
+
+    rational_unsigned_pair_gen_var_8().test_properties(|(x, prec)| {
+        let (agm, o) = Float::agm_rational_prec_ref_ref(&x, &x, prec);
+        let (agm_alt, o_alt) = Float::from_rational_prec_ref(&x, prec);
+        assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
+        assert_eq!(o_alt, o);
+
+        let (agm, o) = Float::agm_rational_prec_ref_val(&x, Rational::ZERO, prec);
+        assert_eq!(ComparableFloatRef(&agm), ComparableFloatRef(&Float::ZERO));
+        assert_eq!(o, Equal);
+
+        let (agm, o) = Float::agm_rational_prec_val_ref(Rational::ZERO, &x, prec);
+        assert_eq!(ComparableFloatRef(&agm), ComparableFloatRef(&Float::ZERO));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_agm_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_pair_gen().test_properties(|(x, y)| {
+        primitive_float_agm_rational::<T>(&x, &y);
+    });
+}
+
+#[test]
+fn primitive_float_agm_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_agm_rational_properties_helper);
 }

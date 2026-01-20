@@ -10,12 +10,16 @@ use malachite_base::num::arithmetic::traits::{Agm, AgmAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::pair_max_primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
-use malachite_float::arithmetic::agm::primitive_float_agm;
+use malachite_float::arithmetic::agm::{primitive_float_agm, primitive_float_agm_rational};
+use malachite_float::basic::extended::ExtendedFloat;
+use malachite_float::basic::extended::agm_prec_round_normal_ref_ref_extended;
 use malachite_float::test_util::arithmetic::agm::{
     rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
 };
@@ -37,8 +41,18 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_10, float_float_unsigned_triple_gen_var_1,
     float_float_unsigned_triple_gen_var_1_rm, float_float_unsigned_triple_gen_var_2,
     float_pair_gen, float_pair_gen_rm, float_pair_gen_var_10,
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::test_util::bench::bucketers::{
+    pair_rational_max_bit_bucketer,
+    quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer,
+    triple_rational_rational_primitive_int_max_bit_bucketer,
+};
+use malachite_q::test_util::generators::{
+    rational_pair_gen, rational_rational_unsigned_triple_gen_var_2,
+};
+use std::cmp::max;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_agm);
@@ -98,23 +112,50 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_agm_prec_round_assign_ref);
     register_demo!(runner, demo_float_agm_prec_round_assign_ref_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_agm);
+    register_demo!(runner, demo_agm_rational_prec);
+    register_demo!(runner, demo_agm_rational_prec_debug);
+    register_demo!(runner, demo_agm_rational_prec_val_ref);
+    register_demo!(runner, demo_agm_rational_prec_val_ref_debug);
+    register_demo!(runner, demo_agm_rational_prec_ref_val);
+    register_demo!(runner, demo_agm_rational_prec_ref_val_debug);
+    register_demo!(runner, demo_agm_rational_prec_ref_ref);
+    register_demo!(runner, demo_agm_rational_prec_ref_ref_debug);
+    register_demo!(runner, demo_agm_rational_prec_round);
+    register_demo!(runner, demo_agm_rational_prec_round_debug);
+    register_demo!(runner, demo_agm_rational_prec_round_val_ref);
+    register_demo!(runner, demo_agm_rational_prec_round_val_ref_debug);
+    register_demo!(runner, demo_agm_rational_prec_round_ref_val);
+    register_demo!(runner, demo_agm_rational_prec_round_ref_val_debug);
+    register_demo!(runner, demo_agm_rational_prec_round_ref_ref);
+    register_demo!(runner, demo_agm_rational_prec_round_ref_ref_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_agm_rational);
 
     register_bench!(runner, benchmark_float_agm_evaluation_strategy);
+    register_bench!(runner, benchmark_float_agm_algorithms);
     register_bench!(runner, benchmark_float_agm_library_comparison);
     register_bench!(runner, benchmark_float_agm_assign_evaluation_strategy);
     register_bench!(runner, benchmark_float_agm_prec_evaluation_strategy);
+    register_bench!(runner, benchmark_float_agm_prec_algorithms);
     register_bench!(runner, benchmark_float_agm_prec_library_comparison);
     register_bench!(runner, benchmark_float_agm_prec_assign_evaluation_strategy);
     register_bench!(runner, benchmark_float_agm_round_evaluation_strategy);
+    register_bench!(runner, benchmark_float_agm_round_algorithms);
     register_bench!(runner, benchmark_float_agm_round_library_comparison);
     register_bench!(runner, benchmark_float_agm_round_assign_evaluation_strategy);
     register_bench!(runner, benchmark_float_agm_prec_round_evaluation_strategy);
+    register_bench!(runner, benchmark_float_agm_prec_round_algorithms);
     register_bench!(runner, benchmark_float_agm_prec_round_library_comparison);
     register_bench!(
         runner,
         benchmark_float_agm_prec_round_assign_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_agm);
+    register_bench!(runner, benchmark_agm_rational_prec_evaluation_strategy);
+    register_bench!(
+        runner,
+        benchmark_agm_rational_prec_round_evaluation_strategy
+    );
+    register_primitive_float_benches!(runner, benchmark_primitive_float_agm_rational);
 }
 
 fn demo_float_agm(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -280,13 +321,13 @@ fn demo_float_agm_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        let (sum, o) = x.agm_prec(y, prec);
+        let (agm, o) = x.agm_prec(y, prec);
         println!(
             "({:#x}).agm_prec({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y_old),
             prec,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -316,13 +357,13 @@ fn demo_float_agm_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usi
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        let (sum, o) = x.agm_prec(y, prec);
+        let (agm, o) = x.agm_prec(y, prec);
         println!(
             "({:#x}).agm_prec({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y_old),
             prec,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -350,13 +391,13 @@ fn demo_float_agm_prec_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usi
         .take(limit)
     {
         let x_old = x.clone();
-        let (sum, o) = x.agm_prec_val_ref(&y, prec);
+        let (agm, o) = x.agm_prec_val_ref(&y, prec);
         println!(
             "({:#x}).agm_prec_val_ref(&{:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y),
             prec,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -384,13 +425,13 @@ fn demo_float_agm_prec_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usi
         .take(limit)
     {
         let y_old = y.clone();
-        let (sum, o) = x.agm_prec_ref_val(y, prec);
+        let (agm, o) = x.agm_prec_ref_val(y, prec);
         println!(
             "(&{:#x}).agm_prec_ref_val({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             ComparableFloat(y_old),
             prec,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -416,13 +457,13 @@ fn demo_float_agm_prec_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usi
         .get(gm, config)
         .take(limit)
     {
-        let (sum, o) = x.agm_prec_ref_ref(&y, prec);
+        let (agm, o) = x.agm_prec_ref_ref(&y, prec);
         println!(
             "(&{:#x}).agm_prec_ref_ref(&{:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             ComparableFloat(y),
             prec,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -512,13 +553,13 @@ fn demo_float_agm_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        let (sum, o) = x.agm_round(y, rm);
+        let (agm, o) = x.agm_round(y, rm);
         println!(
             "({:#x}).agm_round({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y_old),
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -548,13 +589,13 @@ fn demo_float_agm_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: us
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        let (sum, o) = x.agm_round(y, rm);
+        let (agm, o) = x.agm_round(y, rm);
         println!(
             "({:#x}).agm_round({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y_old),
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -582,13 +623,13 @@ fn demo_float_agm_round_val_ref_debug(gm: GenMode, config: &GenConfig, limit: us
         .take(limit)
     {
         let x_old = x.clone();
-        let (sum, o) = x.agm_round_val_ref(&y, rm);
+        let (agm, o) = x.agm_round_val_ref(&y, rm);
         println!(
             "({:#x}).agm_round_val_ref(&{:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y),
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -616,13 +657,13 @@ fn demo_float_agm_round_ref_val_debug(gm: GenMode, config: &GenConfig, limit: us
         .take(limit)
     {
         let y_old = y.clone();
-        let (sum, o) = x.agm_round_ref_val(y, rm);
+        let (agm, o) = x.agm_round_ref_val(y, rm);
         println!(
             "(&{:#x}).agm_round_ref_val({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             ComparableFloat(y_old),
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -648,13 +689,13 @@ fn demo_float_agm_round_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: us
         .get(gm, config)
         .take(limit)
     {
-        let (sum, o) = x.agm_round_ref_ref(&y, rm);
+        let (agm, o) = x.agm_round_ref_ref(&y, rm);
         println!(
             "(&{:#x}).agm_round_ref_ref(&{:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             ComparableFloat(y),
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -745,14 +786,14 @@ fn demo_float_agm_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        let (sum, o) = x.agm_prec_round(y, prec, rm);
+        let (agm, o) = x.agm_prec_round(y, prec, rm);
         println!(
             "({:#x}).agm_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y_old),
             prec,
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -783,14 +824,14 @@ fn demo_float_agm_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limi
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        let (sum, o) = x.agm_prec_round(y, prec, rm);
+        let (agm, o) = x.agm_prec_round(y, prec, rm);
         println!(
             "({:#x}).agm_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y_old),
             prec,
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -819,14 +860,14 @@ fn demo_float_agm_prec_round_val_ref_debug(gm: GenMode, config: &GenConfig, limi
         .take(limit)
     {
         let x_old = x.clone();
-        let (sum, o) = x.agm_prec_round_val_ref(&y, prec, rm);
+        let (agm, o) = x.agm_prec_round_val_ref(&y, prec, rm);
         println!(
             "({:#x}).agm_prec_round_val_ref(&{:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x_old),
             ComparableFloat(y),
             prec,
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -855,14 +896,14 @@ fn demo_float_agm_prec_round_ref_val_debug(gm: GenMode, config: &GenConfig, limi
         .take(limit)
     {
         let y_old = y.clone();
-        let (sum, o) = x.agm_prec_round_ref_val(y, prec, rm);
+        let (agm, o) = x.agm_prec_round_ref_val(y, prec, rm);
         println!(
             "(&{:#x}).agm_prec_round_ref_val({:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             ComparableFloat(y_old),
             prec,
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -889,14 +930,14 @@ fn demo_float_agm_prec_round_ref_ref_debug(gm: GenMode, config: &GenConfig, limi
         .get(gm, config)
         .take(limit)
     {
-        let (sum, o) = x.agm_prec_round_ref_ref(&y, prec, rm);
+        let (agm, o) = x.agm_prec_round_ref_ref(&y, prec, rm);
         println!(
             "({:#x}).agm_prec_round_ref_ref(&{:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             ComparableFloat(y),
             prec,
             rm,
-            ComparableFloat(sum),
+            ComparableFloat(agm),
             o
         );
     }
@@ -980,6 +1021,306 @@ where
     }
 }
 
+fn demo_agm_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "agm_rational_prec({}, {}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            Float::agm_rational_prec(x, y, prec)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (agm, o) = Float::agm_rational_prec(x, y, prec);
+        println!(
+            "agm_rational_prec({}, {}, {}) = ({:#x}, {:?})",
+            x_old,
+            y_old,
+            prec,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "agm_rational_prec_val_ref({}, {}, {}) = {:?}",
+            x_old,
+            y,
+            prec,
+            Float::agm_rational_prec_val_ref(x, &y, prec)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (agm, o) = Float::agm_rational_prec_val_ref(x, &y, prec);
+        println!(
+            "agm_rational_prec_val_ref({}, {}, {}) = ({:#x}, {:?})",
+            x_old,
+            y,
+            prec,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "agm_rational_prec_ref_val({}, {}, {}) = {:?}",
+            x,
+            y_old,
+            prec,
+            Float::agm_rational_prec_ref_val(&x, y, prec)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        let (agm, o) = Float::agm_rational_prec_ref_val(&x, y, prec);
+        println!(
+            "agm_rational_prec_ref_val({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            y_old,
+            prec,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "agm_rational_prec_ref_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            prec,
+            Float::agm_rational_prec_ref_ref(&x, &y, prec)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (agm, o) = Float::agm_rational_prec(x, y, prec);
+        println!(
+            "agm_rational_prec({}, {}, {}) = ({:#x}, {:?})",
+            x_old,
+            y_old,
+            prec,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "agm_rational_prec_round({}, {}, {}, {:?}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            rm,
+            Float::agm_rational_prec_round(x, y, prec, rm)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (agm, o) = Float::agm_rational_prec_round(x, y, prec, rm);
+        println!(
+            "agm_rational_prec_round({}, {}, {}, {:?}) = ({:#x}, {:?})",
+            x_old,
+            y_old,
+            prec,
+            rm,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "agm_rational_prec_round_val_ref({}, {}, {}, {:?}) = {:?}",
+            x_old,
+            y,
+            prec,
+            rm,
+            Float::agm_rational_prec_round_val_ref(x, &y, prec, rm)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (agm, o) = Float::agm_rational_prec_round_val_ref(x, &y, prec, rm);
+        println!(
+            "agm_rational_prec_round_val_ref({}, {}, {}, {:?}) = ({:#x}, {:?})",
+            x_old,
+            y,
+            prec,
+            rm,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "agm_rational_prec_round_ref_val({}, {}, {}, {:?}) = {:?}",
+            x,
+            y_old,
+            prec,
+            rm,
+            Float::agm_rational_prec_round_ref_val(&x, y, prec, rm)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        let (agm, o) = Float::agm_rational_prec_round_ref_val(&x, y, prec, rm);
+        println!(
+            "agm_rational_prec_round_ref_val({}, {}, {}, {:?}) = ({:#x}, {:?})",
+            x,
+            y_old,
+            prec,
+            rm,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "agm_rational_prec_round_ref_ref({}, {}, {}, {:?}) = {:?}",
+            x,
+            y,
+            prec,
+            rm,
+            Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm)
+        );
+    }
+}
+
+fn demo_agm_rational_prec_round_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (agm, o) = Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm);
+        println!(
+            "agm_rational_prec_round_ref_ref({}, {}, {}, {:?}) = ({:#x}, {:?})",
+            x,
+            y,
+            prec,
+            rm,
+            ComparableFloat(agm),
+            o
+        );
+    }
+}
+
+fn demo_primitive_float_agm_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_agm_rational({}, {}) = {}",
+            x,
+            y,
+            NiceFloat(primitive_float_agm_rational::<T>(&x, &y))
+        );
+    }
+}
+
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_float_agm_evaluation_strategy(
     gm: GenMode,
@@ -1000,6 +1341,31 @@ fn benchmark_float_agm_evaluation_strategy(
             ("Float.agm(&Float)", &mut |(x, y)| no_out!(x.agm(&y))),
             ("(&Float).agm(Float)", &mut |(x, y)| no_out!((&x).agm(y))),
             ("(&Float).agm(&Float)", &mut |(x, y)| no_out!((&x).agm(&y))),
+        ],
+    );
+}
+
+#[allow(clippy::no_effect, unused_must_use)]
+fn benchmark_float_agm_algorithms(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Float.agm(Float)",
+        BenchmarkType::Algorithms,
+        float_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| no_out!(x.agm(y))),
+            ("extended", &mut |(x, y)| {
+                let prec = max(x.significant_bits(), y.significant_bits());
+                agm_prec_round_normal_ref_ref_extended(
+                    &ExtendedFloat::from(x.clone()),
+                    &ExtendedFloat::from(y.clone()),
+                    prec,
+                    Nearest,
+                );
+            }),
         ],
     );
 }
@@ -1082,6 +1448,36 @@ fn benchmark_float_agm_prec_evaluation_strategy(
                 "(&Float).agm_prec_ref_ref(&Float, u64)",
                 &mut |(x, y, prec)| no_out!(x.agm_prec_ref_ref(&y, prec)),
             ),
+        ],
+    );
+}
+
+fn benchmark_float_agm_prec_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.agm_prec(Float, u64)",
+        BenchmarkType::Algorithms,
+        float_float_unsigned_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("default", &mut |(x, y, prec)| {
+                no_out!(x.agm_prec(y, prec));
+            }),
+            ("extended", &mut |(x, y, prec)| {
+                agm_prec_round_normal_ref_ref_extended(
+                    &ExtendedFloat::from(x.clone()),
+                    &ExtendedFloat::from(y.clone()),
+                    prec,
+                    Nearest,
+                );
+            }),
         ],
     );
 }
@@ -1175,6 +1571,37 @@ fn benchmark_float_agm_round_evaluation_strategy(
     );
 }
 
+fn benchmark_float_agm_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.agm_round(Float, RoundingMode)",
+        BenchmarkType::Algorithms,
+        float_float_rounding_mode_triple_gen_var_33().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y, rm)| {
+                no_out!(x.agm_round(y, rm));
+            }),
+            ("extended", &mut |(x, y, rm)| {
+                let prec = max(x.significant_bits(), y.significant_bits());
+                agm_prec_round_normal_ref_ref_extended(
+                    &ExtendedFloat::from(x.clone()),
+                    &ExtendedFloat::from(y.clone()),
+                    prec,
+                    rm,
+                );
+            }),
+        ],
+    );
+}
+
 fn benchmark_float_agm_round_library_comparison(
     gm: GenMode,
     config: &GenConfig,
@@ -1262,6 +1689,36 @@ fn benchmark_float_agm_prec_round_evaluation_strategy(
     );
 }
 
+fn benchmark_float_agm_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.agm_prec_round(Float, u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        float_float_unsigned_rounding_mode_quadruple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("default", &mut |(x, y, prec, rm)| {
+                no_out!(x.agm_prec_round(y, prec, rm));
+            }),
+            ("extended", &mut |(x, y, prec, rm)| {
+                agm_prec_round_normal_ref_ref_extended(
+                    &ExtendedFloat::from(x.clone()),
+                    &ExtendedFloat::from(y.clone()),
+                    prec,
+                    rm,
+                );
+            }),
+        ],
+    );
+}
+
 fn benchmark_float_agm_prec_round_library_comparison(
     gm: GenMode,
     config: &GenConfig,
@@ -1334,6 +1791,115 @@ fn benchmark_primitive_float_agm<T: PrimitiveFloat>(
         &pair_max_primitive_float_bucketer("x", "y"),
         &mut [("malachite", &mut |(x, y)| {
             no_out!(primitive_float_agm(x, y));
+        })],
+    );
+}
+
+fn benchmark_agm_rational_prec_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::agm_rational_prec(Rational, Rational, u64)",
+        BenchmarkType::EvaluationStrategy,
+        rational_rational_unsigned_triple_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_rational_rational_primitive_int_max_bit_bucketer("x", "y", "prec"),
+        &mut [
+            (
+                "Float::agm_rational_prec(Rational, Rational, u64)",
+                &mut |(x, y, prec)| {
+                    no_out!(Float::agm_rational_prec(x, y, prec));
+                },
+            ),
+            (
+                "Float::agm_rational_prec_val_ref(Rational, &Rational, u64)",
+                &mut |(x, y, prec)| {
+                    no_out!(Float::agm_rational_prec_val_ref(x, &y, prec));
+                },
+            ),
+            (
+                "Float::agm_rational_prec_ref_val(&Rational, Rational, u64)",
+                &mut |(x, y, prec)| no_out!(Float::agm_rational_prec_ref_val(&x, y, prec)),
+            ),
+            (
+                "Float::agm_rational_prec_ref_ref(&Rational, &Rational, u64)",
+                &mut |(x, y, prec)| no_out!(Float::agm_rational_prec_ref_ref(&x, &y, prec)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_agm_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::agm_rational_prec_round(Rational, Rational, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_rational_unsigned_rounding_mode_quadruple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer("x", "y", "prec"),
+        &mut [
+            (
+                "Float::agm_rational_prec_round(Rational, Rational, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| {
+                    no_out!(Float::agm_rational_prec_round(x, y, prec, rm));
+                },
+            ),
+            (
+                "Float::agm_rational_prec_round_val_ref(Rational, &Rational, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| {
+                    no_out!(Float::agm_rational_prec_round_val_ref(x, &y, prec, rm));
+                },
+            ),
+            (
+                "Float::agm_rational_prec_round_ref_val(&Rational, Rational, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| {
+                    no_out!(Float::agm_rational_prec_round_ref_val(&x, y, prec, rm))
+                },
+            ),
+            (
+                "Float::agm_rational_prec_round_ref_ref(&Rational, &Rational, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| {
+                    no_out!(Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm))
+                },
+            ),
+        ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_agm_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_agm_rational_prec::<{}>(Rational, Rational)",
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        rational_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_rational_max_bit_bucketer("x", "y"),
+        &mut [("Malachite", &mut |(x, y)| {
+            no_out!(primitive_float_agm_rational::<T>(&x, &y));
         })],
     );
 }

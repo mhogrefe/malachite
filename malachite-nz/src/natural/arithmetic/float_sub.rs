@@ -3308,10 +3308,10 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
 // This is mpfr_cmp2 from cmp2.c, MPFR 4.2.0, returning `cancel` along with `sign`.
 pub fn exponent_shift_compare<'a>(
     mut xs: &'a [Limb],
-    mut x_exp: i32,
+    mut x_exp: i64,
     mut x_prec: u64,
     mut ys: &'a [Limb],
-    mut y_exp: i32,
+    mut y_exp: i64,
     mut y_prec: u64,
 ) -> (Ordering, u64) {
     // x == y should not happen, since cmp2 is called only from agm (with different variables) and
@@ -3319,7 +3319,7 @@ pub fn exponent_shift_compare<'a>(
     // optimization here.
     //
     // the cases b=0 or c=0 are also treated apart in agm and sub (which calls sub1)
-    let sdiff_exp = i64::from(x_exp) - i64::from(y_exp);
+    let sdiff_exp = x_exp - y_exp;
     let mut sign;
     let mut diff_exp;
     // index of the most significant limb of x and y
@@ -3599,7 +3599,8 @@ fn sub_float_significands_general<'a>(
     let mut ys_len = ys.len();
     let out_len = out.len();
     let mut add_exp = false;
-    let (sign, cancel) = exponent_shift_compare(xs, x_exp, x_prec, ys, y_exp, y_prec);
+    let (sign, cancel) =
+        exponent_shift_compare(xs, i64::from(x_exp), x_prec, ys, i64::from(y_exp), y_prec);
     if sign == Equal {
         // x == y. Return exact number 0. Setting the most-significant limb to 0 is a sufficient
         // signal to the caller that the entire output is 0, since in every other case the precision

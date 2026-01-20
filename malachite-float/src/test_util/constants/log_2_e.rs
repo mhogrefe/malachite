@@ -16,21 +16,21 @@ pub fn log_2_e_prec_round_simple(prec: u64, rm: RoundingMode) -> (Float, Orderin
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let ln_2_lower_bound = Float::ln_2_prec_round(working_prec, Floor).0;
-        let mut ln_2_upper_bound = ln_2_lower_bound.clone();
-        ln_2_upper_bound.increment();
-        let lower_bound = ln_2_upper_bound.reciprocal_round(Floor).0;
-        let upper_bound = ln_2_lower_bound.reciprocal_round(Ceiling).0;
-        let (log_2_e_1, mut o_1) = Float::from_float_prec_round(lower_bound, prec, rm);
-        let (log_2_e_2, mut o_2) = Float::from_float_prec_round(upper_bound, prec, rm);
-        if o_1 == Equal {
-            o_1 = o_2;
+        let ln_2_lo = Float::ln_2_prec_round(working_prec, Floor).0;
+        let mut ln_2_hi = ln_2_lo.clone();
+        ln_2_hi.increment();
+        let lo = ln_2_hi.reciprocal_round(Floor).0;
+        let hi = ln_2_lo.reciprocal_round(Ceiling).0;
+        let (log_2_e_lo, mut o_lo) = Float::from_float_prec_round(lo, prec, rm);
+        let (log_2_e_hi, mut o_hi) = Float::from_float_prec_round(hi, prec, rm);
+        if o_lo == Equal {
+            o_lo = o_hi;
         }
-        if o_2 == Equal {
-            o_2 = o_1;
+        if o_hi == Equal {
+            o_hi = o_lo;
         }
-        if o_1 == o_2 && log_2_e_1 == log_2_e_2 {
-            return (log_2_e_1, o_1);
+        if o_lo == o_hi && log_2_e_lo == log_2_e_hi {
+            return (log_2_e_lo, o_lo);
         }
         working_prec += increment;
         increment = working_prec >> 1;
