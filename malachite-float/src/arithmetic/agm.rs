@@ -3026,7 +3026,6 @@ where
 /// # Examples
 /// ```
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::agm::primitive_float_agm;
 /// use malachite_float::arithmetic::agm::primitive_float_agm_rational;
 /// use malachite_q::Rational;
 ///

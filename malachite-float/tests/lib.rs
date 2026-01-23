@@ -121,6 +121,7 @@ pub mod constants {
     pub mod ln_2;
     pub mod log_2_e;
     pub mod phi;
+    pub mod pi;
     pub mod prime_constant;
     pub mod prouhet_thue_morse_constant;
     pub mod sqrt_2;

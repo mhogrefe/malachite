@@ -17,8 +17,10 @@ impl Float {
     /// irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \sqrt{3}.
+    /// x = \sqrt{3}+\varepsilon.
     /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p}$.
     ///
     /// The constant is irrational and algebraic.
     ///
@@ -59,8 +61,9 @@ impl Float {
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \sqrt{3}.
+    /// x = \sqrt{3}+\varepsilon.
     /// $$
+    /// - $|\varepsilon| < 2^{-p}$.
     ///
     /// The constant is irrational and algebraic.
     ///

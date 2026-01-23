@@ -16,7 +16,7 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Phi,
+    Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Phi, Pi,
     PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Two, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
@@ -162,6 +162,7 @@ pub trait PrimitiveFloat:
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
     + Phi
+    + Pi
     + Pow<i64, Output = Self>
     + Pow<Self, Output = Self>
     + PowAssign<i64>
@@ -766,6 +767,11 @@ macro_rules! impl_basic_traits_primitive_float {
         /// $\varphi$, the golden ratio.
         impl Phi for $t {
             const PHI: $t = $phi;
+        }
+
+        /// $\pi$.
+        impl Pi for $t {
+            const PI: $t = core::$t::consts::PI;
         }
     };
 }

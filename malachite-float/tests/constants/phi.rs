@@ -132,6 +132,12 @@ pub fn test_phi_prec() {
     assert_eq!(phi_f64, f64::PHI);
 }
 
+#[test]
+#[should_panic]
+fn phi_prec_fail_1() {
+    Float::phi_prec(0);
+}
+
 fn test_phi_prec_round_helper(
     prec: u64,
     rm: RoundingMode,

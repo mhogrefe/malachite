@@ -165,6 +165,12 @@ pub fn test_ln_2_prec() {
     assert_eq!(ln_2_f64, f64::LN_2);
 }
 
+#[test]
+#[should_panic]
+fn ln_2_prec_fail_1() {
+    Float::ln_2_prec(0);
+}
+
 fn test_ln_2_prec_round_helper(
     prec: u64,
     rm: RoundingMode,

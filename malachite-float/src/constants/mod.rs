@@ -12,6 +12,8 @@ pub mod ln_2;
 pub mod log_2_e;
 /// Functions for approximating $\varphi$, the golden ratio.
 pub mod phi;
+/// Functions for approximating $\pi$.
+pub mod pi;
 /// Functions for approximating the prime constant (the constant whose $n$th bit is 1 if and only if
 /// $n$ is prime).
 pub mod prime_constant;

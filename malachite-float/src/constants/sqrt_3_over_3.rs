@@ -17,8 +17,10 @@ impl Float {
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}.
+    /// x = \sqrt{3}/3+\varepsilon=\sqrt{1/3}+\varepsilon=1/\sqrt{3}+\varepsilon.
     /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p-1}$.
     ///
     /// The constant is irrational and algebraic.
     ///
@@ -66,8 +68,9 @@ impl Float {
     /// value.)
     ///
     /// $$
-    /// x = \sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}.
+    /// x = \sqrt{3}/3+\varepsilon=\sqrt{1/3}+\varepsilon=1/\sqrt{3}+\varepsilon.
     /// $$
+    /// - $|\varepsilon| < 2^{-p-1}$.
     ///
     /// The constant is irrational and algebraic.
     ///

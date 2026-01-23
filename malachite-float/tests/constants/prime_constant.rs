@@ -137,6 +137,12 @@ pub fn test_prime_constant_prec() {
     assert_eq!(pc_f64, f64::PRIME_CONSTANT);
 }
 
+#[test]
+#[should_panic]
+fn prime_constant_prec_fail_1() {
+    Float::prime_constant_prec(0);
+}
+
 fn test_prime_constant_prec_round_helper(
     prec: u64,
     rm: RoundingMode,

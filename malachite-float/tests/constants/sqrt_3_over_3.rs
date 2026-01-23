@@ -143,6 +143,12 @@ pub fn test_sqrt_3_over_3_prec() {
     assert_eq!(sqrt_3_over_3_f64, f64::SQRT_3_OVER_3);
 }
 
+#[test]
+#[should_panic]
+fn sqrt_3_over_3_prec_fail_1() {
+    Float::sqrt_3_over_3_prec(0);
+}
+
 fn test_sqrt_3_over_3_prec_round_helper(
     prec: u64,
     rm: RoundingMode,

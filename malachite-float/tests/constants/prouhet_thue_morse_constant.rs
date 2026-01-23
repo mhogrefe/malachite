@@ -142,6 +142,12 @@ pub fn test_prouhet_thue_morse_constant_prec() {
     assert_eq!(ptmc_f64, f64::PROUHET_THUE_MORSE_CONSTANT);
 }
 
+#[test]
+#[should_panic]
+fn prouhet_thue_morse_constant_prec_fail_1() {
+    Float::prouhet_thue_morse_constant_prec(0);
+}
+
 fn test_prouhet_thue_morse_constant_prec_round_helper(
     prec: u64,
     rm: RoundingMode,

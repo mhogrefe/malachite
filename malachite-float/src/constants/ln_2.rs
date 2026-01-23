@@ -88,8 +88,10 @@ impl Float {
     /// constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// L = \ln 2.
+    /// x = \ln 2+\varepsilon.
     /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p-1}$.
     ///
     /// The constant is irrational and transcendental.
     ///
@@ -152,8 +154,9 @@ impl Float {
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// L = \ln 2.
+    /// x = \ln 2+\varepsilon.
     /// $$
+    /// - $|\varepsilon| < 2^{-p-1}$.
     ///
     /// The constant is irrational and transcendental.
     ///

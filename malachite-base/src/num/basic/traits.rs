@@ -110,6 +110,11 @@ pub trait Phi {
     const PHI: Self;
 }
 
+/// Provides $\pi$.
+pub trait Pi {
+    const PI: Self;
+}
+
 // Implementation for `NonZero*` types:
 // - `One` and `Two` for both signed and unsigned variants
 // - `NegativeOne` for the signed variant

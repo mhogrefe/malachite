@@ -4312,7 +4312,7 @@ fn test_primitive_float_agm() {
 }
 
 #[test]
-fn test_agm_rational_prec_xxx() {
+fn test_agm_rational_prec() {
     let test = |s, t, prec, out, out_hex, out_o| {
         let u = Rational::from_str(s).unwrap();
         let v = Rational::from_str(t).unwrap();

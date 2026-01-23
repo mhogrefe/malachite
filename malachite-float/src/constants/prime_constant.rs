@@ -20,8 +20,10 @@ impl Float {
     /// The prime constant is the real number whose $n$th bit is prime if and only if $n$ is prime.
     /// That is,
     /// $$
-    /// P = \sum_{p\ \text{prime}\}2^{-p}.
+    /// \rho = \sum_{p\ \text{prime}\}2^{-p}+\varepsilon.
     /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p-1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p-2}$.
     ///
     /// The constant is irrational. It is unknown whether it is transcendental; see
     /// <https://mathoverflow.net/questions/114905>.
@@ -76,8 +78,9 @@ impl Float {
     /// The prime constant is the real number whose $n$th bit is prime if and only if $n$ is prime.
     /// That is,
     /// $$
-    /// P = \sum_{p\ \text{prime}\}2^{-p}.
+    /// \rho = \sum_{p\ \text{prime}\}2^{-p}+\varepsilon.
     /// $$
+    /// - $|\varepsilon| < 2^{-p-2}$.
     ///
     /// The constant is irrational. It is unknown whether it is transcendental; see
     /// <https://mathoverflow.net/questions/114905>.

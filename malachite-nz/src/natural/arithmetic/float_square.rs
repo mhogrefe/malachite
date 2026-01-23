@@ -18,13 +18,11 @@ use crate::natural::arithmetic::add::{
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::float_extras::{limbs_float_can_round, round_helper_raw};
-use crate::natural::arithmetic::float_mul::{MPFR_MULHIGH_TAB, limbs_float_mul_high_same_length};
-use crate::natural::arithmetic::mul::limbs_mul_same_length_to_out;
-use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
-use crate::natural::arithmetic::square::{
-    SQR_FFT_THRESHOLD, limbs_square_to_out, limbs_square_to_out_basecase,
-    limbs_square_to_out_scratch_len,
+use crate::natural::arithmetic::float_mul::{
+    limbs_float_mul_high_same_length, limbs_float_mul_high_same_length_scratch_len,
 };
+use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
@@ -36,7 +34,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_leading_zeros;
 
@@ -459,8 +457,28 @@ fn square_float_significand_same_prec_gt_2w_lt_3w(
     }
 }
 
-// This is mpfr_mulhigh_n_basecase from mulders.c, MPFR 4.2.0, adapted for squaring.
-fn limbs_float_square_high_basecase(out: &mut [Limb], xs: &[Limb]) {
+fn limbs_float_square_high_scratch_len(n: usize) -> usize {
+    let k = MPFR_SQRHIGH_TAB
+        .get(n)
+        .map_or_else(|| isize::exact_from((n + 4) >> 1), |&x| isize::from(x));
+    if k < 0 {
+        limbs_square_to_out_scratch_len(n)
+    } else if k == 0 {
+        0
+    } else {
+        let k = usize::wrapping_from(k);
+        max(
+            limbs_square_to_out_scratch_len(k),
+            limbs_float_mul_high_same_length_scratch_len(n - k),
+        )
+    }
+}
+
+pub(crate) const MPFR_SQRHIGH_TAB: [i8; 17] =
+    [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+// This is mpfr_mulhigh_n_basecase from mulders.c, MPFR 4.2.0, specialized for squaring.
+fn limbs_float_sqr_high_same_length_basecase(out: &mut [Limb], xs: &[Limb]) {
     let len = xs.len();
     // We neglect xs[0..len - 2] * xs[0], which is less than B ^ len
     let out = &mut out[len - 1..];
@@ -471,22 +489,6 @@ fn limbs_float_square_high_basecase(out: &mut [Limb], xs: &[Limb]) {
         let (out_lo, out_hi) = out.split_at_mut(i);
         out_hi[0] = limbs_slice_add_mul_limb_same_length_in_place_left(out_lo, &xs[len - i..], *x);
         // In total, we neglect less than n * B ^ len, i.e., n ulps of out[len].
-    }
-}
-
-fn limbs_float_square_high_scratch_len(len: usize) -> usize {
-    if len > SQR_FFT_THRESHOLD {
-        limbs_square_to_out_scratch_len(len)
-    } else {
-        let k = MPFR_MULHIGH_TAB.get(len).map_or_else(
-            || 3 * (len >> 2),
-            |&m| if m == -1 { 0 } else { usize::wrapping_from(m) },
-        );
-        if k == 0 {
-            0
-        } else {
-            limbs_square_to_out_scratch_len(max(len, len - k))
-        }
     }
 }
 
@@ -501,48 +503,32 @@ fn limbs_float_square_high_scratch_len(len: usize) -> usize {
 //
 // This is mpfr_sqrhigh_n from mulders.c, MPFR 4.2.0.
 fn limbs_float_square_high(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
-    let len = xs.len();
-    const LENGTH_VALID: bool = MPFR_MULHIGH_TAB.len() >= 8;
-    assert!(LENGTH_VALID); // so that 3 * (len / 4) > len / 2
-    let k = MPFR_MULHIGH_TAB.get(len).map_or_else(
-        || Some(3 * (len >> 2)),
-        |&m| {
-            if m == -1 {
-                None
-            } else {
-                Some(usize::wrapping_from(m))
-            }
-        },
+    const LEN_ASSERT: bool = MPFR_SQRHIGH_TAB.len() > 2;
+    assert!(LEN_ASSERT);
+    let n = xs.len();
+    let k = MPFR_SQRHIGH_TAB
+        .get(n)
+        .map_or_else(|| isize::exact_from((n + 4) >> 1), |&x| isize::from(x));
+    assert!(
+        k == -1 || k == 0 || (k >= isize::exact_from((n + 4) >> 1) && k < isize::exact_from(n))
     );
-    assert!(k.is_none() || k == Some(0) || (k.unwrap() >= (len + 4) >> 1 && k.unwrap() < len));
-    if let Some(k) = k {
-        if k == 0 {
-            // basecase error < len ulps
-            limbs_float_square_high_basecase(out, xs);
-        } else if len > SQR_FFT_THRESHOLD {
-            // result is exact, no error
-            limbs_square_to_out(out, xs, scratch);
-        } else {
-            let l = len - k;
-            let out = &mut out[..len << 1];
-            let (out_lo, out_hi) = out.split_at_mut(l << 1);
-            let (xs_lo, xs_hi) = xs.split_at(l);
-            limbs_mul_same_length_to_out(out_hi, &xs[l..], xs_hi, scratch);
-            limbs_float_mul_high_same_length(out_lo, &xs[k..], xs_lo, scratch);
-            let out_hi = &mut out_hi[k - l - 1..k];
-            let mut carry = Limb::from(limbs_slice_add_same_length_in_place_left(
-                out_hi,
-                &out_lo[l - 1..],
-            ));
-            limbs_float_mul_high_same_length(out_lo, &xs[..l], &xs[k..], scratch);
-            if limbs_slice_add_same_length_in_place_left(out_hi, &out_lo[l - 1..]) {
-                carry += 1;
-            }
-            limbs_slice_add_limb_in_place(&mut out[len + l..], carry);
-        }
+    if k < 0 {
+        limbs_square_to_out(out, xs, scratch);
+    } else if k == 0 {
+        limbs_float_sqr_high_same_length_basecase(out, xs);
     } else {
-        // result is exact, no error
-        limbs_square_to_out_basecase(out, xs);
+        let k = usize::wrapping_from(k);
+        let l = n - k;
+        limbs_square_to_out(&mut out[l << 1..], &xs[l..], scratch);
+        let (xs_lo, xs_hi) = xs.split_at(k);
+        limbs_float_mul_high_same_length(out, &xs_lo[..l], xs_hi, scratch);
+        let (out_lo, out_hi) = out.split_at_mut(n - 1);
+        let out_lo = &mut out_lo[l - 1..l << 1];
+        let mut carry = limbs_slice_shl_in_place(out_lo, 1);
+        if limbs_slice_add_same_length_in_place_left(&mut out_hi[..l + 1], out_lo) {
+            carry += 1;
+        }
+        limbs_slice_add_limb_in_place(&mut out[n + l..n << 1], carry);
     }
 }
 

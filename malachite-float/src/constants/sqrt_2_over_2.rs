@@ -18,8 +18,10 @@ impl Float {
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}.
+    /// x = \sqrt{2}/2+\varepsilon=\sqrt{1/2}+\varepsilon=1/\sqrt{2}+\varepsilon.
     /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p-1}$.
     ///
     /// The constant is irrational and algebraic.
     ///
@@ -68,8 +70,9 @@ impl Float {
     /// value.)
     ///
     /// $$
-    /// x = \sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}.
+    /// x = \sqrt{2}/2+\varepsilon=\sqrt{1/2}+\varepsilon=1/\sqrt{2}+\varepsilon.
     /// $$
+    /// - $|\varepsilon| < 2^{-p-1}$.
     ///
     /// The constant is irrational and algebraic.
     ///

@@ -143,6 +143,12 @@ pub fn test_sqrt_2_prec() {
     assert_eq!(sqrt_2_f64, f64::SQRT_2);
 }
 
+#[test]
+#[should_panic]
+fn sqrt_2_prec_fail_1() {
+    Float::sqrt_2_prec(0);
+}
+
 fn test_sqrt_2_prec_round_helper(
     prec: u64,
     rm: RoundingMode,

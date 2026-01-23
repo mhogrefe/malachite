@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     ln_2::register(runner);
     log_2_e::register(runner);
     phi::register(runner);
+    pi::register(runner);
     prime_constant::register(runner);
     prouhet_thue_morse_constant::register(runner);
     sqrt_2::register(runner);
@@ -23,6 +24,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod ln_2;
 mod log_2_e;
 mod phi;
+mod pi;
 mod prime_constant;
 mod prouhet_thue_morse_constant;
 mod sqrt_2;
