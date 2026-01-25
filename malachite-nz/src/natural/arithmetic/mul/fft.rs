@@ -5642,31 +5642,7 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
     let abuf;
     // Normally, p.to_ffts is None only for extremely large arguments, which are impractical to
     // test, so we set a test_slow flag instead
-    if p.to_ffts.is_none() || test_slow {
-        mpn_ctx_fit_buffer(r, ((p.np + 1) * stride) << 3);
-        let crt = &r.crts[p.np - 1];
-        let bbuf;
-        (abuf, bbuf) = r.buffer.split_at_mut(p.np * stride);
-        let mut m = 0;
-        for l in 0..p.np {
-            process_mod_fft(
-                p.bits as usize,
-                &mut r.ffts[l],
-                &r.slow_two_pow_backing[r.slow_two_pow_offsets[l]..],
-                crt.co_prime_red(l),
-                depth,
-                ztrunc,
-                a,
-                &mut abuf[m..],
-                atrunc,
-                b,
-                bbuf,
-                btrunc,
-                squaring,
-            );
-            m += stride;
-        }
-    } else {
+    if !test_slow && let Some(to_ffts) = p.to_ffts {
         let bits = p.bits as usize;
         let an_64 = an << 6;
         let bn_64 = bn << 6;
@@ -5693,7 +5669,7 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
         a_stop_easy &= rounding.wrapping_neg();
         b_stop_easy &= rounding.wrapping_neg();
         process_mod(
-            p.to_ffts.unwrap(),
+            to_ffts,
             &r.ffts,
             stride,
             &r.vec_two_pow_tab_backing
@@ -5723,6 +5699,30 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
                 &mut abuf[m..],
                 atrunc,
                 &mut bbuf[m..],
+                btrunc,
+                squaring,
+            );
+            m += stride;
+        }
+    } else {
+        mpn_ctx_fit_buffer(r, ((p.np + 1) * stride) << 3);
+        let crt = &r.crts[p.np - 1];
+        let bbuf;
+        (abuf, bbuf) = r.buffer.split_at_mut(p.np * stride);
+        let mut m = 0;
+        for l in 0..p.np {
+            process_mod_fft(
+                p.bits as usize,
+                &mut r.ffts[l],
+                &r.slow_two_pow_backing[r.slow_two_pow_offsets[l]..],
+                crt.co_prime_red(l),
+                depth,
+                ztrunc,
+                a,
+                &mut abuf[m..],
+                atrunc,
+                b,
+                bbuf,
                 btrunc,
                 squaring,
             );
