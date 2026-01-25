@@ -1916,6 +1916,7 @@ impl Float {
     /// assert_eq!(agm.to_string(), "0.3985114");
     /// assert_eq!(o, Greater);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn agm_rational_prec_round(
         x: Rational,

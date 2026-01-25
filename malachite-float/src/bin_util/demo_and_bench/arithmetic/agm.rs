@@ -1303,6 +1303,7 @@ fn demo_agm_rational_prec_round_ref_ref_debug(gm: GenMode, config: &GenConfig, l
     }
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_agm_rational<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
@@ -1864,13 +1865,13 @@ fn benchmark_agm_rational_prec_round_evaluation_strategy(
             (
                 "Float::agm_rational_prec_round_ref_val(&Rational, Rational, u64, RoundingMode)",
                 &mut |(x, y, prec, rm)| {
-                    no_out!(Float::agm_rational_prec_round_ref_val(&x, y, prec, rm))
+                    no_out!(Float::agm_rational_prec_round_ref_val(&x, y, prec, rm));
                 },
             ),
             (
                 "Float::agm_rational_prec_round_ref_ref(&Rational, &Rational, u64, RoundingMode)",
                 &mut |(x, y, prec, rm)| {
-                    no_out!(Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm))
+                    no_out!(Float::agm_rational_prec_round_ref_ref(&x, &y, prec, rm));
                 },
             ),
         ],

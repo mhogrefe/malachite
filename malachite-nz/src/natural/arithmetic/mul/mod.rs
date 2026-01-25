@@ -149,6 +149,7 @@ pub_crate_test! {limbs_mul_same_length_to_out(
     let len = xs.len();
     assert_eq!(ys.len(), len);
     assert_ne!(len, 0);
+    let out = &mut out[..len << 1];
     if len < MUL_TOOM22_THRESHOLD {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if len < MUL_TOOM33_THRESHOLD {

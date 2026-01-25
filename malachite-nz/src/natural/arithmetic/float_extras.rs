@@ -141,8 +141,8 @@ pub(crate) fn round_helper_even(
     })
 }
 
-// This is MPFR_RNDRAW from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool` signifying
-// whether the returned exponent should be incremented.
+// This is MPFR_RNDRAW and mpfr_round_raw from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a
+// `bool` signifying whether the returned exponent should be incremented.
 pub fn round_helper_raw(
     out: &mut [Limb],
     out_prec: u64,

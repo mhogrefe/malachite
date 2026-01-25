@@ -14,7 +14,7 @@
 
 use crate::Float;
 use core::cmp::Ordering;
-use malachite_base::num::arithmetic::traits::{SqrtAssign, Square};
+use malachite_base::num::arithmetic::traits::{Sqrt, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -65,55 +65,53 @@ impl Float {
     // This is mpfr_const_pi_internal from const_pi.c, MPFR 4.2.0.
     #[inline]
     pub fn pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        let px = prec;
         // we need 9 * 2 ^ kmax - 4 >= px + 2 * kmax + 8
         let mut kmax = 2;
-        while ((px + 2 * kmax + 12) / 9) >> kmax != 0 {
+        while ((prec + 2 * kmax + 12) / 9) >> kmax != 0 {
             kmax += 1;
         }
         // guarantees no recomputation for px <= 10000
-        let mut p = px + 3 * kmax + 14;
+        let mut working_prec = prec + 3 * kmax + 14;
         let mut increment = Limb::WIDTH;
-        let mut big_a;
         loop {
-            let mut a = Float::one_prec(p); // a = 1
-            big_a = a.clone(); // A = a^2 = 1
-            let mut big_b = Float::one_half_prec(p); // B = b^2 = 1/2
-            let mut big_d = Float::one_prec(p) >> 2u32; // D = 1/4
+            let mut a = Self::one_prec(working_prec);
+            let mut big_a = a.clone();
+            let mut big_b = Self::one_half_prec(working_prec);
+            let mut big_d = Self::one_prec(working_prec) >> 2;
             let mut k = 0;
             loop {
-                let mut s = &big_a + &big_b;
-                s >>= 2;
-                big_b.sqrt_assign();
-                a += big_b;
-                a >>= 1;
+                let s = (&big_a + &big_b) >> 2;
+                a = (a + big_b.sqrt()) >> 1;
                 big_a = (&a).square();
-                big_b = &big_a - s;
-                big_b <<= 1;
+                big_b = (&big_a - s) << 1;
                 let mut s = &big_a - &big_b;
                 assert!(s < 1u32);
-                let cancel = if s != 0 {
-                    i64::from(-s.get_exponent().unwrap())
+                let ip = i64::exact_from(working_prec);
+                let cancel = if s == 0 {
+                    ip
                 } else {
-                    i64::exact_from(p)
+                    i64::from(-s.get_exponent().unwrap())
                 };
                 s <<= k;
                 big_d -= s;
                 // stop when |A_k - B_k| <= 2 ^ (k - p) i.e. cancel >= p - k
-                if cancel >= i64::exact_from(p) - i64::exact_from(k) {
+                if cancel >= ip - i64::exact_from(k) {
                     break;
                 }
                 k += 1;
             }
-            big_a = big_b / big_d;
-            if float_can_round(big_a.significand_ref().unwrap(), p - 2 * k - 8, px, rm) {
-                break;
+            let pi: Self = big_b / big_d;
+            if float_can_round(
+                pi.significand_ref().unwrap(),
+                working_prec - (k << 1) - 8,
+                prec,
+                rm,
+            ) {
+                return Self::from_float_prec_round(pi, prec, rm);
             }
-            p += kmax;
-            p += increment;
-            increment = p >> 1;
+            working_prec += kmax + increment;
+            increment = working_prec >> 1;
         }
-        Float::from_float_prec_round(big_a, prec, rm)
     }
 
     /// Returns an approximation to $\pi$, with the given precision and rounded to the nearest

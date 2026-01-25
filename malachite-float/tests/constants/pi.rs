@@ -36,6 +36,19 @@ fn test_pi_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) {
     assert_eq!(rug_o, o);
 }
 
+fn test_pi_prec_helper_big(prec: u64) {
+    let (x, o) = Float::pi_prec(prec);
+    assert!(x.is_valid());
+
+    let (rug_x, rug_o) =
+        rug_pi_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_x)),
+        ComparableFloatRef(&x)
+    );
+    assert_eq!(rug_o, o);
+}
+
 #[test]
 pub fn test_pi_prec() {
     test_pi_prec_helper(1, "4.0", "0x4.0#1", Greater);
@@ -131,6 +144,7 @@ pub fn test_pi_prec() {
         ebaefc93c9718146b6a70a1687f358452a0e286b79c5305aa5007373e07841c7fdeae5c8e7c#10000",
         Less,
     );
+    test_pi_prec_helper_big(1000000);
 
     let pi_f32 = Float::pi_prec(u64::from(f32::MANTISSA_DIGITS)).0;
     assert_eq!(pi_f32.to_string(), "3.1415927");
@@ -173,7 +187,7 @@ fn test_pi_prec_round_helper(
 }
 
 #[test]
-pub fn test_pi_prec_round_xxx() {
+pub fn test_pi_prec_round() {
     test_pi_prec_round_helper(1, Floor, "2.0", "0x2.0#1", Less);
     test_pi_prec_round_helper(1, Ceiling, "4.0", "0x4.0#1", Greater);
     test_pi_prec_round_helper(1, Down, "2.0", "0x2.0#1", Less);

@@ -18,6 +18,9 @@ use crate::natural::arithmetic::add::{
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::float_extras::{limbs_float_can_round, round_helper_raw};
+use crate::natural::arithmetic::float_square::{
+    limbs_float_square_high, limbs_float_square_high_scratch_len,
+};
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
     limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
@@ -159,7 +162,7 @@ pub fn mul_float_significands_ref_ref(
     }
 }
 
-fn mul_float_significands_ref_ref_helper(
+pub(crate) fn mul_float_significands_ref_ref_helper(
     xs: &[Limb],
     x_prec: u64,
     ys: &[Limb],
@@ -874,10 +877,22 @@ fn mul_float_significands_general(
             tmp = &mut tmp_vec;
         } else {
             // Compute an approximation of the product of x and y
-            tmp_vec = vec![0; limbs_float_mul_high_same_length_scratch_len(len) + tmp_alloc];
+            let square = core::ptr::eq(xs, ys) && x_prec == y_prec;
+            tmp_vec = vec![
+                0;
+                if square {
+                    limbs_float_square_high_scratch_len(len)
+                } else {
+                    limbs_float_mul_high_same_length_scratch_len(len)
+                } + tmp_alloc
+            ];
             let scratch: &mut [Limb];
             (tmp, scratch) = tmp_vec.split_at_mut(tmp_alloc);
-            limbs_float_mul_high_same_length(&mut tmp[to + k - (len << 1)..], xs, ys, scratch);
+            if square {
+                limbs_float_square_high(&mut tmp[to + k - (len << 1)..], xs, scratch);
+            } else {
+                limbs_float_mul_high_same_length(&mut tmp[to + k - (len << 1)..], xs, ys, scratch);
+            }
             // now tmp[k - len]..tmp[k - 1] contains an approximation of the `len` upper limbs of
             // the product, with tmp[k - 1] >= 2 ^ (Limb::WIDTH - 2)
             //

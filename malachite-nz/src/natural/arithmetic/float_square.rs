@@ -17,26 +17,23 @@ use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use crate::natural::arithmetic::float_extras::{limbs_float_can_round, round_helper_raw};
+use crate::natural::arithmetic::float_extras::round_helper_raw;
 use crate::natural::arithmetic::float_mul::{
     limbs_float_mul_high_same_length, limbs_float_mul_high_same_length_scratch_len,
+    mul_float_significands_ref_ref_helper,
 };
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
-use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
+use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
 use crate::platform::{DoubleLimb, Limb};
-use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
-use core::cmp::{max, min};
-use malachite_base::fail_on_untested_path;
+use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CeilingLogBase2, OverflowingAddAssign, Parity, PowerOf2, Sign,
-    WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
+    OverflowingAddAssign, Parity, PowerOf2, Sign, WrappingAddAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::slices::slice_leading_zeros;
 
 // This is mpfr_sqr from sqr.c, MPFR 4.3.0.
 pub fn square_float_significand_in_place(
@@ -457,7 +454,7 @@ fn square_float_significand_same_prec_gt_2w_lt_3w(
     }
 }
 
-fn limbs_float_square_high_scratch_len(n: usize) -> usize {
+pub(crate) fn limbs_float_square_high_scratch_len(n: usize) -> usize {
     let k = MPFR_SQRHIGH_TAB
         .get(n)
         .map_or_else(|| isize::exact_from((n + 4) >> 1), |&x| isize::from(x));
@@ -502,7 +499,7 @@ fn limbs_float_sqr_high_same_length_basecase(out: &mut [Limb], xs: &[Limb]) {
 // Symposium on Computer Arithmetic (ARITH-20), July 25-27, 2011, pages 7-14.
 //
 // This is mpfr_sqrhigh_n from mulders.c, MPFR 4.2.0.
-fn limbs_float_square_high(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+pub(crate) fn limbs_float_square_high(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     const LEN_ASSERT: bool = MPFR_SQRHIGH_TAB.len() > 2;
     assert!(LEN_ASSERT);
     let n = xs.len();
@@ -525,7 +522,7 @@ fn limbs_float_square_high(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) 
         let (out_lo, out_hi) = out.split_at_mut(n - 1);
         let out_lo = &mut out_lo[l - 1..l << 1];
         let mut carry = limbs_slice_shl_in_place(out_lo, 1);
-        if limbs_slice_add_same_length_in_place_left(&mut out_hi[..l + 1], out_lo) {
+        if limbs_slice_add_same_length_in_place_left(&mut out_hi[..=l], out_lo) {
             carry += 1;
         }
         limbs_slice_add_limb_in_place(&mut out[n + l..n << 1], carry);
@@ -541,175 +538,30 @@ fn square_float_significands_general(
     rm: RoundingMode,
 ) -> (Natural, i32, Ordering) {
     let xs_len = xs.len();
-    let mut new_xs;
-    let orig_xs = xs;
-    let mut xs = xs;
-    let k = xs_len.arithmetic_checked_shl(1).unwrap();
-    let tmp_len = bit_to_limb_count_ceiling(x_prec.arithmetic_checked_shl(1u32).unwrap());
-    assert!(tmp_len <= k);
-    let mut tmp_vec: Vec<Limb>;
-    let mut tmp: &mut [Limb];
-    let mut b1 = false;
-    let mut goto_full_square = xs_len > 2 && xs_len <= MPFR_SQR_THRESHOLD;
-    let mut to = 0;
-    if xs_len <= 2 {
-        tmp_vec = vec![0; k];
-        tmp = &mut tmp_vec;
-        // The 3 cases perform the same first operation.
-        (tmp[1], tmp[0]) = Limb::x_mul_y_to_zz(xs[0], xs[0]);
-        b1 = if xs_len == 1 {
-            // 1 limb * 1 limb
-            tmp[1]
-        } else {
-            // 2 limbs * 2 limbs
-            //
-            // First 2 limbs * 1 limb
-            let mut t1;
-            let (x0_y1_hi, x0_y1_lo) = Limb::x_mul_y_to_zz(xs[0], xs[1]);
-            (tmp[2], t1) = (x0_y1_hi, x0_y1_lo);
-            (tmp[2], tmp[1]) = Limb::xx_add_yy_to_zz(tmp[2], tmp[1], 0, t1);
-            let t2;
-            // Second, the other 2 limbs * 1 limb product
-            (t1, t2) = (x0_y1_hi, x0_y1_lo);
-            let t3;
-            (tmp[3], t3) = Limb::x_mul_y_to_zz(xs[1], xs[1]);
-            (tmp[3], t1) = Limb::xx_add_yy_to_zz(tmp[3], t1, 0, t3);
-            // Sum those two partial products
-            (tmp[2], tmp[1]) = Limb::xx_add_yy_to_zz(tmp[2], tmp[1], t1, t2);
-            let tmp_2 = tmp[2];
-            if tmp_2 < t1 {
-                tmp[3].wrapping_add_assign(1);
-            }
-            tmp[3]
-        }
-        .get_highest_bit();
-        to = k - tmp_len;
-        if !b1 {
-            limbs_slice_shl_in_place(&mut tmp[to..to + tmp_len], 1);
-        }
-    } else if xs_len > MPFR_SQR_THRESHOLD {
-        // xs_len >= 3
-        //
-        // Mulders' sqrhigh.
-        //
-        // First check if we can reduce the precision of x: exact values are a nightmare for the
-        // short product trick
-        if xs[0] == 0 && xs[1] == 0 {
-            let xs_leading_zeros = slice_leading_zeros(xs);
-            assert_ne!(xs_leading_zeros, xs_len);
-            return square_float_significand_ref_helper(
-                &xs[xs_leading_zeros..],
-                limb_to_bit_count(xs_len - xs_leading_zeros),
-                out_prec,
-                rm,
-            );
-        }
-        // Compute estimated precision of sqrhigh.
-        let mut len = min(bit_to_limb_count_ceiling(out_prec) + 1, xs_len);
-        assert!(len >= 1 && len << 1 <= k && len <= xs_len);
-        let mut p = limb_to_bit_count(len) - (len + 2).ceiling_log_base_2();
-        // Check if sqrhigh can produce a roundable result. We may lose 1 bit due to Nearest, 1 due
-        // to final shift.
-        let mut tmp_alloc = k;
-        if out_prec > p - 5 {
-            if out_prec > p - 5 + Limb::WIDTH || xs_len <= MPFR_SQR_THRESHOLD + 1 {
-                // sqrhigh can't produce a roundable result.
-                goto_full_square = true;
-                xs = &xs[xs_len - len..];
-            } else {
-                // Add one extra limb to mantissa of x and y.
-                if xs_len > len {
-                    xs = &xs[xs_len - len - 1..];
-                } else {
-                    new_xs = vec![0; len + 1];
-                    new_xs[1..].copy_from_slice(&xs[xs_len - len..xs_len]);
-                    xs = &new_xs;
-                }
-                // We will compute with one extra limb.
-                len += 1;
-                // ceil(log_2(len + 2)) takes into account the lost bits due to Mulders' short
-                // product.
-                p = limb_to_bit_count(len) - (len + 2).ceiling_log_base_2();
-                // Due to some nasty reasons we can have only 4 bits
-                assert!(out_prec <= p - 4);
-                let twice_len = len << 1;
-                if k < twice_len {
-                    tmp_alloc = twice_len;
-                    to = twice_len - k;
-                } else {
-                    fail_on_untested_path("sqr_float_significands_general, k >= len << 1 ");
-                }
-            }
-        } else {
-            xs = &xs[xs_len - len..];
-        }
-        if goto_full_square {
-            tmp_vec = vec![0; tmp_alloc];
-            tmp = &mut tmp_vec;
-        } else {
-            // Compute an approximation of the square of x
-            tmp_vec = vec![0; limbs_float_square_high_scratch_len(len) + tmp_alloc];
-            let scratch: &mut [Limb];
-            (tmp, scratch) = tmp_vec.split_at_mut(tmp_alloc);
-            limbs_float_square_high(&mut tmp[to + k - (len << 1)..], xs, scratch);
-            // now tmp[k - len]..tmp[k - 1] contains an approximation of the `len` upper limbs of
-            // the square, with tmp[k - 1] >= 2 ^ (Limb::WIDTH - 2)
-            //
-            // msb from the square
-            //
-            // If the mantissa of x is uniformly distributed in (1/2, 1], then its square is in
-            // (1/4, 1/2] with probability 2 * ln(2) - 1 ~ 0.386 and in [1/2, 1] with probability 2
-            // - 2 * ln(2) ~ 0.614
-            b1 = tmp[to + k - 1].get_highest_bit();
-            if !b1 {
-                limbs_slice_shl_in_place(&mut tmp[to + k - len - 1..to + k], 1);
-            }
-            // Now the approximation is in tmp[temp_len - len]...tmp[temp_len - 1]
-            assert!(tmp[to + k - 1].get_highest_bit());
-            // if the most significant bit b1 is zero, we have only p - 1 correct bits
-            if limbs_float_can_round(
-                &tmp[to + k - tmp_len..to + k],
-                p + u64::from(b1) - 1,
-                out_prec,
-                rm,
-            ) {
-                to += k - tmp_len;
-            } else {
-                goto_full_square = true;
-            }
-        }
-    } else {
-        tmp_vec = vec![0; k];
-        tmp = &mut tmp_vec;
+    let tn = bit_to_limb_count_ceiling(x_prec << 1);
+    if xs_len > MPFR_SQR_THRESHOLD {
+        return mul_float_significands_ref_ref_helper(xs, x_prec, xs, x_prec, out_prec, rm);
     }
-    tmp = &mut tmp[to..];
-    if goto_full_square {
-        let mut scratch = vec![0; limbs_square_to_out_scratch_len(xs_len)];
-        limbs_square_to_out(tmp, orig_xs, &mut scratch);
-        b1 = tmp[(xs_len << 1) - 1].get_highest_bit();
-        // Now tmp[0]..tmp[k - 1] contains the square of the mantissa, with tmp[k - 1] >= 2 ^
-        // (Limb::WIDTH - 2).
-        //
-        // msb from the square
-        //
-        // If the mantissa of x is uniformly distributed in (1/2, 1], then its square is in (1/4,
-        // 1/2] with probability 2 * ln(2) - 1 ~ 0.386 and in [1/2, 1] with probability 2 - 2 *
-        // ln(2) ~ 0.614
-        tmp = &mut tmp[k - tmp_len..];
-        if !b1 {
-            limbs_slice_shl_in_place(&mut tmp[..tmp_len], 1);
-        }
+    let xs_len_2 = xs_len << 1;
+    let mut scratch = vec![0; xs_len_2 + limbs_square_to_out_scratch_len(xs.len())];
+    let (tmp, scratch) = scratch.split_at_mut(xs_len_2);
+    // Multiplies the mantissa in temporary allocated space
+    limbs_square_to_out(tmp, xs, scratch);
+    let mut b1 = tmp[xs_len_2 - 1];
+    // now tmp[0]..tmp[2 * xs_len - 1] contains the square of the mantissa, with tmp[2 * xs_len - 1]
+    // >= 2 ^ (Limb::WIDTH - 2)
+    b1 >>= const { Limb::WIDTH - 1 }; // msb from the product
+    // if the mantissas of b and c are uniformly distributed in (1/2, 1], then their product is in
+    // (1/4, 1/2] with probability 2 * ln(2) - 1 ~ 0.386 and in [1/2, 1] with probability 2 - 2 *
+    // ln(2) ~ 0.614
+    let tmp = &mut tmp[xs_len_2 - tn..];
+    if b1 == 0 {
+        limbs_slice_shl_in_place(&mut tmp[..tn], 1);
     }
     let mut out = vec![0; bit_to_limb_count_ceiling(out_prec)];
-    let (inexact, increment_exp) = round_helper_raw(
-        &mut out,
-        out_prec,
-        tmp,
-        x_prec.checked_add(x_prec).unwrap(),
-        rm,
-    );
+    let (inexact, increment_exp) = round_helper_raw(&mut out, out_prec, tmp, x_prec << 1, rm);
     assert!(inexact == 0 || rm != Exact, "Inexact float squaring");
-    let mut exp_offset = -i32::from(!b1);
+    let mut exp_offset = -i32::from(b1 == 0);
     if increment_exp {
         exp_offset += 1;
     }
