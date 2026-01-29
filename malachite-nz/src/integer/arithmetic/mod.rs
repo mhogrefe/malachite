@@ -73,8 +73,8 @@ pub mod kronecker_symbol;
 ///
 /// | rounding          | by value or reference      | by mutable reference (assignment)      |
 /// |-------------------|----------------------------|----------------------------------------|
-/// | towards $-\infty$ | [`Mod`](malachite_base::num::arithmetic::traits::Mod)       | [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign)       |
-/// | towards $\infty$  | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
+/// | towards $-\infty$ | [`Mod`](malachite_base::num::arithmetic::traits::Mod) | [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign)       |
+/// | towards $\infty$ | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
 ///
 /// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
 pub mod mod_op;

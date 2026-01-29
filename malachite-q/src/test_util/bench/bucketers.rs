@@ -31,6 +31,15 @@ pub fn pair_2_pair_1_rational_bit_bucketer<T, U>(
     }
 }
 
+pub fn triple_3_pair_1_rational_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (T, U, (Rational, V))> {
+    Bucketer {
+        bucketing_function: &|(_, _, (q, _))| usize::exact_from(q.significant_bits()),
+        bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
 pub fn pair_1_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (Rational, T)> {
     Bucketer {
         bucketing_function: &|(q, _)| usize::exact_from(q.significant_bits()),

@@ -9,6 +9,7 @@
 pub mod add;
 pub mod approximate;
 pub mod div;
+pub mod mod_op;
 pub mod mul;
 pub mod sign;
 pub mod simplest_rational_in_interval;

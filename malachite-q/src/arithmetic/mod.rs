@@ -53,6 +53,18 @@ pub mod log_base_2;
 /// [`CeilingLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2), and
 /// [`CheckedLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2).
 pub mod log_base_power_of_2;
+/// Implementations of traits for finding the remainder of two numbers, subject to various rounding
+/// rules.
+///
+/// These are the traits:
+///
+/// | rounding          | by value or reference      | by mutable reference (assignment)      |
+/// |-------------------|----------------------------|----------------------------------------|
+/// | towards $-\infty$ | [`Mod`](malachite_base::num::arithmetic::traits::Mod) | [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign)       |
+/// | towards $\infty$ | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
+///
+/// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
+pub mod mod_op;
 /// Multiplication of [`Rational`](super::Rational)s.
 pub mod mul;
 /// Negation of [`Rational`](super::Rational)s.
