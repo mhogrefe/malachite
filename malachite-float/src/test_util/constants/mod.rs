@@ -9,6 +9,7 @@
 pub mod ln_2;
 pub mod log_2_e;
 pub mod pi;
+pub mod pi_over_3;
 pub mod prime_constant;
 pub mod prouhet_thue_morse_constant;
 pub mod sqrt_2;

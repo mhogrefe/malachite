@@ -115,6 +115,36 @@ pub trait Pi {
     const PI: Self;
 }
 
+/// Provides $\tau=2\pi$.
+pub trait Tau {
+    const TAU: Self;
+}
+
+/// Provides $\pi/2$.
+pub trait PiOver2 {
+    const PI_OVER_2: Self;
+}
+
+/// Provides $\pi/3$.
+pub trait PiOver3 {
+    const PI_OVER_3: Self;
+}
+
+/// Provides $\pi/4$.
+pub trait PiOver4 {
+    const PI_OVER_4: Self;
+}
+
+/// Provides $\pi/6$.
+pub trait PiOver6 {
+    const PI_OVER_6: Self;
+}
+
+/// Provides $\pi/8$.
+pub trait PiOver8 {
+    const PI_OVER_8: Self;
+}
+
 // Implementation for `NonZero*` types:
 // - `One` and `Two` for both signed and unsigned variants
 // - `NegativeOne` for the signed variant

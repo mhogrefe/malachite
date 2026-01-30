@@ -14,6 +14,16 @@ pub mod log_2_e;
 pub mod phi;
 /// Functions for approximating $\pi$.
 pub mod pi;
+/// Functions for approximating $\pi/2$.
+pub mod pi_over_2;
+/// Functions for approximating $\pi/3$.
+pub mod pi_over_3;
+/// Functions for approximating $\pi/4$.
+pub mod pi_over_4;
+/// Functions for approximating $\pi/6$.
+pub mod pi_over_6;
+/// Functions for approximating $\pi/8$.
+pub mod pi_over_8;
 /// Functions for approximating the prime constant (the constant whose $n$th bit is 1 if and only if
 /// $n$ is prime).
 pub mod prime_constant;
@@ -28,3 +38,5 @@ pub mod sqrt_2_over_2;
 pub mod sqrt_3;
 /// Functions for approximating $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
 pub mod sqrt_3_over_3;
+/// Functions for approximating $\tau=2\pi$.
+pub mod tau;

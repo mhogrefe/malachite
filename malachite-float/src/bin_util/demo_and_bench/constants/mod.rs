@@ -13,21 +13,33 @@ pub(crate) fn register(runner: &mut Runner) {
     log_2_e::register(runner);
     phi::register(runner);
     pi::register(runner);
+    pi_over_2::register(runner);
+    pi_over_3::register(runner);
+    pi_over_4::register(runner);
+    pi_over_6::register(runner);
+    pi_over_8::register(runner);
     prime_constant::register(runner);
     prouhet_thue_morse_constant::register(runner);
     sqrt_2::register(runner);
     sqrt_2_over_2::register(runner);
     sqrt_3::register(runner);
     sqrt_3_over_3::register(runner);
+    tau::register(runner);
 }
 
 mod ln_2;
 mod log_2_e;
 mod phi;
 mod pi;
+mod pi_over_2;
+mod pi_over_3;
+mod pi_over_4;
+mod pi_over_6;
+mod pi_over_8;
 mod prime_constant;
 mod prouhet_thue_morse_constant;
 mod sqrt_2;
 mod sqrt_2_over_2;
 mod sqrt_3;
 mod sqrt_3_over_3;
+mod tau;

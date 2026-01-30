@@ -122,12 +122,18 @@ pub mod constants {
     pub mod log_2_e;
     pub mod phi;
     pub mod pi;
+    pub mod pi_over_2;
+    pub mod pi_over_3;
+    pub mod pi_over_4;
+    pub mod pi_over_6;
+    pub mod pi_over_8;
     pub mod prime_constant;
     pub mod prouhet_thue_morse_constant;
     pub mod sqrt_2;
     pub mod sqrt_2_over_2;
     pub mod sqrt_3;
     pub mod sqrt_3_over_3;
+    pub mod tau;
 }
 pub mod conversion {
     pub mod clone;

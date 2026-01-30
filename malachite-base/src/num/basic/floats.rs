@@ -17,7 +17,8 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::traits::{
     Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Phi, Pi,
-    PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Two, Zero,
+    PiOver2, PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant, Sqrt2,
+    Sqrt2Over2, Sqrt3, Sqrt3Over3, Tau, Two, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -772,6 +773,36 @@ macro_rules! impl_basic_traits_primitive_float {
         /// $\pi$.
         impl Pi for $t {
             const PI: $t = core::$t::consts::PI;
+        }
+
+        /// $\tau=2\pi$.
+        impl Tau for $t {
+            const TAU: $t = core::$t::consts::TAU;
+        }
+
+        /// $\pi/2$.
+        impl PiOver2 for $t {
+            const PI_OVER_2: $t = core::$t::consts::FRAC_PI_2;
+        }
+
+        /// $\pi/3$.
+        impl PiOver3 for $t {
+            const PI_OVER_3: $t = core::$t::consts::FRAC_PI_3;
+        }
+
+        /// $\pi/4$.
+        impl PiOver4 for $t {
+            const PI_OVER_4: $t = core::$t::consts::FRAC_PI_4;
+        }
+
+        /// $\pi/6$.
+        impl PiOver6 for $t {
+            const PI_OVER_6: $t = core::$t::consts::FRAC_PI_6;
+        }
+
+        /// $\pi/8$.
+        impl PiOver8 for $t {
+            const PI_OVER_8: $t = core::$t::consts::FRAC_PI_8;
         }
     };
 }
