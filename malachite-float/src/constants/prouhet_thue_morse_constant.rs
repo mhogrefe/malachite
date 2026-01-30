@@ -29,12 +29,13 @@ const LIMB_0: Limb = 0xd32d2cd32cd2d32c;
 const LIMB_1: Limb = 0x2cd2d32cd32d2cd2;
 
 impl Float {
-    /// Returns an approximation to the Thue-Morse constant, with the given precision and rounded
-    /// using the given [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
-    /// rounded value is less than or greater than the exact value of the constant. (Since the
-    /// constant is irrational, the rounded value is never equal to the exact value.)
+    /// Returns an approximation to the Prouhet-Thue-Morse constant, with the given precision and
+    /// rounded using the given [`RoundingMode`]. An [`Ordering`] is also returned, indicating
+    /// whether the rounded value is less than or greater than the exact value of the constant.
+    /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
-    /// The Thue-Morse constant is the real number whose bits are the Thue-Morse sequence. That is,
+    /// The Prouhet-Thue-Morse constant is the real number whose bits are the Thue-Morse sequence.
+    /// That is,
     /// $$
     /// \tau = \sum_{k=0}^\infty\frac{t_n}{2^{n+1}}+\varepsilon,
     /// where $t_n$ is the Thue-Morse sequence.
@@ -131,12 +132,14 @@ impl Float {
         )
     }
 
-    /// Returns an approximation to the Thue-Morse constant, with the given precision and rounded to
-    /// the nearest [`Float`] of that precision. An [`Ordering`] is also returned, indicating
-    /// whether the rounded value is less than or greater than the exact value of the constant.
-    /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
+    /// Returns an approximation to the Prouhet-Thue-Morse constant, with the given precision and
+    /// rounded to the nearest [`Float`] of that precision. An [`Ordering`] is also returned,
+    /// indicating whether the rounded value is less than or greater than the exact value of the
+    /// constant. (Since the constant is irrational, the rounded value is never equal to the exact
+    /// value.)
     ///
-    /// The Thue-Morse constant is the real number whose bits are the Thue-Morse sequence. That is,
+    /// The Prouhet-Thue-Morse constant is the real number whose bits are the Thue-Morse sequence.
+    /// That is,
     /// $$
     /// \tau = \sum_{k=0}^\infty\frac{t_n}{2^{n+1}}+\varepsilon,
     /// $$

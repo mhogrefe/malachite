@@ -66,7 +66,7 @@ impl Float {
         loop {
             let log_2_e = Self::ln_2_prec_round(working_prec, Floor).0.reciprocal();
             // See algorithms.tex. Since we rounded down when computing ln_2, the absolute error of
-            // the square root is bounded by (c_w + 2c_uk_u)ulp(sqrt) <= 4ulp(sqrt).
+            // the inverse is bounded by (c_w + 2c_uk_u)ulp(log_e(2)) <= 4ulp(log_e(2)).
             if float_can_round(
                 log_2_e.significand_ref().unwrap(),
                 working_prec - 2,
