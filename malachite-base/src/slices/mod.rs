@@ -448,8 +448,8 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
 /// assert_eq!(
 ///     css.iter().map(String::as_str).collect_vec().as_slice(),
 ///     [
-///         "cadb", "cbad", "cadb", "badc", "acdb", "cbad", "dabc", "dbca", "cdba", "cdab", "bacd",
-///         "cabd", "adbc", "cdab", "dcab", "abcd", "abcd", "dacb", "bcad", "adcb"
+///         "dacb", "cbad", "cdab", "cbad", "cdab", "bcda", "bcda", "acbd", "bcda", "dbca", "bdac",
+///         "dbac", "dbca", "bcad", "cadb", "dacb", "acbd", "dbac", "bdca", "abdc"
 ///     ]
 /// );
 /// ```

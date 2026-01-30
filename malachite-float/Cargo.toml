@@ -27,9 +27,9 @@ malachite-nz = { version = "0.9.0", default-features = false, features = ["float
 malachite-q = { version = "0.9.0", default-features = false, path = "../malachite-q" }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
-serde_json = { version = "1.0.105", optional = true }
+serde_json = { version = "1.0.149", optional = true }
 num = { version = "0.4.3", optional = true, features = ["serde"] }
-rug = { version = "1.24.1", default-features = false, optional = true, features = ["float", "serde"] }
+rug = { version = "1.28.1", default-features = false, optional = true, features = ["float", "serde"] }
 
 [dev-dependencies]
 malachite-float = { path = ".", features = ["test_build"] }

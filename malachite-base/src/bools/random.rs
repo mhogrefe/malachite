@@ -31,7 +31,7 @@ impl Iterator for RandomBools {
     #[inline]
     fn next(&mut self) -> Option<bool> {
         if self.bits_left == 0 {
-            self.x = self.rng.r#gen();
+            self.x = self.rng.random();
             self.bits_left = 31;
         } else {
             self.x >>= 1;

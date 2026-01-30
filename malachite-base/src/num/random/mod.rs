@@ -13,7 +13,7 @@ use crate::iterators::{
 };
 use crate::num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
 use crate::num::basic::floats::PrimitiveFloat;
-use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
@@ -63,7 +63,7 @@ macro_rules! impl_trivial_random_primitive_ints {
 
             #[inline]
             fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> $t {
-                rng.r#gen()
+                rng.random()
             }
         }
     };
@@ -71,15 +71,45 @@ macro_rules! impl_trivial_random_primitive_ints {
 impl_trivial_random_primitive_ints!(u32);
 impl_trivial_random_primitive_ints!(u64);
 impl_trivial_random_primitive_ints!(u128);
-impl_trivial_random_primitive_ints!(usize);
 impl_trivial_random_primitive_ints!(i32);
 impl_trivial_random_primitive_ints!(i64);
 impl_trivial_random_primitive_ints!(i128);
-impl_trivial_random_primitive_ints!(isize);
+
+impl HasRandomPrimitiveInts for usize {
+    type State = ();
+    #[inline]
+    fn new_state() -> () {}
+    #[inline]
+    fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> usize {
+        if USIZE_IS_U32 {
+            let x: u32 = rng.random();
+            x as usize
+        } else {
+            let x: u64 = rng.random();
+            x as usize
+        }
+    }
+}
+
+impl HasRandomPrimitiveInts for isize {
+    type State = ();
+    #[inline]
+    fn new_state() -> () {}
+    #[inline]
+    fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> isize {
+        if USIZE_IS_U32 {
+            let x: i32 = rng.random();
+            x as isize
+        } else {
+            let x: i64 = rng.random();
+            x as isize
+        }
+    }
+}
 
 fn get_random<T: PrimitiveInt>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
     if state.bits_left == 0 {
-        state.x = rng.r#gen();
+        state.x = rng.random();
         state.bits_left = u32::WIDTH - T::WIDTH;
     } else {
         state.x >>= T::WIDTH;
