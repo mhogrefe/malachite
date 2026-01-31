@@ -14,19 +14,16 @@
 
 use crate::Float;
 use core::cmp::Ordering;
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
-use malachite_nz::platform::Limb;
 
 impl Float {
-    /// Returns an approximation to $\pi/3$, with the given precision and rounded using the given
-    /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded value is
-    /// less than or greater than the exact value of the constant. (Since the constant is
+    /// Returns an approximation to $2/\sqrt{pi}$, with the given precision and rounded using the
+    /// given [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded
+    /// value is less than or greater than the exact value of the constant. (Since the constant is
     /// irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \pi/3+\varepsilon.
+    /// x = 2/\sqrt{pi}+\varepsilon.
     /// $$
     /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p+1}$.
     /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p}$.
@@ -51,40 +48,33 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (pi_over_3, o) = Float::pi_over_3_prec_round(100, Floor);
-    /// assert_eq!(pi_over_3.to_string(), "1.047197551196597746154214461092");
+    /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec_round(100, Floor);
+    /// assert_eq!(
+    ///     two_over_sqrt_pi.to_string(),
+    ///     "1.12837916709551257389615890312"
+    /// );
     /// assert_eq!(o, Less);
     ///
-    /// let (pi_over_3, o) = Float::pi_over_3_prec_round(100, Ceiling);
-    /// assert_eq!(pi_over_3.to_string(), "1.047197551196597746154214461094");
+    /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec_round(100, Ceiling);
+    /// assert_eq!(
+    ///     two_over_sqrt_pi.to_string(),
+    ///     "1.128379167095512573896158903122"
+    /// );
     /// assert_eq!(o, Greater);
     /// ```
-    pub fn pi_over_3_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        const THREE: Float = Float::const_from_unsigned(3);
-        let mut working_prec = prec + 10;
-        let mut increment = Limb::WIDTH;
-        loop {
-            let pi_over_3 = Self::pi_prec(working_prec).0 / THREE;
-            if float_can_round(
-                pi_over_3.significand_ref().unwrap(),
-                working_prec - 1,
-                prec,
-                rm,
-            ) {
-                return Self::from_float_prec_round(pi_over_3, prec, rm);
-            }
-            working_prec += increment;
-            increment = working_prec >> 1;
-        }
+    #[inline]
+    pub fn two_over_sqrt_pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let (pi, o) = Float::one_over_sqrt_pi_prec_round(prec, rm);
+        (pi << 1u32, o)
     }
 
-    /// Returns an approximation to $\pi/3$, with the given precision and rounded to the nearest
-    /// [`Float`] of that precision. An [`Ordering`] is also returned, indicating whether the
-    /// rounded value is less than or greater than the exact value of the constant. (Since the
+    /// Returns an approximation to $2/\sqrt{pi}$, with the given precision and rounded to the
+    /// nearest [`Float`] of that precision. An [`Ordering`] is also returned, indicating whether
+    /// the rounded value is less than or greater than the exact value of the constant. (Since the
     /// constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \pi/3+\varepsilon.
+    /// x = 2/\sqrt{pi}+\varepsilon.
     /// $$
     /// - $|\varepsilon| < 2^{-p}$.
     ///
@@ -107,20 +97,23 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (pi_over_3, o) = Float::pi_over_3_prec(1);
-    /// assert_eq!(pi_over_3.to_string(), "1.0");
+    /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec(1);
+    /// assert_eq!(two_over_sqrt_pi.to_string(), "1.0");
     /// assert_eq!(o, Less);
     ///
-    /// let (pi_over_3, o) = Float::pi_over_3_prec(10);
-    /// assert_eq!(pi_over_3.to_string(), "1.047");
-    /// assert_eq!(o, Less);
+    /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec(10);
+    /// assert_eq!(two_over_sqrt_pi.to_string(), "1.129");
+    /// assert_eq!(o, Greater);
     ///
-    /// let (pi_over_3, o) = Float::pi_over_3_prec(100);
-    /// assert_eq!(pi_over_3.to_string(), "1.047197551196597746154214461094");
+    /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec(100);
+    /// assert_eq!(
+    ///     two_over_sqrt_pi.to_string(),
+    ///     "1.128379167095512573896158903122"
+    /// );
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
-    pub fn pi_over_3_prec(prec: u64) -> (Self, Ordering) {
-        Self::pi_over_3_prec_round(prec, Nearest)
+    pub fn two_over_sqrt_pi_prec(prec: u64) -> (Self, Ordering) {
+        Self::two_over_sqrt_pi_prec_round(prec, Nearest)
     }
 }

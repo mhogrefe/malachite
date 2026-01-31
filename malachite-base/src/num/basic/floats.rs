@@ -16,9 +16,10 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Phi, Pi,
-    PiOver2, PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant, Sqrt2,
-    Sqrt2Over2, Sqrt3, Sqrt3Over3, Tau, Two, Zero,
+    Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf,
+    OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
+    PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, SqrtPi, Tau,
+    Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -606,7 +607,10 @@ macro_rules! impl_basic_traits_primitive_float {
         $prime_constant: expr,
         $sqrt_3: expr,
         $sqrt_3_over_3: expr,
-        $phi: expr
+        $phi: expr,
+        $sqrt_pi: expr,
+        $one_over_sqrt_pi: expr,
+        $one_over_sqrt_tau: expr
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
@@ -804,6 +808,36 @@ macro_rules! impl_basic_traits_primitive_float {
         impl PiOver8 for $t {
             const PI_OVER_8: $t = core::$t::consts::FRAC_PI_8;
         }
+
+        /// $1/\pi$.
+        impl OneOverPi for $t {
+            const ONE_OVER_PI: $t = core::$t::consts::FRAC_1_PI;
+        }
+
+        /// $\sqrt{\pi}$.
+        impl SqrtPi for $t {
+            const SQRT_PI: $t = $sqrt_pi;
+        }
+
+        /// $1/\sqrt{\pi}$.
+        impl OneOverSqrtPi for $t {
+            const ONE_OVER_SQRT_PI: $t = $one_over_sqrt_pi;
+        }
+
+        /// $1/\sqrt{\tau}$.
+        impl OneOverSqrtTau for $t {
+            const ONE_OVER_SQRT_TAU: $t = $one_over_sqrt_tau;
+        }
+
+        /// $2/\pi$.
+        impl TwoOverPi for $t {
+            const TWO_OVER_PI: $t = core::$t::consts::FRAC_2_PI;
+        }
+
+        /// $2/\sqrt{\pi}$.
+        impl TwoOverSqrtPi for $t {
+            const TWO_OVER_SQRT_PI: $t = core::$t::consts::FRAC_2_SQRT_PI;
+        }
     };
 }
 impl_basic_traits_primitive_float!(
@@ -816,7 +850,10 @@ impl_basic_traits_primitive_float!(
     0.4146825,
     1.7320508,
     0.57735026,
-    1.618034
+    1.618034,
+    1.7724539,
+    0.56418961,
+    0.39894229
 );
 impl_basic_traits_primitive_float!(
     f64,
@@ -828,5 +865,8 @@ impl_basic_traits_primitive_float!(
     0.41468250985111166,
     1.7320508075688772,
     0.5773502691896257,
-    1.618033988749895
+    1.618033988749895,
+    1.7724538509055161,
+    0.5641895835477563,
+    0.3989422804014327
 );

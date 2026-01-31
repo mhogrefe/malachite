@@ -120,6 +120,9 @@ pub mod comparison {
 pub mod constants {
     pub mod ln_2;
     pub mod log_2_e;
+    pub mod one_over_pi;
+    pub mod one_over_sqrt_pi;
+    pub mod one_over_sqrt_tau;
     pub mod phi;
     pub mod pi;
     pub mod pi_over_2;
@@ -133,7 +136,10 @@ pub mod constants {
     pub mod sqrt_2_over_2;
     pub mod sqrt_3;
     pub mod sqrt_3_over_3;
+    pub mod sqrt_pi;
     pub mod tau;
+    pub mod two_over_pi;
+    pub mod two_over_sqrt_pi;
 }
 pub mod conversion {
     pub mod clone;

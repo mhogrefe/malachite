@@ -210,7 +210,7 @@ impl ExtendedFloat {
         }
     }
 
-    fn from_extended_float_prec_round_ref(
+    pub_crate_test! {from_extended_float_prec_round_ref(
         x: &Self,
         prec: u64,
         rm: RoundingMode,
@@ -220,7 +220,7 @@ impl ExtendedFloat {
         } else {
             (x.clone(), Equal)
         }
-    }
+    }}
 
     fn shr_prec_round<T: PrimitiveInt>(
         self,

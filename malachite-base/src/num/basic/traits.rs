@@ -145,6 +145,36 @@ pub trait PiOver8 {
     const PI_OVER_8: Self;
 }
 
+/// Provides $1/\pi$.
+pub trait OneOverPi {
+    const ONE_OVER_PI: Self;
+}
+
+/// Provides $\sqrt{\pi}$.
+pub trait SqrtPi {
+    const SQRT_PI: Self;
+}
+
+/// Provides $1/\sqrt{\pi}$.
+pub trait OneOverSqrtPi {
+    const ONE_OVER_SQRT_PI: Self;
+}
+
+/// Provides $1/\sqrt{\tau}=1/\sqrt{2\pi}$.
+pub trait OneOverSqrtTau {
+    const ONE_OVER_SQRT_TAU: Self;
+}
+
+/// Provides $2/\pi$.
+pub trait TwoOverPi {
+    const TWO_OVER_PI: Self;
+}
+
+/// Provides $2/\sqrt{\pi}$.
+pub trait TwoOverSqrtPi {
+    const TWO_OVER_SQRT_PI: Self;
+}
+
 // Implementation for `NonZero*` types:
 // - `One` and `Two` for both signed and unsigned variants
 // - `NegativeOne` for the signed variant

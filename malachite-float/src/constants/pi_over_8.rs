@@ -70,7 +70,7 @@ impl Float {
     /// $$
     /// x = \pi/8+\varepsilon.
     /// $$
-    /// - $|\varepsilon| < 2^{-p-1}$.
+    /// - $|\varepsilon| < 2^{-p-2}$.
     ///
     /// The constant is irrational and transcendental.
     ///

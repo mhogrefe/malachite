@@ -10,6 +10,12 @@
 pub mod ln_2;
 /// Functions for approximating $\log_2 e$.
 pub mod log_2_e;
+/// Functions for approximating $1/\pi$.
+pub mod one_over_pi;
+/// Functions for approximating $1/\sqrt{\pi}$.
+pub mod one_over_sqrt_pi;
+/// Functions for approximating $1/\sqrt{\tau}=1/\sqrt{2\pi}$.
+pub mod one_over_sqrt_tau;
 /// Functions for approximating $\varphi$, the golden ratio.
 pub mod phi;
 /// Functions for approximating $\pi$.
@@ -38,5 +44,11 @@ pub mod sqrt_2_over_2;
 pub mod sqrt_3;
 /// Functions for approximating $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
 pub mod sqrt_3_over_3;
+/// Functions for approximating $\sqrt{\pi}$.
+pub mod sqrt_pi;
 /// Functions for approximating $\tau=2\pi$.
 pub mod tau;
+/// Functions for approximating $2/\pi$.
+pub mod two_over_pi;
+/// Functions for approximating $2/\sqrt{\pi}$.
+pub mod two_over_sqrt_pi;
