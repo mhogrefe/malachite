@@ -480,7 +480,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -571,7 +571,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -659,7 +659,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -747,7 +747,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1087,7 +1087,7 @@ impl Float {
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$, where $p$ is the maximum precision of the
     ///   inputs.
     ///
@@ -1167,7 +1167,7 @@ impl Float {
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$, where $p$ is the maximum precision of the
     ///   inputs.
     ///
@@ -1247,7 +1247,7 @@ impl Float {
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$, where $p$ is the maximum precision of the
     ///   inputs.
     ///
@@ -1324,7 +1324,7 @@ impl Float {
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$, where $p$ is the maximum precision of the
     ///   inputs.
     ///
@@ -1403,7 +1403,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1490,7 +1490,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1701,7 +1701,7 @@ impl Float {
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$, where $p$ is the maximum precision of the
     ///   inputs.
     ///
@@ -1770,7 +1770,7 @@ impl Float {
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$, where $p$ is the maximum precision of the
     ///   inputs.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$, where $p$ is the maximum precision of the
     ///   inputs.
     ///
@@ -1837,7 +1837,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1945,7 +1945,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2082,7 +2082,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2219,7 +2219,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2355,7 +2355,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2424,7 +2424,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2492,7 +2492,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2560,7 +2560,7 @@ impl Float {
     ///   to be 0.
     /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon|
     ///   < 2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p+1}$.
-    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\text{AGM}(x,y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \text{AGM}(x,y)\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.

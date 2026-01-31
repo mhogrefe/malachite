@@ -544,7 +544,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -655,7 +655,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -771,7 +771,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -887,7 +887,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1385,7 +1385,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1480,7 +1480,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1575,7 +1575,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1670,7 +1670,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1764,7 +1764,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2010,7 +2010,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2365,7 +2365,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -2429,7 +2429,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -2492,7 +2492,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2610,7 +2610,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2746,7 +2746,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2887,7 +2887,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -3311,7 +3311,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3409,7 +3409,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3511,7 +3511,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3613,7 +3613,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3714,7 +3714,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -3818,7 +3818,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -4044,7 +4044,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
@@ -4118,7 +4118,7 @@ impl Float {
     /// - If $xy$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $xy$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $xy$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |xy|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].

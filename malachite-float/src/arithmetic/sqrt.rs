@@ -117,7 +117,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -201,7 +201,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -434,7 +434,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -506,7 +506,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -577,7 +577,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -733,7 +733,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -799,7 +799,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -943,7 +943,7 @@ impl Float {
     ///   0.
     /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p+1}$.
-    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $\sqrt{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 \sqrt{x}\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.

@@ -35,7 +35,7 @@ impl Float {
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -134,7 +134,7 @@ impl Float {
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -417,7 +417,7 @@ impl Float {
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -503,7 +503,7 @@ impl Float {
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -589,7 +589,7 @@ impl Float {
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -798,7 +798,7 @@ impl Float {
     /// - If $x^2$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x^2$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x^2$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x^2|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the precision of the input.

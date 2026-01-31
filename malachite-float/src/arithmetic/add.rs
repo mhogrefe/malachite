@@ -681,7 +681,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -787,7 +787,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -898,7 +898,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1009,7 +1009,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1378,7 +1378,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1473,7 +1473,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1568,7 +1568,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1662,7 +1662,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -1756,7 +1756,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -1832,7 +1832,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2028,7 +2028,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -2092,7 +2092,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
@@ -2155,7 +2155,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2271,7 +2271,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2405,7 +2405,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -2620,7 +2620,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -3104,7 +3104,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3200,7 +3200,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3301,7 +3301,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3402,7 +3402,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the [`Float`] input.
@@ -3502,7 +3502,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -3699,7 +3699,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$.
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -4017,7 +4017,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].
@@ -4091,7 +4091,7 @@ impl Float {
     /// - If $x+y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x+y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p+1}$, where $p$ is the precision of the input [`Float`].
-    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $x+y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |x+y|\rfloor-p}$, where $p$ is the precision of the input [`Float`].
     ///
     /// If the output has a precision, it is the precision of the input [`Float`].

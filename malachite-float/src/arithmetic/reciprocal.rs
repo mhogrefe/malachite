@@ -33,7 +33,7 @@ impl Float {
     /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$.
-    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -124,7 +124,7 @@ impl Float {
     /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$.
-    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -385,7 +385,7 @@ impl Float {
     /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -464,7 +464,7 @@ impl Float {
     /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$, where $p$ is the precision of the input.
-    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// If the output has a precision, it is the precision of the input.
@@ -542,7 +542,7 @@ impl Float {
     /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |xy|\rfloor-p+1}$.
-    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
@@ -730,7 +730,7 @@ impl Float {
     /// - If $1/x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $1/x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p+1}$, where $p$ is the maximum precision of the inputs.
-    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    /// - If $1/x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
     ///   2^{\lfloor\log_2 |1/x|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
     ///
     /// If the output has a precision, it is the precision of the input.
