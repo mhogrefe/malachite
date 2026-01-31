@@ -175,6 +175,19 @@ pub trait TwoOverSqrtPi {
     const TWO_OVER_SQRT_PI: Self;
 }
 
+/// Provides Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.
+///
+/// Having three consecutive esses in an identifier is awkward, so let's pretend that we sometimes
+/// use AP Style and write "Gauss' constant".
+pub trait GaussConstant {
+    const GAUSS_CONSTANT: Self;
+}
+
+/// Provides the lemniscate constant $\varpi=\pi G$, where $G$ is Gauss's constant.
+pub trait LemniscateConstant {
+    const LEMNISCATE_CONSTANT: Self;
+}
+
 // Implementation for `NonZero*` types:
 // - `One` and `Two` for both signed and unsigned variants
 // - `NegativeOne` for the signed variant

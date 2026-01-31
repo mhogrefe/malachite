@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+pub mod lemniscate_constant;
 pub mod ln_2;
 pub mod log_2_e;
 pub mod one_over_pi;

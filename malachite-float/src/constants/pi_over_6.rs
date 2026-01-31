@@ -17,7 +17,7 @@ use core::cmp::Ordering;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Float {
-    /// Returns an approximation to $\pi/6$, with the given precision and rounded using the given
+    /// Returns an approximation of $\pi/6$, with the given precision and rounded using the given
     /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than or greater than the exact value of the constant. (Since the constant is
     /// irrational, the rounded value is never equal to the exact value.)
@@ -58,11 +58,11 @@ impl Float {
     /// ```
     #[inline]
     pub fn pi_over_6_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        let (pi_over_3, o) = Float::pi_over_3_prec_round(prec, rm);
+        let (pi_over_3, o) = Self::pi_over_3_prec_round(prec, rm);
         (pi_over_3 >> 1u32, o)
     }
 
-    /// Returns an approximation to $\pi/6$, with the given precision and rounded to the nearest
+    /// Returns an approximation of $\pi/6$, with the given precision and rounded to the nearest
     /// [`Float`] of that precision. An [`Ordering`] is also returned, indicating whether the
     /// rounded value is less than or greater than the exact value of the constant. (Since the
     /// constant is irrational, the rounded value is never equal to the exact value.)

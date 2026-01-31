@@ -14,23 +14,23 @@
 
 use crate::Float;
 use core::cmp::Ordering;
-use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 
 impl Float {
-    /// Returns an approximation of the base-2 logarithm of $e$, with the given precision and
+    /// Returns an approximation of the lemniscate constant $\varpi$, with the given precision and
     /// rounded using the given [`RoundingMode`]. An [`Ordering`] is also returned, indicating
     /// whether the rounded value is less than or greater than the exact value of the constant.
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = \log_2 e+\varepsilon.
+    /// x = \varpi+\varepsilon=\pi G+\varepsilon,
     /// $$
-    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p+1}$.
-    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p}$.
+    /// where $G$ is Gauss's constant.
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p+2}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p+1}$.
     ///
     /// The constant is irrational and transcendental.
     ///
@@ -52,44 +52,44 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log_2_e, o) = Float::log_2_e_prec_round(100, Floor);
-    /// assert_eq!(log_2_e.to_string(), "1.442695040888963407359924681001");
+    /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec_round(100, Floor);
+    /// assert_eq!(lemniscate_constant.to_string(), "2.62205755429211981046483958989");
     /// assert_eq!(o, Less);
     ///
-    /// let (log_2_e, o) = Float::log_2_e_prec_round(100, Ceiling);
-    /// assert_eq!(log_2_e.to_string(), "1.442695040888963407359924681003");
+    /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec_round(100, Ceiling);
+    /// assert_eq!(lemniscate_constant.to_string(), "2.622057554292119810464839589893");
     /// assert_eq!(o, Greater);
     /// ```
-    pub fn log_2_e_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+    pub fn lemniscate_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let mut working_prec = prec + 10;
         let mut increment = Limb::WIDTH;
         loop {
-            let log_2_e = Self::ln_2_prec_round(working_prec, Floor).0.reciprocal();
-            // See algorithms.tex. Since we rounded down when computing ln_2, the absolute error of
-            // the inverse is bounded by (c_w + 2c_uk_u)ulp(log_e(2)) <= 4ulp(log_e(2)).
+            let lemniscate_constant =
+                Self::pi_prec(working_prec).0 * Self::gauss_constant_prec(working_prec).0;
             if float_can_round(
-                log_2_e.significand_ref().unwrap(),
+                lemniscate_constant.significand_ref().unwrap(),
                 working_prec - 2,
                 prec,
                 rm,
             ) {
-                return Self::from_float_prec_round(log_2_e, prec, rm);
+                return Self::from_float_prec_round(lemniscate_constant, prec, rm);
             }
             working_prec += increment;
             increment = working_prec >> 1;
         }
     }
 
-    /// Returns an approximation of the base-2 logarithm of $e$, with the given precision and
+    /// Returns an approximation of the lemniscate constant $\varpi$, with the given precision and
     /// rounded to the nearest [`Float`] of that precision. An [`Ordering`] is also returned,
     /// indicating whether the rounded value is less than or greater than the exact value of the
     /// constant. (Since the constant is irrational, the rounded value is never equal to the exact
     /// value.)
     ///
     /// $$
-    /// x = \log_2 e+\varepsilon.
+    /// x = \varpi+\varepsilon=\pi G+\varepsilon,
     /// $$
-    /// - $|\varepsilon| < 2^{-p}$.
+    /// where $G$ is Gauss's constant.
+    /// - $|\varepsilon| < 2^{-p+1}$.
     ///
     /// The constant is irrational and transcendental.
     ///
@@ -110,20 +110,20 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log_2_e, o) = Float::log_2_e_prec(1);
-    /// assert_eq!(log_2_e.to_string(), "1.0");
+    /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec(1);
+    /// assert_eq!(lemniscate_constant.to_string(), "2.0");
     /// assert_eq!(o, Less);
     ///
-    /// let (log_2_e, o) = Float::log_2_e_prec(10);
-    /// assert_eq!(log_2_e.to_string(), "1.443");
-    /// assert_eq!(o, Greater);
+    /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec(10);
+    /// assert_eq!(lemniscate_constant.to_string(), "2.621");
+    /// assert_eq!(o, Less);
     ///
-    /// let (log_2_e, o) = Float::log_2_e_prec(100);
-    /// assert_eq!(log_2_e.to_string(), "1.442695040888963407359924681003");
-    /// assert_eq!(o, Greater);
+    /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec(100);
+    /// assert_eq!(lemniscate_constant.to_string(), "2.62205755429211981046483958989");
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn log_2_e_prec(prec: u64) -> (Self, Ordering) {
-        Self::log_2_e_prec_round(prec, Nearest)
+    pub fn lemniscate_constant_prec(prec: u64) -> (Self, Ordering) {
+        Self::lemniscate_constant_prec_round(prec, Nearest)
     }
 }

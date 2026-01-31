@@ -16,43 +16,43 @@ use malachite_base::test_util::generators::{
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
-use malachite_float::test_util::constants::one_over_sqrt_tau::one_over_sqrt_tau_prec_round_simple;
+use malachite_float::test_util::constants::lemniscate_constant::lemniscate_constant_prec_round_simple;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_float_one_over_sqrt_tau_prec_round);
-    register_demo!(runner, demo_float_one_over_sqrt_tau_prec_round_debug);
-    register_demo!(runner, demo_float_one_over_sqrt_tau_prec);
-    register_demo!(runner, demo_float_one_over_sqrt_tau_prec_debug);
+    register_demo!(runner, demo_float_lemniscate_constant_prec_round);
+    register_demo!(runner, demo_float_lemniscate_constant_prec_round_debug);
+    register_demo!(runner, demo_float_lemniscate_constant_prec);
+    register_demo!(runner, demo_float_lemniscate_constant_prec_debug);
 
     register_bench!(
         runner,
-        benchmark_float_one_over_sqrt_tau_prec_round_algorithms
+        benchmark_float_lemniscate_constant_prec_round_algorithms
     );
-    register_bench!(runner, benchmark_float_one_over_sqrt_tau_prec_algorithms);
+    register_bench!(runner, benchmark_float_lemniscate_constant_prec_algorithms);
 }
 
-fn demo_float_one_over_sqrt_tau_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_lemniscate_constant_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
     {
         println!(
-            "one_over_sqrt_tau_prec_round({}, {}) = {:?}",
+            "lemniscate_constant_prec_round({}, {}) = {:?}",
             p,
             rm,
-            Float::one_over_sqrt_tau_prec_round(p, rm)
+            Float::lemniscate_constant_prec_round(p, rm)
         );
     }
 }
 
-fn demo_float_one_over_sqrt_tau_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_lemniscate_constant_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
     {
-        let (pc, o) = Float::one_over_sqrt_tau_prec_round(p, rm);
+        let (pc, o) = Float::lemniscate_constant_prec_round(p, rm);
         println!(
-            "one_over_sqrt_tau_prec_round({}, {}) = ({:#x}, {:?})",
+            "lemniscate_constant_prec_round({}, {}) = ({:#x}, {:?})",
             p,
             rm,
             ComparableFloat(pc),
@@ -61,21 +61,21 @@ fn demo_float_one_over_sqrt_tau_prec_round_debug(gm: GenMode, config: &GenConfig
     }
 }
 
-fn demo_float_one_over_sqrt_tau_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_lemniscate_constant_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
         println!(
-            "one_over_sqrt_tau_prec({}) = {:?}",
+            "lemniscate_constant_prec({}) = {:?}",
             p,
-            Float::one_over_sqrt_tau_prec(p)
+            Float::lemniscate_constant_prec(p)
         );
     }
 }
 
-fn demo_float_one_over_sqrt_tau_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_lemniscate_constant_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
-        let (pc, o) = Float::one_over_sqrt_tau_prec(p);
+        let (pc, o) = Float::lemniscate_constant_prec(p);
         println!(
-            "one_over_sqrt_tau_prec({}) = ({:#x}, {:?})",
+            "lemniscate_constant_prec({}) = ({:#x}, {:?})",
             p,
             ComparableFloat(pc),
             o
@@ -83,14 +83,14 @@ fn demo_float_one_over_sqrt_tau_prec_debug(gm: GenMode, config: &GenConfig, limi
     }
 }
 
-fn benchmark_float_one_over_sqrt_tau_prec_round_algorithms(
+fn benchmark_float_lemniscate_constant_prec_round_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::one_over_sqrt_tau_prec_round(u64, RoundingMode)",
+        "Float::lemniscate_constant_prec_round(u64, RoundingMode)",
         BenchmarkType::Algorithms,
         unsigned_rounding_mode_pair_gen_var_4().get(gm, config),
         gm.name(),
@@ -99,23 +99,23 @@ fn benchmark_float_one_over_sqrt_tau_prec_round_algorithms(
         &pair_1_bucketer("prec"),
         &mut [
             ("default", &mut |(p, rm)| {
-                no_out!(Float::one_over_sqrt_tau_prec_round(p, rm));
+                no_out!(Float::lemniscate_constant_prec_round(p, rm));
             }),
             ("simple", &mut |(p, rm)| {
-                no_out!(one_over_sqrt_tau_prec_round_simple(p, rm));
+                no_out!(lemniscate_constant_prec_round_simple(p, rm));
             }),
         ],
     );
 }
 
-fn benchmark_float_one_over_sqrt_tau_prec_algorithms(
+fn benchmark_float_lemniscate_constant_prec_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::one_over_sqrt_tau_prec(u64)",
+        "Float::lemniscate_constant_prec(u64)",
         BenchmarkType::Algorithms,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
@@ -124,10 +124,10 @@ fn benchmark_float_one_over_sqrt_tau_prec_algorithms(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |p| {
-                no_out!(Float::one_over_sqrt_tau_prec(p));
+                no_out!(Float::lemniscate_constant_prec(p));
             }),
             ("simple", &mut |p| {
-                no_out!(one_over_sqrt_tau_prec_round_simple(p, Nearest));
+                no_out!(lemniscate_constant_prec_round_simple(p, Nearest));
             }),
         ],
     );

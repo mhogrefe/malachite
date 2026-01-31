@@ -16,10 +16,10 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    Infinity, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf,
-    OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
-    PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, SqrtPi, Tau,
-    Two, TwoOverPi, TwoOverSqrtPi, Zero,
+    GaussConstant, Infinity, LemniscateConstant, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne,
+    NegativeZero, One, OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2,
+    PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2,
+    Sqrt3, Sqrt3Over3, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -610,7 +610,9 @@ macro_rules! impl_basic_traits_primitive_float {
         $phi: expr,
         $sqrt_pi: expr,
         $one_over_sqrt_pi: expr,
-        $one_over_sqrt_tau: expr
+        $one_over_sqrt_tau: expr,
+        $gauss_constant: expr,
+        $lemniscate_constant: expr
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
@@ -838,6 +840,16 @@ macro_rules! impl_basic_traits_primitive_float {
         impl TwoOverSqrtPi for $t {
             const TWO_OVER_SQRT_PI: $t = core::$t::consts::FRAC_2_SQRT_PI;
         }
+
+        /// $G=1/\mathrm{AGM}(1,\sqrt{2})$.
+        impl GaussConstant for $t {
+            const GAUSS_CONSTANT: $t = $gauss_constant;
+        }
+
+        /// $\varpi=\pi G$.
+        impl LemniscateConstant for $t {
+            const LEMNISCATE_CONSTANT: $t = $lemniscate_constant;
+        }
     };
 }
 impl_basic_traits_primitive_float!(
@@ -852,8 +864,10 @@ impl_basic_traits_primitive_float!(
     0.57735026,
     1.618034,
     1.7724539,
-    0.56418961,
-    0.39894229
+    0.5641896,
+    0.3989423,
+    0.83462685,
+    2.6220574
 );
 impl_basic_traits_primitive_float!(
     f64,
@@ -866,7 +880,9 @@ impl_basic_traits_primitive_float!(
     1.7320508075688772,
     0.5773502691896257,
     1.618033988749895,
-    1.7724538509055161,
+    1.772453850905516,
     0.5641895835477563,
-    0.3989422804014327
+    0.3989422804014327,
+    0.8346268416740732,
+    2.6220575542921196
 );

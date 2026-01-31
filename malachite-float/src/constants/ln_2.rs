@@ -82,7 +82,7 @@ fn sum(t: &mut [Integer], p: &mut [Integer], q: &mut [Integer], n1: u64, n2: u64
 }
 
 impl Float {
-    /// Returns an approximation to the natural logarithm of 2, with the given precision and rounded
+    /// Returns an approximation of the natural logarithm of 2, with the given precision and rounded
     /// using the given [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
     /// rounded value is less than or greater than the exact value of the constant. (Since the
     /// constant is irrational, the rounded value is never equal to the exact value.)
@@ -148,7 +148,7 @@ impl Float {
         }
     }
 
-    /// Returns an approximation to the natural logarithm of 2, with the given precision and rounded
+    /// Returns an approximation of the natural logarithm of 2, with the given precision and rounded
     /// to the nearest [`Float`] of that precision. An [`Ordering`] is also returned, indicating
     /// whether the rounded value is less than or greater than the exact value of the constant.
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)

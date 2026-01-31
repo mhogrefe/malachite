@@ -77,32 +77,36 @@ impl_trivial_random_primitive_ints!(i128);
 
 impl HasRandomPrimitiveInts for usize {
     type State = ();
+
     #[inline]
-    fn new_state() -> () {}
+    fn new_state() {}
+
     #[inline]
-    fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> usize {
+    fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> Self {
         if USIZE_IS_U32 {
             let x: u32 = rng.random();
-            x as usize
+            x as Self
         } else {
             let x: u64 = rng.random();
-            x as usize
+            x as Self
         }
     }
 }
 
 impl HasRandomPrimitiveInts for isize {
     type State = ();
+
     #[inline]
-    fn new_state() -> () {}
+    fn new_state() {}
+
     #[inline]
-    fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> isize {
+    fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> Self {
         if USIZE_IS_U32 {
             let x: i32 = rng.random();
-            x as isize
+            x as Self
         } else {
             let x: i64 = rng.random();
-            x as isize
+            x as Self
         }
     }
 }

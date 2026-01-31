@@ -12,7 +12,7 @@ use malachite_base::num::basic::traits::Two;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Float {
-    /// Returns an approximation to half of the square root of 2, with the given precision and
+    /// Returns an approximation of half of the square root of 2, with the given precision and
     /// rounded using the given [`RoundingMode`]. An [`Ordering`] is also returned, indicating
     /// whether the rounded value is less than or greater than the exact value of the constant.
     /// (Since the constant is irrational, the rounded value is never equal to the exact value.)
@@ -63,7 +63,7 @@ impl Float {
         (sqrt_2 >> 1u32, o)
     }
 
-    /// Returns an approximation to half of the square root of 2, with the given precision and
+    /// Returns an approximation of half of the square root of 2, with the given precision and
     /// rounded to the nearest [`Float`] of that precision. An [`Ordering`] is also returned,
     /// indicating whether the rounded value is less than or greater than the exact value of the
     /// constant. (Since the constant is irrational, the rounded value is never equal to the exact

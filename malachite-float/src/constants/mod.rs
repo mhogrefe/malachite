@@ -6,6 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Functions for approximating Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.
+pub mod gauss_constant;
+/// Functions for approximating the lemniscate constant $\varpi=\pi G$, where $G$ is Gauss's
+/// constant.
+pub mod lemniscate_constant;
 /// Functions for approximating $\ln 2$.
 pub mod ln_2;
 /// Functions for approximating $\log_2 e$.

@@ -118,6 +118,8 @@ pub mod comparison {
     pub mod partial_eq_rational;
 }
 pub mod constants {
+    pub mod gauss_constant;
+    pub mod lemniscate_constant;
     pub mod ln_2;
     pub mod log_2_e;
     pub mod one_over_pi;

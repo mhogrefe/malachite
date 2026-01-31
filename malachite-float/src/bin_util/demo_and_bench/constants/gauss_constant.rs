@@ -17,37 +17,37 @@ use malachite_float::ComparableFloat;
 use malachite_float::Float;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_float_two_over_sqrt_pi_prec_round);
-    register_demo!(runner, demo_float_two_over_sqrt_pi_prec_round_debug);
-    register_demo!(runner, demo_float_two_over_sqrt_pi_prec);
-    register_demo!(runner, demo_float_two_over_sqrt_pi_prec_debug);
+    register_demo!(runner, demo_float_gauss_constant_prec_round);
+    register_demo!(runner, demo_float_gauss_constant_prec_round_debug);
+    register_demo!(runner, demo_float_gauss_constant_prec);
+    register_demo!(runner, demo_float_gauss_constant_prec_debug);
 
-    register_bench!(runner, benchmark_float_two_over_sqrt_pi_prec_round);
-    register_bench!(runner, benchmark_float_two_over_sqrt_pi_prec);
+    register_bench!(runner, benchmark_float_gauss_constant_prec_round);
+    register_bench!(runner, benchmark_float_gauss_constant_prec);
 }
 
-fn demo_float_two_over_sqrt_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_gauss_constant_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
     {
         println!(
-            "two_over_sqrt_pi_prec_round({}, {}) = {:?}",
+            "gauss_constant_prec_round({}, {}) = {:?}",
             p,
             rm,
-            Float::two_over_sqrt_pi_prec_round(p, rm)
+            Float::gauss_constant_prec_round(p, rm)
         );
     }
 }
 
-fn demo_float_two_over_sqrt_pi_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_gauss_constant_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
     {
-        let (pc, o) = Float::two_over_sqrt_pi_prec_round(p, rm);
+        let (pc, o) = Float::gauss_constant_prec_round(p, rm);
         println!(
-            "two_over_sqrt_pi_prec_round({}, {}) = ({:#x}, {:?})",
+            "gauss_constant_prec_round({}, {}) = ({:#x}, {:?})",
             p,
             rm,
             ComparableFloat(pc),
@@ -56,21 +56,21 @@ fn demo_float_two_over_sqrt_pi_prec_round_debug(gm: GenMode, config: &GenConfig,
     }
 }
 
-fn demo_float_two_over_sqrt_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_gauss_constant_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
         println!(
-            "two_over_sqrt_pi_prec({}) = {:?}",
+            "gauss_constant_prec({}) = {:?}",
             p,
-            Float::two_over_sqrt_pi_prec(p)
+            Float::gauss_constant_prec(p)
         );
     }
 }
 
-fn demo_float_two_over_sqrt_pi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_float_gauss_constant_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
-        let (pc, o) = Float::two_over_sqrt_pi_prec(p);
+        let (pc, o) = Float::gauss_constant_prec(p);
         println!(
-            "two_over_sqrt_pi_prec({}) = ({:#x}, {:?})",
+            "gauss_constant_prec({}) = ({:#x}, {:?})",
             p,
             ComparableFloat(pc),
             o
@@ -78,14 +78,14 @@ fn demo_float_two_over_sqrt_pi_prec_debug(gm: GenMode, config: &GenConfig, limit
     }
 }
 
-fn benchmark_float_two_over_sqrt_pi_prec_round(
+fn benchmark_float_gauss_constant_prec_round(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::two_over_sqrt_pi_prec_round(u64, RoundingMode)",
+        "Float::gauss_constant_prec_round(u64, RoundingMode)",
         BenchmarkType::Single,
         unsigned_rounding_mode_pair_gen_var_4().get(gm, config),
         gm.name(),
@@ -93,27 +93,25 @@ fn benchmark_float_two_over_sqrt_pi_prec_round(
         file_name,
         &pair_1_bucketer("prec"),
         &mut [("Malachite", &mut |(p, rm)| {
-            no_out!(Float::two_over_sqrt_pi_prec_round(p, rm));
+            no_out!(Float::gauss_constant_prec_round(p, rm));
         })],
     );
 }
 
-fn benchmark_float_two_over_sqrt_pi_prec(
+fn benchmark_float_gauss_constant_prec(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Float::two_over_sqrt_pi_prec(u64)",
+        "Float::gauss_constant_prec(u64)",
         BenchmarkType::Single,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &unsigned_direct_bucketer(),
-        &mut [("Malachite", &mut |p| {
-            no_out!(Float::two_over_sqrt_pi_prec(p));
-        })],
+        &mut [("Malachite", &mut |p| no_out!(Float::gauss_constant_prec(p)))],
     );
 }

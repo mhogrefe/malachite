@@ -21,7 +21,7 @@ use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 
 impl Float {
-    /// Returns an approximation to $1/\pi$, with the given precision and rounded using the given
+    /// Returns an approximation of $1/\pi$, with the given precision and rounded using the given
     /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than or greater than the exact value of the constant. (Since the constant is
     /// irrational, the rounded value is never equal to the exact value.)
@@ -80,7 +80,7 @@ impl Float {
         }
     }
 
-    /// Returns an approximation to $1/\pi$, with the given precision and rounded to the nearest
+    /// Returns an approximation of $1/\pi$, with the given precision and rounded to the nearest
     /// [`Float`] of that precision. An [`Ordering`] is also returned, indicating whether the
     /// rounded value is less than or greater than the exact value of the constant. (Since the
     /// constant is irrational, the rounded value is never equal to the exact value.)

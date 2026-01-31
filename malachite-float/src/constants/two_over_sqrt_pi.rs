@@ -17,7 +17,7 @@ use core::cmp::Ordering;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Float {
-    /// Returns an approximation to $2/\sqrt{pi}$, with the given precision and rounded using the
+    /// Returns an approximation of $2/\sqrt{pi}$, with the given precision and rounded using the
     /// given [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded
     /// value is less than or greater than the exact value of the constant. (Since the constant is
     /// irrational, the rounded value is never equal to the exact value.)
@@ -64,11 +64,11 @@ impl Float {
     /// ```
     #[inline]
     pub fn two_over_sqrt_pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        let (pi, o) = Float::one_over_sqrt_pi_prec_round(prec, rm);
+        let (pi, o) = Self::one_over_sqrt_pi_prec_round(prec, rm);
         (pi << 1u32, o)
     }
 
-    /// Returns an approximation to $2/\sqrt{pi}$, with the given precision and rounded to the
+    /// Returns an approximation of $2/\sqrt{pi}$, with the given precision and rounded to the
     /// nearest [`Float`] of that precision. An [`Ordering`] is also returned, indicating whether
     /// the rounded value is less than or greater than the exact value of the constant. (Since the
     /// constant is irrational, the rounded value is never equal to the exact value.)

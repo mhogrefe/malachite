@@ -132,7 +132,7 @@ use malachite_q::Rational;
 /// - an exponent, which is one more than the floor of the base-2 logarithm of the `Float`'s
 ///   absolute value;
 /// - and finally, a precision, which is greater than zero and indicates the number of significant
-///   bits. It is common to think of a `Float` as an approximation to some real number, and the
+///   bits. It is common to think of a `Float` as an approximation of some real number, and the
 ///   precision indicates how good the approximation is intended to be.
 ///
 /// `Float`s inherit some odd behavior from the IEEE 754 standard regarding comparison. A `NaN` is
