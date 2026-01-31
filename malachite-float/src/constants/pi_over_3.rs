@@ -65,7 +65,7 @@ impl Float {
         let mut increment = Limb::WIDTH;
         loop {
             let pi_over_3 = Self::pi_prec(working_prec).0 / THREE;
-            if float_can_round(pi_over_3.significand_ref().unwrap(), working_prec, prec, rm) {
+            if float_can_round(pi_over_3.significand_ref().unwrap(), working_prec - 1, prec, rm) {
                 return Self::from_float_prec_round(pi_over_3, prec, rm);
             }
             working_prec += increment;

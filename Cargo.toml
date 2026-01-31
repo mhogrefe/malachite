@@ -15,3 +15,4 @@ malachite-float = { version = "0.9.0", path = 'malachite-float', default-feature
 [profile.release]
 lto = "fat"
 strip = true
+codegen-units = 1
