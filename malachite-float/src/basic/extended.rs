@@ -12,6 +12,7 @@ use crate::conversion::rational_from_float::RationalFromFloatError;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::mem::swap;
+use core::ops::{Add, Mul, Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, Sqrt, SqrtAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -22,7 +23,6 @@ use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::natural::arithmetic::float_sub::exponent_shift_compare;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use std::ops::{Add, Mul, Shr, ShrAssign};
 
 pub_crate_test_struct! {
 #[derive(Clone)]

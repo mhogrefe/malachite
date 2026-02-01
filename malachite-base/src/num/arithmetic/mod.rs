@@ -300,10 +300,16 @@ pub mod coprime_with;
 /// use malachite_base::num::arithmetic::traits::DivExact;
 ///
 /// // 123 * 456 = 56088
-/// assert_eq!(56088u32.div_exact(456), 123);
+/// #[allow(unstable_name_collisions)]
+/// {
+///     assert_eq!(56088u32.div_exact(456), 123);
+/// }
 ///
 /// // -123 * -456 = 56088
-/// assert_eq!(56088i64.div_exact(-456), -123);
+/// #[allow(unstable_name_collisions)]
+/// {
+///     assert_eq!(56088i64.div_exact(-456), -123);
+/// }
 /// ```
 ///
 /// # div_exact_assign

@@ -307,7 +307,8 @@ pub fn triple_rational_rational_primitive_int_max_bit_bucketer<'a, T: PrimitiveI
             ))
         },
         bucketing_label: format!(
-            "max({x_name}.significant_bits(), {y_name}.significant_bits(), {z_name}.significant_bits())"
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
         ),
     }
 }
@@ -326,7 +327,8 @@ pub fn quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer<'a, T: P
             ))
         },
         bucketing_label: format!(
-            "max({x_name}.significant_bits(), {y_name}.significant_bits(), {z_name}.significant_bits())"
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
         ),
     }
 }

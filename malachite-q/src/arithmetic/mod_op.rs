@@ -197,7 +197,7 @@ impl Mod<Rational> for &Rational {
     /// Panics if `other` is zero.
     ///
     /// # Examples
-    /// ``````
+    /// ```
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_q::Rational;

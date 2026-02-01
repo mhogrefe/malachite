@@ -54,7 +54,10 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec_round(100, Floor);
-    /// assert_eq!(gauss_constant.to_string(), "0.834626841674073186281429732799");
+    /// assert_eq!(
+    ///     gauss_constant.to_string(),
+    ///     "0.834626841674073186281429732799"
+    /// );
     /// assert_eq!(o, Less);
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec_round(100, Ceiling);
@@ -134,7 +137,10 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec(100);
-    /// assert_eq!(gauss_constant.to_string(), "0.834626841674073186281429732799");
+    /// assert_eq!(
+    ///     gauss_constant.to_string(),
+    ///     "0.834626841674073186281429732799"
+    /// );
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

@@ -53,11 +53,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec_round(100, Floor);
-    /// assert_eq!(lemniscate_constant.to_string(), "2.62205755429211981046483958989");
+    /// assert_eq!(
+    ///     lemniscate_constant.to_string(),
+    ///     "2.62205755429211981046483958989"
+    /// );
     /// assert_eq!(o, Less);
     ///
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec_round(100, Ceiling);
-    /// assert_eq!(lemniscate_constant.to_string(), "2.622057554292119810464839589893");
+    /// assert_eq!(
+    ///     lemniscate_constant.to_string(),
+    ///     "2.622057554292119810464839589893"
+    /// );
     /// assert_eq!(o, Greater);
     /// ```
     pub fn lemniscate_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -119,7 +125,10 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec(100);
-    /// assert_eq!(lemniscate_constant.to_string(), "2.62205755429211981046483958989");
+    /// assert_eq!(
+    ///     lemniscate_constant.to_string(),
+    ///     "2.62205755429211981046483958989"
+    /// );
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

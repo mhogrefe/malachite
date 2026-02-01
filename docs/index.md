@@ -55,14 +55,14 @@ Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` featu
 To use Malachite, add the following to your project's `Cargo.toml` file:
 ```yaml
 [dependencies.malachite]
-version = "0.9.0"
+version = "0.9.1"
 ```
 
 By default, all of Malachite's features are included, but you can opt out of some of them. For
 example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
 ```yaml
 [dependencies.malachite]
-version = "0.9.0"
+version = "0.9.1"
 default-features = false
 features = [ "naturals_and_integers" ]
 ```

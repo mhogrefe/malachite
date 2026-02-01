@@ -13,7 +13,7 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_float::test_util::common::{test_constant, to_hex_string};
-use malachite_float::test_util::constants::lemniscate_constant::lemniscate_constant_prec_round_simple;
+use malachite_float::test_util::constants::lemniscate_constant::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;

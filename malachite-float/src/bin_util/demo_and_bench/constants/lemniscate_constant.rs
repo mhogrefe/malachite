@@ -16,7 +16,7 @@ use malachite_base::test_util::generators::{
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
-use malachite_float::test_util::constants::lemniscate_constant::lemniscate_constant_prec_round_simple;
+use malachite_float::test_util::constants::lemniscate_constant::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_lemniscate_constant_prec_round);
