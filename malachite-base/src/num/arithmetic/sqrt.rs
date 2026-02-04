@@ -18,7 +18,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, Ln,
+    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign,
     RoundToMultipleOfPowerOf2, ShrRound, Sqrt, SqrtAssign, SqrtAssignRem, SqrtRem,
 };
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
@@ -1232,19 +1232,10 @@ macro_rules! impl_sqrt_primitive_float {
         impl Sqrt for $f {
             type Output = Self;
 
+            /// This is a wrapper over the `sqrt` function in `libm`.
             #[inline]
             fn sqrt(self) -> $f {
                 libm::Libm::<$f>::sqrt(self)
-            }
-        }
-
-        // TODO move to better location
-        impl Ln for $f {
-            type Output = Self;
-
-            #[inline]
-            fn ln(self) -> $f {
-                libm::Libm::<$f>::log(self)
             }
         }
 

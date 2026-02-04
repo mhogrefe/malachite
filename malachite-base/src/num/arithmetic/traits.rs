@@ -446,6 +446,11 @@ pub trait Ln {
     fn ln(self) -> Self::Output;
 }
 
+/// Replaces a number with its natural logarithm.
+pub trait LnAssign {
+    fn ln_assign(&mut self);
+}
+
 /// Calculates the LCM (least common multiple) of two numbers, returning `None` if the result is not
 /// representable.
 pub trait CheckedLcm<RHS = Self> {

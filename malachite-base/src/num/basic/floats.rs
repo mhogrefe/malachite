@@ -11,9 +11,9 @@ use crate::named::Named;
 use crate::num::arithmetic::traits::{
     Abs, AbsAssign, AddMul, AddMulAssign, Ceiling, CeilingAssign, CeilingLogBase2,
     CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor, FloorAssign,
-    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, Ln, NegAssign, NextPowerOf2,
-    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt,
-    SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
+    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
+    Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt, SqrtAssign, Square,
+    SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
     GaussConstant, Infinity, LemniscateConstant, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne,
@@ -143,7 +143,6 @@ pub trait PrimitiveFloat:
     + IsInteger
     + IsPowerOf2
     + Log2E
-    + Ln
     + Ln2
     + LowerExp
     + Min

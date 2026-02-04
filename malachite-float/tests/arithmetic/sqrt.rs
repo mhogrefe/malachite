@@ -3108,8 +3108,8 @@ fn sqrt_prec_round_properties() {
     });
 
     unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
-        let (product, o) = Float::NAN.sqrt_prec_round(prec, rm);
-        assert!(product.is_nan());
+        let (sqrt, o) = Float::NAN.sqrt_prec_round(prec, rm);
+        assert!(sqrt.is_nan());
         assert_eq!(o, Equal);
 
         assert_eq!(

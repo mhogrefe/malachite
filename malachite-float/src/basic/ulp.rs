@@ -40,7 +40,7 @@ impl Float {
     /// and, if $x$ is finite and nonzero,
     ///
     /// $$
-    /// f(x) = \operatorname{Some}(2^{\lfloor \log_2 x \rfloor-p+1}),
+    /// f(x) = \operatorname{Some}(2^{\lfloor \log_2 |x| \rfloor-p+1}),
     /// $$
     /// where $p$ is the precision of $x$.
     ///

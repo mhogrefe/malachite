@@ -9,6 +9,7 @@
 pub mod add;
 pub mod agm;
 pub mod div;
+pub mod ln;
 pub mod mul;
 pub mod power_of_2;
 pub mod reciprocal;

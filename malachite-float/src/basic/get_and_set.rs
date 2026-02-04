@@ -161,7 +161,7 @@ impl Float {
     /// and, if $x$ is finite and nonzero,
     ///
     /// $$
-    /// f(x) = \operatorname{Some}(\lfloor \log_2 x \rfloor + 1).
+    /// f(x) = \operatorname{Some}(\lfloor \log_2 |x| \rfloor + 1).
     /// $$
     ///
     /// The output is in the range $[-(2^{30}-1), 2^{30}-1]$.

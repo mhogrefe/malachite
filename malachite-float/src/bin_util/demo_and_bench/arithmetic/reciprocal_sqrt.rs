@@ -1159,7 +1159,7 @@ fn benchmark_primitive_float_reciprocal_sqrt_rational<T: PrimitiveFloat>(
 {
     run_benchmark(
         &format!(
-            "primitive_float_reciprocal_sqrt_rational_prec::<{}>(Rational)",
+            "primitive_float_reciprocal_sqrt_rational::<{}>(Rational)",
             T::NAME
         ),
         BenchmarkType::Single,

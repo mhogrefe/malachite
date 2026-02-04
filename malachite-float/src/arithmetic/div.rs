@@ -4948,9 +4948,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -5067,9 +5067,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -5211,9 +5211,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -5355,9 +5355,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -5498,9 +5498,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(0,\pm0.0,p)=\text{NaN}$
     /// - $f(x,\infty,x,p)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p)=0.0$ if $x>0$
     /// - $f(0,x,p)=-0.0$ if $x<0$
     ///
@@ -5565,9 +5565,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(0,\pm0.0,p)=\text{NaN}$
     /// - $f(x,\infty,x,p)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p)=0.0$ if $x>0$
     /// - $f(0,x,p)=-0.0$ if $x<0$
     ///
@@ -5634,9 +5634,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(0,\pm0.0,p)=\text{NaN}$
     /// - $f(x,\infty,x,p)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p)=0.0$ if $x>0$
     /// - $f(0,x,p)=-0.0$ if $x<0$
     ///
@@ -5703,9 +5703,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(0,\pm0.0,p)=\text{NaN}$
     /// - $f(x,\infty,x,p)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p)=0.0$ if $x>0$
     /// - $f(0,x,p)=-0.0$ if $x<0$
     ///
@@ -5774,9 +5774,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},m)=f(0,\pm0.0,m)=\text{NaN}$
     /// - $f(x,\infty,x,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,m)=0.0$ if $x>0$
     /// - $f(0,x,m)=-0.0$ if $x<0$
     ///
@@ -5870,9 +5870,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},m)=f(0,\pm0.0,m)=\text{NaN}$
     /// - $f(x,\infty,x,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,m)=0.0$ if $x>0$
     /// - $f(0,x,m)=-0.0$ if $x<0$
     ///
@@ -5970,9 +5970,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},m)=f(0,\pm0.0,m)=\text{NaN}$
     /// - $f(x,\infty,x,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,m)=0.0$ if $x>0$
     /// - $f(0,x,m)=-0.0$ if $x<0$
     ///
@@ -6070,9 +6070,9 @@ impl Float {
     /// Special cases:
     /// - $f(x,\text{NaN},m)=f(0,\pm0.0,m)=\text{NaN}$
     /// - $f(x,\infty,x,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,m)=0.0$ if $x>0$
     /// - $f(0,x,m)=-0.0$ if $x<0$
     ///
@@ -7208,9 +7208,9 @@ impl Div<Float> for Rational {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -7299,9 +7299,9 @@ impl Div<&Float> for Rational {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -7390,9 +7390,9 @@ impl Div<Float> for &Rational {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///
@@ -7480,9 +7480,9 @@ impl Div<&Float> for &Rational {
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(0,\pm0.0,p,m)=\text{NaN}$
     /// - $f(x,\infty,x,p,m)=0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,\infty,x,p,m)=-0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(x,-\infty,x,p,m)=-0.0$ if $x>0.0$ or $x=0.0$
-    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or #x=-0.0$
+    /// - $f(x,-\infty,x,p,m)=0.0$ if $x<0.0$ or $x=-0.0$
     /// - $f(0,x,p,m)=0.0$ if $x>0$
     /// - $f(0,x,p,m)=-0.0$ if $x<0$
     ///

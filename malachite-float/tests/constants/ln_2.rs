@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
-use malachite_base::num::basic::traits::Ln2;
+use malachite_base::num::basic::traits::{Ln2, Two};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
@@ -26,6 +26,10 @@ fn test_ln_2_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) {
     assert_eq!(x.to_string(), out);
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
+
+    let (x_alt, o_alt) = Float::ln_prec(Float::TWO, prec);
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+    assert_eq!(o_alt, o);
 
     let (rug_x, rug_o) =
         rug_ln_2_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
@@ -184,6 +188,10 @@ fn test_ln_2_prec_round_helper(
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
 
+    let (x_alt, o_alt) = Float::ln_prec_round(Float::TWO, prec, rm);
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+    assert_eq!(o_alt, o);
+
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_x, rug_o) = rug_ln_2_prec_round(prec, rm);
         assert_eq!(
@@ -338,6 +346,10 @@ fn ln_2_prec_properties() {
         assert_eq!(ComparableFloatRef(&ln_2_alt), ComparableFloatRef(&ln_2));
         assert_eq!(o_alt, o);
 
+        let (ln_2_alt, o_alt) = Float::ln_prec(Float::TWO, prec);
+        assert_eq!(ComparableFloatRef(&ln_2_alt), ComparableFloatRef(&ln_2));
+        assert_eq!(o_alt, o);
+
         let (rug_ln_2, rug_o) =
             rug_ln_2_prec_round(prec, rug_round_try_from_rounding_mode(Nearest).unwrap());
         assert_eq!(
@@ -378,6 +390,10 @@ fn ln_2_prec_round_properties() {
             assert_eq!(ComparableFloat(ln_2_alt), ComparableFloat(next_lower));
             assert_eq!(o_alt, Less);
         }
+
+        let (ln_2_alt, o_alt) = Float::ln_prec_round(Float::TWO, prec, rm);
+        assert_eq!(ComparableFloatRef(&ln_2_alt), ComparableFloatRef(&ln_2));
+        assert_eq!(o_alt, o);
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_ln_2, rug_o) = rug_ln_2_prec_round(prec, rm);

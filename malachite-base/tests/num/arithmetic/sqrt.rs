@@ -241,6 +241,14 @@ fn test_sqrt() {
     test::<f32>(f32::NAN, f32::NAN);
     test::<f32>(2.0, std::f32::consts::SQRT_2);
     test::<f32>(-1.0, f32::NAN);
+
+    test::<f64>(0.0, 0.0);
+    test::<f64>(-0.0, -0.0);
+    test::<f64>(1.0, 1.0);
+    test::<f64>(f64::INFINITY, f64::INFINITY);
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(2.0, std::f64::consts::SQRT_2);
+    test::<f64>(-1.0, f64::NAN);
 }
 
 fn floor_sqrt_properties_helper_unsigned<T: PrimitiveUnsigned>() {

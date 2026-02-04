@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::traits::Two;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::{pair_1_bucketer, unsigned_direct_bucketer};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
@@ -26,7 +27,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_ln_2_prec_debug);
 
     register_bench!(runner, benchmark_float_ln_2_prec_round_library_comparison);
+    register_bench!(runner, benchmark_float_ln_2_prec_round_algorithms);
     register_bench!(runner, benchmark_float_ln_2_prec_library_comparison);
+    register_bench!(runner, benchmark_float_ln_2_prec_algorithms);
 }
 
 fn demo_float_ln_2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -100,6 +103,31 @@ fn benchmark_float_ln_2_prec_round_library_comparison(
     );
 }
 
+fn benchmark_float_ln_2_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::ln_2_prec_round(u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        unsigned_rounding_mode_pair_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_bucketer("prec"),
+        &mut [
+            ("default", &mut |(p, rm)| {
+                no_out!(Float::ln_2_prec_round(p, rm));
+            }),
+            ("using ln", &mut |(p, rm)| {
+                no_out!(Float::ln_prec_round(Float::TWO, p, rm));
+            }),
+        ],
+    );
+}
+
 fn benchmark_float_ln_2_prec_library_comparison(
     gm: GenMode,
     config: &GenConfig,
@@ -121,6 +149,29 @@ fn benchmark_float_ln_2_prec_library_comparison(
                     p,
                     rug_round_exact_from_rounding_mode(Nearest)
                 ));
+            }),
+        ],
+    );
+}
+
+fn benchmark_float_ln_2_prec_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::ln_2_prec(u64)",
+        BenchmarkType::Algorithms,
+        unsigned_gen_var_11().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_direct_bucketer(),
+        &mut [
+            ("default", &mut |p| no_out!(Float::ln_2_prec(p))),
+            ("using ln", &mut |p| {
+                no_out!(Float::ln_prec(Float::TWO, p));
             }),
         ],
     );
