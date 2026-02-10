@@ -8,11 +8,12 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, NaN};
+use crate::conversion::primitive_float_from_float::FloatFromFloatError;
 use crate::conversion::rational_from_float::RationalFromFloatError;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::mem::swap;
-use core::ops::{Add, Mul, Shr, ShrAssign};
+use core::ops::{Add, Mul, Shl, ShlAssign, Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, Sqrt, SqrtAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -28,7 +29,7 @@ pub_crate_test_struct! {
 #[derive(Clone)]
 ExtendedFloat {
     pub(crate) x: Float,
-    exp: i64,
+    pub(crate) exp: i64,
 }}
 
 impl ExtendedFloat {
@@ -252,6 +253,40 @@ impl ExtendedFloat {
         Equal
     }
 
+    fn shl_round<T: PrimitiveInt>(mut self, bits: T, rm: RoundingMode) -> (Self, Ordering) {
+        let o = self.shl_round_assign(bits, rm);
+        (self, o)
+    }
+
+    fn shl_round_ref<T: PrimitiveInt>(&self, bits: T, _rm: RoundingMode) -> (Self, Ordering) {
+        // assumes no overflow or underflow
+        if self.x.is_normal() {
+            let out_exp = i64::exact_from(
+                i128::from(self.exp) + SaturatingInto::<i128>::saturating_into(bits),
+            );
+            (
+                Self {
+                    x: self.x.clone(),
+                    exp: out_exp,
+                },
+                Equal,
+            )
+        } else {
+            (self.clone(), Equal)
+        }
+    }
+
+    fn shl_round_assign<T: PrimitiveInt>(&mut self, bits: T, _rm: RoundingMode) -> Ordering {
+        // assumes no overflow or underflow
+        if self.x.is_normal() {
+            let out_exp = i64::exact_from(
+                i128::from(self.exp) + SaturatingInto::<i128>::saturating_into(bits),
+            );
+            self.exp = out_exp;
+        }
+        Equal
+    }
+
     pub(crate) fn into_float_helper(
         mut self,
         prec: u64,
@@ -284,6 +319,27 @@ impl From<Float> for ExtendedFloat {
             }
         } else {
             Self { x: value, exp: 0 }
+        }
+    }
+}
+
+impl TryFrom<ExtendedFloat> for Float {
+    type Error = FloatFromFloatError;
+
+    fn try_from(value: ExtendedFloat) -> Result<Self, Self::Error> {
+        if value.x.is_normal() {
+            let y = value.x << value.exp;
+            if y.is_normal() {
+                Ok(y)
+            } else {
+                Err(if value.exp > 0 {
+                    FloatFromFloatError::Overflow
+                } else {
+                    FloatFromFloatError::Underflow
+                })
+            }
+        } else {
+            Ok(value.x)
         }
     }
 }
@@ -383,6 +439,28 @@ impl Shr<u32> for ExtendedFloat {
 impl ShrAssign<u32> for ExtendedFloat {
     fn shr_assign(&mut self, bits: u32) {
         self.shr_round_assign(bits, Nearest);
+    }
+}
+
+impl ShlAssign<u32> for ExtendedFloat {
+    fn shl_assign(&mut self, bits: u32) {
+        self.shl_round_assign(bits, Nearest);
+    }
+}
+
+impl<T: PrimitiveInt> Shl<T> for &ExtendedFloat {
+    type Output = ExtendedFloat;
+
+    fn shl(self, bits: T) -> ExtendedFloat {
+        self.shl_round_ref(bits, Nearest).0
+    }
+}
+
+impl<T: PrimitiveInt> Shl<T> for ExtendedFloat {
+    type Output = Self;
+
+    fn shl(self, bits: T) -> Self {
+        self.shl_round(bits, Nearest).0
     }
 }
 

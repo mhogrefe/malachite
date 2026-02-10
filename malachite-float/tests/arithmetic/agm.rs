@@ -5662,7 +5662,7 @@ fn primitive_float_agm_properties() {
 }
 
 #[test]
-fn agm_rational_prec_round_properties_zzz() {
+fn agm_rational_prec_round_properties() {
     rational_rational_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
         |(x, y, prec, rm)| {
             let (agm, o) = Float::agm_rational_prec_round(x.clone(), y.clone(), prec, rm);

@@ -3278,6 +3278,15 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_5() -> GT3 {
     )
 }
 
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::ln_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_6() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_6,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_6,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_7,
+    )
+}
+
 // -- (Rational, Rational, PrimitiveUnsigned, RoundingMode) --
 
 // All `(Rational, Rational, u64, RoundingMode)` that are valid inputs to
