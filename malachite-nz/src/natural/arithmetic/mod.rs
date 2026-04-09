@@ -32,6 +32,8 @@ pub mod checked_sub_mul;
 pub mod coprime_with;
 /// Division of [`Natural`](super::Natural)s.
 pub mod div;
+/// Implementation of [`DivEuclidean`](malachite_base::num::arithmetic::traits::DivEuclidean)
+pub mod div_euclid;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
 /// two numbers when it's known that the division is exact.
