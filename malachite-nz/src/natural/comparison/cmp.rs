@@ -194,7 +194,7 @@ impl Natural {
     ///
     /// That is, the comparison is equivalent to a comparison between $f(x)$ and $f(y)$, where
     /// $$
-    /// f(n) = n2^{\lfloor\log_2 n \rfloor}.
+    /// f(n) = n/2^{\lfloor\log_2 n \rfloor}.
     /// $$
     ///
     /// The multiplication is not actually performed.

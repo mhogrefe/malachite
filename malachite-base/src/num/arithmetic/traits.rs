@@ -464,6 +464,18 @@ pub trait LnAssign {
     fn ln_assign(&mut self);
 }
 
+/// Computes $\ln(1+x)$.
+pub trait Ln1PlusX {
+    type Output;
+
+    fn ln_1_plus_x(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ by $\ln(1+x)$.
+pub trait Ln1PlusXAssign {
+    fn ln_1_plus_x_assign(&mut self);
+}
+
 /// Calculates the LCM (least common multiple) of two numbers, returning `None` if the result is not
 /// representable.
 pub trait CheckedLcm<RHS = Self> {
