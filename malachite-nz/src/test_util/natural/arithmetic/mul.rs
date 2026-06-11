@@ -395,7 +395,7 @@ pub fn initialize_context() -> Context {
 impl FFTContext {
     fn serialize(self) -> SerializedFFTContext {
         let mut w2tab_backing = [0; 4096];
-        for (o, x) in w2tab_backing.iter_mut().zip(self.w2tab_backing.into_iter()) {
+        for (o, x) in w2tab_backing.iter_mut().zip(self.w2tab_backing) {
             *o = x.to_bits();
         }
         SerializedFFTContext {
@@ -431,7 +431,7 @@ impl Context {
         let mut vec_two_pow_tab_backing = [[0; 4]; 768];
         for (o, f) in vec_two_pow_tab_backing
             .iter_mut()
-            .zip(self.vec_two_pow_tab_backing.into_iter())
+            .zip(self.vec_two_pow_tab_backing)
         {
             let [f0, f1, f2, f3] = f.to_array();
             *o = [f0.to_bits(), f1.to_bits(), f2.to_bits(), f3.to_bits()];
@@ -439,7 +439,7 @@ impl Context {
         let mut slow_two_pow_backing = [0; 1 << 11];
         for (o, x) in slow_two_pow_backing
             .iter_mut()
-            .zip(self.slow_two_pow_backing.into_iter())
+            .zip(self.slow_two_pow_backing)
         {
             *o = x.to_bits();
         }

@@ -32,9 +32,9 @@ pub(crate) const AORSMUL_FASTER_3AORSLSH: bool = true;
 pub(crate) const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
 pub(crate) const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
-pub(crate) const MUL_TOOM22_THRESHOLD: usize = 20;
-pub(crate) const MUL_TOOM33_THRESHOLD: usize = 39;
-pub(crate) const MUL_TOOM44_THRESHOLD: usize = 340; // unclear when 44 is better than 33
+pub(crate) const MUL_TOOM22_THRESHOLD: usize = 16;
+pub(crate) const MUL_TOOM33_THRESHOLD: usize = 105;
+pub(crate) const MUL_TOOM44_THRESHOLD: usize = 315; // unclear when 44 is better than 33
 pub(crate) const MUL_TOOM6H_THRESHOLD: usize = 345;
 pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 640;
 

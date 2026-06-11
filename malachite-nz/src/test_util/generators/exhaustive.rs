@@ -3648,7 +3648,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_48() -> It<(Vec<Limb>, Vec<Limb>, 
             if *new_n.last().unwrap() == 0 {
                 new_n.pop();
             }
-            if q.len() + d.len() >= new_n.len() + 1 {
+            if q.len() + d.len() > new_n.len() {
                 Some((q, new_n, d))
             } else {
                 None

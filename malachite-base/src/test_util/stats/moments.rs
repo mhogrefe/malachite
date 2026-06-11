@@ -135,12 +135,10 @@ pub fn mean<I: Iterator>(xs: I) -> NiceFloat<f64>
 where
     I::Item: CheckedToF64,
 {
-    let mut n: usize = 1;
     let mut m = 0.0;
-    for x in xs {
+    for (n, x) in (1..).zip(xs) {
         let d_n = (x.checked_to_f64() - m) / n.checked_to_f64();
         m += d_n;
-        n += 1;
     }
     NiceFloat(m)
 }

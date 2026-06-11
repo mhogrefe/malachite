@@ -105,6 +105,20 @@ where
         median_durations_maps.push(median_durations_map);
     }
 
+    // In addition to the gnuplot file, write the measured data as TSV (series, size, time-in-ns) so
+    // that tooling can consume benchmark results. The .gp file alone doesn't suffice: its data
+    // series are sidecar temp files that vanish when this process exits.
+    let mut tsv = String::from("series\tsize\ttime_ns\n");
+    for (median_durations_map, series) in median_durations_maps
+        .iter()
+        .zip(options.series_options.iter())
+    {
+        for (size, duration) in median_durations_map {
+            tsv.push_str(&format!("{}\t{size}\t{duration}\n", series.name));
+        }
+    }
+    std::fs::write(format!("{}.tsv", options.file_name), tsv).ok();
+
     let mut fg = Figure::new();
     {
         let axes = fg.axes2d();

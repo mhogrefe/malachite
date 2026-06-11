@@ -1806,10 +1806,8 @@ pub fn fixed_length_ordered_unique_indices_helper(
         i -= 1;
         expected_j -= 1;
     }
-    let mut j = indices[i] + 1;
-    for index in &mut indices[i..] {
+    for (j, index) in (indices[i] + 1..).zip(indices[i..].iter_mut()) {
         *index = j;
-        j += 1;
     }
     false
 }

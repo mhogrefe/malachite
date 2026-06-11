@@ -94,16 +94,10 @@ fn benchmark_u8_factor_algorithms(gm: GenMode, config: &GenConfig, limit: usize,
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let fs = u.factor();
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(u.factor());
             }),
             ("naive", &mut |u| {
-                let fs = factor_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(factor_naive(u));
             }),
         ],
     );
@@ -120,16 +114,10 @@ fn benchmark_u16_factor_algorithms(gm: GenMode, config: &GenConfig, limit: usize
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let fs = u.factor();
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(u.factor());
             }),
             ("naive", &mut |u| {
-                let fs = factor_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(factor_naive(u));
             }),
         ],
     );
@@ -145,10 +133,7 @@ fn benchmark_u32_factor(gm: GenMode, config: &GenConfig, limit: usize, file_name
         file_name,
         &primitive_int_direct_bucketer(),
         &mut [("Malachite", &mut |u| {
-            let fs = u.factor();
-            unsafe {
-                std::ptr::read_volatile(&fs);
-            }
+            std::hint::black_box(u.factor());
         })],
     );
 }
@@ -164,16 +149,10 @@ fn benchmark_u32_factor_algorithms(gm: GenMode, config: &GenConfig, limit: usize
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let fs = u.factor();
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(u.factor());
             }),
             ("naive", &mut |u| {
-                let fs = factor_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(factor_naive(u));
             }),
         ],
     );
@@ -189,10 +168,7 @@ fn benchmark_u64_factor(gm: GenMode, config: &GenConfig, limit: usize, file_name
         file_name,
         &primitive_int_direct_bucketer(),
         &mut [("Malachite", &mut |u| {
-            let fs = u.factor();
-            unsafe {
-                std::ptr::read_volatile(&fs);
-            }
+            std::hint::black_box(u.factor());
         })],
     );
 }
@@ -208,16 +184,10 @@ fn benchmark_u64_factor_algorithms(gm: GenMode, config: &GenConfig, limit: usize
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let fs = u.factor();
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(u.factor());
             }),
             ("naive", &mut |u| {
-                let fs = factor_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(factor_naive(u));
             }),
         ],
     );
@@ -239,16 +209,10 @@ fn benchmark_usize_factor_algorithms(
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let fs = u.factor();
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(u.factor());
             }),
             ("naive", &mut |u| {
-                let fs = factor_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&fs);
-                }
+                std::hint::black_box(factor_naive(u));
             }),
         ],
     );

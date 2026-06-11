@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 #![cfg_attr(not(any(feature = "random", feature = "std")), no_std)]
+#![forbid(unsafe_code)]
 
 /// This module contains various functions that support the other crates. This includes many
 /// numeric traits and their implementation for primitive numeric types, as well as many functions

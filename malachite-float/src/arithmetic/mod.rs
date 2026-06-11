@@ -25,10 +25,6 @@ pub mod is_power_of_2;
 /// [`LnAssign`](malachite_base::num::arithmetic::traits::LnAssign), traits for computing the
 /// natural logarithm of [`Float`](super::Float)s.
 pub mod ln;
-/// [`Ln1PlusX`](malachite_base::num::arithmetic::traits::Ln1PlusX) and
-/// [`Ln1PlusXAssign`](malachite_base::num::arithmetic::traits::Ln1PlusXAssign), traits for
-/// computing the function $x\mapsto\ln(1+x)$.
-pub mod ln_1_plus_x;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod mul;

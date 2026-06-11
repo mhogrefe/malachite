@@ -40,12 +40,22 @@ pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if delete_count >= xs.len() {
         Vec::new()
     } else {
-        let mut out = xs[delete_count..].to_vec();
         let small_bits = bits & Limb::WIDTH_MASK;
-        if small_bits != 0 {
-            limbs_slice_shr_in_place(&mut out, small_bits);
+        let src = &xs[delete_count..];
+        if small_bits == 0 {
+            src.to_vec()
+        } else {
+            // Writing each limb exactly once via extend is faster than copying and then shifting in
+            // place (one pass instead of two).
+            let cobits = Limb::WIDTH - small_bits;
+            let mut out = Vec::with_capacity(src.len());
+            out.extend(
+                src.windows(2)
+                    .map(|w| (w[0] >> small_bits) | (w[1] << cobits)),
+            );
+            out.push(src[src.len() - 1] >> small_bits);
+            out
         }
-        out
     }
 }}
 
@@ -74,15 +84,14 @@ pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= len);
     let cobits = Limb::WIDTH - bits;
-    let (xs_head, xs_tail) = xs.split_first().unwrap();
-    let remaining_bits = xs_head << cobits;
-    let mut previous_x = xs_head >> bits;
-    let (out_last, out_init) = out[..len].split_last_mut().unwrap();
-    for (out, x) in out_init.iter_mut().zip(xs_tail.iter()) {
-        *out = previous_x | (x << cobits);
-        previous_x = x >> bits;
+    // Windows form: each output limb depends only on two adjacent input limbs, so iterations are
+    // independent (no loop-carried value) and LLVM auto-vectorizes (see the analogous
+    // limbs_shl_to_out).
+    let remaining_bits = xs[0] << cobits;
+    for (o, w) in out[..len - 1].iter_mut().zip(xs.windows(2)) {
+        *o = (w[0] >> bits) | (w[1] << cobits);
     }
-    *out_last = previous_x;
+    out[len - 1] = xs[len - 1] >> bits;
     remaining_bits
 }}
 
@@ -108,15 +117,13 @@ pub_crate_test! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bi
     let len = xs.len();
     assert_ne!(len, 0);
     let cobits = T::WIDTH - bits;
-    let mut x = xs[0];
-    let remaining_bits = x << cobits;
-    let mut previous_x = x >> bits;
-    for i in 1..len {
-        x = xs[i];
-        xs[i - 1] = previous_x | (x << cobits);
-        previous_x = x >> bits;
+    // In-place windows form, ascending so that each limb is read before it is overwritten;
+    // iterations are independent (no loop-carried value), letting LLVM auto-vectorize.
+    let remaining_bits = xs[0] << cobits;
+    for i in 0..len - 1 {
+        xs[i] = (xs[i] >> bits) | (xs[i + 1] << cobits);
     }
-    *xs.last_mut().unwrap() = previous_x;
+    xs[len - 1] >>= bits;
     remaining_bits
 }}
 
@@ -138,9 +145,22 @@ pub_crate_test! {limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
         xs.clear();
     } else {
         let small_shift = bits & Limb::WIDTH_MASK;
-        vec_delete_left(xs, delete_count);
-        if small_shift != 0 {
-            limbs_slice_shr_in_place(xs, small_shift);
+        if small_shift == 0 {
+            vec_delete_left(xs, delete_count);
+        } else {
+            // A single ascending pass both shifts and translates by delete_count, rather than
+            // deleting the low limbs (a full memmove) and then making a second pass to shift.
+            // Ascending order ensures every limb is read before it is overwritten, and iterations
+            // are independent, letting LLVM auto-vectorize.
+            let old_len = xs.len();
+            let new_len = old_len - delete_count;
+            let cobits = Limb::WIDTH - small_shift;
+            for i in 0..new_len - 1 {
+                xs[i] = (xs[i + delete_count] >> small_shift)
+                    | (xs[i + delete_count + 1] << cobits);
+            }
+            xs[new_len - 1] = xs[old_len - 1] >> small_shift;
+            xs.truncate(new_len);
         }
     }
 }}

@@ -132,10 +132,7 @@ fn benchmark_u32_is_prime(gm: GenMode, config: &GenConfig, limit: usize, file_na
         file_name,
         &primitive_int_direct_bucketer(),
         &mut [("Malachite", &mut |u| {
-            let b = u.is_prime();
-            unsafe {
-                std::ptr::read_volatile(&b);
-            }
+            std::hint::black_box(u.is_prime());
         })],
     );
 }
@@ -156,16 +153,10 @@ fn benchmark_u32_is_prime_algorithms(
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let b = u.is_prime();
-                unsafe {
-                    std::ptr::read_volatile(&b);
-                }
+                std::hint::black_box(u.is_prime());
             }),
             ("naive", &mut |u| {
-                let b = is_prime_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&b);
-                }
+                std::hint::black_box(is_prime_naive(u));
             }),
         ],
     );
@@ -181,10 +172,7 @@ fn benchmark_u64_is_prime(gm: GenMode, config: &GenConfig, limit: usize, file_na
         file_name,
         &primitive_int_direct_bucketer(),
         &mut [("Malachite", &mut |u| {
-            let b = u.is_prime();
-            unsafe {
-                std::ptr::read_volatile(&b);
-            }
+            std::hint::black_box(u.is_prime());
         })],
     );
 }
@@ -205,16 +193,10 @@ fn benchmark_u64_is_prime_algorithms(
         &primitive_int_direct_bucketer(),
         &mut [
             ("default", &mut |u| {
-                let b = u.is_prime();
-                unsafe {
-                    std::ptr::read_volatile(&b);
-                }
+                std::hint::black_box(u.is_prime());
             }),
             ("naive", &mut |u| {
-                let b = is_prime_naive(u);
-                unsafe {
-                    std::ptr::read_volatile(&b);
-                }
+                std::hint::black_box(is_prime_naive(u));
             }),
         ],
     );

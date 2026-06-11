@@ -193,11 +193,9 @@ fn get_referenced_items_for_constant(
                     assert_ne!(brace_index, 0);
                     brace_index -= 1;
                 }
-                ';' => {
-                    if brace_index == 0 {
-                        done = true;
-                        break;
-                    }
+                ';' if brace_index == 0 => {
+                    done = true;
+                    break;
                 }
                 _ => {}
             }

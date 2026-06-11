@@ -114,6 +114,7 @@
 //! - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
 //!   takes a long time to build. Enabling this feature also enables `test_build`.
 
+#![cfg_attr(not(feature = "enable_pyo3"), forbid(unsafe_code))]
 #![allow(
     unstable_name_collisions,
     clippy::assertions_on_constants,

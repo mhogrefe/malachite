@@ -9,3 +9,7 @@ src/integer_old.rs
 */.history/*
 
 .direnv/
+
+# Local performance lab: machine-specific paths and benchmark results
+perf/
+CLAUDE.md

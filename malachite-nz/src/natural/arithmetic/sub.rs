@@ -107,12 +107,15 @@ pub_crate_test! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut
     y != T::ZERO
 }}
 
+// A subtract-with-borrow with a `bool` borrow. Written with `overflowing_sub` so that LLVM
+// recognizes the subtract-with-borrow idiom; in the unrolled kernels below this compiles to
+// flag-chained subtracts rather than rematerializing the borrow in a register every limb (see the
+// analogous `add_with_carry` in add.rs and perf/README.md).
 #[inline]
-pub(crate) fn sub_with_carry(x: Limb, y: Limb, carry: Limb) -> (Limb, Limb) {
-    let result_no_carry = x.wrapping_sub(y);
-    let result = result_no_carry.wrapping_sub(carry);
-    let carry = Limb::from((result_no_carry > x) || (result > result_no_carry));
-    (result, carry)
+pub(crate) fn sub_with_borrow(x: Limb, y: Limb, borrow: bool) -> (Limb, bool) {
+    let (diff, borrow_1) = x.overflowing_sub(y);
+    let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+    (diff, borrow_1 | borrow_2)
 }
 
 // Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
@@ -135,16 +138,12 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let mut out = Vec::with_capacity(xs_len);
-    let mut carry = 0;
-    for (&x, &y) in xs.iter().zip(ys.iter()) {
-        let o;
-        (o, carry) = sub_with_carry(x, y, carry);
-        out.push(o);
-    }
-    let mut borrow = carry != 0;
+    // Filling a zeroed Vec and using the unrolled same-length kernel is faster than pushing one
+    // limb at a time.
+    let mut out = vec![0; xs_len];
+    let mut borrow = limbs_sub_same_length_to_out(&mut out, &xs[..ys_len], ys);
     if xs_len != ys_len {
-        out.extend_from_slice(&xs[ys_len..]);
+        out[ys_len..].copy_from_slice(&xs[ys_len..]);
         if borrow {
             borrow = limbs_sub_limb_in_place(&mut out[ys_len..], 1);
         }
@@ -170,16 +169,7 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
-    let len = xs.len();
-    assert_eq!(len, ys.len());
-    assert!(out.len() >= len);
-    let mut carry = 0;
-
-    for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
-        (*out, carry) = sub_with_carry(x, y, carry);
-    }
-
-    carry > 0
+    limbs_sub_same_length_with_borrow_in_to_out(out, xs, ys, false)
 }}
 
 // Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
@@ -233,14 +223,7 @@ pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input.
 pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
-    assert_eq!(xs.len(), ys.len());
-    let mut carry = 0;
-
-    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        (*x, carry) = sub_with_carry(*x, y, carry);
-    }
-
-    carry > 0
+    limbs_sub_same_length_with_borrow_in_in_place_left(xs, ys, false)
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
@@ -292,14 +275,7 @@ pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // second input.
 pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
-    assert_eq!(xs.len(), ys.len());
-    let mut carry = 0;
-
-    for (&x, y) in xs.iter().zip(ys.iter_mut()) {
-        (*y, carry) = sub_with_carry(x, *y, carry);
-    }
-
-    carry > 0
+    limbs_sub_same_length_with_borrow_in_in_place_right(xs, ys, false)
 }}
 
 // Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s whose
@@ -393,11 +369,19 @@ pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
     right_start: usize
 ) -> bool {
     let len = xs.len() - right_start;
-    let mut carry = 0;
-    for i in 0..len {
-        (xs[i], carry) = sub_with_carry(xs[i], xs[i + right_start], carry);
+    if right_start >= len {
+        // The read and write ranges are disjoint, so the unrolled kernel can be used.
+        let (xs_lo, xs_hi) = xs.split_at_mut(right_start);
+        limbs_sub_same_length_in_place_left(&mut xs_lo[..len], &xs_hi[..len])
+    } else {
+        // The ranges overlap. Each read at i + right_start happens before the write at that index,
+        // so reading and writing in ascending order is correct.
+        let mut borrow = false;
+        for i in 0..len {
+            (xs[i], borrow) = sub_with_borrow(xs[i], xs[i + right_start], borrow);
+        }
+        borrow
     }
-    carry != 0
 }}
 
 // Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
@@ -424,11 +408,19 @@ pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: 
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     let right_start = xs_len - ys_len;
-    let mut carry = 0;
-    for i in 0..ys_len {
-        (xs[i], carry) = sub_with_carry(xs[i + right_start], ys[i], carry);
+    if right_start >= ys_len {
+        // The read and write ranges are disjoint, so the unrolled kernel can be used.
+        let (xs_lo, xs_hi) = xs.split_at_mut(right_start);
+        limbs_sub_same_length_to_out(xs_lo, xs_hi, ys)
+    } else {
+        // The ranges overlap. Each read at i + right_start happens before the write at that index,
+        // so reading and writing in ascending order is correct.
+        let mut borrow = false;
+        for i in 0..ys_len {
+            (xs[i], borrow) = sub_with_borrow(xs[i + right_start], ys[i], borrow);
+        }
+        borrow
     }
-    carry != 0
 }}
 
 // Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -454,9 +446,26 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_to_out(
     ys: &[Limb],
     borrow_in: bool,
 ) -> bool {
-    let mut borrow = limbs_sub_same_length_to_out(out, xs, ys);
-    if borrow_in {
-        borrow |= limbs_sub_limb_in_place(&mut out[..xs.len()], 1);
+    let len = xs.len();
+    assert_eq!(len, ys.len());
+    assert!(out.len() >= len);
+    let mut borrow = borrow_in;
+    // 4x-unrolled so that LLVM chains the borrows in flags within each block.
+    let mut out_chunks = out[..len].chunks_exact_mut(4);
+    let mut xs_chunks = xs.chunks_exact(4);
+    let mut ys_chunks = ys.chunks_exact(4);
+    for ((o, x), y) in (&mut out_chunks).zip(&mut xs_chunks).zip(&mut ys_chunks) {
+        for i in 0..4 {
+            (o[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
+        }
+    }
+    for ((o, &x), &y) in out_chunks
+        .into_remainder()
+        .iter_mut()
+        .zip(xs_chunks.remainder().iter())
+        .zip(ys_chunks.remainder().iter())
+    {
+        (*o, borrow) = sub_with_borrow(x, y, borrow);
     }
     borrow
 }}
@@ -482,9 +491,22 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_left(
     ys: &[Limb],
     borrow_in: bool,
 ) -> bool {
-    let mut borrow = limbs_sub_same_length_in_place_left(xs, ys);
-    if borrow_in {
-        borrow |= limbs_sub_limb_in_place(xs, 1);
+    assert_eq!(xs.len(), ys.len());
+    let mut borrow = borrow_in;
+    // 4x-unrolled so that LLVM chains the borrows in flags within each block.
+    let mut xs_chunks = xs.chunks_exact_mut(4);
+    let mut ys_chunks = ys.chunks_exact(4);
+    for (x, y) in (&mut xs_chunks).zip(&mut ys_chunks) {
+        for i in 0..4 {
+            (x[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
+        }
+    }
+    for (x, &y) in xs_chunks
+        .into_remainder()
+        .iter_mut()
+        .zip(ys_chunks.remainder().iter())
+    {
+        (*x, borrow) = sub_with_borrow(*x, y, borrow);
     }
     borrow
 }}
@@ -510,9 +532,22 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_right(
     ys: &mut [Limb],
     borrow_in: bool,
 ) -> bool {
-    let mut borrow = limbs_sub_same_length_in_place_right(xs, ys);
-    if borrow_in {
-        borrow |= limbs_sub_limb_in_place(ys, 1);
+    assert_eq!(xs.len(), ys.len());
+    let mut borrow = borrow_in;
+    // 4x-unrolled so that LLVM chains the borrows in flags within each block.
+    let mut xs_chunks = xs.chunks_exact(4);
+    let mut ys_chunks = ys.chunks_exact_mut(4);
+    for (x, y) in (&mut xs_chunks).zip(&mut ys_chunks) {
+        for i in 0..4 {
+            (y[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
+        }
+    }
+    for (&x, y) in xs_chunks
+        .remainder()
+        .iter()
+        .zip(ys_chunks.into_remainder().iter_mut())
+    {
+        (*y, borrow) = sub_with_borrow(x, *y, borrow);
     }
     borrow
 }}

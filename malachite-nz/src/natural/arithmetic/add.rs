@@ -135,12 +135,25 @@ pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     }
 }}
 
+// Only used by mul/fft.rs under `32_bit_limbs`; new code should prefer `add_with_carry` below.
+#[cfg(feature = "32_bit_limbs")]
 #[inline]
 pub(crate) fn add_with_carry_limb<T: PrimitiveUnsigned>(x: T, y: T, carry: T) -> (T, T) {
     let result_no_carry = x.wrapping_add(y);
     let result = result_no_carry.wrapping_add(carry);
     let carry = T::from((result_no_carry < x) || (result < result_no_carry));
     (result, carry)
+}
+
+// An add-with-carry with a `bool` carry. Written with `overflowing_add` so that LLVM recognizes the
+// add-with-carry idiom; in the unrolled kernels below this compiles to flag-chained adds rather
+// than rematerializing the carry in a register every limb, which measured 2.3-2.5x faster on
+// aarch64 (see perf/README.md).
+#[inline]
+pub(crate) fn add_with_carry<T: PrimitiveUnsigned>(x: T, y: T, carry: bool) -> (T, bool) {
+    let (sum, carry_1) = x.overflowing_add(y);
+    let (sum, carry_2) = sum.overflowing_add(if carry { T::ONE } else { T::ZERO });
+    (sum, carry_1 | carry_2)
 }
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
@@ -166,22 +179,18 @@ pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let mut out = Vec::with_capacity(xs_len);
-    let mut carry = 0;
-    for (&x, &y) in xs.iter().zip(ys.iter()) {
-        let o;
-        (o, carry) = add_with_carry_limb(x, y, carry);
-        out.push(o);
+    // Filling a zeroed Vec and using the unrolled same-length kernel is faster than pushing one
+    // limb at a time.
+    let mut out = vec![0; xs_len];
+    let mut carry = limbs_add_same_length_to_out(&mut out, &xs[..ys_len], ys);
+    if xs_len != ys_len {
+        out[ys_len..].copy_from_slice(&xs[ys_len..]);
+        if carry {
+            carry = limbs_slice_add_limb_in_place(&mut out[ys_len..], 1);
+        }
     }
-    if xs_len == ys_len {
-        if carry != 0 {
-            out.push(1);
-        }
-    } else {
-        out.extend_from_slice(&xs[ys_len..]);
-        if carry != 0 && limbs_slice_add_limb_in_place(&mut out[ys_len..], 1) {
-            out.push(1);
-        }
+    if carry {
+        out.push(1);
     }
     out
 }}
@@ -225,11 +234,25 @@ pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    let mut carry = 0;
-    for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
-        (*out, carry) = add_with_carry_limb(x, y, carry);
+    let mut carry = false;
+    // 4x-unrolled so that LLVM chains the carries in flags within each block.
+    let mut out_chunks = out[..len].chunks_exact_mut(4);
+    let mut xs_chunks = xs.chunks_exact(4);
+    let mut ys_chunks = ys.chunks_exact(4);
+    for ((o, x), y) in (&mut out_chunks).zip(&mut xs_chunks).zip(&mut ys_chunks) {
+        for i in 0..4 {
+            (o[i], carry) = add_with_carry(x[i], y[i], carry);
+        }
     }
-    carry != 0
+    for ((o, &x), &y) in out_chunks
+        .into_remainder()
+        .iter_mut()
+        .zip(xs_chunks.remainder().iter())
+        .zip(ys_chunks.remainder().iter())
+    {
+        (*o, carry) = add_with_carry(x, y, carry);
+    }
+    carry
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
@@ -325,11 +348,19 @@ pub_crate_test! {
     limbs_add_to_out_aliased_2(xs: &mut [Limb], xs_offset: usize, ys: &[Limb]) -> bool {
     let len = ys.len();
     assert_eq!(xs.len(), len + xs_offset);
-    let mut carry = 0;
-    for i in 0..len {
-        (xs[i], carry) = add_with_carry_limb(xs[i + xs_offset], ys[i], carry);
+    if xs_offset >= len {
+        // The read and write ranges are disjoint, so the unrolled kernel can be used.
+        let (xs_lo, xs_hi) = xs.split_at_mut(xs_offset);
+        limbs_add_same_length_to_out(&mut xs_lo[..len], xs_hi, ys)
+    } else {
+        // The ranges overlap. Each read at i + xs_offset happens before the write at that index, so
+        // reading and writing in ascending order is correct.
+        let mut carry = false;
+        for i in 0..len {
+            (xs[i], carry) = add_with_carry(xs[i + xs_offset], ys[i], carry);
+        }
+        carry
     }
-    carry != 0
 }}
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -354,11 +385,23 @@ pub_crate_test! {limbs_slice_add_same_length_in_place_left<T: PrimitiveUnsigned>
 ) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
-    let mut carry = T::ZERO;
-    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        (*x, carry) = add_with_carry_limb(*x, y, carry);
+    let mut carry = false;
+    // 4x-unrolled so that LLVM chains the carries in flags within each block.
+    let mut xs_chunks = xs.chunks_exact_mut(4);
+    let mut ys_chunks = ys.chunks_exact(4);
+    for (x, y) in (&mut xs_chunks).zip(&mut ys_chunks) {
+        for i in 0..4 {
+            (x[i], carry) = add_with_carry(x[i], y[i], carry);
+        }
     }
-    carry != T::ZERO
+    for (x, &y) in xs_chunks
+        .into_remainder()
+        .iter_mut()
+        .zip(ys_chunks.remainder().iter())
+    {
+        (*x, carry) = add_with_carry(*x, y, carry);
+    }
+    carry
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the

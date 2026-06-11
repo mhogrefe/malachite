@@ -112,7 +112,13 @@ fn main() {
         match codegen_key.as_str() {
             "digits_data" => generate_string_data(),
             "factorial_data" => generate_factorial_data(),
-            _ => panic!("Invalid codegen key: {codegen_key}"),
+            key => {
+                if let Some(tune_key) = key.strip_prefix("tune_") {
+                    crate::bin_util::tune::tune(tune_key);
+                } else {
+                    panic!("Invalid codegen key: {codegen_key}");
+                }
+            }
         }
     }
 }
@@ -124,4 +130,5 @@ const fn main() {}
 pub mod bin_util {
     pub mod demo_and_bench;
     pub mod generate;
+    pub mod tune;
 }

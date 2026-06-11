@@ -5887,7 +5887,7 @@ pub fn random_unsigned_vec_triple_gen_var_7(
             if *new_n.last().unwrap() == 0 {
                 new_n.pop();
             }
-            if q.len() + d.len() >= new_n.len() + 1 {
+            if q.len() + d.len() > new_n.len() {
                 Some((q, new_n, d))
             } else {
                 None

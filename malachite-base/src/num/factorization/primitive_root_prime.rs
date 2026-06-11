@@ -32,7 +32,7 @@ where
     // compute (p - 1) / factors once and for all
     let mut exponents = [T::ZERO; N];
     let pm1 = p - T::ONE;
-    for (e, (pf, _)) in exponents.iter_mut().zip((p - T::ONE).factor().into_iter()) {
+    for (e, (pf, _)) in exponents.iter_mut().zip((p - T::ONE).factor()) {
         *e = pm1 / pf;
     }
     // try 2, 3, ..., p - 1

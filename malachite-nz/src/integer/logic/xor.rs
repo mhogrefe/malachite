@@ -607,13 +607,11 @@ pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
                 }
             }
         }
-        Greater => {
-            if !boundary_seen {
+        Greater if !boundary_seen => {
                 for x in &mut xs[ys_len..] {
                     *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_seen);
                 }
             }
-        }
         _ => {}
     }
     if slice_test_zero(xs) {
