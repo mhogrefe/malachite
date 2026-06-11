@@ -512,6 +512,338 @@ fn tune_shl() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// div_mod_by_preinversion correction-step shootout. GMP's asm divrem_1 keeps the rare second
+// quotient correction off the critical path as a cold branch (~13 insns/limb); LLVM if-converts
+// Malachite's version into a long branchless csel chain (~22 insns/limb) on a loop that is
+// inherently serial. These variants test whether restructuring recovers the difference.
+
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_nz::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
+
+// MP_BASES_BIG_BASE_10 (10^19), private to the library; redeclared here for the shootout.
+const BIG_BASE_10: Limb = 0x8ac7230489e80000;
+
+// Variant B: GMP-shaped straight-line corrections (first adjustment unconditional on r > q_low,
+// second as plain if), letting LLVM choose the lowering.
+#[inline]
+fn div_mod_preinv_gmp_shape(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> (Limb, Limb) {
+    let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
+        .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
+        .split_in_half();
+    let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
+    if r > q_low {
+        q_high = q_high.wrapping_sub(1);
+        r = r.wrapping_add(d);
+    }
+    if r >= d {
+        q_high = q_high.wrapping_add(1);
+        r -= d;
+    }
+    (q_high, r)
+}
+
+#[cold]
+#[inline(never)]
+const fn divrem_second_fixup(q_high: Limb, r: Limb, d: Limb) -> (Limb, Limb) {
+    (q_high.wrapping_add(1), r - d)
+}
+
+// Variant C: like B, but the rare second correction is outlined into a cold function, forcing a
+// real branch and keeping the hot dependency chain short.
+#[inline]
+fn div_mod_preinv_cold_fixup(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> (Limb, Limb) {
+    let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
+        .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
+        .split_in_half();
+    let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
+    if r > q_low {
+        q_high = q_high.wrapping_sub(1);
+        r = r.wrapping_add(d);
+    }
+    if r >= d {
+        return divrem_second_fixup(q_high, r, d);
+    }
+    (q_high, r)
+}
+
+// Variant D: current's nested first adjustment (which beat the GMP shape) plus the cold-outlined
+// second correction.
+#[inline]
+fn div_mod_preinv_hybrid(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> (Limb, Limb) {
+    let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
+        .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
+        .split_in_half();
+    let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
+    if r > q_low {
+        let (r_plus_d, overflow) = r.overflowing_add(d);
+        if overflow {
+            q_high = q_high.wrapping_sub(1);
+            r = r_plus_d;
+        }
+    } else if r >= d {
+        return divrem_second_fixup(q_high, r, d);
+    }
+    (q_high, r)
+}
+
+#[inline(never)]
+fn divrem_loop_hybrid(qs: &mut [Limb], ns: &[Limb], d: Limb, d_inv: Limb) -> Limb {
+    let mut r = 0;
+    for (q, &n) in qs.iter_mut().zip(ns.iter()).rev() {
+        (*q, r) = div_mod_preinv_hybrid(r, n, d, d_inv);
+    }
+    r
+}
+
+#[inline(never)]
+fn divrem_loop_current(qs: &mut [Limb], ns: &[Limb], d: Limb, d_inv: Limb) -> Limb {
+    let mut r = 0;
+    for (q, &n) in qs.iter_mut().zip(ns.iter()).rev() {
+        (*q, r) = div_mod_by_preinversion(r, n, d, d_inv);
+    }
+    r
+}
+
+#[inline(never)]
+fn divrem_loop_gmp_shape(qs: &mut [Limb], ns: &[Limb], d: Limb, d_inv: Limb) -> Limb {
+    let mut r = 0;
+    for (q, &n) in qs.iter_mut().zip(ns.iter()).rev() {
+        (*q, r) = div_mod_preinv_gmp_shape(r, n, d, d_inv);
+    }
+    r
+}
+
+#[inline(never)]
+fn divrem_loop_cold_fixup(qs: &mut [Limb], ns: &[Limb], d: Limb, d_inv: Limb) -> Limb {
+    let mut r = 0;
+    for (q, &n) in qs.iter_mut().zip(ns.iter()).rev() {
+        (*q, r) = div_mod_preinv_cold_fixup(r, n, d, d_inv);
+    }
+    r
+}
+
+fn tune_divrem() {
+    type DivremFn = fn(&mut [Limb], &[Limb], Limb, Limb) -> Limb;
+    let variants: [(&str, DivremFn); 4] = [
+        ("current", divrem_loop_current),
+        ("gmp_shape", divrem_loop_gmp_shape),
+        ("cold_fixup", divrem_loop_cold_fixup),
+        ("hybrid", divrem_loop_hybrid),
+    ];
+    let d = BIG_BASE_10;
+    let d_inv = limbs_invert_limb::<DoubleLimb, Limb>(d);
+    // Correctness cross-check on many random inputs before timing.
+    for k in 0..200 {
+        let ns: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("dr{k}")))
+            .take(17)
+            .collect();
+        let mut q_ref = vec![0; 17];
+        let r_ref = variants[0].1(&mut q_ref, &ns, d, d_inv);
+        for (name, f) in &variants[1..] {
+            let mut q = vec![0; 17];
+            let r = f(&mut q, &ns, d, d_inv);
+            assert_eq!((q, r), (q_ref.clone(), r_ref), "variant {name} disagrees, seed {k}");
+        }
+    }
+    println!("all variants agree; timing (ns/call, ns/limb):");
+    for n in [16usize, 64, 256, 1024] {
+        println!("n = {n}:");
+        for (name, f) in &variants {
+            let inputs: Vec<Vec<Limb>> = (0..INPUT_SETS)
+                .map(|k| {
+                    random_primitive_ints(EXAMPLE_SEED.fork(&format!("dv{k}")))
+                        .take(n)
+                        .collect()
+                })
+                .collect();
+            let mut qs_a = vec![0; n];
+            let mut qs_b = vec![0; n];
+            for xs in &inputs {
+                divrem_loop_current(&mut qs_a, xs, d, d_inv);
+                f(&mut qs_b, xs, d, d_inv);
+            }
+            let (mut i, mut j) = (0usize, 0usize);
+            let (t_base, t) = interleaved_min_pair(
+                &mut || {
+                    let xs = &inputs[i & (INPUT_SETS - 1)];
+                    i += 1;
+                    black_box(divrem_loop_current(black_box(&mut qs_a), xs, d, d_inv));
+                },
+                &mut || {
+                    let xs = &inputs[j & (INPUT_SETS - 1)];
+                    j += 1;
+                    black_box(f(black_box(&mut qs_b), xs, d, d_inv));
+                },
+            );
+            println!(
+                "  {name:>12}: {t:>9.1} ns  {:>6.3} ns/limb  (vs current {:>5.2}x)",
+                t / n as f64,
+                t_base / t,
+            );
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// GET_STR_PRECOMPUTE_THRESHOLD: at what size does building a power table + divide-and-conquer
+// beat the O(n^2) basecase? The power-table construction is timed inside the candidate, since
+// the real dispatch pays it on every conversion.
+
+fn tune_get_str_precompute() {
+    use malachite_nz::natural::conversion::digits::general_digits::{
+        digits_in_base_per_limb_for_tuning, get_chars_per_limb, limbs_compute_power_table,
+        limbs_digits_power_table_scratch_len_for_tuning,
+        limbs_to_digits_small_base_basecase,
+        limbs_to_digits_small_base_divide_and_conquer_for_tuning,
+        limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning,
+    };
+    const BASE: u64 = 10;
+    // The basecase asserts xs_len < GET_STR_PRECOMPUTE_THRESHOLD (its stack buffers are sized by
+    // it), so the scan is capped just below the compiled-in value; lower the constant and rebuild
+    // to scan higher.
+    let max_size = malachite_nz::natural::conversion::digits::general_digits::
+        GET_STR_PRECOMPUTE_THRESHOLD - 1;
+    find_crossover(&Level {
+        threshold_name: "GET_STR_PRECOMPUTE_THRESHOLD",
+        min_size: 4,
+        max_size,
+        lower: Algo {
+            name: "basecase",
+            valid: &|_| true,
+            scratch_len: &|_| 0,
+            run: &|out_limbs, xs, _, _| {
+                // out is digit bytes; reuse the limb out buffer as raw space via a local. The
+                // basecase writes u8 digits; we keep a thread-local-free local buffer per call
+                // shape by transmuting sizes — simplest is a fixed buffer.
+                let mut digits = [0u8; 64 * 20];
+                let mut xs_copy = [0; 64];
+                let n = xs.len();
+                xs_copy[..n].copy_from_slice(xs);
+                black_box(limbs_to_digits_small_base_basecase(
+                    &mut digits[..n * 20],
+                    0,
+                    &xs_copy[..n],
+                    BASE,
+                ));
+                // Touch out_limbs so the Algo signature stays uniform.
+                black_box(&out_limbs[0]);
+            },
+        },
+        upper: Algo {
+            name: "powtab+dc",
+            valid: &|_| true,
+            scratch_len: &|_| 0,
+            run: &|out_limbs, xs, _, _| {
+                let n = xs.len();
+                let mut digits = [0u8; 64 * 20];
+                let mut xs_copy = [0; 64];
+                xs_copy[..n].copy_from_slice(xs);
+                let mut power_table_memory =
+                    vec![0; limbs_digits_power_table_scratch_len_for_tuning(n)];
+                let digits_len = digits_in_base_per_limb_for_tuning(n, BASE);
+                let len = 1 + usize::try_from(digits_len).unwrap() / get_chars_per_limb(BASE);
+                let (power_len, powers) =
+                    limbs_compute_power_table(&mut power_table_memory, len, BASE, None);
+                let mut scratch =
+                    vec![0; limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning(n)];
+                black_box(limbs_to_digits_small_base_divide_and_conquer_for_tuning(
+                    &mut digits[..n * 20],
+                    &mut xs_copy[..n],
+                    BASE,
+                    &powers,
+                    power_len,
+                    &mut scratch,
+                ));
+                black_box(&out_limbs[0]);
+            },
+        },
+    });
+}
+
+// Probe for GET_STR_DC_THRESHOLD grid search: times the full powtab+dc conversion at fixed
+// sizes. The DC threshold is a compiled-in constant controlling recursion leaf size, so the
+// driver (perf/tune.sh or a loop) rebuilds with each candidate value and compares these numbers.
+fn tune_get_str_dc_probe() {
+    use malachite_nz::natural::conversion::digits::general_digits::{
+        digits_in_base_per_limb_for_tuning, get_chars_per_limb, limbs_compute_power_table,
+        limbs_digits_power_table_scratch_len_for_tuning,
+        limbs_to_digits_small_base_divide_and_conquer_for_tuning,
+        limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning,
+    };
+    const BASE: u64 = 10;
+    for n in [32usize, 48, 63] {
+        let inputs: Vec<Vec<Limb>> = (0..INPUT_SETS)
+            .map(|k| {
+                random_primitive_ints(EXAMPLE_SEED.fork(&format!("g{k}")))
+                    .take(n)
+                    .collect()
+            })
+            .collect();
+        let mut run = |xs: &[Limb]| {
+            let mut digits = [0u8; 64 * 20];
+            let mut xs_copy = [0; 64];
+            xs_copy[..n].copy_from_slice(xs);
+            let mut power_table_memory =
+                vec![0; limbs_digits_power_table_scratch_len_for_tuning(n)];
+            let digits_len = digits_in_base_per_limb_for_tuning(n, BASE);
+            let len = 1 + usize::try_from(digits_len).unwrap() / get_chars_per_limb(BASE);
+            let (power_len, powers) =
+                limbs_compute_power_table(&mut power_table_memory, len, BASE, None);
+            let mut scratch =
+                vec![0; limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning(n)];
+            black_box(limbs_to_digits_small_base_divide_and_conquer_for_tuning(
+                &mut digits[..n * 20],
+                &mut xs_copy[..n],
+                BASE,
+                &powers,
+                power_len,
+                &mut scratch,
+            ));
+        };
+        // Control series: the basecase at a fixed size, which does not depend on
+        // GET_STR_DC_THRESHOLD. Reporting the ratio dc/control makes numbers comparable across
+        // rebuilds and runs, canceling out core-scheduling and frequency effects.
+        let control_inputs: Vec<Vec<Limb>> = (0..INPUT_SETS)
+            .map(|k| {
+                random_primitive_ints(EXAMPLE_SEED.fork(&format!("c{k}")))
+                    .take(20)
+                    .collect()
+            })
+            .collect();
+        let control = |xs: &[Limb]| {
+            use malachite_nz::natural::conversion::digits::general_digits::
+                limbs_to_digits_small_base_basecase;
+            let mut digits = [0u8; 20 * 20];
+            black_box(limbs_to_digits_small_base_basecase(&mut digits, 0, xs, BASE));
+        };
+        for xs in &inputs {
+            run(xs);
+        }
+        for xs in &control_inputs {
+            control(xs);
+        }
+        let mut i = 0usize;
+        let mut j = 0usize;
+        let (t, t_control) = interleaved_min_pair(
+            &mut || {
+                let xs = &inputs[i & (INPUT_SETS - 1)];
+                i += 1;
+                run(xs);
+            },
+            &mut || {
+                let xs = &control_inputs[j & (INPUT_SETS - 1)];
+                j += 1;
+                control(xs);
+            },
+        );
+        println!(
+            "dc_probe n={n}: {t:.1} ns, control {t_control:.1} ns, ratio {:.3}",
+            t / t_control
+        );
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
 // Allocating-shl shootout: does avoiding the vec![0; n] zero-init pass via Vec::extend pay off, or
 // does the iterator plumbing defeat vectorization / the TrustedLen specialization?
 
@@ -689,6 +1021,9 @@ pub fn tune(key: &str) {
         "add" => tune_add(),
         "shl" => tune_shl(),
         "shl_alloc" => tune_shl_alloc(),
+        "get_str_precompute" => tune_get_str_precompute(),
+        "get_str_dc_probe" => tune_get_str_dc_probe(),
+        "divrem" => tune_divrem(),
         "mul_toom22" => tune_mul_toom22(),
         "mul_toom33" => tune_mul_toom33(),
         "mul_toom44" => tune_mul_toom44(),

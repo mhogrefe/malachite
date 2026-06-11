@@ -53,12 +53,12 @@ use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zer
 // TODO tune
 const GET_STR_THRESHOLD_LIMIT: usize = 150;
 
-// TODO tune
+// The values live in the platform files so that they can be tuned per platform.
 #[cfg(feature = "test_build")]
-pub const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
+pub const GET_STR_PRECOMPUTE_THRESHOLD: usize = crate::platform::GET_STR_PRECOMPUTE_THRESHOLD;
 
 #[cfg(not(feature = "test_build"))]
-const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
+const GET_STR_PRECOMPUTE_THRESHOLD: usize = crate::platform::GET_STR_PRECOMPUTE_THRESHOLD;
 
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -676,8 +676,8 @@ pub_test! {limbs_compute_power_table(
     (power_len, powers)
 }}
 
-// TODO tune
-const GET_STR_DC_THRESHOLD: usize = 15;
+// The value lives in the platform files so that it can be tuned per platform.
+use crate::platform::GET_STR_DC_THRESHOLD;
 
 // Convert `xs` to a string with a base as represented in `powers`, and put the string in `out`.
 // Generate `len` characters, possibly padding with zeros to the left. If `len` is zero, generate as
@@ -769,6 +769,38 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
             ) + next_index
         }
     }
+}
+
+// Direct entry to the divide-and-conquer conversion plus its scratch sizing, exposed for the
+// threshold tuner (which needs to A/B the basecase against forced divide-and-conquer at sizes
+// where the normal dispatch would choose for itself).
+#[cfg(feature = "test_build")]
+pub fn limbs_to_digits_small_base_divide_and_conquer_for_tuning<T: PrimitiveUnsigned>(
+    out: &mut [T],
+    xs: &mut [Limb],
+    base: u64,
+    powers: &[PowerTableRow],
+    i: usize,
+    scratch: &mut [Limb],
+) -> usize {
+    limbs_to_digits_small_base_divide_and_conquer(out, 0, xs, base, powers, i, scratch)
+}
+
+#[cfg(feature = "test_build")]
+pub const fn limbs_digits_power_table_scratch_len_for_tuning(xs_len: usize) -> usize {
+    limbs_digits_power_table_scratch_len(xs_len)
+}
+
+#[cfg(feature = "test_build")]
+pub fn digits_in_base_per_limb_for_tuning(limb_count: usize, base: u64) -> u64 {
+    digits_in_base_per_limb(limb_count, base)
+}
+
+#[cfg(feature = "test_build")]
+pub const fn limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning(
+    xs_len: usize,
+) -> usize {
+    limbs_to_digits_small_base_divide_and_conquer_scratch_len(xs_len)
 }
 
 // # Worst-case complexity

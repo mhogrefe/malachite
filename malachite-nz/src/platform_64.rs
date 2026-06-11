@@ -45,6 +45,12 @@ pub(crate) const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
 
 pub(crate) const MUL_FFT_THRESHOLD: usize = 1500;
 
+// Binary-to-string conversion thresholds (see natural/conversion/digits/general_digits.rs).
+// TODO tune
+pub(crate) const GET_STR_DC_THRESHOLD: usize = 18;
+// TODO tune
+pub(crate) const GET_STR_PRECOMPUTE_THRESHOLD: usize = 26;
+
 pub(crate) const DC_DIV_QR_THRESHOLD: usize = 85;
 pub(crate) const DC_DIVAPPR_Q_THRESHOLD: usize = 211;
 pub(crate) const MAYBE_DCP1_DIVAPPR: bool = true;
