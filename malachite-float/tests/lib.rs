@@ -67,6 +67,7 @@ pub mod arithmetic {
     pub mod div;
     pub mod is_power_of_2;
     pub mod ln;
+    pub mod ln_1_plus_x;
     pub mod mul;
     pub mod neg;
     pub mod power_of_2;

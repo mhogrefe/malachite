@@ -642,7 +642,11 @@ fn tune_divrem() {
         for (name, f) in &variants[1..] {
             let mut q = vec![0; 17];
             let r = f(&mut q, &ns, d, d_inv);
-            assert_eq!((q, r), (q_ref.clone(), r_ref), "variant {name} disagrees, seed {k}");
+            assert_eq!(
+                (q, r),
+                (q_ref.clone(), r_ref),
+                "variant {name} disagrees, seed {k}"
+            );
         }
     }
     println!("all variants agree; timing (ns/call, ns/limb):");
@@ -692,8 +696,7 @@ fn tune_divrem() {
 fn tune_get_str_precompute() {
     use malachite_nz::natural::conversion::digits::general_digits::{
         digits_in_base_per_limb_for_tuning, get_chars_per_limb, limbs_compute_power_table,
-        limbs_digits_power_table_scratch_len_for_tuning,
-        limbs_to_digits_small_base_basecase,
+        limbs_digits_power_table_scratch_len_for_tuning, limbs_to_digits_small_base_basecase,
         limbs_to_digits_small_base_divide_and_conquer_for_tuning,
         limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning,
     };
@@ -701,8 +704,8 @@ fn tune_get_str_precompute() {
     // The basecase asserts xs_len < GET_STR_PRECOMPUTE_THRESHOLD (its stack buffers are sized by
     // it), so the scan is capped just below the compiled-in value; lower the constant and rebuild
     // to scan higher.
-    let max_size = malachite_nz::natural::conversion::digits::general_digits::
-        GET_STR_PRECOMPUTE_THRESHOLD - 1;
+    let max_size =
+        malachite_nz::natural::conversion::digits::general_digits::GET_STR_PRECOMPUTE_THRESHOLD - 1;
     find_crossover(&Level {
         threshold_name: "GET_STR_PRECOMPUTE_THRESHOLD",
         min_size: 4,
@@ -744,8 +747,10 @@ fn tune_get_str_precompute() {
                 let len = 1 + usize::try_from(digits_len).unwrap() / get_chars_per_limb(BASE);
                 let (power_len, powers) =
                     limbs_compute_power_table(&mut power_table_memory, len, BASE, None);
-                let mut scratch =
-                    vec![0; limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning(n)];
+                let mut scratch = vec![
+                        0;
+                        limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning(n)
+                    ];
                 black_box(limbs_to_digits_small_base_divide_and_conquer_for_tuning(
                     &mut digits[..n * 20],
                     &mut xs_copy[..n],
@@ -779,7 +784,7 @@ fn tune_get_str_dc_probe() {
                     .collect()
             })
             .collect();
-        let mut run = |xs: &[Limb]| {
+        let run = |xs: &[Limb]| {
             let mut digits = [0u8; 64 * 20];
             let mut xs_copy = [0; 64];
             xs_copy[..n].copy_from_slice(xs);
@@ -811,10 +816,14 @@ fn tune_get_str_dc_probe() {
             })
             .collect();
         let control = |xs: &[Limb]| {
-            use malachite_nz::natural::conversion::digits::general_digits::
-                limbs_to_digits_small_base_basecase;
+            use malachite_nz::natural::conversion::digits::general_digits::limbs_to_digits_small_base_basecase;
             let mut digits = [0u8; 20 * 20];
-            black_box(limbs_to_digits_small_base_basecase(&mut digits, 0, xs, BASE));
+            black_box(limbs_to_digits_small_base_basecase(
+                &mut digits,
+                0,
+                xs,
+                BASE,
+            ));
         };
         for xs in &inputs {
             run(xs);
