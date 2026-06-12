@@ -62,6 +62,10 @@ major improvement warrants re-porting.
   `ln`. Many Float functions also take Rational arguments (Rationals can't be losslessly converted
   to Float), but skip those when the function reduces trivially to an existing Rational entry
   point.
+- **Use the shorthand variants**: in algorithm bodies, `x.ln_prec_ref(p)` rather than
+  `x.ln_prec_round_ref(p, Nearest)` — `additional-lints.py` enforces this. Three contexts keep the
+  explicit form: the shorthand's own defining delegation, operator/assign trait impls (`fn add`,
+  `fn ln_assign`, ...), and doc examples demonstrating the `_prec_round*` function itself.
 - **Visibility macros**: `pub_test!`/`pub_crate_test!` make internals `pub` under `test_build` so
   tests, demos, and tuning code can call them. For tuner- or test-only entry points that don't fit
   the macros, add explicit `#[cfg(feature = "test_build")] pub fn ..._for_tuning` wrappers.

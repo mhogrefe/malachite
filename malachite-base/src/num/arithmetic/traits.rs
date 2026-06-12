@@ -530,6 +530,18 @@ pub trait CheckedLogBase2 {
     fn checked_log_base_2(self) -> Option<Self::Output>;
 }
 
+/// Calculates the base-2 logarithm of a number.
+pub trait LogBase2 {
+    type Output;
+
+    fn log_base_2(self) -> Self::Output;
+}
+
+/// Replaces a number with its base-2 logarithm.
+pub trait LogBase2Assign {
+    fn log_base_2_assign(&mut self);
+}
+
 /// Calculates the floor of the base-2 logarithm of a number.
 pub trait FloorLogBase2 {
     type Output;

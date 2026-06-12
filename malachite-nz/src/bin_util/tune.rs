@@ -38,6 +38,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_44_input_sizes_valid,
     limbs_mul_greater_to_out_toom_44_scratch_len,
 };
+use malachite_nz::natural::conversion::digits::general_digits::limbs_to_digits_small_base_basecase;
 use malachite_nz::platform::Limb;
 use std::hint::black_box;
 use std::time::Instant;
@@ -816,7 +817,6 @@ fn tune_get_str_dc_probe() {
             })
             .collect();
         let control = |xs: &[Limb]| {
-            use malachite_nz::natural::conversion::digits::general_digits::limbs_to_digits_small_base_basecase;
             let mut digits = [0u8; 20 * 20];
             black_box(limbs_to_digits_small_base_basecase(
                 &mut digits,
