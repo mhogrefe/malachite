@@ -36,22 +36,22 @@ fn ln_1_plus_x_small(x: &Float, prec: u64) -> (Float, u64) {
     assert!(x.get_exponent().unwrap() <= -1); // ensures |x| < 1/2
     // In the following, theta represents a value with |theta| <= 2^(1-prec) (might be a different
     // value each time).
-    let mut t = Float::from_float_prec_round_ref(x, prec, Nearest).0; // t = x * (1 + theta)
+    let mut t = Float::from_float_prec_ref(x, prec).0; // t = x * (1 + theta)
     let mut y = t.clone(); // exact
     let y_exp = y.get_exponent().unwrap();
     let mut i = 2u32;
     loop {
-        t = t.mul_prec_round_val_ref(x, prec, Nearest).0; // t = x^i * (1 + theta)^i
+        t = t.mul_prec_val_ref(x, prec).0; // t = x^i * (1 + theta)^i
         // u = x^i / i * (1 + theta)^(i + 1)
-        let u = t.div_prec_round_ref_val(Float::from(i), prec, Nearest).0;
+        let u = t.div_prec_ref_val(Float::from(i), prec).0;
         // |u| < ulp(y)
         if i64::from(u.get_exponent().unwrap()) <= i64::from(y_exp) - i64::exact_from(prec) {
             break;
         }
         y = if i.odd() {
-            y.add_prec_round(u, prec, Nearest).0 // error <= ulp(y)
+            y.add_prec(u, prec).0 // error <= ulp(y)
         } else {
-            y.sub_prec_round(u, prec, Nearest).0 // error <= ulp(y)
+            y.sub_prec(u, prec).0 // error <= ulp(y)
         };
         i += 1;
     }
@@ -113,7 +113,7 @@ fn ln_1_plus_x_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
             let (t, k_err) = ln_1_plus_x_small(x, working_prec);
             (t, working_prec - k_err)
         } else {
-            let (t, o) = x.add_prec_round_ref_val(Float::ONE, working_prec, Nearest); // 1 + x
+            let (t, o) = x.add_prec_ref_val(Float::ONE, working_prec); // 1 + x
             if o == Equal {
                 // t = 1 + x exactly, and the result is simply ln(t).
                 return t.ln_prec_round(prec, rm);
@@ -135,9 +135,9 @@ fn ln_1_plus_x_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
             } else if t.is_infinite() {
                 // 1 + x overflowed, so x >= 2^working_prec and ln(1+x) differs from ln(x) by ln(1 +
                 // 1/x) < 2^(1-MAX_EXPONENT), far less than an ulp; use ln(x).
-                x.ln_prec_round_ref(working_prec, Nearest).0
+                x.ln_prec_ref(working_prec).0
             } else {
-                t.ln_prec_round(working_prec, Nearest).0 // ln(1+x)
+                t.ln_prec(working_prec).0 // ln(1+x)
             };
             // The error is bounded by (1/2 + 2^(1-EXP(t))) * ulp(t) (cf algorithms.tex). If EXP(t)
             // >= 2, then error <= ulp(t). If EXP(t) <= 1, then error <= 2^(2-EXP(t)) * ulp(t).
@@ -942,7 +942,7 @@ impl Ln1PlusX for Float {
     #[inline]
     fn ln_1_plus_x(self) -> Self {
         let prec = self.significant_bits();
-        self.ln_1_plus_x_prec_round(prec, Nearest).0
+        self.ln_1_plus_x_prec(prec).0
     }
 }
 

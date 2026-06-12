@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     is_power_of_2::register(runner);
     ln::register(runner);
     ln_1_plus_x::register(runner);
+    log_base_2::register(runner);
     mul::register(runner);
     neg::register(runner);
     power_of_2::register(runner);
@@ -38,6 +39,7 @@ mod div;
 mod is_power_of_2;
 mod ln;
 mod ln_1_plus_x;
+mod log_base_2;
 mod mul;
 mod neg;
 mod power_of_2;
