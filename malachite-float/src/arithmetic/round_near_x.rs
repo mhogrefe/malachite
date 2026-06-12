@@ -76,15 +76,11 @@ pub_crate_test! {float_round_near_x(
     assert_ne!(rm, Exact, "Inexact float_round_near_x");
     let sign = if v > &0u32 { Greater } else { Less };
     let prec_v = v.get_prec().unwrap();
-    // First check if we can round. The test is more restrictive than necessary.
+    // First check if we can round. The test is more restrictive than necessary. (The C version
+    // calls the raw mpfr_round_p and adds 1 to the precision for Nearest itself;
+    // float_can_round is the MPFR_CAN_ROUND macro, which already does that internally.)
     if !(err > prec + 1
-        && (err > prec_v
-            || float_can_round(
-                v.significand_ref().unwrap(),
-                err,
-                prec + u64::from(rm == Nearest),
-                rm,
-            )))
+        && (err > prec_v || float_can_round(v.significand_ref().unwrap(), err, prec, rm)))
     {
         // If we can't round, the caller must compute the function the expensive way.
         return None;
