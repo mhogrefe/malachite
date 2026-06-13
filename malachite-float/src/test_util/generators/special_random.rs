@@ -24,15 +24,15 @@ use crate::test_util::generators::exhaustive::{
     from_primitive_float_prec_round_valid, integer_rounding_from_float_valid,
     ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
     ln_rational_prec_round_valid, ln_round_valid, log_base_2_prec_round_valid,
-    log_base_2_round_valid, mul_prec_round_valid, mul_rational_prec_round_valid,
-    mul_rational_round_valid, mul_round_valid, natural_rounding_from_float_valid,
-    rational_div_float_prec_round_valid, rational_div_float_round_valid,
-    reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
-    reciprocal_sqrt_rational_prec_round_valid, reciprocal_sqrt_round_valid, set_prec_round_valid,
-    shl_prec_round_valid, shl_round_valid, shr_prec_round_valid, shr_round_valid,
-    signed_rounding_from_float_valid, sqrt_prec_round_valid, sqrt_rational_prec_round_valid,
-    sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    log_base_2_rational_prec_round_valid, log_base_2_round_valid, mul_prec_round_valid,
+    mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
+    natural_rounding_from_float_valid, rational_div_float_prec_round_valid,
+    rational_div_float_round_valid, reciprocal_prec_round_valid, reciprocal_round_valid,
+    reciprocal_sqrt_prec_round_valid, reciprocal_sqrt_rational_prec_round_valid,
+    reciprocal_sqrt_round_valid, set_prec_round_valid, shl_prec_round_valid, shl_round_valid,
+    shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
+    sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
     unsigned_rounding_from_float_valid,
 };
 use crate::test_util::generators::random::{
@@ -6896,6 +6896,34 @@ pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_7(
             &random_rounding_modes,
         )
         .filter(|&(ref n, prec, rm)| ln_rational_prec_round_valid(n, prec, rm)),
+    )
+}
+
+pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_8(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| log_base_2_rational_prec_round_valid(n, prec, rm)),
     )
 }
 

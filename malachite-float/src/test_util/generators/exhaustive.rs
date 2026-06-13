@@ -19,7 +19,7 @@ use crate::{Float, significand_bits};
 use alloc::vec::IntoIter;
 use core::cmp::Ordering::*;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, Reciprocal, Square};
+use malachite_base::num::arithmetic::traits::{CheckedLogBase2, IsPowerOf2, Reciprocal, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -3570,6 +3570,25 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_6()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| ln_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+pub fn log_base_2_rational_prec_round_valid(x: &Rational, prec: u64, rm: RoundingMode) -> bool {
+    // `checked_log_base_2` panics for nonpositive arguments, so the order of these tests matters.
+    rm != Exact
+        || *x <= 0
+        || x.checked_log_base_2()
+            .is_some_and(|k| Float::from_signed_prec(k, prec).1 == Equal)
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_7()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| log_base_2_rational_prec_round_valid(n, prec, rm)),
     ))
 }
 

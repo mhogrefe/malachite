@@ -16,7 +16,7 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, IsPowerOf2, LogBase2, LogBase2Assign,
+    CeilingLogBase2, CheckedLogBase2, IsPowerOf2, LogBase2, LogBase2Assign, Sign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
@@ -24,6 +24,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // The computation of log_base_2(x) is done by log_base_2(x) = ln(x) / ln(2).
 //
@@ -48,6 +49,33 @@ fn log_base_2_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Floa
         // ln(x) / ln(2)
         let t = x
             .ln_prec_ref(working_prec)
+            .0
+            .div_prec(Float::ln_2_prec(working_prec).0, working_prec)
+            .0;
+        // Estimation of the error.
+        if float_can_round(t.significand_ref().unwrap(), working_prec - 3, prec, rm) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        // Increase the precision.
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// The computation of log_base_2(x) is done by log_base_2(x) = ln(x) / ln(2). `ln_rational_prec`
+// handles inputs whose magnitudes are outside the representable range of `Float`; the result of the
+// division has greater magnitude than the result of `ln_rational_prec`, but only by a factor of
+// 1/ln(2), so the division cannot overflow or underflow if the `ln` didn't.
+fn log_base_2_rational_prec_round_helper(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
+    let mut increment = Limb::WIDTH;
+    loop {
+        // ln(x) / ln(2)
+        let t = Float::ln_rational_prec_ref(x, working_prec)
             .0
             .div_prec(Float::ln_2_prec(working_prec).0, working_prec)
             .0;
@@ -776,6 +804,355 @@ impl Float {
     pub fn log_base_2_round_assign(&mut self, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();
         self.log_base_2_prec_round_assign(prec, rm)
+    }
+
+    /// Computes $\log_2 x$, where $x$ is a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded value is less than, equal to, or greater than the exact value. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The base-2 logarithm of any negative number is `NaN`.
+    ///
+    /// Inputs of any magnitude are handled, including [`Rational`]s whose magnitudes are too large
+    /// or too small to be representable as [`Float`]s.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \log_2 x+\varepsilon.
+    /// $$
+    /// - If $\log_2 x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\log_2 x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\log_2 x|\rfloor-p+1}$.
+    /// - If $\log_2 x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\log_2 x|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=-\infty$
+    /// - $f(x,p,m)=\text{NaN}$ for $x<0$
+    /// - $f(1,p,m)=0.0$, and the result is exact
+    /// - $f(2^k,p,m)=k$, rounded to precision $p$; the result is exact if and only if $k$ is
+    ///   representable with precision $p$. This includes negative powers of 2 like $1/4$, and
+    ///   powers of 2 whose exponents $k$ lie far outside the exponent range of [`Float`]; the
+    ///   result is just the integer $k$ as a [`Float`].
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::log_base_2_rational_prec`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision. (The result is exactly representable if and only if $x\leq 0$ or
+    /// $x$ is a power of 2 whose base-2 logarithm is representable with the given precision.)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(log.to_string(), "-0.72");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Nearest);
+    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(log.to_string(), "-0.736966");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Nearest);
+    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn log_base_2_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::log_base_2_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\log_2 x$, where $x$ is a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded value is less than, equal to, or greater than the exact value. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The base-2 logarithm of any negative number is `NaN`.
+    ///
+    /// Inputs of any magnitude are handled, including [`Rational`]s whose magnitudes are too large
+    /// or too small to be representable as [`Float`]s.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \log_2 x+\varepsilon.
+    /// $$
+    /// - If $\log_2 x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\log_2 x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\log_2 x|\rfloor-p+1}$.
+    /// - If $\log_2 x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\log_2 x|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=-\infty$
+    /// - $f(x,p,m)=\text{NaN}$ for $x<0$
+    /// - $f(1,p,m)=0.0$, and the result is exact
+    /// - $f(2^k,p,m)=k$, rounded to precision $p$; the result is exact if and only if $k$ is
+    ///   representable with precision $p$. This includes negative powers of 2 like $1/4$, and
+    ///   powers of 2 whose exponents $k$ lie far outside the exponent range of [`Float`]; the
+    ///   result is just the integer $k$ as a [`Float`].
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::log_base_2_rational_prec_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision. (The result is exactly representable if and only if $x\leq 0$ or
+    /// $x$ is a power of 2 whose base-2 logarithm is representable with the given precision.)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(log.to_string(), "-0.72");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(log.to_string(), "-0.736966");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn log_base_2_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match x.sign() {
+            Equal => return (float_negative_infinity!(), Equal),
+            Less => return (float_nan!(), Equal),
+            Greater => {}
+        }
+        // If x is 2^k, log_base_2(x) is exact (though possibly subject to rounding at the target
+        // precision).
+        if let Some(k) = x.checked_log_base_2() {
+            return Self::from_signed_prec_round(k, prec, rm);
+        }
+        // The result is never exactly representable for other inputs.
+        assert_ne!(rm, Exact, "Inexact log_base_2");
+        log_base_2_rational_prec_round_helper(x, prec, rm)
+    }
+
+    /// Computes $\log_2 x$, where $x$ is a [`Rational`], rounding the result to the nearest value
+    /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded value is
+    /// less than, equal to, or greater than the exact value. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The base-2 logarithm of any negative number is `NaN`.
+    ///
+    /// Inputs of any magnitude are handled, including [`Rational`]s whose magnitudes are too large
+    /// or too small to be representable as [`Float`]s.
+    ///
+    /// If the logarithm is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \log_2 x+\varepsilon.
+    /// $$
+    /// - If $\log_2 x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\log_2 x$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\log_2
+    ///   x|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=-\infty$
+    /// - $f(x,p)=\text{NaN}$ for $x<0$
+    /// - $f(1,p)=0.0$, and the result is exact
+    /// - $f(2^k,p)=k$, rounded to precision $p$; the result is exact if and only if $k$ is
+    ///   representable with precision $p$. This includes negative powers of 2 like $1/4$, and
+    ///   powers of 2 whose exponents $k$ lie far outside the exponent range of [`Float`]; the
+    ///   result is just the integer $k$ as a [`Float`].
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::log_base_2_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn log_base_2_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::log_base_2_rational_prec_round(x, prec, Nearest)
+    }
+
+    /// Computes $\log_2 x$, where $x$ is a [`Rational`], rounding the result to the nearest value
+    /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded value
+    /// is less than, equal to, or greater than the exact value. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The base-2 logarithm of any negative number is `NaN`.
+    ///
+    /// Inputs of any magnitude are handled, including [`Rational`]s whose magnitudes are too large
+    /// or too small to be representable as [`Float`]s.
+    ///
+    /// If the logarithm is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \log_2 x+\varepsilon.
+    /// $$
+    /// - If $\log_2 x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\log_2 x$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\log_2
+    ///   x|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=-\infty$
+    /// - $f(x,p)=\text{NaN}$ for $x<0$
+    /// - $f(1,p)=0.0$, and the result is exact
+    /// - $f(2^k,p)=k$, rounded to precision $p$; the result is exact if and only if $k$ is
+    ///   representable with precision $p$. This includes negative powers of 2 like $1/4$, and
+    ///   powers of 2 whose exponents $k$ lie far outside the exponent range of [`Float`]; the
+    ///   result is just the integer $k$ as a [`Float`].
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::log_base_2_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) = Float::log_base_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn log_base_2_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::log_base_2_rational_prec_round_ref(x, prec, Nearest)
     }
 }
 

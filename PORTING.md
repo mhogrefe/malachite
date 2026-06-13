@@ -106,8 +106,12 @@ major improvement warrants re-porting.
 
 - Run test suites with `--release` and a module filter; debug-profile property tests over many or
   large inputs are unusably slow (unit tests are fine in debug). The full suite takes hours.
-- Heavy builds and all benchmarks should respect the machine-wide bench lock (see CLAUDE.md /
-  `perf/bench-lock.sh` where present); concurrent timing runs contaminate each other.
+- **Always run extreme-input tests with `--release`** — this includes unit-test rows, not just
+  property tests. Extreme Rationals (e.g. `Rational::power_of_2(i64::from(Float::MAX_EXPONENT))`)
+  carry multi-megabyte numerators/denominators, and extreme Floats trigger high working
+  precisions; in debug mode these rows can stall a test run indefinitely.
+- Cap builds at `-j 4` (full parallelism has OOM'd the machine). Concurrent benchmarks contaminate
+  each other's timings, so give the user a heads-up before benchmarking.
 
 ## Known traps
 
