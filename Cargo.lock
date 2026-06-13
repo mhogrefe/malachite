@@ -1362,6 +1362,7 @@ checksum = "dfdfe6a32973f2d1b268b8895845a8a96cac2f0191e72c27cc929036060dbf89"
 dependencies = [
  "bytemuck",
  "safe_arch",
+ "serde",
 ]
 
 [[package]]
