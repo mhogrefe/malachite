@@ -13,6 +13,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::bench::bucketers::{Bucketer, float_size};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -212,6 +213,35 @@ pub fn pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer<'a, T: Prim
             usize::exact_from(max!(x.complexity(), y.significant_bits()))
         },
         bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn quadruple_1_3_float_primitive_int_max_complexity_bucketer<'a, T, U: PrimitiveInt>(
+    x_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Float, T, U, RoundingMode)> {
+    Bucketer {
+        bucketing_function: &|(x, _, z, _)| {
+            usize::exact_from(max!(x.complexity(), z.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {z_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_2_quadruple_1_3_float_primitive_int_max_complexity_bucketer<
+    'a,
+    T,
+    U: PrimitiveInt,
+    V,
+>(
+    x_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (V, (Float, T, U, RoundingMode))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, _, z, _))| {
+            usize::exact_from(max!(x.complexity(), z.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {z_name}.significant_bits())"),
     }
 }
 

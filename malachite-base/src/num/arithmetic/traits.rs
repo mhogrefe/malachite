@@ -590,6 +590,18 @@ pub trait CeilingLogBasePowerOf2<POW> {
     fn ceiling_log_base_power_of_2(self, pow: POW) -> Self::Output;
 }
 
+/// Calculates the base-$2^k$ logarithm of a number.
+pub trait LogBasePowerOf2<POW> {
+    type Output;
+
+    fn log_base_power_of_2(self, pow: POW) -> Self::Output;
+}
+
+/// Replaces a number with its base-$2^k$ logarithm.
+pub trait LogBasePowerOf2Assign<POW> {
+    fn log_base_power_of_2_assign(&mut self, pow: POW);
+}
+
 /// Adds two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 pub trait ModAdd<RHS = Self, M = Self> {
     type Output;
