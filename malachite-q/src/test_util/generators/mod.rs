@@ -520,6 +520,16 @@ pub fn rational_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(Ra
     )
 }
 
+// All `(Rational, T)` where the `Rational` is positive and the `T` is small, unsigned, and greater
+// than 1.
+pub fn rational_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(Rational, T)> {
+    Generator::new(
+        &exhaustive_rational_unsigned_pair_gen_var_7,
+        &random_rational_unsigned_pair_gen_var_9,
+        &special_random_rational_unsigned_pair_gen_var_7,
+    )
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(Rational, T, T)>

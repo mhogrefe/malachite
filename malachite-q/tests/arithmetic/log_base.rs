@@ -13,10 +13,12 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::generators::unsigned_gen_var_31;
 use malachite_nz::test_util::generators::natural_pair_gen_var_3;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen_var_2, rational_gen_var_8, rational_pair_gen_var_7,
+    rational_unsigned_pair_gen_var_9,
 };
 use std::str::FromStr;
 
@@ -303,6 +305,124 @@ fn checked_log_base_fail_4() {
 }
 
 #[test]
+fn test_floor_log_base_u64() {
+    let test = |n, base: u64, out| {
+        let x = Rational::from_str(n).unwrap();
+        assert_eq!((&x).floor_log_base(base), out);
+        // The u64 specialization agrees with the arbitrary-Rational-base version.
+        assert_eq!((&x).floor_log_base(&Rational::from(base)), out);
+    };
+    test("1", 2, 0);
+    test("1", 5, 0);
+    test("2", 2, 1);
+    test("2", 3, 0);
+    test("3", 3, 1);
+    test("3", 4, 0);
+    test("100", 2, 6);
+    test("100", 3, 4);
+    test("100", 4, 3);
+    test("100", 10, 2);
+    test("100", 11, 1);
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        10,
+        60,
+    );
+    test("1/2", 2, -1);
+    test("1/3", 2, -2);
+    test("1/64", 4, -3);
+    test("22/7", 10, 0);
+    test("936851431250/1397", 10, 8);
+    test("1/1000000", 10, -6);
+    test("5153632/16807", 5, 3);
+}
+
+#[test]
+#[should_panic]
+fn floor_log_base_u64_fail_1() {
+    (&Rational::ZERO).floor_log_base(2u64);
+}
+
+#[test]
+#[should_panic]
+fn floor_log_base_u64_fail_2() {
+    (&Rational::ONE).floor_log_base(1u64);
+}
+
+#[test]
+#[should_panic]
+fn floor_log_base_u64_fail_3() {
+    (&Rational::NEGATIVE_ONE).floor_log_base(2u64);
+}
+
+#[test]
+fn test_ceiling_log_base_u64() {
+    let test = |n, base: u64, out| {
+        let x = Rational::from_str(n).unwrap();
+        assert_eq!((&x).ceiling_log_base(base), out);
+        assert_eq!((&x).ceiling_log_base(&Rational::from(base)), out);
+    };
+    test("1", 2, 0);
+    test("2", 2, 1);
+    test("3", 3, 1);
+    test("3", 4, 1);
+    test("100", 3, 5);
+    test("100", 4, 4);
+    test("100", 10, 2);
+    test("100", 11, 2);
+    test("1/2", 2, -1);
+    test("1/3", 2, -1);
+    test("1/64", 4, -3);
+    test("22/7", 10, 1);
+    test("936851431250/1397", 10, 9);
+    test("1/1000000", 10, -6);
+}
+
+#[test]
+#[should_panic]
+fn ceiling_log_base_u64_fail_1() {
+    (&Rational::ZERO).ceiling_log_base(2u64);
+}
+
+#[test]
+#[should_panic]
+fn ceiling_log_base_u64_fail_2() {
+    (&Rational::ONE).ceiling_log_base(1u64);
+}
+
+#[test]
+fn test_checked_log_base_u64() {
+    let test = |n, base: u64, out| {
+        let x = Rational::from_str(n).unwrap();
+        assert_eq!((&x).checked_log_base(base), out);
+        assert_eq!((&x).checked_log_base(&Rational::from(base)), out);
+    };
+    test("1", 2, Some(0));
+    test("80", 3, None);
+    test("81", 3, Some(4));
+    test("82", 3, None);
+    test("1000000", 10, Some(6));
+    test("1/1000000", 10, Some(-6));
+    test("4294967296", 10, None);
+    test("4294967296", 2, Some(32));
+    test("1/9", 3, Some(-2));
+    test("22/7", 10, None);
+    test("8/27", 3, None);
+}
+
+#[test]
+#[should_panic]
+fn checked_log_base_u64_fail_1() {
+    (&Rational::ZERO).checked_log_base(2u64);
+}
+
+#[test]
+#[should_panic]
+fn checked_log_base_u64_fail_2() {
+    (&Rational::ONE).checked_log_base(1u64);
+}
+
+#[test]
 fn approx_log_properties() {
     rational_gen_var_2().test_properties(|n| {
         let log = n.approx_log();
@@ -413,5 +533,81 @@ fn checked_log_base_properties() {
                 .checked_log_base(&Rational::from(base))
                 .map(u64::exact_from)
         );
+    });
+}
+
+#[test]
+fn floor_log_base_u64_properties() {
+    rational_unsigned_pair_gen_var_9::<u64>().test_properties(|(n, base)| {
+        let floor_log = (&n).floor_log_base(base);
+        // The u64 specialization agrees with the arbitrary-Rational-base version.
+        assert_eq!(floor_log, (&n).floor_log_base(&Rational::from(base)));
+
+        let base_q = Rational::from(base);
+        let power = (&base_q).pow(floor_log);
+        assert!(power <= n);
+        assert!(&power * &base_q > n);
+
+        assert_eq!((&n).ceiling_log_base(base), {
+            if power == n { floor_log } else { floor_log + 1 }
+        });
+    });
+
+    rational_gen_var_2().test_properties(|n| {
+        assert_eq!((&n).floor_log_base(2u64), n.floor_log_base_2());
+    });
+
+    unsigned_gen_var_31::<u64>().test_properties(|base| {
+        assert_eq!((&Rational::ONE).floor_log_base(base), 0);
+    });
+}
+
+#[test]
+fn ceiling_log_base_u64_properties() {
+    rational_unsigned_pair_gen_var_9::<u64>().test_properties(|(n, base)| {
+        let ceiling_log = (&n).ceiling_log_base(base);
+        assert_eq!(ceiling_log, (&n).ceiling_log_base(&Rational::from(base)));
+
+        let base_q = Rational::from(base);
+        let power = (&base_q).pow(ceiling_log);
+        assert!(power >= n);
+        assert!(&power / &base_q < n);
+
+        assert_eq!((&n).floor_log_base(base), {
+            if power == n {
+                ceiling_log
+            } else {
+                ceiling_log - 1
+            }
+        });
+    });
+
+    rational_gen_var_2().test_properties(|n| {
+        assert_eq!((&n).ceiling_log_base(2u64), n.ceiling_log_base_2());
+    });
+
+    unsigned_gen_var_31::<u64>().test_properties(|base| {
+        assert_eq!((&Rational::ONE).ceiling_log_base(base), 0);
+    });
+}
+
+#[test]
+fn checked_log_base_u64_properties() {
+    rational_unsigned_pair_gen_var_9::<u64>().test_properties(|(n, base)| {
+        let checked_log = (&n).checked_log_base(base);
+        assert_eq!(checked_log, (&n).checked_log_base(&Rational::from(base)));
+        if let Some(log) = checked_log {
+            assert_eq!(Rational::from(base).pow(log), n);
+            assert_eq!((&n).floor_log_base(base), log);
+            assert_eq!((&n).ceiling_log_base(base), log);
+        }
+    });
+
+    rational_gen_var_2().test_properties(|n| {
+        assert_eq!((&n).checked_log_base(2u64), n.checked_log_base_2());
+    });
+
+    unsigned_gen_var_31::<u64>().test_properties(|base| {
+        assert_eq!((&Rational::ONE).checked_log_base(base), Some(0));
     });
 }

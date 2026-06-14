@@ -29,7 +29,8 @@ use malachite_base::num::conversion::string::options::random::random_to_sci_opti
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
-    geometric_random_signeds, geometric_random_unsigneds,
+    geometric_random_signeds, geometric_random_unsigned_inclusive_range,
+    geometric_random_unsigneds,
 };
 use malachite_base::num::random::{
     random_primitive_ints, random_unsigned_inclusive_range, special_random_finite_primitive_floats,
@@ -917,6 +918,30 @@ pub fn random_rational_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(
                 seed,
                 config.get_or("mean_small_n", 64),
                 config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Rational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_positive_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigned_inclusive_range(
+                seed,
+                T::TWO,
+                T::MAX,
+                config.get_or("mean_small_unsigned_n", 32),
+                config.get_or("mean_small_unsigned_d", 1),
             )
         },
     ))

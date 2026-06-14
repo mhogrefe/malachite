@@ -362,6 +362,13 @@ pub fn exhaustive_rational_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> It
     ))
 }
 
+pub fn exhaustive_rational_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> It<(Rational, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_positive_rationals(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::MAX),
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>()

@@ -3142,6 +3142,17 @@ pub fn random_unsigned_gen_var_25<T: PrimitiveUnsigned>(config: &GenConfig) -> I
     ))
 }
 
+// Small unsigned values greater than 1.
+pub fn random_unsigned_gen_var_31<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
+    Box::new(geometric_random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        T::TWO,
+        T::MAX,
+        config.get_or("mean_small_unsigned_n", 32),
+        config.get_or("mean_small_unsigned_d", 1),
+    ))
+}
+
 pub fn random_unsigned_gen_var_26<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
     let limit = smallest_invalid_value(T::checked_primorial);
     Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))

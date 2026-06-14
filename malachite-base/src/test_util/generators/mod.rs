@@ -1790,6 +1790,15 @@ pub fn unsigned_gen_var_30<T: PrimitiveFloat>() -> Generator<u64> {
     )
 }
 
+// All unsigned `T`s greater than 1, generated in increasing order (exhaustive) or with a small
+// geometric distribution (random).
+pub fn unsigned_gen_var_31<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_gen_var_2::<T>,
+        &random_unsigned_gen_var_31::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {
