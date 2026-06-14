@@ -150,6 +150,17 @@ pub_crate_test! {limbs_mul_same_length_to_out(
     assert_eq!(ys.len(), len);
     assert_ne!(len, 0);
     let out = &mut out[..len << 1];
+    // A too-short `scratch` otherwise panics with an opaque "mid > len" deep inside a Toom routine;
+    // fail clearly here instead. For the Toom22 range the requirement is computed as a range
+    // maximum (an over-estimate), so the check is restricted to Toom33 and above, where
+    // `limbs_mul_same_length_to_out_scratch_len` returns the exact requirement.
+    assert!(
+        len < MUL_TOOM33_THRESHOLD
+            || scratch.len() >= limbs_mul_same_length_to_out_scratch_len(len),
+        "limbs_mul_same_length_to_out: scratch too short (have {}, need {})",
+        scratch.len(),
+        limbs_mul_same_length_to_out_scratch_len(len),
+    );
     if len < MUL_TOOM22_THRESHOLD {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if len < MUL_TOOM33_THRESHOLD {

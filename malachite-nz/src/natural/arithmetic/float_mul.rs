@@ -33,7 +33,6 @@ use core::cmp::{
     Ordering::{self, *},
     max, min,
 };
-use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, OverflowingAddAssign, Parity, PowerOf2, Sign, WrappingAddAssign, XMulYToZZ,
     XXAddYYToZZ,
@@ -864,9 +863,9 @@ fn mul_float_significands_general(
                 if k < twice_len {
                     tmp_alloc = twice_len;
                     to = twice_len - k;
-                } else {
-                    fail_on_untested_path("mul_float_significands_general, k >= len << 1 ");
                 }
+                // Otherwise (k >= 2 * len) the initial `tmp_alloc = k` and `to = 0` are already
+                // correct: the approximate product is written to `tmp[k - 2 * len..]`, which fits.
             }
         } else {
             xs = &xs[xs_len - len..];

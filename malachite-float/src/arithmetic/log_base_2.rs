@@ -13,13 +13,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase2, IsPowerOf2, LogBase2, LogBase2Assign, Sign,
+    CeilingLogBase2, CheckedLogBase2, IsPowerOf2, LogBase2, LogBase2Assign, PowerOf2, Sign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
@@ -62,6 +64,72 @@ fn log_base_2_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Floa
     }
 }
 
+// Computes `log_2(1 + eps)` for a small nonzero [`Rational`] `eps` (`x - 1`, where `x` is near 1).
+// The result is near zero, so unlike the near-a-larger-power case it must be computed directly
+// rather than rounded near an integer; a Ziv loop over a [`Float`] approximation of `eps` does so
+// without the catastrophic cancellation that `ln(x)` would suffer for `x` near 1.
+fn log_base_2_rational_near_one(eps: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
+    let mut increment = Limb::WIDTH;
+    loop {
+        // log_2(1 + eps), via a Float approximation of eps. The error comes from `eps_float`
+        // approximating `eps` (below an ulp) and from the rounding in `log_base_2_1_plus_x` (below
+        // an ulp), so a few ulps of slack suffice.
+        let eps_float = Float::from_rational_prec_ref(eps, working_prec).0;
+        let off = eps_float.log_base_2_1_plus_x_prec(working_prec).0;
+        if float_can_round(off.significand_ref().unwrap(), working_prec - 3, prec, rm) {
+            return Float::from_float_prec_round(off, prec, rm);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// If `x` is close enough to a power of 2 that the general Ziv loop would need a precision
+// proportional to the distance (potentially exhausting memory), returns the correctly-rounded
+// `log_2(x)`; otherwise returns `None`. `x` must be positive and not a power of 2.
+//
+// `log_2(x) = k + log_2(x / 2^k)` for the nearest power of 2, `2^k`. When `x` is very close to
+// `2^k` the offset `log_2(x / 2^k)` is tiny: for `k != 0` the result is `k` nudged by a fraction of
+// an ulp, which `float_round_near_x` rounds directly (returning `None` when the offset is not
+// sub-ulp, so the general loop — which then converges quickly — takes over); for `k == 0` (`x`
+// near 1) the result is the tiny offset itself.
+fn log_base_2_rational_near_power_of_2(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    // 2^m <= x < 2^(m + 1)
+    let m = x.floor_log_base_2_abs();
+    let pow_lo = Rational::power_of_2(m);
+    let pow_hi = Rational::power_of_2(m + 1);
+    // eps = x / 2^k - 1 for the nearer of the two surrounding powers of 2, 2^k.
+    let dist_lo = x - &pow_lo;
+    let dist_hi = &pow_hi - x;
+    let (k, eps) = if dist_lo <= dist_hi {
+        (m, dist_lo / pow_lo)
+    } else {
+        (m + 1, -(dist_hi / pow_hi))
+    };
+    if k == 0 {
+        // x is near 1, so log_2(x) = log_2(1 + eps) is near zero.
+        return Some(log_base_2_rational_near_one(&eps, prec, rm));
+    }
+    // eps is nonzero since x is not a power of 2.
+    let eps_exp = eps.floor_log_base_2_abs();
+    let k_float = Float::from_signed_prec(k, k.unsigned_abs().significant_bits()).0;
+    let exp_k = i64::from(k_float.get_exponent().unwrap());
+    // |log_2(1 + eps)| < 3|eps| < 2^(eps_exp + 3), so passing err = exp_k - eps_exp - 3 to
+    // `float_round_near_x` (which requires |offset| < 2^(exp_k - err)) is sound.
+    let err = exp_k - eps_exp - 3;
+    if err <= 0 {
+        return None;
+    }
+    // The offset moves the magnitude up (away from zero) iff it has the same sign as k.
+    let dir = (eps > 0) == (k > 0);
+    float_round_near_x(&k_float, u64::exact_from(err), dir, prec, rm)
+}
+
 // The computation of log_base_2(x) is done by log_base_2(x) = ln(x) / ln(2). `ln_rational_prec`
 // handles inputs whose magnitudes are outside the representable range of `Float`; the result of the
 // division has greater magnitude than the result of `ln_rational_prec`, but only by a factor of
@@ -71,6 +139,12 @@ fn log_base_2_rational_prec_round_helper(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
+    // When x is extremely close to a power of 2, log_2(x) is extremely close to an integer, and the
+    // Ziv loop below would need a precision proportional to the distance to round it. Handle that
+    // case separately.
+    if let Some(result) = log_base_2_rational_near_power_of_2(x, prec, rm) {
+        return result;
+    }
     let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {
@@ -498,7 +572,9 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = Float::from_unsigned_prec(10u32, 100).0.log_base_2_round(Floor);
+    /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
+    ///     .0
+    ///     .log_base_2_round(Floor);
     /// assert_eq!(log.to_string(), "3.321928094887362347870319429487");
     /// assert_eq!(o, Less);
     ///

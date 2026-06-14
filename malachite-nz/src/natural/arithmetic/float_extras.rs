@@ -112,6 +112,52 @@ pub fn limbs_float_can_round(xs: &[Limb], err0: u64, mut prec: u64, rm: Rounding
     }
 }
 
+// Given the significand `xs` of a nonzero finite `Float` (little-endian limbs, with the most
+// significant bit of the most significant limb set), returns `Some(j)` if the significand's bits
+// form a run of `j` ones followed by all zeros (that is, the mantissa equals $2^j - 1$), and `None`
+// otherwise.
+//
+// This detects inputs `x` for which $1+x$ is an exact power of 2: combined with the exponent, a
+// significand of the form $2^j - 1$ means the value is $2^e - 2^{e-j}$, which equals $2^k - 1$ (for
+// `x` positive, when $e = j$, giving $k = j$) or $1 - 2^{-j}$ (for `x` in $(-1, 0)$, when $e = 0$,
+// giving $k = -j$).
+pub fn limbs_float_significand_leading_ones(xs: &[Limb]) -> Option<u64> {
+    let mut i = xs.len();
+    let mut count = 0;
+    // Skip the all-ones limbs at the top.
+    while i > 0 && xs[i - 1] == Limb::MAX {
+        count += Limb::WIDTH;
+        i -= 1;
+    }
+    if i == 0 {
+        return Some(count);
+    }
+    // The transition limb (not all ones): it must be a run of ones followed by zeros.
+    let m = xs[i - 1];
+    let j = m.leading_ones();
+    if m << j != 0 {
+        // A one-bit appears below the leading run of ones.
+        return None;
+    }
+    count += u64::from(j);
+    // Every remaining lower limb must be zero.
+    if slice_test_zero(&xs[..i - 1]) {
+        Some(count)
+    } else {
+        None
+    }
+}
+
+// Given the significand `x` of a nonzero finite `Float`, returns `Some(j)` if the mantissa equals
+// $2^j - 1$ (a run of ones followed by all zeros), and `None` otherwise. See
+// [`limbs_float_significand_leading_ones`].
+pub fn float_significand_leading_ones(x: &Natural) -> Option<u64> {
+    match x {
+        Natural(Small(small)) => limbs_float_significand_leading_ones(core::slice::from_ref(small)),
+        Natural(Large(xs)) => limbs_float_significand_leading_ones(xs),
+    }
+}
+
 const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
 pub(crate) const MPFR_EVEN_INEX: i8 = 2;
 

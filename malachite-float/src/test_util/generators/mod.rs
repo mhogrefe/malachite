@@ -2259,6 +2259,48 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_23_rm() -> Generator<(
     )
 }
 
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.log_base_2_1_plus_x_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_25() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_25,
+        &random_float_unsigned_rounding_mode_triple_gen_var_25,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_25,
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.log_base_2_1_plus_x_prec_round`,
+// where the `Float` may have an extreme exponent.
+pub fn float_unsigned_rounding_mode_triple_gen_var_26() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_26,
+        &random_float_unsigned_rounding_mode_triple_gen_var_26,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_26,
+    )
+}
+
+pub fn float_unsigned_rounding_mode_triple_gen_var_25_rm() -> Generator<(
+    (rug::Float, u64, rug::float::Round),
+    (Float, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_t_rounding_mode_triple_rm(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_25(),
+            )
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(random_float_unsigned_rounding_mode_triple_gen_var_25(
+                config,
+            ))
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_25(config),
+            )
+        },
+    )
+}
+
 // -- (Float, Rational) --
 
 pub fn float_rational_pair_gen() -> Generator<(Float, Rational)> {
@@ -3216,6 +3258,36 @@ pub fn float_rounding_mode_pair_gen_var_38_rm()
         &|config| float_rounding_mode_pair_rm(random_float_rounding_mode_pair_gen_var_38(config)),
         &|config| {
             float_rounding_mode_pair_rm(special_random_float_rounding_mode_pair_gen_var_38(config))
+        },
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `log_base_2_1_plus_x_round`.
+pub fn float_rounding_mode_pair_gen_var_40() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_40,
+        &random_float_rounding_mode_pair_gen_var_40,
+        &special_random_float_rounding_mode_pair_gen_var_40,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `log_base_2_1_plus_x_round`, where the
+// `Float` may have an extreme exponent.
+pub fn float_rounding_mode_pair_gen_var_41() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_41,
+        &random_float_rounding_mode_pair_gen_var_41,
+        &special_random_float_rounding_mode_pair_gen_var_41,
+    )
+}
+
+pub fn float_rounding_mode_pair_gen_var_40_rm()
+-> Generator<((rug::Float, rug::float::Round), (Float, RoundingMode))> {
+    Generator::new(
+        &|| float_rounding_mode_pair_rm(exhaustive_float_rounding_mode_pair_gen_var_40()),
+        &|config| float_rounding_mode_pair_rm(random_float_rounding_mode_pair_gen_var_40(config)),
+        &|config| {
+            float_rounding_mode_pair_rm(special_random_float_rounding_mode_pair_gen_var_40(config))
         },
     )
 }

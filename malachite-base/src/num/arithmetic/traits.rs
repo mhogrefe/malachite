@@ -542,6 +542,18 @@ pub trait LogBase2Assign {
     fn log_base_2_assign(&mut self);
 }
 
+/// Computes $\log_2(1+x)$.
+pub trait LogBase2Of1PlusX {
+    type Output;
+
+    fn log_base_2_1_plus_x(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ by $\log_2(1+x)$.
+pub trait LogBase2Of1PlusXAssign {
+    fn log_base_2_1_plus_x_assign(&mut self);
+}
+
 /// Calculates the floor of the base-2 logarithm of a number.
 pub trait FloorLogBase2 {
     type Output;

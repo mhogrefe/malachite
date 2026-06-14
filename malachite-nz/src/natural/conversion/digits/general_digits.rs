@@ -772,8 +772,8 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
 }
 
 // Direct entry to the divide-and-conquer conversion plus its scratch sizing, exposed for the
-// threshold tuner (which needs to A/B the basecase against forced divide-and-conquer at sizes
-// where the normal dispatch would choose for itself).
+// threshold tuner (which needs to A/B the basecase against forced divide-and-conquer at sizes where
+// the normal dispatch would choose for itself).
 #[cfg(feature = "test_build")]
 pub fn limbs_to_digits_small_base_divide_and_conquer_for_tuning<T: PrimitiveUnsigned>(
     out: &mut [T],

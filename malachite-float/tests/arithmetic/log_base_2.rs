@@ -4407,4 +4407,294 @@ fn test_log_base_2_rational_prec_round() {
         "0x8.00E+7#10",
         Equal,
     );
+    // Inputs extremely close to a power of 2, where the general Ziv loop would otherwise need a
+    // precision proportional to the distance (previously diverged / crashed).
+    test_big(
+        Rational::power_of_2(100000i64) + Rational::ONE,
+        1,
+        Floor,
+        "7.0e4",
+        "0x1.0E+4#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) + Rational::ONE,
+        5,
+        Floor,
+        "9.8e4",
+        "0x1.8E+4#5",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) + Rational::ONE,
+        1,
+        Ceiling,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) + Rational::ONE,
+        5,
+        Ceiling,
+        "1.0e5",
+        "0x1.9E+4#5",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) + Rational::ONE,
+        1,
+        Nearest,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) + Rational::ONE,
+        5,
+        Nearest,
+        "9.8e4",
+        "0x1.8E+4#5",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) - Rational::power_of_2(-5i64),
+        1,
+        Floor,
+        "7.0e4",
+        "0x1.0E+4#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) - Rational::power_of_2(-5i64),
+        5,
+        Floor,
+        "9.8e4",
+        "0x1.8E+4#5",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) - Rational::power_of_2(-5i64),
+        1,
+        Ceiling,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) - Rational::power_of_2(-5i64),
+        5,
+        Ceiling,
+        "1.0e5",
+        "0x1.9E+4#5",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) - Rational::power_of_2(-5i64),
+        1,
+        Nearest,
+        "1.0e5",
+        "0x2.0E+4#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100000i64) - Rational::power_of_2(-5i64),
+        5,
+        Nearest,
+        "9.8e4",
+        "0x1.8E+4#5",
+        Less,
+    );
+    test_big(
+        Rational::ONE + Rational::power_of_2(-100000i64),
+        1,
+        Floor,
+        "too_small",
+        "0x1.0E-25000#1",
+        Less,
+    );
+    test_big(
+        Rational::ONE + Rational::power_of_2(-100000i64),
+        5,
+        Floor,
+        "too_small",
+        "0x1.7E-25000#5",
+        Less,
+    );
+    test_big(
+        Rational::ONE + Rational::power_of_2(-100000i64),
+        1,
+        Ceiling,
+        "too_small",
+        "0x2.0E-25000#1",
+        Greater,
+    );
+    test_big(
+        Rational::ONE + Rational::power_of_2(-100000i64),
+        5,
+        Ceiling,
+        "too_small",
+        "0x1.8E-25000#5",
+        Greater,
+    );
+    test_big(
+        Rational::ONE + Rational::power_of_2(-100000i64),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-25000#1",
+        Less,
+    );
+    test_big(
+        Rational::ONE + Rational::power_of_2(-100000i64),
+        5,
+        Nearest,
+        "too_small",
+        "0x1.7E-25000#5",
+        Less,
+    );
+    test_big(
+        Rational::ONE - Rational::power_of_2(-100000i64),
+        1,
+        Floor,
+        "-too_small",
+        "-0x2.0E-25000#1",
+        Less,
+    );
+    test_big(
+        Rational::ONE - Rational::power_of_2(-100000i64),
+        5,
+        Floor,
+        "-too_small",
+        "-0x1.8E-25000#5",
+        Less,
+    );
+    test_big(
+        Rational::ONE - Rational::power_of_2(-100000i64),
+        1,
+        Ceiling,
+        "-too_small",
+        "-0x1.0E-25000#1",
+        Greater,
+    );
+    test_big(
+        Rational::ONE - Rational::power_of_2(-100000i64),
+        5,
+        Ceiling,
+        "-too_small",
+        "-0x1.7E-25000#5",
+        Greater,
+    );
+    test_big(
+        Rational::ONE - Rational::power_of_2(-100000i64),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-25000#1",
+        Greater,
+    );
+    test_big(
+        Rational::ONE - Rational::power_of_2(-100000i64),
+        5,
+        Nearest,
+        "-too_small",
+        "-0x1.7E-25000#5",
+        Greater,
+    );
+    test_big(
+        Rational::from(4) + Rational::power_of_2(-200i64),
+        1,
+        Floor,
+        "2.0",
+        "0x2.0#1",
+        Less,
+    );
+    test_big(
+        Rational::from(4) + Rational::power_of_2(-200i64),
+        5,
+        Floor,
+        "2.0",
+        "0x2.0#5",
+        Less,
+    );
+    test_big(
+        Rational::from(4) + Rational::power_of_2(-200i64),
+        1,
+        Ceiling,
+        "4.0",
+        "0x4.0#1",
+        Greater,
+    );
+    test_big(
+        Rational::from(4) + Rational::power_of_2(-200i64),
+        5,
+        Ceiling,
+        "2.1",
+        "0x2.2#5",
+        Greater,
+    );
+    test_big(
+        Rational::from(4) + Rational::power_of_2(-200i64),
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Less,
+    );
+    test_big(
+        Rational::from(4) + Rational::power_of_2(-200i64),
+        5,
+        Nearest,
+        "2.0",
+        "0x2.0#5",
+        Less,
+    );
+    test_big(
+        Rational::from_signeds(1, 4) - Rational::power_of_2(-200i64),
+        1,
+        Floor,
+        "-4.0",
+        "-0x4.0#1",
+        Less,
+    );
+    test_big(
+        Rational::from_signeds(1, 4) - Rational::power_of_2(-200i64),
+        5,
+        Floor,
+        "-2.1",
+        "-0x2.2#5",
+        Less,
+    );
+    test_big(
+        Rational::from_signeds(1, 4) - Rational::power_of_2(-200i64),
+        1,
+        Ceiling,
+        "-2.0",
+        "-0x2.0#1",
+        Greater,
+    );
+    test_big(
+        Rational::from_signeds(1, 4) - Rational::power_of_2(-200i64),
+        5,
+        Ceiling,
+        "-2.0",
+        "-0x2.0#5",
+        Greater,
+    );
+    test_big(
+        Rational::from_signeds(1, 4) - Rational::power_of_2(-200i64),
+        1,
+        Nearest,
+        "-2.0",
+        "-0x2.0#1",
+        Greater,
+    );
+    test_big(
+        Rational::from_signeds(1, 4) - Rational::power_of_2(-200i64),
+        5,
+        Nearest,
+        "-2.0",
+        "-0x2.0#5",
+        Greater,
+    );
 }

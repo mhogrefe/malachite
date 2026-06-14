@@ -59,8 +59,8 @@ pub(crate) const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 295;
 // TODO tune
 pub(crate) const MUL_FFT_THRESHOLD: usize = 5608;
 
-// Binary-to-string conversion thresholds (see natural/conversion/digits/general_digits.rs).
-// TODO tune
+// Binary-to-string conversion thresholds (see natural/conversion/digits/general_digits.rs). TODO
+// tune
 pub(crate) const GET_STR_DC_THRESHOLD: usize = 15;
 // TODO tune
 pub(crate) const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;

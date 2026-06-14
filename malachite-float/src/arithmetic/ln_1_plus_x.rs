@@ -922,7 +922,9 @@ impl Ln1PlusX for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Ln1PlusX;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One};
+    /// use malachite_base::num::basic::traits::{
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, One,
+    /// };
     /// use malachite_float::Float;
     ///
     /// assert!(Float::NAN.ln_1_plus_x().is_nan());
@@ -992,7 +994,9 @@ impl Ln1PlusX for &Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Ln1PlusX;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One};
+    /// use malachite_base::num::basic::traits::{
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, One,
+    /// };
     /// use malachite_float::Float;
     ///
     /// assert!((&Float::NAN).ln_1_plus_x().is_nan());
@@ -1009,7 +1013,9 @@ impl Ln1PlusX for &Float {
     ///     (&Float::NEGATIVE_ONE).ln_1_plus_x(),
     ///     Float::NEGATIVE_INFINITY
     /// );
-    /// assert!((&Float::from_signed_prec(-10, 100).0).ln_1_plus_x().is_nan());
+    /// assert!((&Float::from_signed_prec(-10, 100).0)
+    ///     .ln_1_plus_x()
+    ///     .is_nan());
     /// ```
     #[inline]
     fn ln_1_plus_x(self) -> Float {
@@ -1054,7 +1060,9 @@ impl Ln1PlusXAssign for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Ln1PlusXAssign;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One};
+    /// use malachite_base::num::basic::traits::{
+    ///     Infinity, NaN, NegativeInfinity, NegativeOne, One,
+    /// };
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::NAN;

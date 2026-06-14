@@ -521,8 +521,12 @@ fn tune_shl() {
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_nz::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
 
-// MP_BASES_BIG_BASE_10 (10^19), private to the library; redeclared here for the shootout.
+// MP_BASES_BIG_BASE_10, the largest power of 10 fitting in a `Limb` (private to the library;
+// redeclared here for the shootout): 10^19 for 64-bit limbs, 10^9 for 32-bit limbs.
+#[cfg(not(feature = "32_bit_limbs"))]
 const BIG_BASE_10: Limb = 0x8ac7230489e80000;
+#[cfg(feature = "32_bit_limbs")]
+const BIG_BASE_10: Limb = 0x3b9aca00;
 
 // Variant B: GMP-shaped straight-line corrections (first adjustment unconditional on r > q_low,
 // second as plain if), letting LLVM choose the lowering.
@@ -690,9 +694,9 @@ fn tune_divrem() {
 }
 
 // ---------------------------------------------------------------------------------------------
-// GET_STR_PRECOMPUTE_THRESHOLD: at what size does building a power table + divide-and-conquer
-// beat the O(n^2) basecase? The power-table construction is timed inside the candidate, since
-// the real dispatch pays it on every conversion.
+// GET_STR_PRECOMPUTE_THRESHOLD: at what size does building a power table + divide-and-conquer beat
+// the O(n^2) basecase? The power-table construction is timed inside the candidate, since the real
+// dispatch pays it on every conversion.
 
 fn tune_get_str_precompute() {
     use malachite_nz::natural::conversion::digits::general_digits::{
@@ -766,9 +770,9 @@ fn tune_get_str_precompute() {
     });
 }
 
-// Probe for GET_STR_DC_THRESHOLD grid search: times the full powtab+dc conversion at fixed
-// sizes. The DC threshold is a compiled-in constant controlling recursion leaf size, so the
-// driver (perf/tune.sh or a loop) rebuilds with each candidate value and compares these numbers.
+// Probe for GET_STR_DC_THRESHOLD grid search: times the full powtab+dc conversion at fixed sizes.
+// The DC threshold is a compiled-in constant controlling recursion leaf size, so the driver
+// (perf/tune.sh or a loop) rebuilds with each candidate value and compares these numbers.
 fn tune_get_str_dc_probe() {
     use malachite_nz::natural::conversion::digits::general_digits::{
         digits_in_base_per_limb_for_tuning, get_chars_per_limb, limbs_compute_power_table,

@@ -87,10 +87,10 @@ pub_crate_test! {limbs_invert_limb<
     (DT::join_halves(!d, T::MAX) / DT::from(d)).lower_half()
 }}
 
-// The second quotient correction is almost never taken; outlining it into a cold function keeps
-// it a real branch instead of letting LLVM if-convert it into csels on the loop-carried critical
-// path (the remainder chains through every iteration of divrem loops). This measured 1.26-1.28x
-// faster in divrem_1-style loops on aarch64.
+// The second quotient correction is almost never taken; outlining it into a cold function keeps it
+// a real branch instead of letting LLVM if-convert it into csels on the loop-carried critical path
+// (the remainder chains through every iteration of divrem loops). This measured 1.26-1.28x faster
+// in divrem_1-style loops on aarch64.
 #[cold]
 #[inline(never)]
 const fn div_mod_by_preinversion_second_fixup(q_high: Limb, r: Limb, d: Limb) -> (Limb, Limb) {
