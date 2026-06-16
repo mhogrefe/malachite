@@ -542,6 +542,18 @@ pub trait LogBase2Assign {
     fn log_base_2_assign(&mut self);
 }
 
+/// Calculates the base-10 logarithm of a number, rounding the (generally irrational) result.
+pub trait LogBase10 {
+    type Output;
+
+    fn log_base_10(self) -> Self::Output;
+}
+
+/// Replaces a number with its base-10 logarithm, rounding the (generally irrational) result.
+pub trait LogBase10Assign {
+    fn log_base_10_assign(&mut self);
+}
+
 /// Computes $\log_2(1+x)$.
 pub trait LogBase2Of1PlusX {
     type Output;

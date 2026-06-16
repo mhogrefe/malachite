@@ -1,0 +1,550 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MPFR Library.
+//
+//      Copyright 2001-2026 Free Software Foundation, Inc.
+//
+//      Contributed by the Pascaline and Caramba projects, INRIA.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
+use core::cmp::Ordering::{self, *};
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, CheckedLogBase, LogBase10, LogBase10Assign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero as ZeroTrait;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::platform::Limb;
+
+// Returns `Some(n)` when `x == 10^n` for some integer `n >= 1`. The input `x` must be finite,
+// positive, and not equal to 1.
+//
+// `log_base_10(10^n) = n` is an exactly-representable integer, but the Ziv loop in
+// `log_base_10_prec_round_normal` could never certify it (the computed quotient lands on a
+// representable value the rounding test cannot resolve), so the exact case must be detected up
+// front. This is the `10^n` exactness check from mpfr_log10. Unlike a general base, `10 = 2 * 5` is
+// not a perfect power, so `log_base_10(x)` is rational only when `x` is a power of 10, and then the
+// result is the integer `n` -- there are no dyadic results to handle.
+//
+// The check is balloon-safe. An exact `10^n` has bit length about `n * log2(10)`, but its odd part
+// (the only part stored in the significand) is `5^n`, needing `n * log2(5)` bits, so the bit length
+// is at most about `64 * prec`. When `x`'s exponent exceeds that bound, `x` is too large to be an
+// exact power of 10 and is left to the Ziv loop (which then converges, `x` not being a power of
+// 10), so `x` is materialized as an integer only when doing so is cheap.
+pub(crate) fn float_is_power_of_10(x: &Float) -> Option<u64> {
+    let e = i64::from(x.get_exponent().unwrap());
+    // x < 1 cannot equal 10^n for n >= 1, and only positive exponents can.
+    if e < 1 || u64::exact_from(e) > x.get_prec().unwrap().saturating_mul(64) {
+        return None;
+    }
+    // `Natural::try_from` fails unless `x` is a nonnegative integer.
+    let n = Natural::try_from(x).ok()?;
+    (&n).checked_log_base(&const { Natural::const_from(10) })
+}
+
+// The computation of log_base_10(x) is done by log_base_10(x) = ln(x) / ln(10).
+//
+// This is mpfr_log10 from log10.c, MPFR 4.3.0. The input is finite, nonzero, and positive.
+fn log_base_10_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    // If x is 1, the result is 0.
+    if *x == 1u32 {
+        return (Float::ZERO, Equal);
+    }
+    // If x = 10^n for some n >= 1, log_base_10(x) = n is exact (though possibly subject to rounding
+    // at the target precision).
+    if let Some(n) = float_is_power_of_10(x) {
+        return Float::from_unsigned_prec_round(n, prec, rm);
+    }
+    // The result is irrational, so it is never exactly representable.
+    assert_ne!(rm, Exact, "Inexact log_base_10");
+    const TEN: Float = Float::const_from_unsigned(10);
+    // Compute the precision of the intermediary variable: the optimal number of bits, see
+    // algorithms.tex.
+    let mut working_prec = prec + 4 + prec.ceiling_log_base_2();
+    let mut increment = Limb::WIDTH;
+    loop {
+        // ln(x) / ln(10). ln(x), ln(10), and the division are each correctly rounded (at most 1/2
+        // ulp), so the relative error is below 2^(2 - working_prec) and working_prec - 4 correct
+        // bits suffice for rounding (mpfr_log10 uses Nt - 4).
+        let t = x
+            .ln_prec_ref(working_prec)
+            .0
+            .div_prec(TEN.ln_prec_ref(working_prec).0, working_prec)
+            .0;
+        if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        // Increase the precision.
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+impl Float {
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded value is less than, equal to,
+    /// or greater than the exact value. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The base-10 logarithm of any nonzero negative number is `NaN`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \log_{10} x+\varepsilon.
+    /// $$
+    /// - If $\log_{10} x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\log_{10} x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\log_{10} x|\rfloor-p+1}$.
+    /// - If $\log_{10} x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\log_{10} x|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p,m)=\text{NaN}$
+    /// - $f(\infty,p,m)=\infty$
+    /// - $f(-\infty,p,m)=\text{NaN}$
+    /// - $f(\pm0.0,p,m)=-\infty$
+    /// - $f(1.0,p,m)=0.0$, and the result is exact
+    /// - $f(10^n,p,m)=n$, rounded to precision $p$; the result is exact if and only if $n$ is
+    ///   representable with precision $p$
+    /// - $f(x,p,m)=\text{NaN}$ for $x<0$
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::log_base_10_prec`] instead.
+    /// If you know that your target precision is the precision of the input, consider using
+    /// [`Float::log_base_10_round`] instead. If both of these things are true, consider using
+    /// [`Float::log_base_10`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(1000).log_base_10_prec_round(10, Nearest);
+    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (log, o) = Float::from(50).log_base_10_prec_round(10, Floor);
+    /// assert_eq!(log.to_string(), "1.697");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (log, o) = Float::from(50).log_base_10_prec_round(10, Ceiling);
+    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn log_base_10_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match self {
+            Self(NaN | Infinity { sign: false } | Finite { sign: false, .. }) => {
+                (float_nan!(), Equal)
+            }
+            float_either_zero!() => (float_negative_infinity!(), Equal),
+            float_infinity!() => (float_infinity!(), Equal),
+            _ => log_base_10_prec_round_normal(&self, prec, rm),
+        }
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded value is less than, equal to,
+    /// or greater than the exact value. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details, special cases, and a description of the
+    /// rounding behavior.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(1000).log_base_10_prec_round_ref(10, Nearest);
+    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn log_base_10_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match self {
+            Self(NaN | Infinity { sign: false } | Finite { sign: false, .. }) => {
+                (float_nan!(), Equal)
+            }
+            float_either_zero!() => (float_negative_infinity!(), Equal),
+            float_infinity!() => (float_infinity!(), Equal),
+            _ => log_base_10_prec_round_normal(self, prec, rm),
+        }
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the nearest value
+    /// of the specified precision. The [`Float`] is taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded value is less than, equal to, or greater than the
+    /// exact value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(50).log_base_10_prec(10);
+    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn log_base_10_prec(self, prec: u64) -> (Self, Ordering) {
+        self.log_base_10_prec_round(prec, Nearest)
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the nearest value
+    /// of the specified precision. The [`Float`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded value is less than, equal to, or greater than the
+    /// exact value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(50).log_base_10_prec_ref(10);
+    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn log_base_10_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.log_base_10_prec_round_ref(prec, Nearest)
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the precision of
+    /// the input and with the specified rounding mode. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded value is less than, equal to,
+    /// or greater than the exact value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input's
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(1000).log_base_10_round(Floor);
+    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn log_base_10_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.log_base_10_prec_round(prec, rm)
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the precision of
+    /// the input and with the specified rounding mode. The [`Float`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded value is less than, equal to,
+    /// or greater than the exact value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input's
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(100).log_base_10_round_ref(Ceiling);
+    /// assert_eq!(log.to_string(), "2.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn log_base_10_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.log_base_10_prec_round_ref(self.significant_bits(), rm)
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], in place, rounding the result to the
+    /// specified precision and with the specified rounding mode. An [`Ordering`] is returned,
+    /// indicating whether the rounded value is less than, equal to, or greater than the exact
+    /// value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(50);
+    /// let o = x.log_base_10_prec_round_assign(10, Floor);
+    /// assert_eq!(x.to_string(), "1.697");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn log_base_10_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        let (result, o) = core::mem::take(self).log_base_10_prec_round(prec, rm);
+        *self = result;
+        o
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], in place, rounding the result to the
+    /// nearest value of the specified precision. An [`Ordering`] is returned, indicating whether
+    /// the rounded value is less than, equal to, or greater than the exact value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(1000);
+    /// let o = x.log_base_10_prec_assign(10);
+    /// assert_eq!(x.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn log_base_10_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.log_base_10_prec_round_assign(prec, Nearest)
+    }
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], in place, rounding the result to the
+    /// precision of the input and with the specified rounding mode. An [`Ordering`] is returned,
+    /// indicating whether the rounded value is less than, equal to, or greater than the exact
+    /// value.
+    ///
+    /// See [`Float::log_base_10_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input's
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(100);
+    /// let o = x.log_base_10_round_assign(Nearest);
+    /// assert_eq!(x.to_string(), "2.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn log_base_10_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.log_base_10_prec_round_assign(prec, rm)
+    }
+}
+
+impl LogBase10 for Float {
+    type Output = Self;
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the nearest value
+    /// of the input's precision. The [`Float`] is taken by value.
+    ///
+    /// The base-10 logarithm of any nonzero negative number is `NaN`. See
+    /// [`Float::log_base_10_prec_round`] for the special cases.
+    ///
+    /// $$
+    /// f(x) = \log_{10} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\log_{10} x|\rfloor-p}$ and $p$ is the precision
+    /// of the input.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::LogBase10;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::from(1000).log_base_10().to_string(), "3.0");
+    /// assert_eq!(Float::from(100).log_base_10().to_string(), "2.0");
+    /// ```
+    #[inline]
+    fn log_base_10(self) -> Self {
+        let prec = self.significant_bits();
+        self.log_base_10_prec_round(prec, Nearest).0
+    }
+}
+
+impl LogBase10 for &Float {
+    type Output = Float;
+
+    /// Computes $\log_{10} x$, where $x$ is a [`Float`], rounding the result to the nearest value
+    /// of the input's precision. The [`Float`] is taken by reference.
+    ///
+    /// The base-10 logarithm of any nonzero negative number is `NaN`. See
+    /// [`Float::log_base_10_prec_round`] for the special cases.
+    ///
+    /// $$
+    /// f(x) = \log_{10} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\log_{10} x|\rfloor-p}$ and $p$ is the precision
+    /// of the input.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::LogBase10;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!((&Float::from(1000)).log_base_10().to_string(), "3.0");
+    /// ```
+    #[inline]
+    fn log_base_10(self) -> Float {
+        self.log_base_10_prec_round_ref(self.significant_bits(), Nearest)
+            .0
+    }
+}
+
+impl LogBase10Assign for Float {
+    /// Replaces a [`Float`] $x$ with $\log_{10} x$, rounding the result to the nearest value of the
+    /// input's precision.
+    ///
+    /// The base-10 logarithm of any nonzero negative number is `NaN`. See
+    /// [`Float::log_base_10_prec_round`] for the special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::LogBase10Assign;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(1000);
+    /// x.log_base_10_assign();
+    /// assert_eq!(x.to_string(), "3.0");
+    /// ```
+    #[inline]
+    fn log_base_10_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.log_base_10_prec_round_assign(prec, Nearest);
+    }
+}

@@ -16,11 +16,12 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase, CheckedRoot, IsPowerOf2, LogBase, LogBaseAssign,
+    CeilingLogBase2, CheckedLogBase, IsPowerOf2, LogBase, LogBaseAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
@@ -28,36 +29,14 @@ use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-// Writes `n > 1` as `root ^ mult` with `mult` maximal, so `root` is the "primitive root" of `n` --
-// the smallest integer of which `n` is a power, itself not a perfect power.
-//
-// For example `primitive_root(8) == (2, 3)`, `primitive_root(9) == (3, 2)`, and `primitive_root(10)
-// == (10, 1)` (10 is not a perfect power).
-pub(crate) fn primitive_root(n: u64) -> (u64, u64) {
-    let mut root = n;
-    let mut mult = 1;
-    let mut exp = 2;
-    // `root` can only be a perfect `exp`th power (with a base of at least 2) while `2 ^ exp <=
-    // root`.
-    while exp < u64::WIDTH && (1 << exp) <= root {
-        if let Some(r) = root.checked_root(exp) {
-            root = r;
-            mult *= exp;
-        } else {
-            exp += 1;
-        }
-    }
-    (root, mult)
-}
-
 // Returns `Some(e_x / e_base)` when `log_base(x)` is rational, and `None` when it is irrational.
 // The input `x` must be finite, positive, and not equal to 1, and `base > 1` must not be a power of
 // 2.
 //
 // `log_base(x)` is rational exactly when `x` and `base` are both powers of a common integer `g`,
 // say `x = g ^ e_x` and `base = g ^ e_base`; then `log_base(x) = e_x / e_base`. Taking `g` to be
-// the primitive root of `base` (see `primitive_root`), this holds iff `x` is a positive integer
-// that is a power of `g`.
+// the smallest integer of which `base` is a power (obtained by stripping `base` of perfect-power
+// factors via `express_as_power`), this holds iff `x` is a positive integer that is a power of `g`.
 //
 // Detecting these rational results up front is essential, not just an optimization: when the result
 // is exactly representable (for example `log_9(3) = 1/2`), the Ziv loop in
@@ -78,9 +57,11 @@ pub(crate) fn rational_log_base(x: &Float, base: u64) -> Option<Rational> {
     }
     // `Natural::try_from` fails unless `x` is a nonnegative integer.
     let n = Natural::try_from(x).ok()?;
-    let (root, e_base) = primitive_root(base);
+    // `express_as_power` returns `None` when `base` is not a perfect power, in which case `base`
+    // itself is `g` (with exponent 1).
+    let (root, e_base) = base.express_as_power().unwrap_or((base, 1));
     let e_x = (&n).checked_log_base(&Natural::from(root))?;
-    Some(Rational::from(e_x) / Rational::from(e_base))
+    Some(Rational::from_unsigneds(e_x, e_base))
 }
 
 // The computation of log_base(x, base) is done by log_base(x) = ln(x) / ln(base). When `base` is a
@@ -292,6 +273,16 @@ impl Float {
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(50).log_base_prec(10, 10);
+    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(o, Greater);
+    /// ```
     #[inline]
     pub fn log_base_prec(self, base: u64, prec: u64) -> (Self, Ordering) {
         self.log_base_prec_round(base, prec, Nearest)
@@ -313,6 +304,16 @@ impl Float {
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(50).log_base_prec_ref(10, 10);
+    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(o, Greater);
+    /// ```
     #[inline]
     pub fn log_base_prec_ref(&self, base: u64, prec: u64) -> (Self, Ordering) {
         self.log_base_prec_round_ref(base, prec, Nearest)
@@ -335,6 +336,17 @@ impl Float {
     /// # Panics
     /// Panics if `base` is less than 2, or if `rm` is `Exact` but the result cannot be represented
     /// exactly with the input's precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(1000).log_base_round(10, Floor);
+    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
     #[inline]
     pub fn log_base_round(self, base: u64, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
@@ -358,6 +370,17 @@ impl Float {
     /// # Panics
     /// Panics if `base` is less than 2, or if `rm` is `Exact` but the result cannot be represented
     /// exactly with the input's precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::from(81).log_base_round_ref(3, Ceiling);
+    /// assert_eq!(log.to_string(), "4.0");
+    /// assert_eq!(o, Equal);
+    /// ```
     #[inline]
     pub fn log_base_round_ref(&self, base: u64, rm: RoundingMode) -> (Self, Ordering) {
         self.log_base_prec_round_ref(base, self.significant_bits(), rm)
@@ -380,6 +403,18 @@ impl Float {
     /// # Panics
     /// Panics if `prec` is zero, if `base` is less than 2, or if `rm` is `Exact` but the result
     /// cannot be represented exactly with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(50);
+    /// let o = x.log_base_prec_round_assign(10, 10, Floor);
+    /// assert_eq!(x.to_string(), "1.697");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn log_base_prec_round_assign(
         &mut self,
@@ -408,6 +443,17 @@ impl Float {
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(1000);
+    /// let o = x.log_base_prec_assign(10, 10);
+    /// assert_eq!(x.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
     #[inline]
     pub fn log_base_prec_assign(&mut self, base: u64, prec: u64) -> Ordering {
         self.log_base_prec_round_assign(base, prec, Nearest)
@@ -430,6 +476,18 @@ impl Float {
     /// # Panics
     /// Panics if `base` is less than 2, or if `rm` is `Exact` but the result cannot be represented
     /// exactly with the input's precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(81);
+    /// let o = x.log_base_round_assign(3, Nearest);
+    /// assert_eq!(x.to_string(), "4.0");
+    /// assert_eq!(o, Equal);
+    /// ```
     #[inline]
     pub fn log_base_round_assign(&mut self, base: u64, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();

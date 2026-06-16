@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::arithmetic::log_base::rational_log_base;
+use crate::arithmetic::log_base_10::float_is_power_of_10;
 use crate::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
     exhaustive_finite_floats, exhaustive_floats, exhaustive_non_negative_finite_floats,
@@ -3558,6 +3559,53 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_28() -> It<(Float,
     ))
 }
 
+pub fn log_base_10_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
+    if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    // rm == Exact and x is finite, positive, and not 1: exact only when x = 10^n and the integer n
+    // is representable at the target precision.
+    match float_is_power_of_10(x) {
+        Some(n) => Float::from_unsigned_prec_round(n, prec, Nearest).1 == Equal,
+        None => false,
+    }
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_29() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| log_base_10_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_30() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| log_base_10_prec_round_valid(x, p, rm)),
+    ))
+}
+
+// Valid inputs to `Float::log_base_10_prec_round`, excluding those with `Exact` (a non-`Exact`
+// rounding mode is valid for any `Float`).
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_31() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+        exhaustive_rounding_modes().filter(|rm| *rm != Exact),
+    )))
+}
+
 pub(crate) fn log_base_2_1_plus_x_round_valid(x: &Float, rm: RoundingMode) -> bool {
     rm != Exact || *x == 0u32 || *x <= -1i32
 }
@@ -3610,6 +3658,39 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_41() -> It<(Float, RoundingMo
         lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
             .filter(|(f, rm)| log_base_2_1_plus_x_round_valid(f, *rm)),
     )
+}
+
+pub(crate) fn log_base_10_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    match float_is_power_of_10(x) {
+        Some(n) => Float::from_unsigned_prec_round(n, x.significant_bits(), Nearest).1 == Equal,
+        None => false,
+    }
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_42() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| log_base_10_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_43() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| log_base_10_round_valid(f, *rm)),
+    )
+}
+
+// Valid inputs to `Float::log_base_10_round`, excluding those with `Exact` (a non-`Exact` rounding
+// mode is valid for any `Float`).
+pub fn exhaustive_float_rounding_mode_pair_gen_var_44() -> It<(Float, RoundingMode)> {
+    Box::new(lex_pairs(
+        exhaustive_floats(),
+        exhaustive_rounding_modes().filter(|rm| *rm != Exact),
+    ))
 }
 
 // -- (Integer, PrimitiveUnsigned, RoundingMode) --

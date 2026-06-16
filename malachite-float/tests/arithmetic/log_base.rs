@@ -85,6 +85,10 @@ fn test_log_base_prec_round() {
     test(Float::from(64), 4, 10, Nearest, "3.0", Equal); // log_4(64) = 3
     test(Float::from(8), 2, 10, Exact, "3.0", Equal);
     test(Float::from(1000000), 8, 10, Nearest, "6.64", Less); // log_8(10^6), inexact
+    // Perfect-power base: exercises the express_as_power reduction (base 9 -> root 3) and the
+    // dyadic exact case.
+    test(Float::from(3), 9, 10, Exact, "0.5", Equal); // log_9(3) = 1/2
+    test(Float::from(81), 9, 10, Exact, "2.0", Equal); // log_9(81) = 2
     // Inexact.
     test(Float::from(50), 10, 10, Floor, "1.697", Less);
     test(Float::from(50), 10, 10, Ceiling, "1.699", Greater);
@@ -111,9 +115,11 @@ fn test_log_base_directed_consistency() {
         (Float::from(81), 3, 30),
         (Float::from(2), 3, 30),
         (Float::from(7), 5, 40),
-        (Float::from(8), 2, 30),      // power-of-2 base
-        (Float::from(64), 4, 30),     // power-of-2 base
-        (Float::from(1) >> 5, 3, 30), // 1/32, negative result
+        (Float::from(8), 2, 30),         // power-of-2 base
+        (Float::from(64), 4, 30),        // power-of-2 base
+        (Float::from(1) >> 5, 3, 30),    // 1/32, negative result
+        (Float::from(5) >> 1, 3, 30),    // 2.5, a non-integer >= 1
+        (Float::from(3) << 1000, 5, 10), // huge exponent: exercises the balloon-safety guard
     ];
     for (x, base, prec) in inputs {
         let (floor, _) = check(x, *base, *prec, Floor);
