@@ -12,6 +12,7 @@ use crate::exhaustive::{
     exhaustive_nonzero_finite_floats, exhaustive_positive_finite_floats,
     exhaustive_positive_floats_with_precision, exhaustive_positive_floats_with_sci_exponent,
 };
+use crate::arithmetic::log_base::rational_log_base;
 use crate::test_util::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
@@ -2262,6 +2263,54 @@ pub fn log_base_power_of_2_prec_round_valid(
                 == Equal
 }
 
+pub fn log_base_prec_round_valid(x: &Float, base: u64, prec: u64, rm: RoundingMode) -> bool {
+    if base < 2 {
+        return false;
+    }
+    if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    // rm == Exact and x is finite, positive, and not 1: exact only when log_base(x) is a rational
+    // that is representable at the target precision.
+    if base.is_power_of_2() {
+        return log_base_power_of_2_prec_round_valid(x, i64::from(base.trailing_zeros()), prec, rm);
+    }
+    match rational_log_base(x, base) {
+        Some(q) => Float::from_rational_prec_round(q, prec, Nearest).1 == Equal,
+        None => false,
+    }
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base, prec), rm)| log_base_prec_round_valid(x, base, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base, prec), rm)| log_base_prec_round_valid(x, base, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_5()
 -> It<(Float, i64, u64, RoundingMode)> {
     reshape_3_1_to_4(Box::new(
@@ -3462,6 +3511,50 @@ pub fn exhaustive_float_signed_rounding_mode_triple_gen_var_8() -> It<(Float, i6
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, pow), rm)| log_base_power_of_2_round_valid(x, pow, rm)),
+    ))
+}
+
+pub(crate) fn log_base_round_valid(x: &Float, base: u64, rm: RoundingMode) -> bool {
+    if base < 2 {
+        return false;
+    }
+    if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    if base.is_power_of_2() {
+        return log_base_power_of_2_round_valid(x, i64::from(base.trailing_zeros()), rm);
+    }
+    match rational_log_base(x, base) {
+        Some(q) => Float::from_rational_prec_round(q, x.significant_bits(), Nearest).1 == Equal,
+        None => false,
+    }
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_27() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base), rm)| log_base_round_valid(x, base, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_28() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base), rm)| log_base_round_valid(x, base, rm)),
     ))
 }
 

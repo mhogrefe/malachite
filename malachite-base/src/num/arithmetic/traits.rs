@@ -614,6 +614,18 @@ pub trait LogBasePowerOf2Assign<POW> {
     fn log_base_power_of_2_assign(&mut self, pow: POW);
 }
 
+/// Calculates the base-$b$ logarithm of a number, rounding the (generally irrational) result.
+pub trait LogBase<B = Self> {
+    type Output;
+
+    fn log_base(self, base: B) -> Self::Output;
+}
+
+/// Replaces a number with its base-$b$ logarithm, rounding the (generally irrational) result.
+pub trait LogBaseAssign<B = Self> {
+    fn log_base_assign(&mut self, base: B);
+}
+
 /// Adds two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 pub trait ModAdd<RHS = Self, M = Self> {
     type Output;

@@ -1968,6 +1968,28 @@ pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4<T: PrimitiveUns
     )
 }
 
+// All `(Float, u64, u64, RoundingMode)` that are valid inputs to `Float::log_base_prec_round`, with
+// the first `u64` (the base) greater than 1.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+    )
+}
+
+// All `(Float, u64, u64, RoundingMode)` that are valid inputs to `Float::log_base_prec_round`, with
+// the first `u64` (the base) greater than 1, where the `Float` may have an extreme exponent.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6,
+    )
+}
+
 // -- (Float, PrimitiveUnsigned, RoundingMode) --
 
 // All `(Float, u64, RoundingMode)` that are valid inputs to `Float.set_prec_round`.
@@ -2452,6 +2474,26 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_26() -> Generator<(Float, u64
         &exhaustive_float_unsigned_rounding_mode_triple_gen_var_26,
         &random_float_unsigned_rounding_mode_triple_gen_var_26,
         &special_random_float_unsigned_rounding_mode_triple_gen_var_26,
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float::log_base_round`, with the `u64`
+// (the base) greater than 1.
+pub fn float_unsigned_rounding_mode_triple_gen_var_27() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_27,
+        &random_float_unsigned_rounding_mode_triple_gen_var_27,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_27,
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float::log_base_round`, with the `u64`
+// (the base) greater than 1, where the `Float` may have an extreme exponent.
+pub fn float_unsigned_rounding_mode_triple_gen_var_28() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_28,
+        &random_float_unsigned_rounding_mode_triple_gen_var_28,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_28,
     )
 }
 

@@ -23,7 +23,8 @@ use crate::test_util::generators::exhaustive::{
     div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
     from_primitive_float_prec_round_valid, integer_rounding_from_float_valid,
     ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
-    ln_rational_prec_round_valid, ln_round_valid, log_base_2_1_plus_x_prec_round_valid,
+    ln_rational_prec_round_valid, ln_round_valid, log_base_prec_round_valid, log_base_round_valid,
+    log_base_2_1_plus_x_prec_round_valid,
     log_base_2_1_plus_x_round_valid, log_base_2_prec_round_valid,
     log_base_2_rational_prec_round_valid, log_base_2_round_valid,
     log_base_power_of_2_1_plus_x_prec_round_valid, log_base_power_of_2_1_plus_x_round_valid,
@@ -4300,6 +4301,84 @@ pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_6(
     )
 }
 
+pub fn random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Float, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    2,
+                    u64::MAX,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, base, prec, rm)| log_base_prec_round_valid(x, base, prec, rm)),
+    )
+}
+
+pub fn random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6(
+    config: &GenConfig,
+) -> It<(Float, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    2,
+                    u64::MAX,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, base, prec, rm)| log_base_prec_round_valid(x, base, prec, rm)),
+    )
+}
+
 pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_7(
     config: &GenConfig,
 ) -> It<(Float, i64, u64, RoundingMode)> {
@@ -6170,6 +6249,70 @@ pub fn random_float_signed_rounding_mode_triple_gen_var_8(
             &random_rounding_modes,
         )
         .filter(|&(ref x, pow, rm)| log_base_power_of_2_round_valid(x, pow, rm)),
+    )
+}
+
+pub fn random_float_unsigned_rounding_mode_triple_gen_var_27(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    2,
+                    u64::MAX,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, base, rm)| log_base_round_valid(x, base, rm)),
+    )
+}
+
+pub fn random_float_unsigned_rounding_mode_triple_gen_var_28(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    2,
+                    u64::MAX,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, base, rm)| log_base_round_valid(x, base, rm)),
     )
 }
 

@@ -29,6 +29,10 @@ pub mod ln;
 /// [`Ln1PlusXAssign`](malachite_base::num::arithmetic::traits::Ln1PlusXAssign), traits for
 /// computing $\ln(1+x)$ for [`Float`](super::Float)s.
 pub mod ln_1_plus_x;
+/// [`LogBase`](malachite_base::num::arithmetic::traits::LogBase) and
+/// [`LogBaseAssign`](malachite_base::num::arithmetic::traits::LogBaseAssign), traits for computing
+/// the base-$b$ logarithm of [`Float`](super::Float)s for an arbitrary integer base $b>1$.
+pub mod log_base;
 /// [`LogBase2`](malachite_base::num::arithmetic::traits::LogBase2) and
 /// [`LogBase2Assign`](malachite_base::num::arithmetic::traits::LogBase2Assign), traits for
 /// computing the base-2 logarithm of [`Float`](super::Float)s.

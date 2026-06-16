@@ -1610,6 +1610,15 @@ fn log_base_2_prec_round_fail() {
     });
 }
 
+// `Rational::exact_from(&x)` produces an integer whose bit length is roughly `x`'s exponent
+// magnitude (up to Float::MAX_EXPONENT ~ 2^30), so cross-checking the Float log against the Rational
+// log is only affordable when that exponent is modest. Normal-range floats always pass; only the
+// extreme-exponent floats from the var_4 / var_24 generators are filtered out, where the conversion
+// would otherwise build a ~10^9-bit integer and run for minutes.
+fn rational_cross_check_cheap(x: &Float) -> bool {
+    x.get_exponent().is_some_and(|e| e.unsigned_abs() < 1 << 16)
+}
+
 #[allow(clippy::needless_pass_by_value)]
 fn log_base_2_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (log_base_2, o) = x.clone().log_base_2_prec_round(prec, rm);
@@ -1639,7 +1648,11 @@ fn log_base_2_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode
         assert_eq!(rug_o, o);
     }
 
-    if x.is_finite() && x != 0u32 {
+    // Cross-check against the Rational log path. This is skipped for extreme-exponent inputs:
+    // `Rational::exact_from(&x)` expands `x`'s exponent (up to Float::MAX_EXPONENT ~ 2^30) into an
+    // integer of that many bits, so the conversion alone would be prohibitively slow. The Rational
+    // path's large-magnitude handling is covered separately by the rational_* generators.
+    if x.is_finite() && x != 0u32 && rational_cross_check_cheap(&x) {
         let (log_base_2_alt, o_alt) =
             Float::log_base_2_rational_prec_round_ref(&Rational::exact_from(&x), prec, rm);
         assert_eq!(
@@ -1765,7 +1778,8 @@ fn log_base_2_prec_properties_helper(x: Float, prec: u64) {
     );
     assert_eq!(o_alt, o);
 
-    if x.is_finite() && x != 0u32 {
+    // See log_base_2_prec_round_properties_helper for why extreme-exponent inputs are skipped.
+    if x.is_finite() && x != 0u32 && rational_cross_check_cheap(&x) {
         let (log_base_2_alt, o_alt) =
             Float::log_base_2_rational_prec_ref(&Rational::exact_from(&x), prec);
         assert_eq!(
