@@ -409,6 +409,17 @@ pub fn rational_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: Primitiv
     )
 }
 
+// All `(Rational, T, U)` where `T` is small, signed, and nonzero, and `U` is small, unsigned, and
+// positive.
+pub fn rational_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>()
+-> Generator<(Rational, T, U)> {
+    Generator::new(
+        &exhaustive_rational_signed_unsigned_triple_gen_var_2,
+        &random_rational_signed_unsigned_triple_gen_var_2,
+        &special_random_rational_signed_unsigned_triple_gen_var_2,
+    )
+}
+
 // -- (Rational, PrimitiveUnsigned) --
 
 pub fn rational_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(Rational, T)> {

@@ -24,8 +24,13 @@ use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_5,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_5_rm,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_6,
+    rational_signed_unsigned_rounding_mode_quadruple_gen_var_1,
 };
-use malachite_float::{ComparableFloat, ComparableFloatRef};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::test_util::bench::bucketers::{
+    quadruple_1_2_3_rational_bit_i64_u64_max_bucketer, triple_rational_bit_i64_u64_max_bucketer,
+};
+use malachite_q::test_util::generators::rational_signed_unsigned_triple_gen_var_2;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_power_of_2);
@@ -64,6 +69,26 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_float_log_base_power_of_2_prec_round_assign_debug
     );
+    register_demo!(runner, demo_float_log_base_power_of_2_rational_prec);
+    register_demo!(runner, demo_float_log_base_power_of_2_rational_prec_debug);
+    register_demo!(runner, demo_float_log_base_power_of_2_rational_prec_ref);
+    register_demo!(
+        runner,
+        demo_float_log_base_power_of_2_rational_prec_ref_debug
+    );
+    register_demo!(runner, demo_float_log_base_power_of_2_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_float_log_base_power_of_2_rational_prec_round_debug
+    );
+    register_demo!(
+        runner,
+        demo_float_log_base_power_of_2_rational_prec_round_ref
+    );
+    register_demo!(
+        runner,
+        demo_float_log_base_power_of_2_rational_prec_round_ref_debug
+    );
 
     register_bench!(
         runner,
@@ -94,6 +119,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_float_log_base_power_of_2_prec_round_assign
+    );
+    register_bench!(
+        runner,
+        benchmark_float_log_base_power_of_2_rational_prec_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_float_log_base_power_of_2_rational_prec_round_evaluation_strategy
     );
 }
 
@@ -821,5 +854,225 @@ fn benchmark_float_log_base_power_of_2_prec_round_assign(
                 no_out!(x.log_base_power_of_2_prec_round_assign(pow, prec, rm));
             },
         )],
+    );
+}
+
+fn demo_float_log_base_power_of_2_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow, p) in rational_signed_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::log_base_power_of_2_rational_prec({}, {}, {}) = {:?}",
+            n.clone(),
+            pow,
+            p,
+            Float::log_base_power_of_2_rational_prec(n, pow, p)
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow, p) in rational_signed_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (f, o) = Float::log_base_power_of_2_rational_prec(n.clone(), pow, p);
+        println!(
+            "Float::log_base_power_of_2_rational_prec({}, {}, {}) = ({:#x}, {:?})",
+            n,
+            pow,
+            p,
+            ComparableFloat(f),
+            o
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow, p) in rational_signed_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::log_base_power_of_2_rational_prec_ref(&{}, {}, {}) = {:?}",
+            n,
+            pow,
+            p,
+            Float::log_base_power_of_2_rational_prec_ref(&n, pow, p)
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow, p) in rational_signed_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (f, o) = Float::log_base_power_of_2_rational_prec_ref(&n, pow, p);
+        println!(
+            "Float::log_base_power_of_2_rational_prec_ref(&{}, {}, {}) = {:x?}",
+            n,
+            pow,
+            p,
+            (ComparableFloat(f), o)
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow, p, rm) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::log_base_power_of_2_rational_prec_round({}, {}, {}, {:?}) = {:?}",
+            n.clone(),
+            pow,
+            p,
+            rm,
+            Float::log_base_power_of_2_rational_prec_round(n, pow, p, rm)
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow, p, rm) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (f, o) = Float::log_base_power_of_2_rational_prec_round(n.clone(), pow, p, rm);
+        println!(
+            "Float::log_base_power_of_2_rational_prec_round({}, {}, {}, {:?}) = {:x?}",
+            n,
+            pow,
+            p,
+            rm,
+            (ComparableFloat(f), o)
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_round_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow, p, rm) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::log_base_power_of_2_rational_prec_round_ref(&{}, {}, {}, {:?}) = {:?}",
+            n,
+            pow,
+            p,
+            rm,
+            Float::log_base_power_of_2_rational_prec_round_ref(&n, pow, p, rm)
+        );
+    }
+}
+
+fn demo_float_log_base_power_of_2_rational_prec_round_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow, p, rm) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (f, o) = Float::log_base_power_of_2_rational_prec_round_ref(&n, pow, p, rm);
+        println!(
+            "Float::log_base_power_of_2_rational_prec_round_ref(&{}, {}, {}, {:?}) = {:x?}",
+            n,
+            pow,
+            p,
+            rm,
+            (ComparableFloat(f), o)
+        );
+    }
+}
+
+fn benchmark_float_log_base_power_of_2_rational_prec_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::log_base_power_of_2_rational_prec(Rational, i64, u64)",
+        BenchmarkType::EvaluationStrategy,
+        rational_signed_unsigned_triple_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_rational_bit_i64_u64_max_bucketer("n", "pow", "prec"),
+        &mut [
+            (
+                "Float::log_base_power_of_2_rational_prec(Rational, i64, u64)",
+                &mut |(n, pow, prec)| {
+                    no_out!(Float::log_base_power_of_2_rational_prec(n, pow, prec));
+                },
+            ),
+            (
+                "Float::log_base_power_of_2_rational_prec_ref(&Rational, i64, u64)",
+                &mut |(n, pow, prec)| {
+                    no_out!(Float::log_base_power_of_2_rational_prec_ref(&n, pow, prec));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_log_base_power_of_2_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::log_base_power_of_2_rational_prec_round(Rational, i64, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_signed_unsigned_rounding_mode_quadruple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_rational_bit_i64_u64_max_bucketer("n", "pow", "prec"),
+        &mut [
+            (
+                "Float::log_base_power_of_2_rational_prec_round(Rational, i64, u64, RoundingMode)",
+                &mut |(n, pow, prec, rm)| {
+                    no_out!(Float::log_base_power_of_2_rational_prec_round(
+                        n, pow, prec, rm
+                    ));
+                },
+            ),
+            (
+                "Float::log_base_power_of_2_rational_prec_round_ref(&Rational, i64, u64, \
+                 RoundingMode)",
+                &mut |(n, pow, prec, rm)| {
+                    no_out!(Float::log_base_power_of_2_rational_prec_round_ref(
+                        &n, pow, prec, rm
+                    ));
+                },
+            ),
+        ],
     );
 }

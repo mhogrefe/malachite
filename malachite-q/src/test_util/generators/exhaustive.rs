@@ -283,6 +283,20 @@ pub fn exhaustive_rational_signed_unsigned_triple_gen_var_1<
     ))
 }
 
+pub fn exhaustive_rational_signed_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Rational, T, U)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_rationals(),
+        exhaustive_nonzero_signeds::<T>(),
+        exhaustive_positive_primitive_ints::<U>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
 // -- (Rational, PrimitiveSigned, RoundingMode) --
 
 pub fn exhaustive_rational_signed_rounding_mode_triple_gen_var_1()

@@ -5,6 +5,7 @@ MAX_LINE_LENGTH = 100
 line_length_exceptions = set((
     # long Markdown table rows and/or links
     ('./malachite-base/src/lib.rs', 65),
+    ('./malachite-float/src/arithmetic/mod.rs', 46),
     ('./malachite-base/src/num/arithmetic/mod.rs', 339),
     ('./malachite-base/src/num/arithmetic/mod.rs', 340),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1340),

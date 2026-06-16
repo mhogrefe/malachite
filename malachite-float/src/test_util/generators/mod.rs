@@ -1487,6 +1487,52 @@ pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_5_rm() -> Generator
     )
 }
 
+// All `(Float, i64, u64, RoundingMode)` that are valid inputs to
+// `Float::log_base_power_of_2_1_plus_x_prec_round`, with the `i64` (the power) nonzero.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_7()
+-> Generator<(Float, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_7,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_7,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_7,
+    )
+}
+
+// All `(Float, i64, u64, RoundingMode)` that are valid inputs to
+// `Float::log_base_power_of_2_1_plus_x_prec_round`, with the `i64` (the power) nonzero, where the
+// `Float` may have an extreme exponent.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_8()
+-> Generator<(Float, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_8,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_8,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_8,
+    )
+}
+
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_7_rm() -> Generator<(
+    (rug::Float, i64, u64, rug::float::Round),
+    (Float, i64, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_t_u_rounding_mode_quadruple_rm(
+                exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_7(),
+            )
+        },
+        &|config| {
+            float_t_u_rounding_mode_quadruple_rm(
+                random_float_signed_unsigned_rounding_mode_quadruple_gen_var_7(config),
+            )
+        },
+        &|config| {
+            float_t_u_rounding_mode_quadruple_rm(
+                special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_7(config),
+            )
+        },
+    )
+}
+
 // -- (Float, PrimitiveSigned, RoundingMode) --
 
 // All `(Float, T, RoundingMode)` where `T` is signed and the triple is a valid input to
@@ -1636,6 +1682,49 @@ pub fn float_signed_rounding_mode_triple_gen_var_7_rm() -> Generator<(
         &|config| {
             float_t_rounding_mode_triple_rm(
                 special_random_float_signed_rounding_mode_triple_gen_var_7(config),
+            )
+        },
+    )
+}
+
+// All `(Float, i64, RoundingMode)` that are valid inputs to
+// `Float::log_base_power_of_2_1_plus_x_round`, with the `i64` (the power) nonzero.
+pub fn float_signed_rounding_mode_triple_gen_var_9() -> Generator<(Float, i64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_rounding_mode_triple_gen_var_9,
+        &random_float_signed_rounding_mode_triple_gen_var_9,
+        &special_random_float_signed_rounding_mode_triple_gen_var_9,
+    )
+}
+
+// All `(Float, i64, RoundingMode)` that are valid inputs to
+// `Float::log_base_power_of_2_1_plus_x_round`, with the `i64` (the power) nonzero, where the
+// `Float` may have an extreme exponent.
+pub fn float_signed_rounding_mode_triple_gen_var_10() -> Generator<(Float, i64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_rounding_mode_triple_gen_var_10,
+        &random_float_signed_rounding_mode_triple_gen_var_10,
+        &special_random_float_signed_rounding_mode_triple_gen_var_10,
+    )
+}
+
+pub fn float_signed_rounding_mode_triple_gen_var_9_rm() -> Generator<(
+    (rug::Float, i64, rug::float::Round),
+    (Float, i64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            let ts = exhaustive_float_signed_rounding_mode_triple_gen_var_9();
+            float_t_rounding_mode_triple_rm(ts)
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(random_float_signed_rounding_mode_triple_gen_var_9(
+                config,
+            ))
+        },
+        &|config| {
+            float_t_rounding_mode_triple_rm(
+                special_random_float_signed_rounding_mode_triple_gen_var_9(config),
             )
         },
     )
@@ -3598,6 +3687,19 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_7() -> GT3 {
         &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_7,
         &random_rational_unsigned_rounding_mode_triple_gen_var_7,
         &special_random_rational_unsigned_rounding_mode_triple_gen_var_8,
+    )
+}
+
+// -- (Rational, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Rational, i64, u64, RoundingMode)` that are valid inputs to
+// `Float::log_base_power_of_2_rational_prec_round`.
+pub fn rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Rational, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_signed_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_rational_signed_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_rational_signed_unsigned_rounding_mode_quadruple_gen_var_1,
     )
 }
 

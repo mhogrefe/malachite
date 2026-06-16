@@ -685,6 +685,38 @@ pub fn random_rational_signed_unsigned_triple_gen_var_1<
     ))
 }
 
+pub fn random_rational_signed_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Rational, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_nonzero_signeds::<T>(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds::<U>(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Rational, PrimitiveSigned, RoundingMode) --
 
 pub fn random_rational_signed_rounding_mode_triple_gen_var_1(

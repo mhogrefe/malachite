@@ -41,6 +41,11 @@ pub mod log_base_2_1_plus_x;
 /// [`LogBasePowerOf2Assign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Assign),
 /// traits for computing $\log_{2^k} x$ for [`Float`](super::Float)s.
 pub mod log_base_power_of_2;
+/// [`LogBasePowerOf2Of1PlusX`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusX)
+/// and
+/// [`LogBasePowerOf2Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusXAssign),
+/// traits for computing $\log_{2^k}(1+x)$ for [`Float`](super::Float)s.
+pub mod log_base_power_of_2_1_plus_x;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod mul;

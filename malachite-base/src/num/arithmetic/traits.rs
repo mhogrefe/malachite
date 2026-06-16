@@ -554,6 +554,18 @@ pub trait LogBase2Of1PlusXAssign {
     fn log_base_2_1_plus_x_assign(&mut self);
 }
 
+/// Computes $\log_{2^k}(1+x)$.
+pub trait LogBasePowerOf2Of1PlusX<POW> {
+    type Output;
+
+    fn log_base_power_of_2_1_plus_x(self, pow: POW) -> Self::Output;
+}
+
+/// Replaces a number $x$ by $\log_{2^k}(1+x)$.
+pub trait LogBasePowerOf2Of1PlusXAssign<POW> {
+    fn log_base_power_of_2_1_plus_x_assign(&mut self, pow: POW);
+}
+
 /// Calculates the floor of the base-2 logarithm of a number.
 pub trait FloorLogBase2 {
     type Output;

@@ -646,7 +646,17 @@ pub(crate) fn limbs_float_mul_high_same_length_scratch_len(len: usize) -> usize 
         if k == 0 {
             0
         } else {
-            limbs_mul_same_length_to_out_scratch_len(max(len, len - k))
+            // The recursive case in `limbs_float_mul_high_same_length` reuses `scratch` for a
+            // full multiply of length `k` and two recursive mul-highs of length `l = len - k`, so
+            // the requirement is the max of those, not `scratch_len(len)`. Because Toom/FFT
+            // scratch requirements are not monotonic in the operand length, `scratch_len(len)` can
+            // be smaller than `scratch_len(k)` and under-size the buffer (mirrors the already-
+            // correct `limbs_float_square_high_scratch_len`).
+            let l = len - k;
+            max(
+                limbs_mul_same_length_to_out_scratch_len(k),
+                limbs_float_mul_high_same_length_scratch_len(l),
+            )
         }
     }
 }
@@ -957,4 +967,62 @@ fn mul_float_significands_general(
         exp_offset,
         inexact.sign(),
     )
+}
+
+#[cfg(test)]
+mod float_mul_high_tests {
+    use super::*;
+    use crate::natural::Natural;
+
+    // Deterministically fill `xs` with a normalized significand (most significant bit set).
+    fn fill(xs: &mut [Limb], mut seed: u64) {
+        for x in xs.iter_mut() {
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            *x = Limb::wrapping_from(seed >> 11);
+        }
+        *xs.last_mut().unwrap() |= 1 << (Limb::WIDTH - 1);
+    }
+
+    // Regression test for the mul-high scratch under-sizing bug. For operand lengths in the Toom
+    // band just below `MUL_FFT_THRESHOLD`, the old `scratch_len(len)` formula could return far less
+    // than the recursion actually consumes (as little as 0 where 1510 limbs are needed), which
+    // panicked deep in a Toom routine with "scratch too short". This checks that, for a range of
+    // lengths spanning that band and the FFT boundary, the scratch the size function reports is
+    // sufficient (no panic) and that the high-limb approximation matches the true product (the
+    // documented error is less than `len` ulps of the low limb of the high window).
+    #[test]
+    fn mul_high_scratch_len_sufficient_and_correct() {
+        for len in [5, 30, 100, 500, 800, 999, 1000, 1001, 1100, 1250, 1400, 1499, 1500, 1501, 1600]
+        {
+            let mut xs = vec![0; len];
+            let mut ys = vec![0; len];
+            fill(&mut xs, 0x1234_5678 ^ u64::wrapping_from(len));
+            fill(
+                &mut ys,
+                0x9abc_def0 ^ u64::wrapping_from(len).rotate_left(17),
+            );
+            let mut out = vec![0; len << 1];
+            let mut scratch = vec![0; limbs_float_mul_high_same_length_scratch_len(len)];
+            limbs_float_mul_high_same_length(&mut out, &xs, &ys, &mut scratch);
+
+            let mut full = vec![0; len << 1];
+            let mut full_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(len)];
+            limbs_mul_same_length_to_out(&mut full, &xs, &ys, &mut full_scratch);
+
+            // Compare the top `len` limbs of the approximation against the true product.
+            let approx = Natural::from_limbs_asc(&out[len..len << 1]);
+            let exact = Natural::from_limbs_asc(&full[len..len << 1]);
+            let diff = if approx <= exact {
+                exact - approx
+            } else {
+                approx - exact
+            };
+            assert!(
+                diff <= Natural::from(u64::wrapping_from(len << 1)),
+                "len={len}: mul-high approximation error too large"
+            );
+        }
+    }
 }

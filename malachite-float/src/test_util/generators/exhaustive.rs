@@ -2296,6 +2296,60 @@ pub fn log_base_2_1_plus_x_prec_round_valid(x: &Float, _prec: u64, rm: RoundingM
     rm != Exact || *x == 0u32 || *x <= -1i32
 }
 
+pub fn log_base_power_of_2_1_plus_x_prec_round_valid(
+    x: &Float,
+    pow: i64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if pow == 0 {
+        return false;
+    }
+    // For `Exact` the result must be representable: this happens when `x` is special (NaN,
+    // infinite, zero, or at most -1, all of which give NaN, an infinity, or a signed zero), or when
+    // `1 + x = 2^m` and `m / pow` rounds exactly at `prec`.
+    rm != Exact
+        || !x.is_finite()
+        || *x == 0u32
+        || *x <= -1i32
+        || crate::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x)
+            .is_some_and(|m| Float::from(m).div_prec(Float::from(pow), prec).1 == Equal)
+}
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_7()
+-> It<(Float, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_nonzero_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, pow, prec), rm)| {
+            log_base_power_of_2_1_plus_x_prec_round_valid(x, pow, prec, rm)
+        }),
+    ))
+}
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_8()
+-> It<(Float, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_nonzero_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, pow, prec), rm)| {
+            log_base_power_of_2_1_plus_x_prec_round_valid(x, pow, prec, rm)
+        }),
+    ))
+}
+
 pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_25() -> It<(Float, u64, RoundingMode)>
 {
     reshape_2_1_to_3(Box::new(
@@ -3415,6 +3469,42 @@ pub(crate) fn log_base_2_1_plus_x_round_valid(x: &Float, rm: RoundingMode) -> bo
     rm != Exact || *x == 0u32 || *x <= -1i32
 }
 
+pub fn log_base_power_of_2_1_plus_x_round_valid(x: &Float, pow: i64, rm: RoundingMode) -> bool {
+    if pow == 0 {
+        return false;
+    }
+    rm != Exact
+        || !x.is_finite()
+        || *x == 0u32
+        || *x <= -1i32
+        || crate::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x).is_some_and(|m| {
+            Float::from(m)
+                .div_prec(Float::from(pow), x.significant_bits())
+                .1
+                == Equal
+        })
+}
+
+pub fn exhaustive_float_signed_rounding_mode_triple_gen_var_9() -> It<(Float, i64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_nonzero_signeds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, pow), rm)| log_base_power_of_2_1_plus_x_round_valid(x, pow, rm)),
+    ))
+}
+
+pub fn exhaustive_float_signed_rounding_mode_triple_gen_var_10() -> It<(Float, i64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_extreme_floats(), exhaustive_nonzero_signeds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, pow), rm)| log_base_power_of_2_1_plus_x_round_valid(x, pow, rm)),
+    ))
+}
+
 pub fn exhaustive_float_rounding_mode_pair_gen_var_40() -> It<(Float, RoundingMode)> {
     Box::new(
         lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
@@ -3721,6 +3811,44 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_7()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| log_base_2_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+// -- (Rational, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn log_base_power_of_2_rational_prec_round_valid(
+    x: &Rational,
+    pow: i64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if pow == 0 {
+        return false;
+    }
+    // `checked_log_base_2` panics for nonpositive arguments, so the order of these tests matters.
+    rm != Exact
+        || *x <= 0
+        || x.checked_log_base_2()
+            .is_some_and(|k| Float::from(k).div_prec(Float::from(pow), prec).1 == Equal)
+}
+
+pub fn exhaustive_rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Rational, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_nonzero_signeds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, pow, prec), rm)| {
+            log_base_power_of_2_rational_prec_round_valid(n, pow, prec, rm)
+        }),
     ))
 }
 

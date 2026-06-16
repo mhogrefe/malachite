@@ -36,7 +36,7 @@ use malachite_nz::platform::Limb;
 // positive, or the exponent of `x` is 0 (so `x` is $-(1 - 2^{-j})$ and $k = -j$) when `x` is
 // negative. This replaces MPFR's `mpfr_log2p1_isexact`, which adds 1 to `x` and tests for a power
 // of 2; we test the significand's bits directly.
-fn log_base_2_1_plus_x_exact(x: &Float) -> Option<i64> {
+pub(crate) fn log_base_2_1_plus_x_exact(x: &Float) -> Option<i64> {
     let j = i64::exact_from(float_significand_leading_ones(
         x.significand_ref().unwrap(),
     )?);
