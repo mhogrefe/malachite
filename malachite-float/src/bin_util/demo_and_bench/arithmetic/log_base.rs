@@ -551,12 +551,7 @@ fn benchmark_float_log_base_evaluation_strategy(
     );
 }
 
-fn benchmark_float_log_base_assign(
-    gm: GenMode,
-    config: &GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_float_log_base_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Float.log_base_assign(u64)",
         BenchmarkType::Single,

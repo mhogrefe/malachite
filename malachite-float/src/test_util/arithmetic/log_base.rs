@@ -33,11 +33,11 @@ fn simplest_dyadic_in(lo: &Rational, hi: &Rational) -> Rational {
     }
 }
 
-// Returns `Some(n)` if the rug `Float` `x` (finite and positive, and not 1) equals `base^n` for some
-// integer `n >= 1`. This short-circuits the exact case, which the bracketing Ziv loop could never
-// resolve (`log_base(base^n) = n` is an exactly-representable integer). It is balloon-safe: `x` is
-// materialized as an integer only when its exponent is within `64 * prec` of being a representable
-// power, the same bound used by the implementation under test.
+// Returns `Some(n)` if the rug `Float` `x` (finite and positive, and not 1) equals `base^n` for
+// some integer `n >= 1`. This short-circuits the exact case, which the bracketing Ziv loop could
+// never resolve (`log_base(base^n) = n` is an exactly-representable integer). It is balloon-safe:
+// `x` is materialized as an integer only when its exponent is within `64 * prec` of being a
+// representable power, the same bound used by the implementation under test.
 fn rug_log_base_exact(x: &rug::Float, base: u64) -> Option<u64> {
     // Cheap rejection of the overwhelmingly common non-integer case before the (more expensive)
     // conversion to a malachite `Float` and `Natural`.
@@ -55,10 +55,10 @@ fn rug_log_base_exact(x: &rug::Float, base: u64) -> Option<u64> {
 
 // log_base(x, base) = ln(x) / ln(base). rug serves as an independent oracle by bracketing: compute
 // ln(x) and ln(base) at a generous working precision rounding down and up, divide the brackets, and
-// round both to `prec`. The true result lies between the two chains, so when both agree on the value
-// and the ternary the answer is correctly rounded. Because ln(base) > 0 (base > 1), ln(x)/ln(base)
-// increases with ln(x), so each bound divides the corresponding ln(x) bracket by the ln(base)
-// bracket endpoint that extremizes it (which depends on the sign of ln(x)). The exact case
+// round both to `prec`. The true result lies between the two chains, so when both agree on the
+// value and the ternary the answer is correctly rounded. Because ln(base) > 0 (base > 1),
+// ln(x)/ln(base) increases with ln(x), so each bound divides the corresponding ln(x) bracket by the
+// ln(base) bracket endpoint that extremizes it (which depends on the sign of ln(x)). The exact case
 // x = base^n is detected up front, since then the result is an exactly-representable integer the
 // brackets could never resolve.
 pub fn rug_log_base_prec_round(
@@ -67,18 +67,21 @@ pub fn rug_log_base_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    if x.is_finite() && x.is_sign_positive() && *x != 1u32 {
-        if let Some(n) = rug_log_base_exact(x, base) {
-            return rug::Float::with_val_round(u32::exact_from(prec), n, rm);
-        }
+    if x.is_finite()
+        && x.is_sign_positive()
+        && *x != 1u32
+        && let Some(n) = rug_log_base_exact(x, base)
+    {
+        return rug::Float::with_val_round(u32::exact_from(prec), n, rm);
     }
     let target_prec = u32::exact_from(prec);
     let mut working_prec = (prec << 1) + 128 + (rug_float_significant_bits(x) << 1);
-    // A genuinely irrational log_base(x) converges at a working precision close to the target. If the
-    // precision grows far past that, the true value must be an exactly-representable dyadic that the
-    // brackets straddle (for example log_4(2) = 1/2, or log_9(27) = 3/2) -- a case the integer-power
-    // detection above does not catch. This threshold is far above where any irrational result for
-    // the (bounded) test inputs converges, and far below the runaway the straddle would cause.
+    // A genuinely irrational log_base(x) converges at a working precision close to the target. If
+    // the precision grows far past that, the true value must be an exactly-representable dyadic
+    // that the brackets straddle (for example log_4(2) = 1/2, or log_9(27) = 3/2) -- a case the
+    // integer-power detection above does not catch. This threshold is far above where any
+    // irrational result for the (bounded) test inputs converges, and far below the runaway the
+    // straddle would cause.
     let exact_threshold = (prec << 1) + 512;
     loop {
         let wp = u32::exact_from(working_prec);
@@ -94,8 +97,16 @@ pub fn rug_log_base_prec_round(
         let mut b_hi = rug::Float::with_val(wp, 0);
         b_hi.assign_round(base_float.ln_ref(), Round::Up);
         // q_lo <= ln(x) / ln(base) <= q_hi
-        let q_lo_den = if a_lo.is_sign_negative() { &b_lo } else { &b_hi };
-        let q_hi_den = if a_hi.is_sign_negative() { &b_hi } else { &b_lo };
+        let q_lo_den = if a_lo.is_sign_negative() {
+            &b_lo
+        } else {
+            &b_hi
+        };
+        let q_hi_den = if a_hi.is_sign_negative() {
+            &b_hi
+        } else {
+            &b_lo
+        };
         let mut q_lo = rug::Float::with_val(wp, 0);
         q_lo.assign_round(&a_lo / q_lo_den, Round::Down);
         let mut q_hi = rug::Float::with_val(wp, 0);
@@ -105,7 +116,8 @@ pub fn rug_log_base_prec_round(
         let mut l_hi = rug::Float::with_val(target_prec, 0);
         let mut o_hi = l_hi.assign_round(&q_hi, rm);
         if l_lo.is_nan() && l_hi.is_nan() {
-            // x <= 0, so the result is NaN. (NaN != NaN, so equality tests against it never succeed.)
+            // x <= 0, so the result is NaN. (NaN != NaN, so equality tests against it never
+            // succeed.)
             return (l_lo, Equal);
         }
         // If one endpoint's rounding was exact but the other's wasn't, the result is irrational and
@@ -119,10 +131,10 @@ pub fn rug_log_base_prec_round(
         if l_lo == l_hi && o_lo == o_hi {
             return (l_lo, o_lo);
         }
-        // The chains disagree (on the value under directed rounding, or only on the ternary), and the
-        // precision has grown well past where any irrational result would converge for these bounded
-        // inputs: the true value is a dyadic rational the brackets straddle (for example log_4(2) =
-        // 1/2). Recover it exactly and round it.
+        // The chains disagree (on the value under directed rounding, or only on the ternary), and
+        // the precision has grown well past where any irrational result would converge for these
+        // bounded inputs: the true value is a dyadic rational the brackets straddle (for example
+        // log_4(2) = 1/2). Recover it exactly and round it.
         if working_prec > exact_threshold {
             let lo = Rational::try_from(&Float::from(&q_lo)).unwrap();
             let hi = Rational::try_from(&Float::from(&q_hi)).unwrap();

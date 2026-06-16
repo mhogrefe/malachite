@@ -31,13 +31,14 @@ use malachite_q::Rational;
 // Writes `n > 1` as `root ^ mult` with `mult` maximal, so `root` is the "primitive root" of `n` --
 // the smallest integer of which `n` is a power, itself not a perfect power.
 //
-// For example `primitive_root(8) == (2, 3)`, `primitive_root(9) == (3, 2)`, and
-// `primitive_root(10) == (10, 1)` (10 is not a perfect power).
+// For example `primitive_root(8) == (2, 3)`, `primitive_root(9) == (3, 2)`, and `primitive_root(10)
+// == (10, 1)` (10 is not a perfect power).
 pub(crate) fn primitive_root(n: u64) -> (u64, u64) {
     let mut root = n;
     let mut mult = 1;
     let mut exp = 2;
-    // `root` can only be a perfect `exp`th power (with a base of at least 2) while `2 ^ exp <= root`.
+    // `root` can only be a perfect `exp`th power (with a base of at least 2) while `2 ^ exp <=
+    // root`.
     while exp < u64::WIDTH && (1 << exp) <= root {
         if let Some(r) = root.checked_root(exp) {
             root = r;
@@ -49,13 +50,14 @@ pub(crate) fn primitive_root(n: u64) -> (u64, u64) {
     (root, mult)
 }
 
-// Returns `Some(e_x / e_base)` when `log_base(x)` is rational, and `None` when it is irrational. The
-// input `x` must be finite, positive, and not equal to 1, and `base > 1` must not be a power of 2.
+// Returns `Some(e_x / e_base)` when `log_base(x)` is rational, and `None` when it is irrational.
+// The input `x` must be finite, positive, and not equal to 1, and `base > 1` must not be a power of
+// 2.
 //
 // `log_base(x)` is rational exactly when `x` and `base` are both powers of a common integer `g`,
-// say `x = g ^ e_x` and `base = g ^ e_base`; then `log_base(x) = e_x / e_base`. Taking `g` to be the
-// primitive root of `base` (see `primitive_root`), this holds iff `x` is a positive integer that is
-// a power of `g`.
+// say `x = g ^ e_x` and `base = g ^ e_base`; then `log_base(x) = e_x / e_base`. Taking `g` to be
+// the primitive root of `base` (see `primitive_root`), this holds iff `x` is a positive integer
+// that is a power of `g`.
 //
 // Detecting these rational results up front is essential, not just an optimization: when the result
 // is exactly representable (for example `log_9(3) = 1/2`), the Ziv loop in
@@ -66,8 +68,8 @@ pub(crate) fn primitive_root(n: u64) -> (u64, u64) {
 // The check is balloon-safe. If `x = g ^ e_x` then `x`'s bit length is `e_x * log2(g) >= e_x`, and
 // `e_x <= e_base * prec` is needed for `e_x / e_base` to be representable in `prec` bits, so an `x`
 // worth materializing has bit length at most about `64 * prec`. When `x`'s exponent exceeds that
-// bound, `x` is left to the Ziv loop (which then converges, `x` not being a power of `g`), so `x` is
-// materialized as an integer only when doing so is cheap.
+// bound, `x` is left to the Ziv loop (which then converges, `x` not being a power of `g`), so `x`
+// is materialized as an integer only when doing so is cheap.
 pub(crate) fn rational_log_base(x: &Float, base: u64) -> Option<Rational> {
     let e = i64::from(x.get_exponent().unwrap());
     // x < 1 cannot be a power of g >= 2, and only positive exponents can.
@@ -113,8 +115,8 @@ fn log_base_prec_round_normal(
     let mut increment = Limb::WIDTH;
     loop {
         // ln(x) / ln(base). ln(x), ln(base), and the division are each correctly rounded (at most
-        // 1/2 ulp), so the relative error is below 2^(2 - working_prec) and working_prec - 4 correct
-        // bits suffice for rounding (mpfr_log10 uses Nt - 4).
+        // 1/2 ulp), so the relative error is below 2^(2 - working_prec) and working_prec - 4
+        // correct bits suffice for rounding (mpfr_log10 uses Nt - 4).
         let t = x
             .ln_prec_ref(working_prec)
             .0
@@ -130,8 +132,8 @@ fn log_base_prec_round_normal(
 }
 
 impl Float {
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the specified precision and with the specified rounding mode. The [`Float`] is
     /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than, equal to, or greater than the exact value. Although `NaN`s are not comparable to
     /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
@@ -146,7 +148,8 @@ impl Float {
     /// $$
     /// f(x,b,p,m) = \log_b x+\varepsilon.
     /// $$
-    /// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
     /// - If $\log_b x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |\log_b x|\rfloor-p+1}$.
     /// - If $\log_b x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
@@ -217,11 +220,11 @@ impl Float {
         }
     }
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
-    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded value is
-    /// less than, equal to, or greater than the exact value. Although `NaN`s are not comparable to
-    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded value
+    /// is less than, equal to, or greater than the exact value. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`Float::log_base_prec_round`] for details, special cases, and a description of the
     /// rounding behavior.
@@ -273,10 +276,10 @@ impl Float {
         }
     }
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
-    /// [`Ordering`] is also returned, indicating whether the rounded value is less than, equal to,
-    /// or greater than the exact value.
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the nearest value of the specified precision. The [`Float`] is taken by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded value is less than, equal
+    /// to, or greater than the exact value.
     ///
     /// See [`Float::log_base_prec_round`] for details and special cases.
     ///
@@ -294,10 +297,10 @@ impl Float {
         self.log_base_prec_round(base, prec, Nearest)
     }
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
-    /// An [`Ordering`] is also returned, indicating whether the rounded value is less than, equal
-    /// to, or greater than the exact value.
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the nearest value of the specified precision. The [`Float`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded value is less
+    /// than, equal to, or greater than the exact value.
     ///
     /// See [`Float::log_base_prec_round`] for details and special cases.
     ///
@@ -315,9 +318,9 @@ impl Float {
         self.log_base_prec_round_ref(base, prec, Nearest)
     }
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the precision of the input and with the specified rounding mode. The [`Float`] is
-    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded value is
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the precision of the input and with the specified rounding mode. The [`Float`]
+    /// is taken by value. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than, equal to, or greater than the exact value.
     ///
     /// See [`Float::log_base_prec_round`] for details and special cases.
@@ -338,10 +341,10 @@ impl Float {
         self.log_base_prec_round(base, prec, rm)
     }
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the precision of the input and with the specified rounding mode. The [`Float`] is
-    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded value is
-    /// less than, equal to, or greater than the exact value.
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the precision of the input and with the specified rounding mode. The [`Float`]
+    /// is taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// value is less than, equal to, or greater than the exact value.
     ///
     /// See [`Float::log_base_prec_round`] for details and special cases.
     ///
@@ -435,10 +438,10 @@ impl Float {
 }
 
 impl LogBase<u64> for Float {
-    type Output = Float;
+    type Output = Self;
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the nearest value of the input's precision. The [`Float`] is taken by value.
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the nearest value of the input's precision. The [`Float`] is taken by value.
     ///
     /// The base-$b$ logarithm of any nonzero negative number is `NaN`. See
     /// [`Float::log_base_prec_round`] for the special cases.
@@ -468,7 +471,7 @@ impl LogBase<u64> for Float {
     /// assert_eq!(Float::from(81).log_base(3).to_string(), "4.0");
     /// ```
     #[inline]
-    fn log_base(self, base: u64) -> Float {
+    fn log_base(self, base: u64) -> Self {
         let prec = self.significant_bits();
         self.log_base_prec_round(base, prec, Nearest).0
     }
@@ -477,8 +480,9 @@ impl LogBase<u64> for Float {
 impl LogBase<u64> for &Float {
     type Output = Float;
 
-    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding the
-    /// result to the nearest value of the input's precision. The [`Float`] is taken by reference.
+    /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the nearest value of the input's precision. The [`Float`] is taken by
+    /// reference.
     ///
     /// The base-$b$ logarithm of any nonzero negative number is `NaN`. See
     /// [`Float::log_base_prec_round`] for the special cases.
@@ -508,7 +512,8 @@ impl LogBase<u64> for &Float {
     /// ```
     #[inline]
     fn log_base(self, base: u64) -> Float {
-        self.log_base_prec_round_ref(base, self.significant_bits(), Nearest).0
+        self.log_base_prec_round_ref(base, self.significant_bits(), Nearest)
+            .0
     }
 }
 

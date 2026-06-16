@@ -60,11 +60,11 @@ fn log_base_power_of_2_prec_round_normal(
     }
 }
 
-// The computation of log_base_power_of_2_rational(x, pow) is done by log_{2^pow}(x) =
-// log_2(x) / pow, where the input is a positive [`Rational`] that is not a power of 2. The
-// base-2 logarithm of a [`Rational`] (computed by `log_base_2_rational_prec_ref`) already handles
-// inputs that are extremely close to a power of 2 without needing extra precision, so a simple Ziv
-// loop dividing by the exact integer pow suffices here.
+// The computation of log_base_power_of_2_rational(x, pow) is done by log_{2^pow}(x) = log_2(x) /
+// pow, where the input is a positive [`Rational`] that is not a power of 2. The base-2 logarithm of
+// a [`Rational`] (computed by `log_base_2_rational_prec_ref`) already handles inputs that are
+// extremely close to a power of 2 without needing extra precision, so a simple Ziv loop dividing by
+// the exact integer pow suffices here.
 fn log_base_power_of_2_rational_prec_round_helper(
     x: &Rational,
     pow: i64,

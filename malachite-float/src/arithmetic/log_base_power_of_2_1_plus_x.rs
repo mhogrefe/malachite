@@ -21,8 +21,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 
-// The computation of log_base_power_of_2_1_plus_x(x, pow) is done by log_{2^pow}(1 + x) =
-// log_2(1 + x) / pow, where the input is finite, nonzero, and greater than -1.
+// The computation of log_base_power_of_2_1_plus_x(x, pow) is done by log_{2^pow}(1 + x) = log_2(1 +
+// x) / pow, where the input is finite, nonzero, and greater than -1.
 fn log_base_power_of_2_1_plus_x_prec_round_normal(
     x: &Float,
     pow: i64,
@@ -57,10 +57,10 @@ fn log_base_power_of_2_1_plus_x_prec_round_normal(
     let min_exp = i64::from(Float::MIN_EXPONENT);
     // If x = 2^k for a k large enough that 1 + x is astronomically close to 2^k, then log_2(1 + x)
     // is k plus a positive infinitesimal (delta < 2^(2 - expx)), so log_{2^pow}(1 + x) is k / pow
-    // nudged infinitesimally away from k / pow (toward +infinity when pow > 0, toward -infinity when
-    // pow < 0). The Ziv loop below could never resolve this: log_2(1 + x) rounds to exactly k at
-    // every working precision (this is log_base_2_1_plus_x's own `_special` regime), so when k / pow
-    // is exactly representable the rounding test can never certify it and the precision grows
+    // nudged infinitesimally away from k / pow (toward +infinity when pow > 0, toward -infinity
+    // when pow < 0). The Ziv loop below could never resolve this: log_2(1 + x) rounds to exactly k
+    // at every working precision (this is log_base_2_1_plus_x's own `_special` regime), so when k /
+    // pow is exactly representable the rounding test can never certify it and the precision grows
     // without bound. Handle it directly, but only once delta is below a quarter ulp of the *result*
     // k / pow (note the deviation must be measured at the result's scale, e_res, not k's scale --
     // dividing by pow can make the ulp finer relative to delta); otherwise delta is large enough
@@ -71,9 +71,9 @@ fn log_base_power_of_2_1_plus_x_prec_round_normal(
         if k >= 1 {
             // log_2(1 + x) lies in (k, k + delta). Represent "just above k" at a precision high
             // enough that the nudge, once divided by pow, stays far below one ulp of k / pow (so it
-            // shares k / pow's rounding cell) yet is strictly nonzero. This pushes a representable or
-            // tied k / pow off the boundary in the correct direction, so div_prec_round returns the
-            // correctly-rounded value and ternary for the true (infinitesimally offset) result.
+            // shares k / pow's rounding cell) yet is strictly nonzero. This pushes a representable
+            // or tied k / pow off the boundary in the correct direction, so div_prec_round returns
+            // the correctly-rounded value and ternary for the true (infinitesimally offset) result.
             let high_prec = prec + e_pow.unsigned_abs() + Limb::WIDTH;
             let mut t = Float::from_signed_prec(k, high_prec).0;
             t.increment();
@@ -91,19 +91,19 @@ fn log_base_power_of_2_1_plus_x_prec_round_normal(
         let num = x.log_base_2_1_plus_x_prec_ref(working_prec).0;
         // log_2(1 + x) is always within the Float exponent range, but dividing by pow (with |pow| >
         // 1) can push the result below MIN_EXPONENT; overflow is impossible, since |pow| >= 1 means
-        // |result| <= |log_2(1 + x)|. The quotient's exponent is e_num - e_pow or e_num - e_pow + 1.
-        // When the result underflows, the Ziv test below can never resolve it (the quotient clamps
-        // to a power of 2 at MIN_EXPONENT), so hand the rounding to div_prec_round, which clamps to
-        // zero or the minimum positive value per the rounding mode. The exact quotient exponent is
-        // resolved only in the narrow band where the cheap exponent bound is inconclusive (then
-        // e_num - e_pow == min_exp - 1, so the result underflows iff |log_2(1 + x) / pow| <
-        // 2^(min_exp - 1), i.e. iff |log_2(1 + x)| * 2^(1 - min_exp) < |pow|). The left shift only
-        // adjusts the exponent (the shifted value's exponent is e_pow, well within range), so this
-        // avoids converting a near-MIN_EXPONENT `num` to a `Rational` with a ~2^30-bit denominator.
+        // |result| <= |log_2(1 + x)|. The quotient's exponent is e_num - e_pow or e_num - e_pow +
+        // 1. When the result underflows, the Ziv test below can never resolve it (the quotient
+        // clamps to a power of 2 at MIN_EXPONENT), so hand the rounding to div_prec_round, which
+        // clamps to zero or the minimum positive value per the rounding mode. The exact quotient
+        // exponent is resolved only in the narrow band where the cheap exponent bound is
+        // inconclusive (then e_num - e_pow == min_exp - 1, so the result underflows iff |log_2(1 +
+        // x) / pow| < 2^(min_exp - 1), i.e. iff |log_2(1 + x)| * 2^(1 - min_exp) < |pow|). The left
+        // shift only adjusts the exponent (the shifted value's exponent is e_pow, well within
+        // range), so this avoids converting a near-MIN_EXPONENT `num` to a `Rational` with a
+        // ~2^30-bit denominator.
         let e_num = i64::from(num.get_exponent().unwrap());
         if e_num - e_pow + 1 < min_exp
-            || (e_num - e_pow < min_exp
-                && (&num << u64::exact_from(1 - min_exp)).lt_abs(&pow_f))
+            || (e_num - e_pow < min_exp && (&num << u64::exact_from(1 - min_exp)).lt_abs(&pow_f))
         {
             return num.div_prec_round(pow_f, prec, rm);
         }
@@ -165,7 +165,8 @@ impl Float {
     /// - If $0<f(x,k,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
     /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,k,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
@@ -174,9 +175,9 @@ impl Float {
     ///
     /// If you know you'll be using `Nearest`, consider using
     /// [`Float::log_base_power_of_2_1_plus_x_prec`] instead. If you know that your target precision
-    /// is the precision of the input, consider using
-    /// [`Float::log_base_power_of_2_1_plus_x_round`] instead. If both of these things are true,
-    /// consider using [`Float::log_base_power_of_2_1_plus_x`] instead.
+    /// is the precision of the input, consider using [`Float::log_base_power_of_2_1_plus_x_round`]
+    /// instead. If both of these things are true, consider using
+    /// [`Float::log_base_power_of_2_1_plus_x`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -274,7 +275,8 @@ impl Float {
     /// - If $0<f(x,k,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
     /// - If $-2^{-2^{30}}<f(x,k,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,k,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
@@ -699,8 +701,7 @@ impl Float {
     /// If the output has a precision, it is `prec`.
     ///
     /// See the [`Float::log_base_power_of_2_1_plus_x_prec`] documentation for information on
-    /// special
-    /// cases, overflow, and underflow.
+    /// special cases, overflow, and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::log_base_power_of_2_1_plus_x_prec_round_assign`] instead. If you know that your

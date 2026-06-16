@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::arithmetic::log_base::rational_log_base;
 use crate::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
     exhaustive_finite_floats, exhaustive_floats, exhaustive_non_negative_finite_floats,
     exhaustive_nonzero_finite_floats, exhaustive_positive_finite_floats,
     exhaustive_positive_floats_with_precision, exhaustive_positive_floats_with_sci_exponent,
 };
-use crate::arithmetic::log_base::rational_log_base;
 use crate::test_util::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };

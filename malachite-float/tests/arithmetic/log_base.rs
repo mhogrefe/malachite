@@ -22,8 +22,8 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloatRef, Float};
 use std::panic::catch_unwind;
 
-// Cross-checks the by-value, by-reference, and assigning variants against each other and against the
-// rug oracle, and checks delegation when `base` is a power of 2. Returns the computed `(Float,
+// Cross-checks the by-value, by-reference, and assigning variants against each other and against
+// the rug oracle, and checks delegation when `base` is a power of 2. Returns the computed `(Float,
 // Ordering)`.
 fn check(x: &Float, base: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let (log, o) = x.clone().log_base_prec_round(base, prec, rm);
@@ -111,8 +111,8 @@ fn test_log_base_directed_consistency() {
         (Float::from(81), 3, 30),
         (Float::from(2), 3, 30),
         (Float::from(7), 5, 40),
-        (Float::from(8), 2, 30),  // power-of-2 base
-        (Float::from(64), 4, 30), // power-of-2 base
+        (Float::from(8), 2, 30),      // power-of-2 base
+        (Float::from(64), 4, 30),     // power-of-2 base
         (Float::from(1) >> 5, 3, 30), // 1/32, negative result
     ];
     for (x, base, prec) in inputs {
@@ -122,8 +122,14 @@ fn test_log_base_directed_consistency() {
         let _ = check(x, *base, *prec, Down);
         let _ = check(x, *base, *prec, Up);
         if floor.is_normal() && ceiling.is_normal() {
-            assert!(floor <= nearest, "{x} base {base}: floor {floor} > nearest {nearest}");
-            assert!(nearest <= ceiling, "{x} base {base}: nearest {nearest} > ceiling {ceiling}");
+            assert!(
+                floor <= nearest,
+                "{x} base {base}: floor {floor} > nearest {nearest}"
+            );
+            assert!(
+                nearest <= ceiling,
+                "{x} base {base}: nearest {nearest} > ceiling {ceiling}"
+            );
         }
     }
 }
@@ -145,7 +151,10 @@ fn test_log_base() {
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&log));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_log_base(&rug::Float::exact_from(&x), base))),
+            ComparableFloatRef(&Float::from(&rug_log_base(
+                &rug::Float::exact_from(&x),
+                base
+            ))),
             ComparableFloatRef(&log),
         );
         let _ = x.significant_bits();

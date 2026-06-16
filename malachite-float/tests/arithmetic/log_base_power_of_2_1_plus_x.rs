@@ -512,20 +512,21 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
 // cases; they are locked in here. Behavior matches div_prec_round's per-rounding-mode clamping.
 #[test]
 fn test_log_base_power_of_2_1_plus_x_prec_round_underflow() {
-    let test = |x: Float, pow: i64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out| {
-        let (log, o) = x
-            .clone()
-            .log_base_power_of_2_1_plus_x_prec_round(pow, prec, rm);
-        assert!(log.is_valid());
-        assert_eq!(log.to_string(), out);
-        assert_eq!(to_hex_string(&log), out_hex);
-        assert_eq!(o, o_out);
+    let test =
+        |x: Float, pow: i64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out| {
+            let (log, o) = x
+                .clone()
+                .log_base_power_of_2_1_plus_x_prec_round(pow, prec, rm);
+            assert!(log.is_valid());
+            assert_eq!(log.to_string(), out);
+            assert_eq!(to_hex_string(&log), out_hex);
+            assert_eq!(o, o_out);
 
-        let (log_alt, o_alt) = x.log_base_power_of_2_1_plus_x_prec_round_ref(pow, prec, rm);
-        assert!(log_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&log_alt));
-        assert_eq!(o_alt, o);
-    };
+            let (log_alt, o_alt) = x.log_base_power_of_2_1_plus_x_prec_round_ref(pow, prec, rm);
+            assert!(log_alt.is_valid());
+            assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&log_alt));
+            assert_eq!(o_alt, o);
+        };
     let tiny = Float::power_of_2(-1073741824i64);
     // pow = 2: log underflows; Down -> 0, Up/Nearest -> min positive Float.
     test(tiny.clone(), 2, 1, Down, "0.0", "0x0.0", Less);
@@ -632,20 +633,18 @@ fn log_base_power_of_2_1_plus_x_prec_round_properties_helper(
         || ComparableFloat(log.abs_negative_zero_ref())
             == ComparableFloat(Float::min_positive_value_prec(prec).abs_negative_zero());
 
-    if !underflowed {
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_log, rug_o) = rug_log_base_power_of_2_1_plus_x_prec_round(
-                &rug::Float::exact_from(&x),
-                pow,
-                prec,
-                rug_rm,
-            );
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_log).abs_negative_zero()),
-                ComparableFloatRef(&log.abs_negative_zero_ref()),
-            );
-            assert_eq!(rug_o, o);
-        }
+    if !underflowed && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_log, rug_o) = rug_log_base_power_of_2_1_plus_x_prec_round(
+            &rug::Float::exact_from(&x),
+            pow,
+            prec,
+            rug_rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_log).abs_negative_zero()),
+            ComparableFloatRef(&log.abs_negative_zero_ref()),
+        );
+        assert_eq!(rug_o, o);
     }
 
     // log_{2^1}(1 + x) == log_2(1 + x)
@@ -667,8 +666,8 @@ fn log_base_power_of_2_1_plus_x_prec_round_properties_helper(
         // same precision), since both are correctly-rounded approximations of the same real number.
         // Skipped when the result underflowed (clamped to the minimum positive value), since then
         // it is no longer a faithful approximation of log_2(1 + x) / pow. Also skipped for extreme
-        // inputs, whose `Float`-to-`Rational` conversions produce astronomically large numerators or
-        // denominators and would make the test intolerably slow.
+        // inputs, whose `Float`-to-`Rational` conversions produce astronomically large numerators
+        // or denominators and would make the test intolerably slow.
         if !extreme && !underflowed {
             let (l2_lo, _) = x.log_base_2_1_plus_x_prec_round_ref(prec, Floor);
             let (l2_hi, _) = x.log_base_2_1_plus_x_prec_round_ref(prec, Ceiling);
@@ -683,8 +682,8 @@ fn log_base_power_of_2_1_plus_x_prec_round_properties_helper(
                 };
                 // Allow a generous slack on each side, scaled by the magnitude of the brackets and
                 // by |pow|, to account for the independent roundings of the two logarithms (the
-                // result is rounded at its own scale, which is |pow| times smaller than
-                // log_2(1 + x)).
+                // result is rounded at its own scale, which is |pow| times smaller than log_2(1 +
+                // x)).
                 let scale = hi.floor_log_base_2_abs().max(lo.floor_log_base_2_abs());
                 let slack = Rational::from(pow.unsigned_abs())
                     * Rational::power_of_2(scale - i64::exact_from(prec) + 2);
@@ -895,16 +894,14 @@ fn log_base_power_of_2_1_plus_x_round_properties_helper(x: Float, pow: i64, rm: 
         || ComparableFloat(log.abs_negative_zero_ref())
             == ComparableFloat(Float::min_positive_value_prec(prec).abs_negative_zero());
 
-    if !underflowed {
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rug_log, rug_o) =
-                rug_log_base_power_of_2_1_plus_x_round(&rug::Float::exact_from(&x), pow, rug_rm);
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_log).abs_negative_zero()),
-                ComparableFloatRef(&log.abs_negative_zero_ref()),
-            );
-            assert_eq!(rug_o, o);
-        }
+    if !underflowed && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_log, rug_o) =
+            rug_log_base_power_of_2_1_plus_x_round(&rug::Float::exact_from(&x), pow, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_log).abs_negative_zero()),
+            ComparableFloatRef(&log.abs_negative_zero_ref()),
+        );
+        assert_eq!(rug_o, o);
     }
 
     if o == Equal {
@@ -1034,4 +1031,3 @@ fn log_base_power_of_2_1_plus_x_properties() {
         log_base_power_of_2_1_plus_x_properties_helper(x, pow);
     });
 }
-

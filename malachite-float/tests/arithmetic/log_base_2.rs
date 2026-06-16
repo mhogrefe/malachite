@@ -1611,10 +1611,10 @@ fn log_base_2_prec_round_fail() {
 }
 
 // `Rational::exact_from(&x)` produces an integer whose bit length is roughly `x`'s exponent
-// magnitude (up to Float::MAX_EXPONENT ~ 2^30), so cross-checking the Float log against the Rational
-// log is only affordable when that exponent is modest. Normal-range floats always pass; only the
-// extreme-exponent floats from the var_4 / var_24 generators are filtered out, where the conversion
-// would otherwise build a ~10^9-bit integer and run for minutes.
+// magnitude (up to Float::MAX_EXPONENT ~ 2^30), so cross-checking the Float log against the
+// Rational log is only affordable when that exponent is modest. Normal-range floats always pass;
+// only the extreme-exponent floats from the var_4 / var_24 generators are filtered out, where the
+// conversion would otherwise build a ~10^9-bit integer and run for minutes.
 fn rational_cross_check_cheap(x: &Float) -> bool {
     x.get_exponent().is_some_and(|e| e.unsigned_abs() < 1 << 16)
 }
