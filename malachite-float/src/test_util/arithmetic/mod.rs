@@ -18,6 +18,7 @@ pub mod log_base_1_plus_x;
 pub mod log_base_2;
 pub mod log_base_2_1_plus_x;
 pub mod log_base_float_base;
+pub mod log_base_float_base_1_plus_x;
 pub mod log_base_power_of_2;
 pub mod log_base_power_of_2_1_plus_x;
 pub mod log_base_rational_base;

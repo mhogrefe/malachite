@@ -59,6 +59,11 @@ pub mod log_base_2_1_plus_x;
 /// [`Float`](super::Float) base, for computing $\log_b x$ of a [`Float`](super::Float) with an
 /// arbitrary [`Float`](super::Float) base.
 pub mod log_base_float_base;
+/// [`LogBaseOf1PlusX`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusX) and
+/// [`LogBaseOf1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusXAssign),
+/// implemented for a [`Float`](super::Float) base, for computing $\log_b(1+x)$ of a
+/// [`Float`](super::Float) with an arbitrary [`Float`](super::Float) base.
+pub mod log_base_float_base_1_plus_x;
 /// [`LogBasePowerOf2`](malachite_base::num::arithmetic::traits::LogBasePowerOf2) and
 /// [`LogBasePowerOf2Assign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Assign),
 /// traits for computing $\log_{2^k} x$ for [`Float`](super::Float)s.

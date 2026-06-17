@@ -643,6 +643,26 @@ pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_12()
     )
 }
 
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float.log_base_float_base_1_plus_x_prec_round` (var_14 over extreme `Float`s).
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_13()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_13,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_13,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_13,
+    )
+}
+
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_14()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_14,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_14,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_14,
+    )
+}
+
 // -- (Float, Float, Rational) --
 
 pub fn float_float_rational_triple_gen() -> Generator<(Float, Float, Rational)> {
@@ -1121,6 +1141,24 @@ pub fn float_float_rounding_mode_triple_gen_var_36() -> Generator<(Float, Float,
         &exhaustive_float_float_rounding_mode_triple_gen_var_36,
         &random_float_float_rounding_mode_triple_gen_var_36,
         &special_random_float_float_rounding_mode_triple_gen_var_36,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to
+// `Float.log_base_float_base_1_plus_x_round` (var_38 over extreme `Float`s).
+pub fn float_float_rounding_mode_triple_gen_var_37() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_37,
+        &random_float_float_rounding_mode_triple_gen_var_37,
+        &special_random_float_float_rounding_mode_triple_gen_var_37,
+    )
+}
+
+pub fn float_float_rounding_mode_triple_gen_var_38() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_38,
+        &random_float_float_rounding_mode_triple_gen_var_38,
+        &special_random_float_float_rounding_mode_triple_gen_var_38,
     )
 }
 
