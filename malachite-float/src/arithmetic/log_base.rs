@@ -16,7 +16,7 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase, IsPowerOf2, LogBase, LogBaseAssign,
+    CeilingLogBase2, CheckedLogBase, IsPowerOf2, LogBase, LogBaseAssign, Sign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
@@ -64,6 +64,19 @@ pub(crate) fn rational_log_base(x: &Float, base: u64) -> Option<Rational> {
     Some(Rational::from_unsigneds(e_x, e_base))
 }
 
+// Returns `Some(m / e_base)` -- the value of `log_base(x)` -- when the positive `Rational` `x`
+// equals `g ^ m` for the root `g` of `base` (so `base = g ^ e_base` and `log_base(x)` is rational),
+// and `None` when `log_base(x)` is irrational. `x` must be positive and `base > 1`.
+//
+// `m` (signed) is found by `Rational::checked_log_base`, which also covers `x < 1` (negative `m`).
+// Detecting these rational results up front is essential: the Ziv loop could never certify an
+// exactly-representable one (see `rational_log_base` for the `Float` analog).
+pub(crate) fn rational_log_base_of_rational(x: &Rational, base: u64) -> Option<Rational> {
+    let (g, e_base) = base.express_as_power().unwrap_or((base, 1));
+    x.checked_log_base(g)
+        .map(|m| Rational::from_signeds(m, i64::exact_from(e_base)))
+}
+
 // The computation of log_base(x, base) is done by log_base(x) = ln(x) / ln(base). When `base` is a
 // power of 2 the caller delegates to `log_base_power_of_2`, so here `base` is not a power of 2.
 //
@@ -102,6 +115,38 @@ fn log_base_prec_round_normal(
             .ln_prec_ref(working_prec)
             .0
             .div_prec(base_float.ln_prec_ref(working_prec).0, working_prec)
+            .0;
+        if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        // Increase the precision.
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Computes log_base(x) for a positive `Rational` x whose logarithm is irrational, in a Ziv loop.
+// `base > 1` is not a power of 2.
+//
+// log_base(x) = log_2(x) / log_2(base). Routing through `log_base_2_rational` (rather than
+// computing `ln(x) / ln(base)` directly) reuses its handling of x near a power of 2 -- in
+// particular x near 1, where the result is near 0 and a direct computation would need a working
+// precision proportional to how close x is to 1. log_2(x), log_2(base), and the division are each
+// correctly rounded (at most 1/2 ulp), so the relative error is below 2^(2 - working_prec) and
+// working_prec - 4 correct bits suffice for rounding.
+fn log_base_rational_prec_round_helper(
+    x: &Rational,
+    base: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let base_float = Float::from(base);
+    let mut working_prec = prec + 4 + prec.ceiling_log_base_2();
+    let mut increment = Limb::WIDTH;
+    loop {
+        let t = Float::log_base_2_rational_prec_ref(x, working_prec)
+            .0
+            .div_prec(base_float.log_base_2_prec_ref(working_prec).0, working_prec)
             .0;
         if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
             return Float::from_float_prec_round(t, prec, rm);
@@ -492,6 +537,197 @@ impl Float {
     pub fn log_base_round_assign(&mut self, base: u64, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();
         self.log_base_prec_round_assign(base, prec, rm)
+    }
+
+    /// Computes $\log_b x$, where $x$ is a [`Rational`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded value is less than, equal to, or greater than the exact
+    /// value. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// The base-$b$ logarithm of any negative number is `NaN`.
+    ///
+    /// Inputs of any magnitude are handled, including [`Rational`]s whose magnitudes are too large
+    /// or too small to be representable as [`Float`]s. Neither overflow nor underflow of the output
+    /// is possible.
+    ///
+    /// When `base` is a power of 2, this function delegates to
+    /// [`Float::log_base_power_of_2_rational_prec_round`].
+    ///
+    /// See [`Float::log_base_prec_round`] for details and a description of the rounding behavior.
+    ///
+    /// Special cases:
+    /// - $f(0,b,p,m)=-\infty$
+    /// - $f(x,b,p,m)=\text{NaN}$ for $x<0$
+    /// - $f(1,b,p,m)=0.0$, and the result is exact
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, if `base` is less than 2, or if `rm` is `Exact` but the result
+    /// cannot be represented exactly with the given precision. (The result is exactly representable
+    /// if and only if $x \leq 0$ or $\log_b x$ is rational and representable with the given
+    /// precision.)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::log_base_rational_prec_round(Rational::from(3), 9, 10, Exact);
+    /// assert_eq!(log.to_string(), "0.5"); // log_9(3) = 1/2
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (log, o) = Float::log_base_rational_prec_round(Rational::from(2), 3, 20, Nearest);
+    /// assert_eq!(log.to_string(), "0.63093");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn log_base_rational_prec_round(
+        x: Rational,
+        base: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::log_base_rational_prec_round_ref(&x, base, prec, rm)
+    }
+
+    /// Computes $\log_b x$, where $x$ is a [`Rational`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded value is less than, equal to, or greater than the
+    /// exact value. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::log_base_rational_prec_round`] for details, special cases, and a description of
+    /// the rounding behavior.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, if `base` is less than 2, or if `rm` is `Exact` but the result
+    /// cannot be represented exactly with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) =
+    ///     Float::log_base_rational_prec_round_ref(&Rational::from_signeds(1, 9), 3, 10, Exact);
+    /// assert_eq!(log.to_string(), "-2.0"); // log_3(1/9) = -2
+    /// assert_eq!(o, Equal);
+    /// ```
+    pub fn log_base_rational_prec_round_ref(
+        x: &Rational,
+        base: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        assert!(base > 1, "Logarithm base must be greater than 1");
+        if base.is_power_of_2() {
+            return Self::log_base_power_of_2_rational_prec_round_ref(
+                x,
+                i64::from(base.trailing_zeros()),
+                prec,
+                rm,
+            );
+        }
+        match x.sign() {
+            Equal => return (float_negative_infinity!(), Equal),
+            Less => return (float_nan!(), Equal),
+            Greater => {}
+        }
+        // If x = g^m for the base's root g (so base = g^e_base), then log_base(x) = m / e_base is
+        // rational, and exact -- the Ziv loop could never certify it (see rational_log_base).
+        if let Some(q) = rational_log_base_of_rational(x, base) {
+            return Self::from_rational_prec_round(q, prec, rm);
+        }
+        // The result is irrational, so it is never exactly representable.
+        assert_ne!(rm, Exact, "Inexact log_base");
+        log_base_rational_prec_round_helper(x, base, prec, rm)
+    }
+
+    /// Computes $\log_b x$, where $x$ is a [`Rational`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded value is less than, equal to, or greater than the exact value.
+    ///
+    /// See [`Float::log_base_rational_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero or if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::log_base_rational_prec(Rational::from_signeds(1, 9), 3, 10);
+    /// assert_eq!(log.to_string(), "-2.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn log_base_rational_prec(x: Rational, base: u64, prec: u64) -> (Self, Ordering) {
+        Self::log_base_rational_prec_round(x, base, prec, Nearest)
+    }
+
+    /// Computes $\log_b x$, where $x$ is a [`Rational`] and $b$ is a `u64` greater than 1, rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded value is less than, equal to, or greater than the exact
+    /// value.
+    ///
+    /// See [`Float::log_base_rational_prec_round`] for details and special cases.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero or if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (log, o) = Float::log_base_rational_prec_ref(&Rational::from(2), 3, 20);
+    /// assert_eq!(log.to_string(), "0.63093");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn log_base_rational_prec_ref(x: &Rational, base: u64, prec: u64) -> (Self, Ordering) {
+        Self::log_base_rational_prec_round_ref(x, base, prec, Nearest)
     }
 }
 

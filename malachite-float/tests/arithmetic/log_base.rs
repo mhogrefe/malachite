@@ -7,19 +7,26 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, LogBase, LogBaseAssign};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, LogBase, LogBaseAssign, Reciprocal};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_float::test_util::arithmetic::log_base::{rug_log_base, rug_log_base_prec_round};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_float::test_util::arithmetic::log_base::{
+    rug_log_base, rug_log_base_prec_round, rug_log_base_rational_prec_round,
+};
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
 use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_27, float_unsigned_rounding_mode_triple_gen_var_28,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6,
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
 };
 use malachite_float::{ComparableFloatRef, Float};
+use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 
 // Cross-checks the by-value, by-reference, and assigning variants against each other and against
@@ -280,4 +287,191 @@ fn log_base_properties() {
     float_unsigned_rounding_mode_triple_gen_var_28().test_properties(|(x, base, _rm)| {
         f(x, base);
     });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn log_base_rational_prec_round_properties_helper(
+    x: Rational,
+    base: u64,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    let (log, o) = Float::log_base_rational_prec_round(x.clone(), base, prec, rm);
+    assert!(log.is_valid());
+
+    let (log_alt, o_alt) = Float::log_base_rational_prec_round_ref(&x, base, prec, rm);
+    assert!(log_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+    assert_eq!(o_alt, o);
+
+    // Power-of-2 base must agree with log_base_power_of_2_rational.
+    if base.is_power_of_2() {
+        let (alt, o2) = Float::log_base_power_of_2_rational_prec_round_ref(
+            &x,
+            i64::from(base.trailing_zeros()),
+            prec,
+            rm,
+        );
+        assert_eq!(ComparableFloatRef(&alt), ComparableFloatRef(&log));
+        assert_eq!(o2, o);
+    }
+
+    // Independent rug oracle (skips Exact, which rug can't represent).
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_log, rug_o) = rug_log_base_rational_prec_round(&x, base, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_log)),
+            ComparableFloatRef(&log),
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    // log_base(1/x) = -log_base(x), with the rounding direction reversed.
+    if x != 0u32 {
+        let (log_recip, o_recip) =
+            Float::log_base_rational_prec_round((&x).reciprocal(), base, prec, -rm);
+        assert!(log_recip.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&(-log_recip).abs_negative_zero()),
+            ComparableFloatRef(&log.abs_negative_zero_ref())
+        );
+        assert_eq!(o_recip.reverse(), o);
+    }
+
+    if log.is_normal() {
+        assert_eq!(log.get_prec(), Some(prec));
+        if x > 1u32 && o > Less {
+            assert!(log > 0u32);
+        } else if x > 0u32 && x < 1u32 && o < Greater {
+            assert!(log < 0u32);
+        }
+    }
+}
+
+#[test]
+fn log_base_rational_prec_round_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(x, base, prec, rm)| {
+            log_base_rational_prec_round_properties_helper(x, base, prec, rm);
+        },
+    );
+
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().test_properties_with_config(
+        &config,
+        |(x, base, prec, rm)| {
+            log_base_rational_prec_round_properties_helper(x, base, prec, rm);
+        },
+    );
+}
+
+#[test]
+fn log_base_rational_prec_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(x, base, prec, _rm)| {
+            let (log, o) = Float::log_base_rational_prec(x.clone(), base, prec);
+            assert!(log.is_valid());
+            let (log_ref, o_ref) = Float::log_base_rational_prec_ref(&x, base, prec);
+            assert_eq!(ComparableFloatRef(&log_ref), ComparableFloatRef(&log));
+            assert_eq!(o_ref, o);
+            // _prec is _prec_round with Nearest.
+            let (expected, eo) = Float::log_base_rational_prec_round(x, base, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&expected));
+            assert_eq!(o, eo);
+        },
+    );
+}
+
+#[test]
+fn test_log_base_rational_prec_round() {
+    let test =
+        |n: i64, d: u64, base: u64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
+            let x = Rational::from_signeds(n, i64::exact_from(d));
+            let (log, o) = Float::log_base_rational_prec_round(x.clone(), base, prec, rm);
+            assert!(log.is_valid());
+            assert_eq!(log.to_string(), out);
+            assert_eq!(o, o_out);
+            let (log_alt, o_alt) = Float::log_base_rational_prec_round_ref(&x, base, prec, rm);
+            assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+            assert_eq!(o_alt, o);
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rl, ro) = rug_log_base_rational_prec_round(&x, base, prec, rug_rm);
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rl)),
+                    ComparableFloatRef(&log)
+                );
+                assert_eq!(ro, o);
+            }
+        };
+    test(3, 5, 10, 20, Floor, "-0.221849", Less);
+    test(3, 5, 10, 20, Ceiling, "-0.2218487", Greater);
+    test(3, 5, 10, 20, Nearest, "-0.2218487", Greater);
+    test(2, 1, 3, 20, Floor, "0.630929", Less);
+    test(2, 1, 3, 20, Ceiling, "0.63093", Greater);
+    test(2, 1, 3, 20, Nearest, "0.63093", Greater);
+    test(1, 8, 3, 20, Floor, "-1.89279", Less);
+    test(1, 8, 3, 20, Ceiling, "-1.892788", Greater);
+    test(1, 8, 3, 20, Nearest, "-1.89279", Less);
+    test(7, 1, 5, 30, Floor, "1.209061954", Less);
+    test(7, 1, 5, 30, Ceiling, "1.209061956", Greater);
+    test(7, 1, 5, 30, Nearest, "1.209061956", Greater);
+    test(50, 1, 10, 10, Floor, "1.697", Less);
+    test(50, 1, 10, 10, Ceiling, "1.699", Greater);
+    test(50, 1, 10, 10, Nearest, "1.699", Greater);
+    test(1, 100, 10, 10, Floor, "-2.0", Equal);
+    test(1, 100, 10, 10, Ceiling, "-2.0", Equal);
+    test(1, 100, 10, 10, Nearest, "-2.0", Equal);
+    test(1, 100, 10, 10, Exact, "-2.0", Equal);
+    test(22, 7, 3, 15, Floor, "1.0423", Less);
+    test(22, 7, 3, 15, Ceiling, "1.04236", Greater);
+    test(22, 7, 3, 15, Nearest, "1.04236", Greater);
+    test(3, 1, 9, 10, Floor, "0.5", Equal);
+    test(3, 1, 9, 10, Ceiling, "0.5", Equal);
+    test(3, 1, 9, 10, Nearest, "0.5", Equal);
+    test(3, 1, 9, 10, Exact, "0.5", Equal);
+    test(1, 9, 3, 10, Floor, "-2.0", Equal);
+    test(1, 9, 3, 10, Ceiling, "-2.0", Equal);
+    test(1, 9, 3, 10, Nearest, "-2.0", Equal);
+    test(1, 9, 3, 10, Exact, "-2.0", Equal);
+    test(1000, 1, 10, 10, Floor, "3.0", Equal);
+    test(1000, 1, 10, 10, Ceiling, "3.0", Equal);
+    test(1000, 1, 10, 10, Nearest, "3.0", Equal);
+    test(1000, 1, 10, 10, Exact, "3.0", Equal);
+    test(5, 2, 4, 20, Floor, "0.660964", Less);
+    test(5, 2, 4, 20, Ceiling, "0.660965", Greater);
+    test(5, 2, 4, 20, Nearest, "0.660964", Less);
+    // Special cases.
+    test(0, 1, 10, 10, Nearest, "-Infinity", Equal);
+    test(0, 1, 10, 10, Exact, "-Infinity", Equal);
+    test(-3, 1, 10, 10, Nearest, "NaN", Equal);
+    test(1, 1, 10, 10, Exact, "0.0", Equal);
+}
+
+#[test]
+fn test_log_base_rational_prec() {
+    let test = |n: i64, d: u64, base: u64, prec: u64, out: &str, o_out: Ordering| {
+        let x = Rational::from_signeds(n, i64::exact_from(d));
+        let (log, o) = Float::log_base_rational_prec(x.clone(), base, prec);
+        assert!(log.is_valid());
+        assert_eq!(log.to_string(), out);
+        assert_eq!(o, o_out);
+        let (log_alt, o_alt) = Float::log_base_rational_prec_ref(&x, base, prec);
+        assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+        assert_eq!(o_alt, o);
+    };
+    test(3, 5, 10, 20, "-0.2218487", Greater);
+    test(2, 1, 3, 20, "0.63093", Greater);
+    test(1, 8, 3, 20, "-1.89279", Less);
+    test(7, 1, 5, 30, "1.209061956", Greater);
+    test(50, 1, 10, 10, "1.699", Greater);
+    test(1, 100, 10, 10, "-2.0", Equal);
+    test(22, 7, 3, 15, "1.04236", Greater);
+    test(3, 1, 9, 10, "0.5", Equal);
+    test(1, 9, 3, 10, "-2.0", Equal);
+    test(1000, 1, 10, 10, "3.0", Equal);
+    test(5, 2, 4, 20, "0.660964", Less);
+    test(0, 1, 10, 10, "-Infinity", Equal);
+    test(1, 1, 10, 10, "0.0", Equal);
 }

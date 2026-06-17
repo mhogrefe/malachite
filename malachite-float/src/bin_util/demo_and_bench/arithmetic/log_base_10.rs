@@ -27,8 +27,10 @@ use malachite_float::test_util::generators::{
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_29, float_unsigned_rounding_mode_triple_gen_var_30,
     float_unsigned_rounding_mode_triple_gen_var_31_rm,
+    rational_unsigned_rounding_mode_triple_gen_var_9,
 };
-use malachite_float::{ComparableFloat, ComparableFloatRef};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::test_util::bench::bucketers::triple_1_2_rational_bit_u64_max_bucketer;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_10);
@@ -63,6 +65,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_10_prec_round_ref_debug);
     register_demo!(runner, demo_float_log_base_10_prec_round_assign);
     register_demo!(runner, demo_float_log_base_10_prec_round_assign_debug);
+    register_demo!(runner, demo_float_log_base_10_rational_prec);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_debug);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_ref);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_ref_debug);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_round);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_round_debug);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_round_ref);
+    register_demo!(runner, demo_float_log_base_10_rational_prec_round_ref_debug);
 
     register_bench!(runner, benchmark_float_log_base_10_evaluation_strategy);
     register_bench!(runner, benchmark_float_log_base_10_library_comparison);
@@ -85,6 +95,14 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_log_base_10_prec_round_library_comparison
     );
     register_bench!(runner, benchmark_float_log_base_10_prec_round_assign);
+    register_bench!(
+        runner,
+        benchmark_float_log_base_10_rational_prec_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_float_log_base_10_rational_prec_round_evaluation_strategy
+    );
 }
 
 fn demo_float_log_base_10(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -788,5 +806,189 @@ fn benchmark_float_log_base_10_prec_round_assign(
             "Float.log_base_10_prec_round_assign(u64, RoundingMode)",
             &mut |(mut x, prec, rm)| no_out!(x.log_base_10_prec_round_assign(prec, rm)),
         )],
+    );
+}
+
+fn demo_float_log_base_10_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "log_base_10_rational_prec({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            Float::log_base_10_rational_prec(x, prec)
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (log, o) = Float::log_base_10_rational_prec(x.clone(), prec);
+        println!(
+            "log_base_10_rational_prec({}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            ComparableFloat(log),
+            o
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "log_base_10_rational_prec_ref(&{}, {}) = {:?}",
+            x,
+            prec,
+            Float::log_base_10_rational_prec_ref(&x, prec)
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (log, o) = Float::log_base_10_rational_prec_ref(&x, prec);
+        println!(
+            "log_base_10_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            ComparableFloat(log),
+            o
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "log_base_10_rational_prec_round({}, {}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            Float::log_base_10_rational_prec_round(x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
+        println!(
+            "log_base_10_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            rm,
+            ComparableFloat(log),
+            o
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_round_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "log_base_10_rational_prec_round_ref(&{}, {}, {}) = {:?}",
+            x,
+            prec,
+            rm,
+            Float::log_base_10_rational_prec_round_ref(&x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_log_base_10_rational_prec_round_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (log, o) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
+        println!(
+            "log_base_10_rational_prec_round_ref(&{}, {}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            rm,
+            ComparableFloat(log),
+            o
+        );
+    }
+}
+
+fn benchmark_float_log_base_10_rational_prec_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::log_base_10_rational_prec(Rational, u64)",
+        BenchmarkType::EvaluationStrategy,
+        rational_unsigned_rounding_mode_triple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            (
+                "Float::log_base_10_rational_prec(Rational, u64)",
+                &mut |(x, prec, _)| no_out!(Float::log_base_10_rational_prec(x, prec)),
+            ),
+            (
+                "Float::log_base_10_rational_prec_ref(&Rational, u64)",
+                &mut |(x, prec, _)| no_out!(Float::log_base_10_rational_prec_ref(&x, prec)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_log_base_10_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::log_base_10_rational_prec_round(Rational, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_unsigned_rounding_mode_triple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            (
+                "Float::log_base_10_rational_prec_round(Rational, u64, RoundingMode)",
+                &mut |(x, prec, rm)| no_out!(Float::log_base_10_rational_prec_round(x, prec, rm)),
+            ),
+            (
+                "Float::log_base_10_rational_prec_round_ref(&Rational, u64, RoundingMode)",
+                &mut |(x, prec, rm)| {
+                    no_out!(Float::log_base_10_rational_prec_round_ref(&x, prec, rm));
+                },
+            ),
+        ],
     );
 }

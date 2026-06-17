@@ -11,6 +11,7 @@ use crate::test_util::common::{rounding_mode_from_rug_round, rug_float_significa
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CheckedLogBase, Floor};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
@@ -21,7 +22,7 @@ use rug::ops::AssignRound;
 // assumed nonempty). Used to recover an exactly-representable result that the bracketing straddles;
 // such results are always dyadic (a non-dyadic rational like log_8(4) = 2/3 is strictly between
 // `Float`s and so the brackets converge normally).
-fn simplest_dyadic_in(lo: &Rational, hi: &Rational) -> Rational {
+pub(crate) fn simplest_dyadic_in(lo: &Rational, hi: &Rational) -> Rational {
     let mut k = 0u64;
     loop {
         let m = (lo << k).floor() + Integer::from(1u32); // smallest integer m with m / 2^k > lo
@@ -159,4 +160,89 @@ pub fn rug_log_base_round(x: &rug::Float, base: u64, rm: Round) -> (rug::Float, 
 
 pub fn rug_log_base(x: &rug::Float, base: u64) -> rug::Float {
     rug_log_base_prec_round(x, base, rug_float_significant_bits(x), Round::Nearest).0
+}
+
+// log_base(x, base) = ln(x) / ln(base) for a `Rational` x. Same bracketing oracle as
+// `rug_log_base_prec_round`, but since a `Rational` is generally not representable as a rug
+// `Float`, ln(x) is itself bracketed: convert x (exactly, as a `rug::Rational`) to rug `Float`
+// bounds rounding down and up, then take their (monotonic) logarithms. The sign cases fall out of
+// the bracketing: ln(0) = -inf gives -inf, and ln of a negative gives NaN.
+pub fn rug_log_base_rational_prec_round(
+    x: &Rational,
+    base: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let rug_x = rug::Rational::from(x);
+    let target_prec = u32::exact_from(prec);
+    let mut working_prec = (prec << 1) + 128 + (x.significant_bits() << 1);
+    // See `rug_log_base_prec_round`: well past this precision, a non-converging bracket means the
+    // true value is an exactly-representable dyadic the brackets straddle.
+    let exact_threshold = (prec << 1) + 512;
+    loop {
+        let wp = u32::exact_from(working_prec);
+        // x_lo <= x <= x_hi
+        let mut x_lo = rug::Float::with_val(wp, 0);
+        x_lo.assign_round(&rug_x, Round::Down);
+        let mut x_hi = rug::Float::with_val(wp, 0);
+        x_hi.assign_round(&rug_x, Round::Up);
+        // ln is increasing, so a_lo <= ln(x) <= a_hi
+        let mut a_lo = rug::Float::with_val(wp, 0);
+        a_lo.assign_round(x_lo.ln_ref(), Round::Down);
+        let mut a_hi = rug::Float::with_val(wp, 0);
+        a_hi.assign_round(x_hi.ln_ref(), Round::Up);
+        // 0 < b_lo <= ln(base) <= b_hi
+        let base_float = rug::Float::with_val(wp, base);
+        let mut b_lo = rug::Float::with_val(wp, 0);
+        b_lo.assign_round(base_float.ln_ref(), Round::Down);
+        let mut b_hi = rug::Float::with_val(wp, 0);
+        b_hi.assign_round(base_float.ln_ref(), Round::Up);
+        // q_lo <= ln(x) / ln(base) <= q_hi
+        let q_lo_den = if a_lo.is_sign_negative() {
+            &b_lo
+        } else {
+            &b_hi
+        };
+        let q_hi_den = if a_hi.is_sign_negative() {
+            &b_hi
+        } else {
+            &b_lo
+        };
+        let mut q_lo = rug::Float::with_val(wp, 0);
+        q_lo.assign_round(&a_lo / q_lo_den, Round::Down);
+        let mut q_hi = rug::Float::with_val(wp, 0);
+        q_hi.assign_round(&a_hi / q_hi_den, Round::Up);
+        let mut l_lo = rug::Float::with_val(target_prec, 0);
+        let mut o_lo = l_lo.assign_round(&q_lo, rm);
+        let mut l_hi = rug::Float::with_val(target_prec, 0);
+        let mut o_hi = l_hi.assign_round(&q_hi, rm);
+        if l_lo.is_nan() && l_hi.is_nan() {
+            // x < 0, so the result is NaN.
+            return (l_lo, Equal);
+        }
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if l_lo == l_hi && o_lo == o_hi {
+            return (l_lo, o_lo);
+        }
+        if working_prec > exact_threshold {
+            let lo = Rational::try_from(&Float::from(&q_lo)).unwrap();
+            let hi = Rational::try_from(&Float::from(&q_hi)).unwrap();
+            let (l, o) = Float::from_rational_prec_round(
+                simplest_dyadic_in(&lo, &hi),
+                prec,
+                rounding_mode_from_rug_round(rm),
+            );
+            return (rug::Float::exact_from(&l), o);
+        }
+        working_prec += working_prec >> 1;
+    }
+}
+
+pub fn rug_log_base_rational_prec(x: &Rational, base: u64, prec: u64) -> (rug::Float, Ordering) {
+    rug_log_base_rational_prec_round(x, base, prec, Round::Nearest)
 }

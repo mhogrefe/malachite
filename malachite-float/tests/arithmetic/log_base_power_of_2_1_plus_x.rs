@@ -508,8 +508,9 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
 // log_{2^pow}(1 + x) can underflow: log_2(1 + x) is always representable, but dividing by pow (with
 // |pow| > 1) can push the result below MIN_EXPONENT. The smallest positive Float x = 2^-2^30 has
 // log_2(1 + x) ~ x / ln 2, just above 2^-2^30, and dividing by |pow| > 1 drops it below the minimum
-// exponent. rug's exponent range is wider than Float's, so the property tests can't reach these
-// cases; they are locked in here. Behavior matches div_prec_round's per-rounding-mode clamping.
+// exponent. The property-test oracle skips underflowed results (see the `check` helper), so these
+// clamped cases are locked in here instead. Behavior matches div_prec_round's per-rounding-mode
+// clamping.
 #[test]
 fn test_log_base_power_of_2_1_plus_x_prec_round_underflow() {
     let test =
@@ -627,8 +628,10 @@ fn log_base_power_of_2_1_plus_x_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&log));
     assert_eq!(o_alt, o);
 
-    // rug's exponent range is wider than Float's, so it doesn't reproduce underflow; the clamped
-    // cases are covered by unit tests.
+    // The clamped underflow cases are covered by the dedicated underflow unit test, so the
+    // property-test oracle skips them here. (rug's exponent range is not wider than Float's -- both
+    // are MPFR's defaults, +/-(2^30 - 1) -- so this skip is about where underflow is checked, not
+    // about rug being unable to reach it.)
     let underflowed = log == 0u32
         || ComparableFloat(log.abs_negative_zero_ref())
             == ComparableFloat(Float::min_positive_value_prec(prec).abs_negative_zero());
@@ -792,8 +795,10 @@ fn log_base_power_of_2_1_plus_x_prec_properties_helper(x: Float, pow: i64, prec:
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&log));
     assert_eq!(o_alt, o);
 
-    // rug's exponent range is wider than Float's, so it doesn't reproduce underflow; the clamped
-    // cases are covered by unit tests.
+    // The clamped underflow cases are covered by the dedicated underflow unit test, so the
+    // property-test oracle skips them here. (rug's exponent range is not wider than Float's -- both
+    // are MPFR's defaults, +/-(2^30 - 1) -- so this skip is about where underflow is checked, not
+    // about rug being unable to reach it.)
     let underflowed = log == 0u32
         || ComparableFloat(log.abs_negative_zero_ref())
             == ComparableFloat(Float::min_positive_value_prec(prec).abs_negative_zero());

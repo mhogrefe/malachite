@@ -37,6 +37,15 @@ pub mod log_base;
 /// [`LogBase10Assign`](malachite_base::num::arithmetic::traits::LogBase10Assign), traits for
 /// computing the base-10 logarithm of [`Float`](super::Float)s.
 pub mod log_base_10;
+/// [`LogBase10Of1PlusX`](malachite_base::num::arithmetic::traits::LogBase10Of1PlusX) and
+/// [`LogBase10Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBase10Of1PlusXAssign),
+/// traits for computing $\log_{10}(1+x)$ of [`Float`](super::Float)s.
+pub mod log_base_10_1_plus_x;
+/// [`LogBaseOf1PlusX`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusX) and
+/// [`LogBaseOf1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusXAssign),
+/// traits for computing $\log_b(1+x)$ of [`Float`](super::Float)s for an arbitrary integer base
+/// $b>1$.
+pub mod log_base_1_plus_x;
 /// [`LogBase2`](malachite_base::num::arithmetic::traits::LogBase2) and
 /// [`LogBase2Assign`](malachite_base::num::arithmetic::traits::LogBase2Assign), traits for
 /// computing the base-2 logarithm of [`Float`](super::Float)s.
@@ -54,6 +63,11 @@ pub mod log_base_power_of_2;
 /// [`LogBasePowerOf2Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusXAssign),
 /// traits for computing $\log_{2^k}(1+x)$ for [`Float`](super::Float)s.
 pub mod log_base_power_of_2_1_plus_x;
+/// [`LogBase`](malachite_base::num::arithmetic::traits::LogBase) and
+/// [`LogBaseAssign`](malachite_base::num::arithmetic::traits::LogBaseAssign), implemented for a
+/// [`Rational`](malachite_q::Rational) base, for computing $\log_b x$ of a [`Float`](super::Float)
+/// with an arbitrary rational base $b>1$.
+pub mod log_base_rational_base;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod mul;

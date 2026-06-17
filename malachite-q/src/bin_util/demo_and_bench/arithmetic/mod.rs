@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     ceiling::register(runner);
     denominators_in_closed_interval::register(runner);
     div::register(runner);
+    express_as_power::register(runner);
     floor::register(runner);
     is_power_of_2::register(runner);
     log_base::register(runner);
@@ -47,6 +48,7 @@ mod approximate;
 mod ceiling;
 mod denominators_in_closed_interval;
 mod div;
+mod express_as_power;
 mod floor;
 mod is_power_of_2;
 mod log_base;

@@ -70,10 +70,13 @@ pub mod arithmetic {
     pub mod ln_1_plus_x;
     pub mod log_base;
     pub mod log_base_10;
+    pub mod log_base_10_1_plus_x;
+    pub mod log_base_1_plus_x;
     pub mod log_base_2;
     pub mod log_base_2_1_plus_x;
     pub mod log_base_power_of_2;
     pub mod log_base_power_of_2_1_plus_x;
+    pub mod log_base_rational_base;
     pub mod mul;
     pub mod neg;
     pub mod power_of_2;

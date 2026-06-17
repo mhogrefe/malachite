@@ -72,6 +72,7 @@ pub mod arithmetic {
     pub mod ceiling;
     pub mod denominators_in_closed_interval;
     pub mod div;
+    pub mod express_as_power;
     pub mod floor;
     pub mod is_power_of_2;
     pub mod log_base;

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{LogBase10, LogBase10Assign};
+use malachite_base::num::arithmetic::traits::{LogBase10, LogBase10Assign, Reciprocal};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
@@ -21,7 +21,8 @@ use malachite_base::test_util::generators::{
     rounding_mode_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
 };
 use malachite_float::test_util::arithmetic::log_base_10::{
-    rug_log_base_10, rug_log_base_10_prec, rug_log_base_10_prec_round, rug_log_base_10_round,
+    rug_log_base_10, rug_log_base_10_prec, rug_log_base_10_prec_round,
+    rug_log_base_10_rational_prec_round, rug_log_base_10_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -31,9 +32,11 @@ use malachite_float::test_util::generators::{
     float_rounding_mode_pair_gen_var_43, float_unsigned_pair_gen_var_1,
     float_unsigned_pair_gen_var_4, float_unsigned_rounding_mode_triple_gen_var_29,
     float_unsigned_rounding_mode_triple_gen_var_30,
+    rational_unsigned_rounding_mode_triple_gen_var_9,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 
 #[test]
@@ -1507,4 +1510,164 @@ fn log_base_10_properties() {
     float_gen_var_12().test_properties(|x| {
         log_base_10_properties_helper(x);
     });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn log_base_10_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
+    let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
+    assert!(log.is_valid());
+
+    let (log_alt, o_alt) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
+    assert!(log_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+    assert_eq!(o_alt, o);
+
+    // Independent rug oracle (native log10; skips Exact, which rug can't represent).
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_log, rug_o) = rug_log_base_10_rational_prec_round(&x, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_log)),
+            ComparableFloatRef(&log),
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    // log_10(1/x) = -log_10(x), with the rounding direction reversed.
+    if x != 0u32 {
+        let (log_recip, o_recip) =
+            Float::log_base_10_rational_prec_round((&x).reciprocal(), prec, -rm);
+        assert!(log_recip.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&(-log_recip).abs_negative_zero()),
+            ComparableFloatRef(&log.abs_negative_zero_ref())
+        );
+        assert_eq!(o_recip.reverse(), o);
+    }
+
+    if log.is_normal() {
+        assert_eq!(log.get_prec(), Some(prec));
+        if x > 1u32 && o > Less {
+            assert!(log > 0u32);
+        } else if x > 0u32 && x < 1u32 && o < Greater {
+            assert!(log < 0u32);
+        }
+    }
+}
+
+#[test]
+fn log_base_10_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_9().test_properties(|(x, prec, rm)| {
+        log_base_10_rational_prec_round_properties_helper(x, prec, rm);
+    });
+
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    rational_unsigned_rounding_mode_triple_gen_var_9().test_properties_with_config(
+        &config,
+        |(x, prec, rm)| {
+            log_base_10_rational_prec_round_properties_helper(x, prec, rm);
+        },
+    );
+}
+
+#[test]
+fn log_base_10_rational_prec_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_9().test_properties(|(x, prec, _rm)| {
+        let (log, o) = Float::log_base_10_rational_prec(x.clone(), prec);
+        assert!(log.is_valid());
+        let (log_ref, o_ref) = Float::log_base_10_rational_prec_ref(&x, prec);
+        assert_eq!(ComparableFloatRef(&log_ref), ComparableFloatRef(&log));
+        assert_eq!(o_ref, o);
+        let (expected, eo) = Float::log_base_10_rational_prec_round(x, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&expected));
+        assert_eq!(o, eo);
+    });
+}
+
+#[test]
+fn test_log_base_10_rational_prec_round() {
+    let test = |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
+        let x = Rational::from_signeds(n, i64::exact_from(d));
+        let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
+        assert!(log.is_valid());
+        assert_eq!(log.to_string(), out);
+        assert_eq!(o, o_out);
+        let (log_alt, o_alt) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
+        assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+        assert_eq!(o_alt, o);
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rl, ro) = rug_log_base_10_rational_prec_round(&x, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rl)),
+                ComparableFloatRef(&log)
+            );
+            assert_eq!(ro, o);
+        }
+    };
+    test(3, 5, 20, Floor, "-0.221849", Less);
+    test(3, 5, 20, Ceiling, "-0.2218487", Greater);
+    test(3, 5, 20, Nearest, "-0.2218487", Greater);
+    test(2, 1, 20, Floor, "0.3010297", Less);
+    test(2, 1, 20, Ceiling, "0.3010302", Greater);
+    test(2, 1, 20, Nearest, "0.3010302", Greater);
+    test(1, 8, 20, Floor, "-0.9030905", Less);
+    test(1, 8, 20, Ceiling, "-0.9030895", Greater);
+    test(1, 8, 20, Nearest, "-0.9030895", Greater);
+    test(7, 1, 30, Floor, "0.845098039", Less);
+    test(7, 1, 30, Ceiling, "0.84509804", Greater);
+    test(7, 1, 30, Nearest, "0.84509804", Greater);
+    test(50, 1, 10, Floor, "1.697", Less);
+    test(50, 1, 10, Ceiling, "1.699", Greater);
+    test(50, 1, 10, Nearest, "1.699", Greater);
+    test(1, 100, 10, Floor, "-2.0", Equal);
+    test(1, 100, 10, Ceiling, "-2.0", Equal);
+    test(1, 100, 10, Nearest, "-2.0", Equal);
+    test(1, 100, 10, Exact, "-2.0", Equal);
+    test(22, 7, 15, Floor, "0.49731", Less);
+    test(22, 7, 15, Ceiling, "0.49733", Greater);
+    test(22, 7, 15, Nearest, "0.49733", Greater);
+    test(1000, 1, 10, Floor, "3.0", Equal);
+    test(1000, 1, 10, Ceiling, "3.0", Equal);
+    test(1000, 1, 10, Nearest, "3.0", Equal);
+    test(1000, 1, 10, Exact, "3.0", Equal);
+    test(10, 1, 10, Floor, "1.0", Equal);
+    test(10, 1, 10, Ceiling, "1.0", Equal);
+    test(10, 1, 10, Nearest, "1.0", Equal);
+    test(10, 1, 10, Exact, "1.0", Equal);
+    test(1, 10, 10, Floor, "-1.0", Equal);
+    test(1, 10, 10, Ceiling, "-1.0", Equal);
+    test(1, 10, 10, Nearest, "-1.0", Equal);
+    test(1, 10, 10, Exact, "-1.0", Equal);
+    // Special cases.
+    test(0, 1, 10, Nearest, "-Infinity", Equal);
+    test(0, 1, 10, Exact, "-Infinity", Equal);
+    test(-3, 1, 10, Nearest, "NaN", Equal);
+    test(1, 1, 10, Exact, "0.0", Equal);
+}
+
+#[test]
+fn test_log_base_10_rational_prec() {
+    let test = |n: i64, d: u64, prec: u64, out: &str, o_out: Ordering| {
+        let x = Rational::from_signeds(n, i64::exact_from(d));
+        let (log, o) = Float::log_base_10_rational_prec(x.clone(), prec);
+        assert!(log.is_valid());
+        assert_eq!(log.to_string(), out);
+        assert_eq!(o, o_out);
+        let (log_alt, o_alt) = Float::log_base_10_rational_prec_ref(&x, prec);
+        assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+        assert_eq!(o_alt, o);
+    };
+    test(3, 5, 20, "-0.2218487", Greater);
+    test(2, 1, 20, "0.3010302", Greater);
+    test(1, 8, 20, "-0.9030895", Greater);
+    test(7, 1, 30, "0.84509804", Greater);
+    test(50, 1, 10, "1.699", Greater);
+    test(1, 100, 10, "-2.0", Equal);
+    test(22, 7, 15, "0.49733", Greater);
+    test(1000, 1, 10, "3.0", Equal);
+    test(10, 1, 10, "1.0", Equal);
+    test(1, 10, 10, "-1.0", Equal);
+    test(0, 1, 10, "-Infinity", Equal);
+    test(1, 1, 10, "0.0", Equal);
 }

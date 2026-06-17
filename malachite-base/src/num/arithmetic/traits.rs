@@ -578,6 +578,30 @@ pub trait LogBasePowerOf2Of1PlusXAssign<POW> {
     fn log_base_power_of_2_1_plus_x_assign(&mut self, pow: POW);
 }
 
+/// Computes $\log_b(1+x)$ for an integer base $b$.
+pub trait LogBaseOf1PlusX<B = Self> {
+    type Output;
+
+    fn log_base_1_plus_x(self, base: B) -> Self::Output;
+}
+
+/// Replaces a number $x$ by $\log_b(1+x)$ for an integer base $b$.
+pub trait LogBaseOf1PlusXAssign<B = Self> {
+    fn log_base_1_plus_x_assign(&mut self, base: B);
+}
+
+/// Computes $\log_{10}(1+x)$.
+pub trait LogBase10Of1PlusX {
+    type Output;
+
+    fn log_base_10_1_plus_x(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ by $\log_{10}(1+x)$.
+pub trait LogBase10Of1PlusXAssign {
+    fn log_base_10_1_plus_x_assign(&mut self);
+}
+
 /// Calculates the floor of the base-2 logarithm of a number.
 pub trait FloorLogBase2 {
     type Output;

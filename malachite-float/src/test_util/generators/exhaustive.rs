@@ -6,8 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::log_base::rational_log_base;
+use crate::arithmetic::log_base::{rational_log_base, rational_log_base_of_rational};
+use crate::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
 use crate::arithmetic::log_base_10::float_is_power_of_10;
+use crate::arithmetic::log_base_rational_base::rational_log_base_rational_base;
 use crate::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
     exhaustive_finite_floats, exhaustive_floats, exhaustive_non_negative_finite_floats,
@@ -21,7 +23,9 @@ use crate::{Float, significand_bits};
 use alloc::vec::IntoIter;
 use core::cmp::Ordering::*;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{CheckedLogBase2, IsPowerOf2, Reciprocal, Square};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase, CheckedLogBase2, IsPowerOf2, Reciprocal, Square,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -2312,6 +2316,62 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6()
     ))
 }
 
+pub fn log_base_1_plus_x_prec_round_valid(
+    x: &Float,
+    base: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if base < 2 {
+        return false;
+    }
+    if rm != Exact || !x.is_finite() || *x == 0u32 || *x <= -1i32 {
+        return true;
+    }
+    if base.is_power_of_2() {
+        return log_base_power_of_2_1_plus_x_prec_round_valid(
+            x,
+            i64::from(base.trailing_zeros()),
+            prec,
+            rm,
+        );
+    }
+    // rm == Exact and x is finite, nonzero, and > -1: exact only when 1 + x = g^m and m / e_base is
+    // representable at the target precision.
+    log_base_1_plus_x_rational(x, base)
+        .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_7()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base, prec), rm)| log_base_1_plus_x_prec_round_valid(x, base, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base, prec), rm)| log_base_1_plus_x_prec_round_valid(x, base, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_5()
 -> It<(Float, i64, u64, RoundingMode)> {
     reshape_3_1_to_4(Box::new(
@@ -2776,6 +2836,61 @@ pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_10()
     )
 }
 
+pub fn log_base_rational_base_prec_round_valid(
+    x: &Float,
+    base: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if *base <= 1u32 {
+        // The base must be greater than 1.
+        return false;
+    }
+    if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    // rm == Exact and x is finite, positive, and not 1: exact only when log_base(x) is rational and
+    // representable at the target precision.
+    rational_log_base_rational_base(x, base)
+        .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_11()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| log_base_rational_base_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_extreme_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| log_base_rational_base_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
 // -- (Float, Rational, Rational) --
 
 pub fn exhaustive_float_rational_rational_triple_gen() -> It<(Float, Rational, Rational)> {
@@ -2997,6 +3112,43 @@ pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_11()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| rational_div_float_round_valid(x, y, *rm)),
+    )
+}
+
+pub(crate) fn log_base_rational_base_round_valid(
+    x: &Float,
+    base: &Rational,
+    rm: RoundingMode,
+) -> bool {
+    if *base <= 1u32 {
+        return false;
+    }
+    if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    rational_log_base_rational_base(x, base)
+        .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_12()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| log_base_rational_base_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_13()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_extreme_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| log_base_rational_base_round_valid(x, y, *rm)),
     )
 }
 
@@ -3559,6 +3711,48 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_28() -> It<(Float,
     ))
 }
 
+pub(crate) fn log_base_1_plus_x_round_valid(x: &Float, base: u64, rm: RoundingMode) -> bool {
+    if base < 2 {
+        return false;
+    }
+    if rm != Exact || !x.is_finite() || *x == 0u32 || *x <= -1i32 {
+        return true;
+    }
+    if base.is_power_of_2() {
+        return log_base_power_of_2_1_plus_x_round_valid(x, i64::from(base.trailing_zeros()), rm);
+    }
+    log_base_1_plus_x_rational(x, base)
+        .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_32() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base), rm)| log_base_1_plus_x_round_valid(x, base, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_33() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, base), rm)| log_base_1_plus_x_round_valid(x, base, rm)),
+    ))
+}
+
 pub fn log_base_10_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
     if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
         return true;
@@ -3691,6 +3885,62 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_44() -> It<(Float, RoundingMo
         exhaustive_floats(),
         exhaustive_rounding_modes().filter(|rm| *rm != Exact),
     ))
+}
+
+pub fn log_base_10_1_plus_x_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
+    if rm != Exact || !x.is_finite() || *x == 0u32 || *x <= -1i32 {
+        return true;
+    }
+    // rm == Exact and x is finite, nonzero, and greater than -1: exact only when 1 + x = 10^m and
+    // the result m is representable at the target precision.
+    log_base_1_plus_x_rational(x, 10).is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_34() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| log_base_10_1_plus_x_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_35() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| log_base_10_1_plus_x_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub(crate) fn log_base_10_1_plus_x_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    if rm != Exact || !x.is_finite() || *x == 0u32 || *x <= -1i32 {
+        return true;
+    }
+    log_base_1_plus_x_rational(x, 10)
+        .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_45() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| log_base_10_1_plus_x_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_46() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| log_base_10_1_plus_x_round_valid(f, *rm)),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned, RoundingMode) --
@@ -3988,6 +4238,25 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_7()
     ))
 }
 
+pub fn log_base_10_rational_prec_round_valid(x: &Rational, prec: u64, rm: RoundingMode) -> bool {
+    // `checked_log_base` panics for nonpositive arguments, so the order of these tests matters.
+    rm != Exact
+        || *x <= 0
+        || x.checked_log_base(10)
+            .is_some_and(|m| Float::from_signed_prec(m, prec).1 == Equal)
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_9()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| log_base_10_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
 // -- (Rational, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
 
 pub fn log_base_power_of_2_rational_prec_round_valid(
@@ -4023,6 +4292,52 @@ pub fn exhaustive_rational_signed_unsigned_rounding_mode_quadruple_gen_var_1()
         .filter(|&((ref n, pow, prec), rm)| {
             log_base_power_of_2_rational_prec_round_valid(n, pow, prec, rm)
         }),
+    ))
+}
+
+// -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn log_base_rational_prec_round_valid(
+    x: &Rational,
+    base: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if base < 2 {
+        return false;
+    }
+    // `checked_log_base` panics for nonpositive arguments, so the order of these tests matters.
+    if rm != Exact || *x <= 0 {
+        return true;
+    }
+    if base.is_power_of_2() {
+        return log_base_power_of_2_rational_prec_round_valid(
+            x,
+            i64::from(base.trailing_zeros()),
+            prec,
+            rm,
+        );
+    }
+    // rm == Exact and x > 0: exact only when log_base(x) is a rational representable at `prec`.
+    rational_log_base_of_rational(x, base)
+        .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                primitive_int_increasing_inclusive_range(2, u64::MAX),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, base, prec), rm)| log_base_rational_prec_round_valid(n, base, prec, rm)),
     ))
 }
 
