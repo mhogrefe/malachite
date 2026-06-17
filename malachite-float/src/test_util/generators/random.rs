@@ -33,8 +33,8 @@ use crate::test_util::generators::exhaustive::{
     log_base_power_of_2_prec_round_valid, log_base_power_of_2_rational_prec_round_valid,
     log_base_power_of_2_round_valid, log_base_prec_round_valid,
     log_base_rational_base_prec_round_valid, log_base_rational_base_round_valid,
-    log_base_rational_prec_round_valid, log_base_round_valid, mul_prec_round_valid,
-    mul_rational_prec_round_valid,
+    log_base_rational_prec_round_valid, log_base_rational_rational_base_prec_round_valid,
+    log_base_round_valid, mul_prec_round_valid, mul_rational_prec_round_valid,
     mul_rational_round_valid, mul_round_valid, natural_rounding_from_float_valid,
     rational_div_float_prec_round_valid, rational_div_float_round_valid,
     reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
@@ -7579,6 +7579,34 @@ pub fn random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1(
             &random_rounding_modes,
         )
         .filter(|(x, y, prec, rm)| agm_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Rational, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, prec, rm)| {
+            log_base_rational_rational_base_prec_round_valid(x, y, *prec, *rm)
+        }),
     )
 }
 

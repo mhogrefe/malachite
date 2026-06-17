@@ -14,13 +14,14 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::arithmetic::round_near_x::float_round_near_x;
+use crate::basic::extended::ExtendedFloat;
 use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase2, IsPowerOf2, LogBase2, LogBase2Assign, PowerOf2, Sign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero as ZeroTrait;
+use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -160,6 +161,35 @@ fn log_base_2_rational_prec_round_helper(
         // Increase the precision.
         working_prec += increment;
         increment = working_prec >> 1;
+    }
+}
+
+// Computes `log_2(r)` as an `ExtendedFloat`, accurate to within 2 ulps of `prec` bits. `r` must be
+// positive and not equal to 1.
+//
+// The result is kept in the extended exponent range so that an `r` extremely close to 1 -- where
+// `log_2(r)` is tiny and would underflow an ordinary `Float` (its value-exponent reaches `-2^63`,
+// far below `MIN_EXPONENT = -(2^30 - 1)`) -- is represented faithfully rather than flushed to zero.
+// This lets the logarithm-with-a-rational-base functions divide two such logs and clamp only once,
+// at the very end, rather than losing the operand entirely.
+//
+// For `r` not pathologically near 1, the ordinary `log_2(r)` is a normal `Float`, correctly rounded
+// (at most 1/2 ulp), and is simply wrapped. When `r` is within about `2^(-2^30)` of 1, `log_2(r) =
+// log_2(1 + y)` with `y = r - 1`, and `log_2(1 + y) = y / ln 2 + O(y^2)`; here `|y| < 2^(-2^30)` is
+// far smaller than `2^(-prec)`, so the `O(y^2)` term is below an ulp and `y / ln 2` (computed in
+// the extended range, where `y`'s exponent fits in the `i64`) is accurate to within 2 ulps (1/2
+// from the conversion of `y`, 1/2 from the division, the rest from the dropped term).
+pub(crate) fn extended_log_base_2_of_rational(r: &Rational, prec: u64) -> ExtendedFloat {
+    // `log_2(r)` underflows an ordinary `Float` only when `r` is within roughly `2^(-2^30)` of 1.
+    // Switch to the linear approximation a couple of exponents before that boundary; the ordinary
+    // path is then guaranteed not to underflow, and the linear path is valid well beyond it.
+    let y = r - Rational::ONE;
+    if y.floor_log_base_2_abs() <= i64::from(Float::MIN_EXPONENT) + 1 {
+        let y_ext = ExtendedFloat::from_rational_prec_round_ref(&y, prec, Nearest).0;
+        let ln_2 = ExtendedFloat::from(Float::ln_2_prec(prec).0);
+        y_ext.div_prec_val_ref(&ln_2, prec).0
+    } else {
+        ExtendedFloat::from(Float::log_base_2_rational_prec_ref(r, prec).0)
     }
 }
 

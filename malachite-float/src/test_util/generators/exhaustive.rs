@@ -10,6 +10,7 @@ use crate::arithmetic::log_base::{rational_log_base, rational_log_base_of_ration
 use crate::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
 use crate::arithmetic::log_base_10::float_is_power_of_10;
 use crate::arithmetic::log_base_rational_base::rational_log_base_rational_base;
+use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
 use crate::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
     exhaustive_finite_floats, exhaustive_floats, exhaustive_non_negative_finite_floats,
@@ -4357,6 +4358,46 @@ pub fn exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, prec, rm)| agm_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn log_base_rational_rational_base_prec_round_valid(
+    x: &Rational,
+    base: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if *base <= 1u32 {
+        // The base must be greater than 1.
+        return false;
+    }
+    if rm != Exact || *x <= 0u32 || *x == 1u32 {
+        return true;
+    }
+    // rm == Exact and x is positive and not 1: exact only when log_base(x) is rational and
+    // representable at the target precision.
+    rational_log_base_rational_rational_base(x, base, prec)
+        .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+// All `(Rational, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::log_base_rational_rational_base_prec_round`.
+pub fn exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Rational, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| {
+            log_base_rational_rational_base_prec_round_valid(x, y, *prec, *rm)
+        }),
     )
 }
 

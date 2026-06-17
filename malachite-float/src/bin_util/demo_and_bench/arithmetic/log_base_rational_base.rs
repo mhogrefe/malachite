@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::{LogBase, LogBaseAssign};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::ComparableFloat;
 use malachite_float::test_util::bench::bucketers::{
     quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer,
     triple_1_2_float_rational_max_complexity_bucketer,
@@ -19,7 +20,6 @@ use malachite_float::test_util::generators::{
     float_rational_unsigned_rounding_mode_quadruple_gen_var_11,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_12,
 };
-use malachite_float::ComparableFloat;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_rational_base);

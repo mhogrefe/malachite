@@ -114,8 +114,14 @@ fn log_base_10_1_plus_x_prec_round_properties() {
         assert_eq!(f(Float::INFINITY), (Float::INFINITY, Equal));
         assert!(f(Float::NEGATIVE_INFINITY).0.is_nan());
         // log_10(1 + 0) = 0, with the sign of the zero preserved.
-        assert_eq!(ComparableFloat(f(Float::ZERO).0), ComparableFloat(Float::ZERO));
-        assert_eq!(ComparableFloat(f(-Float::ZERO).0), ComparableFloat(-Float::ZERO));
+        assert_eq!(
+            ComparableFloat(f(Float::ZERO).0),
+            ComparableFloat(Float::ZERO)
+        );
+        assert_eq!(
+            ComparableFloat(f(-Float::ZERO).0),
+            ComparableFloat(-Float::ZERO)
+        );
         // 1 + (-1) = 0, so log_10(0) = -infinity.
         assert_eq!(f(Float::NEGATIVE_ONE), (Float::NEGATIVE_INFINITY, Equal));
         // x < -1 is outside the domain.

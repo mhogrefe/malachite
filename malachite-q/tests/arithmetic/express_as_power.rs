@@ -17,7 +17,10 @@ use std::str::FromStr;
 fn test_express_as_power() {
     let test = |s: &str, out: &str| {
         assert_eq!(
-            Rational::from_str(s).unwrap().express_as_power().to_debug_string(),
+            Rational::from_str(s)
+                .unwrap()
+                .express_as_power()
+                .to_debug_string(),
             out
         );
     };

@@ -133,8 +133,8 @@ fn log_base_1_plus_x_prec_round_properties() {
         },
     );
 
-    // The special cases hold for every base > 1, precision, and rounding mode. (Base 4 exercises the
-    // power-of-2 delegation, base 3 the general path.)
+    // The special cases hold for every base > 1, precision, and rounding mode. (Base 4 exercises
+    // the power-of-2 delegation, base 3 the general path.)
     unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
         for base in [3, 4] {
             let f = |x: Float| x.log_base_1_plus_x_prec_round(base, prec, rm);
@@ -142,8 +142,14 @@ fn log_base_1_plus_x_prec_round_properties() {
             assert_eq!(f(Float::INFINITY), (Float::INFINITY, Equal));
             assert!(f(Float::NEGATIVE_INFINITY).0.is_nan());
             // log_b(1 + 0) = 0, with the sign of the zero preserved.
-            assert_eq!(ComparableFloat(f(Float::ZERO).0), ComparableFloat(Float::ZERO));
-            assert_eq!(ComparableFloat(f(-Float::ZERO).0), ComparableFloat(-Float::ZERO));
+            assert_eq!(
+                ComparableFloat(f(Float::ZERO).0),
+                ComparableFloat(Float::ZERO)
+            );
+            assert_eq!(
+                ComparableFloat(f(-Float::ZERO).0),
+                ComparableFloat(-Float::ZERO)
+            );
             // 1 + (-1) = 0, so log_b(0) = -infinity.
             assert_eq!(f(Float::NEGATIVE_ONE), (Float::NEGATIVE_INFINITY, Equal));
             // x < -1 is outside the domain.

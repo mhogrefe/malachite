@@ -7,12 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
+use crate::basic::extended::ExtendedFloat;
 use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase, LogBase, LogBaseAssign};
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, CheckedLogBase, LogBase, LogBaseAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
-use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -56,12 +59,15 @@ pub(crate) fn rational_log_base_rational_base(x: &Float, base: &Rational) -> Opt
 // The computation of log_base(x) for a `Rational` base is done by log_base(x) = log_2(x) /
 // log_2(base). The input is finite, nonzero, and positive, and `base` is greater than 1.
 //
-// Routing the base through `log_base_2_rational` (rather than computing `ln(x) / ln(base)` directly)
-// reuses its handling of a base near 1, where `log_2(base)` is tiny and a direct computation would
-// suffer catastrophic cancellation. Unlike an integer base, a `Rational` base allows both overflow
-// (base near 1, so `log_2(base)` is tiny and the quotient is huge) and underflow (x near 1, so
-// `log_2(x)` is tiny); both are detected by an exponent bound and handed to `div_prec_round`, which
-// clamps to the appropriate infinity/maximum or zero/minimum per the rounding mode.
+// `log_2(base)` is computed in the extended exponent range (see `extended_log_base_2_of_rational`)
+// so that a base near 1 -- where `log_2(base)` is tiny and would otherwise underflow an ordinary
+// `Float`, losing the operand entirely -- is represented faithfully. The quotient is also kept
+// extended, and the single conversion back to a `Float`, via `ExtendedFloat::into_float_helper`,
+// performs the one correctly-rounded clamp to an infinity/maximum or zero/minimum per the rounding
+// mode. Unlike an integer base, a `Rational` base allows both overflow (base near 1) and underflow
+// (x near 1); both are handled by that clamp. (`log_2(x)` itself never underflows: `x` is a
+// `Float`, so `|x - 1|` is at least the smallest positive `Float`, keeping `|log_2(x)|`
+// representable.)
 fn log_base_rational_base_prec_round_normal(
     x: &Float,
     base: &Rational,
@@ -80,42 +86,33 @@ fn log_base_rational_base_prec_round_normal(
     }
     // The result is irrational, so it is never exactly representable.
     assert_ne!(rm, Exact, "Inexact log_base_rational_base");
-    let max_exp = i64::from(Float::MAX_EXPONENT);
-    let min_exp = i64::from(Float::MIN_EXPONENT);
-    let mut working_prec = prec + 4 + prec.ceiling_log_base_2();
+    // The initial slack keeps working_prec at least 7, so the working_prec - 6 below stays
+    // positive.
+    let mut working_prec = prec + 6 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {
-        // log_2(x), correctly rounded to working_prec; finite and nonzero (x is positive and not 1).
-        let num = x.log_base_2_prec_ref(working_prec).0;
-        // log_2(base) > 0, correctly rounded to working_prec.
-        let den = Float::log_base_2_rational_prec_ref(base, working_prec).0;
-        // The quotient's exponent is e_num - e_den or one more. Detect overflow (too large to
-        // represent) and underflow (too small), where the Ziv test below could never resolve the
-        // clamped result, and hand the rounding to div_prec_round. Overflow needs e_num - e_den >
-        // MAX_EXPONENT; the boundary e_num - e_den == MAX_EXPONENT never overflows, because
-        // |log_2(x)| <= 2^30 forces the quotient's mantissa below 1 there. Underflow mirrors the
-        // div.rs handling: the narrow band where the cheap bound is inconclusive is resolved by the
-        // shift-and-compare (which only adjusts exponents, avoiding a huge Rational conversion).
-        //
-        // This clamp is only reached by inputs within ~2^(-2^30) of 1 (a base near 1 for overflow,
-        // an x near 1 for underflow), which require multi-hundred-megabyte operands and so are
-        // beyond the property tests' range; the underflow logic is the same band exercised and
-        // verified in log_base_1_plus_x.
-        let e_num = i64::from(num.get_exponent().unwrap());
-        let e_den = i64::from(den.get_exponent().unwrap());
-        let d = e_num - e_den;
-        if d > max_exp
-            || d + 1 < min_exp
-            || (d < min_exp && (&num << u64::exact_from(1 - min_exp)).lt_abs(&den))
-        {
-            return num.div_prec_round(den, prec, rm);
-        }
-        // log_2(x) / log_2(base), with three correctly-rounded operations (log_base_2,
-        // log_base_2_rational, and the division, each at most 1/2 ulp), so the relative error is
-        // below 2^(2 - working_prec) and working_prec - 4 correct bits suffice for rounding.
-        let t = num.div_prec(den, working_prec).0;
-        if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
-            return Float::from_float_prec_round(t, prec, rm);
+        // log_2(x), correctly rounded to working_prec; finite and nonzero (x is positive and not
+        // 1), and never underflowing, so the ordinary log wrapped as an ExtendedFloat suffices.
+        let num = ExtendedFloat::from(x.log_base_2_prec_ref(working_prec).0);
+        // log_2(base) > 0, extended (may be tiny for a base near 1).
+        let den = extended_log_base_2_of_rational(base, working_prec);
+        // log_2(x) / log_2(base) in the extended range; cannot overflow or underflow here.
+        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        // log_2(x) is correctly rounded (<= 1/2 ulp), log_2(base) is within 2 ulps, and the
+        // division adds at most 1 more, for at most 4 ulps total; working_prec - 6 correct bits
+        // comfortably suffice for the rounding test.
+        if float_can_round(
+            quotient.x.significand_ref().unwrap(),
+            working_prec - 6,
+            prec,
+            rm,
+        ) {
+            // Round the mantissa to prec, then place the extended exponent, clamping once to the
+            // Float range as the rounding mode dictates.
+            let (rounded, o) = Float::from_float_prec_round(quotient.x, prec, rm);
+            let mut result = ExtendedFloat::from(rounded);
+            result.exp = result.exp.checked_add(quotient.exp).unwrap();
+            return result.into_float_helper(prec, rm, o);
         }
         // Increase the precision.
         working_prec += increment;
@@ -127,20 +124,21 @@ impl Float {
     /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a [`Rational`] greater than 1,
     /// rounding the result to the specified precision and with the specified rounding mode. The
     /// [`Float`] is taken by value and the base by reference. An [`Ordering`] is also returned,
-    /// indicating whether the rounded value is less than, equal to, or greater than the exact value.
-    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it
-    /// also returns `Equal`.
+    /// indicating whether the rounded value is less than, equal to, or greater than the exact
+    /// value. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
     ///
     /// This computes $\log_2 x / \log_2 b$, routing the base through
-    /// [`Float::log_base_2_rational_prec_ref`] so that a base near 1 (where $\log_2 b$ is tiny) does
-    /// not lose accuracy to cancellation.
+    /// [`Float::log_base_2_rational_prec_ref`] so that a base near 1 (where $\log_2 b$ is tiny)
+    /// does not lose accuracy to cancellation.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,b,p,m) = \log_b x+\varepsilon.
     /// $$
-    /// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
     /// - If $\log_b x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
     ///   2^{\lfloor\log_2 |\log_b x|\rfloor-p+1}$.
     /// - If $\log_b x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
@@ -170,8 +168,8 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but the
-    /// result cannot be represented exactly with the given precision.
+    /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but
+    /// the result cannot be represented exactly with the given precision.
     ///
     /// # Examples
     /// ```
@@ -210,7 +208,8 @@ impl Float {
     /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a [`Rational`] greater than 1,
     /// rounding the result to the specified precision and with the specified rounding mode. The
     /// [`Float`] and the base are both taken by reference. An [`Ordering`] is also returned,
-    /// indicating whether the rounded value is less than, equal to, or greater than the exact value.
+    /// indicating whether the rounded value is less than, equal to, or greater than the exact
+    /// value.
     ///
     /// See [`Float::log_base_rational_base_prec_round`] for details, special cases, and a
     /// description of the rounding behavior.
@@ -223,8 +222,8 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but the
-    /// result cannot be represented exactly with the given precision.
+    /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but
+    /// the result cannot be represented exactly with the given precision.
     ///
     /// # Examples
     /// ```
@@ -365,7 +364,11 @@ impl Float {
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
-    pub fn log_base_rational_base_round(self, base: &Rational, rm: RoundingMode) -> (Self, Ordering) {
+    pub fn log_base_rational_base_round(
+        self,
+        base: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.log_base_rational_base_prec_round(base, prec, rm)
     }
@@ -425,8 +428,8 @@ impl Float {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but the
-    /// result cannot be represented exactly with the given precision.
+    /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but
+    /// the result cannot be represented exactly with the given precision.
     ///
     /// # Examples
     /// ```
@@ -456,8 +459,8 @@ impl Float {
     }
 
     /// Computes $\log_b x$, where $x$ is a [`Float`] and $b$ is a [`Rational`] greater than 1, in
-    /// place, rounding the result to the nearest value of the specified precision. The base is taken
-    /// by reference. An [`Ordering`] is returned.
+    /// place, rounding the result to the nearest value of the specified precision. The base is
+    /// taken by reference. An [`Ordering`] is returned.
     ///
     /// See [`Float::log_base_rational_base_prec_round`] for details and special cases.
     ///
@@ -561,7 +564,8 @@ impl LogBase<Rational> for Float {
     #[inline]
     fn log_base(self, base: Rational) -> Self {
         let prec = self.significant_bits();
-        self.log_base_rational_base_prec_round(&base, prec, Nearest).0
+        self.log_base_rational_base_prec_round(&base, prec, Nearest)
+            .0
     }
 }
 
@@ -601,8 +605,9 @@ impl LogBase<&Rational> for &Float {
 }
 
 impl LogBaseAssign<&Rational> for Float {
-    /// Replaces a [`Float`] $x$ with $\log_b x$, where $b$ is a [`Rational`] greater than 1, rounding
-    /// the result to the nearest value of the input's precision. The base is taken by reference.
+    /// Replaces a [`Float`] $x$ with $\log_b x$, where $b$ is a [`Rational`] greater than 1,
+    /// rounding the result to the nearest value of the input's precision. The base is taken by
+    /// reference.
     ///
     /// See [`Float::log_base_rational_base_prec_round`] for special cases.
     ///

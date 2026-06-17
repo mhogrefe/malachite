@@ -20,7 +20,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_express_as_power(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in rational_gen().get(gm, config).take(limit) {
-        println!("({}).express_as_power() = {:?}", x.clone(), x.express_as_power());
+        println!(
+            "({}).express_as_power() = {:?}",
+            x.clone(),
+            x.express_as_power()
+        );
     }
 }
 

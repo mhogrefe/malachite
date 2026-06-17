@@ -15,8 +15,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
 use malachite_float::test_util::arithmetic::log_base_rational_base::{
-    rug_log_base_rational_base, rug_log_base_rational_base_prec, rug_log_base_rational_base_prec_round,
-    rug_log_base_rational_base_round,
+    rug_log_base_rational_base, rug_log_base_rational_base_prec,
+    rug_log_base_rational_base_prec_round, rug_log_base_rational_base_round,
 };
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
 use malachite_float::test_util::generators::{
@@ -32,7 +32,13 @@ use std::panic::catch_unwind;
 // rug oracle. The oracle is skipped for extreme inputs, whose ln(x)/ln(base) bracketing at large
 // working precision (driven by an extreme `x` or a large `base`) is slow. Returns the computed
 // `(Float, Ordering)`.
-fn check(x: &Float, base: &Rational, prec: u64, rm: RoundingMode, extreme: bool) -> (Float, Ordering) {
+fn check(
+    x: &Float,
+    base: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) -> (Float, Ordering) {
     let (log, o) = x.clone().log_base_rational_base_prec_round(base, prec, rm);
     assert!(log.is_valid());
 
@@ -280,12 +286,14 @@ fn log_base_rational_base_prec_round_properties_helper(
 
 #[test]
 fn log_base_rational_base_prec_round_properties() {
-    float_rational_unsigned_rounding_mode_quadruple_gen_var_11().test_properties_with_limit(20, 
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_11().test_properties_with_limit(
+        20,
         |(x, base, prec, rm)| {
             log_base_rational_base_prec_round_properties_helper(&x, &base, prec, rm, false);
         },
     );
-    float_rational_unsigned_rounding_mode_quadruple_gen_var_12().test_properties_with_limit(20,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_12().test_properties_with_limit(
+        20,
         |(x, base, prec, rm)| {
             log_base_rational_base_prec_round_properties_helper(&x, &base, prec, rm, true);
         },
@@ -355,19 +363,31 @@ fn log_base_rational_base_properties() {
         x_alt.log_base_assign(&base);
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&log));
     };
-    float_rational_rounding_mode_triple_gen_var_12().test_properties_with_limit(20, |(x, base, _rm)| f(x, base, false));
-    float_rational_rounding_mode_triple_gen_var_13().test_properties_with_limit(20, |(x, base, _rm)| f(x, base, true));
+    float_rational_rounding_mode_triple_gen_var_12()
+        .test_properties_with_limit(20, |(x, base, _rm)| f(x, base, false));
+    float_rational_rounding_mode_triple_gen_var_13()
+        .test_properties_with_limit(20, |(x, base, _rm)| f(x, base, true));
 }
 
 #[test]
 fn log_base_rational_base_fail() {
     // Precision must be nonzero.
-    assert_panic!(Float::from(8).log_base_rational_base_prec_round(&Rational::from(3u32), 0, Nearest));
+    assert_panic!(Float::from(8).log_base_rational_base_prec_round(
+        &Rational::from(3u32),
+        0,
+        Nearest
+    ));
     // Base must be greater than 1.
     assert_panic!(Float::from(8).log_base_rational_base_prec_round(&Rational::ONE, 10, Nearest));
-    assert_panic!(
-        Float::from(8).log_base_rational_base_prec_round(&Rational::from_unsigneds(1u32, 2), 10, Nearest)
-    );
+    assert_panic!(Float::from(8).log_base_rational_base_prec_round(
+        &Rational::from_unsigneds(1u32, 2),
+        10,
+        Nearest
+    ));
     // Exact is not allowed when the result is not exactly representable.
-    assert_panic!(Float::from(2).log_base_rational_base_prec_round(&Rational::from(3u32), 10, Exact));
+    assert_panic!(Float::from(2).log_base_rational_base_prec_round(
+        &Rational::from(3u32),
+        10,
+        Exact
+    ));
 }
