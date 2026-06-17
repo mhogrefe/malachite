@@ -4106,6 +4106,28 @@ pub fn rational_rational_unsigned_rounding_mode_quadruple_gen_var_2()
     )
 }
 
+// -- (Rational, Float, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Rational, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::log_base_rational_float_base_prec_round` (var_2 over extreme `Float` bases).
+pub fn rational_float_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Rational, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_float_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_rational_float_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_rational_float_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+pub fn rational_float_unsigned_rounding_mode_quadruple_gen_var_2()
+-> Generator<(Rational, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_float_unsigned_rounding_mode_quadruple_gen_var_2,
+        &random_rational_float_unsigned_rounding_mode_quadruple_gen_var_2,
+        &special_random_rational_float_unsigned_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
 // -- (Rational, RoundingMode) --
 
 // vars 1 through 5 are in malachite-q.

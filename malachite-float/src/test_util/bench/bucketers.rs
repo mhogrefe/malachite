@@ -313,6 +313,29 @@ pub fn quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer<
     }
 }
 
+pub fn quadruple_1_2_3_rational_float_primitive_int_max_complexity_bucketer<
+    'a,
+    T: PrimitiveInt,
+    U,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Rational, Float, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, _)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.complexity(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.complexity(), {z_name}.significant_bits())"
+        ),
+    }
+}
+
 pub fn pair_2_quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer<
     'a,
     T: PrimitiveInt,

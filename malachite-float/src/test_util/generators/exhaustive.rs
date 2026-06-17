@@ -12,6 +12,7 @@ use crate::arithmetic::log_base_10::float_is_power_of_10;
 use crate::arithmetic::log_base_float_base::log_base_float_base_rational;
 use crate::arithmetic::log_base_rational_base::rational_log_base_rational_base;
 use crate::arithmetic::log_base_rational_base_1_plus_x::rational_log_base_rational_base_1_plus_x;
+use crate::arithmetic::log_base_rational_float_base::log_base_rational_float_base_rational;
 use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
 use crate::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
@@ -4601,6 +4602,64 @@ pub fn exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2()
         .filter(|(x, y, prec, rm)| {
             log_base_rational_rational_base_prec_round_valid(x, y, *prec, *rm)
         }),
+    )
+}
+
+// -- (Rational, Float, PrimitiveUnsigned, RoundingMode) --
+
+pub fn log_base_rational_float_base_prec_round_valid(
+    x: &Rational,
+    base: &Float,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if rm != Exact {
+        return true;
+    }
+    // Special and degenerate inputs (x not positive, x = 1, or base not finite-positive, or base =
+    // 1) yield exact results (0, +-infinity, or NaN) and never panic with Exact.
+    if *x <= 0u32 || *x == 1u32 || !base.is_finite() || *base <= 0u32 || *base == 1u32 {
+        return true;
+    }
+    log_base_rational_float_base_rational(x, base, prec)
+        .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+// All `(Rational, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::log_base_rational_float_base_prec_round`.
+pub fn exhaustive_rational_float_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Rational, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| log_base_rational_float_base_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_rational_float_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Rational, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_extreme_floats(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| log_base_rational_float_base_prec_round_valid(x, y, *prec, *rm)),
     )
 }
 

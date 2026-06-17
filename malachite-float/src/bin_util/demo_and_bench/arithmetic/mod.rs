@@ -27,6 +27,7 @@ pub(crate) fn register(runner: &mut Runner) {
     log_base_float_base::register(runner);
     log_base_rational_base::register(runner);
     log_base_rational_base_1_plus_x::register(runner);
+    log_base_rational_float_base::register(runner);
     log_base_rational_rational_base::register(runner);
     mul::register(runner);
     neg::register(runner);
@@ -61,6 +62,7 @@ mod log_base_power_of_2;
 mod log_base_power_of_2_1_plus_x;
 mod log_base_rational_base;
 mod log_base_rational_base_1_plus_x;
+mod log_base_rational_float_base;
 mod log_base_rational_rational_base;
 mod mul;
 mod neg;

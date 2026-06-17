@@ -79,6 +79,9 @@ pub mod log_base_rational_base;
 /// [`Float`](super::Float) with an arbitrary rational base $b>1$.
 pub mod log_base_rational_base_1_plus_x;
 /// Functions for computing $\log_b x$ of a [`Rational`](malachite_q::Rational) $x$ with an
+/// arbitrary [`Float`](super::Float) base, returning a [`Float`](super::Float).
+pub mod log_base_rational_float_base;
+/// Functions for computing $\log_b x$ of a [`Rational`](malachite_q::Rational) $x$ with an
 /// arbitrary [`Rational`](malachite_q::Rational) base $b>1$, returning a [`Float`](super::Float).
 pub mod log_base_rational_rational_base;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with

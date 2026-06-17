@@ -79,6 +79,7 @@ pub mod arithmetic {
     pub mod log_base_power_of_2_1_plus_x;
     pub mod log_base_rational_base;
     pub mod log_base_rational_base_1_plus_x;
+    pub mod log_base_rational_float_base;
     pub mod log_base_rational_rational_base;
     pub mod mul;
     pub mod neg;
