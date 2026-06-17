@@ -68,6 +68,11 @@ pub mod log_base_power_of_2_1_plus_x;
 /// [`Rational`](malachite_q::Rational) base, for computing $\log_b x$ of a [`Float`](super::Float)
 /// with an arbitrary rational base $b>1$.
 pub mod log_base_rational_base;
+/// [`LogBaseOf1PlusX`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusX) and
+/// [`LogBaseOf1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusXAssign),
+/// implemented for a [`Rational`](malachite_q::Rational) base, for computing $\log_b(1+x)$ of a
+/// [`Float`](super::Float) with an arbitrary rational base $b>1$.
+pub mod log_base_rational_base_1_plus_x;
 /// Functions for computing $\log_b x$ of a [`Rational`](malachite_q::Rational) $x$ with an
 /// arbitrary [`Rational`](malachite_q::Rational) base $b>1$, returning a [`Float`](super::Float).
 pub mod log_base_rational_rational_base;

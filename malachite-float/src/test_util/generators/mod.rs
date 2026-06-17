@@ -2979,6 +2979,26 @@ pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
     )
 }
 
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float.log_base_rational_base_1_plus_x_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_13()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_13,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_13,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_13,
+    )
+}
+
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_14()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_14,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_14,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_14,
+    )
+}
+
 // -- (Float, Rational, Rational) --
 
 pub fn float_rational_rational_triple_gen() -> Generator<(Float, Rational, Rational)> {
@@ -3159,6 +3179,24 @@ pub fn float_rational_rounding_mode_triple_gen_var_13() -> FRR {
         &exhaustive_float_rational_rounding_mode_triple_gen_var_13,
         &random_float_rational_rounding_mode_triple_gen_var_13,
         &special_random_float_rational_rounding_mode_triple_gen_var_13,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` that are valid inputs to
+// `Float.log_base_rational_base_1_plus_x_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_14() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_14,
+        &random_float_rational_rounding_mode_triple_gen_var_14,
+        &special_random_float_rational_rounding_mode_triple_gen_var_14,
+    )
+}
+
+pub fn float_rational_rounding_mode_triple_gen_var_15() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_15,
+        &random_float_rational_rounding_mode_triple_gen_var_15,
+        &special_random_float_rational_rounding_mode_triple_gen_var_15,
     )
 }
 
