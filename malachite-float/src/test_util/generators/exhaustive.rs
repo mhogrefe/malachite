@@ -9,6 +9,7 @@
 use crate::arithmetic::log_base::{rational_log_base, rational_log_base_of_rational};
 use crate::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
 use crate::arithmetic::log_base_10::float_is_power_of_10;
+use crate::arithmetic::log_base_float_base::log_base_float_base_rational;
 use crate::arithmetic::log_base_rational_base::rational_log_base_rational_base;
 use crate::arithmetic::log_base_rational_base_1_plus_x::rational_log_base_rational_base_1_plus_x;
 use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
@@ -951,6 +952,84 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_10()
     )
 }
 
+pub fn log_base_float_base_prec_round_valid(
+    x: &Float,
+    base: &Float,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    if rm != Exact {
+        return true;
+    }
+    // Special and degenerate inputs (x or base not finite-positive, or x = 1, or base = 1) yield
+    // exact results (0, +-infinity, or NaN) and never panic with Exact.
+    if !x.is_finite()
+        || *x <= 0u32
+        || *x == 1u32
+        || !base.is_finite()
+        || *base <= 0u32
+        || *base == 1u32
+    {
+        return true;
+    }
+    // x, base finite positive and not 1: Exact only when log_base(x) is rational and representable.
+    log_base_float_base_rational(x, base, prec)
+        .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
+}
+
+pub(crate) fn log_base_float_base_round_valid(x: &Float, base: &Float, rm: RoundingMode) -> bool {
+    if rm != Exact {
+        return true;
+    }
+    if !x.is_finite()
+        || *x <= 0u32
+        || *x == 1u32
+        || !base.is_finite()
+        || *base <= 0u32
+        || *base == 1u32
+    {
+        return true;
+    }
+    log_base_float_base_rational(x, base, x.significant_bits())
+        .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float.log_base_float_base_prec_round`.
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_11()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| log_base_float_base_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_12()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| log_base_float_base_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
 // -- (Float, Float, Rational) --
 
 pub fn exhaustive_float_float_rational_triple_gen() -> It<(Float, Float, Rational)> {
@@ -1396,6 +1475,29 @@ pub fn exhaustive_float_float_rounding_mode_triple_gen_var_34() -> It<(Float, Fl
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| agm_round_valid(x, y, *rm)),
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float.log_base_float_base_round`.
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_35() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| log_base_float_base_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_36() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_mixed_extreme_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| log_base_float_base_round_valid(x, y, *rm)),
     )
 }
 

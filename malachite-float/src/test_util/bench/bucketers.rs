@@ -128,6 +128,16 @@ pub fn triple_1_2_float_rational_max_complexity_bucketer<'a, T>(
     }
 }
 
+pub fn triple_1_2_float_float_max_complexity_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, Float, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| usize::exact_from(max(x.complexity(), y.complexity())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity())"),
+    }
+}
+
 pub fn pair_2_triple_1_2_float_rational_max_complexity_bucketer<'a, T, U>(
     x_name: &'a str,
     y_name: &'a str,
