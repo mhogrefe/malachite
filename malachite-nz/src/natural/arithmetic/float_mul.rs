@@ -646,12 +646,12 @@ pub(crate) fn limbs_float_mul_high_same_length_scratch_len(len: usize) -> usize 
         if k == 0 {
             0
         } else {
-            // The recursive case in `limbs_float_mul_high_same_length` reuses `scratch` for a
-            // full multiply of length `k` and two recursive mul-highs of length `l = len - k`, so
-            // the requirement is the max of those, not `scratch_len(len)`. Because Toom/FFT
-            // scratch requirements are not monotonic in the operand length, `scratch_len(len)` can
-            // be smaller than `scratch_len(k)` and under-size the buffer (mirrors the already-
-            // correct `limbs_float_square_high_scratch_len`).
+            // The recursive case in `limbs_float_mul_high_same_length` reuses `scratch` for a full
+            // multiply of length `k` and two recursive mul-highs of length `l = len - k`, so the
+            // requirement is the max of those, not `scratch_len(len)`. Because Toom/FFT scratch
+            // requirements are not monotonic in the operand length, `scratch_len(len)` can be
+            // smaller than `scratch_len(k)` and under-size the buffer (mirrors the already- correct
+            // `limbs_float_square_high_scratch_len`).
             let l = len - k;
             max(
                 limbs_mul_same_length_to_out_scratch_len(k),

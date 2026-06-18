@@ -292,6 +292,53 @@ pub mod checked_sub_mul;
 /// assert_eq!(6u8.coprime_with(35), true);
 /// ```
 pub mod coprime_with;
+/// [`DivEuclidean`](traits::DivEuclidean) and [`DivAssignEuclidean`](traits::DivAssignEuclidean),
+/// traits for simultaneously finding the quotient and remainder of two numbers, where the remainder
+/// is always nonnegative.
+///
+/// # div_euclidean
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivEuclidean;
+///
+/// // 2 * 10 + 3 = 23
+/// assert_eq!(23u8.div_euclidean(10), (2, 3));
+///
+/// // 9 * 5 + 0 = 45
+/// assert_eq!(45u32.div_euclidean(5), (9, 0));
+///
+/// // 2 * 10 + 3 = 23
+/// assert_eq!(23i8.div_euclidean(10), (2, 3));
+///
+/// // -2 * -10 + 3 = 23
+/// assert_eq!(23i16.div_euclidean(-10), (-2, 3));
+///
+/// // -3 * 10 + 7 = -23
+/// assert_eq!((-23i32).div_euclidean(10), (-3, 7));
+///
+/// // 3 * -10 + 7 = -23
+/// assert_eq!((-23i64).div_euclidean(-10), (3, 7));
+/// ```
+///
+/// # div_assign_euclidean
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivAssignEuclidean;
+///
+/// // 2 * 10 + 3 = 23
+/// let mut x = 23u8;
+/// assert_eq!(x.div_assign_euclidean(10), 3);
+/// assert_eq!(x, 2);
+///
+/// // -3 * 10 + 7 = -23
+/// let mut x = -23i32;
+/// assert_eq!(x.div_assign_euclidean(10), 7);
+/// assert_eq!(x, -3);
+///
+/// // 3 * -10 + 7 = -23
+/// let mut x = -23i64;
+/// assert_eq!(x.div_assign_euclidean(-10), 7);
+/// assert_eq!(x, 3);
+/// ```
+pub mod div_euclidean;
 /// [`DivExact`](traits::DivExact) and [`DivExactAssign`](traits::DivExactAssign), traits for
 /// dividing two numbers when it's known that the division is exact.
 ///

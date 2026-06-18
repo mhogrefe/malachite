@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add_mul::register(runner);
     binomial_coefficient::register(runner);
     div::register(runner);
+    div_euclidean::register(runner);
     div_exact::register(runner);
     div_mod::register(runner);
     div_round::register(runner);
@@ -51,6 +52,7 @@ mod add;
 mod add_mul;
 mod binomial_coefficient;
 mod div;
+mod div_euclidean;
 mod div_exact;
 mod div_mod;
 mod div_round;

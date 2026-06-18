@@ -72,6 +72,7 @@ pub mod integer {
         pub mod add_mul;
         pub mod binomial_coefficient;
         pub mod div;
+        pub mod div_euclidean;
         pub mod div_exact;
         pub mod div_mod;
         pub mod div_round;
@@ -228,6 +229,7 @@ pub mod natural {
         pub mod checked_sub_mul;
         pub mod coprime_with;
         pub mod div;
+        pub mod div_euclidean;
         pub mod div_exact;
         pub mod div_mod;
         pub mod div_round;

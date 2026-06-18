@@ -12,20 +12,20 @@ use crate::num::arithmetic::traits::{
     AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, BinomialCoefficient,
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRoot,
-    CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignRem, DivExact,
-    DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOf2,
-    EqMod, EqModPowerOf2, ExtendedGcd, FloorRoot, FloorRootAssign, FloorSqrt, FloorSqrtAssign,
-    JacobiSymbol, KroneckerSymbol, LegendreSymbol, Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign,
-    OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
-    OverflowingDiv, OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
-    OverflowingNegAssign, OverflowingPow, OverflowingPowAssign, OverflowingSquare,
-    OverflowingSquareAssign, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
-    OverflowingSubMulAssign, Parity, Pow, PowAssign, PowerOf2, RemPowerOf2, RemPowerOf2Assign,
-    RotateLeft, RotateLeftAssign, RotateRight, RotateRightAssign, RoundToMultiple,
-    RoundToMultipleAssign, RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
-    SaturatingAdd, SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
-    SaturatingMulAssign, SaturatingPow, SaturatingPowAssign, SaturatingSquare,
-    SaturatingSquareAssign, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
+    CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignEuclidean, DivAssignMod,
+    DivAssignRem, DivEuclidean, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ExtendedGcd, FloorRoot,
+    FloorRootAssign, FloorSqrt, FloorSqrtAssign, JacobiSymbol, KroneckerSymbol, LegendreSymbol,
+    Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign,
+    OverflowingAddMul, OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign,
+    OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
+    OverflowingPowAssign, OverflowingSquare, OverflowingSquareAssign, OverflowingSub,
+    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowAssign,
+    PowerOf2, RemPowerOf2, RemPowerOf2Assign, RotateLeft, RotateLeftAssign, RotateRight,
+    RotateRightAssign, RoundToMultiple, RoundToMultipleAssign, RoundToMultipleOfPowerOf2,
+    RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
+    SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingPowAssign,
+    SaturatingSquare, SaturatingSquareAssign, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
     SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, Square,
     SquareAssign, SubMul, SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul,
     WrappingAddMulAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
@@ -151,8 +151,10 @@ pub trait PrimitiveInt:
     + Display
     + Div<Self, Output = Self>
     + DivAssign<Self>
+    + DivAssignEuclidean<Self, ModOutput = Self>
     + DivAssignMod<Self, ModOutput = Self>
     + DivAssignRem<Self, RemOutput = Self>
+    + DivEuclidean<Self, DivOutput = Self, ModOutput = Self>
     + DivExact<Self, Output = Self>
     + DivExactAssign<Self>
     + DivMod<Self, DivOutput = Self, ModOutput = Self>
@@ -628,8 +630,10 @@ pub trait PrimitiveInt:
     + Display
     + Div<Self, Output = Self>
     + DivAssign<Self>
+    + DivAssignEuclidean<Self, ModOutput = Self>
     + DivAssignMod<Self, ModOutput = Self>
     + DivAssignRem<Self, RemOutput = Self>
+    + DivEuclidean<Self, DivOutput = Self, ModOutput = Self>
     + DivExact<Self, Output = Self>
     + DivExactAssign<Self>
     + DivMod<Self, DivOutput = Self, ModOutput = Self>

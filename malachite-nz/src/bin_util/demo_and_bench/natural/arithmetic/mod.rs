@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     checked_sub_mul::register(runner);
     coprime_with::register(runner);
     div::register(runner);
+    div_euclidean::register(runner);
     div_exact::register(runner);
     div_mod::register(runner);
     div_round::register(runner);
@@ -86,6 +87,7 @@ mod checked_sub;
 mod checked_sub_mul;
 mod coprime_with;
 mod div;
+mod div_euclidean;
 mod div_exact;
 mod div_mod;
 mod div_round;

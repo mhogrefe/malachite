@@ -215,17 +215,15 @@ pub trait DivMod<RHS = Self> {
     fn div_mod(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
 }
 
-/// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards
-/// negative infinity, and the remainder is always positive.
+/// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards the
+/// quotient that makes the remainder nonnegative, and the remainder is always nonnegative.
 ///
-/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < |y|$.
 pub trait DivEuclidean<RHS = Self> {
     type DivOutput;
     type ModOutput;
 
     fn div_euclidean(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
-
-    fn div_euclidean_ref(self, other: &RHS) -> (Self::DivOutput, Self::ModOutput);
 }
 
 /// Divides a number by another number in place, returning the remainder. The quotient is rounded
@@ -236,6 +234,17 @@ pub trait DivAssignMod<RHS = Self> {
     type ModOutput;
 
     fn div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
+}
+
+/// Divides a number by another number in place, returning the remainder. The quotient is rounded
+/// towards the quotient that makes the remainder nonnegative, and the remainder is always
+/// nonnegative.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < |y|$.
+pub trait DivAssignEuclidean<RHS = Self> {
+    type ModOutput;
+
+    fn div_assign_euclidean(&mut self, other: RHS) -> Self::ModOutput;
 }
 
 /// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards zero,
