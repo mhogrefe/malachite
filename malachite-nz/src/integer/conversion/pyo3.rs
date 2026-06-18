@@ -22,9 +22,10 @@
 //! integer. This is not possible with Rust's native integers if the Python integer is too large,
 //! in which case it will fail its conversion and raise `OverflowError`.
 //! ```rust
-//! use malachite::Integer;
-//! use malachite::num::basic::traits::One;
+//! use malachite_base::num::basic::traits::One;
+//! use malachite_nz::integer::Integer;
 //! use pyo3::prelude::*;
+//! use pyo3::types::PyModule;
 //!
 //! #[pyfunction]
 //! fn add_one(n: Integer) -> Integer {
@@ -32,7 +33,7 @@
 //! }
 //!
 //! #[pymodule]
-//! fn my_module(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+//! fn my_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 //!     m.add_function(wrap_pyfunction!(add_one, m)?)?;
 //!     Ok(())
 //! }
@@ -49,78 +50,40 @@
 //! ```
 
 use crate::integer::Integer;
+use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::convert::Infallible;
 use malachite_base::num::basic::traits::Zero;
-#[cfg(Py_LIMITED_API)]
+#[cfg(any(not(Py_3_13), Py_LIMITED_API))]
 use pyo3::intern;
 #[allow(unused_imports)]
 use pyo3::{
-    Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyObject, PyResult, Python, ffi,
+    Borrowed, Bound, FromPyObject, IntoPyObject, IntoPyObjectExt, Py, PyErr, PyResult, Python, ffi,
     types::*,
 };
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
-impl<'source> FromPyObject<'source> for Integer {
-    fn extract_bound(ob: &Bound<'source, PyAny>) -> PyResult<Integer> {
+impl<'py> FromPyObject<'_, 'py> for Integer {
+    type Error = PyErr;
+
+    fn extract(ob: Borrowed<'_, 'py, PyAny>) -> Result<Self, PyErr> {
         // get the Python interpreter
         let py = ob.py();
 
-        // get PyInt object
-        let num_owned: Py<PyInt>;
-        let num = if let Ok(long) = ob.downcast::<PyInt>() {
+        // get the PyInt object, calling `__index__` if necessary
+        let num_owned: Bound<'_, PyInt>;
+        let num = if let Ok(long) = ob.cast::<PyInt>() {
             long
         } else {
-            num_owned = unsafe { Py::from_owned_ptr_or_err(py, ffi::PyNumber_Index(ob.as_ptr()))? };
-            num_owned.bind(py)
+            num_owned =
+                unsafe { Bound::from_owned_ptr_or_err(py, ffi::PyNumber_Index(ob.as_ptr()))? }
+                    .cast_into()?;
+            num_owned.as_borrowed()
         };
 
-        // check if number is zero, and if so, return zero
-        let n_bits = int_n_bits(num)?;
-        if n_bits == 0 {
-            return Ok(Integer::ZERO);
-        }
-
-        // the number of bytes needed to store the integer
-        let mut n_bytes = (n_bits + 7 + 1) >> 3; // +1 for the sign bit
-
-        #[cfg(feature = "32_bit_limbs")]
-        {
-            // convert the number of bytes to a multiple of 4, because of 32-bit limbs
-            n_bytes = ((n_bytes + 7) >> 2) << 2;
-        }
-        #[cfg(not(feature = "32_bit_limbs"))]
-        {
-            // convert the number of bytes to a multiple of 8, because of 64-bit limbs
-            n_bytes = ((n_bytes + 7) >> 3) << 3;
-        }
-
-        #[cfg(not(Py_LIMITED_API))]
-        {
-            let limbs = int_to_limbs(num, n_bytes, true)?;
-            Ok(Integer::from_owned_twos_complement_limbs_asc(limbs))
-        }
-        #[cfg(all(Py_LIMITED_API, feature = "32_bit_limbs"))]
-        {
-            let py_bytes = int_to_py_bytes(num, n_bytes, true)?;
-            let bytes = py_bytes.as_bytes();
-            let n_limbs_32 = n_bytes >> 2; // the number of 32-bit limbs needed to store the integer
-            let mut limbs_32 = Vec::with_capacity(n_limbs_32);
-            for i in (0..n_bytes).step_by(4) {
-                limbs_32.push(u32::from_le_bytes(bytes[i..(i + 4)].try_into().unwrap()));
-            }
-            Ok(Integer::from_owned_twos_complement_limbs_asc(limbs_32))
-        }
-        #[cfg(all(Py_LIMITED_API, not(feature = "32_bit_limbs")))]
-        {
-            let bytes = int_to_py_bytes(num, n_bytes, true)?.as_bytes();
-            let n_limbs_64 = n_bytes >> 3; // the number of 64-bit limbs needed to store the integer
-            let mut limbs_64 = Vec::with_capacity(n_limbs_64);
-            for i in (0..n_bytes).step_by(8) {
-                limbs_64.push(u64::from_le_bytes(bytes[i..(i + 8)].try_into().unwrap()));
-            }
-            Ok(Integer::from_owned_twos_complement_limbs_asc(limbs_64))
-        }
+        Ok(Self::from_owned_twos_complement_limbs_asc(int_to_limbs(
+            &num, true,
+        )?))
     }
 }
 
@@ -143,7 +106,7 @@ impl<'py> IntoPyObject<'py> for &Integer {
 
     fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         if self == &Integer::ZERO {
-            return Ok(0i32.into_pyobject(py).unwrap());
+            return 0i32.into_pyobject(py);
         }
 
         let bytes = limbs_to_bytes(
@@ -151,7 +114,14 @@ impl<'py> IntoPyObject<'py> for &Integer {
             self.twos_complement_limb_count(),
         );
 
-        #[cfg(not(Py_LIMITED_API))]
+        #[cfg(all(not(Py_LIMITED_API), Py_3_13))]
+        unsafe {
+            let flags = ffi::Py_ASNATIVEBYTES_LITTLE_ENDIAN;
+            let obj = ffi::PyLong_FromNativeBytes(bytes.as_ptr().cast(), bytes.len(), flags);
+            Ok(Bound::from_owned_ptr(py, obj).cast_into_unchecked())
+        }
+
+        #[cfg(all(not(Py_LIMITED_API), not(Py_3_13)))]
         unsafe {
             let obj = ffi::_PyLong_FromByteArray(
                 bytes.as_ptr().cast(),
@@ -159,19 +129,18 @@ impl<'py> IntoPyObject<'py> for &Integer {
                 1,           // little endian
                 true.into(), // signed
             );
-            Ok(Bound::from_owned_ptr(py, obj).downcast_into_unchecked::<PyInt>())
+            Ok(Bound::from_owned_ptr(py, obj).cast_into_unchecked())
         }
 
         #[cfg(Py_LIMITED_API)]
-        {
+        unsafe {
             let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = PyDict::new(py);
             kwargs.set_item(intern!(py, "signed"), true).unwrap();
-            let result: Bound<'py, PyAny> = py
-                .get_type::<PyInt>()
+            py.get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), Some(&kwargs))
-                .expect("int.from_bytes() failed during into_pyobject()");
-            Ok(result)
+                .expect("int.from_bytes() failed during into_pyobject()")
+                .cast_into_unchecked()
         }
     }
 }
@@ -206,63 +175,103 @@ fn limbs_to_bytes(limbs: impl Iterator<Item = u64>, limb_count: u64) -> Vec<u8> 
     bytes
 }
 
-/// Converts a Python integer to a vector of 32-bit limbs (little endian). Takes number of bytes to
-/// convert to. Multiple of 4. If `is_signed` is true, the integer is treated as signed, and two's
-/// complement is returned.
-#[cfg(all(not(Py_LIMITED_API), feature = "32_bit_limbs"))]
+/// Converts a Python integer to a vector of little-endian limbs. If `is_signed` is true, the
+/// integer is treated as signed and the limbs are its two's complement representation.
+///
+/// This is the fast path for Python 3.13 and later, which exposes the stable `PyLong_AsNativeBytes`
+/// API. It writes directly into a limb-aligned buffer (with sign or zero extension to fill the
+/// final limb).
+#[cfg(all(not(Py_LIMITED_API), Py_3_13))]
 #[inline]
-fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u32>> {
-    let mut buffer = Vec::with_capacity(n_bytes);
+fn int_to_limbs(long: &Bound<PyInt>, is_signed: bool) -> PyResult<Vec<Limb>> {
+    let py = long.py();
+    let mut flags = ffi::Py_ASNATIVEBYTES_LITTLE_ENDIAN;
+    if !is_signed {
+        flags |= ffi::Py_ASNATIVEBYTES_UNSIGNED_BUFFER | ffi::Py_ASNATIVEBYTES_REJECT_NEGATIVE;
+    }
+
+    // Passing a null buffer asks for the number of bytes needed.
+    let n_bytes =
+        unsafe { ffi::PyLong_AsNativeBytes(long.as_ptr().cast(), core::ptr::null_mut(), 0, flags) };
+    let n_bytes: usize = n_bytes.try_into().map_err(|_| PyErr::fetch(py))?;
+    if n_bytes == 0 {
+        return Ok(Vec::new());
+    }
+
+    let n_limbs = n_bytes.div_ceil(size_of::<Limb>());
+    let mut buffer = Vec::<Limb>::with_capacity(n_limbs);
     unsafe {
-        let error_code = ffi::_PyLong_AsByteArray(
-            long.as_ptr().cast(),           // ptr to PyLong object
-            buffer.as_mut_ptr() as *mut u8, // ptr to first byte of buffer
-            n_bytes << 2,                   // 4 bytes per u32
-            1,                              // little endian
-            is_signed.into(),               // signed flag
+        let written = ffi::PyLong_AsNativeBytes(
+            long.as_ptr().cast(),
+            buffer.as_mut_ptr().cast(),
+            (n_limbs * size_of::<Limb>()).try_into().unwrap(),
+            flags,
         );
-        if error_code == -1 {
-            return Err(PyErr::fetch(long.py()));
+        if written < 0 {
+            return Err(PyErr::fetch(py));
         }
-        buffer.set_len(n_bytes); // set buffer length to the number of bytes
+        buffer.set_len(n_limbs);
     };
-    buffer
-        .iter_mut()
-        .for_each(|chunk| *chunk = u32::from_le(*chunk));
+    buffer.iter_mut().for_each(|limb| *limb = Limb::from_le(*limb));
 
     Ok(buffer)
 }
 
-/// Converts a Python integer to a vector of 64-bit limbs (little endian). Takes number of bytes to
-/// convert to. Multiple of 8. If `is_signed` is true, the integer is treated as signed, and two's
-/// complement is returned.
-#[cfg(all(not(Py_LIMITED_API), not(feature = "32_bit_limbs")))]
+/// Converts a Python integer to a vector of little-endian limbs, using the (now internal) byte-array
+/// API available before Python 3.13. If `is_signed` is true, the integer is treated as signed and
+/// the limbs are its two's complement representation.
+#[cfg(all(not(Py_LIMITED_API), not(Py_3_13)))]
 #[inline]
-fn int_to_limbs(long: &Bound<PyInt>, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u64>> {
-    let mut buffer = Vec::with_capacity(n_bytes);
+fn int_to_limbs(long: &Bound<PyInt>, is_signed: bool) -> PyResult<Vec<Limb>> {
+    let py = long.py();
+    let n_bits = int_n_bits(long)?;
+    if n_bits == 0 {
+        return Ok(Vec::new());
+    }
+    // The number of bits needed, plus a sign bit for signed values, rounded up to a whole number of
+    // limbs.
+    let n_limbs = (n_bits + usize::from(is_signed)).div_ceil(size_of::<Limb>() << 3);
+    let mut buffer = Vec::<Limb>::with_capacity(n_limbs);
     unsafe {
         let error_code = ffi::_PyLong_AsByteArray(
-            long.as_ptr().cast(),           // ptr to PyLong object
-            buffer.as_mut_ptr() as *mut u8, // ptr to first byte of buffer
-            n_bytes << 3,                   // 8 bytes per u64
-            1,                              // little endian
-            is_signed.into(),               // signed flag
+            long.as_ptr().cast(),
+            buffer.as_mut_ptr().cast(),
+            n_limbs * size_of::<Limb>(),
+            1,                // little endian
+            is_signed.into(), // signed flag
         );
         if error_code == -1 {
-            return Err(PyErr::fetch(long.py()));
+            return Err(PyErr::fetch(py));
         }
-        buffer.set_len(n_bytes); // set buffer length to the number of bytes
+        buffer.set_len(n_limbs);
     };
-    buffer
-        .iter_mut()
-        .for_each(|chunk| *chunk = u64::from_le(*chunk));
+    buffer.iter_mut().for_each(|limb| *limb = Limb::from_le(*limb));
 
     Ok(buffer)
 }
 
-/// Converts a Python integer to a Python bytes object. Bytes are in little endian order. Takes
-/// number of bytes to convert to (can be calculated from the number of bits in the integer). If
-/// `is_signed` is true, the integer is treated as signed, and two's complement is returned.
+/// Converts a Python integer to a vector of little-endian limbs, using only the limited (stable
+/// ABI) API. If `is_signed` is true, the integer is treated as signed and the limbs are its two's
+/// complement representation.
+#[cfg(Py_LIMITED_API)]
+#[inline]
+fn int_to_limbs(long: &Bound<PyInt>, is_signed: bool) -> PyResult<Vec<Limb>> {
+    let n_bits = int_n_bits(long)?;
+    if n_bits == 0 {
+        return Ok(Vec::new());
+    }
+    let n_limbs = (n_bits + usize::from(is_signed)).div_ceil(size_of::<Limb>() << 3);
+    let py_bytes = int_to_py_bytes(long, n_limbs * size_of::<Limb>(), is_signed)?;
+    Ok(py_bytes
+        .as_bytes()
+        .chunks_exact(size_of::<Limb>())
+        .map(|chunk| Limb::from_le_bytes(chunk.try_into().unwrap()))
+        .collect())
+}
+
+/// Converts a Python integer to a Python bytes object. Bytes are in little endian order. Takes the
+/// number of bytes to convert to. If `is_signed` is true, the integer is treated as signed, and
+/// two's complement is returned.
 #[cfg(Py_LIMITED_API)]
 #[inline]
 fn int_to_py_bytes<'py>(
@@ -290,32 +299,21 @@ fn int_to_py_bytes<'py>(
     )?;
 
     // downcast to PyBytes
-    Ok(bytes.downcast_into()?)
+    Ok(bytes.cast_into()?)
 }
 
 /// Returns the number of bits in the absolute value of the given integer. The number of bits
 /// returned is the smallest number of bits that can represent the integer, not the multiple of 8
 /// (bytes) that it would take up in memory.
+///
+/// On Python 3.13 and later (with access to the non-limited API) the number of bits is not needed,
+/// because [`int_to_limbs`] queries `PyLong_AsNativeBytes` for the buffer size directly.
+#[cfg(any(not(Py_3_13), Py_LIMITED_API))]
 #[inline]
 fn int_n_bits(long: &Bound<PyInt>) -> PyResult<usize> {
     let py = long.py();
-
-    #[cfg(not(Py_LIMITED_API))]
-    {
-        // fast path
-        let n_bits = unsafe { ffi::_PyLong_NumBits(long.as_ptr()) };
-        if n_bits == (-1isize as usize) {
-            return Err(PyErr::fetch(py));
-        }
-        Ok(n_bits)
-    }
-
-    #[cfg(Py_LIMITED_API)]
-    {
-        // slow path
-        long.call_method0(intern!(py, "bit_length"))
-            .and_then(|ob| ob.extract())
-    }
+    long.call_method0(intern!(py, "bit_length"))
+        .and_then(|ob| ob.extract())
 }
 
 #[cfg(test)]
@@ -324,7 +322,7 @@ mod tests {
 
     /// Prepare Python
     fn prepare_python() {
-        pyo3::prepare_freethreaded_python();
+        Python::initialize();
     }
 
     /// Fibonacci sequence iterator (Rust)
@@ -349,7 +347,7 @@ mod tests {
             let f2 = f0
                 .call_method1("__add__", (&f1,))
                 .unwrap()
-                .downcast_into::<PyInt>()
+                .cast_into::<PyInt>()
                 .unwrap();
             Some(std::mem::replace(&mut f0, std::mem::replace(&mut f1, f2)).unbind())
         })
@@ -357,20 +355,13 @@ mod tests {
 
     /// Generate test python class
     fn python_index_class(py: Python<'_>) -> Bound<'_, PyModule> {
-        let index_code = std::ffi::CStr::from_bytes_with_nul(
-            concat!(
-                r#"
-                class C:
-                    def __init__(self, x):
-                        self.x = x
-                    def __index__(self):
-                        return self.x
-                "#,
-                "\0"
-            )
-            .as_bytes(),
-        )
-        .unwrap();
+        let index_code = c"
+class C:
+    def __init__(self, x):
+        self.x = x
+    def __index__(self):
+        return self.x
+";
         let filename = c"index.py";
         let modulename = c"index";
         PyModule::from_code(py, index_code, filename, modulename).unwrap()
@@ -381,7 +372,7 @@ mod tests {
     #[test]
     fn convert_integer() {
         prepare_python();
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             // check the first 2000 numbers in the fibonacci sequence
             for (py_result, rs_result) in python_fib(py).zip(rust_fib::<Integer>()).take(2000) {
                 // Python -> Rust
@@ -411,19 +402,19 @@ mod tests {
     #[test]
     fn convert_index_class() {
         prepare_python();
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             let index = python_index_class(py);
             let locals = PyDict::new(py);
             locals.set_item("index", &index).unwrap();
             let expr = c"index.C(10)";
             let ob = py.eval(expr, None, Some(&locals)).unwrap();
-            let integer: Integer = <Integer as FromPyObject>::extract_bound(&ob).unwrap();
+            let integer: Integer = ob.extract().unwrap();
 
             assert_eq!(integer, Integer::from(10));
 
             let expr2 = c"index.C(-10)";
             let ob2 = py.eval(expr2, None, Some(&locals)).unwrap();
-            let integer2: Integer = <Integer as FromPyObject>::extract_bound(&ob2).unwrap();
+            let integer2: Integer = ob2.extract().unwrap();
 
             assert_eq!(integer2, Integer::from(-10));
         });
@@ -433,7 +424,7 @@ mod tests {
     #[test]
     fn handle_zero() {
         prepare_python();
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             // Python -> Rust
             let zero_integer: Integer = 0u8.into_pyobject(py).unwrap().extract().unwrap();
             assert_eq!(zero_integer, Integer::from(0));
@@ -453,14 +444,13 @@ mod tests {
     #[test]
     fn check_overflow() {
         prepare_python();
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             macro_rules! test {
                 ($T:ty, $value:expr, $py:expr) => {
                     let value = $value;
                     println!("{}: {}", stringify!($T), value);
                     let python_value = value.clone().into_pyobject(py).unwrap();
-                    let roundtrip_value =
-                        <$T as FromPyObject>::extract_bound(&python_value).unwrap();
+                    let roundtrip_value = python_value.extract::<$T>().unwrap();
                     assert_eq!(value, roundtrip_value);
                 };
             }
