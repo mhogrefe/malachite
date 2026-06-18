@@ -66,8 +66,8 @@
 //! Large [`Natural`](natural::Natural)s and [`Integer`](integer::Integer)s store their data as
 //! [`Vec`]s of some primitive type. The elements of these
 //! [`Vec`]s are called "limbs" in GMP terminology, since they're large digits.
-//! By default, the type of a `Limb` is [`u64`], but you can set it to [`u32`] using the
-//! `32_bit_limbs` feature.
+//! By default, the type of a [`Limb`](crate::platform::Limb) is [`u64`], but you can set it to
+//! [`u32`] using the `32_bit_limbs` feature.
 //!
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
@@ -183,10 +183,22 @@ extern crate num;
 #[cfg(feature = "test_build")]
 extern crate rug;
 
-#[doc(hidden)]
+/// Numeric types whose widths depend on whether Malachite is built with 32-bit or 64-bit limbs.
+///
+/// Large [`Natural`](natural::Natural)s and [`Integer`](integer::Integer)s store their data as
+/// [`Vec`]s of [`Limb`](crate::platform::Limb)s (see the [Limbs](crate#limbs) section). By default
+/// [`Limb`](crate::platform::Limb) is [`u64`], but it is [`u32`] when the `32_bit_limbs` feature is
+/// enabled; the other types here scale accordingly.
+#[doc(inline)]
 #[cfg(not(feature = "32_bit_limbs"))]
 pub use crate::platform_64 as platform;
-#[doc(hidden)]
+/// Numeric types whose widths depend on whether Malachite is built with 32-bit or 64-bit limbs.
+///
+/// Large [`Natural`](natural::Natural)s and [`Integer`](integer::Integer)s store their data as
+/// [`Vec`]s of [`Limb`](crate::platform::Limb)s (see the [Limbs](crate#limbs) section). By default
+/// [`Limb`](crate::platform::Limb) is [`u64`], but it is [`u32`] when the `32_bit_limbs` feature is
+/// enabled; the other types here scale accordingly.
+#[doc(inline)]
 #[cfg(feature = "32_bit_limbs")]
 pub use platform_32 as platform;
 

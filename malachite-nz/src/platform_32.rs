@@ -17,6 +17,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// The type whose [`Vec`](alloc::vec::Vec)s store the limbs (large digits) of a
+/// [`Natural`](crate::natural::Natural). [`u64`] by default, or [`u32`] with the `32_bit_limbs`
+/// feature.
 pub type Limb = u32;
 pub type HalfLimb = u16;
 pub type DoubleLimb = u64;
