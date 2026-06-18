@@ -10,16 +10,21 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     LogBase2Of1PlusX, LogBasePowerOf2Of1PlusX, LogBasePowerOf2Of1PlusXAssign, PowerOf2,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
-use malachite_base::test_util::generators::signed_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_signed_pair_gen_var_4, signed_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::primitive_float_log_base_power_of_2_1_plus_x;
 use malachite_float::test_util::arithmetic::log_base_power_of_2_1_plus_x::{
     rug_log_base_power_of_2_1_plus_x, rug_log_base_power_of_2_1_plus_x_prec,
     rug_log_base_power_of_2_1_plus_x_prec_round, rug_log_base_power_of_2_1_plus_x_round,
@@ -1035,4 +1040,87 @@ fn log_base_power_of_2_1_plus_x_properties() {
     float_signed_rounding_mode_triple_gen_var_10().test_properties(|(x, pow, _)| {
         log_base_power_of_2_1_plus_x_properties_helper(x, pow);
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_power_of_2_1_plus_x() {
+    fn test<T: PrimitiveFloat>(x: T, pow: i64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(x, pow)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 2, f32::NAN);
+    test::<f32>(f32::INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::INFINITY, -2, f32::NEGATIVE_INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 2, f32::NAN);
+    test::<f32>(0.0, 2, 0.0);
+    test::<f32>(0.0, -2, -0.0);
+    test::<f32>(-0.0, 2, -0.0);
+    test::<f32>(-0.0, -2, 0.0);
+    test::<f32>(-1.0, 2, f32::NEGATIVE_INFINITY);
+    test::<f32>(-1.0, -2, f32::INFINITY);
+    test::<f32>(-2.0, 2, f32::NAN);
+    test::<f32>(15.0, 2, 2.0); // log_4(16)
+    test::<f32>(7.0, 2, 1.5); // log_4(8)
+    test::<f32>(63.0, 3, 2.0); // log_8(64)
+    test::<f32>(7.0, 1, 3.0); // log_2(8)
+    test::<f32>(7.0, -1, -3.0); // log_(1/2)(8)
+    test::<f32>(9.0, 1, std::f32::consts::LOG2_10); // log_2(10)
+    test::<f32>(9.0, 2, 1.660964); // log_4(10)
+    test::<f32>(9.0, 3, 1.1073093); // log_8(10)
+
+    test::<f64>(f64::NAN, 2, f64::NAN);
+    test::<f64>(f64::INFINITY, 2, f64::INFINITY);
+    test::<f64>(f64::INFINITY, -2, f64::NEGATIVE_INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, 2, f64::NAN);
+    test::<f64>(0.0, 2, 0.0);
+    test::<f64>(0.0, -2, -0.0);
+    test::<f64>(-0.0, 2, -0.0);
+    test::<f64>(-0.0, -2, 0.0);
+    test::<f64>(-1.0, 2, f64::NEGATIVE_INFINITY);
+    test::<f64>(-1.0, -2, f64::INFINITY);
+    test::<f64>(-2.0, 2, f64::NAN);
+    test::<f64>(15.0, 2, 2.0); // log_4(16)
+    test::<f64>(7.0, 2, 1.5); // log_4(8)
+    test::<f64>(63.0, 3, 2.0); // log_8(64)
+    test::<f64>(7.0, 1, 3.0); // log_2(8)
+    test::<f64>(7.0, -1, -3.0); // log_(1/2)(8)
+    test::<f64>(9.0, 1, std::f64::consts::LOG2_10); // log_2(10)
+    test::<f64>(9.0, 2, 1.660964047443681); // log_4(10)
+    test::<f64>(9.0, 3, 1.1073093649624541); // log_8(10)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_power_of_2_1_plus_x_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_signed_pair_gen_var_4::<T, i64>().test_properties(|(x, pow)| {
+        if pow == 0 {
+            return;
+        }
+        let y = primitive_float_log_base_power_of_2_1_plus_x(x, pow);
+        // log_{2^(-k)}(1 + x) = -log_{2^k}(1 + x), since negating the exact value commutes with
+        // round-to-nearest.
+        if pow != i64::MIN {
+            assert_eq!(
+                NiceFloat(
+                    primitive_float_log_base_power_of_2_1_plus_x(x, -pow).abs_negative_zero()
+                ),
+                NiceFloat((-y).abs_negative_zero())
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_log_base_power_of_2_1_plus_x_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_power_of_2_1_plus_x_properties_helper);
 }

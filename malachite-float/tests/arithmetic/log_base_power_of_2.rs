@@ -10,16 +10,23 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     LogBase2, LogBasePowerOf2, LogBasePowerOf2Assign, PowerOf2, Reciprocal,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
-use malachite_base::test_util::generators::signed_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_signed_pair_gen_var_4, signed_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::log_base_power_of_2::{
+    primitive_float_log_base_power_of_2, primitive_float_log_base_power_of_2_rational,
+};
 use malachite_float::test_util::arithmetic::log_base_power_of_2::{
     rug_log_base_power_of_2, rug_log_base_power_of_2_prec, rug_log_base_power_of_2_prec_round,
     rug_log_base_power_of_2_rational_prec, rug_log_base_power_of_2_rational_prec_round,
@@ -37,7 +44,9 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::test_util::generators::rational_signed_unsigned_triple_gen_var_2;
+use malachite_q::test_util::generators::{
+    rational_signed_pair_gen_var_5, rational_signed_unsigned_triple_gen_var_2,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -1356,4 +1365,151 @@ fn log_base_power_of_2_rational_prec_properties() {
         assert_eq!(ComparableFloat(log), ComparableFloat(Float::NAN));
         assert_eq!(o, Equal);
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_power_of_2() {
+    fn test<T: PrimitiveFloat>(x: T, pow: i64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_power_of_2(x, pow)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 2, f32::NAN);
+    test::<f32>(f32::INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::INFINITY, -2, f32::NEGATIVE_INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 2, f32::NAN);
+    test::<f32>(0.0, 2, f32::NEGATIVE_INFINITY);
+    test::<f32>(0.0, -2, f32::INFINITY);
+    test::<f32>(-0.0, 2, f32::NEGATIVE_INFINITY);
+    test::<f32>(1.0, 2, 0.0);
+    test::<f32>(16.0, 2, 2.0); // log_4(16)
+    test::<f32>(8.0, 2, 1.5); // log_4(8)
+    test::<f32>(64.0, 3, 2.0); // log_8(64)
+    test::<f32>(8.0, 1, 3.0); // log_2(8)
+    test::<f32>(8.0, -1, -3.0); // log_(1/2)(8)
+    test::<f32>(10.0, 1, std::f32::consts::LOG2_10); // log_2(10)
+    test::<f32>(10.0, 2, 1.660964); // log_4(10)
+    test::<f32>(10.0, 3, 1.1073093); // log_8(10)
+    test::<f32>(-1.0, 2, f32::NAN);
+
+    test::<f64>(f64::NAN, 2, f64::NAN);
+    test::<f64>(f64::INFINITY, 2, f64::INFINITY);
+    test::<f64>(f64::INFINITY, -2, f64::NEGATIVE_INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, 2, f64::NAN);
+    test::<f64>(0.0, 2, f64::NEGATIVE_INFINITY);
+    test::<f64>(0.0, -2, f64::INFINITY);
+    test::<f64>(-0.0, 2, f64::NEGATIVE_INFINITY);
+    test::<f64>(1.0, 2, 0.0);
+    test::<f64>(16.0, 2, 2.0); // log_4(16)
+    test::<f64>(8.0, 2, 1.5); // log_4(8)
+    test::<f64>(64.0, 3, 2.0); // log_8(64)
+    test::<f64>(8.0, 1, 3.0); // log_2(8)
+    test::<f64>(8.0, -1, -3.0); // log_(1/2)(8)
+    test::<f64>(10.0, 1, std::f64::consts::LOG2_10); // log_2(10)
+    test::<f64>(10.0, 2, 1.660964047443681); // log_4(10)
+    test::<f64>(10.0, 3, 1.1073093649624541); // log_8(10)
+    test::<f64>(-1.0, 2, f64::NAN);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_power_of_2_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_signed_pair_gen_var_4::<T, i64>().test_properties(|(x, pow)| {
+        if pow == 0 {
+            return;
+        }
+        let y = primitive_float_log_base_power_of_2(x, pow);
+        // log_{2^(-k)}(x) = -log_{2^k}(x), since negating the exact value commutes with
+        // round-to-nearest.
+        if pow != i64::MIN {
+            assert_eq!(
+                NiceFloat(primitive_float_log_base_power_of_2(x, -pow).abs_negative_zero()),
+                NiceFloat((-y).abs_negative_zero())
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_log_base_power_of_2_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_power_of_2_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_power_of_2_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, pow: i64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_power_of_2_rational(&u, pow)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 2, f32::NEGATIVE_INFINITY);
+    test::<f32>("0", -2, f32::INFINITY);
+    test::<f32>("1", 2, 0.0);
+    test::<f32>("1/2", 2, -0.5); // log_4(1/2)
+    test::<f32>("16", 2, 2.0); // log_4(16)
+    test::<f32>("8", 2, 1.5); // log_4(8)
+    test::<f32>("64", 3, 2.0); // log_8(64)
+    test::<f32>("8", 1, 3.0); // log_2(8)
+    test::<f32>("8", -1, -3.0); // log_(1/2)(8)
+    test::<f32>("1/3", 2, -0.7924812436103821); // log_4(1/3)
+    test::<f32>("10000", 2, 6.643856048583984); // log_4(10000)
+    test::<f32>("-1", 2, f32::NAN);
+    test::<f32>("-22/7", 2, f32::NAN);
+
+    test::<f64>("0", 2, f64::NEGATIVE_INFINITY);
+    test::<f64>("0", -2, f64::INFINITY);
+    test::<f64>("1", 2, 0.0);
+    test::<f64>("1/2", 2, -0.5); // log_4(1/2)
+    test::<f64>("16", 2, 2.0); // log_4(16)
+    test::<f64>("8", 2, 1.5); // log_4(8)
+    test::<f64>("64", 3, 2.0); // log_8(64)
+    test::<f64>("8", 1, 3.0); // log_2(8)
+    test::<f64>("8", -1, -3.0); // log_(1/2)(8)
+    test::<f64>("1/3", 2, -0.792481250360578); // log_4(1/3)
+    test::<f64>("10000", 2, 6.643856189774724); // log_4(10000)
+    test::<f64>("-1", 2, f64::NAN);
+    test::<f64>("-22/7", 2, f64::NAN);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_power_of_2_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    // The generator yields a positive `Rational` and a small, nonzero `i64`.
+    rational_signed_pair_gen_var_5::<i64>().test_properties(|(x, pow)| {
+        let y = primitive_float_log_base_power_of_2_rational::<T>(&x, pow);
+        // log_{2^(-k)}(x) = -log_{2^k}(x), since negating the exact value commutes with
+        // round-to-nearest.
+        if pow != i64::MIN {
+            assert_eq!(
+                NiceFloat(
+                    primitive_float_log_base_power_of_2_rational::<T>(&x, -pow).abs_negative_zero()
+                ),
+                NiceFloat((-y).abs_negative_zero())
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_log_base_power_of_2_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_power_of_2_rational_properties_helper);
 }

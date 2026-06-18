@@ -7,13 +7,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
+use crate::{
+    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
+    float_infinity, float_nan, float_negative_infinity,
+};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase2, IsPowerOf2, LogBasePowerOf2, LogBasePowerOf2Assign, Sign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
@@ -1462,4 +1467,162 @@ impl LogBasePowerOf2Assign<i64> for Float {
         let prec = self.significant_bits();
         self.log_base_power_of_2_prec_round_assign(pow, prec, Nearest);
     }
+}
+
+/// Computes $\log_{2^k} x$, the base-$2^k$ logarithm of a primitive float, where the base is $2^k$
+/// for some nonzero integer $k$. The exponent $k$ is `pow`, which may be negative. Using this
+/// function is more accurate than computing the logarithm using the standard library, whose `log2`
+/// is not always correctly rounded.
+///
+/// The base-$2^k$ logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x,k) = \log_{2^k} x+\varepsilon.
+/// $$
+/// - If $\log_{2^k} x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+///   0.
+/// - If $\log_{2^k} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_{2^k}
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN},k)=\text{NaN}$
+/// - $f(\infty,k)=\infty$ if $k>0$, and $-\infty$ if $k<0$
+/// - $f(-\infty,k)=\text{NaN}$
+/// - $f(\pm0.0,k)=-\infty$ if $k>0$, and $\infty$ if $k<0$
+/// - $f(1.0,k)=0.0$
+/// - $f(x,k)=\text{NaN}$ for $x<0$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `pow` is zero (the base $2^0=1$ has no logarithm).
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_power_of_2::primitive_float_log_base_power_of_2;
+///
+/// assert!(primitive_float_log_base_power_of_2(f32::NAN, 2).is_nan());
+/// // log_4(16) = 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2(16.0f32, 2)),
+///     NiceFloat(2.0)
+/// );
+/// // log_4(8) = 3/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2(8.0f32, 2)),
+///     NiceFloat(1.5)
+/// );
+/// // log_8(64) = 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2(64.0f32, 3)),
+///     NiceFloat(2.0)
+/// );
+/// // log_4(10)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2(10.0f32, 2)),
+///     NiceFloat(1.660964)
+/// );
+/// // log_(1/2)(8) = -3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2(8.0f32, -1)),
+///     NiceFloat(-3.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_power_of_2<T: PrimitiveFloat>(x: T, pow: i64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::log_base_power_of_2_prec(x, pow, prec), x)
+}
+
+/// Computes $\log_{2^k} x$, the base-$2^k$ logarithm of a [`Rational`], where the base is $2^k$ for
+/// some nonzero integer $k$, returning a primitive float result. The exponent $k$ is `pow`, which
+/// may be negative.
+///
+/// If the logarithm is equidistant from two primitive floats, the primitive float with fewer 1s in
+/// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding
+/// mode.
+///
+/// The base-$2^k$ logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x,k) = \log_{2^k} x+\varepsilon.
+/// $$
+/// - If $\log_{2^k} x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+///   0.
+/// - If $\log_{2^k} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_{2^k}
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0,k)=-\infty$ if $k>0$, and $\infty$ if $k<0$
+/// - $f(x,k)=\text{NaN}$ for $x<0$
+/// - $f(1,k)=0.0$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `pow` is zero (the base $2^0=1$ has no logarithm).
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_power_of_2::primitive_float_log_base_power_of_2_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(&Rational::ZERO, 2)),
+///     NiceFloat(f64::NEGATIVE_INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(&Rational::ZERO, -2)),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// // log_4(1/3)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3),
+///         2
+///     )),
+///     NiceFloat(-0.792481250360578)
+/// );
+/// // log_4(10000)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(
+///         &Rational::from(10000),
+///         2
+///     )),
+///     NiceFloat(6.643856189774724)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(
+///         &Rational::from(-10000),
+///         2
+///     )),
+///     NiceFloat(f64::NAN)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_power_of_2_rational<T: PrimitiveFloat>(x: &Rational, pow: i64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::log_base_power_of_2_rational_prec_ref(x, pow, prec),
+        x,
+    )
 }

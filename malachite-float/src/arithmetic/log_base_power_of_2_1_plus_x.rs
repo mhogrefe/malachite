@@ -8,14 +8,15 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact;
-use crate::{Float, float_infinity, float_nan, float_negative_infinity};
+use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, IsPowerOf2, LogBasePowerOf2Of1PlusX, LogBasePowerOf2Of1PlusXAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
@@ -992,4 +993,94 @@ impl LogBasePowerOf2Of1PlusXAssign<i64> for Float {
         let prec = self.significant_bits();
         self.log_base_power_of_2_1_plus_x_prec_round_assign(pow, prec, Nearest);
     }
+}
+
+/// Computes $\log_{2^k}(1+x)$, the base-$2^k$ logarithm of one plus a primitive float, where the
+/// base is $2^k$ for some nonzero integer $k$. The exponent $k$ is `pow`, which may be negative.
+/// Using this function is more accurate than computing the logarithm using the standard library,
+/// both because $1+x$ may not be representable as a primitive float and because the standard
+/// library's `log2` is not always correctly rounded.
+///
+/// $\log_{2^k}(1+x)$ is undefined for $x<-1$, so whenever $x<-1$, `NaN` is returned.
+///
+/// $$
+/// f(x,k) = \log_{2^k}(1+x)+\varepsilon.
+/// $$
+/// - If $\log_{2^k}(1+x)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+///   be 0.
+/// - If $\log_{2^k}(1+x)$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\log_{2^k}(1+x)|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a
+///   [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN},k)=\text{NaN}$
+/// - $f(\infty,k)=\infty$ if $k>0$, and $-\infty$ if $k<0$
+/// - $f(-\infty,k)=\text{NaN}$
+/// - $f(0.0,k)=0.0$ if $k>0$, and $-0.0$ if $k<0$
+/// - $f(-0.0,k)=-0.0$ if $k>0$, and $0.0$ if $k<0$
+/// - $f(-1.0,k)=-\infty$ if $k>0$, and $\infty$ if $k<0$
+/// - $f(x,k)=\text{NaN}$ for $x<-1$
+///
+/// This function can underflow (to a subnormal or zero) when $x$ is close to zero and $|k|$ is
+/// large, but it cannot overflow.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `pow` is zero (the base $2^0=1$ has no logarithm).
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::primitive_float_log_base_power_of_2_1_plus_x;
+///
+/// assert!(primitive_float_log_base_power_of_2_1_plus_x(f32::NAN, 2).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(f32::INFINITY, 2)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(-1.0f32, 2)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// assert!(primitive_float_log_base_power_of_2_1_plus_x(-2.0f32, 2).is_nan());
+/// // log_4(1 + 15) = log_4(16) = 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(15.0f32, 2)),
+///     NiceFloat(2.0)
+/// );
+/// // log_4(1 + 7) = log_4(8) = 3/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(7.0f32, 2)),
+///     NiceFloat(1.5)
+/// );
+/// // log_8(1 + 63) = log_8(64) = 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(63.0f32, 3)),
+///     NiceFloat(2.0)
+/// );
+/// // log_4(1 + 9) = log_4(10)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(9.0f32, 2)),
+///     NiceFloat(1.660964)
+/// );
+/// // log_(1/2)(1 + 7) = log_(1/2)(8) = -3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(7.0f32, -1)),
+///     NiceFloat(-3.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_power_of_2_1_plus_x<T: PrimitiveFloat>(x: T, pow: i64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |x, prec| Float::log_base_power_of_2_1_plus_x_prec(x, pow, prec),
+        x,
+    )
 }

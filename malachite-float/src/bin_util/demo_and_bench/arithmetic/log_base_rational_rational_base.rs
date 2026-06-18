@@ -6,11 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
+use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
 use malachite_float::test_util::generators::rational_rational_unsigned_rounding_mode_quadruple_gen_var_2;
 use malachite_q::test_util::bench::bucketers::quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer;
 
@@ -36,6 +40,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_float_log_base_rational_rational_base_prec_round_evaluation_strategy
+    );
+
+    register_primitive_float_demos!(runner, demo_primitive_float_log_base_rational_rational_base);
+    register_primitive_float_benches!(
+        runner,
+        benchmark_primitive_float_log_base_rational_rational_base
     );
 }
 
@@ -185,5 +195,58 @@ fn benchmark_float_log_base_rational_rational_base_prec_round_evaluation_strateg
                 },
             ),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_log_base_rational_rational_base<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, base, _, _) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_log_base_rational_rational_base({}, {}) = {:?}",
+            x,
+            base,
+            NiceFloat(primitive_float_log_base_rational_rational_base::<T>(
+                &x, &base
+            ))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_log_base_rational_rational_base<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_log_base_rational_rational_base::<{}>(Rational, Rational)",
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        rational_rational_unsigned_rounding_mode_quadruple_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer("x", "base", "prec"),
+        &mut [("malachite", &mut |(x, base, _, _)| {
+            no_out!(primitive_float_log_base_rational_rational_base::<T>(
+                &x, &base
+            ));
+        })],
     );
 }

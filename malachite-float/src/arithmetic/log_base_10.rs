@@ -13,14 +13,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
+use crate::{
+    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
+    float_infinity, float_nan, float_negative_infinity,
+};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase, LogBase10, LogBase10Assign, Sign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
@@ -758,4 +762,130 @@ impl LogBase10Assign for Float {
         let prec = self.significant_bits();
         self.log_base_10_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes $\log_{10} x$, the base-10 logarithm of a primitive float. Using this function is more
+/// accurate than using the primitive float `log10` function (the standard library's `log10` is not
+/// always correctly rounded).
+///
+/// The base-10 logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x) = \log_{10} x+\varepsilon.
+/// $$
+/// - If $\log_{10} x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_{10} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_{10}
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\infty)=\infty$
+/// - $f(-\infty)=\text{NaN}$
+/// - $f(\pm0.0)=-\infty$
+/// - $f(1.0)=0.0$
+/// - $f(x)=\text{NaN}$ for $x<0$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_10::primitive_float_log_base_10;
+///
+/// assert!(primitive_float_log_base_10(f32::NAN).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10(f32::INFINITY)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10(0.0f32)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// // log_10(1000) = 3
+/// assert_eq!(NiceFloat(primitive_float_log_base_10(1000.0f32)), NiceFloat(3.0));
+/// // log_10(50)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10(50.0f32)),
+///     NiceFloat(1.69897)
+/// );
+/// assert!(primitive_float_log_base_10(-1.0f32).is_nan());
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_10<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::log_base_10_prec, x)
+}
+
+/// Computes $\log_{10} x$, the base-10 logarithm of a [`Rational`], returning a primitive float
+/// result.
+///
+/// If the logarithm is equidistant from two primitive floats, the primitive float with fewer 1s in
+/// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding
+/// mode.
+///
+/// The base-10 logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x) = \log_{10} x+\varepsilon.
+/// $$
+/// - If $\log_{10} x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_{10} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_{10}
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=-\infty$
+/// - $f(x)=\text{NaN}$ for $x<0$
+/// - $f(1)=0.0$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_10::primitive_float_log_base_10_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(f64::NEGATIVE_INFINITY)
+/// );
+/// // log_10(1000) = 3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_rational::<f64>(&Rational::from(1000))),
+///     NiceFloat(3.0)
+/// );
+/// // log_10(1/3)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(-0.47712125471966244)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_rational::<f64>(&Rational::from(-1000))),
+///     NiceFloat(f64::NAN)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_10_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::log_base_10_rational_prec_ref, x)
 }

@@ -7,12 +7,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
+use core::str::FromStr;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{NegativeInfinity, One, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_float::arithmetic::log_base::primitive_float_log_base_rational;
+use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
 use malachite_float::test_util::arithmetic::log_base_rational_rational_base::{
     rug_log_base_rational_rational_base_prec, rug_log_base_rational_rational_base_prec_round,
 };
@@ -265,4 +270,78 @@ fn log_base_rational_rational_base_fail() {
         10,
         Exact
     ));
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_rational_rational_base() {
+    fn test<T: PrimitiveFloat>(x: &str, base: &str, out: T)
+    where
+        Float: PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(x).unwrap();
+        let base = Rational::from_str(base).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_rational_rational_base::<T>(
+                &x, &base
+            )),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", "10", f32::NEGATIVE_INFINITY);
+    test::<f32>("1", "10", 0.0);
+    test::<f32>("8", "4", 1.5); // log_4(8)
+    test::<f32>("9", "3", 2.0); // log_3(9)
+    test::<f32>("1000", "10", 3.0); // log_10(1000)
+    test::<f32>("8", "2", 3.0); // log_2(8), power-of-2 base
+    test::<f32>("9/4", "3/2", 2.0); // log_(3/2)(9/4)
+    test::<f32>("2", "3/2", 1.7095113); // log_(3/2)(2)
+    test::<f32>("50", "10", 1.6989699602127075); // log_10(50)
+    test::<f32>("1/3", "10", -0.4771212637424469); // log_10(1/3)
+    test::<f32>("-1", "10", f32::NAN);
+    test::<f32>("-22/7", "10", f32::NAN);
+
+    test::<f64>("0", "10", f64::NEGATIVE_INFINITY);
+    test::<f64>("1", "10", 0.0);
+    test::<f64>("8", "4", 1.5); // log_4(8)
+    test::<f64>("9", "3", 2.0); // log_3(9)
+    test::<f64>("1000", "10", 3.0); // log_10(1000)
+    test::<f64>("8", "2", 3.0); // log_2(8), power-of-2 base
+    test::<f64>("9/4", "3/2", 2.0); // log_(3/2)(9/4)
+    test::<f64>("2", "3/2", 1.7095112913514547); // log_(3/2)(2)
+    test::<f64>("50", "10", 1.6989700043360187); // log_10(50)
+    test::<f64>("1/3", "10", -0.47712125471966244); // log_10(1/3)
+    test::<f64>("-1", "10", f64::NAN);
+    test::<f64>("-22/7", "10", f64::NAN);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_rational_rational_base_properties_helper<T: PrimitiveFloat>()
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    // The generator yields a positive `Rational` `x` and a `Rational` base greater than 1 (and an
+    // unrelated precision and rounding mode).
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_2().test_properties_with_limit(
+        20,
+        |(x, base, _, _)| {
+            let y = primitive_float_log_base_rational_rational_base::<T>(&x, &base);
+            // When the base is a positive integer, the result matches the integer-base function.
+            if let Ok(b) = u64::try_from(&base) {
+                assert_eq!(
+                    NiceFloat(y),
+                    NiceFloat(primitive_float_log_base_rational::<T>(&x, b))
+                );
+            }
+        },
+    );
+}
+
+#[test]
+fn primitive_float_log_base_rational_rational_base_properties() {
+    apply_fn_to_primitive_floats!(
+        primitive_float_log_base_rational_rational_base_properties_helper
+    );
 }

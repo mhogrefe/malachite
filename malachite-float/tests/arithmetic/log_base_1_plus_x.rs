@@ -10,12 +10,18 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, LogBaseOf1PlusX, LogBaseOf1PlusXAssign, PowerOf2,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_unsigned_pair_gen_var_4, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::log_base_1_plus_x::primitive_float_log_base_1_plus_x;
+use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::primitive_float_log_base_power_of_2_1_plus_x;
 use malachite_float::test_util::arithmetic::log_base_1_plus_x::{
     rug_log_base_1_plus_x, rug_log_base_1_plus_x_prec, rug_log_base_1_plus_x_prec_round,
 };
@@ -612,4 +618,77 @@ fn test_log_base_1_plus_x_round() {
     test(-3, 1, 10, Nearest, "NaN", Equal);
     test(-3, 1, 10, Down, "NaN", Equal);
     test(-3, 1, 10, Up, "NaN", Equal);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_1_plus_x() {
+    fn test<T: PrimitiveFloat>(x: T, base: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_1_plus_x(x, base)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 10, f32::NAN);
+    test::<f32>(f32::INFINITY, 10, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 10, f32::NAN);
+    test::<f32>(0.0, 10, 0.0);
+    test::<f32>(-0.0, 10, -0.0);
+    test::<f32>(-1.0, 10, f32::NEGATIVE_INFINITY);
+    test::<f32>(-2.0, 10, f32::NAN);
+    test::<f32>(999.0, 10, 3.0); // log_10(1000)
+    test::<f32>(8.0, 9, 1.0); // log_9(9)
+    test::<f32>(80.0, 9, 2.0); // log_9(81)
+    test::<f32>(7.0, 2, 3.0); // log_2(8), power-of-2 base
+    test::<f32>(1.0, 3, 0.63092977); // log_3(2)
+    test::<f32>(49.0, 10, 1.6989699602127075); // log_10(50)
+    test::<f32>(9.0, 3, 2.095903158187866); // log_3(10)
+
+    test::<f64>(f64::NAN, 10, f64::NAN);
+    test::<f64>(f64::INFINITY, 10, f64::INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, 10, f64::NAN);
+    test::<f64>(0.0, 10, 0.0);
+    test::<f64>(-0.0, 10, -0.0);
+    test::<f64>(-1.0, 10, f64::NEGATIVE_INFINITY);
+    test::<f64>(-2.0, 10, f64::NAN);
+    test::<f64>(999.0, 10, 3.0); // log_10(1000)
+    test::<f64>(8.0, 9, 1.0); // log_9(9)
+    test::<f64>(80.0, 9, 2.0); // log_9(81)
+    test::<f64>(7.0, 2, 3.0); // log_2(8), power-of-2 base
+    test::<f64>(1.0, 3, 0.6309297535714574); // log_3(2)
+    test::<f64>(49.0, 10, 1.6989700043360187); // log_10(50)
+    test::<f64>(9.0, 3, 2.0959032742893844); // log_3(10)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_1_plus_x_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_unsigned_pair_gen_var_4::<T, u64>().test_properties(|(x, base)| {
+        if base < 2 {
+            return;
+        }
+        let y = primitive_float_log_base_1_plus_x(x, base);
+        // When the base is a power of 2, log_b(1 + x) agrees with log_base_power_of_2_1_plus_x.
+        if base.is_power_of_2() {
+            assert_eq!(
+                NiceFloat(y),
+                NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(
+                    x,
+                    i64::exact_from(base.trailing_zeros())
+                ))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_log_base_1_plus_x_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_1_plus_x_properties_helper);
 }

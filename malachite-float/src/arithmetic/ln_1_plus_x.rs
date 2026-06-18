@@ -14,13 +14,14 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::round_near_x::float_round_near_x;
-use crate::{Float, float_infinity, float_nan, float_negative_infinity};
+use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Ln1PlusX, Ln1PlusXAssign, Parity};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
@@ -1098,4 +1099,61 @@ impl Ln1PlusXAssign for Float {
         let prec = self.significant_bits();
         self.ln_1_plus_x_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes the natural logarithm of one plus a primitive float, $\ln(1+x)$. Using this function is
+/// more accurate than using the primitive float `ln_1p` function (the standard library's `ln_1p` is
+/// not correctly rounded).
+///
+/// $\ln(1+x)$ is undefined for $x<-1$, so whenever $x<-1$, `NaN` is returned.
+///
+/// $$
+/// f(x) = \ln(1+x)+\varepsilon.
+/// $$
+/// - If $\ln(1+x)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\ln(1+x)$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\ln(1+x)|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`]
+///   and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\infty)=\infty$
+/// - $f(-\infty)=\text{NaN}$
+/// - $f(\pm0.0)=\pm0.0$
+/// - $f(-1.0)=-\infty$
+/// - $f(x)=\text{NaN}$ for $x<-1$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::ln_1_plus_x::primitive_float_ln_1_plus_x;
+///
+/// assert!(primitive_float_ln_1_plus_x(f32::NAN).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_ln_1_plus_x(f32::INFINITY)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert!(primitive_float_ln_1_plus_x(f32::NEGATIVE_INFINITY).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_ln_1_plus_x(-1.0f32)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// assert!(primitive_float_ln_1_plus_x(-2.0f32).is_nan());
+/// assert_eq!(NiceFloat(primitive_float_ln_1_plus_x(1.0f32)), NiceFloat(0.6931472));
+/// assert_eq!(NiceFloat(primitive_float_ln_1_plus_x(7.0f32)), NiceFloat(2.0794415));
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_ln_1_plus_x<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::ln_1_plus_x_prec, x)
 }

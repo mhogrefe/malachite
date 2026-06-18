@@ -7,14 +7,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_float::arithmetic::log_base_rational_float_base::primitive_float_log_base_rational_float_base;
+use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
 use malachite_float::test_util::arithmetic::log_base_rational_float_base::{
     rug_log_base_rational_float_base_prec, rug_log_base_rational_float_base_prec_round,
 };
@@ -25,6 +29,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use std::panic::catch_unwind;
 
 // Cross-checks the by-value and by-reference variants, precision, the rational-base logarithm (for
@@ -299,4 +304,89 @@ fn log_base_rational_float_base_fail() {
         10,
         Exact
     ));
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_rational_float_base() {
+    fn test<T: PrimitiveFloat>(x: &Rational, base: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_rational_float_base::<T>(x, base)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(&Rational::from(8), f32::NAN, f32::NAN); // base NaN
+    test::<f32>(&Rational::from(-1), 10.0, f32::NAN); // x < 0
+    test::<f32>(&Rational::from(8), -2.0, f32::NAN); // base < 0
+    test::<f32>(&Rational::from(8), 4.0, 1.5); // log_4(8) = 3/2
+    test::<f32>(&Rational::from(4), 0.5, -2.0); // log_(1/2)(4) = -2
+    test::<f32>(&Rational::from(1000), 10.0, 3.0); // log_10(1000)
+    test::<f32>(&Rational::from(50), 10.0, 1.6989699602127075); // log_10(50)
+    test::<f32>(&Rational::from_unsigneds(1u8, 3), 10.0, -0.47712126); // log_10(1/3)
+    test::<f32>(&Rational::ZERO, 10.0, f32::NEGATIVE_INFINITY); // x = 0, base > 1
+    test::<f32>(&Rational::ZERO, 0.5, f32::INFINITY); // x = 0, base in (0, 1)
+    test::<f32>(&Rational::ONE, 10.0, 0.0); // log_b(1) = 0
+    test::<f32>(&Rational::from(8), f32::INFINITY, 0.0); // base = inf, x > 0
+    test::<f32>(&Rational::from(8), 1.0, f32::INFINITY); // base = 1, x > 1
+    test::<f32>(
+        &Rational::from_unsigneds(1u8, 2),
+        1.0,
+        f32::NEGATIVE_INFINITY,
+    ); // base = 1, 0<x<1
+    test::<f32>(&Rational::ONE, 1.0, f32::NAN); // base = 1, x = 1
+
+    test::<f64>(&Rational::from(8), f64::NAN, f64::NAN); // base NaN
+    test::<f64>(&Rational::from(-1), 10.0, f64::NAN); // x < 0
+    test::<f64>(&Rational::from(8), -2.0, f64::NAN); // base < 0
+    test::<f64>(&Rational::from(8), 4.0, 1.5); // log_4(8) = 3/2
+    test::<f64>(&Rational::from(4), 0.5, -2.0); // log_(1/2)(4) = -2
+    test::<f64>(&Rational::from(1000), 10.0, 3.0); // log_10(1000)
+    test::<f64>(&Rational::from(50), 10.0, 1.6989700043360187); // log_10(50)
+    test::<f64>(
+        &Rational::from_unsigneds(1u8, 3),
+        10.0,
+        -0.47712125471966244,
+    ); // log_10(1/3)
+    test::<f64>(&Rational::ZERO, 10.0, f64::NEGATIVE_INFINITY); // x = 0, base > 1
+    test::<f64>(&Rational::ZERO, 0.5, f64::INFINITY); // x = 0, base in (0, 1)
+    test::<f64>(&Rational::ONE, 10.0, 0.0); // log_b(1) = 0
+    test::<f64>(&Rational::from(8), f64::INFINITY, 0.0); // base = inf, x > 0
+    test::<f64>(&Rational::from(8), 1.0, f64::INFINITY); // base = 1, x > 1
+    test::<f64>(
+        &Rational::from_unsigneds(1u8, 2),
+        1.0,
+        f64::NEGATIVE_INFINITY,
+    ); // base = 1, 0<x<1
+    test::<f64>(&Rational::ONE, 1.0, f64::NAN); // base = 1, x = 1
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_rational_float_base_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    Rational: ExactFrom<T>,
+{
+    rational_primitive_float_pair_gen::<T>().test_properties(|(x, base)| {
+        let y = primitive_float_log_base_rational_float_base::<T>(&x, base);
+        // For a finite base greater than 1, the result matches the Rational-base function.
+        if base.is_finite() && base > T::ONE {
+            assert_eq!(
+                NiceFloat(y),
+                NiceFloat(primitive_float_log_base_rational_rational_base::<T>(
+                    &x,
+                    &Rational::exact_from(base)
+                ))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_log_base_rational_float_base_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_rational_float_base_properties_helper);
 }

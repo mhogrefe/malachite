@@ -7,9 +7,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{LogBase, LogBaseAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::pair_1_primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_unsigned_pair_gen_var_4;
 use malachite_base::test_util::runner::Runner;
+use malachite_float::arithmetic::log_base::{
+    primitive_float_log_base, primitive_float_log_base_rational,
+};
 use malachite_float::test_util::bench::bucketers::{
     quadruple_1_3_float_primitive_int_max_complexity_bucketer, triple_1_float_complexity_bucketer,
 };
@@ -20,7 +28,10 @@ use malachite_float::test_util::generators::{
     rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
-use malachite_q::test_util::bench::bucketers::quadruple_1_2_3_rational_bit_u64_u64_max_bucketer;
+use malachite_q::test_util::bench::bucketers::{
+    pair_1_rational_bit_bucketer, quadruple_1_2_3_rational_bit_u64_u64_max_bucketer,
+};
+use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_9;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base);
@@ -61,6 +72,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_rational_prec_round_debug);
     register_demo!(runner, demo_float_log_base_rational_prec_round_ref);
     register_demo!(runner, demo_float_log_base_rational_prec_round_ref_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_log_base);
+    register_primitive_float_demos!(runner, demo_primitive_float_log_base_rational);
 
     register_bench!(runner, benchmark_float_log_base_evaluation_strategy);
     register_bench!(runner, benchmark_float_log_base_assign);
@@ -79,6 +92,8 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_log_base_rational_prec_round_evaluation_strategy
     );
+    register_primitive_float_benches!(runner, benchmark_primitive_float_log_base);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_log_base_rational);
 }
 
 fn demo_float_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -873,5 +888,100 @@ fn benchmark_float_log_base_rational_prec_round_evaluation_strategy(
                 },
             ),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_log_base<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, base) in primitive_float_unsigned_pair_gen_var_4::<T, u64>()
+        .get(gm, config)
+        .filter(|&(_, base)| base >= 2)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_log_base({}, {}) = {}",
+            NiceFloat(x),
+            base,
+            NiceFloat(primitive_float_log_base(x, base))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_log_base<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_log_base({}, u64)", T::NAME),
+        BenchmarkType::Single,
+        primitive_float_unsigned_pair_gen_var_4::<T, u64>()
+            .get(gm, config)
+            .filter(|&(_, base)| base >= 2),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_primitive_float_bucketer("x"),
+        &mut [("malachite", &mut |(x, base)| {
+            no_out!(primitive_float_log_base(x, base));
+        })],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_log_base_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, base) in rational_unsigned_pair_gen_var_9::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_log_base_rational({}, {}) = {:?}",
+            x,
+            base,
+            NiceFloat(primitive_float_log_base_rational::<T>(&x, base))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_log_base_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_log_base_rational::<{}>(Rational, u64)",
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        rational_unsigned_pair_gen_var_9::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("x"),
+        &mut [("malachite", &mut |(x, base)| {
+            no_out!(primitive_float_log_base_rational::<T>(&x, base));
+        })],
     );
 }

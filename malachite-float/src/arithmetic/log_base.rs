@@ -13,14 +13,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
+use crate::{
+    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
+    float_infinity, float_nan, float_negative_infinity,
+};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase, IsPowerOf2, LogBase, LogBaseAssign, Sign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -842,4 +846,153 @@ impl LogBaseAssign<u64> for Float {
         let prec = self.significant_bits();
         self.log_base_prec_round_assign(base, prec, Nearest);
     }
+}
+
+/// Computes $\log_b x$, the base-$b$ logarithm of a primitive float, where $b$ is a `u64` greater
+/// than 1. Using this function is more accurate than computing the logarithm using the standard
+/// library, whose `log` is not always correctly rounded.
+///
+/// The base-$b$ logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x,b) = \log_b x+\varepsilon.
+/// $$
+/// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_b x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_b
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN},b)=\text{NaN}$
+/// - $f(\infty,b)=\infty$
+/// - $f(-\infty,b)=\text{NaN}$
+/// - $f(\pm0.0,b)=-\infty$
+/// - $f(1.0,b)=0.0$
+/// - $f(x,b)=\text{NaN}$ for $x<0$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `base` is less than 2.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base::primitive_float_log_base;
+///
+/// assert!(primitive_float_log_base(f32::NAN, 10).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base(f32::INFINITY, 10)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base(0.0f32, 10)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// // log_10(1000) = 3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base(1000.0f32, 10)),
+///     NiceFloat(3.0)
+/// );
+/// // log_3(9) = 2
+/// assert_eq!(NiceFloat(primitive_float_log_base(9.0f32, 3)), NiceFloat(2.0));
+/// // log_10(50)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base(50.0f32, 10)),
+///     NiceFloat(1.69897)
+/// );
+/// assert!(primitive_float_log_base(-1.0f32, 10).is_nan());
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base<T: PrimitiveFloat>(x: T, base: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::log_base_prec(x, base, prec), x)
+}
+
+/// Computes $\log_b x$, the base-$b$ logarithm of a [`Rational`], where $b$ is a `u64` greater than
+/// 1, returning a primitive float result.
+///
+/// If the logarithm is equidistant from two primitive floats, the primitive float with fewer 1s in
+/// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding
+/// mode.
+///
+/// The base-$b$ logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x,b) = \log_b x+\varepsilon.
+/// $$
+/// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_b x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_b
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0,b)=-\infty$
+/// - $f(x,b)=\text{NaN}$ for $x<0$
+/// - $f(1,b)=0.0$
+///
+/// Neither overflow nor underflow is possible.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `base` is less than 2.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base::primitive_float_log_base_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational::<f64>(&Rational::ZERO, 10)),
+///     NiceFloat(f64::NEGATIVE_INFINITY)
+/// );
+/// // log_10(1000) = 3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational::<f64>(&Rational::from(1000), 10)),
+///     NiceFloat(3.0)
+/// );
+/// // log_3(1/9) = -2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 9),
+///         3
+///     )),
+///     NiceFloat(-2.0)
+/// );
+/// // log_10(1/3)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3),
+///         10
+///     )),
+///     NiceFloat(-0.47712125471966244)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational::<f64>(&Rational::from(-1000), 10)),
+///     NiceFloat(f64::NAN)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_rational<T: PrimitiveFloat>(x: &Rational, base: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::log_base_rational_prec_ref(x, base, prec),
+        x,
+    )
 }

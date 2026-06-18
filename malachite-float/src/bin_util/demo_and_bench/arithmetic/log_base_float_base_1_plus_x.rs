@@ -7,10 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{LogBaseOf1PlusX, LogBaseOf1PlusXAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::pair_max_primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
+use malachite_float::arithmetic::log_base_float_base_1_plus_x::primitive_float_log_base_float_base_1_plus_x;
 use malachite_float::test_util::bench::bucketers::{
     quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
     triple_1_2_float_float_max_complexity_bucketer,
@@ -20,6 +25,7 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_13,
     float_float_unsigned_rounding_mode_quadruple_gen_var_14,
 };
+use malachite_float::{ComparableFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_float_base_1_plus_x);
@@ -69,6 +75,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_float_log_base_float_base_1_plus_x_prec_round_assign
+    );
+
+    register_primitive_float_demos!(runner, demo_primitive_float_log_base_float_base_1_plus_x);
+    register_primitive_float_benches!(
+        runner,
+        benchmark_primitive_float_log_base_float_base_1_plus_x
     );
 }
 
@@ -473,5 +485,52 @@ fn benchmark_float_log_base_float_base_1_plus_x_prec_round_assign(
                 no_out!(x.log_base_float_base_1_plus_x_prec_round_assign(&base, prec, rm));
             },
         )],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_log_base_float_base_1_plus_x<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, base) in primitive_float_pair_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_log_base_float_base_1_plus_x({}, {}) = {}",
+            NiceFloat(x),
+            NiceFloat(base),
+            NiceFloat(primitive_float_log_base_float_base_1_plus_x(x, base))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_log_base_float_base_1_plus_x<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_log_base_float_base_1_plus_x({}, {})",
+            T::NAME,
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        primitive_float_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_primitive_float_bucketer("x", "base"),
+        &mut [("malachite", &mut |(x, base)| {
+            no_out!(primitive_float_log_base_float_base_1_plus_x(x, base));
+        })],
     );
 }

@@ -9,14 +9,18 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
 use crate::basic::extended::ExtendedFloat;
-use crate::{Float, float_either_zero, float_infinity, float_nan, float_negative_infinity};
+use crate::{
+    Float, emulate_float_to_float_fn, float_either_zero, float_infinity, float_nan,
+    float_negative_infinity,
+};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase, LogBase, LogBaseAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -30,21 +34,27 @@ use malachite_q::Rational;
 // `log_base(x)` is rational exactly when `x` and `base` are both powers of a common rational `g`,
 // say `x = g^a` and `base = g^e_base`; then `log_base(x) = a / e_base`. Taking `g` to be the
 // primitive root of `base` (`base.express_as_power()`), this holds iff `x` is an integer power of
-// `g`, found by `Rational::checked_log_base` (which also covers `x < 1`, giving a negative `a`).
+// `g` (including a negative power when `x < 1`), found by `Rational::checked_log_base`.
 //
 // Detecting these rational results up front is essential, not just an optimization: when the result
 // is exactly representable (for example `log_9(3) = 1/2`), the Ziv loop in
-// `log_base_rational_base_prec_round_normal` would never terminate, because the rounding test can
-// never certify a value sitting exactly on a representable point or tie.
+// `log_base_rational_base_prec_round_normal` would never terminate, because its rounding test
+// cannot resolve the ordering (less than, equal to, or greater than the representable value) of a
+// result sitting exactly on a representable point or tie. That holds in every rounding mode, so
+// every exactly-representable result must be caught here.
 //
-// The check is balloon-safe. If `x = g^a` then `x`'s bit length is about `|a| * log2(g)`, and a
-// representable result needs `|a|` within about `e_base * prec` of `x`'s precision; an `x` worth
-// materializing as a `Rational` therefore has bit length at most about `64 * x.get_prec()`. When
-// `x`'s exponent (or `base`'s size) exceeds that bound, `x` cannot be an exact power of `g` at this
-// precision, so it is left to the Ziv loop (which then converges) and is never materialized.
-pub(crate) fn rational_log_base_rational_base(x: &Float, base: &Rational) -> Option<Rational> {
-    let x_prec = x.get_prec().unwrap();
-    let bound = x_prec.saturating_mul(64);
+// Materializing `x` as a `Rational` is kept balloon-safe by capping `x`'s exponent and `base`'s
+// size at `bound`, the larger of `x`'s own precision and the requested `prec`. The two can differ
+// sharply -- a precision-1 `x` such as `2.0` may be asked for a 53-bit result -- so the bound must
+// track `prec`, not just `x.get_prec()`; otherwise an exactly-representable result like
+// `log_{2^64}(2) = 2^-6` would be missed and the Ziv loop would spin forever on it.
+// (`Rational::checked_log_base` itself is balloon-safe even for a `g` near 1.)
+pub(crate) fn rational_log_base_rational_base(
+    x: &Float,
+    base: &Rational,
+    prec: u64,
+) -> Option<Rational> {
+    let bound = x.get_prec().unwrap().max(prec).saturating_mul(64);
     let e = i64::from(x.get_exponent().unwrap());
     if e.unsigned_abs() > bound || base.significant_bits() > bound {
         return None;
@@ -81,7 +91,7 @@ fn log_base_rational_base_prec_round_normal(
     // If log_base(x) is rational -- x and base are both powers of a common rational -- compute it
     // directly. This includes exactly-representable results (which the Ziv loop could never
     // certify) as well as non-representable rationals (cheaper and exact this way).
-    if let Some(q) = rational_log_base_rational_base(x, base) {
+    if let Some(q) = rational_log_base_rational_base(x, base, prec) {
         return Float::from_rational_prec_round(q, prec, rm);
     }
     // The result is irrational, so it is never exactly representable.
@@ -640,4 +650,77 @@ impl LogBaseAssign<&Rational> for Float {
         let prec = self.significant_bits();
         self.log_base_rational_base_prec_round_assign(base, prec, Nearest);
     }
+}
+
+/// Computes $\log_b x$, the base-$b$ logarithm of a primitive float, where $b$ is a [`Rational`]
+/// greater than 1. Using this function is more accurate than computing the logarithm using the
+/// standard library, whose logarithm functions are not always correctly rounded.
+///
+/// The base-$b$ logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x,b) = \log_b x+\varepsilon.
+/// $$
+/// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_b x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_b
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN},b)=\text{NaN}$
+/// - $f(\infty,b)=\infty$
+/// - $f(-\infty,b)=\text{NaN}$
+/// - $f(\pm0.0,b)=-\infty$
+/// - $f(1.0,b)=0.0$
+/// - $f(x,b)=\text{NaN}$ for $x<0$
+///
+/// Unlike a logarithm with an integer base, this function can both overflow (for a base near 1) and
+/// underflow (for an $x$ near 1).
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `base` is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_rational_base::primitive_float_log_base_rational_base;
+/// use malachite_q::Rational;
+///
+/// assert!(primitive_float_log_base_rational_base(f32::NAN, &Rational::from(10)).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_base(0.0f32, &Rational::from(10))),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// // log_4(8) = 3/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_base(8.0f32, &Rational::from(4))),
+///     NiceFloat(1.5)
+/// );
+/// // log_(3/2)(2.25) = 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_base(
+///         2.25f32,
+///         &Rational::from_unsigneds(3u8, 2)
+///     )),
+///     NiceFloat(2.0)
+/// );
+/// // log_10(50)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_base(50.0f32, &Rational::from(10))),
+///     NiceFloat(1.69897)
+/// );
+/// assert!(primitive_float_log_base_rational_base(-1.0f32, &Rational::from(10)).is_nan());
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_rational_base<T: PrimitiveFloat>(x: T, base: &Rational) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| x.log_base_rational_base_prec(base, prec), x)
 }

@@ -8,18 +8,22 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Ln1PlusX, Ln1PlusXAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    rounding_mode_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
+    unsigned_rounding_mode_pair_gen_var_3,
 };
+use malachite_float::arithmetic::ln_1_plus_x::primitive_float_ln_1_plus_x;
 use malachite_float::test_util::arithmetic::ln_1_plus_x::{
     rug_ln_1_plus_x, rug_ln_1_plus_x_prec, rug_ln_1_plus_x_prec_round, rug_ln_1_plus_x_round,
 };
@@ -2069,4 +2073,62 @@ fn ln_1_plus_x_properties() {
     float_gen_var_12().test_properties(|x| {
         ln_1_plus_x_properties_helper(x);
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_ln_1_plus_x() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_ln_1_plus_x(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN);
+    test::<f32>(0.0, 0.0);
+    test::<f32>(-0.0, -0.0);
+    test::<f32>(-1.0, f32::NEGATIVE_INFINITY);
+    test::<f32>(-2.0, f32::NAN);
+    test::<f32>(1.0, std::f32::consts::LN_2); // ln(2)
+    test::<f32>(-0.5, -std::f32::consts::LN_2); // ln(1/2) = -ln(2)
+    test::<f32>(7.0, 2.0794415);
+    test::<f32>(100.0, 4.6151204);
+    // Points where the standard library's `ln_1p` rounds differently (it gives 0.0021846225 and
+    // -0.0003517591 respectively); `primitive_float_ln_1_plus_x` is correctly rounded.
+    test::<f32>(0.0021870106, 0.0021846227);
+    test::<f32>(-0.00035169724, -0.00035175908);
+
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, f64::NAN);
+    test::<f64>(0.0, 0.0);
+    test::<f64>(-0.0, -0.0);
+    test::<f64>(-1.0, f64::NEGATIVE_INFINITY);
+    test::<f64>(-2.0, f64::NAN);
+    test::<f64>(1.0, std::f64::consts::LN_2); // ln(2)
+    test::<f64>(-0.5, -std::f64::consts::LN_2); // ln(1/2) = -ln(2)
+    test::<f64>(7.0, 2.0794415416798357);
+    test::<f64>(100.0, 4.61512051684126);
+    // A point where the standard library's `ln_1p` rounds differently (it gives
+    // 6.151952638666437e-9); `primitive_float_ln_1_plus_x` is correctly rounded.
+    test::<f64>(6.151952657589698e-9, 6.151952638666438e-9);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_ln_1_plus_x_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        primitive_float_ln_1_plus_x(x);
+    });
+}
+
+#[test]
+fn primitive_float_ln_1_plus_x_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_ln_1_plus_x_properties_helper);
 }

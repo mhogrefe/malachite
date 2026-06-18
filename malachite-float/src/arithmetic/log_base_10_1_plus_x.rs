@@ -8,14 +8,15 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
-use crate::{Float, float_infinity, float_nan, float_negative_infinity};
+use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, LogBase10Of1PlusX, LogBase10Of1PlusXAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
@@ -568,4 +569,76 @@ impl LogBase10Of1PlusXAssign for Float {
         let prec = self.significant_bits();
         self.log_base_10_1_plus_x_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes $\log_{10}(1+x)$, the base-10 logarithm of one plus a primitive float. Using this
+/// function is more accurate than computing `(1 + x).log10()`, both because $1+x$ may not be
+/// representable as a primitive float and because the standard library's `log10` is not always
+/// correctly rounded.
+///
+/// $\log_{10}(1+x)$ is undefined for $x<-1$, so whenever $x<-1$, `NaN` is returned.
+///
+/// $$
+/// f(x) = \log_{10}(1+x)+\varepsilon.
+/// $$
+/// - If $\log_{10}(1+x)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be
+///   0.
+/// - If $\log_{10}(1+x)$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\log_{10}(1+x)|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a
+///   [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\infty)=\infty$
+/// - $f(-\infty)=\text{NaN}$
+/// - $f(\pm0.0)=\pm0.0$
+/// - $f(-1.0)=-\infty$
+/// - $f(x)=\text{NaN}$ for $x<-1$
+///
+/// This function can underflow (to a subnormal or zero) when $x$ is close to zero, but it cannot
+/// overflow.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_10_1_plus_x::primitive_float_log_base_10_1_plus_x;
+///
+/// assert!(primitive_float_log_base_10_1_plus_x(f32::NAN).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_1_plus_x(f32::INFINITY)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_1_plus_x(-1.0f32)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// assert!(primitive_float_log_base_10_1_plus_x(-2.0f32).is_nan());
+/// // log_10(1 + 999) = log_10(1000) = 3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_1_plus_x(999.0f32)),
+///     NiceFloat(3.0)
+/// );
+/// // log_10(1 + 9) = log_10(10) = 1
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_1_plus_x(9.0f32)),
+///     NiceFloat(1.0)
+/// );
+/// // log_10(1 + 1) = log_10(2)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10_1_plus_x(1.0f32)),
+///     NiceFloat(std::f32::consts::LOG10_2)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_10_1_plus_x<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::log_base_10_1_plus_x_prec, x)
 }

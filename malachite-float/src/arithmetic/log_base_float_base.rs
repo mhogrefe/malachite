@@ -9,12 +9,15 @@
 use crate::InnerFloat::{Infinity, NaN};
 use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
 use crate::basic::extended::ExtendedFloat;
-use crate::{Float, float_infinity, float_nan, float_negative_infinity};
+use crate::{
+    Float, emulate_float_float_to_float_fn, float_infinity, float_nan, float_negative_infinity,
+};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, LogBase, LogBaseAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
@@ -641,4 +644,80 @@ impl LogBaseAssign<&Self> for Float {
         let prec = self.significant_bits();
         self.log_base_float_base_prec_round_assign(base, prec, Nearest);
     }
+}
+
+/// Computes $\log_b x$, the base-$b$ logarithm of a primitive float, where the base $b$ is also a
+/// primitive float, returning a primitive float result. Using this function is more accurate than
+/// computing the logarithm using the standard library, whose logarithm functions are not always
+/// correctly rounded.
+///
+/// Unlike the integer- and rational-base logarithms, the base may be any primitive float: the
+/// function is defined as $\ln x / \ln b$ and never panics on an input value. A base in $(0,1)$
+/// gives a (sign-flipped) logarithm, and the non-normal and degenerate bases follow the limits
+/// below.
+///
+/// $$
+/// f(x,b) = \log_b x+\varepsilon.
+/// $$
+/// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_b x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_b
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases (with $b$ the base):
+/// - $f(\text{NaN},b)=\text{NaN}$, and $f(x,\text{NaN})=\text{NaN}$
+/// - $f(x,b)=\text{NaN}$ for $x<0$ or $b<0$
+/// - $f(\infty,b)=\infty$ for $b>1$, and $-\infty$ for $0\leq b<1$
+/// - $f(\pm0.0,b)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$
+/// - $f(1.0,b)=0.0$ (with the sign of $1/\ln b$)
+/// - $f(x,\infty)=0.0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\{\pm\infty,\pm0.0\}$)
+/// - $f(x,\pm0.0)=0.0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\{\pm\infty,\pm0.0\}$)
+/// - $f(x,1.0)=\infty$ for $x>1$ or $x=\infty$, $-\infty$ for $0\leq x<1$, and $\text{NaN}$ for
+///   $x=1$
+///
+/// This function can both overflow (for a base near 1) and underflow (for an $x$ near 1).
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_float_base::primitive_float_log_base_float_base;
+///
+/// // log_4(8) = 3/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_float_base(8.0f32, 4.0)),
+///     NiceFloat(1.5)
+/// );
+/// // log_(1/2)(4) = -2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_float_base(4.0f32, 0.5)),
+///     NiceFloat(-2.0)
+/// );
+/// // log_10(50)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_float_base(50.0f32, 10.0)),
+///     NiceFloat(1.69897)
+/// );
+/// // log_inf(8) = 0
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_float_base(8.0f32, f32::INFINITY)),
+///     NiceFloat(0.0)
+/// );
+/// assert!(primitive_float_log_base_float_base(-1.0f32, 10.0).is_nan());
+/// assert!(primitive_float_log_base_float_base(8.0f32, f32::NAN).is_nan());
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_float_base<T: PrimitiveFloat>(x: T, base: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_float_to_float_fn(
+        |x, base, prec| x.log_base_float_base_prec(&base, prec),
+        x,
+        base,
+    )
 }

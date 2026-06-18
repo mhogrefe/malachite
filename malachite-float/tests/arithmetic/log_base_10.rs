@@ -8,17 +8,26 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{LogBase10, LogBase10Assign, Reciprocal};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    rounding_mode_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
+    unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::log_base::{
+    primitive_float_log_base, primitive_float_log_base_rational,
+};
+use malachite_float::arithmetic::log_base_10::{
+    primitive_float_log_base_10, primitive_float_log_base_10_rational,
 };
 use malachite_float::test_util::arithmetic::log_base_10::{
     rug_log_base_10, rug_log_base_10_prec, rug_log_base_10_prec_round,
@@ -37,7 +46,9 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_gen;
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_log_base_10() {
@@ -1670,4 +1681,124 @@ fn test_log_base_10_rational_prec() {
     test(1, 10, 10, "-1.0", Equal);
     test(0, 1, 10, "-Infinity", Equal);
     test(1, 1, 10, "0.0", Equal);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_10() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_log_base_10(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN);
+    test::<f32>(0.0, f32::NEGATIVE_INFINITY);
+    test::<f32>(-0.0, f32::NEGATIVE_INFINITY);
+    test::<f32>(1.0, 0.0);
+    test::<f32>(10.0, 1.0); // log_10(10)
+    test::<f32>(100.0, 2.0); // log_10(100)
+    test::<f32>(1000.0, 3.0); // log_10(1000)
+    test::<f32>(2.0, std::f32::consts::LOG10_2); // log_10(2)
+    test::<f32>(0.5, -std::f32::consts::LOG10_2); // log_10(1/2) = -log_10(2)
+    test::<f32>(50.0, 1.6989699602127075); // log_10(50)
+    test::<f32>(-1.0, f32::NAN);
+
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, f64::NAN);
+    test::<f64>(0.0, f64::NEGATIVE_INFINITY);
+    test::<f64>(-0.0, f64::NEGATIVE_INFINITY);
+    test::<f64>(1.0, 0.0);
+    test::<f64>(10.0, 1.0); // log_10(10)
+    test::<f64>(100.0, 2.0); // log_10(100)
+    test::<f64>(1000.0, 3.0); // log_10(1000)
+    test::<f64>(2.0, std::f64::consts::LOG10_2); // log_10(2)
+    test::<f64>(0.5, -std::f64::consts::LOG10_2); // log_10(1/2) = -log_10(2)
+    test::<f64>(50.0, 1.6989700043360187); // log_10(50)
+    test::<f64>(-1.0, f64::NAN);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_10_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        // log_base_10 agrees with log_base with a base of 10.
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_10(x)),
+            NiceFloat(primitive_float_log_base(x, 10))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_log_base_10_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_10_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_10_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_10_rational(&u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", f32::NEGATIVE_INFINITY);
+    test::<f32>("1", 0.0);
+    test::<f32>("10", 1.0); // log_10(10)
+    test::<f32>("1000", 3.0); // log_10(1000)
+    test::<f32>("1/10", -1.0); // log_10(1/10)
+    test::<f32>("1/1000", -3.0); // log_10(1/1000)
+    test::<f32>("2", std::f32::consts::LOG10_2); // log_10(2)
+    test::<f32>("1/2", -std::f32::consts::LOG10_2); // log_10(1/2)
+    test::<f32>("50", 1.6989699602127075); // log_10(50)
+    test::<f32>("1/3", -0.4771212637424469); // log_10(1/3)
+    test::<f32>("-1", f32::NAN);
+    test::<f32>("-22/7", f32::NAN);
+
+    test::<f64>("0", f64::NEGATIVE_INFINITY);
+    test::<f64>("1", 0.0);
+    test::<f64>("10", 1.0); // log_10(10)
+    test::<f64>("1000", 3.0); // log_10(1000)
+    test::<f64>("1/10", -1.0); // log_10(1/10)
+    test::<f64>("1/1000", -3.0); // log_10(1/1000)
+    test::<f64>("2", std::f64::consts::LOG10_2); // log_10(2)
+    test::<f64>("1/2", -std::f64::consts::LOG10_2); // log_10(1/2)
+    test::<f64>("50", 1.6989700043360187); // log_10(50)
+    test::<f64>("1/3", -0.47712125471966244); // log_10(1/3)
+    test::<f64>("-1", f64::NAN);
+    test::<f64>("-22/7", f64::NAN);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_10_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        // log_base_10_rational agrees with log_base_rational with a base of 10.
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_10_rational::<T>(&x)),
+            NiceFloat(primitive_float_log_base_rational::<T>(&x, 10))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_log_base_10_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_10_rational_properties_helper);
 }

@@ -8,14 +8,20 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{LogBaseOf1PlusX, LogBaseOf1PlusXAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_pair_gen, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::log_base_float_base_1_plus_x::primitive_float_log_base_float_base_1_plus_x;
+use malachite_float::arithmetic::log_base_rational_base_1_plus_x::primitive_float_log_base_rational_base_1_plus_x;
 use malachite_float::test_util::arithmetic::log_base_float_base_1_plus_x::{
     rug_log_base_float_base_1_plus_x, rug_log_base_float_base_1_plus_x_prec,
     rug_log_base_float_base_1_plus_x_prec_round, rug_log_base_float_base_1_plus_x_round,
@@ -417,4 +423,89 @@ fn log_base_float_base_1_plus_x_fail() {
         10,
         Exact
     ));
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_log_base_float_base_1_plus_x() {
+    fn test<T: PrimitiveFloat>(x: T, base: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_log_base_float_base_1_plus_x(x, base)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 10.0, f32::NAN); // x NaN
+    test::<f32>(3.0, f32::NAN, f32::NAN); // base NaN
+    test::<f32>(-2.0, 10.0, f32::NAN); // x < -1
+    test::<f32>(3.0, -2.0, f32::NAN); // base < 0
+    test::<f32>(3.0, 4.0, 1.0); // log_4(1 + 3) = log_4(4)
+    test::<f32>(1.0, 4.0, 0.5); // log_4(1 + 1) = log_4(2)
+    test::<f32>(3.0, 0.5, -2.0); // log_(1/2)(1 + 3) = log_(1/2)(4)
+    test::<f32>(8.0, 9.0, 1.0); // log_9(1 + 8) = log_9(9)
+    test::<f32>(1.0, 3.0, 0.63092977); // log_3(2)
+    test::<f32>(1.0, 1.5, 1.7095113); // log_(3/2)(2)
+    test::<f32>(49.0, 10.0, 1.6989699602127075); // log_10(50)
+    test::<f32>(0.0, 10.0, 0.0); // x = +0
+    test::<f32>(-0.0, 10.0, -0.0); // x = -0
+    test::<f32>(-1.0, 10.0, f32::NEGATIVE_INFINITY); // x = -1, base > 1
+    test::<f32>(-1.0, 0.5, f32::INFINITY); // x = -1, base in (0, 1)
+    test::<f32>(f32::INFINITY, 10.0, f32::INFINITY); // x = inf, base > 1
+    test::<f32>(f32::INFINITY, 0.5, f32::NEGATIVE_INFINITY); // x = inf, base in (0, 1)
+    test::<f32>(3.0, f32::INFINITY, 0.0); // base = inf
+    test::<f32>(3.0, 1.0, f32::INFINITY); // base = 1, x > 0
+    test::<f32>(-0.5, 1.0, f32::NEGATIVE_INFINITY); // base = 1, -1 <= x < 0
+    test::<f32>(0.0, 1.0, f32::NAN); // base = 1, x = 0
+
+    test::<f64>(f64::NAN, 10.0, f64::NAN); // x NaN
+    test::<f64>(3.0, f64::NAN, f64::NAN); // base NaN
+    test::<f64>(-2.0, 10.0, f64::NAN); // x < -1
+    test::<f64>(3.0, -2.0, f64::NAN); // base < 0
+    test::<f64>(3.0, 4.0, 1.0); // log_4(1 + 3) = log_4(4)
+    test::<f64>(1.0, 4.0, 0.5); // log_4(1 + 1) = log_4(2)
+    test::<f64>(3.0, 0.5, -2.0); // log_(1/2)(1 + 3) = log_(1/2)(4)
+    test::<f64>(8.0, 9.0, 1.0); // log_9(1 + 8) = log_9(9)
+    test::<f64>(1.0, 3.0, 0.6309297535714574); // log_3(2)
+    test::<f64>(1.0, 1.5, 1.7095112913514547); // log_(3/2)(2)
+    test::<f64>(49.0, 10.0, 1.6989700043360187); // log_10(50)
+    test::<f64>(0.0, 10.0, 0.0); // x = +0
+    test::<f64>(-0.0, 10.0, -0.0); // x = -0
+    test::<f64>(-1.0, 10.0, f64::NEGATIVE_INFINITY); // x = -1, base > 1
+    test::<f64>(-1.0, 0.5, f64::INFINITY); // x = -1, base in (0, 1)
+    test::<f64>(f64::INFINITY, 10.0, f64::INFINITY); // x = inf, base > 1
+    test::<f64>(f64::INFINITY, 0.5, f64::NEGATIVE_INFINITY); // x = inf, base in (0, 1)
+    test::<f64>(3.0, f64::INFINITY, 0.0); // base = inf
+    test::<f64>(3.0, 1.0, f64::INFINITY); // base = 1, x > 0
+    test::<f64>(-0.5, 1.0, f64::NEGATIVE_INFINITY); // base = 1, -1 <= x < 0
+    test::<f64>(0.0, 1.0, f64::NAN); // base = 1, x = 0
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_log_base_float_base_1_plus_x_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    Rational: ExactFrom<T>,
+{
+    primitive_float_pair_gen::<T>().test_properties(|(x, base)| {
+        let y = primitive_float_log_base_float_base_1_plus_x(x, base);
+        // For a finite base greater than 1, the result matches the Rational-base function.
+        if base.is_finite() && base > T::ONE {
+            assert_eq!(
+                NiceFloat(y),
+                NiceFloat(primitive_float_log_base_rational_base_1_plus_x(
+                    x,
+                    &Rational::exact_from(base)
+                ))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_log_base_float_base_1_plus_x_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_log_base_float_base_1_plus_x_properties_helper);
 }

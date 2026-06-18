@@ -7,15 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
-use crate::{Float, float_infinity, float_nan, float_negative_infinity};
+use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase, IsPowerOf2, LogBaseOf1PlusX, LogBaseOf1PlusXAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One as OneTrait, Zero as ZeroTrait};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -634,4 +635,78 @@ impl LogBaseOf1PlusXAssign<u64> for Float {
         let prec = self.significant_bits();
         self.log_base_1_plus_x_prec_round_assign(base, prec, Nearest);
     }
+}
+
+/// Computes $\log_b(1+x)$, the base-$b$ logarithm of one plus a primitive float, where $b$ is a
+/// `u64` greater than 1. Using this function is more accurate than computing the logarithm using
+/// the standard library, both because $1+x$ may not be representable as a primitive float and
+/// because the standard library's `log` is not always correctly rounded.
+///
+/// $\log_b(1+x)$ is undefined for $x<-1$, so whenever $x<-1$, `NaN` is returned.
+///
+/// $$
+/// f(x,b) = \log_b(1+x)+\varepsilon.
+/// $$
+/// - If $\log_b(1+x)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_b(1+x)$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\log_b(1+x)|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a
+///   [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN},b)=\text{NaN}$
+/// - $f(\infty,b)=\infty$
+/// - $f(-\infty,b)=\text{NaN}$
+/// - $f(\pm0.0,b)=\pm0.0$
+/// - $f(-1.0,b)=-\infty$
+/// - $f(x,b)=\text{NaN}$ for $x<-1$
+///
+/// This function can underflow (to a subnormal or zero) when $x$ is close to zero and $b$ is large,
+/// but it cannot overflow.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `base` is less than 2.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_1_plus_x::primitive_float_log_base_1_plus_x;
+///
+/// assert!(primitive_float_log_base_1_plus_x(f32::NAN, 10).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_1_plus_x(f32::INFINITY, 10)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_1_plus_x(-1.0f32, 10)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// assert!(primitive_float_log_base_1_plus_x(-2.0f32, 10).is_nan());
+/// // log_10(1 + 999) = log_10(1000) = 3
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_1_plus_x(999.0f32, 10)),
+///     NiceFloat(3.0)
+/// );
+/// // log_9(1 + 8) = log_9(9) = 1
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_1_plus_x(8.0f32, 9)),
+///     NiceFloat(1.0)
+/// );
+/// // log_3(1 + 1) = log_3(2)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_1_plus_x(1.0f32, 3)),
+///     NiceFloat(0.63092977)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_1_plus_x<T: PrimitiveFloat>(x: T, base: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::log_base_1_plus_x_prec(x, base, prec), x)
 }

@@ -183,6 +183,31 @@ fn log_base_u64_helper(x: &Rational, base: u64) -> (i64, bool) {
     }
 }
 
+// Returns the unique `a >= 1` with `xn == bn^a` and `xd == bd^a`, or `None` if there is no such `a`.
+// `bn` and `bd` must be unequal (so at least one is at least 2) and all four arguments positive. The
+// candidate exponent is read off from whichever base component is at least 2 -- so no logarithm is
+// ever taken to base 1 -- and is then verified against both components. Each `pow` is bounded by the
+// inputs' bit lengths, never by `a`, so this does not balloon when the base is near 1.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xn, xd).significant_bits()`.
+fn checked_power_exponent(bn: &Natural, bd: &Natural, xn: &Natural, xd: &Natural) -> Option<u64> {
+    let a = if *bn >= 2u32 {
+        xn.checked_log_base(bn)?
+    } else {
+        xd.checked_log_base(bd)?
+    };
+    if a != 0 && *xn == bn.pow(a) && *xd == bd.pow(a) {
+        Some(a)
+    } else {
+        None
+    }
+}
+
 impl FloorLogBase<&Rational> for &Rational {
     type Output = i64;
 
@@ -308,8 +333,6 @@ impl CheckedLogBase<&Rational> for &Rational {
     /// Returns the base-$b$ logarithm of a positive [`Rational`]. If the [`Rational`] is not a
     /// power of $b$, then `None` is returned.
     ///
-    /// Note that this function may be slow if the base is very close to 1.
-    ///
     /// $$
     /// f(x, b) = \\begin{cases}
     ///     \operatorname{Some}(\log_b x) & \text{if} \\quad \log_b x \in \Z, \\\\
@@ -318,12 +341,11 @@ impl CheckedLogBase<&Rational> for &Rational {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n, m) = O(nm \log (nm))$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
-    /// $|\log_b x|$, where $b$ is `base` and $x$ is `x`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` less than or equal to zero or `base` is 1.
@@ -363,8 +385,22 @@ impl CheckedLogBase<&Rational> for &Rational {
         if let Some(log_base) = base.checked_log_base_2() {
             return self.checked_log_base_power_of_2(log_base);
         }
-        let (log, exact) = log_base_helper(self, base);
-        if exact { Some(log) } else { None }
+        if *self == 1u32 {
+            return Some(0);
+        }
+        // Unlike `floor_log_base`/`ceiling_log_base`, deciding whether `self` is an exact power of
+        // `base` needs no power scan -- which would balloon for a `base` near 1, where the exponent
+        // is enormous. Writing `self = n / d` and `base = p / q` in lowest terms, `gcd(p, q) = 1`
+        // makes `base^a = p^a / q^a` already reduced, so `self = base^a` forces `n = p^a` and
+        // `d = q^a` for `a >= 0`, or `n = q^m` and `d = p^m` for `a = -m < 0`. Each candidate
+        // exponent comes from an integer logarithm, bounded by `self`'s bit length, not by `a`.
+        let n = self.numerator_ref();
+        let d = self.denominator_ref();
+        let p = base.numerator_ref();
+        let q = base.denominator_ref();
+        checked_power_exponent(p, q, n, d)
+            .map(i64::exact_from)
+            .or_else(|| checked_power_exponent(q, p, n, d).map(|m| -i64::exact_from(m)))
     }
 }
 

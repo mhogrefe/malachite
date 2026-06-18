@@ -9,9 +9,15 @@
 use malachite_base::num::arithmetic::traits::{
     LogBasePowerOf2Of1PlusX, LogBasePowerOf2Of1PlusXAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::pair_1_primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_signed_pair_gen_var_4;
 use malachite_base::test_util::runner::Runner;
+use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::primitive_float_log_base_power_of_2_1_plus_x;
 use malachite_float::test_util::arithmetic::log_base_power_of_2_1_plus_x::{
     rug_log_base_power_of_2_1_plus_x, rug_log_base_power_of_2_1_plus_x_prec_round,
     rug_log_base_power_of_2_1_plus_x_round,
@@ -28,7 +34,7 @@ use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_7_rm,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_8,
 };
-use malachite_float::{ComparableFloat, ComparableFloatRef};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_power_of_2_1_plus_x);
@@ -103,6 +109,7 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_float_log_base_power_of_2_1_plus_x_prec_round_assign_debug
     );
+    register_primitive_float_demos!(runner, demo_primitive_float_log_base_power_of_2_1_plus_x);
 
     register_bench!(
         runner,
@@ -136,6 +143,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_float_log_base_power_of_2_1_plus_x_prec_round_assign
+    );
+    register_primitive_float_benches!(
+        runner,
+        benchmark_primitive_float_log_base_power_of_2_1_plus_x
     );
 }
 
@@ -939,5 +950,57 @@ fn benchmark_float_log_base_power_of_2_1_plus_x_prec_round_assign(
                 no_out!(x.log_base_power_of_2_1_plus_x_prec_round_assign(pow, prec, rm));
             },
         )],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_log_base_power_of_2_1_plus_x<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, pow) in primitive_float_signed_pair_gen_var_4::<T, i64>()
+        .get(gm, config)
+        .filter(|&(_, pow)| pow != 0)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_log_base_power_of_2_1_plus_x({}, {}) = {}",
+            NiceFloat(x),
+            pow,
+            NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(x, pow))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_log_base_power_of_2_1_plus_x<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_log_base_power_of_2_1_plus_x({}, i64)",
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        primitive_float_signed_pair_gen_var_4::<T, i64>()
+            .get(gm, config)
+            .filter(|&(_, pow)| pow != 0),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_primitive_float_bucketer("x"),
+        &mut [("malachite", &mut |(x, pow)| {
+            no_out!(primitive_float_log_base_power_of_2_1_plus_x(x, pow));
+        })],
     );
 }

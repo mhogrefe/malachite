@@ -6,14 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
 use crate::basic::extended::ExtendedFloat;
+use crate::{Float, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase, Sign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN, NegativeInfinity, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -337,4 +338,99 @@ impl Float {
     ) -> (Self, Ordering) {
         Self::log_base_rational_rational_base_prec_round_ref(x, base, prec, Nearest)
     }
+}
+
+/// Computes $\log_b x$, the base-$b$ logarithm of a [`Rational`], where the base $b$ is also a
+/// [`Rational`] greater than 1, returning a primitive float result. Using this function is more
+/// accurate than computing the logarithm using the standard library, whose logarithm functions are
+/// not always correctly rounded.
+///
+/// If the logarithm is equidistant from two primitive floats, the primitive float with fewer 1s in
+/// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding
+/// mode.
+///
+/// The base-$b$ logarithm of any negative number is `NaN`.
+///
+/// $$
+/// f(x,b) = \log_b x+\varepsilon.
+/// $$
+/// - If $\log_b x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\log_b x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\log_b
+///   x|\rfloor-p}$, where $p$ is precision of the output (typically 24 if `T` is a [`f32`] and 53
+///   if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0,b)=-\infty$
+/// - $f(x,b)=\text{NaN}$ for $x<0$
+/// - $f(1,b)=0.0$
+///
+/// Unlike a logarithm with an integer base, this function can both overflow (for a base near 1) and
+/// underflow (for an $x$ near 1).
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `base` is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_rational_base::<f32>(
+///         &Rational::ZERO,
+///         &Rational::from(10)
+///     )),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// // log_4(8) = 3/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_rational_base::<f32>(
+///         &Rational::from(8),
+///         &Rational::from(4)
+///     )),
+///     NiceFloat(1.5)
+/// );
+/// // log_(3/2)(9/4) = 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_rational_base::<f32>(
+///         &Rational::from_unsigneds(9u8, 4),
+///         &Rational::from_unsigneds(3u8, 2)
+///     )),
+///     NiceFloat(2.0)
+/// );
+/// // log_10(50)
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_rational_base::<f32>(
+///         &Rational::from(50),
+///         &Rational::from(10)
+///     )),
+///     NiceFloat(1.69897)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_rational_rational_base::<f32>(
+///         &Rational::from(-1000),
+///         &Rational::from(10)
+///     )),
+///     NiceFloat(f32::NAN)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_log_base_rational_rational_base<T: PrimitiveFloat>(
+    x: &Rational,
+    base: &Rational,
+) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::log_base_rational_rational_base_prec_ref(x, base, prec),
+        x,
+    )
 }
