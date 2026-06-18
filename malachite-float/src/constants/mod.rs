@@ -11,8 +11,16 @@ pub mod gauss_constant;
 /// Functions for approximating the lemniscate constant $\varpi=\pi G$, where $G$ is Gauss's
 /// constant.
 pub mod lemniscate_constant;
+/// Functions for approximating $\ln 10$.
+pub mod ln_10;
 /// Functions for approximating $\ln 2$.
 pub mod ln_2;
+/// Functions for approximating $\log_{10} 2$.
+pub mod log_10_2;
+/// Functions for approximating $\log_{10} e$.
+pub mod log_10_e;
+/// Functions for approximating $\log_2 10$.
+pub mod log_2_10;
 /// Functions for approximating $\log_2 e$.
 pub mod log_2_e;
 /// Functions for approximating $1/\pi$.
@@ -49,6 +57,10 @@ pub mod sqrt_2_over_2;
 pub mod sqrt_3;
 /// Functions for approximating $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
 pub mod sqrt_3_over_3;
+/// Functions for approximating $\sqrt{5}$.
+pub mod sqrt_5;
+/// Functions for approximating $\sqrt{5}/5=\sqrt{1/5}=1/\sqrt{5}$.
+pub mod sqrt_5_over_5;
 /// Functions for approximating $\sqrt{\pi}$.
 pub mod sqrt_pi;
 /// Functions for approximating $\tau=2\pi$.

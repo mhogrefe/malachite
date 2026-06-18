@@ -80,9 +80,29 @@ pub trait Ln2 {
     const LN_2: Self;
 }
 
+/// Provides $\ln 10$.
+pub trait Ln10 {
+    const LN_10: Self;
+}
+
 /// Provides $\log_2 e$.
 pub trait Log2E {
     const LOG_2_E: Self;
+}
+
+/// Provides $\log_{10} e$.
+pub trait Log10E {
+    const LOG_10_E: Self;
+}
+
+/// Provides $\log_2 10$.
+pub trait Log210 {
+    const LOG_2_10: Self;
+}
+
+/// Provides $\log_{10} 2$.
+pub trait Log102 {
+    const LOG_10_2: Self;
 }
 
 /// Provides $\sqrt{2}$.
@@ -95,6 +115,11 @@ pub trait Sqrt3 {
     const SQRT_3: Self;
 }
 
+/// Provides $\sqrt{5}$.
+pub trait Sqrt5 {
+    const SQRT_5: Self;
+}
+
 /// Provides $\sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}$.
 pub trait Sqrt2Over2 {
     const SQRT_2_OVER_2: Self;
@@ -103,6 +128,11 @@ pub trait Sqrt2Over2 {
 /// Provides $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
 pub trait Sqrt3Over3 {
     const SQRT_3_OVER_3: Self;
+}
+
+/// Provides $\sqrt{5}/5=\sqrt{1/5}=1/\sqrt{5}$.
+pub trait Sqrt5Over5 {
+    const SQRT_5_OVER_5: Self;
 }
 
 /// Provides $\varphi$, the golden ratio.

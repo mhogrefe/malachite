@@ -11,7 +11,11 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     gauss_constant::register(runner);
     lemniscate_constant::register(runner);
+    ln_10::register(runner);
     ln_2::register(runner);
+    log_10_2::register(runner);
+    log_10_e::register(runner);
+    log_2_10::register(runner);
     log_2_e::register(runner);
     one_over_pi::register(runner);
     one_over_sqrt_pi::register(runner);
@@ -29,6 +33,8 @@ pub(crate) fn register(runner: &mut Runner) {
     sqrt_2_over_2::register(runner);
     sqrt_3::register(runner);
     sqrt_3_over_3::register(runner);
+    sqrt_5::register(runner);
+    sqrt_5_over_5::register(runner);
     sqrt_pi::register(runner);
     tau::register(runner);
     two_over_pi::register(runner);
@@ -37,7 +43,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod gauss_constant;
 mod lemniscate_constant;
+mod ln_10;
 mod ln_2;
+mod log_10_2;
+mod log_10_e;
+mod log_2_10;
 mod log_2_e;
 mod one_over_pi;
 mod one_over_sqrt_pi;
@@ -55,6 +65,8 @@ mod sqrt_2;
 mod sqrt_2_over_2;
 mod sqrt_3;
 mod sqrt_3_over_3;
+mod sqrt_5;
+mod sqrt_5_over_5;
 mod sqrt_pi;
 mod tau;
 mod two_over_pi;

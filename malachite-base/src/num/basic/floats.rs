@@ -16,10 +16,11 @@ use crate::num::arithmetic::traits::{
     SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    GaussConstant, Infinity, LemniscateConstant, Ln2, Log2E, NaN, NegativeInfinity, NegativeOne,
-    NegativeZero, One, OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2,
-    PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2,
-    Sqrt3, Sqrt3Over3, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
+    GaussConstant, Infinity, LemniscateConstant, Ln2, Ln10, Log2E, Log10E, Log102, Log210, NaN,
+    NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi, OneOverSqrtPi,
+    OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant,
+    ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau,
+    Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -143,7 +144,11 @@ pub trait PrimitiveFloat:
     + IsInteger
     + IsPowerOf2
     + Log2E
+    + Log10E
+    + Log210
+    + Log102
     + Ln2
+    + Ln10
     + LowerExp
     + Min
     + Max
@@ -211,6 +216,8 @@ pub trait PrimitiveFloat:
     + Sqrt2Over2
     + Sqrt3
     + Sqrt3Over3
+    + Sqrt5
+    + Sqrt5Over5
     + Square<Output = Self>
     + SquareAssign
     + Sub<Output = Self>
@@ -605,7 +612,9 @@ macro_rules! impl_basic_traits_primitive_float {
         $prouhet_thue_morse_constant: expr,
         $prime_constant: expr,
         $sqrt_3: expr,
+        $sqrt_5: expr,
         $sqrt_3_over_3: expr,
+        $sqrt_5_over_5: expr,
         $phi: expr,
         $sqrt_pi: expr,
         $one_over_sqrt_pi: expr,
@@ -745,9 +754,29 @@ macro_rules! impl_basic_traits_primitive_float {
             const LN_2: $t = core::$t::consts::LN_2;
         }
 
+        /// $\ln 10$.
+        impl Ln10 for $t {
+            const LN_10: $t = core::$t::consts::LN_10;
+        }
+
         /// $\log_2 e$.
         impl Log2E for $t {
             const LOG_2_E: $t = core::$t::consts::LOG2_E;
+        }
+
+        /// $\log_{10} e$.
+        impl Log10E for $t {
+            const LOG_10_E: $t = core::$t::consts::LOG10_E;
+        }
+
+        /// $\log_2 10$.
+        impl Log210 for $t {
+            const LOG_2_10: $t = core::$t::consts::LOG2_10;
+        }
+
+        /// $\log_{10} 2$.
+        impl Log102 for $t {
+            const LOG_10_2: $t = core::$t::consts::LOG10_2;
         }
 
         /// $\sqrt{2}$.
@@ -760,6 +789,11 @@ macro_rules! impl_basic_traits_primitive_float {
             const SQRT_3: $t = $sqrt_3;
         }
 
+        /// $\sqrt{5}$.
+        impl Sqrt5 for $t {
+            const SQRT_5: $t = $sqrt_5;
+        }
+
         /// $\sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}$.
         impl Sqrt2Over2 for $t {
             const SQRT_2_OVER_2: $t = core::$t::consts::FRAC_1_SQRT_2;
@@ -768,6 +802,11 @@ macro_rules! impl_basic_traits_primitive_float {
         /// $\sqrt{3}/3=\sqrt{1/3}=1/\sqrt{3}$.
         impl Sqrt3Over3 for $t {
             const SQRT_3_OVER_3: $t = $sqrt_3_over_3;
+        }
+
+        /// $\sqrt{5}/5=\sqrt{1/5}=1/\sqrt{5}$.
+        impl Sqrt5Over5 for $t {
+            const SQRT_5_OVER_5: $t = $sqrt_5_over_5;
         }
 
         /// $\varphi$, the golden ratio.
@@ -860,7 +899,9 @@ impl_basic_traits_primitive_float!(
     0.41245404,
     0.4146825,
     1.7320508,
+    2.236068,
     0.57735026,
+    0.4472136,
     1.618034,
     1.7724539,
     0.5641896,
@@ -877,7 +918,9 @@ impl_basic_traits_primitive_float!(
     0.4124540336401076,
     0.41468250985111166,
     1.7320508075688772,
+    2.23606797749979,
     0.5773502691896257,
+    0.4472135954999579,
     1.618033988749895,
     1.772453850905516,
     0.5641895835477563,
