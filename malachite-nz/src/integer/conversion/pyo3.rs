@@ -212,14 +212,16 @@ fn int_to_limbs(long: &Bound<PyInt>, is_signed: bool) -> PyResult<Vec<Limb>> {
         }
         buffer.set_len(n_limbs);
     };
-    buffer.iter_mut().for_each(|limb| *limb = Limb::from_le(*limb));
+    buffer
+        .iter_mut()
+        .for_each(|limb| *limb = Limb::from_le(*limb));
 
     Ok(buffer)
 }
 
-/// Converts a Python integer to a vector of little-endian limbs, using the (now internal) byte-array
-/// API available before Python 3.13. If `is_signed` is true, the integer is treated as signed and
-/// the limbs are its two's complement representation.
+/// Converts a Python integer to a vector of little-endian limbs, using the (now internal)
+/// byte-array API available before Python 3.13. If `is_signed` is true, the integer is treated as
+/// signed and the limbs are its two's complement representation.
 #[cfg(all(not(Py_LIMITED_API), not(Py_3_13)))]
 #[inline]
 fn int_to_limbs(long: &Bound<PyInt>, is_signed: bool) -> PyResult<Vec<Limb>> {
@@ -245,7 +247,9 @@ fn int_to_limbs(long: &Bound<PyInt>, is_signed: bool) -> PyResult<Vec<Limb>> {
         }
         buffer.set_len(n_limbs);
     };
-    buffer.iter_mut().for_each(|limb| *limb = Limb::from_le(*limb));
+    buffer
+        .iter_mut()
+        .for_each(|limb| *limb = Limb::from_le(*limb));
 
     Ok(buffer)
 }
