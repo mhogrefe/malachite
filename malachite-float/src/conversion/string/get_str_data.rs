@@ -26,7 +26,7 @@
 // Indexed as `MPFR_L2B[b - 2][i]`.
 // TODO: remove the `dead_code` allow once the `mpfr_get_str` port consumes this table.
 #[allow(dead_code)]
-pub(crate) const MPFR_L2B: [[(u128, i16); 2]; 61] = [
+pub(crate) const MPFR_L2B: [[(u128, i8); 2]; 61] = [
     [(0x80000000000000000000000000000000, 1), (0x80000000000000000000000000000000, 1)], // b = 2
     [(0xcae00e00000000000000000000000000, 1), (0xa1849cc1a9a9e94e0448000000000000, 0)], // b = 3
     [(0x80000000000000000000000000000000, 2), (0x80000000000000000000000000000000, 0)], // b = 4

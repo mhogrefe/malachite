@@ -39,20 +39,20 @@ fn ln_1_plus_x_small(x: &Float, prec: u64) -> (Float, u64) {
     // value each time).
     let mut t = Float::from_float_prec_ref(x, prec).0; // t = x * (1 + theta)
     let mut y = t.clone(); // exact
-    let y_exp = y.get_exponent().unwrap();
+    let y_exp_m_prec = i64::from(y.get_exponent().unwrap()) - i64::exact_from(prec);
     let mut i = 2u32;
     loop {
-        t = t.mul_prec_val_ref(x, prec).0; // t = x^i * (1 + theta)^i
+        t.mul_prec_assign_ref(x, prec); // t = x^i * (1 + theta)^i
         // u = x^i / i * (1 + theta)^(i + 1)
         let u = t.div_prec_ref_val(Float::from(i), prec).0;
         // |u| < ulp(y)
-        if i64::from(u.get_exponent().unwrap()) <= i64::from(y_exp) - i64::exact_from(prec) {
+        if i64::from(u.get_exponent().unwrap()) <= y_exp_m_prec {
             break;
         }
-        y = if i.odd() {
-            y.add_prec(u, prec).0 // error <= ulp(y)
+        if i.odd() {
+            y.add_prec_assign(u, prec); // error <= ulp(y)
         } else {
-            y.sub_prec(u, prec).0 // error <= ulp(y)
+            y.sub_prec_assign(u, prec); // error <= ulp(y)
         };
         i += 1;
     }
