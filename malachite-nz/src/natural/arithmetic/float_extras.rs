@@ -14,11 +14,17 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::shl::limbs_shl_to_out;
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_floor, limb_to_bit_count};
-use crate::platform::Limb;
+use crate::platform::{DoubleLimb, Limb};
+use alloc::vec::Vec;
 use core::cmp::min;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
@@ -376,4 +382,111 @@ pub(crate) fn round_helper_2(xs: &[Limb], err0: i32, prec: u64) -> bool {
 #[inline]
 pub fn limbs_significand_slice_add_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
     limbs_slice_add_limb_in_place(xs, y)
+}
+
+// Computes an approximation to `b ^ e` in `{a, n}`, where `n` is `a.len()`, returning the pair
+// `(exp, err)`. The computed value is rounded toward zero (truncated), and `a * 2 ^ exp` represents
+// it, where `a` is the integer `a[0] + a[1] * B + ... + a[n - 1] * B ^ (n - 1)` with
+// `B = 2 ^ Limb::WIDTH`.
+//
+// `err` is an integer `f` such that the final error is bounded by `2 ^ f` ulps; that is,
+// `a * 2 ^ exp <= b ^ e <= 2 ^ exp * (a + 2 ^ f)`. `err` is -1 if the result is exact, or -2 if an
+// overflow occurred while computing `exp`.
+//
+// `n` must be positive, `e` must be positive, and `b` must be between 2 and 62, inclusive.
+//
+// This is equivalent to `mpfr_mpn_exp` from `mpn_exp.c`, MPFR 4.x.
+pub fn limbs_float_exp(a: &mut [Limb], b: u64, e: i64) -> (i64, i32) {
+    // Shifts the `n`-limb value in `c[n..2 * n]` left by one bit into `a`, bringing in the top bit
+    // of `c[n - 1]`, and decrements the exponent `f` to match.
+    fn shift_a_left_one_bit(a: &mut [Limb], c: &[Limb], n: usize, f: &mut i64) {
+        limbs_shl_to_out(a, &c[n..2 * n], 1);
+        a[0] |= Limb::from(c[n - 1].get_highest_bit());
+        *f -= 1;
+    }
+
+    let n = a.len();
+    assert!(n > 0);
+    assert!(e > 0);
+    assert!((2..=62).contains(&b));
+    let width = i64::exact_from(Limb::WIDTH);
+    let n_width = i64::exact_from(n) * width;
+    // Normalize the base.
+    let mut big_b = Limb::exact_from(b);
+    let mut h = i64::from(big_b.leading_zeros());
+    big_b <<= h;
+    h = -h;
+    // Allocate space for the running square or product (and a scratch buffer large enough for any of
+    // the squarings below), and set A to B.
+    let mut c: Vec<Limb> = vec![0; 2 * n];
+    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(n)];
+    a[n - 1] = big_b;
+    a[..n - 1].fill(0);
+    // The initial exponent for A; the invariant is A = {a, n} * 2 ^ f.
+    let mut f = h - i64::exact_from(n - 1) * width;
+    // The number of bits in e.
+    let t = i32::exact_from(i64::WIDTH - u64::from(e.leading_zeros()));
+    // `error == t` means that the result is still exact.
+    let mut error = t;
+    let mut err_s_a2: i32 = 0; // number of left shifts when squaring after the first inexact loop
+    let mut err_s_ab: i32 = 0; // number of left shifts when multiplying after the first inexact loop
+    for i in (0..=t - 2).rev() {
+        // n1 is the number of zero low limbs of {a, n} (that is, mpn_scan1(a, 0) / Limb::WIDTH).
+        let n1 = a.iter().take_while(|&&x| x == 0).count();
+        // Square of A: {c + 2 * n1, 2 * (n - n1)} = {a + n1, n - n1} ^ 2.
+        limbs_square_to_out(
+            &mut c[2 * n1..2 * n],
+            &a[n1..n],
+            &mut square_scratch[..limbs_square_to_out_scratch_len(n - n1)],
+        );
+        // Check for overflow on f.
+        if !(i64::MIN / 2..=i64::MAX / 2).contains(&f) {
+            return (f, -2);
+        }
+        f *= 2;
+        if let Some(g) = f.checked_add(n_width) {
+            f = g;
+        } else {
+            // Reachable only when `f` lands within `Limb::WIDTH / 2` below `i64::MAX / 2`, so that
+            // doubling and adding `n * Limb::WIDTH` overflows without the check above catching it
+            // first. Every overflow found by testing is caught by that check instead, so this arm
+            // is untested.
+            fail_on_untested_path("limbs_float_exp, f overflow in checked_add");
+            return (f, -2);
+        }
+        if c[2 * n - 1].get_highest_bit() {
+            a.copy_from_slice(&c[n..2 * n]);
+        } else {
+            shift_a_left_one_bit(a, &c, n, &mut f);
+            if error != t {
+                err_s_a2 += 1;
+            }
+        }
+        if error == t && 2 * n1 <= n && c[2 * n1..n].iter().any(|&x| x != 0) {
+            error = i;
+        }
+        if (e >> i) & 1 == 1 {
+            // Multiply A by B.
+            let carry =
+                limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut c[n - 1..2 * n - 1], a, big_b);
+            c[2 * n - 1] = carry;
+            f += h + width;
+            if c[2 * n - 1].get_highest_bit() {
+                a.copy_from_slice(&c[n..2 * n]);
+                if error != t {
+                    err_s_ab += 1;
+                }
+            } else {
+                shift_a_left_one_bit(a, &c, n, &mut f);
+            }
+            if error == t && c[n - 1] != 0 {
+                error = i;
+            }
+        }
+    }
+    if error == t {
+        (f, -1) // the result is exact
+    } else {
+        (f, error + err_s_ab + err_s_a2 / 2 + 3)
+    }
 }

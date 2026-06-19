@@ -27,6 +27,8 @@ pub(crate) fn register(runner: &mut Runner) {
     eq_mod_power_of_2::register(runner);
     extended_gcd::register(runner);
     factorial::register(runner);
+    #[cfg(feature = "float_helpers")]
+    float_extras::register(runner);
     gcd::register(runner);
     is_power_of_2::register(runner);
     kronecker_symbol::register(runner);
@@ -97,6 +99,8 @@ mod eq_mod;
 mod eq_mod_power_of_2;
 mod extended_gcd;
 mod factorial;
+#[cfg(feature = "float_helpers")]
+mod float_extras;
 mod gcd;
 mod is_power_of_2;
 mod kronecker_symbol;

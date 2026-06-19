@@ -105,7 +105,7 @@ use malachite_base::num::random::striped::{
 };
 use malachite_base::num::random::{
     RandomUnsignedRange, RandomUnsignedsLessThan, random_primitive_floats,
-    random_unsigneds_less_than,
+    random_unsigned_inclusive_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
 use malachite_base::random::{EXAMPLE_SEED, Seed};
@@ -7978,4 +7978,41 @@ pub fn special_random_large_type_gen_var_24(
         ),
         xs_map: HashMap::new(),
     })
+}
+
+// All `(Vec<Limb>, u64, u64)`s `(out, b, e)` with `out` nonempty, `b` in [2, 62], and `e` positive,
+// where the length of `out` is set to bracket the number of limbs needed to hold `b ^ e`. This is
+// the input for `limbs_float_exp`.
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_22(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, u64, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    1,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range::<u64>(seed, 2, 62),
+            &|seed| {
+                geometric_random_positive_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 4),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(out, b, e): (Vec<Limb>, u64, u64)| {
+            let approx_bits = e.saturating_mul(b.significant_bits());
+            let n_min = usize::exact_from(approx_bits.div_ceil(Limb::WIDTH)).max(1);
+            let n = (n_min + out.len()).saturating_sub(4).max(1);
+            (vec![0; n], b, e)
+        }),
+    )
 }

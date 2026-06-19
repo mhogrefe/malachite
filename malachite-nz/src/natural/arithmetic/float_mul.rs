@@ -1020,7 +1020,7 @@ mod float_mul_high_tests {
                 approx - exact
             };
             assert!(
-                diff <= Natural::from(u64::wrapping_from(len << 1)),
+                diff <= len << 1,
                 "len={len}: mul-high approximation error too large"
             );
         }

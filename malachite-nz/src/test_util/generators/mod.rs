@@ -2718,6 +2718,18 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_12() -> Generator<(Vec<Limb
     )
 }
 
+// All `(Vec<Limb>, u64, u64)`s `(out, b, e)` where `out` is nonempty, `b` is in [2, 62], and `e` is
+// positive. This is the input for `limbs_float_exp(&mut out, b, e as i64)`; in the random and
+// special-random modes the length of `out` is set to bracket the number of limbs needed to hold
+// `b ^ e`, so both the exact and inexact paths of `limbs_float_exp` are exercised.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_17() -> Generator<(Vec<Limb>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_17,
+        &random_unsigned_vec_unsigned_unsigned_triple_gen_var_9,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_22,
+    )
+}
+
 // var 13 is in malachite-base.
 
 // All `(Vec<Limb>, T, u64)` where `T` is unsigned, the `u64` is small, and the number of

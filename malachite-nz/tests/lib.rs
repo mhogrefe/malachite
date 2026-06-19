@@ -239,6 +239,8 @@ pub mod natural {
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
         pub mod factorial;
+        #[cfg(feature = "float_helpers")]
+        pub mod float_extras;
         pub mod gcd;
         pub mod is_power_of_2;
         pub mod kronecker_symbol;

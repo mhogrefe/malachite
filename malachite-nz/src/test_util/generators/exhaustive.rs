@@ -4600,3 +4600,13 @@ pub fn exhaustive_large_type_gen_var_25() -> It<(Natural, Vec<Natural>, Rational
 pub fn exhaustive_large_type_gen_var_26() -> It<(Vec<Natural>, RationalSequence<Natural>)> {
     RationalFromDigitsGenerator.get_ys(&Natural::from(10u32))
 }
+
+// All `(Vec<Limb>, u64, u64)`s `(out, b, e)` with `out` nonempty, `b` in [2, 62], and `e` positive.
+// This is the input for `limbs_float_exp`.
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_17() -> It<(Vec<Limb>, u64, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()),
+        primitive_int_increasing_inclusive_range::<u64>(2, 62),
+        exhaustive_positive_primitive_ints::<u64>(),
+    ))
+}
