@@ -75,6 +75,8 @@ extern crate serde_json;
 #[cfg(feature = "bin_build")]
 use crate::bin_util::demo_and_bench::register;
 #[cfg(feature = "bin_build")]
+use crate::bin_util::generate::l2b_data::generate_l2b_data;
+#[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::Runner;
 #[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
@@ -100,6 +102,11 @@ fn main() {
             args.limit,
             &args.out,
         );
+    } else if let Some(codegen_key) = args.codegen_key {
+        match codegen_key.as_str() {
+            "l2b_data" => generate_l2b_data(),
+            key => panic!("Unrecognized codegen key: {key}"),
+        }
     } else {
         panic!();
     }
@@ -111,4 +118,5 @@ const fn main() {}
 #[cfg(feature = "bin_build")]
 pub mod bin_util {
     pub mod demo_and_bench;
+    pub mod generate;
 }
