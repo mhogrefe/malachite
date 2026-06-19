@@ -19,15 +19,16 @@ use crate::natural::arithmetic::shl::limbs_shl_to_out;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb};
-use alloc::vec::Vec;
 use core::cmp::min;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{
+    NegAssign, NegModPowerOf2, Parity, PowerOf2, WrappingSubAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::LowMask;
+use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
 // This is MPFR_CAN_ROUND from mpfr-impl.h, MPFR 4.2.0.
 pub fn float_can_round(x: &Natural, err0: u64, prec: u64, rm: RoundingMode) -> bool {
@@ -396,54 +397,49 @@ pub fn limbs_significand_slice_add_limb_in_place(xs: &mut [Limb], y: Limb) -> bo
 // `n` must be positive, `e` must be positive, and `b` must be between 2 and 62, inclusive.
 //
 // This is equivalent to `mpfr_mpn_exp` from `mpn_exp.c`, MPFR 4.x.
+#[doc(hidden)]
 pub fn limbs_float_exp(a: &mut [Limb], b: u64, e: i64) -> (i64, i32) {
-    // Shifts the `n`-limb value in `c[n..2 * n]` left by one bit into `a`, bringing in the top bit
-    // of `c[n - 1]`, and decrements the exponent `f` to match.
-    fn shift_a_left_one_bit(a: &mut [Limb], c: &[Limb], n: usize, f: &mut i64) {
-        limbs_shl_to_out(a, &c[n..2 * n], 1);
-        a[0] |= Limb::from(c[n - 1].get_highest_bit());
-        *f -= 1;
-    }
-
     let n = a.len();
-    assert!(n > 0);
+    assert_ne!(n, 0);
     assert!(e > 0);
-    assert!((2..=62).contains(&b));
-    let width = i64::exact_from(Limb::WIDTH);
-    let n_width = i64::exact_from(n) * width;
+    assert!(const { 2..=62 }.contains(&b));
+    let n_width = i64::exact_from(limb_to_bit_count(n));
     // Normalize the base.
-    let mut big_b = Limb::exact_from(b);
-    let mut h = i64::from(big_b.leading_zeros());
-    big_b <<= h;
-    h = -h;
+    let mut limb_b = Limb::exact_from(b);
+    let mut h = i64::from(limb_b.leading_zeros());
+    limb_b <<= h;
+    h.neg_assign();
     // Allocate space for the running square or product (and a scratch buffer large enough for any
     // of the squarings below), and set A to B.
-    let mut c: Vec<Limb> = vec![0; 2 * n];
-    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(n)];
-    a[n - 1] = big_b;
-    a[..n - 1].fill(0);
+    let two_n = n << 1;
+    let mut scratch = vec![0; two_n + limbs_square_to_out_scratch_len(n)];
+    let (c, square_scratch) = scratch.split_at_mut(two_n);
+    let (a_last, a_init) = a.split_last_mut().unwrap();
+    *a_last = limb_b;
+    a_init.fill(0);
     // The initial exponent for A; the invariant is A = {a, n} * 2 ^ f.
-    let mut f = h - i64::exact_from(n - 1) * width;
+    let mut f = h - (n_width - const { Limb::WIDTH as i64 });
     // The number of bits in e.
-    let t = i32::exact_from(i64::WIDTH - u64::from(e.leading_zeros()));
+    let t = i32::exact_from(e.significant_bits());
     // `error == t` means that the result is still exact.
     let mut error = t;
     let mut err_s_a2: i32 = 0; // number of left shifts when squaring after the first inexact loop
     let mut err_s_ab: i32 = 0; // number of left shifts when multiplying after the first inexact loop
     for i in (0..=t - 2).rev() {
         // n1 is the number of zero low limbs of {a, n} (that is, mpn_scan1(a, 0) / Limb::WIDTH).
-        let n1 = a.iter().take_while(|&&x| x == 0).count();
+        let n1 = slice_leading_zeros(a);
+        let two_n1 = n1 << 1;
         // Square of A: {c + 2 * n1, 2 * (n - n1)} = {a + n1, n - n1} ^ 2.
         limbs_square_to_out(
-            &mut c[2 * n1..2 * n],
-            &a[n1..n],
+            &mut c[two_n1..],
+            &a[n1..],
             &mut square_scratch[..limbs_square_to_out_scratch_len(n - n1)],
         );
         // Check for overflow on f.
-        if !(i64::MIN / 2..=i64::MAX / 2).contains(&f) {
+        if !const { i64::MIN >> 1..=i64::MAX >> 1 }.contains(&f) {
             return (f, -2);
         }
-        f *= 2;
+        f <<= 1;
         if let Some(g) = f.checked_add(n_width) {
             f = g;
         } else {
@@ -454,39 +450,48 @@ pub fn limbs_float_exp(a: &mut [Limb], b: u64, e: i64) -> (i64, i32) {
             fail_on_untested_path("limbs_float_exp, f overflow in checked_add");
             return (f, -2);
         }
-        if c[2 * n - 1].get_highest_bit() {
-            a.copy_from_slice(&c[n..2 * n]);
+        let (c_lo, c_hi) = c.split_at(n);
+        if c_hi.last().unwrap().get_highest_bit() {
+            a.copy_from_slice(c_hi);
         } else {
-            shift_a_left_one_bit(a, &c, n, &mut f);
+            limbs_shl_to_out(a, c_hi, 1);
+            a[0] |= Limb::from(c_lo.last().unwrap().get_highest_bit());
+            f -= 1;
             if error != t {
                 err_s_a2 += 1;
             }
         }
-        if error == t && 2 * n1 <= n && c[2 * n1..n].iter().any(|&x| x != 0) {
+        if error == t && two_n1 <= n && !slice_test_zero(&c_lo[two_n1..]) {
             error = i;
         }
-        if (e >> i) & 1 == 1 {
+        if (e >> i).odd() {
             // Multiply A by B.
-            let carry =
-                limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut c[n - 1..2 * n - 1], a, big_b);
-            c[2 * n - 1] = carry;
-            f += h + width;
-            if c[2 * n - 1].get_highest_bit() {
-                a.copy_from_slice(&c[n..2 * n]);
+            let (c_last, c_init) = c.split_last_mut().unwrap();
+            let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut c_init[n - 1..], a, limb_b);
+            *c_last = carry;
+            f += h + const { Limb::WIDTH as i64 };
+            let (c_lo, c_hi) = c.split_at(n);
+            if c_hi.last().unwrap().get_highest_bit() {
+                a.copy_from_slice(c_hi);
                 if error != t {
                     err_s_ab += 1;
                 }
             } else {
-                shift_a_left_one_bit(a, &c, n, &mut f);
+                limbs_shl_to_out(a, c_hi, 1);
+                a[0] |= Limb::from(c_lo.last().unwrap().get_highest_bit());
+                f -= 1;
             }
-            if error == t && c[n - 1] != 0 {
+            if error == t && *c_lo.last().unwrap() != 0 {
                 error = i;
             }
         }
     }
-    if error == t {
-        (f, -1) // the result is exact
-    } else {
-        (f, error + err_s_ab + err_s_a2 / 2 + 3)
-    }
+    (
+        f,
+        if error == t {
+            -1 // the result is exact
+        } else {
+            error + err_s_ab + (err_s_a2 >> 1) + 3
+        },
+    )
 }

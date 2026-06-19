@@ -72,6 +72,7 @@ fn verify_limbs_float_exp(out_len: usize, b: u64, e: u64) -> (i64, i32) {
 
 #[test]
 fn test_limbs_float_exp() {
+    #[cfg(not(feature = "32_bit_limbs"))]
     fn test(n: usize, b: u64, e: u64, out: &[Limb], exp: i64, err: i32) {
         let mut a = vec![0; n];
         let (actual_exp, actual_err) = limbs_float_exp(&mut a, b, i64::exact_from(e));
@@ -80,6 +81,7 @@ fn test_limbs_float_exp() {
         assert_eq!(actual_err, err);
         verify_limbs_float_exp(n, b, e);
     }
+
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         // - exact first time (e == 1, so the loop is never entered)
