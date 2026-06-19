@@ -386,12 +386,12 @@ pub fn limbs_significand_slice_add_limb_in_place(xs: &mut [Limb], y: Limb) -> bo
 
 // Computes an approximation to `b ^ e` in `{a, n}`, where `n` is `a.len()`, returning the pair
 // `(exp, err)`. The computed value is rounded toward zero (truncated), and `a * 2 ^ exp` represents
-// it, where `a` is the integer `a[0] + a[1] * B + ... + a[n - 1] * B ^ (n - 1)` with
-// `B = 2 ^ Limb::WIDTH`.
+// it, where `a` is the integer `a[0] + a[1] * B + ... + a[n - 1] * B ^ (n - 1)` with `B = 2 ^
+// Limb::WIDTH`.
 //
-// `err` is an integer `f` such that the final error is bounded by `2 ^ f` ulps; that is,
-// `a * 2 ^ exp <= b ^ e <= 2 ^ exp * (a + 2 ^ f)`. `err` is -1 if the result is exact, or -2 if an
-// overflow occurred while computing `exp`.
+// `err` is an integer `f` such that the final error is bounded by `2 ^ f` ulps; that is, `a * 2 ^
+// exp <= b ^ e <= 2 ^ exp * (a + 2 ^ f)`. `err` is -1 if the result is exact, or -2 if an overflow
+// occurred while computing `exp`.
 //
 // `n` must be positive, `e` must be positive, and `b` must be between 2 and 62, inclusive.
 //
@@ -416,8 +416,8 @@ pub fn limbs_float_exp(a: &mut [Limb], b: u64, e: i64) -> (i64, i32) {
     let mut h = i64::from(big_b.leading_zeros());
     big_b <<= h;
     h = -h;
-    // Allocate space for the running square or product (and a scratch buffer large enough for any of
-    // the squarings below), and set A to B.
+    // Allocate space for the running square or product (and a scratch buffer large enough for any
+    // of the squarings below), and set A to B.
     let mut c: Vec<Limb> = vec![0; 2 * n];
     let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(n)];
     a[n - 1] = big_b;

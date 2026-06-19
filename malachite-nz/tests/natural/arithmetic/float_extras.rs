@@ -15,12 +15,12 @@ use malachite_nz::natural::arithmetic::float_extras::limbs_float_exp;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::unsigned_vec_unsigned_unsigned_triple_gen_var_17;
 
-// Runs `limbs_float_exp` on a buffer of length `out_len` and verifies its contract against the exact
-// value of `b ^ e`, returning the `(exp, err)` it produced.
+// Runs `limbs_float_exp` on a buffer of length `out_len` and verifies its contract against the
+// exact value of `b ^ e`, returning the `(exp, err)` it produced.
 //
 // Checks: the result is independent of the buffer's initial contents; the result is normalized (the
-// most significant bit of the top limb is set); and the enclosure
-// `a * 2 ^ exp <= b ^ e <= (a + 2 ^ err) * 2 ^ exp` holds, tightening to equality when `err == -1`.
+// most significant bit of the top limb is set); and the enclosure `a * 2 ^ exp <= b ^ e <= (a + 2 ^
+// err) * 2 ^ exp` holds, tightening to equality when `err == -1`.
 fn verify_limbs_float_exp(out_len: usize, b: u64, e: u64) -> (i64, i32) {
     let mut a = vec![0; out_len];
     let (exp, err) = limbs_float_exp(&mut a, b, i64::exact_from(e));
@@ -46,8 +46,8 @@ fn verify_limbs_float_exp(out_len: usize, b: u64, e: u64) -> (i64, i32) {
     } else {
         Natural::ZERO
     };
-    // Verify `a * 2 ^ exp <= b ^ e <= (a + 2 ^ err) * 2 ^ exp` exactly, scaling by a power of two to
-    // stay in the integers regardless of the sign of `exp`.
+    // Verify `a * 2 ^ exp <= b ^ e <= (a + 2 ^ err) * 2 ^ exp` exactly, scaling by a power of two
+    // to stay in the integers regardless of the sign of `exp`.
     if exp >= 0 {
         let s = u64::exact_from(exp);
         let lo = &big_a << s;
