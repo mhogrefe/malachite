@@ -385,40 +385,40 @@ pub fn limbs_significand_slice_add_limb_in_place(xs: &mut [Limb], y: Limb) -> bo
     limbs_slice_add_limb_in_place(xs, y)
 }
 
-// Computes an approximation to `b ^ e` in `{a, n}`, where `n` is `a.len()`, returning the pair
-// `(exp, err)`. The computed value is rounded toward zero (truncated), and `a * 2 ^ exp` represents
-// it, where `a` is the integer `a[0] + a[1] * B + ... + a[n - 1] * B ^ (n - 1)` with `B = 2 ^
-// Limb::WIDTH`.
+// Computes an approximation to `base ^ e` in `{xs, len}`, where `len` is `xs.len()`, returning the
+// pair `(exp, err)`. The computed value is rounded toward zero (truncated), and `xs * 2 ^ exp`
+// represents it, where `xs` is the integer `xs[0] + xs[1] * B + ... + xs[n - 1] * B ^ (n - 1)` with
+// `B = 2 ^ Limb::WIDTH`.
 //
-// `err` is an integer `f` such that the final error is bounded by `2 ^ f` ulps; that is, `a * 2 ^
-// exp <= b ^ e <= 2 ^ exp * (a + 2 ^ f)`. `err` is -1 if the result is exact, or -2 if an overflow
-// occurred while computing `exp`.
+// `err` is an integer `f` such that the final error is bounded by `2 ^ f` ulps; that is, `xs * 2 ^
+// exp <= base ^ e <= 2 ^ exp * (xs + 2 ^ f)`. `err` is -1 if the result is exact, or -2 if an
+// overflow occurred while computing `exp`.
 //
-// `n` must be positive, `e` must be positive, and `b` must be between 2 and 62, inclusive.
+// `len` must be positive, `e` must be positive, and `base` must be between 2 and 62, inclusive.
 //
 // This is equivalent to `mpfr_mpn_exp` from `mpn_exp.c`, MPFR 4.x.
 #[doc(hidden)]
-pub fn limbs_float_exp(a: &mut [Limb], b: u64, e: i64) -> (i64, i32) {
-    let n = a.len();
-    assert_ne!(n, 0);
+pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
+    let len = xs.len();
+    assert_ne!(len, 0);
     assert!(e > 0);
-    assert!(const { 2..=62 }.contains(&b));
-    let n_width = i64::exact_from(limb_to_bit_count(n));
+    assert!(const { 2..=62 }.contains(&base));
+    let bit_len = i64::exact_from(limb_to_bit_count(len));
     // Normalize the base.
-    let mut limb_b = Limb::exact_from(b);
-    let mut h = i64::from(limb_b.leading_zeros());
-    limb_b <<= h;
+    let mut limb_base = Limb::exact_from(base);
+    let mut h = i64::from(limb_base.leading_zeros());
+    limb_base <<= h;
     h.neg_assign();
     // Allocate space for the running square or product (and a scratch buffer large enough for any
-    // of the squarings below), and set A to B.
-    let two_n = n << 1;
-    let mut scratch = vec![0; two_n + limbs_square_to_out_scratch_len(n)];
-    let (c, square_scratch) = scratch.split_at_mut(two_n);
-    let (a_last, a_init) = a.split_last_mut().unwrap();
-    *a_last = limb_b;
-    a_init.fill(0);
-    // The initial exponent for A; the invariant is A = {a, n} * 2 ^ f.
-    let mut f = h - (n_width - const { Limb::WIDTH as i64 });
+    // of the squarings below), and set X to B.
+    let two_len = len << 1;
+    let mut scratch = vec![0; two_len + limbs_square_to_out_scratch_len(len)];
+    let (ys, square_scratch) = scratch.split_at_mut(two_len);
+    let (xs_last, xs_init) = xs.split_last_mut().unwrap();
+    *xs_last = limb_base;
+    xs_init.fill(0);
+    // The initial exponent for X; the invariant is X = {xs, len} * 2 ^ f.
+    let mut f = h - (bit_len - const { Limb::WIDTH as i64 });
     // The number of bits in e.
     let t = i32::exact_from(e.significant_bits());
     // `error == t` means that the result is still exact.
@@ -426,62 +426,65 @@ pub fn limbs_float_exp(a: &mut [Limb], b: u64, e: i64) -> (i64, i32) {
     let mut err_s_a2: i32 = 0; // number of left shifts when squaring after the first inexact loop
     let mut err_s_ab: i32 = 0; // number of left shifts when multiplying after the first inexact loop
     for i in (0..=t - 2).rev() {
-        // n1 is the number of zero low limbs of {a, n} (that is, mpn_scan1(a, 0) / Limb::WIDTH).
-        let n1 = slice_leading_zeros(a);
-        let two_n1 = n1 << 1;
-        // Square of A: {c + 2 * n1, 2 * (n - n1)} = {a + n1, n - n1} ^ 2.
+        // xs_zeros is the number of zero low limbs of {xs, len} (that is, mpn_scan1(xs, 0) /
+        // Limb::WIDTH).
+        let xs_zeros = slice_leading_zeros(xs);
+        let two_n1 = xs_zeros << 1;
+        // Square of X: {c + 2 * xs_zeros, 2 * (len - xs_zeros)} = {xs + xs_zeros, len - xs_zeros} ^
+        // 2.
         limbs_square_to_out(
-            &mut c[two_n1..],
-            &a[n1..],
-            &mut square_scratch[..limbs_square_to_out_scratch_len(n - n1)],
+            &mut ys[two_n1..],
+            &xs[xs_zeros..],
+            &mut square_scratch[..limbs_square_to_out_scratch_len(len - xs_zeros)],
         );
         // Check for overflow on f.
         if !const { i64::MIN >> 1..=i64::MAX >> 1 }.contains(&f) {
             return (f, -2);
         }
         f <<= 1;
-        if let Some(g) = f.checked_add(n_width) {
+        if let Some(g) = f.checked_add(bit_len) {
             f = g;
         } else {
             // Reachable only when `f` lands within `Limb::WIDTH / 2` below `i64::MAX / 2`, so that
-            // doubling and adding `n * Limb::WIDTH` overflows without the check above catching it
+            // doubling and adding `len * Limb::WIDTH` overflows without the check above catching it
             // first. Every overflow found by testing is caught by that check instead, so this arm
             // is untested.
             fail_on_untested_path("limbs_float_exp, f overflow in checked_add");
             return (f, -2);
         }
-        let (c_lo, c_hi) = c.split_at(n);
-        if c_hi.last().unwrap().get_highest_bit() {
-            a.copy_from_slice(c_hi);
+        let (ys_lo, ys_hi) = ys.split_at(len);
+        if ys_hi.last().unwrap().get_highest_bit() {
+            xs.copy_from_slice(ys_hi);
         } else {
-            limbs_shl_to_out(a, c_hi, 1);
-            a[0] |= Limb::from(c_lo.last().unwrap().get_highest_bit());
+            limbs_shl_to_out(xs, ys_hi, 1);
+            xs[0] |= Limb::from(ys_lo.last().unwrap().get_highest_bit());
             f -= 1;
             if error != t {
                 err_s_a2 += 1;
             }
         }
-        if error == t && two_n1 <= n && !slice_test_zero(&c_lo[two_n1..]) {
+        if error == t && two_n1 <= len && !slice_test_zero(&ys_lo[two_n1..]) {
             error = i;
         }
         if (e >> i).odd() {
             // Multiply A by B.
-            let (c_last, c_init) = c.split_last_mut().unwrap();
-            let carry = limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut c_init[n - 1..], a, limb_b);
-            *c_last = carry;
+            let (ys_last, ys_init) = ys.split_last_mut().unwrap();
+            let carry =
+                limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut ys_init[len - 1..], xs, limb_base);
+            *ys_last = carry;
             f += h + const { Limb::WIDTH as i64 };
-            let (c_lo, c_hi) = c.split_at(n);
-            if c_hi.last().unwrap().get_highest_bit() {
-                a.copy_from_slice(c_hi);
+            let (ys_lo, ys_hi) = ys.split_at(len);
+            if ys_hi.last().unwrap().get_highest_bit() {
+                xs.copy_from_slice(ys_hi);
                 if error != t {
                     err_s_ab += 1;
                 }
             } else {
-                limbs_shl_to_out(a, c_hi, 1);
-                a[0] |= Limb::from(c_lo.last().unwrap().get_highest_bit());
+                limbs_shl_to_out(xs, ys_hi, 1);
+                xs[0] |= Limb::from(ys_lo.last().unwrap().get_highest_bit());
                 f -= 1;
             }
-            if error == t && *c_lo.last().unwrap() != 0 {
+            if error == t && *ys_lo.last().unwrap() != 0 {
                 error = i;
             }
         }
