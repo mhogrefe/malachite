@@ -5,46 +5,46 @@ MAX_LINE_LENGTH = 100
 line_length_exceptions = set((
     # long Markdown table rows and/or links
     ('./malachite-base/src/lib.rs', 65),
-    ('./malachite-float/src/arithmetic/mod.rs', 46),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 339),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 340),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1340),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1580),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1581),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1582),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1583),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 386),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 387),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1387),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1627),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1628),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1629),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1630),
     ('./malachite-base/src/num/arithmetic/primorial.rs', 85),
     ('./malachite-base/src/num/arithmetic/primorial.rs', 244),
     ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 118),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 153),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 155),
     ('./malachite-base/src/num/exhaustive/mod.rs', 1074),
+    ('./malachite-float/src/arithmetic/mod.rs', 73),
     ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 478),
     ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 682),
     ('./malachite-float/src/conversion/mod.rs', 227),
     ('./malachite-float/src/lib.rs', 24),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 41),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 42),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 43),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 78),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 79),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 90),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 91),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 92),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 121),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 123),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 44),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 45),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 46),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 81),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 82),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 93),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 94),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 95),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 124),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 126),
     ('./malachite-nz/src/lib.rs', 36),
     ('./malachite-nz/src/lib.rs', 103),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 48),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 49),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 50),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 164),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 165),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 188),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 189),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 190),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 573),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 575),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 51),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 52),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 53),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 167),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 168),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 191),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 192),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 193),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 576),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 578),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 526),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 528),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 827),
@@ -52,14 +52,39 @@ line_length_exceptions = set((
     ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 323),
     ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 508),
     ('./malachite-nz/src/natural/conversion/mod.rs', 257),
-    ('./malachite-q/src/arithmetic/mod.rs', 63),
-    ('./malachite-q/src/arithmetic/mod.rs', 64),
-    ('./malachite-q/src/arithmetic/mod.rs', 95),
-    ('./malachite-q/src/arithmetic/mod.rs', 97),
+    ('./malachite-q/src/arithmetic/mod.rs', 67),
+    ('./malachite-q/src/arithmetic/mod.rs', 68),
+    ('./malachite-q/src/arithmetic/mod.rs', 99),
+    ('./malachite-q/src/arithmetic/mod.rs', 101),
     ('./malachite-q/src/conversion/string/from_sci_string.rs', 145),
     ('./malachite-q/src/conversion/string/from_sci_string.rs', 232),
     ('./malachite-q/src/lib.rs', 54),
 ))
+
+# Lines where `*_prec_round*(.., Nearest)` is intentional and should not be rewritten to the
+# `*_prec*` shorthand. Like `line_length_exceptions`, this list can't go stale: an entry that no
+# longer corresponds to a flagged line is itself an error (see the staleness check at the bottom).
+redundant_nearest_exceptions = set((
+    # The `LogBase`/`LogBaseAssign` trait impls (`log_base` value and reference, and
+    # `log_base_assign`) intentionally delegate via the explicit `_prec_round*(.., Nearest)` form.
+    # The lint's name-based exemptions only cover the shorthand's own body and operator/assign
+    # impls, not these trait methods (whose names differ from the `log_base_float_base` base).
+    ('./malachite-float/src/arithmetic/log_base_float_base_1_plus_x.rs', 617),
+    ('./malachite-float/src/arithmetic/log_base_float_base.rs', 588),
+    ('./malachite-float/src/arithmetic/log_base_float_base.rs', 623),
+    ('./malachite-float/src/arithmetic/log_base_float_base.rs', 653),
+    ('./malachite-float/src/arithmetic/log_base_float_base_1_plus_x.rs', 652),
+    ('./malachite-float/src/arithmetic/log_base_float_base_1_plus_x.rs', 682),
+    ('./malachite-float/src/arithmetic/log_base_rational_base.rs', 593),
+    ('./malachite-float/src/arithmetic/log_base_rational_base.rs', 634),
+    ('./malachite-float/src/arithmetic/log_base_rational_base.rs', 673),
+    ('./malachite-float/src/arithmetic/log_base_rational_base_1_plus_x.rs', 584),
+    ('./malachite-float/src/arithmetic/log_base_rational_base_1_plus_x.rs', 624),
+    ('./malachite-float/src/arithmetic/log_base_rational_base_1_plus_x.rs', 659),
+))
+
+# Populated as exceptions are hit; any left over once all files are checked are stale.
+unused_redundant_nearest_exceptions = set(redundant_nearest_exceptions)
 
 import re
 
@@ -119,6 +144,9 @@ def redundant_nearest_lint(filename, source):
                 args += ' '
             last_arg = args.rsplit(',', 1)[-1].strip()
             if last_arg == 'Nearest':
+                if (filename, i) in redundant_nearest_exceptions:
+                    unused_redundant_nearest_exceptions.discard((filename, i))
+                    continue
                 raise ValueError(
                     f'redundant Nearest: {filename}: {i}: use `{shorthand}` instead of '
                     f'`{callee}(.., Nearest)`'
@@ -152,4 +180,9 @@ filename_list.sort()
 line_count = 0
 for filename in filename_list:
     line_count += lint(filename)
+if unused_redundant_nearest_exceptions:
+    raise ValueError(
+        'stale redundant-Nearest exceptions (no longer flagged): '
+        f'{sorted(unused_redundant_nearest_exceptions)}'
+    )
 print(f'{line_count} lines checked')

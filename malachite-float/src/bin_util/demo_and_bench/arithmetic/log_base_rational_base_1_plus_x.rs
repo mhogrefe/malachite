@@ -13,7 +13,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::arithmetic::log_base_rational_base_1_plus_x::primitive_float_log_base_rational_base_1_plus_x;
+use malachite_float::arithmetic::log_base_rational_base_1_plus_x::*;
 use malachite_float::test_util::bench::bucketers::{
     quadruple_1_2_3_float_rational_primitive_int_max_complexity_bucketer,
     triple_1_2_float_rational_max_complexity_bucketer,

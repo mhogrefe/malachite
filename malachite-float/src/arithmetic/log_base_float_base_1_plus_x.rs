@@ -318,13 +318,13 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) =
-    ///     (&Float::from(7)).log_base_float_base_1_plus_x_prec_round_ref(&Float::from(2), 10, Exact);
+    /// let x = Float::from(7);
+    /// let (log, o) = x.log_base_float_base_1_plus_x_prec_round_ref(&Float::from(2), 10, Exact);
     /// assert_eq!(log.to_string(), "3.0"); // log_2(1 + 7) = log_2(8) = 3
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) =
-    ///     (&Float::from(1)).log_base_float_base_1_plus_x_prec_round_ref(&Float::from(3), 20, Floor);
+    /// let x = Float::from(1);
+    /// let (log, o) = x.log_base_float_base_1_plus_x_prec_round_ref(&Float::from(3), 20, Floor);
     /// assert_eq!(log.to_string(), "0.630929"); // log_3(2), rounded down
     /// assert_eq!(o, Less);
     /// ```
@@ -641,7 +641,9 @@ impl LogBaseOf1PlusX<&Float> for &Float {
     ///
     /// // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(
-    ///     (&Float::from(8)).log_base_1_plus_x(&Float::from(3)).to_string(),
+    ///     (&Float::from(8))
+    ///         .log_base_1_plus_x(&Float::from(3))
+    ///         .to_string(),
     ///     "2.0"
     /// );
     /// ```
@@ -720,7 +722,7 @@ impl LogBaseOf1PlusXAssign<&Self> for Float {
 /// ```
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::log_base_float_base_1_plus_x::primitive_float_log_base_float_base_1_plus_x;
+/// use malachite_float::arithmetic::log_base_float_base_1_plus_x::*;
 ///
 /// // log_4(1 + 3) = log_4(4) = 1
 /// assert_eq!(

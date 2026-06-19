@@ -1512,8 +1512,14 @@ impl LogBase2Assign for Float {
 ///     NiceFloat(primitive_float_log_base_2(0.0f32)),
 ///     NiceFloat(f32::NEGATIVE_INFINITY)
 /// );
-/// assert_eq!(NiceFloat(primitive_float_log_base_2(8.0f32)), NiceFloat(3.0));
-/// assert_eq!(NiceFloat(primitive_float_log_base_2(10.0f32)), NiceFloat(3.321928));
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_2(8.0f32)),
+///     NiceFloat(3.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_2(10.0f32)),
+///     NiceFloat(3.321928)
+/// );
 /// assert!(primitive_float_log_base_2(-10.0f32).is_nan());
 /// ```
 #[inline]
@@ -1568,11 +1574,15 @@ where
 ///     NiceFloat(-1.584962500721156)
 /// );
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_2_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(primitive_float_log_base_2_rational::<f64>(&Rational::from(
+///         10000
+///     ))),
 ///     NiceFloat(13.287712379549449)
 /// );
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_2_rational::<f64>(&Rational::from(-10000))),
+///     NiceFloat(primitive_float_log_base_2_rational::<f64>(&Rational::from(
+///         -10000
+///     ))),
 ///     NiceFloat(f64::NAN)
 /// );
 /// ```

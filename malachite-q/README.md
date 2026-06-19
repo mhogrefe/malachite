@@ -85,6 +85,6 @@ browsing through
 - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
   takes a long time to build. Enabling this feature also enables `test_build` and `random`.
 
-Malachite is developed by Mikhail Hogrefe. Thanks to b4D8, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, shekohex, and skycloudd for additional contributions.
+Malachite is developed by Mikhail Hogrefe. Thanks to 43615, b4D8, Romain Billot, Maxim Biryukov, coolreader18, Dasaav-dsv, Duncan Freeman, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, Kevin Phoenix, probablykasper, shekohex, skycloudd, John Vandenberg, Brandon Weeks, and Will Youmans for additional contributions.
 
 Copyright © 2026 Mikhail Hogrefe

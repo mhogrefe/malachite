@@ -17,7 +17,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
 use malachite_float::arithmetic::log_base_1_plus_x::primitive_float_log_base_1_plus_x;
-use malachite_float::arithmetic::log_base_rational_base_1_plus_x::primitive_float_log_base_rational_base_1_plus_x;
+use malachite_float::arithmetic::log_base_rational_base_1_plus_x::*;
 use malachite_float::test_util::arithmetic::log_base_rational_base_1_plus_x::{
     rug_log_base_rational_base_1_plus_x, rug_log_base_rational_base_1_plus_x_prec,
     rug_log_base_rational_base_1_plus_x_prec_round, rug_log_base_rational_base_1_plus_x_round,
@@ -205,7 +205,9 @@ fn test_log_base_rational_base_1_plus_x_round() {
         }
     };
     // Exact results that fit in the input's precision (across all rounding modes).
-    test(8, 1, 3, 1, Floor, "2.0", Equal); // log_3(9) = 2 (2.0 is representable at x = 8's precision)
+
+    // log_3(9) = 2 (2.0 is representable at x = 8's precision)
+    test(8, 1, 3, 1, Floor, "2.0", Equal);
     test(8, 1, 3, 1, Ceiling, "2.0", Equal);
     test(8, 1, 3, 1, Nearest, "2.0", Equal);
     test(8, 1, 3, 1, Down, "2.0", Equal);

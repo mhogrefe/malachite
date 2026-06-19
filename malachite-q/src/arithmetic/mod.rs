@@ -27,8 +27,9 @@ pub mod ceiling;
 pub mod denominators_in_closed_interval;
 /// Division of [`Rational`](super::Rational)s.
 pub mod div;
-/// Implementation of [`ExpressAsPower`](malachite_base::num::factorization::traits::ExpressAsPower),
-/// a trait for expressing a number as a perfect power.
+/// Implementation of
+/// [`ExpressAsPower`](malachite_base::num::factorization::traits::ExpressAsPower), a trait for
+/// expressing a number as a perfect power.
 pub mod express_as_power;
 /// Implementations of [`Floor`](malachite_base::num::arithmetic::traits::Floor) and
 /// [`FloorAssign`](malachite_base::num::arithmetic::traits::FloorAssign), traits for taking the

@@ -190,13 +190,19 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) =
-    ///     Float::from(3).log_base_rational_base_1_plus_x_prec_round(&Rational::from(4), 10, Exact);
+    /// let (log, o) = Float::from(3).log_base_rational_base_1_plus_x_prec_round(
+    ///     &Rational::from(4),
+    ///     10,
+    ///     Exact,
+    /// );
     /// assert_eq!(log.to_string(), "1.0"); // log_4(1 + 3) = log_4(4) = 1
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) =
-    ///     Float::from(1).log_base_rational_base_1_plus_x_prec_round(&Rational::from(4), 10, Exact);
+    /// let (log, o) = Float::from(1).log_base_rational_base_1_plus_x_prec_round(
+    ///     &Rational::from(4),
+    ///     10,
+    ///     Exact,
+    /// );
     /// assert_eq!(log.to_string(), "0.5"); // log_4(1 + 1) = log_4(2) = 1/2
     /// assert_eq!(o, Equal);
     /// ```
@@ -244,13 +250,19 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = (&Float::from(8))
-    ///     .log_base_rational_base_1_plus_x_prec_round_ref(&Rational::from(3), 10, Exact);
+    /// let (log, o) = (&Float::from(8)).log_base_rational_base_1_plus_x_prec_round_ref(
+    ///     &Rational::from(3),
+    ///     10,
+    ///     Exact,
+    /// );
     /// assert_eq!(log.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = (&Float::from(1))
-    ///     .log_base_rational_base_1_plus_x_prec_round_ref(&Rational::from(3), 20, Floor);
+    /// let (log, o) = (&Float::from(1)).log_base_rational_base_1_plus_x_prec_round_ref(
+    ///     &Rational::from(3),
+    ///     20,
+    ///     Floor,
+    /// );
     /// assert_eq!(log.to_string(), "0.630929"); // log_3(2), rounded down
     /// assert_eq!(o, Less);
     /// ```
@@ -365,7 +377,8 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = Float::from(8).log_base_rational_base_1_plus_x_round(&Rational::from(3), Exact);
+    /// let (log, o) =
+    ///     Float::from(8).log_base_rational_base_1_plus_x_round(&Rational::from(3), Exact);
     /// assert_eq!(log.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(o, Equal);
     /// ```
@@ -559,7 +572,9 @@ impl LogBaseOf1PlusX<Rational> for Float {
     ///
     /// // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(
-    ///     Float::from(8).log_base_1_plus_x(Rational::from(3)).to_string(),
+    ///     Float::from(8)
+    ///         .log_base_1_plus_x(Rational::from(3))
+    ///         .to_string(),
     ///     "2.0"
     /// );
     /// ```
@@ -598,7 +613,9 @@ impl LogBaseOf1PlusX<&Rational> for &Float {
     ///
     /// // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(
-    ///     (&Float::from(8)).log_base_1_plus_x(&Rational::from(3)).to_string(),
+    ///     (&Float::from(8))
+    ///         .log_base_1_plus_x(&Rational::from(3))
+    ///         .to_string(),
     ///     "2.0"
     /// );
     /// ```
@@ -680,10 +697,12 @@ impl LogBaseOf1PlusXAssign<&Rational> for Float {
 /// ```
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::log_base_rational_base_1_plus_x::primitive_float_log_base_rational_base_1_plus_x;
+/// use malachite_float::arithmetic::log_base_rational_base_1_plus_x::*;
 /// use malachite_q::Rational;
 ///
-/// assert!(primitive_float_log_base_rational_base_1_plus_x(f32::NAN, &Rational::from(10)).is_nan());
+/// assert!(
+///     primitive_float_log_base_rational_base_1_plus_x(f32::NAN, &Rational::from(10)).is_nan()
+/// );
 /// assert_eq!(
 ///     NiceFloat(primitive_float_log_base_rational_base_1_plus_x(
 ///         f32::INFINITY,
@@ -701,12 +720,18 @@ impl LogBaseOf1PlusXAssign<&Rational> for Float {
 /// assert!(primitive_float_log_base_rational_base_1_plus_x(-2.0f32, &Rational::from(10)).is_nan());
 /// // log_4(1 + 3) = log_4(4) = 1
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational_base_1_plus_x(3.0f32, &Rational::from(4))),
+///     NiceFloat(primitive_float_log_base_rational_base_1_plus_x(
+///         3.0f32,
+///         &Rational::from(4)
+///     )),
 ///     NiceFloat(1.0)
 /// );
 /// // log_4(1 + 1) = log_4(2) = 1/2
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational_base_1_plus_x(1.0f32, &Rational::from(4))),
+///     NiceFloat(primitive_float_log_base_rational_base_1_plus_x(
+///         1.0f32,
+///         &Rational::from(4)
+///     )),
 ///     NiceFloat(0.5)
 /// );
 /// // log_(3/2)(1 + 1/2) = log_(3/2)(3/2) = 1

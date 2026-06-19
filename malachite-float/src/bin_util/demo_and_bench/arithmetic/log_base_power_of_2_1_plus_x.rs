@@ -17,7 +17,7 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_signed_pair_gen_var_4;
 use malachite_base::test_util::runner::Runner;
-use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::primitive_float_log_base_power_of_2_1_plus_x;
+use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::*;
 use malachite_float::test_util::arithmetic::log_base_power_of_2_1_plus_x::{
     rug_log_base_power_of_2_1_plus_x, rug_log_base_power_of_2_1_plus_x_prec_round,
     rug_log_base_power_of_2_1_plus_x_round,

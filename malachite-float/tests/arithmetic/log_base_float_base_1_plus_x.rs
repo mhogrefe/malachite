@@ -20,8 +20,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
     primitive_float_pair_gen, unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::arithmetic::log_base_float_base_1_plus_x::primitive_float_log_base_float_base_1_plus_x;
-use malachite_float::arithmetic::log_base_rational_base_1_plus_x::primitive_float_log_base_rational_base_1_plus_x;
+use malachite_float::arithmetic::log_base_float_base_1_plus_x::*;
+use malachite_float::arithmetic::log_base_rational_base_1_plus_x::*;
 use malachite_float::test_util::arithmetic::log_base_float_base_1_plus_x::{
     rug_log_base_float_base_1_plus_x, rug_log_base_float_base_1_plus_x_prec,
     rug_log_base_float_base_1_plus_x_prec_round, rug_log_base_float_base_1_plus_x_round,

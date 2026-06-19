@@ -80,8 +80,8 @@ fn express_as_power_properties() {
     });
 
     rational_unsigned_pair_gen_var_4::<u64>().test_properties(|(x, y)| {
-        // x^y is a perfect power for y > 1, except when x is +-1 or 0 (giving +-1 or 0, which lack a
-        // maximal exponent or are the special cases).
+        // x^y is a perfect power for y > 1, except when x is +-1 or 0 (giving +-1 or 0, which lack
+        // a maximal exponent or are the special cases).
         if y > 1 && x != 0u32 && x != 1u32 && x != -1i32 {
             let power = (&x).pow(y);
             let (p, e) = power.express_as_power().unwrap();

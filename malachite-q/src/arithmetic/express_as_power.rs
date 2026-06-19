@@ -61,19 +61,27 @@ impl ExpressAsPower for Rational {
     ///     "Some((2, 3))"
     /// );
     /// assert_eq!(
-    ///     Rational::from_unsigneds(9u32, 4).express_as_power().to_debug_string(),
+    ///     Rational::from_unsigneds(9u32, 4)
+    ///         .express_as_power()
+    ///         .to_debug_string(),
     ///     "Some((3/2, 2))"
     /// );
     /// assert_eq!(
-    ///     Rational::from_unsigneds(1u32, 9).express_as_power().to_debug_string(),
+    ///     Rational::from_unsigneds(1u32, 9)
+    ///         .express_as_power()
+    ///         .to_debug_string(),
     ///     "Some((1/3, 2))"
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(-1, 8).express_as_power().to_debug_string(),
+    ///     Rational::from_signeds(-1, 8)
+    ///         .express_as_power()
+    ///         .to_debug_string(),
     ///     "Some((-1/2, 3))"
     /// );
     /// assert_eq!(
-    ///     Rational::from_unsigneds(3u32, 2).express_as_power().to_debug_string(),
+    ///     Rational::from_unsigneds(3u32, 2)
+    ///         .express_as_power()
+    ///         .to_debug_string(),
     ///     "None"
     /// );
     /// ```
@@ -84,9 +92,9 @@ impl ExpressAsPower for Rational {
         }
         let positive = *self > 0u32;
         let (numerator, denominator) = self.numerator_and_denominator_ref();
-        // `self` is a perfect `e`th power iff both its numerator and denominator are, so the largest
-        // valid `e` is the gcd of their individual perfect-power exponents. A unit (1) imposes no
-        // constraint, so it is skipped.
+        // `self` is a perfect `e`th power iff both its numerator and denominator are, so the
+        // largest valid `e` is the gcd of their individual perfect-power exponents. A unit (1)
+        // imposes no constraint, so it is skipped.
         let e = match (
             unit_or_perfect_power_exponent(numerator),
             unit_or_perfect_power_exponent(denominator),
@@ -102,8 +110,8 @@ impl ExpressAsPower for Rational {
         if e <= 1 {
             return None;
         }
-        // `e` divides both the numerator's and denominator's perfect-power exponents, so the root is
-        // exact (and correctly signed for a negative `self` with odd `e`).
+        // `e` divides both the numerator's and denominator's perfect-power exponents, so the root
+        // is exact (and correctly signed for a negative `self` with odd `e`).
         Some((self.checked_root(e).unwrap(), e))
     }
 }

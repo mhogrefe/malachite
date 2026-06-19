@@ -17,12 +17,12 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
 use malachite_float::arithmetic::log_base::primitive_float_log_base_rational;
-use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
+use malachite_float::arithmetic::log_base_rational_rational_base::*;
 use malachite_float::test_util::arithmetic::log_base_rational_rational_base::{
     rug_log_base_rational_rational_base_prec, rug_log_base_rational_rational_base_prec_round,
 };
 use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
-use malachite_float::test_util::generators::rational_rational_unsigned_rounding_mode_quadruple_gen_var_2;
+use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
 use std::panic::catch_unwind;

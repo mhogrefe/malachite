@@ -21,7 +21,7 @@ macro_rules! impl_div_euclidean {
             ///
             /// $$
             /// f(x, y) = \left ( \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor,
-            /// \space x - y \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor \right ).
+            /// \space x-y \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor \right).
             /// $$
             ///
             /// For unsigned integers, `div_euclidean` is equivalent to

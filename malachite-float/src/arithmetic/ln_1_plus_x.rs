@@ -1145,8 +1145,14 @@ impl Ln1PlusXAssign for Float {
 ///     NiceFloat(f32::NEGATIVE_INFINITY)
 /// );
 /// assert!(primitive_float_ln_1_plus_x(-2.0f32).is_nan());
-/// assert_eq!(NiceFloat(primitive_float_ln_1_plus_x(1.0f32)), NiceFloat(0.6931472));
-/// assert_eq!(NiceFloat(primitive_float_ln_1_plus_x(7.0f32)), NiceFloat(2.0794415));
+/// assert_eq!(
+///     NiceFloat(primitive_float_ln_1_plus_x(1.0f32)),
+///     NiceFloat(0.6931472)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_ln_1_plus_x(7.0f32)),
+///     NiceFloat(2.0794415)
+/// );
 /// ```
 #[inline]
 #[allow(clippy::type_repetition_in_bounds)]

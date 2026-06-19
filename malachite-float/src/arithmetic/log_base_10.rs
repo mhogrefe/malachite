@@ -807,7 +807,10 @@ impl LogBase10Assign for Float {
 ///     NiceFloat(f32::NEGATIVE_INFINITY)
 /// );
 /// // log_10(1000) = 3
-/// assert_eq!(NiceFloat(primitive_float_log_base_10(1000.0f32)), NiceFloat(3.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base_10(1000.0f32)),
+///     NiceFloat(3.0)
+/// );
 /// // log_10(50)
 /// assert_eq!(
 ///     NiceFloat(primitive_float_log_base_10(50.0f32)),
@@ -865,7 +868,9 @@ where
 /// );
 /// // log_10(1000) = 3
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_10_rational::<f64>(&Rational::from(1000))),
+///     NiceFloat(primitive_float_log_base_10_rational::<f64>(
+///         &Rational::from(1000)
+///     )),
 ///     NiceFloat(3.0)
 /// );
 /// // log_10(1/3)
@@ -876,7 +881,9 @@ where
 ///     NiceFloat(-0.47712125471966244)
 /// );
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_10_rational::<f64>(&Rational::from(-1000))),
+///     NiceFloat(primitive_float_log_base_10_rational::<f64>(
+///         &Rational::from(-1000)
+///     )),
 ///     NiceFloat(f64::NAN)
 /// );
 /// ```

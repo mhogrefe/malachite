@@ -377,7 +377,7 @@ impl Float {
 /// ```
 /// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
+/// use malachite_float::arithmetic::log_base_rational_rational_base::*;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(

@@ -419,11 +419,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = Float::from_unsigned_prec(10u32, 100).0.log_base_power_of_2_prec(2, 5);
+    /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
+    ///     .0
+    ///     .log_base_power_of_2_prec(2, 5);
     /// assert_eq!(log.to_string(), "1.7");
     /// assert_eq!(o, Greater);
     ///
-    /// let (log, o) = Float::from_unsigned_prec(10u32, 100).0.log_base_power_of_2_prec(3, 20);
+    /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
+    ///     .0
+    ///     .log_base_power_of_2_prec(3, 20);
     /// assert_eq!(log.to_string(), "1.107309");
     /// assert_eq!(o, Less);
     /// ```
@@ -729,11 +733,17 @@ impl Float {
     /// assert_eq!(x.to_string(), "1.62");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
-    /// assert_eq!(x.log_base_power_of_2_prec_round_assign(2, 5, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.log_base_power_of_2_prec_round_assign(2, 5, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "1.7");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
-    /// assert_eq!(x.log_base_power_of_2_prec_round_assign(2, 5, Nearest), Greater);
+    /// assert_eq!(
+    ///     x.log_base_power_of_2_prec_round_assign(2, 5, Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "1.7");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
@@ -741,11 +751,17 @@ impl Float {
     /// assert_eq!(x.to_string(), "1.107309");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
-    /// assert_eq!(x.log_base_power_of_2_prec_round_assign(3, 20, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.log_base_power_of_2_prec_round_assign(3, 20, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "1.107311");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
-    /// assert_eq!(x.log_base_power_of_2_prec_round_assign(3, 20, Nearest), Less);
+    /// assert_eq!(
+    ///     x.log_base_power_of_2_prec_round_assign(3, 20, Nearest),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "1.107309");
     /// ```
     #[inline]
@@ -1298,12 +1314,10 @@ impl LogBasePowerOf2<i64> for Float {
     ///         .to_string(),
     ///     "1.660964047443681173935159714745"
     /// );
-    /// assert!(
-    ///     Float::from_signed_prec(-10, 100)
-    ///         .0
-    ///         .log_base_power_of_2(2)
-    ///         .is_nan()
-    /// );
+    /// assert!(Float::from_signed_prec(-10, 100)
+    ///     .0
+    ///     .log_base_power_of_2(2)
+    ///     .is_nan());
     /// ```
     #[inline]
     fn log_base_power_of_2(self, pow: i64) -> Self {
@@ -1381,11 +1395,9 @@ impl LogBasePowerOf2<i64> for &Float {
     ///         .to_string(),
     ///     "1.660964047443681173935159714745"
     /// );
-    /// assert!(
-    ///     (&Float::from_signed_prec(-10, 100).0)
-    ///         .log_base_power_of_2(2)
-    ///         .is_nan()
-    /// );
+    /// assert!((&Float::from_signed_prec(-10, 100).0)
+    ///     .log_base_power_of_2(2)
+    ///     .is_nan());
     /// ```
     #[inline]
     fn log_base_power_of_2(self, pow: i64) -> Float {
@@ -1579,15 +1591,21 @@ where
 /// ```
 /// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::log_base_power_of_2::primitive_float_log_base_power_of_2_rational;
+/// use malachite_float::arithmetic::log_base_power_of_2::*;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(&Rational::ZERO, 2)),
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(
+///         &Rational::ZERO,
+///         2
+///     )),
 ///     NiceFloat(f64::NEGATIVE_INFINITY)
 /// );
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(&Rational::ZERO, -2)),
+///     NiceFloat(primitive_float_log_base_power_of_2_rational::<f64>(
+///         &Rational::ZERO,
+///         -2
+///     )),
 ///     NiceFloat(f64::INFINITY)
 /// );
 /// // log_4(1/3)

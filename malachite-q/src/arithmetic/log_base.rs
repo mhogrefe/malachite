@@ -23,7 +23,7 @@ use malachite_nz::natural::Natural;
 
 fn approx_log_helper(x: &Rational) -> f64 {
     let (mantissa, exponent): (f64, i64) = x.sci_mantissa_and_exponent();
-    mantissa.ln() + (exponent as f64) * core::f64::consts::LN_2
+    libm::log(mantissa) + (exponent as f64) * core::f64::consts::LN_2
 }
 
 impl Rational {
@@ -183,11 +183,12 @@ fn log_base_u64_helper(x: &Rational, base: u64) -> (i64, bool) {
     }
 }
 
-// Returns the unique `a >= 1` with `xn == bn^a` and `xd == bd^a`, or `None` if there is no such `a`.
-// `bn` and `bd` must be unequal (so at least one is at least 2) and all four arguments positive. The
-// candidate exponent is read off from whichever base component is at least 2 -- so no logarithm is
-// ever taken to base 1 -- and is then verified against both components. Each `pow` is bounded by the
-// inputs' bit lengths, never by `a`, so this does not balloon when the base is near 1.
+// Returns the unique `a >= 1` with `xn == bn^a` and `xd == bd^a`, or `None` if there is no such
+// `a`. `bn` and `bd` must be unequal (so at least one is at least 2) and all four arguments
+// positive. The candidate exponent is read off from whichever base component is at least 2 -- so no
+// logarithm is ever taken to base 1 -- and is then verified against both components. Each `pow` is
+// bounded by the inputs' bit lengths, never by `a`, so this does not balloon when the base is near
+// 1.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -391,9 +392,9 @@ impl CheckedLogBase<&Rational> for &Rational {
         // Unlike `floor_log_base`/`ceiling_log_base`, deciding whether `self` is an exact power of
         // `base` needs no power scan -- which would balloon for a `base` near 1, where the exponent
         // is enormous. Writing `self = n / d` and `base = p / q` in lowest terms, `gcd(p, q) = 1`
-        // makes `base^a = p^a / q^a` already reduced, so `self = base^a` forces `n = p^a` and
-        // `d = q^a` for `a >= 0`, or `n = q^m` and `d = p^m` for `a = -m < 0`. Each candidate
-        // exponent comes from an integer logarithm, bounded by `self`'s bit length, not by `a`.
+        // makes `base^a = p^a / q^a` already reduced, so `self = base^a` forces `n = p^a` and `d =
+        // q^a` for `a >= 0`, or `n = q^m` and `d = p^m` for `a = -m < 0`. Each candidate exponent
+        // comes from an integer logarithm, bounded by `self`'s bit length, not by `a`.
         let n = self.numerator_ref();
         let d = self.denominator_ref();
         let p = base.numerator_ref();
@@ -478,7 +479,10 @@ impl CeilingLogBase<u64> for &Rational {
     ///     Rational::from_signeds(936851431250i64, 1397).ceiling_log_base(10u64),
     ///     9
     /// );
-    /// assert_eq!(Rational::from_signeds(1, 1000000).ceiling_log_base(10u64), -6);
+    /// assert_eq!(
+    ///     Rational::from_signeds(1, 1000000).ceiling_log_base(10u64),
+    ///     -6
+    /// );
     /// ```
     fn ceiling_log_base(self, base: u64) -> i64 {
         assert!(*self > 0u32);
@@ -524,7 +528,10 @@ impl CheckedLogBase<u64> for &Rational {
     /// assert_eq!(Rational::from(82u32).checked_log_base(3u64), None);
     /// assert_eq!(Rational::from(4294967296u64).checked_log_base(10u64), None);
     /// assert_eq!(Rational::from(1000000u32).checked_log_base(10u64), Some(6));
-    /// assert_eq!(Rational::from_signeds(1, 1000000).checked_log_base(10u64), Some(-6));
+    /// assert_eq!(
+    ///     Rational::from_signeds(1, 1000000).checked_log_base(10u64),
+    ///     Some(-6)
+    /// );
     /// ```
     fn checked_log_base(self, base: u64) -> Option<i64> {
         assert!(*self > 0u32);

@@ -838,12 +838,13 @@ impl LogBasePowerOf2Of1PlusX<i64> for Float {
     /// use malachite_float::Float;
     ///
     /// assert!(Float::NAN.log_base_power_of_2_1_plus_x(2).is_nan());
-    /// assert_eq!(Float::INFINITY.log_base_power_of_2_1_plus_x(2), Float::INFINITY);
-    /// assert!(
-    ///     Float::NEGATIVE_INFINITY
-    ///         .log_base_power_of_2_1_plus_x(2)
-    ///         .is_nan()
+    /// assert_eq!(
+    ///     Float::INFINITY.log_base_power_of_2_1_plus_x(2),
+    ///     Float::INFINITY
     /// );
+    /// assert!(Float::NEGATIVE_INFINITY
+    ///     .log_base_power_of_2_1_plus_x(2)
+    ///     .is_nan());
     /// assert_eq!(
     ///     Float::from_unsigned_prec(10u32, 100)
     ///         .0
@@ -911,11 +912,9 @@ impl LogBasePowerOf2Of1PlusX<i64> for &Float {
     ///     (&Float::INFINITY).log_base_power_of_2_1_plus_x(2),
     ///     Float::INFINITY
     /// );
-    /// assert!(
-    ///     (&Float::NEGATIVE_INFINITY)
-    ///         .log_base_power_of_2_1_plus_x(2)
-    ///         .is_nan()
-    /// );
+    /// assert!((&Float::NEGATIVE_INFINITY)
+    ///     .log_base_power_of_2_1_plus_x(2)
+    ///     .is_nan());
     /// assert_eq!(
     ///     (&Float::from_unsigned_prec(10u32, 100).0)
     ///         .log_base_power_of_2_1_plus_x(2)
@@ -973,7 +972,7 @@ impl LogBasePowerOf2Of1PlusXAssign<i64> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusXAssign;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
+    /// use malachite_base::num::basic::traits::{Infinity, NaN};
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::NAN;
@@ -1034,11 +1033,14 @@ impl LogBasePowerOf2Of1PlusXAssign<i64> for Float {
 /// ```
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::primitive_float_log_base_power_of_2_1_plus_x;
+/// use malachite_float::arithmetic::log_base_power_of_2_1_plus_x::*;
 ///
 /// assert!(primitive_float_log_base_power_of_2_1_plus_x(f32::NAN, 2).is_nan());
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(f32::INFINITY, 2)),
+///     NiceFloat(primitive_float_log_base_power_of_2_1_plus_x(
+///         f32::INFINITY,
+///         2
+///     )),
 ///     NiceFloat(f32::INFINITY)
 /// );
 /// assert_eq!(

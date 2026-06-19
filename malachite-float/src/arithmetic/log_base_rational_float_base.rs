@@ -250,8 +250,12 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) =
-    ///     Float::log_base_rational_float_base_prec_round(Rational::from(8), Float::from(4), 10, Exact);
+    /// let (log, o) = Float::log_base_rational_float_base_prec_round(
+    ///     Rational::from(8),
+    ///     Float::from(4),
+    ///     10,
+    ///     Exact,
+    /// );
     /// assert_eq!(log.to_string(), "1.5"); // log_4(8) = 3/2
     /// assert_eq!(o, Equal);
     ///
@@ -388,11 +392,8 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = Float::log_base_rational_float_base_prec_ref(
-    ///     &Rational::from(9),
-    ///     &Float::from(3),
-    ///     10,
-    /// );
+    /// let (log, o) =
+    ///     Float::log_base_rational_float_base_prec_ref(&Rational::from(9), &Float::from(3), 10);
     /// assert_eq!(log.to_string(), "2.0"); // log_3(9) = 2
     /// assert_eq!(o, Equal);
     /// ```
@@ -442,17 +443,23 @@ impl Float {
 /// # Examples
 /// ```
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::arithmetic::log_base_rational_float_base::primitive_float_log_base_rational_float_base;
+/// use malachite_float::arithmetic::log_base_rational_float_base::*;
 /// use malachite_q::Rational;
 ///
 /// // log_4(8) = 3/2
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational_float_base::<f32>(&Rational::from(8), 4.0)),
+///     NiceFloat(primitive_float_log_base_rational_float_base::<f32>(
+///         &Rational::from(8),
+///         4.0
+///     )),
 ///     NiceFloat(1.5)
 /// );
 /// // log_(1/2)(4) = -2
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational_float_base::<f32>(&Rational::from(4), 0.5)),
+///     NiceFloat(primitive_float_log_base_rational_float_base::<f32>(
+///         &Rational::from(4),
+///         0.5
+///     )),
 ///     NiceFloat(-2.0)
 /// );
 /// // log_10(1/3)
@@ -463,8 +470,12 @@ impl Float {
 ///     )),
 ///     NiceFloat(-0.47712126)
 /// );
-/// assert!(primitive_float_log_base_rational_float_base::<f32>(&Rational::from(-1), 10.0).is_nan());
-/// assert!(primitive_float_log_base_rational_float_base::<f32>(&Rational::from(8), f32::NAN).is_nan());
+/// assert!(
+///     primitive_float_log_base_rational_float_base::<f32>(&Rational::from(-1), 10.0).is_nan()
+/// );
+/// assert!(
+///     primitive_float_log_base_rational_float_base::<f32>(&Rational::from(8), f32::NAN).is_nan()
+/// );
 /// ```
 #[inline]
 #[allow(clippy::type_repetition_in_bounds)]

@@ -14,9 +14,9 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
-use malachite_float::arithmetic::log_base_rational_float_base::primitive_float_log_base_rational_float_base;
-use malachite_float::test_util::bench::bucketers::quadruple_1_2_3_rational_float_primitive_int_max_complexity_bucketer;
-use malachite_float::test_util::generators::rational_float_unsigned_rounding_mode_quadruple_gen_var_1;
+use malachite_float::arithmetic::log_base_rational_float_base::*;
+use malachite_float::test_util::bench::bucketers::*;
+use malachite_float::test_util::generators::*;
 use malachite_q::test_util::bench::bucketers::pair_1_rational_bit_bucketer;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 
@@ -173,7 +173,8 @@ fn benchmark_float_log_base_rational_float_base_prec_round_evaluation_strategy(
         &quadruple_1_2_3_rational_float_primitive_int_max_complexity_bucketer("x", "base", "prec"),
         &mut [
             (
-                "Float::log_base_rational_float_base_prec_round(Rational, Float, u64, RoundingMode)",
+                "Float::log_base_rational_float_base_prec_round(Rational, Float, u64, \
+                RoundingMode)",
                 &mut |(x, base, prec, rm)| {
                     no_out!(Float::log_base_rational_float_base_prec_round(
                         x, base, prec, rm

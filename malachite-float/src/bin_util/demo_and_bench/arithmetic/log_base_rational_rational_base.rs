@@ -14,9 +14,9 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloat;
 use malachite_float::Float;
-use malachite_float::arithmetic::log_base_rational_rational_base::primitive_float_log_base_rational_rational_base;
-use malachite_float::test_util::generators::rational_rational_unsigned_rounding_mode_quadruple_gen_var_2;
-use malachite_q::test_util::bench::bucketers::quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer;
+use malachite_float::arithmetic::log_base_rational_rational_base::*;
+use malachite_float::test_util::generators::*;
+use malachite_q::test_util::bench::bucketers::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_log_base_rational_rational_base_prec);

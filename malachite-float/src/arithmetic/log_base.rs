@@ -899,7 +899,10 @@ impl LogBaseAssign<u64> for Float {
 ///     NiceFloat(3.0)
 /// );
 /// // log_3(9) = 2
-/// assert_eq!(NiceFloat(primitive_float_log_base(9.0f32, 3)), NiceFloat(2.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_log_base(9.0f32, 3)),
+///     NiceFloat(2.0)
+/// );
 /// // log_10(50)
 /// assert_eq!(
 ///     NiceFloat(primitive_float_log_base(50.0f32, 10)),
@@ -955,12 +958,18 @@ where
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational::<f64>(&Rational::ZERO, 10)),
+///     NiceFloat(primitive_float_log_base_rational::<f64>(
+///         &Rational::ZERO,
+///         10
+///     )),
 ///     NiceFloat(f64::NEGATIVE_INFINITY)
 /// );
 /// // log_10(1000) = 3
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational::<f64>(&Rational::from(1000), 10)),
+///     NiceFloat(primitive_float_log_base_rational::<f64>(
+///         &Rational::from(1000),
+///         10
+///     )),
 ///     NiceFloat(3.0)
 /// );
 /// // log_3(1/9) = -2
@@ -980,7 +989,10 @@ where
 ///     NiceFloat(-0.47712125471966244)
 /// );
 /// assert_eq!(
-///     NiceFloat(primitive_float_log_base_rational::<f64>(&Rational::from(-1000), 10)),
+///     NiceFloat(primitive_float_log_base_rational::<f64>(
+///         &Rational::from(-1000),
+///         10
+///     )),
 ///     NiceFloat(f64::NAN)
 /// );
 /// ```

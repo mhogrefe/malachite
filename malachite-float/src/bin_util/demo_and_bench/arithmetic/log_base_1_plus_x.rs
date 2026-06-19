@@ -541,7 +541,8 @@ fn demo_float_log_base_1_plus_x_prec_round_assign(gm: GenMode, config: &GenConfi
         let x_old = x.clone();
         let o = x.log_base_1_plus_x_prec_round_assign(base, prec, rm);
         println!(
-            "x := {x_old}; x.log_base_1_plus_x_prec_round_assign({base}, {prec}, {rm}) = {o:?}; x = {x}"
+            "x := {x_old}; x.log_base_1_plus_x_prec_round_assign({base}, {prec}, {rm}) = {o:?}; \
+            x = {x}"
         );
     }
 }
