@@ -79,7 +79,9 @@ fn benchmark_get_str_library_comparison(
             bucketing_function: &|(_, (x, _, _, _)): &(
                 (rug::Float, i64, usize, rug::float::Round),
                 (Float, i64, usize, RoundingMode),
-            )| { usize::try_from(x.get_prec().unwrap_or(0)).unwrap() },
+            )| {
+                usize::try_from(x.get_prec().unwrap_or(0)).unwrap()
+            },
             bucketing_label: "x.prec".to_string(),
         },
         &mut [

@@ -21,12 +21,14 @@ use crate::natural::arithmetic::shl::limbs_shl_to_out;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::conversion::digits::general_digits::limbs_to_digits_small_base;
-use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_floor, limb_to_bit_count};
+use crate::natural::{
+    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+};
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::min;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    NegAssign, NegModPowerOf2, Parity, PowerOf2, WrappingSubAssign,
+    DivMod, NegAssign, NegModPowerOf2, Parity, PowerOf2, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
@@ -525,8 +527,8 @@ const NUM_TO_TEXT_62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
 //
 // Rounding may fail for two reasons:
 // - the error is too large to determine the integer `N` nearest to `Y`;
-// - either the number of digits of `N` in base `b` is too large (`m + 1`), or `N = 2 * N1 + (b /
-//   2)` and the rounding mode is to nearest. This can only happen when `b` is even.
+// - either the number of digits of `N` in base `b` is too large (`m + 1`), or `N = 2 * N1 + (b/2)`
+//   and the rounding mode is to nearest. This can only happen when `b` is even.
 //
 // The first returned value is the direction of rounding:
 // - the direction of rounding (-1, 0, 1) if rounding is possible;
@@ -838,23 +840,19 @@ pub fn limbs_get_str_power_of_2(
     m: usize,
     rnd: RoundingMode,
 ) -> (Vec<u8>, i64, i32) {
-    let width = i64::exact_from(Limb::WIDTH);
-    let pow2 = i64::exact_from(b.significant_bits() - 1); // b = 2 ^ pow2
-    // x_exp = f * pow2 + r, with 1 <= r <= pow2
-    let mut f = (x_exp - 1) / pow2;
-    let mut r = x_exp - f * pow2;
-    if r <= 0 {
-        f -= 1;
-        r += pow2;
-    }
+    let pow2 = b.significant_bits() - 1; // b = 2 ^ pow2
+    // x_exp = f * pow2 + r, with 1 <= r <= pow2 (a 1-indexed remainder, so split x_exp - 1)
+    let (mut f, r) = (x_exp - 1).div_mod(i64::exact_from(pow2));
+    f += 1;
+    let r = u64::exact_from(r) + 1;
     // the first digit holds only r bits; prec is the total number of bits
-    let prec = (i64::exact_from(m) - 1) * pow2 + r;
-    let mut n = usize::exact_from((prec - 1) / width + 1);
+    let prec = (u64::exact_from(m) - 1) * pow2 + r;
+    let n = bit_to_limb_count_ceiling(prec);
+    let nb = limb_to_bit_count(n) - prec;
     let mut x1 = vec![0; n + 1];
-    let nb = i64::exact_from(n) * width - prec;
     // round xp to prec bits into x1, with the carry going into x1[n]; the conversion to base 2 ^
     // pow2 is then exact, so this rounding's direction is the overall direction
-    let (dir, carry) = round_helper_raw(&mut x1[..n], u64::exact_from(prec), xp, x_prec, rnd);
+    let (dir, carry) = round_helper_raw(&mut x1[..n], prec, xp, x_prec, rnd);
     if carry {
         // mpfr_round_raw returns the wrapped value [0, ..., 0] and the carry; round_helper_raw
         // renormalizes the top limb to the high bit instead, so clear it to recover x1 = 2 ^ prec.
@@ -862,24 +860,20 @@ pub fn limbs_get_str_power_of_2(
         x1[n] = 1;
         if r == pow2 {
             // prec = m * pow2: 2 ^ prec needs m + 1 digits in base 2 ^ pow2, so divide by 2 ^ pow2
-            limbs_slice_shr_in_place(&mut x1, u64::exact_from(pow2));
+            limbs_slice_shr_in_place(&mut x1, pow2);
             f += 1;
-        } else {
-            // 2 ^ prec still needs m digits, but x1 may need n + 1 limbs
-            n += 1;
         }
     }
     // shift x1 right by nb bits, so the digit conversion sees a right-normalized number
     if nb != 0 {
-        limbs_slice_shr_in_place(&mut x1[..n], u64::exact_from(nb));
+        limbs_slice_shr_in_place(&mut x1, nb);
         // the most significant limb may have become zero
-        if x1[n - 1] == 0 {
-            n -= 1;
+        if *x1.last().unwrap() == 0 {
+            x1.pop();
         }
     }
     // convert x1 to base b = 2 ^ pow2, most significant digit first, and map to characters
-    let digits: Vec<u8> =
-        Natural::from_limbs_asc(&x1[..n]).to_power_of_2_digits_desc(u64::exact_from(pow2));
+    let digits: Vec<u8> = Natural::from_owned_limbs_asc(x1).to_power_of_2_digits_desc(pow2);
     let num_to_text = if (2..=36).contains(&b0) {
         NUM_TO_TEXT_36
     } else {
@@ -889,6 +883,5 @@ pub fn limbs_get_str_power_of_2(
         .iter()
         .map(|&d| num_to_text[usize::from(d)])
         .collect();
-    // the exponent of s is f + 1
-    (s, f + 1, i32::from(dir))
+    (s, f, i32::from(dir))
 }

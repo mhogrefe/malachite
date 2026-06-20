@@ -8,7 +8,7 @@
 
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use malachite_base::num::arithmetic::traits::{Abs, Pow};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::Float;
@@ -20,6 +20,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use std::panic::catch_unwind;
 
 // Inverts the `num_to_text` tables: maps an output character to its base value.
 fn digit_value(c: u8, large_table: bool) -> u8 {
@@ -39,12 +40,14 @@ fn digit_value(c: u8, large_table: bool) -> u8 {
 // `Ordering` must equal `V` compared to `x`. For bases 2..=36 the digit string and exponent are
 // also cross-checked against rug (MPFR).
 fn verify_get_str(x: &Float, b0: i64, m: usize, rnd: RoundingMode) {
-    let result = get_str(x, b0, m, rnd);
     if !((-36..=-2).contains(&b0) || (2..=62).contains(&b0)) {
-        assert!(result.is_none());
+        assert!(get_str(x, b0, m, rnd).is_none());
         return;
     }
-    let (digits, exp, ord) = result.unwrap();
+    // `Exact` is only ever paired with exactly-representable values here (the generators filter out
+    // the would-panic cases via `valid_float_get_str_quadruple`; the panic itself is checked in
+    // `test_get_str_exact_panics`), so this call never panics.
+    let (digits, exp, ord) = get_str(x, b0, m, rnd).unwrap();
     let b = b0.unsigned_abs();
     if x.is_nan() {
         assert_eq!(digits, b"@NaN@");
@@ -121,12 +124,22 @@ fn verify_get_str(x: &Float, b0: i64, m: usize, rnd: RoundingMode) {
             assert!(v >= x_rat);
             assert!(&v - &x_rat < ulp);
         }
-        Nearest => assert!((&v - &x_rat).abs() * Rational::from(2u32) <= ulp),
-        Exact => assert!((&v - &x_rat).abs() < ulp),
+        Nearest => assert!((&v - &x_rat).abs() * Rational::TWO <= ulp),
+        // We only reach here for `Exact` when the value is exactly representable (the inexact case
+        // is filtered out above), so the digits must reconstruct `x` precisely.
+        Exact => assert_eq!(v, x_rat),
         _ => unreachable!(),
     }
     // The returned ordering is the result compared to x.
     assert_eq!(ord, v.cmp(&x_rat));
+    // It is also consistent with the rounding mode and the sign of x: a directed mode can only err
+    // to one side, with Down/Up depending on the sign (cf. div.rs).
+    match (x_rat >= 0u32, rnd) {
+        (_, Floor) | (true, Down) | (false, Up) => assert_ne!(ord, Greater),
+        (_, Ceiling) | (true, Up) | (false, Down) => assert_ne!(ord, Less),
+        (_, Exact) => assert_eq!(ord, Equal),
+        _ => {}
+    }
 
     // Cross-check the digit string and exponent against rug (MPFR), where it applies.
     if (2..=36).contains(&b0) {
@@ -268,13 +281,14 @@ fn test_get_str() {
         9,
         Greater,
     );
-    // covers: mgt_nxgt mgt_lo
+    // covers: mgt_nxgt mgt_lo (Down, not Exact: this value is inexact in base 7, so Exact would
+    // panic. Down takes the same truncating code path, so the branch coverage is unchanged.)
     test(
         "0.000199046277632504184666664672269768242929310652018203552191617720205649",
         "0x0.000d0b7140b8f3aea60aad60c1dc3b2ee0d83e2eba33dcfb6f874df52d78#225",
         7,
         6,
-        Exact,
+        Down,
         "322631",
         -4,
         Less,
@@ -400,13 +414,14 @@ fn test_get_str() {
         1,
         Greater,
     );
-    // covers: ax_fail ret_fail
+    // covers: ax_fail ret_fail (Down, not Exact: this value is inexact in base 46, so Exact would
+    // panic. Down takes the same truncating code path, so the branch coverage is unchanged.)
     test(
         "7.1987e-15",
         "0x2.06b8E-12#16",
         46,
         8,
-        Exact,
+        Down,
         "6TH73LXN",
         -8,
         Less,
@@ -424,6 +439,26 @@ fn test_get_str() {
     verify_get_str(&x, 100, 0, Nearest);
     verify_get_str(&x, -37, 0, Nearest);
 }
+
+#[test]
+fn test_get_str_exact_panics() {
+    // `Exact` panics unless the value is exactly representable in the requested digits. 1/3 has no
+    // finite base-10 expansion.
+    assert_panic!(get_str(&parse_hex_string("0x0.5555558#25"), 10, 4, Exact));
+    // 0.5 has no finite expansion in the odd base 3 (it is 0.1111...).
+    assert_panic!(get_str(&parse_hex_string("0x0.8#1"), 3, 2, Exact));
+    // A value that is dyadic but needs more than the requested 6 base-7 digits.
+    assert_panic!(get_str(
+        &parse_hex_string("0x0.000d0b7140b8f3aea60aad60c1dc3b2ee0d83e2eba33dcfb6f874df52d78#225"),
+        7,
+        6,
+        Exact
+    ));
+    // m == 0 picks the round-trip digit count, which is generally too few for an exact base-10
+    // representation, so even round-trip mode panics under `Exact`.
+    assert_panic!(get_str(&parse_hex_string("0x1.921fb6#24"), 10, 0, Exact));
+}
+
 #[test]
 fn get_str_properties() {
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9().test_properties(|(x, b0, m, rnd)| {
@@ -431,10 +466,9 @@ fn get_str_properties() {
     });
     // The same property over rug-acceptable inputs only (base 2..=36, non-Exact), so every case
     // also exercises the rug cross-check inside `verify_get_str`.
-    float_signed_unsigned_rounding_mode_quadruple_gen_var_10().test_properties(|(x, b0, m, rnd)| {
-        verify_get_str(&x, b0, m, rnd);
-    });
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_10().test_properties(
+        |(x, b0, m, rnd)| {
+            verify_get_str(&x, b0, m, rnd);
+        },
+    );
 }
-
-
-

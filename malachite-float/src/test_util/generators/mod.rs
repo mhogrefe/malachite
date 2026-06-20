@@ -4180,7 +4180,9 @@ pub fn rational_rounding_mode_pair_gen_var_6() -> Generator<(Rational, RoundingM
     )
 }
 
-// All `(Float, base, m, RoundingMode)` inputs for `get_str`, with base in 2..=62 and m in 0..=20.
+// All valid `(Float, base, m, RoundingMode)` inputs for `get_str`: base in -36..=-2 or 2..=62, m in
+// 0..=20, and (since `get_str` panics on `Exact` for values it cannot represent exactly) `Exact`
+// only paired with exactly-representable values.
 pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_9()
 -> Generator<(Float, i64, usize, RoundingMode)> {
     Generator::new(
@@ -4191,8 +4193,8 @@ pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_9()
 }
 
 // All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's `to_sign_string_exp_round`
-// also accepts: base in 2..=36 (rug supports neither negative bases nor bases above 36) and rounding
-// mode not `Exact`.
+// also accepts: base in 2..=36 (rug supports neither negative bases nor bases above 36) and
+// rounding mode not `Exact`.
 pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_10()
 -> Generator<(Float, i64, usize, RoundingMode)> {
     Generator::new(

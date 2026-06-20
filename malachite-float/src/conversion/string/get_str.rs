@@ -21,7 +21,7 @@ use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Floor};
+use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_str_power_of_2};
 
@@ -179,6 +179,15 @@ pub fn get_str(
             (neg, s, e, dir)
         }
     };
+    // `Exact` demands that the digits represent `x` exactly; a nonzero `dir` means rounding was
+    // needed, which violates the contract. (For odd bases this is common, since a dyadic `Float`
+    // rarely has a finite expansion there; and `m == 0` picks the round-trip digit count, which is
+    // generally fewer than the exact expansion needs.)
+    assert!(
+        rnd != Exact || dir == 0,
+        "get_str: Exact rounding was requested, but {x} is not exactly representable in the \
+         requested number of base-{b0} digits"
+    );
     // `dir` orders the result's magnitude against `|x|`; negating both reverses the order.
     let o = dir.cmp(&0);
     let o = if neg { o.reverse() } else { o };

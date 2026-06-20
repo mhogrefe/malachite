@@ -17,6 +17,7 @@ use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_xxyz, random_triples, random_triples_from_single,
     random_triples_xxy, random_triples_xyy,
 };
+use crate::test_util::generators::common::valid_float_get_str_quadruple;
 use crate::test_util::generators::exhaustive::{
     add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
     agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid, div_prec_round_valid,
@@ -8097,13 +8098,14 @@ pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_9(
                 };
                 (x, base, usize::exact_from((v >> 8) % 21), rm)
             }
-        }),
+        })
+        .filter(|(x, b0, m, rnd)| valid_float_get_str_quadruple(x, *b0, *m, *rnd)),
     )
 }
 
-// All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's
-// `to_sign_string_exp_round` also accepts: base restricted to 2..=36 (rug supports neither negative
-// bases nor bases above 36) and rounding mode not `Exact` (rug has no exact rounding mode).
+// All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's `to_sign_string_exp_round`
+// also accepts: base restricted to 2..=36 (rug supports neither negative bases nor bases above 36)
+// and rounding mode not `Exact` (rug has no exact rounding mode).
 pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10(
     config: &GenConfig,
 ) -> It<(Float, i64, usize, RoundingMode)> {

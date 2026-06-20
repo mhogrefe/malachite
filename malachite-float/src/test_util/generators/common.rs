@@ -7,15 +7,25 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::conversion::string::get_str::get_str;
 use crate::test_util::common::rug_round_exact_from_rounding_mode;
+use core::cmp::Ordering::Equal;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact};
 use malachite_base::test_util::generators::common::It;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+
+// Whether `(x, b0, m, rnd)` is a valid input to `get_str`: every rounding mode is valid except
+// `Exact`, which `get_str` accepts only when `x` is exactly representable in the chosen digits.
+// Exactness is mode-independent, so we detect it by probing with `Down` (any non-`Exact` mode
+// returns `Equal` exactly when the value is representable). The base is assumed already valid.
+pub fn valid_float_get_str_quadruple(x: &Float, b0: i64, m: usize, rnd: RoundingMode) -> bool {
+    rnd != Exact || matches!(get_str(x, b0, m, Down), Some((_, _, Equal)))
+}
 
 pub fn float_rm(xs: It<Float>) -> It<(rug::Float, Float)> {
     Box::new(xs.map(|x| (rug::Float::exact_from(&x), x)))
