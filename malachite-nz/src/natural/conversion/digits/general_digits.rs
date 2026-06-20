@@ -315,7 +315,7 @@ pub enum PowerTableAlgorithm {
 }
 
 #[cfg(not(feature = "test_build"))]
-enum PowerTableAlgorithm {
+pub(crate) enum PowerTableAlgorithm {
     Mul,
     Div,
 }
@@ -826,7 +826,7 @@ pub_crate_test! {limbs_to_digits_small_base_no_alg_specified<T: PrimitiveUnsigne
 //
 // This is equivalent to `mpn_get_str` from `mpn/generic/get_str.c`, GMP 6.2.1, where `un != 0` and
 // base is not a power of 2.
-pub_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
+pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [T],
     base: u64,
     xs: &mut [Limb],

@@ -7007,3 +7007,27 @@ pub fn random_unsigned_vec_unsigned_unsigned_triple_gen_var_9(
         }),
     )
 }
+
+// All valid `(r, f, e, b0, m, rnd)` inputs for `limbs_get_str_aux`. See `get_str_aux_inputs`.
+#[allow(clippy::type_complexity)]
+pub fn random_large_type_gen_var_28(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, i64, i64, i64, usize, RoundingMode)> {
+    Box::new(
+        random_quintuples_xyyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &random_rounding_modes,
+        )
+        .map(crate::test_util::generators::common::get_str_aux_inputs),
+    )
+}

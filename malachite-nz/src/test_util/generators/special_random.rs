@@ -104,7 +104,7 @@ use malachite_base::num::random::striped::{
     striped_random_unsigneds,
 };
 use malachite_base::num::random::{
-    RandomUnsignedRange, RandomUnsignedsLessThan, random_primitive_floats,
+    RandomUnsignedRange, RandomUnsignedsLessThan, random_primitive_floats, random_primitive_ints,
     random_unsigned_inclusive_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
@@ -8014,5 +8014,31 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_22(
             let n = (n_min + out.len()).saturating_sub(4).max(1);
             (vec![0; n], b, e)
         }),
+    )
+}
+
+// All valid `(r, f, e, b0, m, rnd)` inputs for `limbs_get_str_aux`, with `r` striped. See
+// `get_str_aux_inputs`.
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_28(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, i64, i64, i64, usize, RoundingMode)> {
+    Box::new(
+        random_quintuples_xyyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    1,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &random_rounding_modes,
+        )
+        .map(crate::test_util::generators::common::get_str_aux_inputs),
     )
 }

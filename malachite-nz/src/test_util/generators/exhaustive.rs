@@ -4610,3 +4610,16 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_17() -> It<(Vec<
         exhaustive_positive_primitive_ints::<u64>(),
     ))
 }
+
+// All valid `(r, f, e, b0, m, rnd)` inputs for `limbs_get_str_aux`. See `get_str_aux_inputs`.
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_28() -> It<(Vec<Limb>, i64, i64, i64, usize, RoundingMode)> {
+    Box::new(
+        exhaustive_quintuples_xyyyz(
+            exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()),
+            exhaustive_unsigneds::<u64>(),
+            exhaustive_rounding_modes(),
+        )
+        .map(crate::test_util::generators::common::get_str_aux_inputs),
+    )
+}

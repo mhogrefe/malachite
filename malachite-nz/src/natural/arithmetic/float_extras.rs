@@ -14,9 +14,13 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_to_out};
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::shl::limbs_shl_to_out;
+use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
+use crate::natural::conversion::digits::general_digits::limbs_to_digits_small_base;
 use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::min;
@@ -25,7 +29,7 @@ use malachite_base::num::arithmetic::traits::{
     NegAssign, NegModPowerOf2, Parity, PowerOf2, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
@@ -167,6 +171,7 @@ pub fn float_significand_leading_ones(x: &Natural) -> Option<u64> {
 
 const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
 pub(crate) const MPFR_EVEN_INEX: i8 = 2;
+pub(crate) const MPFR_ROUND_FAILED: i32 = 3;
 
 // This is MPFR_RNDRAW_EVEN from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool`
 // signifying whether the returned exponent should be incremented.
@@ -497,4 +502,393 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
             error + err_s_ab + (err_s_a2 >> 1) + 3
         },
     )
+}
+
+// `num_to_text36[d]` is the character for digit `d`, using lowercase letters; for base 2..=36.
+const NUM_TO_TEXT_36: &[u8] = b"0123456789abcdefghijklmnopqrstuvwxyz";
+// `num_to_text62[d]` is the character for digit `d`, using uppercase letters for `d` in 10..=35 and
+// lowercase letters for `d` in 36..=61; for negative bases and for bases 37..=62.
+const NUM_TO_TEXT_62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+// Input: an approximation `r * 2 ^ f` to a real `Y`, with `|r * 2 ^ f - Y| <= 2 ^ (e + f)`.
+//
+// If rounding is possible, returns:
+// - in `str`: the characters of the significand corresponding to the integer nearest to `Y`, in the
+//   direction `rnd`;
+// - in `exp`: the exponent (the number of superfluous characters).
+//
+// `n` is the number of limbs of `r` (that is, `r.len()`). `e` represents the maximal error in the
+// approximation to `Y` (`e < 0` means that the approximation is known to be exact, that is, `r * 2
+// ^ f = Y`). `b` is the wanted base (`2 <= b <= 62` or `-36 <= b <= -2`). `m` is the number of
+// wanted digits in the significand. `rnd` is the rounding mode. It is assumed that `b ^ (m - 1) <=
+// Y < b ^ (m + 1)`, thus the returned value satisfies `b ^ (m - 1) <= rnd(Y) < b ^ (m + 1)`.
+//
+// Rounding may fail for two reasons:
+// - the error is too large to determine the integer `N` nearest to `Y`;
+// - either the number of digits of `N` in base `b` is too large (`m + 1`), or `N = 2 * N1 + (b /
+//   2)` and the rounding mode is to nearest. This can only happen when `b` is even.
+//
+// The first returned value is the direction of rounding:
+// - the direction of rounding (-1, 0, 1) if rounding is possible;
+// - `-MPFR_ROUND_FAILED` if rounding is not possible because of `m + 1` digits;
+// - `MPFR_ROUND_FAILED` otherwise (too large error).
+//
+// This is `mpfr_get_str_aux` from `get_str.c`, MPFR 4.2.2.
+pub fn limbs_get_str_aux(
+    str: &mut [u8],
+    r: &mut [Limb],
+    f: i64,
+    e: i64,
+    b0: i64,
+    m: usize,
+    rnd: RoundingMode,
+) -> (i32, i64) {
+    let n = r.len();
+    let width = Limb::WIDTH;
+    let n_width = u64::exact_from(n) * width;
+    let exact = e < 0;
+    // if f > 0, then the maximal error 2 ^ (e + f) is larger than 2, so we cannot determine the
+    // integer Y
+    assert!(f <= 0);
+    // if f is too small, then r * 2 ^ f is smaller than 1
+    assert!(f > -i64::exact_from(n_width));
+    let num_to_text = if (2..=36).contains(&b0) {
+        NUM_TO_TEXT_36
+    } else {
+        NUM_TO_TEXT_62
+    };
+    let b = b0.unsigned_abs();
+    let mut exp = 0;
+    // check if it is possible to round r with rounding mode rnd, where |r * 2 ^ f - Y| <= 2 ^ (e +
+    // f). R contains exactly -f bits after the integer point; to determine the nearest integer, we
+    // thus need a precision of n * Limb::WIDTH + f.
+    if exact
+        || round_helper_2(
+            r,
+            i32::exact_from(i64::exact_from(n_width) - e),
+            u64::exact_from(i64::exact_from(n_width) + f) + u64::from(rnd == Nearest),
+        )
+    {
+        // compute the nearest integer to R
+
+        // bit of weight 0 in R has position j0 in limb r[i0]
+        let neg_f = f.unsigned_abs();
+        let mut i0 = usize::exact_from(neg_f / width);
+        let j0 = neg_f % width;
+        // mpfr_round_raw writes the rounded high limbs of r back into r starting at index i0, while
+        // reading the original r; snapshot the original limbs to break the in-place aliasing.
+        let r_in = r.to_vec();
+        let (dir, carry) = round_helper_raw(
+            &mut r[i0..],
+            u64::exact_from(i64::exact_from(n_width) + f),
+            &r_in,
+            n_width,
+            rnd,
+        );
+        let mut dir = i32::from(dir);
+        assert_ne!(dir, MPFR_ROUND_FAILED);
+        if carry {
+            // Y is a power of 2
+            if j0 != 0 {
+                r[n - 1] = LIMB_HIGH_BIT >> (j0 - 1);
+            } else {
+                // j0 == 0, necessarily i0 >= 1, otherwise f = 0 and r is exact
+                r[n - 1] = Limb::from(carry);
+                i0 -= 1;
+                r[i0] = 0; // set to zero the new low limb
+            }
+        } else if j0 != 0 {
+            // shift r to the right by (-f) bits (i0 already done)
+            limbs_slice_shr_in_place(&mut r[i0..], j0);
+        }
+        // now the rounded value Y is in {r + i0, n - i0}
+
+        // convert r + i0 into base b: we use b0, which might be in -36..-2
+        let mut str1 = vec![0; m + 3]; // need one extra character for limbs_to_digits_small_base
+        let size_s1 = limbs_to_digits_small_base(&mut str1, b, &mut r[i0..], None);
+        // round str1
+        assert!(size_s1 >= m);
+        exp = i64::exact_from(size_s1 - m); // number of superfluous characters
+
+        // if size_s1 = m + 2, necessarily we have b ^ (m + 1) as result, and the result will not
+        // change; so we have to double-round only when size_s1 = m + 1 and (i) the result is
+        // inexact (ii) or the last digit is nonzero
+        if size_s1 == m + 1 && (dir != 0 || str1[size_s1 - 1] != 0) {
+            // rounding mode
+            let mut rnd1 = rnd;
+            // round to nearest case
+            if rnd == Nearest {
+                let twice_last = 2 * u64::from(str1[size_s1 - 1]);
+                if twice_last == b {
+                    if dir == 0 && exact {
+                        // exact: even rounding
+                        rnd1 = if str1[size_s1 - 2] & 1 == 0 {
+                            Floor
+                        } else {
+                            Ceiling
+                        };
+                    } else {
+                        // otherwise we cannot round correctly: for example if b = 10, we might have
+                        // a mantissa of xxxxxxx5.00000000 which can be rounded to nearest to 8
+                        // digits but not to 7
+                        dir = -MPFR_ROUND_FAILED;
+                        assert_ne!(dir, i32::from(MPFR_EVEN_INEX));
+                        return (dir, exp);
+                    }
+                } else if twice_last < b {
+                    rnd1 = Floor;
+                } else {
+                    rnd1 = Ceiling;
+                }
+            }
+            // now rnd1 is either Floor or Down -> truncate, or Ceiling or Up -> round toward
+            // infinity
+            if rnd1 == Ceiling || rnd1 == Up {
+                // round away from zero
+                if str1[size_s1 - 1] != 0 {
+                    // the carry cannot propagate to the whole string, since Y = x * b ^ (m - g) < 2
+                    // * b ^ m <= b ^ (m + 1) - b, where x is the input float
+                    assert!(size_s1 >= 2);
+                    let mut i = size_s1 - 2;
+                    while str1[i] == u8::exact_from(b - 1) {
+                        assert!(i > 0);
+                        str1[i] = 0;
+                        i -= 1;
+                    }
+                    str1[i] += 1;
+                }
+                dir = 1;
+            } else if str1[size_s1 - 1] != 0 {
+                // Round toward zero (truncate). When the dropped digit is nonzero the digit
+                // rounding dominates the earlier integer rounding (|V - N| >= 1 > |N - Y|), so the
+                // overall direction is toward zero.
+                dir = -1;
+            }
+            // Otherwise the dropped digit is zero, so the truncation is exact (V == N) and the
+            // overall direction is the integer rounding's `dir`, which we leave unchanged.
+            //
+            // MPFR's `mpfr_get_str_aux` sets `dir = -1` unconditionally here, since it uses only
+            // `dir != 0` (an inexact flag) and the sign is incidental; Malachite returns the
+            // direction as an `Ordering`, so it must be correct.
+        }
+        // copy str1 into str and convert to characters (digits and letters from the source
+        // character set)
+        for i in 0..m {
+            str[i] = num_to_text[usize::from(str1[i])];
+        }
+        (dir, exp)
+    } else {
+        // round_helper_2 failed: rounding is not possible
+        (MPFR_ROUND_FAILED, exp)
+    }
+}
+
+// Computes the mantissa digits and exponent of a nonzero finite `Float` whose normalized
+// little-endian significand is `xp` and whose MPFR-style exponent (one more than the scientific
+// exponent) is `x_exp`, in base `b` (the absolute value of the wanted base `b0`), with `m` digits,
+// rounding with `rnd`. Returns the `m` digit characters and the exponent.
+//
+// `g`, `prec`, and `exp` are the initial values computed by the caller (see `mpfr_get_str`): `g =
+// ceil_mul(x_exp - 1, b, 1)`, the radix-2 working precision, and `|m - g|`.
+//
+// This is the non-power-of-two, non-special branch of `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
+pub fn limbs_get_str(
+    xp: &[Limb],
+    x_exp: i64,
+    b: u64,
+    b0: i64,
+    m: usize,
+    rnd: RoundingMode,
+    mut g: i64,
+    mut prec: i64,
+    mut exp: i64,
+) -> (Vec<u8>, i64, i32) {
+    let width = i64::exact_from(Limb::WIDTH);
+    let nx = xp.len();
+    let m_i = i64::exact_from(m);
+    // MPFR_ZIV_INIT: the initial precision increment.
+    let mut ziv_step = width;
+    loop {
+        let mut exact = true;
+        // number of limbs for the working precision
+        let n = usize::exact_from((prec - 1) / width + 1);
+        let mut a = vec![0; n];
+        let exp_a: i64;
+        let mut err: i64;
+        let mut exp_a_mut;
+        if m_i == g {
+            // final exponent is 0: no multiplication or division to perform
+            if nx > n {
+                exact = slice_test_zero(&xp[..nx - n]);
+            }
+            err = i64::from(!exact);
+            // copy the most significant min(n, nx) limbs of x into a, right-justified
+            if n <= nx {
+                a.copy_from_slice(&xp[nx - n..]);
+            } else {
+                a[n - nx..].copy_from_slice(xp);
+            }
+            exp_a = x_exp - i64::exact_from(n) * width;
+        } else if m_i > g {
+            // multiply x by b ^ exp; the error on a is at most 2 ^ err ulps
+            let err_e;
+            (exp_a_mut, err_e) = limbs_float_exp(&mut a, b, exp);
+            exact = err_e == -1;
+            // x = x1 * 2 ^ (n * Limb::WIDTH): the top min(n, nx) limbs of x
+            let nx1 = min(n, nx);
+            let x1 = if nx >= n { &xp[nx - n..] } else { xp };
+            if nx > n {
+                exact = exact && slice_test_zero(&xp[..nx - n]);
+            }
+            // we lose one more bit in the multiplication, except when err = 0 (two bits)
+            err = if err_e <= 0 { 2 } else { i64::from(err_e) + 1 };
+            let result = limbs_mul(&a, x1);
+            exp_a_mut += x_exp;
+            if !slice_test_zero(&result[..nx1]) {
+                exact = false;
+            }
+            // normalize a and truncate
+            if result[n + nx1 - 1].get_highest_bit() {
+                a.copy_from_slice(&result[nx1..nx1 + n]);
+            } else {
+                limbs_shl_to_out(&mut a, &result[nx1..nx1 + n], 1);
+                a[0] |= Limb::from(result[nx1 - 1].get_highest_bit());
+                exp_a_mut -= 1;
+            }
+            exp_a = exp_a_mut;
+        } else {
+            // m < g: divide x by b ^ exp
+            let err_e;
+            (exp_a_mut, err_e) = limbs_float_exp(&mut a, b, exp);
+            exact = err_e == -1;
+            let two_n = n << 1;
+            let mut result = vec![0; n + 1];
+            let mut rem = vec![0; n];
+            let x1: Vec<Limb> = if two_n <= nx {
+                // we ignore the low nx - 2 * n limbs of x
+                if exact && !slice_test_zero(&xp[..nx - two_n]) {
+                    exact = false;
+                }
+                xp[nx - two_n..].to_vec()
+            } else {
+                // copy the nx most significant limbs of x into the top of x1
+                let mut x1 = vec![0; two_n];
+                x1[two_n - nx..].copy_from_slice(xp);
+                x1
+            };
+            // result = x / a
+            if n == 1 {
+                rem[0] = limbs_div_limb_to_out_mod(&mut result, &x1, a[0]);
+            } else {
+                limbs_div_mod_to_out(&mut result, &mut rem, &x1, &a);
+            }
+            exp_a_mut = x_exp - exp_a_mut - i64::exact_from(two_n) * width;
+            // test if the division was exact
+            if exact {
+                exact = slice_test_zero(&rem);
+            }
+            // normalize the result and copy into a
+            if result[n] == 1 {
+                limbs_shr_to_out(&mut a, &result[..n], 1);
+                a[n - 1] |= LIMB_HIGH_BIT;
+                exp_a_mut += 1;
+            } else {
+                a.copy_from_slice(&result[..n]);
+            }
+            err = if err_e == -1 { 2 } else { i64::from(err_e) + 2 };
+            exp_a = exp_a_mut;
+        }
+        if exact {
+            err = -1;
+        }
+        let mut s = vec![0; m];
+        let (ret, e) = limbs_get_str_aux(&mut s, &mut a, exp_a, err, b0, m, rnd);
+        if ret == MPFR_ROUND_FAILED {
+            // error too large: increase the working precision (MPFR_ZIV_NEXT)
+            prec += ziv_step;
+            ziv_step = prec / 2;
+        } else if ret == -MPFR_ROUND_FAILED {
+            // too many digits in the mantissa: adjust the final exponent g and exp = |m - g|
+            if m_i > g {
+                g += 1;
+                exp -= 1;
+            } else {
+                g += 1;
+                exp += 1;
+            }
+        } else {
+            // the exponent of s is its own exponent plus g; ret is the rounding direction
+            return (s, e + g, ret);
+        }
+    }
+}
+
+// Computes the mantissa digit characters and exponent of a nonzero finite `Float` whose normalized
+// little-endian significand is `xp`, whose precision is `x_prec`, and whose MPFR-style exponent
+// (one more than the scientific exponent) is `x_exp`, in the power-of-two base `b` (the absolute
+// value of the wanted base `b0`), with `m` digits, rounding the magnitude with `rnd`.
+//
+// This is the power-of-two-base branch of `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
+pub fn limbs_get_str_power_of_2(
+    xp: &[Limb],
+    x_exp: i64,
+    x_prec: u64,
+    b: u64,
+    b0: i64,
+    m: usize,
+    rnd: RoundingMode,
+) -> (Vec<u8>, i64, i32) {
+    let width = i64::exact_from(Limb::WIDTH);
+    let pow2 = i64::exact_from(b.significant_bits() - 1); // b = 2 ^ pow2
+    // x_exp = f * pow2 + r, with 1 <= r <= pow2
+    let mut f = (x_exp - 1) / pow2;
+    let mut r = x_exp - f * pow2;
+    if r <= 0 {
+        f -= 1;
+        r += pow2;
+    }
+    // the first digit holds only r bits; prec is the total number of bits
+    let prec = (i64::exact_from(m) - 1) * pow2 + r;
+    let mut n = usize::exact_from((prec - 1) / width + 1);
+    let mut x1 = vec![0; n + 1];
+    let nb = i64::exact_from(n) * width - prec;
+    // round xp to prec bits into x1, with the carry going into x1[n]; the conversion to base 2 ^
+    // pow2 is then exact, so this rounding's direction is the overall direction
+    let (dir, carry) = round_helper_raw(&mut x1[..n], u64::exact_from(prec), xp, x_prec, rnd);
+    if carry {
+        // mpfr_round_raw returns the wrapped value [0, ..., 0] and the carry; round_helper_raw
+        // renormalizes the top limb to the high bit instead, so clear it to recover x1 = 2 ^ prec.
+        x1[n - 1] = 0;
+        x1[n] = 1;
+        if r == pow2 {
+            // prec = m * pow2: 2 ^ prec needs m + 1 digits in base 2 ^ pow2, so divide by 2 ^ pow2
+            limbs_slice_shr_in_place(&mut x1, u64::exact_from(pow2));
+            f += 1;
+        } else {
+            // 2 ^ prec still needs m digits, but x1 may need n + 1 limbs
+            n += 1;
+        }
+    }
+    // shift x1 right by nb bits, so the digit conversion sees a right-normalized number
+    if nb != 0 {
+        limbs_slice_shr_in_place(&mut x1[..n], u64::exact_from(nb));
+        // the most significant limb may have become zero
+        if x1[n - 1] == 0 {
+            n -= 1;
+        }
+    }
+    // convert x1 to base b = 2 ^ pow2, most significant digit first, and map to characters
+    let digits: Vec<u8> =
+        Natural::from_limbs_asc(&x1[..n]).to_power_of_2_digits_desc(u64::exact_from(pow2));
+    let num_to_text = if (2..=36).contains(&b0) {
+        NUM_TO_TEXT_36
+    } else {
+        NUM_TO_TEXT_62
+    };
+    let s = digits[..m]
+        .iter()
+        .map(|&d| num_to_text[usize::from(d)])
+        .collect();
+    // the exponent of s is f + 1
+    (s, f + 1, i32::from(dir))
 }

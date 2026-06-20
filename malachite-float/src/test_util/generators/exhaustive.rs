@@ -4781,3 +4781,33 @@ pub fn exhaustive_rational_rounding_mode_pair_gen_var_6() -> It<(Rational, Round
         }),
     )
 }
+
+// For each `(Float, base, m)` triple (base in 2..=62, m in 0..=20), all six rounding modes are
+// generated consecutively.
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_9()
+-> It<(Float, i64, usize, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(lex_pairs(
+        exhaustive_triples(
+            exhaustive_floats(),
+            primitive_int_increasing_inclusive_range::<i64>(-36, 62)
+                .filter(|&b| (2..=62).contains(&b) || (-36..=-2).contains(&b)),
+            primitive_int_increasing_inclusive_range::<usize>(0, 20),
+        ),
+        exhaustive_rounding_modes(),
+    )))
+}
+
+// All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's
+// `to_sign_string_exp_round` also accepts: base restricted to 2..=36 (rug supports neither negative
+// bases nor bases above 36) and rounding mode not `Exact` (rug has no exact rounding mode).
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_10()
+-> It<(Float, i64, usize, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(lex_pairs(
+        exhaustive_triples(
+            exhaustive_floats(),
+            primitive_int_increasing_inclusive_range::<i64>(2, 36),
+            primitive_int_increasing_inclusive_range::<usize>(0, 20),
+        ),
+        exhaustive_rounding_modes().filter(|&rm| rm != Exact),
+    )))
+}

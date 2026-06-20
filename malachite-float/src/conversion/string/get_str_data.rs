@@ -15,17 +15,15 @@
 
 // This section is created by l2b_data.rs.
 
-// This is equivalent to `__gmpfr_l2b` in `get_str.c`, MPFR 4.x; it follows the
-// `compute_l2b` algorithm in MPFR's `tests/tl2b.c`.
+// This is equivalent to `__gmpfr_l2b` in `get_str.c`, MPFR 4.x; it follows the `compute_l2b`
+// algorithm in MPFR's `tests/tl2b.c`.
 //
-// For each base b in 2..=62, column 0 is a 23-bit upper bound on log2(b), and column 1 is a
-// 77-bit upper bound on log_b(2) = 1 / log2(b). Each entry `(m, e)` represents the value `m *
-// 2 ^ (e - 128)`; the mantissa `m` is left-justified (bit 127 is set), so it holds the
-// significand exactly (both 23 and 77 fit in 128 bits).
+// For each base b in 2..=62, column 0 is a 23-bit upper bound on log2(b), and column 1 is a 77-bit
+// upper bound on log_b(2) = 1 / log2(b). Each entry `(m, e)` represents the value `m * 2 ^ (e -
+// 128)`; the mantissa `m` is left-justified (bit 127 is set), so it holds the significand exactly
+// (both 23 and 77 fit in 128 bits).
 //
 // Indexed as `MPFR_L2B[b - 2][i]`.
-// TODO: remove the `dead_code` allow once the `mpfr_get_str` port consumes this table.
-#[allow(dead_code)]
 pub(crate) const MPFR_L2B: [[(u128, i8); 2]; 61] = [
     [(0x80000000000000000000000000000000, 1), (0x80000000000000000000000000000000, 1)], // b = 2
     [(0xcae00e00000000000000000000000000, 1), (0xa1849cc1a9a9e94e0448000000000000, 0)], // b = 3

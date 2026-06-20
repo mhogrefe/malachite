@@ -71,7 +71,9 @@ use malachite_base::num::random::geometric::{
     geometric_random_unsigneds,
 };
 use malachite_base::num::random::striped::{striped_random_signeds, striped_random_unsigneds};
-use malachite_base::num::random::{random_primitive_floats, random_unsigned_inclusive_range};
+use malachite_base::num::random::{
+    random_primitive_floats, random_primitive_ints, random_unsigned_inclusive_range,
+};
 use malachite_base::orderings::random::random_orderings;
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -8729,5 +8731,77 @@ pub fn special_random_rational_rounding_mode_pair_gen_var_6(
             rm != Exact
                 || n.denominator_ref().is_power_of_2() && n.numerator_ref().significant_bits() <= 1
         }),
+    )
+}
+
+pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_9(
+    config: &GenConfig,
+) -> It<(Float, i64, usize, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &random_rounding_modes,
+        )
+        .map(|(x, v, rm): (Float, u64, RoundingMode)| {
+            {
+                // base in -36..=-2 or 2..=62; digit count in 0..=20 (0 chooses the round-trip
+                // minimum)
+                let raw = v % 96;
+                let base = if raw < 61 {
+                    i64::exact_from(2 + raw)
+                } else {
+                    -i64::exact_from(raw - 59)
+                };
+                (x, base, usize::exact_from((v >> 8) % 21), rm)
+            }
+        }),
+    )
+}
+
+// All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's
+// `to_sign_string_exp_round` also accepts: base restricted to 2..=36 (rug supports neither negative
+// bases nor bases above 36) and rounding mode not `Exact` (rug has no exact rounding mode).
+pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10(
+    config: &GenConfig,
+) -> It<(Float, i64, usize, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &random_rounding_modes,
+        )
+        .map(|(x, v, rm): (Float, u64, RoundingMode)| {
+            // base in 2..=36; digit count in 0..=20 (0 chooses the round-trip minimum)
+            let base = i64::exact_from(2 + (v % 35));
+            (x, base, usize::exact_from((v >> 8) % 21), rm)
+        })
+        .filter(|(_, _, _, rm): &(Float, i64, usize, RoundingMode)| *rm != Exact),
     )
 }

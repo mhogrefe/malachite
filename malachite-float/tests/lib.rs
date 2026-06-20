@@ -179,6 +179,9 @@ pub mod conversion {
     pub mod primitive_float_from_float;
     pub mod primitive_int_from_float;
     pub mod rational_from_float;
+    pub mod string {
+        pub mod get_str;
+    }
 }
 pub mod exhaustive {
     pub mod exhaustive_finite_floats;

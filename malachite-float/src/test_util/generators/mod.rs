@@ -4180,6 +4180,51 @@ pub fn rational_rounding_mode_pair_gen_var_6() -> Generator<(Rational, RoundingM
     )
 }
 
+// All `(Float, base, m, RoundingMode)` inputs for `get_str`, with base in 2..=62 and m in 0..=20.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_9()
+-> Generator<(Float, i64, usize, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
+    )
+}
+
+// All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's `to_sign_string_exp_round`
+// also accepts: base in 2..=36 (rug supports neither negative bases nor bases above 36) and rounding
+// mode not `Exact`.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_10()
+-> Generator<(Float, i64, usize, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
+    )
+}
+
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_10_rm() -> Generator<(
+    (rug::Float, i64, usize, rug::float::Round),
+    (Float, i64, usize, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_t_u_rounding_mode_quadruple_rm(
+                exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_10(),
+            )
+        },
+        &|config| {
+            float_t_u_rounding_mode_quadruple_rm(
+                random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10(config),
+            )
+        },
+        &|config| {
+            float_t_u_rounding_mode_quadruple_rm(
+                special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10(config),
+            )
+        },
+    )
+}
+
 pub mod common;
 pub mod exhaustive;
 pub mod random;

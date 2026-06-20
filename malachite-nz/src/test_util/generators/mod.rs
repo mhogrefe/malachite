@@ -3758,6 +3758,16 @@ pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, RationalSequence<Natu
 
 // var 27 is in malachite-base.
 
+// All valid `(r, f, e, b0, m, rnd)` inputs for `limbs_get_str_aux`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_28() -> Generator<(Vec<Limb>, i64, i64, i64, usize, RoundingMode)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_28,
+        &random_large_type_gen_var_28,
+        &special_random_large_type_gen_var_28,
+    )
+}
+
 pub mod common;
 pub mod exhaustive;
 pub mod random;
