@@ -826,60 +826,64 @@ pub fn limbs_get_str(
 }
 
 // Computes the mantissa digit characters and exponent of a nonzero finite `Float` whose normalized
-// little-endian significand is `xp`, whose precision is `x_prec`, and whose MPFR-style exponent
-// (one more than the scientific exponent) is `x_exp`, in the power-of-two base `b` (the absolute
-// value of the wanted base `b0`), with `m` digits, rounding the magnitude with `rnd`.
+// little-endian significand is `xs`, whose precision is `x_prec`, and whose MPFR-style exponent
+// (one more than the scientific exponent) is `x_exp`, in the power-of-two base `abs_base` (the
+// absolute value of the wanted base `base`), with `digit_len` digits, rounding the magnitude with
+// `rm`.
 //
 // This is the power-of-two-base branch of `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
 pub fn limbs_get_str_power_of_2(
-    xp: &[Limb],
+    xs: &[Limb],
     x_exp: i64,
     x_prec: u64,
-    b: u64,
-    b0: i64,
-    m: usize,
-    rnd: RoundingMode,
+    abs_base: u64,
+    base: i64,
+    digit_len: usize,
+    rm: RoundingMode,
 ) -> (Vec<u8>, i64, i32) {
-    let pow2 = b.significant_bits() - 1; // b = 2 ^ pow2
+    let pow2 = abs_base.significant_bits() - 1; // base = 2 ^ pow2
     // x_exp = f * pow2 + r, with 1 <= r <= pow2 (a 1-indexed remainder, so split x_exp - 1)
     let (mut f, r) = (x_exp - 1).div_mod(i64::exact_from(pow2));
     f += 1;
     let r = u64::exact_from(r) + 1;
     // the first digit holds only r bits; prec is the total number of bits
-    let prec = (u64::exact_from(m) - 1) * pow2 + r;
-    let n = bit_to_limb_count_ceiling(prec);
-    let nb = limb_to_bit_count(n) - prec;
-    let mut x1 = vec![0; n + 1];
-    // round xp to prec bits into x1, with the carry going into x1[n]; the conversion to base 2 ^
-    // pow2 is then exact, so this rounding's direction is the overall direction
-    let (dir, carry) = round_helper_raw(&mut x1[..n], prec, xp, x_prec, rnd);
+    let prec = (u64::exact_from(digit_len) - 1) * pow2 + r;
+    let len = bit_to_limb_count_ceiling(prec);
+    let bit_len = limb_to_bit_count(len) - prec;
+    let mut scratch = vec![0; len + 1];
+    // round xs to prec bits into scratch, with the carry going into scratch[n]; the conversion to
+    // base 2 ^ pow2 is then exact, so this rounding's direction is the overall direction
+    let (dir, carry) = round_helper_raw(&mut scratch[..len], prec, xs, x_prec, rm);
     if carry {
         // mpfr_round_raw returns the wrapped value [0, ..., 0] and the carry; round_helper_raw
-        // renormalizes the top limb to the high bit instead, so clear it to recover x1 = 2 ^ prec.
-        x1[n - 1] = 0;
-        x1[n] = 1;
+        // renormalizes the top limb to the high bit instead, so clear it to recover scratch = 2 ^
+        // prec.
+        scratch[len - 1] = 0;
+        scratch[len] = 1;
         if r == pow2 {
-            // prec = m * pow2: 2 ^ prec needs m + 1 digits in base 2 ^ pow2, so divide by 2 ^ pow2
-            limbs_slice_shr_in_place(&mut x1, pow2);
+            // prec = digit_len * pow2: 2 ^ prec needs m + 1 digits in base 2 ^ pow2, so divide by 2
+            // ^ pow2
+            limbs_slice_shr_in_place(&mut scratch, pow2);
             f += 1;
         }
     }
-    // shift x1 right by nb bits, so the digit conversion sees a right-normalized number
-    if nb != 0 {
-        limbs_slice_shr_in_place(&mut x1, nb);
+    // shift scratch right by nb bits, so the digit conversion sees a right-normalized number
+    if bit_len != 0 {
+        limbs_slice_shr_in_place(&mut scratch, bit_len);
         // the most significant limb may have become zero
-        if *x1.last().unwrap() == 0 {
-            x1.pop();
+        if *scratch.last().unwrap() == 0 {
+            scratch.pop();
         }
     }
-    // convert x1 to base b = 2 ^ pow2, most significant digit first, and map to characters
-    let digits: Vec<u8> = Natural::from_owned_limbs_asc(x1).to_power_of_2_digits_desc(pow2);
-    let num_to_text = if (2..=36).contains(&b0) {
+    // convert scratch to base abs_base = 2 ^ pow2, most significant digit first, and map to
+    // characters
+    let digits: Vec<u8> = Natural::from_owned_limbs_asc(scratch).to_power_of_2_digits_desc(pow2);
+    let num_to_text = if (2..=36).contains(&base) {
         NUM_TO_TEXT_36
     } else {
         NUM_TO_TEXT_62
     };
-    let s = digits[..m]
+    let s = digits[..digit_len]
         .iter()
         .map(|&d| num_to_text[usize::from(d)])
         .collect();
