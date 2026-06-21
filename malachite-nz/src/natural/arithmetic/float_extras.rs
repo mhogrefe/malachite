@@ -799,142 +799,166 @@ pub fn limbs_get_str_aux(
 }
 
 // Computes the mantissa digits and exponent of a nonzero finite `Float` whose normalized
-// little-endian significand is `xp` and whose MPFR-style exponent (one more than the scientific
-// exponent) is `x_exp`, in base `b` (the absolute value of the wanted base `b0`), with `m` digits,
-// rounding with `rnd`. Returns the `m` digit characters and the exponent.
+// little-endian significand is `xs` and whose MPFR-style exponent (one more than the scientific
+// exponent) is `x_exp`, in base `abs_base` (the absolute value of the wanted base `base`), with
+// `digit_len` digits, rounding with `rm`. Returns the `digit_len` digit characters and the
+// exponent.
 //
 // `g`, `prec`, and `exp` are the initial values computed by the caller (see `mpfr_get_str`): `g =
-// ceil_mul(x_exp - 1, b, 1)`, the radix-2 working precision, and `|m - g|`.
+// ceil_mul(x_exp - 1, abs_base, 1)`, the radix-2 working precision, and `|digit_len - g|`.
 //
 // This is the non-power-of-two, non-special branch of `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
 pub fn limbs_get_str(
-    xp: &[Limb],
+    xs: &[Limb],
     x_exp: i64,
-    b: u64,
-    b0: i64,
-    m: usize,
-    rnd: RoundingMode,
+    abs_base: u64,
+    base: i64,
+    digit_len: usize,
+    rm: RoundingMode,
     mut g: i64,
-    mut prec: i64,
+    mut prec: u64,
     mut exp: i64,
 ) -> (Vec<u8>, i64, i8) {
-    let width = i64::exact_from(Limb::WIDTH);
-    let nx = xp.len();
-    let m_i = i64::exact_from(m);
+    let xs_len = xs.len();
+    let digit_len_i = i64::exact_from(digit_len);
     // MPFR_ZIV_INIT: the initial precision increment.
-    let mut ziv_step = width;
+    let mut ziv_step = Limb::WIDTH;
     loop {
         let mut exact = true;
         // number of limbs for the working precision
-        let n = usize::exact_from((prec - 1) / width + 1);
+        let n = bit_to_limb_count_ceiling(prec);
         let mut a = vec![0; n];
-        let exp_a: i64;
+        let mut exp_a: i64;
         let mut err: i64;
-        let mut exp_a_mut;
-        if m_i == g {
+        if digit_len_i == g {
             // final exponent is 0: no multiplication or division to perform
-            if nx > n {
-                exact = slice_test_zero(&xp[..nx - n]);
-            }
-            err = i64::from(!exact);
-            // copy the most significant min(n, nx) limbs of x into a, right-justified
-            if n <= nx {
-                a.copy_from_slice(&xp[nx - n..]);
+            err = if n < xs_len {
+                let (xs_lo, xs_hi) = xs.split_at(xs_len - n);
+                exact = slice_test_zero(xs_lo);
+                a.copy_from_slice(xs_hi);
+                i64::from(!exact)
             } else {
-                a[n - nx..].copy_from_slice(xp);
-            }
-            exp_a = x_exp - i64::exact_from(n) * width;
-        } else if m_i > g {
-            // multiply x by b ^ exp; the error on a is at most 2 ^ err ulps
+                a[n - xs_len..].copy_from_slice(xs);
+                0
+            };
+            exp_a = x_exp - i64::exact_from(limb_to_bit_count(n));
+        } else if digit_len_i > g {
+            // multiply x by abs_base ^ exp; the error on a is at most 2 ^ err ulps
             let err_e;
-            (exp_a_mut, err_e) = limbs_float_exp(&mut a, b, exp);
+            (exp_a, err_e) = limbs_float_exp(&mut a, abs_base, exp);
             exact = err_e == -1;
-            // x = x1 * 2 ^ (n * Limb::WIDTH): the top min(n, nx) limbs of x
-            let nx1 = min(n, nx);
-            let x1 = if nx >= n { &xp[nx - n..] } else { xp };
-            if nx > n {
-                exact = exact && slice_test_zero(&xp[..nx - n]);
-            }
+            // x = x1 * 2 ^ (n * Limb::WIDTH): the top min(n, xs_len) limbs of x
+            let (x1, nx1) = if n < xs_len {
+                let (xs_lo, xs_hi) = xs.split_at(xs_len - n);
+                if exact {
+                    exact = slice_test_zero(xs_lo);
+                }
+                (xs_hi, n)
+            } else {
+                (xs, xs_len)
+            };
             // we lose one more bit in the multiplication, except when err = 0 (two bits)
             err = if err_e <= 0 { 2 } else { i64::from(err_e) + 1 };
             let result = limbs_mul(&a, x1);
-            exp_a_mut += x_exp;
-            if !slice_test_zero(&result[..nx1]) {
+            let (result_lo, result_hi) = result.split_at(nx1);
+            let result_hi = &result_hi[..n];
+            if !slice_test_zero(result_lo) {
                 exact = false;
             }
+            exp_a += x_exp;
             // normalize a and truncate
-            if result[n + nx1 - 1].get_highest_bit() {
-                a.copy_from_slice(&result[nx1..nx1 + n]);
+            if result_hi.last().unwrap().get_highest_bit() {
+                a.copy_from_slice(result_hi);
             } else {
-                limbs_shl_to_out(&mut a, &result[nx1..nx1 + n], 1);
-                a[0] |= Limb::from(result[nx1 - 1].get_highest_bit());
-                exp_a_mut -= 1;
+                limbs_shl_to_out(&mut a, result_hi, 1);
+                a[0] |= Limb::from(result_lo.last().unwrap().get_highest_bit());
+                exp_a -= 1;
             }
-            exp_a = exp_a_mut;
         } else {
-            // m < g: divide x by b ^ exp
+            // digit_len < g: divide x by abs_base ^ exp
             let err_e;
-            (exp_a_mut, err_e) = limbs_float_exp(&mut a, b, exp);
+            (exp_a, err_e) = limbs_float_exp(&mut a, abs_base, exp);
             exact = err_e == -1;
             let two_n = n << 1;
-            let mut result = vec![0; n + 1];
-            let mut rem = vec![0; n];
-            let x1: Vec<Limb> = if two_n <= nx {
-                // we ignore the low nx - 2 * n limbs of x
-                if exact && !slice_test_zero(&xp[..nx - two_n]) {
+            let mut scratch;
+            let rem;
+            let result;
+            let x1 = if two_n <= xs_len {
+                scratch = vec![0; two_n + 1];
+                (rem, result) = scratch.split_at_mut(n);
+                let (xs_lo, xs_hi) = xs.split_at(xs_len - two_n);
+                // we ignore the low xs_len - 2 * n limbs of x
+                if exact && !slice_test_zero(xs_lo) {
                     exact = false;
                 }
-                xp[nx - two_n..].to_vec()
+                xs_hi
             } else {
-                // copy the nx most significant limbs of x into the top of x1
-                let mut x1 = vec![0; two_n];
-                x1[two_n - nx..].copy_from_slice(xp);
-                x1
+                scratch = vec![0; (two_n << 1) + 1];
+                let scratch_2;
+                (rem, scratch_2) = scratch.split_at_mut(n);
+                let x1_mut;
+                (x1_mut, result) = scratch_2.split_at_mut(two_n);
+                // copy the xs_len most significant limbs of x into the top of x1
+                x1_mut[two_n - xs_len..].copy_from_slice(xs);
+                &*x1_mut
             };
             // result = x / a
             if n == 1 {
-                rem[0] = limbs_div_limb_to_out_mod(&mut result, &x1, a[0]);
+                rem[0] = limbs_div_limb_to_out_mod(result, x1, a[0]);
             } else {
-                limbs_div_mod_to_out(&mut result, &mut rem, &x1, &a);
+                limbs_div_mod_to_out(result, rem, x1, &a);
             }
-            exp_a_mut = x_exp - exp_a_mut - i64::exact_from(two_n) * width;
+            exp_a = x_exp - exp_a - i64::exact_from(limb_to_bit_count(two_n));
             // test if the division was exact
             if exact {
-                exact = slice_test_zero(&rem);
+                exact = slice_test_zero(rem);
             }
             // normalize the result and copy into a
-            if result[n] == 1 {
-                limbs_shr_to_out(&mut a, &result[..n], 1);
+            let (result_last, result_init) = result.split_last().unwrap();
+            if *result_last == 1 {
+                limbs_shr_to_out(&mut a, result_init, 1);
                 a[n - 1] |= LIMB_HIGH_BIT;
-                exp_a_mut += 1;
+                exp_a += 1;
             } else {
-                a.copy_from_slice(&result[..n]);
+                a.copy_from_slice(result_init);
             }
             err = if err_e == -1 { 2 } else { i64::from(err_e) + 2 };
-            exp_a = exp_a_mut;
         }
         if exact {
             err = -1;
         }
-        let mut s = vec![0; m];
+        let mut s = vec![0; digit_len];
         assert!(exp_a < 0);
-        let (ret, e) = limbs_get_str_aux(&mut s, &mut a, exp_a.unsigned_abs(), err, b0, m, rnd);
-        if ret == MPFR_ROUND_FAILED {
-            // error too large: increase the working precision (MPFR_ZIV_NEXT)
-            prec += ziv_step;
-            ziv_step = prec / 2;
-        } else if ret == -MPFR_ROUND_FAILED {
-            // too many digits in the mantissa: adjust the final exponent g and exp = |m - g|
-            if m_i > g {
-                g += 1;
-                exp -= 1;
-            } else {
-                g += 1;
-                exp += 1;
+        let (ret, e) = limbs_get_str_aux(
+            &mut s,
+            &mut a,
+            exp_a.unsigned_abs(),
+            err,
+            base,
+            digit_len,
+            rm,
+        );
+        const NEG_MPFR_ROUND_FAILED: i8 = -MPFR_ROUND_FAILED;
+        match ret {
+            MPFR_ROUND_FAILED => {
+                // error too large: increase the working precision (MPFR_ZIV_NEXT)
+                prec += ziv_step;
+                ziv_step = prec >> 1;
             }
-        } else {
-            // the exponent of s is its own exponent plus g; ret is the rounding direction
-            return (s, e + g, ret);
+            NEG_MPFR_ROUND_FAILED => {
+                // too many digits in the mantissa: adjust the final exponent g and exp = |digit_len
+                // - g|
+                if digit_len_i > g {
+                    exp -= 1;
+                } else {
+                    exp += 1;
+                }
+                g += 1;
+            }
+            _ => {
+                // the exponent of s is its own exponent plus g; ret is the rounding direction
+                return (s, e + g, ret);
+            }
         }
     }
 }

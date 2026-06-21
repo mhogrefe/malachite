@@ -174,7 +174,7 @@ pub fn get_str(
                     // add the maximal exponentiation error
                     prec += 3 * i64::exact_from(u64::exact_from(exp).ceiling_log_base_2());
                 }
-                limbs_get_str(&xp, x_exp, b, b0, m, rnd, g, prec, exp)
+                limbs_get_str(&xp, x_exp, b, b0, m, rnd, g, u64::exact_from(prec), exp)
             };
             (neg, s, e, dir)
         }
