@@ -18,7 +18,7 @@ use crate::conversion::string::get_str_data::MPFR_L2B;
 use crate::floor_and_ceiling;
 use core::cmp::Ordering::{self, Equal};
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, NegAssign, Sign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor};
@@ -105,10 +105,10 @@ pub fn get_str(
     x: &Float,
     b0: i64,
     m: usize,
-    rnd: RoundingMode,
+    mut rnd: RoundingMode,
 ) -> Option<(Vec<u8>, i64, Ordering)> {
     // valid bases are -36..=-2 and 2..=62
-    if b0 < -36 || (-2 < b0 && b0 < 2) || 62 < b0 {
+    if !(-36..=-2).contains(&b0) && !(2..=62).contains(&b0) {
         return None;
     }
     let b = b0.unsigned_abs();
@@ -142,15 +142,9 @@ pub fn get_str(
             // For a negative x, reduce to the magnitude by inverting the rounding direction (the
             // mpfr_get_str MPFR_INVERT_RND step).
             let neg = !*sign;
-            let rnd = if neg {
-                match rnd {
-                    Floor => Ceiling,
-                    Ceiling => Floor,
-                    rnd => rnd,
-                }
-            } else {
-                rnd
-            };
+            if neg {
+                rnd.neg_assign();
+            }
             // Malachite's `exponent` is MPFR's EXP (the scientific exponent plus one).
             let xp = significand.to_limbs_asc();
             let x_exp = i64::from(*exponent);
@@ -158,15 +152,15 @@ pub fn get_str(
                 limbs_get_str_power_of_2(&xp, x_exp, *precision, b, b0, m, rnd)
             } else {
                 let g = ceil_mul(x_exp - 1, b, 1);
-                let exp = (i64::exact_from(m) - g).abs();
+                let exp = (i64::exact_from(m) - g).unsigned_abs();
                 // radix-2 precision needed for m digits in base b, plus guard bits
-                let mut prec = ceil_mul(i64::exact_from(m), b, 0) + 1;
-                prec += i64::exact_from(u64::exact_from(prec).ceiling_log_base_2());
+                let mut prec = u64::exact_from(ceil_mul(i64::exact_from(m), b, 0)) + 1;
+                prec += prec.ceiling_log_base_2();
                 if exp != 0 {
                     // add the maximal exponentiation error
-                    prec += 3 * i64::exact_from(u64::exact_from(exp).ceiling_log_base_2());
+                    prec += 3 * exp.ceiling_log_base_2();
                 }
-                limbs_get_str(&xp, x_exp, b, b0, m, rnd, g, u64::exact_from(prec), exp)
+                limbs_get_str(&xp, x_exp, b, b0, m, rnd, g, prec, i64::exact_from(exp))
             };
             (neg, s, e, dir)
         }
@@ -181,10 +175,11 @@ pub fn get_str(
          requested number of base-{b0} digits"
     );
     // `dir` orders the result's magnitude against `|x|`; negating both reverses the order.
-    let o = dir.cmp(&0);
-    let o = if neg { o.reverse() } else { o };
-    if neg {
+    let o = dir.sign();
+    Some(if neg {
         s.insert(0, b'-');
-    }
-    Some((s, e, o))
+        (s, e, o.reverse())
+    } else {
+        (s, e, o)
+    })
 }
