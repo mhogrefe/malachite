@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::floor_and_ceiling;
 use crate::malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
@@ -16,9 +17,7 @@ pub fn log_2_e_prec_round_simple(prec: u64, rm: RoundingMode) -> (Float, Orderin
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let ln_2_lo = Float::ln_2_prec_round(working_prec, Floor).0;
-        let mut ln_2_hi = ln_2_lo.clone();
-        ln_2_hi.increment();
+        let (ln_2_lo, ln_2_hi) = floor_and_ceiling(Float::ln_2_prec_round(working_prec, Floor));
         let lo = ln_2_hi.reciprocal_round(Floor).0;
         let hi = ln_2_lo.reciprocal_round(Ceiling).0;
         let (log_2_e_lo, mut o_lo) = Float::from_float_prec_round(lo, prec, rm);

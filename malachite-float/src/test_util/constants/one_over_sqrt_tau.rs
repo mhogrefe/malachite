@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::floor_and_ceiling;
 use crate::malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
@@ -16,9 +17,7 @@ pub fn one_over_sqrt_tau_prec_round_simple(prec: u64, rm: RoundingMode) -> (Floa
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let tau_lo = Float::tau_prec_round(working_prec, Floor).0;
-        let mut tau_hi = tau_lo.clone();
-        tau_hi.increment();
+        let (tau_lo, tau_hi) = floor_and_ceiling(Float::tau_prec_round(working_prec, Floor));
         let lo = tau_hi.reciprocal_sqrt_round(Floor).0;
         let hi = tau_lo.reciprocal_sqrt_round(Ceiling).0;
         let (one_over_sqrt_tau_lo, mut o_lo) = Float::from_float_prec_round(lo, prec, rm);

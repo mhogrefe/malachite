@@ -13,6 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::floor_and_ceiling;
 use core::cmp::Ordering;
 use core::cmp::Ordering::*;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -68,9 +69,8 @@ impl Float {
         let mut working_prec = prec + 10;
         let mut increment = Limb::WIDTH;
         loop {
-            let sqrt_2_lo = Self::sqrt_2_prec_round(working_prec, Floor).0;
-            let mut sqrt_2_hi = sqrt_2_lo.clone();
-            sqrt_2_hi.increment();
+            let (sqrt_2_lo, sqrt_2_hi) =
+                floor_and_ceiling(Self::sqrt_2_prec_round(working_prec, Floor));
             let lo = Self::ONE
                 .agm_round(sqrt_2_hi, Ceiling)
                 .0

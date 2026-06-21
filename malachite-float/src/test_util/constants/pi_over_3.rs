@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::floor_and_ceiling;
 use crate::malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
@@ -17,9 +18,7 @@ pub fn pi_over_3_prec_round_simple(prec: u64, rm: RoundingMode) -> (Float, Order
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let pi_lo = Float::pi_prec_round(working_prec, Floor).0;
-        let mut pi_hi = pi_lo.clone();
-        pi_hi.increment();
+        let (pi_lo, pi_hi) = floor_and_ceiling(Float::pi_prec_round(working_prec, Floor));
         let lo = pi_lo.div_round(THREE, Floor).0;
         let hi = pi_hi.div_round(THREE, Ceiling).0;
         let (pi_over_3_lo, mut o_lo) = Float::from_float_prec_round(lo, prec, rm);

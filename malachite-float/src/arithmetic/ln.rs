@@ -16,7 +16,7 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
-    float_infinity, float_nan, float_negative_infinity, float_zero,
+    float_infinity, float_nan, float_negative_infinity, float_zero, floor_and_ceiling,
 };
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
@@ -223,8 +223,7 @@ fn ln_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Orde
         if x_o == Equal {
             return ln_prec_round_normal(x_lo, prec, rm);
         }
-        let mut x_hi = x_lo.clone();
-        x_hi.increment();
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
         let (ln_lo, mut o_lo) = ln_prec_round_normal(x_lo, prec, rm);
         let (ln_hi, mut o_hi) = ln_prec_round_normal(x_hi, prec, rm);
         if o_lo == Equal {
@@ -249,8 +248,7 @@ fn ln_rational_helper_extended(x: &Rational, prec: u64, rm: RoundingMode) -> (Fl
         if x_o == Equal {
             return ln_prec_round_normal_extended(x_lo, prec, rm);
         }
-        let mut x_hi = x_lo.clone();
-        x_hi.increment();
+        let (x_lo, x_hi) = crate::basic::extended::floor_and_ceiling((x_lo, x_o));
         let (ln_lo, mut o_lo) = ln_prec_round_normal_extended(x_lo, prec, rm);
         let (ln_hi, mut o_hi) = ln_prec_round_normal_extended(x_hi, prec, rm);
         if o_lo == Equal {

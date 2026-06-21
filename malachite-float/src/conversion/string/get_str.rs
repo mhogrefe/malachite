@@ -15,12 +15,12 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::conversion::string::get_str_data::MPFR_L2B;
+use crate::floor_and_ceiling;
 use core::cmp::Ordering::{self, Equal};
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::CeilingLogBase2;
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_str_power_of_2};
@@ -43,52 +43,44 @@ pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     i64::rounding_from(&t, Ceiling).0
 }
 
-// Returns at least `1 + ceil(p * log(2) / log(b))` digits, where `p` is the number of bits of the
-// mantissa, ensuring that converting the output back gives the same `Float`.
+// Returns at least `1 + ceil(bit_len * log(2) / log(base))` digits, where `bit_len` is the number
+// of bits of the mantissa, ensuring that converting the output back gives the same `Float`.
 //
-// `b` must be between 2 and 62, inclusive.
+// `base` must be between 2 and 62, inclusive.
 //
 // This is `mpfr_get_str_ndigits` from `get_str.c`, MPFR 4.2.2.
-pub(crate) fn get_str_ndigits(b: u64, p: u64) -> usize {
-    assert!((2..=62).contains(&b));
+pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
+    assert!((2..=62).contains(&base));
     // Deal first with power-of-two bases, since even for those, `ceil_mul` might return a value too
-    // large by 1. For `b = 2 ^ k`, this is `1 + ceil((p - 1) / k) = 2 + floor((p - 2) / k)`.
-    if b.is_power_of_two() {
-        let k = b.significant_bits() - 1;
-        return usize::exact_from(1 + (p + k - 2) / k);
+    // large by 1. For `base = 2 ^ k`, this is `1 + ceil((bit_len - 1) / k) = 2 + floor((bit_len -
+    // 2) / k)`.
+    if let Some(k) = base.checked_log_base_2() {
+        return usize::exact_from(1 + (bit_len + k - 2) / k);
     }
-    // `ceil_mul` is guaranteed to give `1 + ceil(p * log(2) / log(b))` for `p` below this bound
-    // (for `p = 186564318007` and `b = 7` or `49` it returns one more).
-    let ret = if p < 186_564_318_007 {
-        u64::exact_from(ceil_mul(i64::exact_from(p), b, 1))
+    // `ceil_mul` is guaranteed to give `1 + ceil(bit_len * log(2) / log(base))` for `bit_len` below
+    // this bound (for `bit_len = 186564318007` and `base = 7` or `49` it returns one more).
+    let ret = if bit_len < 186_564_318_007 {
+        u64::exact_from(ceil_mul(i64::exact_from(bit_len), base, 1))
     } else {
-        // `p` is large and `b` is not a power of two, so `p * log(2) / log(b)` cannot be an integer
-        // and Ziv's loop terminates. `w` is the working precision; `ceil_mul` used a 77-bit upper
-        // approximation to `log(2) / log(b)`. Reaching here needs a mantissa of at least ~1.86e11
-        // bits, far beyond any `Float` the test suite builds.
-        fail_on_untested_path("get_str_ndigits, Ziv loop for huge p");
+        // `bit_len` is large and `base` is not a power of two, so `bit_len * log(2) / log(base)`
+        // cannot be an integer and Ziv's loop terminates. `w` is the working precision; `ceil_mul`
+        // used a 77-bit upper approximation to `log(2) / log(base)`. Reaching here needs a mantissa
+        // of at least ~1.86e11 bits, far beyond any `Float` the test suite builds.
+        fail_on_untested_path("get_str_ndigits, Ziv loop for huge bit_len");
         let mut w = 77;
         loop {
-            w *= 2;
-            // upper (rounding up) and lower (rounding down) approximations to `log2(b)`
-            let log_hi = Float::from_unsigned_prec(b, w)
-                .0
-                .log_base_2_prec_round(w, Ceiling)
-                .0;
-            let log_lo = Float::from_unsigned_prec(b, w)
-                .0
-                .log_base_2_prec_round(w, Floor)
-                .0;
-            // lower (`p / log_hi`, rounding down) and upper (`p / log_lo`, rounding up) bounds on
-            // `p * log(2) / log(b)`, each rounded up to an integer
-            let lo = Float::from_unsigned_prec(p, w)
-                .0
-                .div_prec_round(log_hi, w, Floor)
-                .0;
-            let hi = Float::from_unsigned_prec(p, w)
-                .0
-                .div_prec_round(log_lo, w, Ceiling)
-                .0;
+            w <<= 1;
+            // lower (rounding down) and upper (rounding up) approximations to `log2(base)`
+            let (log_lo, log_hi) = floor_and_ceiling(
+                Float::from_unsigned_prec(base, w)
+                    .0
+                    .log_base_2_prec_round(w, Floor),
+            );
+            // lower (`bit_len / log_hi`, rounding down) and upper (`bit_len / log_lo`, rounding up)
+            // bounds on `bit_len * log(2) / log(base)`, each rounded up to an integer
+            let pf = Float::from_unsigned_prec(bit_len, w).0;
+            let lo = pf.div_prec_round_ref_val(log_hi, w, Floor).0;
+            let hi = pf.div_prec_round(log_lo, w, Ceiling).0;
             let lo = u64::rounding_from(&lo, Ceiling).0;
             let hi = u64::rounding_from(&hi, Ceiling).0;
             if lo == hi {

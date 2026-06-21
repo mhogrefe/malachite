@@ -25,6 +25,20 @@ use malachite_nz::natural::arithmetic::float_sub::exponent_shift_compare;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
+// The `ExtendedFloat` analogue of `crate::floor_and_ceiling`: given the `(floor, ordering)` pair
+// from a computation rounded toward negative infinity, returns the `(floor, ceiling)` pair of
+// `ExtendedFloat`s bracketing the exact result, obtaining the ceiling by incrementing the floor
+// when the value is inexact.
+pub(crate) fn floor_and_ceiling(
+    (floor, o): (ExtendedFloat, Ordering),
+) -> (ExtendedFloat, ExtendedFloat) {
+    let mut ceiling = floor.clone();
+    if o != Equal {
+        ceiling.increment();
+    }
+    (floor, ceiling)
+}
+
 pub_crate_test_struct! {
 #[derive(Clone)]
 ExtendedFloat {

@@ -194,6 +194,20 @@ pub(crate) fn significand_bits(significand: &Natural) -> u64 {
     significand.limb_count() << Limb::LOG_WIDTH
 }
 
+// Given the `(Float, Ordering)` pair from a computation that rounded toward negative infinity (the
+// `Float` is the rounded-down value and the `Ordering` compares it to the exact result, as the
+// `*_prec_round` functions return), returns the `(floor, ceiling)` pair of `Float`s bracketing the
+// exact result. When the value is inexact the ceiling is the next `Float` above the floor, so it is
+// obtained by incrementing the floor rather than recomputing — much cheaper when the value comes
+// from, for example, a transcendental function.
+pub(crate) fn floor_and_ceiling((floor, o): (Float, Ordering)) -> (Float, Float) {
+    let mut ceiling = floor.clone();
+    if o != Equal {
+        ceiling.increment();
+    }
+    (floor, ceiling)
+}
+
 impl Float {
     /// The maximum raw exponent of any [`Float`], equal to $2^{30}-1$, or $1,073,741,823$. This is
     /// one more than the maximum scientific exponent. If we write a [`Float`] as $\pm m2^e$, with

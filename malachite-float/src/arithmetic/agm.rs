@@ -16,8 +16,8 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::basic::extended::{ExtendedFloat, agm_prec_round_normal_extended};
 use crate::{
     Float, emulate_float_float_to_float_fn, emulate_rational_rational_to_float_fn,
-    float_either_infinity, float_either_zero, float_infinity, float_nan, float_zero, test_overflow,
-    test_underflow,
+    float_either_infinity, float_either_zero, float_infinity, float_nan, float_zero,
+    floor_and_ceiling, test_overflow, test_underflow,
 };
 use alloc::borrow::Cow;
 use core::cmp::Ordering::{self, *};
@@ -399,14 +399,8 @@ fn agm_rational_helper(
         if x_o == Equal && y_o == Equal {
             return agm_prec_round_normal(x_lo, y_lo, prec, rm);
         }
-        let mut x_hi = x_lo.clone();
-        if x_o != Equal {
-            x_hi.increment();
-        }
-        let mut y_hi = y_lo.clone();
-        if y_o != Equal {
-            y_hi.increment();
-        }
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
+        let (y_lo, y_hi) = floor_and_ceiling((y_lo, y_o));
         let (agm_lo, mut o_lo) = agm_prec_round_normal(x_lo, y_lo, prec, rm);
         let (agm_hi, mut o_hi) = agm_prec_round_normal(x_hi, y_hi, prec, rm);
         if o_lo == Equal {
@@ -438,14 +432,8 @@ fn agm_rational_helper_extended(
             let (agm, o) = agm_prec_round_normal_extended(x_lo, y_lo, prec, rm);
             return agm.into_float_helper(prec, rm, o);
         }
-        let mut x_hi = x_lo.clone();
-        if x_o != Equal {
-            x_hi.increment();
-        }
-        let mut y_hi = y_lo.clone();
-        if y_o != Equal {
-            y_hi.increment();
-        }
+        let (x_lo, x_hi) = crate::basic::extended::floor_and_ceiling((x_lo, x_o));
+        let (y_lo, y_hi) = crate::basic::extended::floor_and_ceiling((y_lo, y_o));
         let (agm_lo, mut o_lo) = agm_prec_round_normal_extended(x_lo, y_lo, prec, rm);
         let (agm_hi, mut o_hi) = agm_prec_round_normal_extended(x_hi, y_hi, prec, rm);
         if o_lo == Equal {
