@@ -266,21 +266,21 @@ pub fn natural_vec_nrm(
 #[allow(clippy::type_complexity)]
 pub fn get_str_aux_inputs(
     (mut r, v1, v2, v3, rnd): (Vec<Limb>, u64, u64, u64, RoundingMode),
-) -> (Vec<Limb>, i64, i64, i64, usize, RoundingMode) {
+) -> (Vec<Limb>, u64, i64, i64, usize, RoundingMode) {
     let width = Limb::WIDTH;
     let n_width = u64::exact_from(r.len()) * width;
     // Normalize r.
     *r.last_mut().unwrap() |= Limb::power_of_2(width - 1);
-    // |f| in [0, n_width - 1], so f <= 0 and f > -n_width.
-    let f = -i64::exact_from(v1 % n_width);
+    // neg_f = -f in [0, n_width - 1] (the function takes the magnitude of the non-positive f).
+    let neg_f = v1 % n_width;
     // base: a non-power-of-2 in 3..=62.
     let mut b0 = (v3 % 60) + 3;
     if b0.is_power_of_two() {
         b0 += 1;
     }
-    // N = floor(r * 2 ^ f) = r >> |f| has base-b0 digit count m0, with b0 ^ (m0 - 1) <= N < b0 ^
-    // m0.
-    let big_n = Natural::from_limbs_asc(&r) >> f.unsigned_abs();
+    // N = r >> neg_f = floor(r * 2 ^ -neg_f) has base-b0 digit count m0, with b0 ^ (m0 - 1) <= N <
+    // b0 ^ m0.
+    let big_n = Natural::from_limbs_asc(&r) >> neg_f;
     let m0 = usize::exact_from(big_n.floor_log_base(&Natural::from(b0)) + 1);
     // The real precondition is `b0 ^ (m - 1) <= Y < 2 * b0 ^ m` (tighter than the `< b0 ^ (m + 1)`
     // in `limbs_get_str_aux`'s header): the round-away carry can't propagate past a leading digit
@@ -305,5 +305,5 @@ pub fn get_str_aux_inputs(
     } else {
         i64::exact_from(3 + v2 % n_width)
     };
-    (r, f, e, i64::exact_from(b0), m, rnd)
+    (r, neg_f, e, i64::exact_from(b0), m, rnd)
 }

@@ -3760,7 +3760,7 @@ pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, RationalSequence<Natu
 
 // All valid `(r, f, e, b0, m, rnd)` inputs for `limbs_get_str_aux`.
 #[allow(clippy::type_complexity)]
-pub fn large_type_gen_var_28() -> Generator<(Vec<Limb>, i64, i64, i64, usize, RoundingMode)> {
+pub fn large_type_gen_var_28() -> Generator<(Vec<Limb>, u64, i64, i64, usize, RoundingMode)> {
     Generator::new(
         &exhaustive_large_type_gen_var_28,
         &random_large_type_gen_var_28,

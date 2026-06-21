@@ -55,12 +55,12 @@ fn benchmark_limbs_float_exp(gm: GenMode, config: &GenConfig, limit: usize, file
 }
 
 fn demo_limbs_get_str_aux(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mut r, f, e, b0, m, rnd) in large_type_gen_var_28().get(gm, config).take(limit) {
+    for (mut r, neg_f, e, b0, m, rnd) in large_type_gen_var_28().get(gm, config).take(limit) {
         let r_old = r.clone();
         let mut out = vec![0; m];
-        let (dir, exp) = limbs_get_str_aux(&mut out, &mut r, f, e, b0, m, rnd);
+        let (dir, exp) = limbs_get_str_aux(&mut out, &mut r, neg_f, e, b0, m, rnd);
         println!(
-            "limbs_get_str_aux(out, {r_old:?}, {f}, {e}, {b0}, {m}, {rnd}) = (dir = {dir}, \
+            "limbs_get_str_aux(out, {r_old:?}, {neg_f}, {e}, {b0}, {m}, {rnd}) = (dir = {dir}, \
              exp = {exp}); str = {:?}",
             String::from_utf8_lossy(&out)
         );
@@ -69,7 +69,7 @@ fn demo_limbs_get_str_aux(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn benchmark_limbs_get_str_aux(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "limbs_get_str_aux(&mut [u8], &mut [Limb], i64, i64, i64, usize, RoundingMode)",
+        "limbs_get_str_aux(&mut [u8], &mut [Limb], u64, i64, i64, usize, RoundingMode)",
         BenchmarkType::Single,
         large_type_gen_var_28().get(gm, config),
         gm.name(),
@@ -78,7 +78,7 @@ fn benchmark_limbs_get_str_aux(gm: GenMode, config: &GenConfig, limit: usize, fi
         &Bucketer {
             bucketing_function: &|(r, _, _, _, _, _): &(
                 Vec<Limb>,
-                i64,
+                u64,
                 i64,
                 i64,
                 usize,
@@ -86,8 +86,16 @@ fn benchmark_limbs_get_str_aux(gm: GenMode, config: &GenConfig, limit: usize, fi
             )| r.len(),
             bucketing_label: "r.len()".to_string(),
         },
-        &mut [("Malachite", &mut |(mut r, f, e, b0, m, rnd)| {
-            no_out!(limbs_get_str_aux(&mut vec![0; m], &mut r, f, e, b0, m, rnd));
+        &mut [("Malachite", &mut |(mut r, neg_f, e, b0, m, rnd)| {
+            no_out!(limbs_get_str_aux(
+                &mut vec![0; m],
+                &mut r,
+                neg_f,
+                e,
+                b0,
+                m,
+                rnd
+            ));
         })],
     );
 }

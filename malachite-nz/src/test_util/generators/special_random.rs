@@ -8022,7 +8022,7 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_22(
 #[allow(clippy::type_complexity)]
 pub fn special_random_large_type_gen_var_28(
     config: &GenConfig,
-) -> It<(Vec<Limb>, i64, i64, i64, usize, RoundingMode)> {
+) -> It<(Vec<Limb>, u64, i64, i64, usize, RoundingMode)> {
     Box::new(
         random_quintuples_xyyyz(
             EXAMPLE_SEED,
