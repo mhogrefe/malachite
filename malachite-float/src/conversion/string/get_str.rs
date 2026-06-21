@@ -91,11 +91,11 @@ pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
     usize::exact_from(1 + ret)
 }
 
-// Computes the mantissa digit string and exponent of a `Float` `x` in base `b0` (`2 <= |b0| <= 62`,
-// or a negative base in `-36..=-2`), with `m` digits (`m == 0` chooses the minimum that
-// round-trips, via `get_str_ndigits`), rounding with `rnd`. Returns the digit characters (with a
-// leading `-` for a negative `x`) and the exponent, or `None` if the base is invalid. Special
-// values produce the strings `@NaN@`, `@Inf@`, and `-@Inf@`.
+// Computes the mantissa digit string and exponent of a `Float` `x` in base `base` (`2 <= |base| <=
+// 62`, or a negative base in `-36..=-2`), with `digit_len` digits (`digit_len == 0` chooses the
+// minimum that round-trips, via `get_str_ndigits`), rounding with `rm`. Returns the digit
+// characters (with a leading `-` for a negative `x`) and the exponent, or `None` if the base is
+// invalid. Special values produce the strings `@NaN@`, `@Inf@`, and `-@Inf@`.
 //
 // The third return value is an [`Ordering`] indicating whether the returned (rounded) value is less
 // than, equal to, or greater than `x`.
@@ -103,15 +103,15 @@ pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
 // This is `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
 pub fn get_str(
     x: &Float,
-    b0: i64,
-    m: usize,
-    mut rnd: RoundingMode,
+    base: i64,
+    digit_len: usize,
+    mut rm: RoundingMode,
 ) -> Option<(Vec<u8>, i64, Ordering)> {
     // valid bases are -36..=-2 and 2..=62
-    if !(-36..=-2).contains(&b0) && !(2..=62).contains(&b0) {
+    if !(-36..=-2).contains(&base) && !(2..=62).contains(&base) {
         return None;
     }
-    let b = b0.unsigned_abs();
+    let b = base.unsigned_abs();
     // `dir` is the direction in which the magnitude of `x` was rounded to the result (-1, 0, or 1).
     let (neg, mut s, e, dir) = match &x.0 {
         NaN => return Some((b"@NaN@".to_vec(), 0, Equal)),
@@ -124,9 +124,14 @@ pub fn get_str(
             return Some((s, 0, Equal));
         }
         Zero { sign } => {
-            // Malachite's zero carries no precision, so the m == 0 default (get_str_ndigits) does
-            // not apply; use a single digit.
-            (!*sign, vec![b'0'; if m == 0 { 1 } else { m }], 0, 0)
+            // Malachite's zero carries no precision, so the digit_len == 0 default
+            // (get_str_ndigits) does not apply; use a single digit.
+            (
+                !*sign,
+                vec![b'0'; if digit_len == 0 { 1 } else { digit_len }],
+                0,
+                0,
+            )
         }
         Finite {
             sign,
@@ -134,22 +139,22 @@ pub fn get_str(
             precision,
             significand,
         } => {
-            let m = if m == 0 {
+            let m = if digit_len == 0 {
                 get_str_ndigits(b, *precision)
             } else {
-                m
+                digit_len
             };
             // For a negative x, reduce to the magnitude by inverting the rounding direction (the
             // mpfr_get_str MPFR_INVERT_RND step).
             let neg = !*sign;
             if neg {
-                rnd.neg_assign();
+                rm.neg_assign();
             }
             // Malachite's `exponent` is MPFR's EXP (the scientific exponent plus one).
             let xp = significand.to_limbs_asc();
             let x_exp = i64::from(*exponent);
             let (s, e, dir) = if b.is_power_of_two() {
-                limbs_get_str_power_of_2(&xp, x_exp, *precision, b, b0, m, rnd)
+                limbs_get_str_power_of_2(&xp, x_exp, *precision, b, base, m, rm)
             } else {
                 let g = ceil_mul(x_exp - 1, b, 1);
                 let exp = (i64::exact_from(m) - g).unsigned_abs();
@@ -160,19 +165,19 @@ pub fn get_str(
                     // add the maximal exponentiation error
                     prec += 3 * exp.ceiling_log_base_2();
                 }
-                limbs_get_str(&xp, x_exp, b, b0, m, rnd, g, prec, i64::exact_from(exp))
+                limbs_get_str(&xp, x_exp, b, base, m, rm, g, prec, i64::exact_from(exp))
             };
             (neg, s, e, dir)
         }
     };
     // `Exact` demands that the digits represent `x` exactly; a nonzero `dir` means rounding was
     // needed, which violates the contract. (For odd bases this is common, since a dyadic `Float`
-    // rarely has a finite expansion there; and `m == 0` picks the round-trip digit count, which is
-    // generally fewer than the exact expansion needs.)
+    // rarely has a finite expansion there; and `digit_len == 0` picks the round-trip digit count,
+    // which is generally fewer than the exact expansion needs.)
     assert!(
-        rnd != Exact || dir == 0,
+        rm != Exact || dir == 0,
         "get_str: Exact rounding was requested, but {x} is not exactly representable in the \
-         requested number of base-{b0} digits"
+         requested number of base-{base} digits"
     );
     // `dir` orders the result's magnitude against `|x|`; negating both reverses the order.
     let o = dir.sign();
