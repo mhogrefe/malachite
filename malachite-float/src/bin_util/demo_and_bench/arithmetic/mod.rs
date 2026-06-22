@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     agm::register(runner);
     div::register(runner);
+    exp::register(runner);
     is_power_of_2::register(runner);
     ln::register(runner);
     ln_1_plus_x::register(runner);
@@ -49,6 +50,7 @@ mod abs;
 mod add;
 mod agm;
 mod div;
+mod exp;
 mod is_power_of_2;
 mod ln;
 mod ln_1_plus_x;

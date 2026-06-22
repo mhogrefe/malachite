@@ -4815,3 +4815,31 @@ pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_10()
         exhaustive_rounding_modes().filter(|&rm| rm != Exact),
     )))
 }
+
+pub fn exp_prec_round_valid(x: &Float, _prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || !x.is_normal()
+}
+
+pub(crate) fn exp_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    rm != Exact || !x.is_normal()
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.exp_prec_round`.
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_36() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| exp_prec_round_valid(x, p, rm)),
+    ))
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `Float.exp_round`.
+pub fn exhaustive_float_rounding_mode_pair_gen_var_47() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| exp_round_valid(f, *rm)),
+    )
+}

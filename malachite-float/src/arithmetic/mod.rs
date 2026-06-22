@@ -18,6 +18,10 @@ pub mod agm;
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.
 pub mod div;
+/// [`Exp`](malachite_base::num::arithmetic::traits::Exp) and
+/// [`ExpAssign`](malachite_base::num::arithmetic::traits::ExpAssign), traits for computing $e^x$ for
+/// [`Float`](super::Float)s.
+pub mod exp;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;

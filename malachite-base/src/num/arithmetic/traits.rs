@@ -461,6 +461,18 @@ pub trait LcmAssign<RHS = Self> {
     fn lcm_assign(&mut self, other: RHS);
 }
 
+/// Computes $e^x$, the exponential of a number.
+pub trait Exp {
+    type Output;
+
+    fn exp(self) -> Self::Output;
+}
+
+/// Replaces a number with its exponential, $e^x$.
+pub trait ExpAssign {
+    fn exp_assign(&mut self);
+}
+
 /// Takes the natural logarithm of a number.
 pub trait Ln {
     type Output;

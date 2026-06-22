@@ -9,6 +9,7 @@
 pub mod add;
 pub mod agm;
 pub mod div;
+pub mod exp;
 pub mod ln;
 pub mod ln_1_plus_x;
 pub mod log_base;
