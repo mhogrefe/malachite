@@ -661,7 +661,7 @@ const NUM_TO_TEXT_62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
 // - `MPFR_ROUND_FAILED` otherwise (too large error).
 //
 // This is `mpfr_get_str_aux` from `get_str.c`, MPFR 4.2.2.
-pub fn limbs_get_str_aux(
+pub_test! {limbs_get_str_aux(
     out: &mut [u8],
     xs: &mut [Limb],
     neg_f: u64,
@@ -796,7 +796,7 @@ pub fn limbs_get_str_aux(
         // round_helper_2 failed: rounding is not possible
         (MPFR_ROUND_FAILED, exp)
     }
-}
+}}
 
 // Computes the mantissa digits and exponent of a nonzero finite `Float` whose normalized
 // little-endian significand is `xs` and whose MPFR-style exponent (one more than the scientific
@@ -808,6 +808,7 @@ pub fn limbs_get_str_aux(
 // ceil_mul(x_exp - 1, abs_base, 1)`, the radix-2 working precision, and `|digit_len - g|`.
 //
 // This is the non-power-of-two, non-special branch of `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
+#[doc(hidden)]
 pub fn limbs_get_str(
     xs: &[Limb],
     x_exp: i64,
@@ -970,6 +971,7 @@ pub fn limbs_get_str(
 // `rm`.
 //
 // This is the power-of-two-base branch of `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
+#[doc(hidden)]
 pub fn limbs_get_str_power_of_2(
     xs: &[Limb],
     x_exp: i64,

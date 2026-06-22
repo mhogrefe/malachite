@@ -30,7 +30,7 @@ use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_s
 // log(beta)`. Both approximations are entries of `MPFR_L2B`.
 //
 // This is `mpfr_ceil_mul` from `get_str.c`, MPFR 4.2.2.
-pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
+fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     // p = mantissa * 2 ^ (exp - 128): the l2b approximation as an exact `Float`.
     let (mantissa, exp) = MPFR_L2B[usize::exact_from(beta) - 2][i];
     let (p, _) = Float::from_natural_prec(Natural::from(mantissa), 128);
@@ -49,7 +49,7 @@ pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
 // `base` must be between 2 and 62, inclusive.
 //
 // This is `mpfr_get_str_ndigits` from `get_str.c`, MPFR 4.2.2.
-pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
+fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
     assert!((2..=62).contains(&base));
     // Deal first with power-of-two bases, since even for those, `ceil_mul` might return a value too
     // large by 1. For `base = 2 ^ k`, this is `1 + ceil((bit_len - 1) / k) = 2 + floor((bit_len -
@@ -91,16 +91,85 @@ pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
     usize::exact_from(1 + ret)
 }
 
-// Computes the mantissa digit string and exponent of a `Float` `x` in base `base` (`2 <= |base| <=
-// 62`, or a negative base in `-36..=-2`), with `digit_len` digits (`digit_len == 0` chooses the
-// minimum that round-trips, via `get_str_ndigits`), rounding with `rm`. Returns the digit
-// characters (with a leading `-` for a negative `x`) and the exponent, or `None` if the base is
-// invalid. Special values produce the strings `@NaN@`, `@Inf@`, and `-@Inf@`.
-//
-// The third return value is an [`Ordering`] indicating whether the returned (rounded) value is less
-// than, equal to, or greater than `x`.
-//
-// This is `mpfr_get_str` from `get_str.c`, MPFR 4.2.2.
+/// Converts a [`Float`] to base-`base` mantissa digits and an exponent, rounding to `digit_len`
+/// digits with the rounding mode `rm`.
+///
+/// The digits are returned as ASCII characters (`0`–`9`, then lowercase `a`–`z`, then uppercase
+/// `A`–`Z`, supporting a `base` of up to 62; a negative `base` in `-36..=-2` uses base `|base|`
+/// with `0`–`9` and uppercase `A`–`Z`), preceded by `-` when `x` is negative. With the returned
+/// exponent $e$, the value represented is $0.d_1 d_2 \ldots \times \mathrm{base}^e$, where $d_1 d_2
+/// \ldots$ are the digits. If `digit_len` is 0, the fewest digits that round-trip back to `x` are
+/// used.
+///
+/// `base` must be in `2..=62` or `-36..=-2`; any other value returns `None`.
+///
+/// The returned [`Ordering`] reports whether the rounded result is less than, equal to, or greater
+/// than the exact value of `x`. The special values NaN, $\infty$, and $-\infty$ produce the strings
+/// `@NaN@`, `@Inf@`, and `-@Inf@`, each with exponent 0 and `Equal`.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.complexity(), digit_len)`.
+///
+/// # Panics
+/// Panics if `rm` is `Exact` but `x` cannot be represented exactly in `digit_len` base-`base`
+/// digits.
+///
+/// # Examples
+/// ```
+/// use core::cmp::Ordering::*;
+/// use malachite_base::rounding_modes::RoundingMode::{self, *};
+/// use malachite_float::conversion::string::get_str::get_str;
+/// use malachite_float::Float;
+/// use malachite_q::Rational;
+///
+/// // Render the returned digit bytes as a `String` for readability.
+/// let s = |x: &Float, base: i64, n: usize, rm: RoundingMode| {
+///     get_str(x, base, n, rm)
+///         .map(|(digits, exp, ord)| (String::from_utf8(digits).unwrap(), exp, ord))
+/// };
+///
+/// // 1.25 to 3 digits: 0.125 * 10^1 in base 10, 0.101 * 2^1 in base 2, both exact.
+/// assert_eq!(
+///     s(&Float::from(1.25), 10, 3, Nearest),
+///     Some(("125".to_string(), 1, Equal))
+/// );
+/// assert_eq!(
+///     s(&Float::from(1.25), 2, 3, Nearest),
+///     Some(("101".to_string(), 1, Equal))
+/// );
+///
+/// // A negative value gets a leading `-`.
+/// assert_eq!(
+///     s(&Float::from(-1.25), 10, 3, Nearest),
+///     Some(("-125".to_string(), 1, Equal))
+/// );
+///
+/// // 1/3 (to 53 bits) has no finite base-10 expansion, so the result is rounded and the
+/// // `Ordering` gives the direction.
+/// let third = Float::from_rational_prec(Rational::from_unsigneds(1u32, 3u32), 53).0;
+/// assert_eq!(s(&third, 10, 4, Floor), Some(("3333".to_string(), 0, Less)));
+/// assert_eq!(
+///     s(&third, 10, 4, Ceiling),
+///     Some(("3334".to_string(), 0, Greater))
+/// );
+///
+/// // Special values produce fixed strings; an invalid base gives `None`.
+/// assert_eq!(
+///     s(&Float::from(f64::NAN), 2, 0, Down),
+///     Some(("@NaN@".to_string(), 0, Equal))
+/// );
+/// assert_eq!(
+///     s(&Float::from(f64::INFINITY), 2, 0, Down),
+///     Some(("@Inf@".to_string(), 0, Equal))
+/// );
+/// assert_eq!(s(&Float::from(1.25), 100, 0, Nearest), None);
+/// ```
+///
+/// This is mpfr_get_str from get_str.c, MPFR 4.2.2.
 pub fn get_str(
     x: &Float,
     base: i64,
