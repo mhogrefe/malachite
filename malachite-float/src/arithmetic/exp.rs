@@ -24,9 +24,9 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::mem::swap;
-use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Exp, ExpAssign, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2, SquareAssign,
+    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2,
+    SquareAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -62,9 +62,8 @@ fn mpz_normalize(z: Integer, q: i64) -> (Integer, i64) {
 // Shifts `z` so that its 2-exponent becomes `target`: right (flooring) by `target - expz` if
 // `target > expz`, otherwise left by `expz - target`. Returns `target`.
 //
-// This is `mpz_normalize2` from `exp_2.c`, MPFR 4.2.2. currently only used by exp2_aux2, which is
-// ported later. Simple enough that it can be inlined
-#[allow(dead_code)]
+// This is `mpz_normalize2` from `exp_2.c`, MPFR 4.2.2. (A negative shift count reverses direction,
+// so the single `>>` covers both of MPFR's branches.)
 fn mpz_normalize2(z: Integer, expz: i64, target: i64) -> (Integer, i64) {
     (z >> (target - expz), target)
 }
@@ -141,14 +140,122 @@ fn exp2_aux(r: Float, q: u64) -> (Integer, i64, u64) {
     (s, exps, 3 * l * (l + 1))
 }
 
+// Precision (in bits) at which `exp_2` switches from the naive `exp2_aux` (square-root `K`) to the
+// Paterson-Stockmeyer `exp2_aux2` (cube-root `K`). MPFR tunes `MPFR_EXP_2_THRESHOLD` per platform;
+// this is the generic default (`generic/mparam.h`), pending Malachite tuning.
+const EXP_2_THRESHOLD: u64 = 100;
+
+// Computes `s = 1 + r/1! + r^2/2! + ... + r^l/l!` (continuing while r^l/l! is still significant at
+// precision `q`) in fixed point, where the returned `Integer` `s` and 2-exponent `exps` satisfy
+// (sum) = s * 2^exps. `r` must be pure FP with exponent < 0 (here it is positive and tiny). Uses
+// the Paterson-Stockmeyer scheme: about `m + l/m` full multiplications (`2*sqrt(l)` for `m =
+// sqrt(l)`), versus `exp2_aux`'s O(l). The error is bounded by `l^2 + 4*l` ulps, and that `l*(l+4)`
+// bound is the returned value.
+//
+// This is `mpfr_exp2_aux2` from `exp_2.c`, MPFR 4.2.2.
+fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
+    let qi = i64::try_from(q).unwrap();
+    let one_minus_q = 1 - qi;
+    // estimate the value of l, then m ~ sqrt(l); we access R[2], so we need m >= 2
+    let expr0 = i64::from(r.get_exponent().unwrap());
+    debug_assert!(expr0 < 0);
+    let l_est = q / u64::try_from(-expr0).unwrap();
+    let mut m = usize::try_from(l_est.floor_sqrt()).unwrap();
+    if m < 2 {
+        m = 2;
+    }
+    // r_pows[i] = r^i (integer mantissa), exp_r_pows[i] its 2-exponent
+    let mut r_pows = vec![Integer::ZERO; m + 1];
+    let mut exp_r_pows = vec![0i64; m + 1];
+    let exps = one_minus_q; // 1 ulp = 2^(1-q)
+    let mut s = Integer::ZERO;
+    let (r1, e1) = get_z_2exp(r); // exact: no error
+    // normalize R[1] to exponent 1 - q (error <= 1 ulp)
+    let (r1, _) = mpz_normalize2(r1, e1, one_minus_q);
+    r_pows[1] = r1;
+    exp_r_pows[1] = one_minus_q;
+    // R[2] = R[1]^2 >> (q - 1) (err <= 3 ulps)
+    r_pows[2] = (&r_pows[1] * &r_pows[1]) >> (q - 1);
+    exp_r_pows[2] = one_minus_q;
+    for i in 3..=m {
+        // err(R[i]) <= 2*i-1 ulps
+        let t = if i & 1 == 1 {
+            &r_pows[i - 1] * &r_pows[1]
+        } else {
+            &r_pows[i / 2] * &r_pows[i / 2]
+        };
+        r_pows[i] = t >> (q - 1);
+        exp_r_pows[i] = one_minus_q;
+    }
+    r_pows[0] = Integer::power_of_2(q - 1); // R[0] = 1
+    exp_r_pows[0] = one_minus_q;
+    let mut rr = Integer::ONE;
+    let mut expr: i64 = 0; // rr contains r^l/l!; by induction err(rr) <= 2*l ulps
+    let mut l: u64 = 0;
+    let mut ql = q; // precision used for the current giant step
+    loop {
+        let one_minus_ql = 1 - i64::try_from(ql).unwrap();
+        // all R[i] (i < m) must have exponent 1 - ql
+        if l != 0 {
+            for i in 0..m {
+                let z = core::mem::replace(&mut r_pows[i], Integer::ZERO);
+                (r_pows[i], exp_r_pows[i]) = mpz_normalize2(z, exp_r_pows[i], one_minus_ql);
+            }
+        }
+        // t = R[m-1] normalized to exponent 1 - ql (err(t) <= 2*m-1 ulps)
+        let (mut t, mut expt) =
+            mpz_normalize2(r_pows[m - 1].clone(), exp_r_pows[m - 1], one_minus_ql);
+        // t = 1 + r/(l+1) + ... + r^(m-1)*l!/(l+m-1)! via Horner's scheme
+        for i in (0..m - 1).rev() {
+            t /= Integer::from(l + i as u64 + 1); // err(t) += 1 ulp
+            t += &r_pows[i];
+        }
+        // multiply t by r^l/l! and add to s
+        t *= &rr;
+        expt += expr;
+        let (t, et) = mpz_normalize2(t, expt, exps);
+        debug_assert_eq!(et, exps);
+        s += &t; // no error here
+        // update rr to r^(l+m)/(l+m)!
+        let mut t = &rr * &r_pows[m]; // err(t) <= err(rr) + 2m-1
+        expr += exp_r_pows[m];
+        let mut tmp = Integer::ONE;
+        for i in 1..=m {
+            tmp *= Integer::from(l + i as u64);
+        }
+        t /= tmp; // err(t) <= err(rr) + 2m
+        l += m as u64;
+        if t == 0 {
+            break;
+        }
+        let (rr2, sh) = mpz_normalize(t, i64::try_from(ql).unwrap());
+        rr = rr2;
+        expr += sh;
+        // in late giant steps `ql` can go <= 0 (s has grown past the working precision), so
+        // normalizing t to ql bits can shift it away entirely; rr is then 0.
+        let rrbit = if rr == 0 {
+            1
+        } else {
+            i64::try_from(rr.significant_bits()).unwrap()
+        };
+        let sbit = i64::try_from(s.significant_bits()).unwrap();
+        ql = (qi - exps - sbit + expr + rrbit) as u64;
+        // MPFR's own `(size_t)` cast here is admittedly dubious (see its TODO), but the operands
+        // cluster near -q, far from the wrap, so the unsigned and signed comparisons agree.
+        if (expr as u64).wrapping_add(rrbit as u64) <= q.wrapping_neg() {
+            break;
+        }
+    }
+    (s, exps, l * (l + 4))
+}
+
 // Computes `exp(x)` rounded to precision `precy` with rounding mode `rm`, returning the rounded
 // value and an [`Ordering`] comparing it to the exact result. `x` must be finite and nonzero and
 // `exp(x)` must be in range; the dispatcher (`exp`) guarantees both. Uses Brent's method: `exp(x) =
 // (1 + r + r^2/2! + ...)^(2^K) * 2^n` with `x = n*log(2) + 2^K*r`.
 //
-// For now the naive series (`exp2_aux`) is always used, so `K` follows the square-root formula; the
-// Paterson-Stockmeyer path (`exp2_aux2`, with the cube-root `K` above `MPFR_EXP_2_THRESHOLD`) is
-// added later.
+// Below `EXP_2_THRESHOLD` the naive series (`exp2_aux`) is used with the square-root `K`; at or
+// above it the Paterson-Stockmeyer series (`exp2_aux2`) is used with the cube-root `K`.
 //
 // This is `mpfr_exp_2` from `exp_2.c`, MPFR 4.2.2.
 pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering) {
@@ -170,8 +277,13 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
     } else {
         (n.unsigned_abs() + 1).significant_bits()
     };
-    // Working-precision setup. (Square-root K; the cube-root branch arrives with exp2_aux2.)
-    let k_param = precy.div_ceil(2).floor_sqrt() + 3;
+    // Working-precision setup. Square-root K for the naive series, cube-root K for
+    // Paterson-Stockmeyer.
+    let k_param = if precy < EXP_2_THRESHOLD {
+        precy.div_ceil(2).floor_sqrt() + 3
+    } else {
+        (4 * precy).floor_root(3)
+    };
     let l = (precy - 1) / k_param + 1;
     let mut err = k_param + ((l << 1) + 18).ceiling_log_base_2();
     let mut q = precy + err + k_param + 10;
@@ -209,8 +321,13 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             }
             // r = (x - n*log(2)) / 2^K, exact
             r >>= k_param;
-            // ss <- 1 + r + r^2/2! + ... (naive method)
-            let (mut ss, mut exps, l_err) = exp2_aux(r, q);
+            // ss <- 1 + r + r^2/2! + ... (naive method below the threshold, Paterson-Stockmeyer at
+            // or above it)
+            let (mut ss, mut exps, l_err) = if precy < EXP_2_THRESHOLD {
+                exp2_aux(r, q)
+            } else {
+                exp2_aux2(r, q)
+            };
             // raise to the 2^K power by K squarings
             for _ in 0..k_param {
                 ss.square_assign();
@@ -224,24 +341,18 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             // error is at most 2^K * l_err, plus 2 for the 3-ulp error on r
             err = k_param + l_err.ceiling_log_base_2() + 2;
             if float_can_round(s.significand_ref().unwrap(), q - err, precy, rm) {
-                // y = s * 2^n. exp of a finite nonzero value is irrational, so the result is never
-                // exactly representable; if the rounding came out exact we landed on a precision
-                // boundary, and must add precision to determine the correct rounding direction.
-                let (y, o) = s.shl_prec_round(n, precy, rm);
-                if o != Equal {
-                    return (y, o);
-                }
-                // The working approximation landed exactly on a precy-bit boundary; no test input
-                // reaches this (it needs ss's tail below precy to be all-zero -- probability
-                // ~2^-(q-precy)), but correctness requires looping rather than returning Equal.
-                fail_on_untested_path("exp_2, approximation is exactly representable at precy");
+                // y = s * 2^n, rounded to precy. `float_can_round` only returns true when s's
+                // trusted bits below precy are not all equal, i.e. s is not exactly representable
+                // at precy; since `shl_prec_round` rounds those same bits, it cannot come out Equal
+                // here. (This matches MPFR, which rounds and breaks with no special case -- exp of
+                // a finite nonzero value is irrational, never exactly representable.)
+                return s.shl_prec_round(n, precy, rm);
             }
-        } else {
-            // r reduced to exactly zero, so the series can't be summed; add precision and retry.
-            // Unreachable for dyadic x (x - n*log(2) is never exactly 0 at working precision), but
-            // kept as a faithful port of MPFR's MPFR_IS_ZERO(r) guard.
-            fail_on_untested_path("exp_2, argument reduction produced r = 0");
         }
+        // If `r` is not normal it is 0: the rounded x - n*log(2) cancelled exactly, which happens
+        // iff x equals the working-precision rounding of n*log(2). The series can't be summed (it
+        // needs `r != 0`), so fall through to raise `q`; the higher-precision log(2) no longer
+        // rounds to x, so `r != 0` next time. This is MPFR's `MPFR_IS_ZERO(r)` case.
         q += increment;
         increment = q >> 1;
     }

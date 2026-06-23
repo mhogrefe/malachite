@@ -115,6 +115,10 @@ fn test_exp_prec_round() {
         "0x1.a61298e0#30",
         Less,
     );
+    // prec >= 100 routes through the Paterson-Stockmeyer series exp2_aux2. This case (m = 4) covers
+    // its general branches: m >= 2 (no clamp), the power-table loop with both an odd and an even
+    // index, multiple giant steps (the l != 0 re-normalization), and termination once the remaining
+    // term becomes negligible.
     test(
         "1.0",
         "0x1.0#1",
@@ -233,6 +237,48 @@ fn test_exp_prec_round() {
         Floor,
         "0.999999999999999999999999999999211",
         "0x0.fffffffffffffffffffffffff00#108",
+        Less,
+    );
+    // exp2_aux2 with tiny x (l_est small): m clamps to 2, so the power-table loop doesn't run
+    test(
+        "9.0e-19",
+        "0x1.0E-15#1",
+        128,
+        Nearest,
+        "1.000000000000000000867361737988403547582",
+        "0x1.00000000000000100000000000000080#128",
+        Less,
+    );
+    // exp2_aux2 termination via the r^l/l! term reaching exactly zero (the t == 0 break)
+    test(
+        "1.003947e-40",
+        "0x8.bee08E-34#21",
+        141,
+        Ceiling,
+        "1.0000000000000000000000000000000000000001004",
+        "0x1.0000000000000000000000000000000008c#141",
+        Greater,
+    );
+    // exp2_aux2 late giant step where ql drops to <= 0, so the rescaled rr normalizes to zero
+    test(
+        "2.78",
+        "0x2.c8#7",
+        112,
+        Up,
+        "16.13918232244641296013145881641377",
+        "0x10.23a173e316b31a0e39d1deb7274#112",
+        Greater,
+    );
+    // x = round_26(log2, Down): at prec 1 the working precision is exactly 26, so the first Ziv
+    // iteration's r = x - round_26(log2) cancels to 0 (MPFR's MPFR_IS_ZERO(r) path), forcing a
+    // retry at higher precision.
+    test(
+        "0.69314717",
+        "0x0.b17217c#26",
+        1,
+        Floor,
+        "1.0",
+        "0x1.0#1",
         Less,
     );
 }
