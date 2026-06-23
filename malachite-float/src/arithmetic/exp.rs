@@ -25,7 +25,7 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2,
+    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2, Square,
     SquareAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -175,14 +175,14 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
     r_pows[1] = r1;
     exp_r_pows[1] = one_minus_q;
     // R[2] = R[1]^2 >> (q - 1) (err <= 3 ulps)
-    r_pows[2] = (&r_pows[1] * &r_pows[1]) >> (q - 1);
+    r_pows[2] = (&r_pows[1]).square() >> (q - 1);
     exp_r_pows[2] = one_minus_q;
     for i in 3..=m {
         // err(R[i]) <= 2*i-1 ulps
         let t = if i & 1 == 1 {
             &r_pows[i - 1] * &r_pows[1]
         } else {
-            &r_pows[i / 2] * &r_pows[i / 2]
+            (&r_pows[i >> 1]).square()
         };
         r_pows[i] = t >> (q - 1);
         exp_r_pows[i] = one_minus_q;
