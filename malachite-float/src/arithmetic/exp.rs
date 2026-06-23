@@ -336,14 +336,200 @@ fn one_neighbor(prec: u64, above: bool) -> Float {
     Float::from_natural_prec(m, prec).0 >> shift
 }
 
-// Public API. Variants delegate naively (val -> ref, prec -> prec_round with Nearest, round ->
-// prec_round at the input's precision); optimizing these is step 6. Docs are step 7.
 impl Float {
+    /// Computes $e^x$, the exponential of a [`Float`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded exponential is less than,
+    /// equal to, or greater than the exact exponential. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 e^x\rfloor-p+1}$.
+    /// - If $e^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 e^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p,m)=\text{NaN}$
+    /// - $f(\infty,p,m)=\infty$
+    /// - $f(-\infty,p,m)=0.0$
+    /// - $f(\pm0.0,p,m)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $f(x,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::exp_prec`] instead. If you
+    /// know that your target precision is the precision of the input, consider using
+    /// [`Float::exp_round`] instead. If both of these things are true, consider using
+    /// [`Float::exp`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round(5, Floor);
+    /// assert_eq!(e.to_string(), "2.6");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round(5, Ceiling);
+    /// assert_eq!(e.to_string(), "2.8");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round(5, Nearest);
+    /// assert_eq!(e.to_string(), "2.8");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round(20, Floor);
+    /// assert_eq!(e.to_string(), "2.718281");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round(20, Ceiling);
+    /// assert_eq!(e.to_string(), "2.718285");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round(20, Nearest);
+    /// assert_eq!(e.to_string(), "2.718281");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn exp_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         self.exp_prec_round_ref(prec, rm)
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded exponential is less than,
+    /// equal to, or greater than the exact exponential. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 e^x\rfloor-p+1}$.
+    /// - If $e^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 e^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p,m)=\text{NaN}$
+    /// - $f(\infty,p,m)=\infty$
+    /// - $f(-\infty,p,m)=0.0$
+    /// - $f(\pm0.0,p,m)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $f(x,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::exp_prec_ref`] instead. If
+    /// you know that your target precision is the precision of the input, consider using
+    /// [`Float::exp_round_ref`] instead. If both of these things are true, consider using
+    /// `(&Float).exp()` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round_ref(5, Floor);
+    /// assert_eq!(e.to_string(), "2.6");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round_ref(5, Ceiling);
+    /// assert_eq!(e.to_string(), "2.8");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round_ref(5, Nearest);
+    /// assert_eq!(e.to_string(), "2.8");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round_ref(20, Floor);
+    /// assert_eq!(e.to_string(), "2.718281");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round_ref(20, Ceiling);
+    /// assert_eq!(e.to_string(), "2.718285");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_prec_round_ref(20, Nearest);
+    /// assert_eq!(e.to_string(), "2.718281");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn exp_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match &self.0 {
@@ -362,28 +548,328 @@ impl Float {
         }
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], rounding the result to the nearest value of
+    /// the specified precision. The [`Float`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded exponential is less than, equal to, or greater than the exact
+    /// exponential. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the exponential is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p)=\text{NaN}$
+    /// - $f(\infty,p)=\infty$
+    /// - $f(-\infty,p)=0.0$
+    /// - $f(\pm0.0,p)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::exp_prec_round`] instead. If you know that your target precision is the precision
+    /// of the input, consider using [`Float::exp`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_prec(5);
+    /// assert_eq!(e.to_string(), "2.8");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_prec(20);
+    /// assert_eq!(e.to_string(), "2.718281");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn exp_prec(self, prec: u64) -> (Self, Ordering) {
         self.exp_prec_round(prec, Nearest)
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], rounding the result to the nearest value of
+    /// the specified precision. The [`Float`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded exponential is less than, equal to, or greater than
+    /// the exact exponential. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the exponential is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p)=\text{NaN}$
+    /// - $f(\infty,p)=\infty$
+    /// - $f(-\infty,p)=0.0$
+    /// - $f(\pm0.0,p)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::exp_prec_round_ref`] instead. If you know that your target precision is the
+    /// precision of the input, consider using `(&Float).exp()` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_prec_ref(5);
+    /// assert_eq!(e.to_string(), "2.8");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_prec_ref(20);
+    /// assert_eq!(e.to_string(), "2.718281");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn exp_prec_ref(&self, prec: u64) -> (Self, Ordering) {
         self.exp_prec_round_ref(prec, Nearest)
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], rounding the result with the specified
+    /// rounding mode. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded exponential is less than, equal to, or greater than the exact
+    /// exponential. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,m) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 e^x\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $e^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 e^x\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},m)=\text{NaN}$
+    /// - $f(\infty,m)=\infty$
+    /// - $f(-\infty,m)=0.0$
+    /// - $f(\pm0.0,m)=1.0$
+    ///
+    /// See the [`Float::exp_prec_round`] documentation for information on overflow and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::exp_prec_round`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`Float::exp`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_round(Floor);
+    /// assert_eq!(e.to_string(), "2.718281828459045235360287471351");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_round(Ceiling);
+    /// assert_eq!(e.to_string(), "2.718281828459045235360287471354");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_round(Nearest);
+    /// assert_eq!(e.to_string(), "2.718281828459045235360287471351");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn exp_round(self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.exp_prec_round(prec, rm)
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], rounding the result with the specified
+    /// rounding mode. The [`Float`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded exponential is less than, equal to, or greater than the exact
+    /// exponential. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,m) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 e^x\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $e^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 e^x\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},m)=\text{NaN}$
+    /// - $f(\infty,m)=\infty$
+    /// - $f(-\infty,m)=0.0$
+    /// - $f(\pm0.0,m)=1.0$
+    ///
+    /// See the [`Float::exp_prec_round`] documentation for information on overflow and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::exp_prec_round_ref`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// `(&Float).exp()` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_round_ref(Floor);
+    /// assert_eq!(e.to_string(), "2.718281828459045235360287471351");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_round_ref(Ceiling);
+    /// assert_eq!(e.to_string(), "2.718281828459045235360287471354");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_round_ref(Nearest);
+    /// assert_eq!(e.to_string(), "2.718281828459045235360287471351");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn exp_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits();
         self.exp_prec_round_ref(prec, rm)
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], in place, rounding the result to the
+    /// specified precision and with the specified rounding mode. An [`Ordering`] is returned,
+    /// indicating whether the rounded exponential is less than, equal to, or greater than the exact
+    /// exponential. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// sets the [`Float`] to `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 e^x\rfloor-p+1}$.
+    /// - If $e^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 e^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::exp_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::exp_prec_assign`] instead. If
+    /// you know that your target precision is the precision of the input, consider using
+    /// [`Float::exp_round_assign`] instead. If both of these things are true, consider using
+    /// [`Float::exp_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_round_assign(5, Floor), Less);
+    /// assert_eq!(x.to_string(), "2.6");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_round_assign(5, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "2.8");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_round_assign(5, Nearest), Greater);
+    /// assert_eq!(x.to_string(), "2.8");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_round_assign(20, Floor), Less);
+    /// assert_eq!(x.to_string(), "2.718281");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_round_assign(20, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "2.718285");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_round_assign(20, Nearest), Less);
+    /// assert_eq!(x.to_string(), "2.718281");
+    /// ```
     #[inline]
     pub fn exp_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
         let mut x = Self::ZERO;
@@ -393,11 +879,112 @@ impl Float {
         o
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], in place, rounding the result to the nearest
+    /// value of the specified precision. An [`Ordering`] is returned, indicating whether the
+    /// rounded exponential is less than, equal to, or greater than the exact exponential. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function sets the [`Float`] to
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// If the exponential is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// x \gets e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::exp_prec`] documentation for information on special cases, overflow, and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::exp_prec_round_assign`] instead. If you know that your target precision is the
+    /// precision of the input, consider using [`Float::exp_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_assign(5), Greater);
+    /// assert_eq!(x.to_string(), "2.8");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_prec_assign(20), Less);
+    /// assert_eq!(x.to_string(), "2.718281");
+    /// ```
     #[inline]
     pub fn exp_prec_assign(&mut self, prec: u64) -> Ordering {
         self.exp_prec_round_assign(prec, Nearest)
     }
 
+    /// Computes $e^x$, the exponential of a [`Float`], in place, rounding the result with the
+    /// specified rounding mode. An [`Ordering`] is returned, indicating whether the rounded
+    /// exponential is less than, equal to, or greater than the exact exponential. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function sets the [`Float`] to `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 e^x\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $e^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 e^x\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// See the [`Float::exp_round`] documentation for information on special cases, overflow, and
+    /// underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::exp_prec_round_assign`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`Float::exp_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "2.718281828459045235360287471351");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_round_assign(Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "2.718281828459045235360287471354");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.exp_round_assign(Nearest), Less);
+    /// assert_eq!(x.to_string(), "2.718281828459045235360287471351");
+    /// ```
     #[inline]
     pub fn exp_round_assign(&mut self, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();
@@ -408,6 +995,53 @@ impl Float {
 impl Exp for Float {
     type Output = Self;
 
+    /// Computes $e^x$, the exponential of a [`Float`], taking it by value.
+    ///
+    /// If the output has a precision, it is the precision of the input. If the exponential is
+    /// equidistant from two [`Float`]s with the specified precision, the [`Float`] with fewer 1s in
+    /// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest`
+    /// rounding mode.
+    ///
+    /// $$
+    /// f(x) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$,
+    ///   where $p$ is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN})=\text{NaN}$
+    /// - $f(\infty)=\infty$
+    /// - $f(-\infty)=0.0$
+    /// - $f(\pm0.0)=1.0$
+    ///
+    /// See the [`Float::exp_round`] documentation for information on overflow and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using [`Float::exp_round`]
+    /// instead. If you want to specify the output precision, consider using [`Float::exp_prec`]. If
+    /// you want both of these things, consider using [`Float::exp_prec_round`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Exp;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+    /// use malachite_float::Float;
+    ///
+    /// assert!(Float::NAN.exp().is_nan());
+    /// assert_eq!(Float::INFINITY.exp(), Float::INFINITY);
+    /// assert_eq!(Float::NEGATIVE_INFINITY.exp(), Float::ZERO);
+    /// assert_eq!(
+    ///     Float::from_unsigned_prec(1u32, 100).0.exp().to_string(),
+    ///     "2.718281828459045235360287471351"
+    /// );
+    /// ```
     #[inline]
     fn exp(self) -> Self {
         let prec = self.significant_bits();
@@ -418,6 +1052,54 @@ impl Exp for Float {
 impl Exp for &Float {
     type Output = Float;
 
+    /// Computes $e^x$, the exponential of a [`Float`], taking it by reference.
+    ///
+    /// If the output has a precision, it is the precision of the input. If the exponential is
+    /// equidistant from two [`Float`]s with the specified precision, the [`Float`] with fewer 1s in
+    /// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest`
+    /// rounding mode.
+    ///
+    /// $$
+    /// f(x) = e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$,
+    ///   where $p$ is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN})=\text{NaN}$
+    /// - $f(\infty)=\infty$
+    /// - $f(-\infty)=0.0$
+    /// - $f(\pm0.0)=1.0$
+    ///
+    /// See the [`Float::exp_round`] documentation for information on overflow and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::exp_round_ref`] instead. If you want to specify the output precision, consider
+    /// using [`Float::exp_prec_ref`]. If you want both of these things, consider using
+    /// [`Float::exp_prec_round_ref`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Exp;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+    /// use malachite_float::Float;
+    ///
+    /// assert!((&Float::NAN).exp().is_nan());
+    /// assert_eq!((&Float::INFINITY).exp(), Float::INFINITY);
+    /// assert_eq!((&Float::NEGATIVE_INFINITY).exp(), Float::ZERO);
+    /// assert_eq!(
+    ///     (&Float::from_unsigned_prec(1u32, 100).0).exp().to_string(),
+    ///     "2.718281828459045235360287471351"
+    /// );
+    /// ```
     #[inline]
     fn exp(self) -> Float {
         let prec = self.significant_bits();
@@ -426,6 +1108,57 @@ impl Exp for &Float {
 }
 
 impl ExpAssign for Float {
+    /// Computes $e^x$, the exponential of a [`Float`], in place.
+    ///
+    /// If the output has a precision, it is the precision of the input. If the exponential is
+    /// equidistant from two [`Float`]s with the specified precision, the [`Float`] with fewer 1s in
+    /// its binary expansion is chosen. See [`RoundingMode`] for a description of the `Nearest`
+    /// rounding mode.
+    ///
+    /// $$
+    /// x \gets e^x+\varepsilon.
+    /// $$
+    /// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$,
+    ///   where $p$ is the precision of the input.
+    ///
+    /// See the [`Float::exp`] documentation for information on special cases, overflow, and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::exp_round_assign`] instead. If you want to specify the output precision, consider
+    /// using [`Float::exp_prec_assign`]. If you want both of these things, consider using
+    /// [`Float::exp_prec_round_assign`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ExpAssign;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::NAN;
+    /// x.exp_assign();
+    /// assert!(x.is_nan());
+    ///
+    /// let mut x = Float::INFINITY;
+    /// x.exp_assign();
+    /// assert_eq!(x, Float::INFINITY);
+    ///
+    /// let mut x = Float::NEGATIVE_INFINITY;
+    /// x.exp_assign();
+    /// assert_eq!(x, Float::ZERO);
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// x.exp_assign();
+    /// assert_eq!(x.to_string(), "2.718281828459045235360287471351");
+    /// ```
     #[inline]
     fn exp_assign(&mut self) {
         let prec = self.significant_bits();
