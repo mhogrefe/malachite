@@ -26,7 +26,7 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Exp, ExpAssign, FloorSqrt, IsPowerOf2, PowerOf2,
+    CeilingLogBase2, Exp, ExpAssign, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2, SquareAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -34,11 +34,13 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Floor, Nearest, Up};
+use malachite_base::rounding_modes::RoundingMode::{
+    self, Ceiling, Down, Exact, Floor, Nearest, Up,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, SignedLimb};
 
 // If the number of bits `k` of `z` exceeds `q`, divides `z` by `2 ^ (k - q)` (flooring) and returns
 // `k - q`; otherwise leaves `z` unchanged and returns 0.
@@ -60,14 +62,11 @@ fn mpz_normalize(z: Integer, q: i64) -> (Integer, i64) {
 // Shifts `z` so that its 2-exponent becomes `target`: right (flooring) by `target - expz` if
 // `target > expz`, otherwise left by `expz - target`. Returns `target`.
 //
-// This is `mpz_normalize2` from `exp_2.c`, MPFR 4.2.2.
-#[allow(dead_code)] // currently only used by exp2_aux2, which is ported later
+// This is `mpz_normalize2` from `exp_2.c`, MPFR 4.2.2. currently only used by exp2_aux2, which is
+// ported later. Simple enough that it can be inlined
+#[allow(dead_code)]
 fn mpz_normalize2(z: Integer, expz: i64, target: i64) -> (Integer, i64) {
-    if target > expz {
-        (z >> (target - expz), target)
-    } else {
-        (z << (expz - target), target)
-    }
+    (z >> (target - expz), target)
 }
 
 // Returns the integer mantissa `m` and 2-exponent `e` of a finite nonzero `x`, so that `x = m *
@@ -76,36 +75,35 @@ fn mpz_normalize2(z: Integer, expz: i64, target: i64) -> (Integer, i64) {
 // 1, giving 2^63 * 2^(1-64) = 1).
 //
 // This is equivalent to `mpfr_get_z_2exp` from MPFR 4.2.2.
-fn get_z_2exp(x: &Float) -> (Integer, i64) {
+fn get_z_2exp(x: Float) -> (Integer, i64) {
     if let Finite {
         sign,
         exponent,
         significand,
         ..
-    } = &x.0
+    } = x.0
     {
         let bits = significand.significant_bits();
-        let m = Integer::from(significand.clone());
-        let m = if *sign { m } else { -m };
-        (m, i64::from(*exponent) - i64::try_from(bits).unwrap())
+        let m = Integer::from_sign_and_abs(sign, significand);
+        (m, i64::from(exponent) - i64::try_from(bits).unwrap())
     } else {
         unreachable!()
     }
 }
 
-// Computes `s = 1 + r/1! + r^2/2! + ... + r^l/l!` (continuing while the term is still significant at
-// precision `q`) in fixed point, where the returned `Integer` `s` and 2-exponent `exps` satisfy
+// Computes `s = 1 + r/1! + r^2/2! + ... + r^l/l!` (continuing while the term is still significant
+// at precision `q`) in fixed point, where the returned `Integer` `s` and 2-exponent `exps` satisfy
 // (sum) = s * 2^exps. `r` must be pure FP (here it is positive and tiny). The naive method, O(l)
 // multiplications; the absolute error on the sum is less than `3*l*(l+1)*2^(-q)`, and that
 // `3*l*(l+1)` bound is the returned value. (`l` stays small for the precisions `exp_2` handles, so
 // the bound fits in a `u64`.)
 //
 // This is `mpfr_exp2_aux` from `exp_2.c`, MPFR 4.2.2.
-fn exp2_aux(r: &Float, q: u64) -> (Integer, i64, u64) {
+fn exp2_aux(r: Float, q: u64) -> (Integer, i64, u64) {
     let qi = i64::try_from(q).unwrap();
     let mut expt: i64 = 0;
     let exps: i64 = 1 - qi; // s = 2^(q-1), i.e. the value 1
-    let mut t = Integer::from(1u32);
+    let mut t = Integer::ONE;
     let mut s = Integer::power_of_2(q - 1);
     let (mut rr, mut expr) = get_z_2exp(r); // rr * 2^expr = r, no error
     let mut l: u64 = 0;
@@ -145,8 +143,8 @@ fn exp2_aux(r: &Float, q: u64) -> (Integer, i64, u64) {
 
 // Computes `exp(x)` rounded to precision `precy` with rounding mode `rm`, returning the rounded
 // value and an [`Ordering`] comparing it to the exact result. `x` must be finite and nonzero and
-// `exp(x)` must be in range; the dispatcher (`exp`) guarantees both. Uses Brent's method:
-// `exp(x) = (1 + r + r^2/2! + ...)^(2^K) * 2^n` with `x = n*log(2) + 2^K*r`.
+// `exp(x)` must be in range; the dispatcher (`exp`) guarantees both. Uses Brent's method: `exp(x) =
+// (1 + r + r^2/2! + ...)^(2^K) * 2^n` with `x = n*log(2) + 2^K*r`.
 //
 // For now the naive series (`exp2_aux`) is always used, so `K` follows the square-root formula; the
 // Paterson-Stockmeyer path (`exp2_aux2`, with the cube-root `K` above `MPFR_EXP_2_THRESHOLD`) is
@@ -162,9 +160,9 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
     } else {
         let log2_est = Float::ln_2_prec_round(Limb::WIDTH - 1, Down).0;
         let r_est = x
-            .div_prec_round_ref_ref(&log2_est, Limb::WIDTH - 1, Nearest)
+            .div_prec_round_ref_val(log2_est, Limb::WIDTH - 1, Nearest)
             .0;
-        i64::rounding_from(&r_est, Nearest).0
+        i64::rounding_from(r_est, Nearest).0
     };
     // error_r bounds the bits cancelled in x - n*log(2)
     let error_r: u64 = if n == 0 {
@@ -173,9 +171,9 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
         (n.unsigned_abs() + 1).significant_bits()
     };
     // Working-precision setup. (Square-root K; the cube-root branch arrives with exp2_aux2.)
-    let k_param = ((precy + 1) / 2).floor_sqrt() + 3;
+    let k_param = precy.div_ceil(2).floor_sqrt() + 3;
     let l = (precy - 1) / k_param + 1;
-    let mut err = k_param + (2 * l + 18).ceiling_log_base_2();
+    let mut err = k_param + ((l << 1) + 18).ceiling_log_base_2();
     let mut q = precy + err + k_param + 10;
     // if |x| >> 1, account for the cancelled bits
     if expx > 0 {
@@ -185,23 +183,23 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
     loop {
         let working = q + error_r;
         // s is within 1 ulp of log(2), rounded so that r = x - n*log(2) is bounded above.
-        let mut s = Float::ln_2_prec_round(working, if n >= 0 { Down } else { Up }).0;
+        let s = Float::ln_2_prec_round(working, if n >= 0 { Down } else { Up }).0;
         // r = |n| * log(2) (directed); negate when n < 0, so r <= n*log(2) within 3 ulps.
         let mut r = s
-            .mul_prec_round_ref_ref(
-                &Float::from(n.unsigned_abs()),
+            .mul_prec_round_ref_val(
+                Float::from(n.unsigned_abs()),
                 working,
                 if n >= 0 { Down } else { Up },
             )
             .0;
         if n < 0 {
-            r = -r;
+            r.neg_assign();
         }
         r = x.sub_prec_round_ref_val(r, working, Up).0;
         // if the initial n was too large, r came out negative: reduce n
         while r.is_normal() && r.is_sign_negative() {
             n -= 1;
-            r = r.add_prec_round_val_ref(&s, working, Up).0;
+            r.add_prec_round_assign_ref(&s, working, Up);
         }
         // if r is 0 we cannot round correctly; otherwise sum the series
         if r.is_normal() {
@@ -212,17 +210,17 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             // r = (x - n*log(2)) / 2^K, exact
             r >>= k_param;
             // ss <- 1 + r + r^2/2! + ... (naive method)
-            let (mut ss, mut exps, l_err) = exp2_aux(&r, q);
+            let (mut ss, mut exps, l_err) = exp2_aux(r, q);
             // raise to the 2^K power by K squarings
             for _ in 0..k_param {
-                ss = &ss * &ss;
-                exps *= 2;
+                ss.square_assign();
+                exps <<= 1;
                 let (ss2, sh) = mpz_normalize(ss, i64::try_from(q).unwrap());
                 ss = ss2;
                 exps += sh;
             }
             // s = ss * 2^exps (exact: ss has at most q bits and working >= q)
-            s = Float::from_integer_prec_round(ss, working, Nearest).0 << exps;
+            let s = Float::from_integer_prec_round(ss, working, Nearest).0 << exps;
             // error is at most 2^K * l_err, plus 2 for the 3-ulp error on r
             err = k_param + l_err.ceiling_log_base_2() + 2;
             if float_can_round(s.significand_ref().unwrap(), q - err, precy, rm) {
@@ -287,14 +285,22 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
     const BP: u64 = 64;
     let log2_up = Float::ln_2_prec_round(BP, Up).0;
     let bound_emax = log2_up
-        .mul_prec_round_ref_ref(&Float::from(i64::from(Float::MAX_EXPONENT)), BP, Up)
+        .mul_prec_round_ref_val(
+            const { Float::const_from_signed(Float::MAX_EXPONENT as SignedLimb) },
+            BP,
+            Up,
+        )
         .0;
     if *x >= bound_emax {
         // x > log(2^emax), so exp(x) > 2^emax
         return exp_overflow(precy, rm);
     }
     let bound_emin = log2_up
-        .mul_prec_round_ref_ref(&Float::from(i64::from(Float::MIN_EXPONENT) - 2), BP, Floor)
+        .mul_prec_round(
+            const { Float::const_from_signed((Float::MIN_EXPONENT as SignedLimb) - 2) },
+            BP,
+            Floor,
+        )
         .0;
     if *x <= bound_emin {
         // x < log(2^(emin - 2)), so exp(x) < 2^(emin - 2)
@@ -341,17 +347,17 @@ impl Float {
     pub fn exp_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         match &self.0 {
-            NaN => (Float::NAN, Equal),
+            NaN => (Self::NAN, Equal),
             // exp(+inf) = +inf; exp(-inf) = +0
             Infinity { sign } => {
                 if *sign {
-                    (Float::INFINITY, Equal)
+                    (Self::INFINITY, Equal)
                 } else {
-                    (Float::ZERO, Equal)
+                    (Self::ZERO, Equal)
                 }
             }
             // exp(+0) = exp(-0) = 1
-            Zero { .. } => (Float::one_prec(prec), Equal),
+            Zero { .. } => (Self::one_prec(prec), Equal),
             Finite { .. } => exp_prec_round_normal_ref(self, prec, rm),
         }
     }
@@ -400,10 +406,10 @@ impl Float {
 }
 
 impl Exp for Float {
-    type Output = Float;
+    type Output = Self;
 
     #[inline]
-    fn exp(self) -> Float {
+    fn exp(self) -> Self {
         let prec = self.significant_bits();
         self.exp_prec_round(prec, Nearest).0
     }
@@ -426,4 +432,3 @@ impl ExpAssign for Float {
         self.exp_prec_round_assign(prec, Nearest);
     }
 }
-

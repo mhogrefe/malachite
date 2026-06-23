@@ -21,9 +21,8 @@ use crate::test_util::generators::common::valid_float_get_str_quadruple;
 use crate::test_util::generators::exhaustive::{
     add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
     agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid, div_prec_round_valid,
-    div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
-    exp_prec_round_valid, exp_round_valid, from_primitive_float_prec_round_valid,
-    integer_rounding_from_float_valid,
+    div_rational_prec_round_valid, div_rational_round_valid, div_round_valid, exp_prec_round_valid,
+    exp_round_valid, from_primitive_float_prec_round_valid, integer_rounding_from_float_valid,
     ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
     ln_rational_prec_round_valid, ln_round_valid, log_base_1_plus_x_prec_round_valid,
     log_base_1_plus_x_round_valid, log_base_2_1_plus_x_prec_round_valid,

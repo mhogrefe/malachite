@@ -59,7 +59,7 @@ fn log_base_10_1_plus_x_prec_round_normal(
         // log_2(1 + x), correctly rounded to working_prec; always within the Float exponent range.
         let num = x.log_base_2_1_plus_x_prec_ref(working_prec).0;
         // log_2(10) > 1, correctly rounded to working_prec.
-        let den = TEN.log_base_2_prec_ref(working_prec).0;
+        let den = TEN.log_base_2_prec(working_prec).0;
         // Dividing by log_2(10) > 1 only shrinks the magnitude (overflow is impossible), but can
         // push the result below MIN_EXPONENT. When it underflows, the Ziv test below could never
         // resolve it (the quotient clamps), so hand the rounding to div_prec_round, which clamps to

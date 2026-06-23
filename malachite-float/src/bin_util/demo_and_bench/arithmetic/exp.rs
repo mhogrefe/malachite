@@ -25,7 +25,8 @@ use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
     float_rounding_mode_pair_gen_var_47_rm, float_unsigned_pair_gen_var_1,
     float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
-    float_unsigned_rounding_mode_triple_gen_var_36, float_unsigned_rounding_mode_triple_gen_var_36_rm,
+    float_unsigned_rounding_mode_triple_gen_var_36,
+    float_unsigned_rounding_mode_triple_gen_var_36_rm,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
@@ -461,7 +462,12 @@ fn benchmark_float_exp_round_library_comparison(
     );
 }
 
-fn benchmark_float_exp_round_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+fn benchmark_float_exp_round_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Float.exp_round_assign(RoundingMode)",
         BenchmarkType::Single,
@@ -470,7 +476,10 @@ fn benchmark_float_exp_round_assign(gm: GenMode, config: &GenConfig, limit: usiz
         limit,
         file_name,
         &pair_1_float_complexity_bucketer("x"),
-        &mut [("Float.exp_round_assign(RoundingMode)", &mut |(mut x, rm)| {
+        &mut [("Float.exp_round_assign(RoundingMode)", &mut |(
+            mut x,
+            rm,
+        )| {
             no_out!(x.exp_round_assign(rm));
         })],
     );

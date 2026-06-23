@@ -142,17 +142,17 @@ fn verify_get_str(x: &Float, b0: i64, m: usize, rnd: RoundingMode) {
     }
 
     // Cross-check the digit string and exponent against rug (MPFR), where it applies.
-    if (2..=36).contains(&b0) {
-        if let Ok(round) = rug_round_try_from_rounding_mode(rnd) {
-            let (rug_neg, rug_mant, rug_exp) = rug::Float::exact_from(x).to_sign_string_exp_round(
-                i32::exact_from(b),
-                Some(m_actual),
-                round,
-            );
-            assert_eq!(neg, rug_neg);
-            assert_eq!(digit_bytes, rug_mant.as_bytes());
-            assert_eq!(exp, i64::from(rug_exp.unwrap()));
-        }
+    if (2..=36).contains(&b0)
+        && let Ok(round) = rug_round_try_from_rounding_mode(rnd)
+    {
+        let (rug_neg, rug_mant, rug_exp) = rug::Float::exact_from(x).to_sign_string_exp_round(
+            i32::exact_from(b),
+            Some(m_actual),
+            round,
+        );
+        assert_eq!(neg, rug_neg);
+        assert_eq!(digit_bytes, rug_mant.as_bytes());
+        assert_eq!(exp, i64::from(rug_exp.unwrap()));
     }
 }
 

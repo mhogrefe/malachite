@@ -107,7 +107,7 @@ fn log_base_2_rational_near_power_of_2(
     // 2^m <= x < 2^(m + 1)
     let m = x.floor_log_base_2_abs();
     let pow_lo = Rational::power_of_2(m);
-    let pow_hi = Rational::power_of_2(m + 1);
+    let pow_hi = &pow_lo << 1u32;
     // eps = x / 2^k - 1 for the nearer of the two surrounding powers of 2, 2^k.
     let dist_lo = x - &pow_lo;
     let dist_hi = &pow_hi - x;
@@ -122,7 +122,7 @@ fn log_base_2_rational_near_power_of_2(
     }
     // eps is nonzero since x is not a power of 2.
     let eps_exp = eps.floor_log_base_2_abs();
-    let k_float = Float::from_signed_prec(k, k.unsigned_abs().significant_bits()).0;
+    let k_float = Float::from_signed_prec(k, k.significant_bits()).0;
     let exp_k = i64::from(k_float.get_exponent().unwrap());
     // |log_2(1 + eps)| < 3|eps| < 2^(eps_exp + 3), so passing err = exp_k - eps_exp - 3 to
     // `float_round_near_x` (which requires |offset| < 2^(exp_k - err)) is sound.
@@ -189,7 +189,7 @@ pub(crate) fn extended_log_base_2_of_rational(r: &Rational, prec: u64) -> Extend
     // path is then guaranteed not to underflow, and the linear path is valid well beyond it.
     let y = r - Rational::ONE;
     if y.floor_log_base_2_abs() <= i64::from(Float::MIN_EXPONENT) + 1 {
-        let y_ext = ExtendedFloat::from_rational_prec_round_ref(&y, prec, Nearest).0;
+        let y_ext = ExtendedFloat::from_rational_prec_round(y, prec, Nearest).0;
         let ln_2 = ExtendedFloat::from(Float::ln_2_prec(prec).0);
         y_ext.div_prec_val_ref(&ln_2, prec).0
     } else {

@@ -52,30 +52,69 @@ fn test_exp_prec_round() {
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_e, rug_o) = rug_exp_prec_round(&rug::Float::exact_from(&x), prec, rm);
-            assert_eq!(ComparableFloatRef(&Float::from(&rug_e)), ComparableFloatRef(&e));
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_e)),
+                ComparableFloatRef(&e)
+            );
             assert_eq!(rug_o, o);
         }
     };
     // specials (exact, rounding-mode-invariant)
     test("NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
-    test("Infinity", "Infinity", 1, Ceiling, "Infinity", "Infinity", Equal);
+    test(
+        "Infinity", "Infinity", 1, Ceiling, "Infinity", "Infinity", Equal,
+    );
     test("-Infinity", "-Infinity", 1, Nearest, "0.0", "0x0.0", Equal);
     test("0.0", "0x0.0", 1, Floor, "1.0", "0x1.0#1", Equal);
     test("-0.0", "-0x0.0", 1, Ceiling, "1.0", "0x1.0#1", Equal);
     // e = exp(1)
     test(
-        "1.0", "0x1.0#1", 53, Nearest, "2.7182818284590451", "0x2.b7e151628aed2#53", Less,
+        "1.0",
+        "0x1.0#1",
+        53,
+        Nearest,
+        "2.7182818284590451",
+        "0x2.b7e151628aed2#53",
+        Less,
     );
     test(
-        "1.0", "0x1.0#1", 53, Floor, "2.7182818284590451", "0x2.b7e151628aed2#53", Less,
+        "1.0",
+        "0x1.0#1",
+        53,
+        Floor,
+        "2.7182818284590451",
+        "0x2.b7e151628aed2#53",
+        Less,
     );
     test(
-        "1.0", "0x1.0#1", 53, Ceiling, "2.7182818284590455", "0x2.b7e151628aed4#53", Greater,
+        "1.0",
+        "0x1.0#1",
+        53,
+        Ceiling,
+        "2.7182818284590455",
+        "0x2.b7e151628aed4#53",
+        Greater,
     );
     // e^2, 1/e, sqrt(e)
     test("2.0", "0x2.0#2", 10, Nearest, "7.39", "0x7.64#10", Greater);
-    test("-1.0", "-0x1.0#1", 20, Nearest, "0.3678794", "0x0.5e2d58#20", Less);
-    test("0.5", "0x0.8#1", 30, Nearest, "1.64872127", "0x1.a61298e0#30", Less);
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        20,
+        Nearest,
+        "0.3678794",
+        "0x0.5e2d58#20",
+        Less,
+    );
+    test(
+        "0.5",
+        "0x0.8#1",
+        30,
+        Nearest,
+        "1.64872127",
+        "0x1.a61298e0#30",
+        Less,
+    );
     test(
         "1.0",
         "0x1.0#1",
@@ -86,22 +125,100 @@ fn test_exp_prec_round() {
         Less,
     );
     // overflow: x = 2^30 > log(2^emax), so exp(x) is above the largest finite Float
-    test("1.0e9", "0x4.0E+7#1", 20, Nearest, "Infinity", "Infinity", Greater);
-    test("1.0e9", "0x4.0E+7#1", 20, Floor, "too_big", "0x7.ffff8E+268435455#20", Less);
-    test("1.0e9", "0x4.0E+7#1", 20, Up, "Infinity", "Infinity", Greater);
+    test(
+        "1.0e9",
+        "0x4.0E+7#1",
+        20,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test(
+        "1.0e9",
+        "0x4.0E+7#1",
+        20,
+        Floor,
+        "too_big",
+        "0x7.ffff8E+268435455#20",
+        Less,
+    );
+    test(
+        "1.0e9",
+        "0x4.0E+7#1",
+        20,
+        Up,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
     // underflow: x = -2^30 < log(2^(emin - 2)), so exp(x) is below the smallest positive Float
     test("-1.0e9", "-0x4.0E+7#1", 20, Nearest, "0.0", "0x0.0", Less);
-    test("-1.0e9", "-0x4.0E+7#1", 20, Up, "too_small", "0x1.00000E-268435456#20", Greater);
+    test(
+        "-1.0e9",
+        "-0x4.0E+7#1",
+        20,
+        Up,
+        "too_small",
+        "0x1.00000E-268435456#20",
+        Greater,
+    );
     test("-1.0e9", "-0x4.0E+7#1", 20, Floor, "0.0", "0x0.0", Less);
     // tiny x: |x| = 2^-100 < ulp(1) at precision 50, so exp(x) = 1 +/- ulp(1)
-    test("8.0e-31", "0x1.0E-25#1", 50, Nearest, "1.0", "0x1.0000000000000#50", Less);
-    test("8.0e-31", "0x1.0E-25#1", 50, Up, "1.000000000000002", "0x1.0000000000008#50", Greater);
-    test("8.0e-31", "0x1.0E-25#1", 50, Floor, "1.0", "0x1.0000000000000#50", Less);
-    test("-8.0e-31", "-0x1.0E-25#1", 50, Nearest, "1.0", "0x1.0000000000000#50", Greater);
     test(
-        "-8.0e-31", "-0x1.0E-25#1", 50, Floor, "0.999999999999999", "0x0.ffffffffffffc#50", Less,
+        "8.0e-31",
+        "0x1.0E-25#1",
+        50,
+        Nearest,
+        "1.0",
+        "0x1.0000000000000#50",
+        Less,
     );
-    test("-8.0e-31", "-0x1.0E-25#1", 50, Ceiling, "1.0", "0x1.0000000000000#50", Greater);
+    test(
+        "8.0e-31",
+        "0x1.0E-25#1",
+        50,
+        Up,
+        "1.000000000000002",
+        "0x1.0000000000008#50",
+        Greater,
+    );
+    test(
+        "8.0e-31",
+        "0x1.0E-25#1",
+        50,
+        Floor,
+        "1.0",
+        "0x1.0000000000000#50",
+        Less,
+    );
+    test(
+        "-8.0e-31",
+        "-0x1.0E-25#1",
+        50,
+        Nearest,
+        "1.0",
+        "0x1.0000000000000#50",
+        Greater,
+    );
+    test(
+        "-8.0e-31",
+        "-0x1.0E-25#1",
+        50,
+        Floor,
+        "0.999999999999999",
+        "0x0.ffffffffffffc#50",
+        Less,
+    );
+    test(
+        "-8.0e-31",
+        "-0x1.0E-25#1",
+        50,
+        Ceiling,
+        "1.0",
+        "0x1.0000000000000#50",
+        Greater,
+    );
     // |x| <= 0.25 takes the n = 0 argument-reduction shortcut
     test("0.1", "0x0.2#1", 2, Down, "1.0", "0x1.0#2", Less);
     // 0.25 < |x| < ~0.5: argument reduction runs but n still rounds to 0
@@ -159,6 +276,7 @@ fn exp_prec_fail() {
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn exp_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (e, o) = x.clone().exp_prec_round(prec, rm);
     assert!(e.is_valid());
@@ -176,7 +294,10 @@ fn exp_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
 
     if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_e, rug_o) = rug_exp_prec_round(&rug::Float::exact_from(&x), prec, rug_rm);
-        assert_eq!(ComparableFloatRef(&Float::from(&rug_e)), ComparableFloatRef(&e));
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_e)),
+            ComparableFloatRef(&e)
+        );
         assert_eq!(rug_o, o);
     }
 
@@ -257,7 +378,10 @@ fn exp_round_properties() {
 
         if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_e, rug_o) = rug_exp_round(&rug::Float::exact_from(&x), rug_rm);
-            assert_eq!(ComparableFloatRef(&Float::from(&rug_e)), ComparableFloatRef(&e));
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_e)),
+                ComparableFloatRef(&e)
+            );
             assert_eq!(rug_o, o);
         }
     });
@@ -290,7 +414,10 @@ fn exp_prec_properties() {
         }
 
         let (rug_e, rug_o) = rug_exp_prec(&rug::Float::exact_from(&x), prec);
-        assert_eq!(ComparableFloatRef(&Float::from(&rug_e)), ComparableFloatRef(&e));
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_e)),
+            ComparableFloatRef(&e)
+        );
         assert_eq!(rug_o, o);
     });
 }

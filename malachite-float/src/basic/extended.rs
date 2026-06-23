@@ -55,7 +55,11 @@ impl ExtendedFloat {
         exp.is_none() || exp == Some(0)
     }
 
-    fn from_rational_prec_round(value: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+    pub(crate) fn from_rational_prec_round(
+        value: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
         if value == 0 {
             return (
                 Self {

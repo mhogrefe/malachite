@@ -85,7 +85,7 @@ fn log_base_10_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
         let t = x
             .ln_prec_ref(working_prec)
             .0
-            .div_prec(TEN.ln_prec_ref(working_prec).0, working_prec)
+            .div_prec(TEN.ln_prec(working_prec).0, working_prec)
             .0;
         if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
             return Float::from_float_prec_round(t, prec, rm);
@@ -115,7 +115,7 @@ fn log_base_10_rational_prec_round_helper(
     loop {
         let t = Float::log_base_2_rational_prec_ref(x, working_prec)
             .0
-            .div_prec(TEN.log_base_2_prec_ref(working_prec).0, working_prec)
+            .div_prec(TEN.log_base_2_prec(working_prec).0, working_prec)
             .0;
         if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
             return Float::from_float_prec_round(t, prec, rm);
