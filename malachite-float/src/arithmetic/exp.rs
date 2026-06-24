@@ -26,14 +26,14 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2,
-    ShrRoundAssign, Square, SquareAssign,
+    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, Parity, PowerOf2,
+    ShrRoundAssign, Square, SquareAssign, WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
 };
-use malachite_base::num::conversion::traits::RoundingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
@@ -49,8 +49,8 @@ use malachite_nz::platform::{Limb, SignedLimb};
 // This is `mpz_normalize` from `exp_2.c`, MPFR 4.2.2.
 fn mpz_normalize(z: Integer, q: i64) -> (Integer, i64) {
     let k = z.significant_bits();
-    if q < 0 || k > u64::try_from(q).unwrap() {
-        let shift = i64::try_from(k).unwrap() - q;
+    if q < 0 || k > u64::exact_from(q) {
+        let shift = i64::exact_from(k) - q;
         (z >> shift, shift)
     } else {
         // Currently unreachable from the naive series (`exp2_aux` always grows `t`/`rr` past `q`
@@ -85,7 +85,7 @@ fn get_z_2exp(x: Float) -> (Integer, i64) {
     {
         let bits = significand.significant_bits();
         let m = Integer::from_sign_and_abs(sign, significand);
-        (m, i64::from(exponent) - i64::try_from(bits).unwrap())
+        (m, i64::from(exponent) - i64::exact_from(bits))
     } else {
         unreachable!()
     }
@@ -100,7 +100,7 @@ fn get_z_2exp(x: Float) -> (Integer, i64) {
 //
 // This is `mpfr_exp2_aux` from `exp_2.c`, MPFR 4.2.2.
 fn exp2_aux(r: Float, q: u64) -> (Integer, i64, u64) {
-    let qi = i64::try_from(q).unwrap();
+    let qi = i64::exact_from(q);
     let mut expt: i64 = 0;
     let exps: i64 = 1 - qi; // s = 2^(q-1), i.e. the value 1
     let mut t = Integer::ONE;
@@ -111,8 +111,8 @@ fn exp2_aux(r: Float, q: u64) -> (Integer, i64, u64) {
         l += 1;
         t *= &rr;
         expt += expr;
-        let sbit = i64::try_from(s.significant_bits()).unwrap();
-        let tbit = i64::try_from(t.significant_bits()).unwrap();
+        let sbit = i64::exact_from(s.significant_bits());
+        let tbit = i64::exact_from(t.significant_bits());
         let dif = exps + sbit - expt - tbit;
         // truncate the bits of t that are below ulp(s) = 2^(1-q); error at most 2^(1-q)
         let (t2, sh) = mpz_normalize(t, qi - dif);
@@ -133,7 +133,7 @@ fn exp2_aux(r: Float, q: u64) -> (Integer, i64, u64) {
         }
         s += &t; // exact
         // keep rr the same size as t: the error on rr stays at most ulp(t) = ulp(s)
-        let tbit = i64::try_from(t.significant_bits()).unwrap();
+        let tbit = i64::exact_from(t.significant_bits());
         let (rr2, sh) = mpz_normalize(rr, tbit);
         rr = rr2;
         expr += sh;
@@ -155,13 +155,13 @@ const EXP_2_THRESHOLD: u64 = 100;
 //
 // This is `mpfr_exp2_aux2` from `exp_2.c`, MPFR 4.2.2.
 fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
-    let qi = i64::try_from(q).unwrap();
+    let qi = i64::exact_from(q);
     let one_minus_q = 1 - qi;
     // estimate the value of l, then m ~ sqrt(l); we access R[2], so we need m >= 2
     let expr0 = i64::from(r.get_exponent().unwrap());
     debug_assert!(expr0 < 0);
-    let l_est = q / u64::try_from(-expr0).unwrap();
-    let mut m = usize::try_from(l_est.floor_sqrt()).unwrap();
+    let l_est = q / u64::exact_from(-expr0);
+    let mut m = usize::exact_from(l_est.floor_sqrt());
     if m < 2 {
         m = 2;
     }
@@ -195,7 +195,7 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
     let mut l: u64 = 0;
     let mut ql = q; // precision used for the current giant step
     loop {
-        let one_minus_ql = 1 - i64::try_from(ql).unwrap();
+        let one_minus_ql = 1 - i64::exact_from(ql);
         // all R[i] (i < m) must have exponent 1 - ql
         if l != 0 {
             for i in 0..m {
@@ -229,7 +229,7 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
         if t == 0 {
             break;
         }
-        let (rr2, sh) = mpz_normalize(t, i64::try_from(ql).unwrap());
+        let (rr2, sh) = mpz_normalize(t, i64::exact_from(ql));
         rr = rr2;
         expr += sh;
         // in late giant steps `ql` can go <= 0 (s has grown past the working precision), so
@@ -237,9 +237,9 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
         let rrbit = if rr == 0 {
             1
         } else {
-            i64::try_from(rr.significant_bits()).unwrap()
+            i64::exact_from(rr.significant_bits())
         };
-        let sbit = i64::try_from(s.significant_bits()).unwrap();
+        let sbit = i64::exact_from(s.significant_bits());
         ql = (qi - exps - sbit + expr + rrbit) as u64;
         // MPFR's own `(size_t)` cast here is admittedly dubious (see its TODO), but the operands
         // cluster near -q, far from the wrap, so the unsigned and signed comparisons agree.
@@ -265,17 +265,16 @@ fn extract(p: &Float, i: u64) -> Integer {
         sign, significand, ..
     } = &p.0
     {
-        let limbs = significand.to_limbs_asc();
+        let limbs = significand.as_limbs_asc();
         let size_p = limbs.len();
-        let two_i = 1usize << i;
+        let two_i = usize::power_of_2(i);
         let two_i_2 = if i == 0 { 1 } else { two_i >> 1 };
         let mut y = vec![0 as Limb; two_i_2];
         if size_p < two_i {
             // The window extends past the bottom of the mantissa: zero-fill and copy what's there.
             if size_p >= two_i_2 {
                 let count = size_p - two_i_2;
-                let dst = two_i - size_p;
-                y[dst..dst + count].copy_from_slice(&limbs[..count]);
+                y[two_i - size_p..][..count].copy_from_slice(&limbs[..count]);
             } else {
                 // The whole window is below the mantissa (chunk all zero). Unreachable from
                 // `exp_3`: it only extracts chunks `i <= prec_x`, and `size_p > 2^(prec_x - 1) >=
@@ -283,8 +282,7 @@ fn extract(p: &Float, i: u64) -> Integer {
                 fail_on_untested_path("extract, window entirely below the mantissa");
             }
         } else {
-            let start = size_p - two_i;
-            y.copy_from_slice(&limbs[start..start + two_i_2]);
+            y.copy_from_slice(&limbs[size_p - two_i..][..two_i_2]);
         }
         Integer::from_sign_and_abs(*sign, Natural::from_owned_limbs_asc(y))
     } else {
@@ -305,12 +303,13 @@ fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
     // Normalize p (strip trailing zeros); since |p/2^r| < 1 and p != 0, r stays >= 1.
     let nz = p.trailing_zeros().unwrap();
     let p = p >> nz;
-    r -= i64::try_from(nz).unwrap();
-    let mut q = vec![Integer::ZERO; m + 1];
-    let mut s = vec![Integer::ZERO; m + 1];
-    let mut ptoj = vec![Integer::ZERO; m + 1]; // ptoj[k] = p^(2^k)
-    let mut mult = vec![0i64; m + 1]; // P[k]/Q[k] for the remaining terms is <= 2^(-mult[k])
-    let mut log2_nb_terms = vec![0u64; m + 1];
+    r -= i64::exact_from(nz);
+    let scratch_len = m + 1;
+    let mut scratch = vec![Integer::ZERO; 3 * scratch_len];
+    split_into_chunks_mut!(scratch, scratch_len, [q, s], ptoj); // ptoj[k] = p^(2^k)
+    let mut scratch = vec![0u64; scratch_len << 1];
+    // P[k]/Q[k] for the remaining terms is <= 2^(-mult[k])
+    let (mult, log2_nb_terms) = scratch.split_at_mut(scratch_len);
     ptoj[0] = p;
     for k in 1..m {
         ptoj[k] = (&ptoj[k - 1]).square();
@@ -329,22 +328,26 @@ fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
         s[k] = Integer::from(i + 1);
         let mut j = i + 1; // terms computed so far
         let mut l = 0u32;
-        while j & 1 == 0 {
+        while j.even() {
             // Combine and reduce: S[k] covers 2^l consecutive terms.
-            s[k] = &s[k] * &ptoj[l as usize];
+            s[k] *= &ptoj[l as usize];
             let mut t = &s[k - 1] * &q[k];
             // Q[k] lacks the 2^(r*2^l) factor, so multiply it in when merging.
             t <<= r << l;
             t += &s[k];
             s[k - 1] = t;
-            q[k - 1] = &q[k - 1] * &q[k];
+            let (q_lo, q_hi) = q.split_at_mut(k);
+            *q_lo.last_mut().unwrap() *= &q_hi[0];
             log2_nb_terms[k - 1] += 1;
             prec_i_have = q[k].significant_bits();
             let prec_ptoj = ptoj[l as usize].significant_bits();
-            mult[k - 1] += i64::try_from(prec_i_have).unwrap() + (r << l)
-                - i64::try_from(prec_ptoj).unwrap()
-                - 1;
-            prec_i_have = u64::try_from(mult[k - 1]).unwrap();
+            mult[k - 1].wrapping_add_assign(
+                prec_i_have
+                    .wrapping_add(u64::wrapping_from(r << l))
+                    .wrapping_sub(prec_ptoj)
+                    .wrapping_sub(1),
+            );
+            prec_i_have = mult[k - 1];
             mult[k] = mult[k - 1];
             l += 1;
             j >>= 1;
@@ -356,29 +359,29 @@ fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
     let mut h = 0u64; // accumulated terms in the right part S[k]/Q[k]
     while k > 0 {
         let jj = log2_nb_terms[k - 1] as usize;
-        s[k] = &s[k] * &ptoj[jj];
+        s[k] *= &ptoj[jj];
         let mut t = &s[k - 1] * &q[k];
         h += 1u64 << log2_nb_terms[k];
-        t <<= r * i64::try_from(h).unwrap();
+        t <<= r * i64::exact_from(h);
         t += &s[k];
         s[k - 1] = t;
-        q[k - 1] = &q[k - 1] * &q[k];
+        let (q_lo, q_hi) = q.split_at_mut(k);
+        *q_lo.last_mut().unwrap() *= &q_hi[0];
         k -= 1;
     }
     // Q[0] now equals i!. Scale S[0] to ~2*prec bits and Q[0] to ~prec bits, then divide.
     let mut s0 = core::mem::replace(&mut s[0], Integer::ZERO);
     let mut q0 = core::mem::replace(&mut q[0], Integer::ZERO);
-    let mut diff = i64::try_from(s0.significant_bits()).unwrap() - 2 * i64::try_from(prec).unwrap();
+    let mut diff = i64::exact_from(s0.significant_bits()) - (i64::exact_from(prec) << 1);
     let mut expo = diff;
     s0 >>= diff; // negative shift is a left shift, covering MPFR's mul_2exp branch
-    diff = i64::try_from(q0.significant_bits()).unwrap() - i64::try_from(prec).unwrap();
+    diff = i64::exact_from(q0.significant_bits()) - i64::exact_from(prec);
     expo -= diff;
     q0 >>= diff;
     s0 /= q0; // truncating division (both positive)
     // y = (S[0] rounded to prec) * 2^(expo - r*(i-1)); MPFR sets the mantissa via set_z then
     // overrides the exponent, which is exactly this scaling.
-    Float::from_integer_prec_round(s0, prec, Floor).0
-        << (expo - r * (i64::try_from(i).unwrap() - 1))
+    Float::from_integer_prec_round(s0, prec, Floor).0 << (expo - r * (i64::exact_from(i) - 1))
 }
 
 // Computes `exp(x)` rounded to precision `precy` with rounding mode `rm`. Decomposes `x` into
@@ -398,7 +401,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
     let mut x_copy = x.clone();
     let shift_x = if ttt > 0 {
         // Shift x down to magnitude < 1.
-        let s = u64::try_from(ttt).unwrap();
+        let s = u64::exact_from(ttt);
         x_copy = x >> s;
         ttt = i64::from(x_copy.get_exponent().unwrap());
         s
@@ -417,8 +420,8 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
         debug_assert_ne!(uk, 0);
         let mut tmp = exp_rational(
             uk,
-            i64::try_from(SHIFT + twopoweri).unwrap() - ttt,
-            usize::try_from(k + 1).unwrap(),
+            i64::exact_from(SHIFT + twopoweri) - ttt,
+            usize::exact_from(k + 1),
             prec,
         );
         for _ in 0..SHIFT {
@@ -432,18 +435,18 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             if uk != 0 {
                 let t = exp_rational(
                     uk,
-                    i64::try_from(twopoweri).unwrap() - ttt,
-                    usize::try_from(k - i + 1).unwrap(),
+                    i64::exact_from(twopoweri) - ttt,
+                    usize::exact_from(k - i + 1),
                     prec,
                 );
-                tmp = tmp.mul_prec_round(t, prec, Floor).0;
+                tmp.mul_prec_round_assign(t, prec, Floor);
             }
-            twopoweri *= 2;
+            twopoweri <<= 1;
         }
         // Raise tmp to 2^shift_x to undo the initial down-shift of x; detect over/underflow.
         let (val, scaled) = if shift_x > 0 {
             for _ in 0..shift_x - 1 {
-                tmp = tmp.square_prec_round(prec, Floor).0;
+                tmp.square_prec_round_assign(prec, Floor);
             }
             let mut t = tmp.square_prec_round_ref(prec, Floor).0;
             if t.is_infinite() {
@@ -541,7 +544,7 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
     let mut q = precy + err + k_param + 10;
     // if |x| >> 1, account for the cancelled bits
     if expx > 0 {
-        q += u64::try_from(expx).unwrap();
+        q += u64::exact_from(expx);
     }
     let mut increment = Limb::WIDTH;
     loop {
@@ -584,7 +587,7 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             for _ in 0..k_param {
                 ss.square_assign();
                 exps <<= 1;
-                let (ss2, sh) = mpz_normalize(ss, i64::try_from(q).unwrap());
+                let (ss2, sh) = mpz_normalize(ss, i64::exact_from(q));
                 ss = ss2;
                 exps += sh;
             }
@@ -671,7 +674,7 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
     }
     let expx = i64::from(x.get_exponent().unwrap());
     // tiny x: if x < 2^(-precy), then exp(x) = 1 +/- ulp(1)
-    if expx < 0 && u64::try_from(-expx).unwrap() > precy {
+    if expx < 0 && u64::exact_from(-expx) > precy {
         return if x.is_sign_negative() && (rm == Down || rm == Floor) {
             (one_neighbor(precy, false), Less) // 1 - ulp
         } else if x.is_sign_positive() && (rm == Up || rm == Ceiling) {

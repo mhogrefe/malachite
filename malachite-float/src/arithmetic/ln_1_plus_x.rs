@@ -129,7 +129,7 @@ fn ln_1_plus_x_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
                 // The sum 1 + x is an exact dyadic rational, so use the Rational implementation of
                 // ln.
                 return Float::ln_rational_prec_round(
-                    Rational::ONE + Rational::try_from(x).unwrap(),
+                    Rational::ONE + Rational::exact_from(x),
                     prec,
                     rm,
                 );

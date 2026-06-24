@@ -8,6 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -33,7 +34,7 @@ pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ord
             }
             let ord_cmp = (i64::from(*e_x) - 1).cmp(&other.floor_log_base_2_abs());
             if ord_cmp == Equal {
-                Rational::try_from(x).unwrap().cmp(other)
+                Rational::exact_from(x).cmp(other)
             } else if *s_x {
                 ord_cmp
             } else {
