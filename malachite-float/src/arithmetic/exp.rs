@@ -24,9 +24,10 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::mem::swap;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2, Square,
-    SquareAssign,
+    CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, PowerOf2,
+    ShrRoundAssign, Square, SquareAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -249,6 +250,257 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
     (s, exps, l * (l + 4))
 }
 
+// Precision (in bits) at or above which `exp` uses the binary-splitting `exp_3` (O(M(n) log(n)^2))
+// instead of `exp_2`. MPFR's generic `MPFR_EXP_THRESHOLD` default (`generic/mparam.h`), untuned.
+const EXP_THRESHOLD: u64 = 25000;
+
+// Extracts the `i`-th binary-splitting chunk of the mantissa of `p`, where `0 <= |p| < 1`, carrying
+// `p`'s sign. With `B = 2 ^ Limb::WIDTH`: chunk 0 is `floor(|p| * B)` (the top limb), and for `i >
+// 0`, chunk `i` is `(|p| * B^(2^i)) mod B^(2^(i-1))` -- the window of `2^(i-1)` limbs ending
+// `2^(i-1)` limbs below where chunk `i - 1` ends.
+//
+// This is `mpfr_extract` from `extract.c`, MPFR 4.2.2.
+fn extract(p: &Float, i: u64) -> Integer {
+    if let Finite {
+        sign, significand, ..
+    } = &p.0
+    {
+        let limbs = significand.to_limbs_asc();
+        let size_p = limbs.len();
+        let two_i = 1usize << i;
+        let two_i_2 = if i == 0 { 1 } else { two_i >> 1 };
+        let mut y = vec![0 as Limb; two_i_2];
+        if size_p < two_i {
+            // The window extends past the bottom of the mantissa: zero-fill and copy what's there.
+            if size_p >= two_i_2 {
+                let count = size_p - two_i_2;
+                let dst = two_i - size_p;
+                y[dst..dst + count].copy_from_slice(&limbs[..count]);
+            } else {
+                // The whole window is below the mantissa (chunk all zero). Unreachable from
+                // `exp_3`: it only extracts chunks `i <= prec_x`, and `size_p > 2^(prec_x - 1) >=
+                // two_i_2`.
+                fail_on_untested_path("extract, window entirely below the mantissa");
+            }
+        } else {
+            let start = size_p - two_i;
+            y.copy_from_slice(&limbs[start..start + two_i_2]);
+        }
+        Integer::from_sign_and_abs(*sign, Natural::from_owned_limbs_asc(y))
+    } else {
+        unreachable!()
+    }
+}
+
+// Computes `y ~ exp(p / 2^r)` to precision `prec`, within 1 ulp, for `|p / 2^r| < 1`, using up to
+// `2^m` terms of the Taylor series summed by binary splitting. With `P(a,b) = p` if `a+1=b` else
+// `P(a,c)*P(c,b)`, `Q(a,b) = a*2^r` if `a+1=b` (except `Q(0,1)=1`) else `Q(a,c)*Q(c,b)`, and
+// `T(a,b) = P(a,b)` if `a+1=b` else `Q(c,b)*T(a,c) + P(a,c)*T(c,b)`, one has `exp(p/2^r) ~
+// T(0,i)/Q(0,i)`. Since `P(a,b) = p^(b-a)` and only `b-a = 2^j` occur, only the powers `p^(2^j)`
+// (the `ptoj` array) are precomputed; and since `Q(a,b)` is divisible by `2^(r*(b-a-1))`, that
+// power of two is tracked separately rather than stored.
+//
+// This is `mpfr_exp_rational` from `exp3.c`, MPFR 4.2.2.
+fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
+    // Normalize p (strip trailing zeros); since |p/2^r| < 1 and p != 0, r stays >= 1.
+    let nz = p.trailing_zeros().unwrap();
+    let p = p >> nz;
+    r -= i64::try_from(nz).unwrap();
+    let mut q = vec![Integer::ZERO; m + 1];
+    let mut s = vec![Integer::ZERO; m + 1];
+    let mut ptoj = vec![Integer::ZERO; m + 1]; // ptoj[k] = p^(2^k)
+    let mut mult = vec![0i64; m + 1]; // P[k]/Q[k] for the remaining terms is <= 2^(-mult[k])
+    let mut log2_nb_terms = vec![0u64; m + 1];
+    ptoj[0] = p;
+    for k in 1..m {
+        ptoj[k] = (&ptoj[k - 1]).square();
+    }
+    q[0] = Integer::ONE;
+    s[0] = Integer::ONE;
+    let mut k = 0usize;
+    let mut prec_i_have: u64 = 0;
+    // Main loop: Q[0]*Q[1]*...*Q[k] equals i! as an invariant.
+    let n_terms = 1u64 << m;
+    let mut i = 1u64;
+    while prec_i_have < prec && i < n_terms {
+        k += 1;
+        log2_nb_terms[k] = 0; // 1 term
+        q[k] = Integer::from(i + 1);
+        s[k] = Integer::from(i + 1);
+        let mut j = i + 1; // terms computed so far
+        let mut l = 0u32;
+        while j & 1 == 0 {
+            // Combine and reduce: S[k] covers 2^l consecutive terms.
+            s[k] = &s[k] * &ptoj[l as usize];
+            let mut t = &s[k - 1] * &q[k];
+            // Q[k] lacks the 2^(r*2^l) factor, so multiply it in when merging.
+            t <<= r << l;
+            t += &s[k];
+            s[k - 1] = t;
+            q[k - 1] = &q[k - 1] * &q[k];
+            log2_nb_terms[k - 1] += 1;
+            prec_i_have = q[k].significant_bits();
+            let prec_ptoj = ptoj[l as usize].significant_bits();
+            mult[k - 1] += i64::try_from(prec_i_have).unwrap() + (r << l)
+                - i64::try_from(prec_ptoj).unwrap()
+                - 1;
+            prec_i_have = u64::try_from(mult[k - 1]).unwrap();
+            mult[k] = mult[k - 1];
+            l += 1;
+            j >>= 1;
+            k -= 1;
+        }
+        i += 1;
+    }
+    // Accumulate all products into S[0] and Q[0].
+    let mut h = 0u64; // accumulated terms in the right part S[k]/Q[k]
+    while k > 0 {
+        let jj = log2_nb_terms[k - 1] as usize;
+        s[k] = &s[k] * &ptoj[jj];
+        let mut t = &s[k - 1] * &q[k];
+        h += 1u64 << log2_nb_terms[k];
+        t <<= r * i64::try_from(h).unwrap();
+        t += &s[k];
+        s[k - 1] = t;
+        q[k - 1] = &q[k - 1] * &q[k];
+        k -= 1;
+    }
+    // Q[0] now equals i!. Scale S[0] to ~2*prec bits and Q[0] to ~prec bits, then divide.
+    let mut s0 = core::mem::replace(&mut s[0], Integer::ZERO);
+    let mut q0 = core::mem::replace(&mut q[0], Integer::ZERO);
+    let mut diff = i64::try_from(s0.significant_bits()).unwrap() - 2 * i64::try_from(prec).unwrap();
+    let mut expo = diff;
+    s0 >>= diff; // negative shift is a left shift, covering MPFR's mul_2exp branch
+    diff = i64::try_from(q0.significant_bits()).unwrap() - i64::try_from(prec).unwrap();
+    expo -= diff;
+    q0 >>= diff;
+    s0 /= q0; // truncating division (both positive)
+    // y = (S[0] rounded to prec) * 2^(expo - r*(i-1)); MPFR sets the mantissa via set_z then
+    // overrides the exponent, which is exactly this scaling.
+    Float::from_integer_prec_round(s0, prec, Floor).0
+        << (expo - r * (i64::try_from(i).unwrap() - 1))
+}
+
+// Computes `exp(x)` rounded to precision `precy` with rounding mode `rm`. Decomposes `x` into
+// limb-window chunks (`extract`), exponentiates each chunk's contribution with binary splitting
+// (`exp_rational`), and multiplies them, using O(M(n) log(n)^2) for high precision.
+//
+// This is `mpfr_exp_3` from `exp3.c`, MPFR 4.2.2.
+pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering) {
+    const SHIFT: u64 = Limb::WIDTH >> 1;
+    // prec_x: number of chunk levels, ~log2 of x's limb count.
+    let prec_x = x
+        .get_prec()
+        .unwrap()
+        .ceiling_log_base_2()
+        .saturating_sub(Limb::LOG_WIDTH);
+    let mut ttt = i64::from(x.get_exponent().unwrap());
+    let mut x_copy = x.clone();
+    let shift_x = if ttt > 0 {
+        // Shift x down to magnitude < 1.
+        let s = u64::try_from(ttt).unwrap();
+        x_copy = x >> s;
+        ttt = i64::from(x_copy.get_exponent().unwrap());
+        s
+    } else {
+        0
+    };
+    debug_assert!(ttt <= 0);
+    let mut realprec = precy + (prec_x + precy).ceiling_log_base_2();
+    let mut prec = realprec + SHIFT + 2 + shift_x;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let k = prec.ceiling_log_base_2().saturating_sub(Limb::LOG_WIDTH);
+        let mut twopoweri = Limb::WIDTH;
+        // Particular case i = 0.
+        let uk = extract(&x_copy, 0);
+        debug_assert_ne!(uk, 0);
+        let mut tmp = exp_rational(
+            uk,
+            i64::try_from(SHIFT + twopoweri).unwrap() - ttt,
+            usize::try_from(k + 1).unwrap(),
+            prec,
+        );
+        for _ in 0..SHIFT {
+            tmp = tmp.square_prec_round(prec, Floor).0;
+        }
+        twopoweri *= 2;
+        // General case.
+        let iter = k.min(prec_x);
+        for i in 1..=iter {
+            let uk = extract(&x_copy, i);
+            if uk != 0 {
+                let t = exp_rational(
+                    uk,
+                    i64::try_from(twopoweri).unwrap() - ttt,
+                    usize::try_from(k - i + 1).unwrap(),
+                    prec,
+                );
+                tmp = tmp.mul_prec_round(t, prec, Floor).0;
+            }
+            twopoweri *= 2;
+        }
+        // Raise tmp to 2^shift_x to undo the initial down-shift of x; detect over/underflow.
+        let (val, scaled) = if shift_x > 0 {
+            for _ in 0..shift_x - 1 {
+                tmp = tmp.square_prec_round(prec, Floor).0;
+            }
+            let mut t = tmp.square_prec_round_ref(prec, Floor).0;
+            if t.is_infinite() {
+                // exp(x) overflowed. Reachable only for x in the narrow band between the true
+                // emax*log(2) and `normal_ref`'s conservative `bound_emax`; no test input lands
+                // there.
+                fail_on_untested_path("exp_3, overflow above normal_ref's bound_emax");
+                return exp_overflow(precy, rm);
+            }
+            let mut scaled = false;
+            if matches!(t.0, Zero { .. }) {
+                // Possibly spurious underflow: rescale by 2 and retry. Reachable only for x in the
+                // narrow band just above `normal_ref`'s `bound_emin`; no test input lands there (so
+                // the genuine-underflow, scaled, and unscale branches below are untested too).
+                fail_on_untested_path("exp_3, underflow below normal_ref's bound_emin");
+                tmp <<= 1;
+                t = tmp.square_prec_round_ref(prec, Floor).0;
+                if matches!(t.0, Zero { .. }) {
+                    // exact result < 2^(emin - 2): genuine underflow.
+                    return exp_underflow(precy, if rm == Nearest { Down } else { rm });
+                }
+                scaled = true;
+            }
+            (t, scaled)
+        } else {
+            (tmp, false)
+        };
+        if float_can_round(val.significand_ref().unwrap(), realprec, precy, rm) {
+            let mut y = val;
+            let mut inexact = y.set_prec_round(precy, rm);
+            if scaled && y.is_normal() {
+                // Undo the *2 scaling: y /= 4.
+                let ey = i64::from(y.get_exponent().unwrap());
+                let inex2 = y.shr_round_assign(2, rm);
+                if inex2 != Equal {
+                    // Underflow while unscaling.
+                    if rm == Nearest
+                        && inexact == Less
+                        && matches!(y.0, Zero { .. })
+                        && ey == i64::from(Float::MIN_EXPONENT) + 1
+                    {
+                        // Double rounding: RNDN rounded the scaled result down to 2^emin, but the
+                        // exact result is > 2^(emin - 2), so round up instead.
+                        (y, inexact) = (Float::min_positive_value_prec(precy), Greater);
+                    } else {
+                        inexact = inex2;
+                    }
+                }
+            }
+            return (y, inexact);
+        }
+        realprec += increment;
+        increment = realprec >> 1;
+        prec = realprec + SHIFT + 2 + shift_x;
+    }
+}
+
 // Computes `exp(x)` rounded to precision `precy` with rounding mode `rm`, returning the rounded
 // value and an [`Ordering`] comparing it to the exact result. `x` must be finite and nonzero and
 // `exp(x)` must be in range; the dispatcher (`exp`) guarantees both. Uses Brent's method: `exp(x) =
@@ -383,8 +635,8 @@ fn exp_underflow(precy: u64, rm: RoundingMode) -> (Float, Ordering) {
 
 // Computes `exp(x)` for finite nonzero `x`, rounded to precision `precy` with rounding mode `rm`.
 // Detects overflow/underflow against `log(2)`-scaled exponent bounds, takes a fast path for tiny
-// `x` (where `exp(x) = 1 +/- ulp(1)`), and otherwise calls `exp_2`. (The high-precision `exp_3`
-// path is added later; `exp_2` is correct at all precisions.)
+// `x` (where `exp(x) = 1 +/- ulp(1)`), and otherwise dispatches to `exp_2` (below `EXP_THRESHOLD`)
+// or the binary-splitting `exp_3` (at or above it).
 //
 // This is the finite-nonzero branch of `mpfr_exp` from `exp.c`, MPFR 4.2.2.
 fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering) {
@@ -431,7 +683,11 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
             )
         };
     }
-    exp_2(x, precy, rm)
+    if precy >= EXP_THRESHOLD {
+        exp_3(x, precy, rm)
+    } else {
+        exp_2(x, precy, rm)
+    }
 }
 
 // The neighbor of 1 at precision `prec`: the successor `1 + 2 ^ (1 - prec)` if `above`, otherwise
