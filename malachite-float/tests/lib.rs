@@ -135,6 +135,7 @@ pub mod comparison {
     pub mod partial_eq_rational;
 }
 pub mod constants {
+    pub mod e;
     pub mod gauss_constant;
     pub mod lemniscate_constant;
     pub mod ln_10;

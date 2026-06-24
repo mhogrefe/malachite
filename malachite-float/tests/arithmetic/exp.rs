@@ -8,13 +8,18 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Exp, ExpAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::exp::primitive_float_exp;
 use malachite_float::test_util::arithmetic::exp::{
     rug_exp, rug_exp_prec, rug_exp_prec_round, rug_exp_round,
 };
@@ -859,6 +864,68 @@ fn test_exp_prec_round() {
         000000000000000000000000000000000000000000000#25000",
         Greater,
     );
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_exp() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_exp(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(0.0, 1.0);
+    test::<f32>(-0.0, 1.0);
+    test::<f32>(1.0, 2.7182817);
+    test::<f32>(-1.0, 0.36787945);
+    test::<f32>(0.5, 1.6487212);
+    test::<f32>(-0.5, 0.60653067);
+    test::<f32>(2.0, 7.389056);
+    test::<f32>(-2.0, 0.13533528);
+    test::<f32>(core::f32::consts::PI, 23.140696);
+    test::<f32>(-core::f32::consts::PI, 0.043213915);
+    test::<f32>(core::f32::consts::E, 15.154261);
+    test::<f32>(-core::f32::consts::E, 0.06598804);
+
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, 0.0);
+    test::<f64>(0.0, 1.0);
+    test::<f64>(-0.0, 1.0);
+    test::<f64>(1.0, 2.718281828459045);
+    test::<f64>(-1.0, 0.36787944117144233);
+    test::<f64>(0.5, 1.6487212707001282);
+    test::<f64>(-0.5, 0.6065306597126334);
+    test::<f64>(2.0, 7.38905609893065);
+    test::<f64>(-2.0, 0.1353352832366127);
+    test::<f64>(core::f64::consts::PI, 23.140692632779267);
+    test::<f64>(-core::f64::consts::PI, 0.04321391826377226);
+    test::<f64>(core::f64::consts::E, 15.154262241479262);
+    test::<f64>(-core::f64::consts::E, 0.06598803584531254);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_exp_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        let e = primitive_float_exp(x);
+        // exp is never negative, and is NaN only for a NaN input.
+        assert_eq!(e.is_nan(), x.is_nan());
+        assert!(e.is_nan() || e >= T::ZERO);
+    });
+}
+
+#[test]
+fn primitive_float_exp_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_exp_properties_helper);
 }
 
 #[test]

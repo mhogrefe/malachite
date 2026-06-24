@@ -20,8 +20,8 @@
 //
 // The Paterson-Stockmeyer series (exp2_aux2) and the high-precision exp_3 are not yet ported.
 
-use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::{Float, emulate_float_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
@@ -29,6 +29,7 @@ use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, Exp, ExpAssign, FloorRoot, FloorSqrt, IsPowerOf2, NegAssign, Parity, PowerOf2,
     ShrRoundAssign, Square, SquareAssign, WrappingAddAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
@@ -1534,4 +1535,55 @@ impl ExpAssign for Float {
         let prec = self.significant_bits();
         self.exp_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes $e^x$, the exponential of a primitive float. Using this function is more accurate than
+/// using the default `exp` function or the one provided by `libm`.
+///
+/// $$
+/// f(x) = e^x+\varepsilon.
+/// $$
+/// - If $e^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\infty)=\infty$
+/// - $f(-\infty)=0.0$
+/// - $f(\pm0.0)=1.0$
+///
+/// Overflow and underflow are possible: a large positive `x` gives $\infty$, and a large negative
+/// `x` gives `0.0`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::exp::primitive_float_exp;
+///
+/// assert!(primitive_float_exp(f32::NAN).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp(f32::INFINITY)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp(f32::NEGATIVE_INFINITY)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(NiceFloat(primitive_float_exp(0.0f32)), NiceFloat(1.0));
+/// assert_eq!(NiceFloat(primitive_float_exp(1.0f32)), NiceFloat(2.7182817));
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_exp<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::exp_prec, x)
 }

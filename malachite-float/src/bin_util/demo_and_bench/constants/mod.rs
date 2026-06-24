@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    e::register(runner);
     gauss_constant::register(runner);
     lemniscate_constant::register(runner);
     ln_10::register(runner);
@@ -41,6 +42,7 @@ pub(crate) fn register(runner: &mut Runner) {
     two_over_sqrt_pi::register(runner);
 }
 
+mod e;
 mod gauss_constant;
 mod lemniscate_constant;
 mod ln_10;
