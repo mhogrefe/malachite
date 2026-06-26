@@ -88,7 +88,7 @@ pub fn float_primitive_float_pair_rm<T: PrimitiveFloat>(
 pub fn float_t_rounding_mode_triple_rm<T: Clone + 'static>(
     xs: It<(Float, T, RoundingMode)>,
 ) -> It<((rug::Float, T, rug::float::Round), (Float, T, RoundingMode))> {
-    Box::new(xs.map(|(x, p, rm)| {
+    Box::new(xs.filter(|(_, _, rm)| *rm != Exact).map(|(x, p, rm)| {
         (
             (
                 rug::Float::exact_from(&x),
@@ -117,23 +117,26 @@ pub fn float_t_u_rounding_mode_quadruple_rm<T: Clone + 'static, U: Clone + 'stat
     (rug::Float, T, U, rug::float::Round),
     (Float, T, U, RoundingMode),
 )> {
-    Box::new(xs.map(|(x, p, q, rm)| {
-        (
-            (
-                rug::Float::exact_from(&x),
-                p.clone(),
-                q.clone(),
-                rug_round_exact_from_rounding_mode(rm),
-            ),
-            (x, p, q, rm),
-        )
-    }))
+    Box::new(
+        xs.filter(|(_, _, _, rm)| *rm != Exact)
+            .map(|(x, p, q, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&x),
+                        p.clone(),
+                        q.clone(),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (x, p, q, rm),
+                )
+            }),
+    )
 }
 
 pub fn float_rounding_mode_pair_rm(
     xs: It<(Float, RoundingMode)>,
 ) -> It<((rug::Float, rug::float::Round), (Float, RoundingMode))> {
-    Box::new(xs.map(|(x, rm)| {
+    Box::new(xs.filter(|(_, rm)| *rm != Exact).map(|(x, rm)| {
         (
             (
                 rug::Float::exact_from(&x),
@@ -150,7 +153,7 @@ pub fn float_float_rounding_mode_triple_rm(
     (rug::Float, rug::Float, rug::float::Round),
     (Float, Float, RoundingMode),
 )> {
-    Box::new(xs.map(|(x, y, rm)| {
+    Box::new(xs.filter(|(_, _, rm)| *rm != Exact).map(|(x, y, rm)| {
         (
             (
                 rug::Float::exact_from(&x),
@@ -198,7 +201,7 @@ pub fn float_rational_rounding_mode_triple_rm(
     (rug::Float, rug::Rational, rug::float::Round),
     (Float, Rational, RoundingMode),
 )> {
-    Box::new(xs.map(|(x, y, rm)| {
+    Box::new(xs.filter(|(_, _, rm)| *rm != Exact).map(|(x, y, rm)| {
         (
             (
                 rug::Float::exact_from(&x),
@@ -216,17 +219,20 @@ pub fn float_float_anything_rounding_mode_quadruple_rm<T: Clone + 'static>(
     (rug::Float, rug::Float, T, rug::float::Round),
     (Float, Float, T, RoundingMode),
 )> {
-    Box::new(xs.map(|(x, y, z, rm)| {
-        (
-            (
-                rug::Float::exact_from(&x),
-                rug::Float::exact_from(&y),
-                z.clone(),
-                rug_round_exact_from_rounding_mode(rm),
-            ),
-            (x, y, z, rm),
-        )
-    }))
+    Box::new(
+        xs.filter(|(_, _, _, rm)| *rm != Exact)
+            .map(|(x, y, z, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&x),
+                        rug::Float::exact_from(&y),
+                        z.clone(),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (x, y, z, rm),
+                )
+            }),
+    )
 }
 
 pub fn float_rational_anything_rounding_mode_quadruple_rm<T: Clone + 'static>(
@@ -235,15 +241,18 @@ pub fn float_rational_anything_rounding_mode_quadruple_rm<T: Clone + 'static>(
     (rug::Float, rug::Rational, T, rug::float::Round),
     (Float, Rational, T, RoundingMode),
 )> {
-    Box::new(xs.map(|(x, y, z, rm)| {
-        (
-            (
-                rug::Float::exact_from(&x),
-                rug::Rational::exact_from(&y),
-                z.clone(),
-                rug_round_exact_from_rounding_mode(rm),
-            ),
-            (x, y, z, rm),
-        )
-    }))
+    Box::new(
+        xs.filter(|(_, _, _, rm)| *rm != Exact)
+            .map(|(x, y, z, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&x),
+                        rug::Rational::exact_from(&y),
+                        z.clone(),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (x, y, z, rm),
+                )
+            }),
+    )
 }

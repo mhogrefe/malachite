@@ -22,6 +22,10 @@ pub mod div;
 /// [`ExpAssign`](malachite_base::num::arithmetic::traits::ExpAssign), traits for computing $e^x$
 /// for [`Float`](super::Float)s.
 pub mod exp;
+/// [`ExpXMinus1`](malachite_base::num::arithmetic::traits::ExpXMinus1) and
+/// [`ExpXMinus1Assign`](malachite_base::num::arithmetic::traits::ExpXMinus1Assign), traits for
+/// computing $e^x-1$ for [`Float`](super::Float)s.
+pub mod exp_x_minus_1;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;

@@ -30,7 +30,7 @@ use malachite_float::test_util::bench::bucketers::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_36,
-    float_rounding_mode_pair_gen_var_36_rm, float_rounding_mode_pair_gen_var_37,
+    float_rounding_mode_pair_gen_var_37, float_rounding_mode_pair_gen_var_44_rm,
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_21,
     float_unsigned_rounding_mode_triple_gen_var_21_rm,
@@ -691,7 +691,7 @@ fn benchmark_float_ln_1_plus_x_round_library_comparison(
     run_benchmark(
         "Float.ln_1_plus_x_round(RoundingMode)",
         BenchmarkType::LibraryComparison,
-        float_rounding_mode_pair_gen_var_36_rm().get(gm, config),
+        float_rounding_mode_pair_gen_var_44_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

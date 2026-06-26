@@ -23,6 +23,7 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{Float, emulate_float_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
+use core::cmp::max;
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -162,10 +163,7 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
     let expr0 = i64::from(r.get_exponent().unwrap());
     debug_assert!(expr0 < 0);
     let l_est = q / u64::exact_from(-expr0);
-    let mut m = usize::exact_from(l_est.floor_sqrt());
-    if m < 2 {
-        m = 2;
-    }
+    let m = max(2, usize::exact_from(l_est.floor_sqrt()));
     // r_pows[i] = r^i (integer mantissa), exp_r_pows[i] its 2-exponent
     let mut r_pows = vec![Integer::ZERO; m + 1];
     let mut exp_r_pows = vec![0i64; m + 1];
@@ -177,16 +175,17 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
     r_pows[1] = r1;
     exp_r_pows[1] = one_minus_q;
     // R[2] = R[1]^2 >> (q - 1) (err <= 3 ulps)
-    r_pows[2] = (&r_pows[1]).square() >> (q - 1);
+    let qm1 = q - 1;
+    r_pows[2] = (&r_pows[1]).square() >> qm1;
     exp_r_pows[2] = one_minus_q;
     for i in 3..=m {
         // err(R[i]) <= 2*i-1 ulps
-        let t = if i & 1 == 1 {
+        let t = if i.odd() {
             &r_pows[i - 1] * &r_pows[1]
         } else {
             (&r_pows[i >> 1]).square()
         };
-        r_pows[i] = t >> (q - 1);
+        r_pows[i] = t >> qm1;
         exp_r_pows[i] = one_minus_q;
     }
     r_pows[0] = Integer::power_of_2(q - 1); // R[0] = 1
@@ -199,9 +198,9 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
         let one_minus_ql = 1 - i64::exact_from(ql);
         // all R[i] (i < m) must have exponent 1 - ql
         if l != 0 {
-            for i in 0..m {
-                let z = core::mem::replace(&mut r_pows[i], Integer::ZERO);
-                (r_pows[i], exp_r_pows[i]) = mpz_normalize2(z, exp_r_pows[i], one_minus_ql);
+            for (r_pow, exp_r_pow) in r_pows[..m].iter_mut().zip(exp_r_pows[..m].iter_mut()) {
+                let z = core::mem::replace(r_pow, Integer::ZERO);
+                (*r_pow, *exp_r_pow) = mpz_normalize2(z, *exp_r_pow, one_minus_ql);
             }
         }
         // t = R[m-1] normalized to exponent 1 - ql (err(t) <= 2*m-1 ulps)
@@ -617,7 +616,7 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
 // The overflow result of exp (the value, which is positive, exceeds the maximum finite Float).
 //
 // This is `mpfr_overflow` (with positive sign) as used by `mpfr_exp`, MPFR 4.2.2.
-fn exp_overflow(precy: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn exp_overflow(precy: u64, rm: RoundingMode) -> (Float, Ordering) {
     match rm {
         Nearest | Up | Ceiling => (Float::INFINITY, Greater),
         Down | Floor => (Float::max_finite_value_with_prec(precy), Less),

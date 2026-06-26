@@ -473,6 +473,18 @@ pub trait ExpAssign {
     fn exp_assign(&mut self);
 }
 
+/// Computes $e^x-1$, the exponential of a number, minus one.
+pub trait ExpXMinus1 {
+    type Output;
+
+    fn exp_x_minus_1(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $e^x-1$.
+pub trait ExpXMinus1Assign {
+    fn exp_x_minus_1_assign(&mut self);
+}
+
 /// Takes the natural logarithm of a number.
 pub trait Ln {
     type Output;

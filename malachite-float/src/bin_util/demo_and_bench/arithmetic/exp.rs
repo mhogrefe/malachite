@@ -29,11 +29,11 @@ use malachite_float::test_util::bench::bucketers::{
     triple_1_2_float_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
-    float_rounding_mode_pair_gen_var_47_rm, float_unsigned_pair_gen_var_1,
+    float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_44_rm,
+    float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
     float_unsigned_pair_gen_var_1_rm, float_unsigned_pair_gen_var_4,
+    float_unsigned_rounding_mode_triple_gen_var_31_rm,
     float_unsigned_rounding_mode_triple_gen_var_36,
-    float_unsigned_rounding_mode_triple_gen_var_36_rm,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
@@ -103,7 +103,7 @@ fn benchmark_primitive_float_exp<T: PrimitiveFloat>(
 {
     run_benchmark(
         &format!("primitive_float_exp({})", T::NAME),
-        BenchmarkType::EvaluationStrategy,
+        BenchmarkType::Single,
         primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
@@ -496,7 +496,7 @@ fn benchmark_float_exp_round_library_comparison(
     run_benchmark(
         "Float.exp_round(RoundingMode)",
         BenchmarkType::LibraryComparison,
-        float_rounding_mode_pair_gen_var_47_rm().get(gm, config),
+        float_rounding_mode_pair_gen_var_44_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -569,7 +569,7 @@ fn benchmark_float_exp_prec_round_library_comparison(
     run_benchmark(
         "Float.exp_prec_round(u64, RoundingMode)",
         BenchmarkType::LibraryComparison,
-        float_unsigned_rounding_mode_triple_gen_var_36_rm().get(gm, config),
+        float_unsigned_rounding_mode_triple_gen_var_31_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
