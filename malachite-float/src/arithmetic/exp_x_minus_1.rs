@@ -27,14 +27,14 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, SignedLimb};
 
 // This is mpfr_expm1 from expm1.c, MPFR 4.2.2, where the input is finite and nonzero.
 fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let ex = i64::from(x.get_exponent().unwrap());
     if ex < 0 {
-        // -0.5 < x < 0.5. For 0 < x < 1, |expm1(x) - x| < x^2. For -1 < x < 0, |expm1(x) - x| <
-        // x^2 / 2. In both cases the error term is positive (expm1(x) > x), so it brings the result
+        // -0.5 < x < 0.5. For 0 < x < 1, |expm1(x) - x| < x^2. For -1 < x < 0, |expm1(x) - x| < x^2
+        // / 2. In both cases the error term is positive (expm1(x) > x), so it brings the result
         // away from zero for x > 0 and toward zero for x < 0.
         let (err, dir) = if *x > 0u32 {
             (-ex, true)
@@ -52,21 +52,22 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
     assert_ne!(rm, Exact, "Inexact exp_x_minus_1");
     const BP: u64 = 64;
     if x.is_sign_negative() && ex > 5 {
-        // x <= -32, so exp(x) is tiny and expm1(x) = exp(x) - 1 is very close to -1 (slightly toward
-        // zero). Since exp(x) = 2^(x / ln(2)), an upper bound on x / ln(2) (obtained by dividing the
-        // negative x by an upper bound on ln(2)) gives an err with exp(x) < 2^(1 - err), so -1 can
-        // be rounded directly. This also handles the regime where exp(x) would underflow.
+        // x <= -32, so exp(x) is tiny and expm1(x) = exp(x) - 1 is very close to -1 (slightly
+        // toward zero). Since exp(x) = 2^(x / ln(2)), an upper bound on x / ln(2) (obtained by
+        // dividing the negative x by an upper bound on ln(2)) gives an err with exp(x) < 2^(1 -
+        // err), so -1 can be rounded directly. This also handles the regime where exp(x) would
+        // underflow.
         let log2_up = Float::ln_2_prec_round(BP, Up).0;
         // Round the (negative) quotient toward +infinity to get an upper bound on x / ln(2). This
-        // must be `Ceiling`, not `Up`: for hugely negative x, rounding away from zero would push the
-        // magnitude past `MAX_EXPONENT` and overflow to -infinity, whereas `Ceiling` saturates to
-        // the largest finite value.
+        // must be `Ceiling`, not `Up`: for hugely negative x, rounding away from zero would push
+        // the magnitude past `MAX_EXPONENT` and overflow to -infinity, whereas `Ceiling` saturates
+        // to the largest finite value.
         let t = x.div_prec_round_ref_val(log2_up, BP, Ceiling).0; // > x / ln(2)
         // err = -ceil(t), clamped to at most MAX_EXPONENT (avoiding overflow for huge |x|).
         let neg_ceil = -Integer::rounding_from(&t, Ceiling).0;
-        let max_exp = Integer::from(Float::MAX_EXPONENT);
-        let err = u64::exact_from(&if neg_ceil > max_exp {
-            max_exp
+        const MAX_EXP: Integer = Integer::const_from_signed(Float::MAX_EXPONENT as SignedLimb);
+        let err = u64::exact_from(&if neg_ceil > MAX_EXP {
+            MAX_EXP
         } else {
             neg_ceil
         });
@@ -84,18 +85,18 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
     let mut increment = Limb::WIDTH;
     loop {
         // exp(x) may overflow.
-        let (t, _) = x.exp_prec_ref(working_prec);
+        let mut t = x.exp_prec_ref(working_prec).0;
         if t.is_infinite() {
             return exp_overflow(prec, rm);
         }
         // exp(x) cannot underflow here: that would require x / ln(2) < MIN_EXPONENT - 1, but then
         // the large-negative case above would already have returned.
         let exp_te = i64::from(t.get_exponent().unwrap());
-        let (t, _) = t.sub_prec(Float::ONE, working_prec); // exp(x) - 1
+        t.sub_prec_assign(Float::ONE, working_prec); // exp(x) - 1
         let t_exp = i64::from(t.get_exponent().unwrap());
         // The error estimate (cf. expm1.c). The cancellation `max(exp_te - t_exp, 0)` never reaches
-        // `working_prec`: when |x| is small the cancellation is about -ex bits, which `working_prec`
-        // already absorbs via the `+= -ex` above, so `err` stays positive.
+        // `working_prec`: when |x| is small the cancellation is about -ex bits, which
+        // `working_prec` already absorbs via the `+= -ex` above, so `err` stays positive.
         let err = working_prec - u64::exact_from(max(exp_te - t_exp, 0) + 1);
         if float_can_round(t.significand_ref().unwrap(), err, prec, rm) {
             return Float::from_float_prec_round(t, prec, rm);
@@ -675,9 +676,9 @@ impl ExpXMinus1 for Float {
     /// - $f(\pm0.0)=\pm0.0$
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
-    /// [`Float::exp_x_minus_1_round`] instead. If you want to specify the output precision, consider
-    /// using [`Float::exp_x_minus_1_prec`]. If you want both of these things, consider using
-    /// [`Float::exp_x_minus_1_prec_round`].
+    /// [`Float::exp_x_minus_1_round`] instead. If you want to specify the output precision,
+    /// consider using [`Float::exp_x_minus_1_prec`]. If you want both of these things, consider
+    /// using [`Float::exp_x_minus_1_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$

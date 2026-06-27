@@ -4569,6 +4569,22 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_9()
     ))
 }
 
+pub fn exp_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // exp of a nonzero rational is transcendental, so `Exact` is valid only for x = 0 (exp(0) = 1).
+    rm != Exact || *x == 0u32
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_10()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| exp_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
 // -- (Rational, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
 
 pub fn log_base_power_of_2_rational_prec_round_valid(
