@@ -22,7 +22,7 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     primitive_float_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::arithmetic::exp::primitive_float_exp;
+use malachite_float::arithmetic::exp::{primitive_float_exp, primitive_float_exp_rational};
 use malachite_float::test_util::arithmetic::exp::{
     rug_exp, rug_exp_prec, rug_exp_prec_round, rug_exp_rational_prec, rug_exp_rational_prec_round,
     rug_exp_round,
@@ -37,7 +37,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
 
 #[test]
@@ -933,6 +933,79 @@ where
 #[test]
 fn primitive_float_exp_properties() {
     apply_fn_to_primitive_floats!(primitive_float_exp_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_exp_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        assert_eq!(NiceFloat(primitive_float_exp_rational(&u)), NiceFloat(out));
+    }
+    test::<f32>("0", 1.0);
+    test::<f32>("1", 2.7182817);
+    test::<f32>("1/2", 1.6487212);
+    test::<f32>("1/3", 1.3956125);
+    test::<f32>("22/7", 23.169971);
+    test::<f32>("1000000", f32::INFINITY);
+    test::<f32>("1/1000000", 1.000001);
+    test::<f32>("-1", 0.36787945);
+    test::<f32>("-1/2", 0.60653067);
+    test::<f32>("-1/3", 0.71653134);
+    test::<f32>("-22/7", 0.04315931);
+    test::<f32>("-1000000", 0.0);
+
+    test::<f64>("0", 1.0);
+    test::<f64>("1", 2.718281828459045);
+    test::<f64>("1/2", 1.6487212707001282);
+    test::<f64>("1/3", 1.3956124250860895);
+    test::<f64>("22/7", 23.16997229826248);
+    test::<f64>("1000000", f64::INFINITY);
+    test::<f64>("1/1000000", 1.0000010000005);
+    test::<f64>("-1", 0.36787944117144233);
+    test::<f64>("-1/2", 0.6065306597126334);
+    test::<f64>("-1/3", 0.7165313105737893);
+    test::<f64>("-22/7", 0.043159309261452596);
+    test::<f64>("-1000000", 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_exp_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let y = primitive_float_exp_rational::<T>(&x);
+        // exp is always positive (a positive value, +0, or +inf), never negative or NaN.
+        assert!(y >= T::ZERO);
+        if x > 0u32 {
+            assert!(y >= T::ONE);
+        } else if x < 0u32 {
+            assert!(y <= T::ONE);
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // The exponential of a finite primitive float, taken through the `Rational` path, matches
+        // the direct primitive-float exponential.
+        if x.is_finite() {
+            assert_eq!(
+                NiceFloat(primitive_float_exp_rational::<T>(&Rational::exact_from(x))),
+                NiceFloat(primitive_float_exp(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_exp_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_exp_rational_properties_helper);
 }
 
 #[test]

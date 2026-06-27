@@ -21,7 +21,7 @@
 // The Paterson-Stockmeyer series (exp2_aux2) and the high-precision exp_3 are not yet ported.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, emulate_float_to_float_fn, floor_and_ceiling};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
 use core::mem::swap;
@@ -1973,4 +1973,59 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::exp_prec, x)
+}
+
+/// Computes $e^x$, the exponential of a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = e^x+\varepsilon.
+/// $$
+/// - If $e^x$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $e^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 e^x\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=1$
+///
+/// Overflow and underflow are possible: a large positive `x` gives $\infty$, and a large negative
+/// `x` gives `0.0`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::exp::primitive_float_exp_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(1.3956124250860895)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_rational::<f64>(&Rational::from(-10000))),
+///     NiceFloat(0.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_exp_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::exp_rational_prec_ref, x)
 }

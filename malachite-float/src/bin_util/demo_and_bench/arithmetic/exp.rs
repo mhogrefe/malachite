@@ -16,7 +16,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::Float;
-use malachite_float::arithmetic::exp::primitive_float_exp;
+use malachite_float::arithmetic::exp::{primitive_float_exp, primitive_float_exp_rational};
 use malachite_float::test_util::arithmetic::exp::{
     rug_exp, rug_exp_prec, rug_exp_prec_round, rug_exp_round,
 };
@@ -38,9 +38,10 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 use malachite_q::test_util::bench::bucketers::{
-    pair_rational_bit_u64_max_bucketer, triple_1_2_rational_bit_u64_max_bucketer,
+    pair_rational_bit_u64_max_bucketer, rational_bit_bucketer,
+    triple_1_2_rational_bit_u64_max_bucketer,
 };
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_exp);
@@ -73,6 +74,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_exp_rational_prec_round_ref);
     register_demo!(runner, demo_float_exp_rational_prec_round_ref_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_exp);
+    register_primitive_float_demos!(runner, demo_primitive_float_exp_rational);
 
     register_bench!(runner, benchmark_float_exp_evaluation_strategy);
     register_bench!(runner, benchmark_float_exp_library_comparison);
@@ -95,6 +97,7 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_exp_rational_prec_round_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_exp);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_exp_rational);
 }
 
 fn demo_float_exp_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -307,6 +310,48 @@ fn benchmark_primitive_float_exp<T: PrimitiveFloat>(
         &primitive_float_bucketer("x"),
         &mut [("malachite", &mut |x| {
             no_out!(primitive_float_exp(x));
+        })],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_exp_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in rational_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_exp_rational({}) = {:?}",
+            x,
+            NiceFloat(primitive_float_exp_rational::<T>(&x))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_exp_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_exp_rational::<{}>(Rational)", T::NAME),
+        BenchmarkType::Single,
+        rational_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_bit_bucketer("x"),
+        &mut [("Malachite", &mut |x| {
+            no_out!(primitive_float_exp_rational::<T>(&x));
         })],
     );
 }
