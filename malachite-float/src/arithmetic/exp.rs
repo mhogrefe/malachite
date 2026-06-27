@@ -36,7 +36,7 @@ use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, WrappingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
@@ -702,7 +702,7 @@ fn one_neighbor(prec: u64, above: bool) -> Float {
     let (m, shift) = if above {
         (Natural::power_of_2(prec - 1) + Natural::ONE, prec - 1)
     } else {
-        (Natural::power_of_2(prec) - Natural::ONE, prec)
+        (Natural::low_mask(prec), prec)
     };
     Float::from_natural_prec(m, prec).0 >> shift
 }
@@ -767,25 +767,24 @@ fn exp_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it (its Float bounds would be 0 or out of range), so sum the Taylor series
     // instead. exp(x) is near 1 but, for an enormous `prec`, possibly more than one ulp away.
-    if exp_x <= i64::from(Float::MIN_EXPONENT) {
+    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
         return exp_rational_near_one(x, prec, rm);
     }
     // Tiny x: if |x| < 2^(-prec-1) then exp(x) is within half an ulp of 1, so it rounds to 1 (or,
     // for directed rounding away from 1, to the neighbor of 1). This mirrors exp's tiny-x fast
     // path.
     if -exp_x > i64::exact_from(prec) {
-        return if !positive && (rm == Down || rm == Floor) {
-            (one_neighbor(prec, false), Less) // 1 - ulp
-        } else if positive && (rm == Up || rm == Ceiling) {
-            (one_neighbor(prec, true), Greater) // 1 + ulp
-        } else {
-            (Float::one_prec(prec), if positive { Less } else { Greater })
+        return match (positive, rm) {
+            (false, Down | Floor) => (one_neighbor(prec, false), Less), // 1 - ulp
+            (true, Up | Ceiling) => (one_neighbor(prec, true), Greater), // 1 + ulp
+            (true, _) => (Float::one_prec(prec), Less),
+            (false, _) => (Float::one_prec(prec), Greater),
         };
     }
     // |x| is too large to be a finite Float, so exp(x) overflows (x > 0) or underflows (x < 0).
     // Smaller x that still overflow/underflow exp are caught by `exp_prec_round_normal_ref` in the
     // loop below.
-    if exp_x >= i64::from(Float::MAX_EXPONENT) {
+    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
         return if positive {
             exp_overflow(prec, rm)
         } else {
