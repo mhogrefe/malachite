@@ -13,21 +13,26 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
-use crate::arithmetic::exp::exp_overflow;
+use crate::arithmetic::exp::{exp_overflow, one_neighbor};
 use crate::arithmetic::round_near_x::float_round_near_x;
-use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan};
+use crate::{
+    Float, emulate_float_to_float_fn, float_infinity, float_nan, float_zero, floor_and_ceiling,
+};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, ExpXMinus1, ExpXMinus1Assign};
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, ExpXMinus1, ExpXMinus1Assign, Sign,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NegativeOne, One};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_q::Rational;
 
 // This is mpfr_expm1 from expm1.c, MPFR 4.2.2, where the input is finite and nonzero.
 fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
@@ -102,6 +107,115 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
             return Float::from_float_prec_round(t, prec, rm);
         }
         // Increase the precision.
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Computes `exp(x) - 1` for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, by summing its
+// Taylor series `sum_{k>=1} x^k / k!`. Used when `x` is so small that `expm1(x) ~ x` underflows:
+// the squeeze in `exp_x_minus_1_rational_helper` cannot bracket such an `x` (its Float bounds
+// collapse to 0). The series is bracketed between two rationals which are rounded with
+// `from_rational_prec_round` (which performs the underflow rounding) until both ends agree.
+fn exp_x_minus_1_rational_near_zero(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let negative = *x < 0u32;
+    let mut s = Rational::ZERO; // partial sum S_{k-1}, starting at S_0 = 0
+    let mut term = Rational::ONE; // x^(k-1) / (k-1)!
+    let mut k = 1u64;
+    loop {
+        term *= x;
+        term /= Rational::from(k); // term = x^k / k!
+        let s_next = &s + &term; // S_k
+        let (lo, hi) = if negative {
+            // The terms alternate in sign with strictly decreasing magnitude (|x| / (k + 1) < 1),
+            // so expm1(x) lies between consecutive partial sums.
+            if s < s_next {
+                (s.clone(), s_next.clone())
+            } else {
+                (s_next.clone(), s.clone())
+            }
+        } else {
+            // Every term is positive, so S_k < expm1(x), and the remainder is bounded by t_{k+1} /
+            // (1
+            // - x).
+            let next = (&term * x) / Rational::from(k + 1); // t_{k+1}
+            (s_next.clone(), &s_next + next / (Rational::ONE - x))
+        };
+        s = s_next;
+        k += 1;
+        let (f_lo, mut o_lo) = Float::from_rational_prec_round_ref(&lo, prec, rm);
+        let (f_hi, mut o_hi) = Float::from_rational_prec_round_ref(&hi, prec, rm);
+        // A bound that is exactly representable at `prec` rounds with `Equal`; treat it as agreeing
+        // with the other bound. (`hi == 0` triggers this for small negative x, since 0 is exact.)
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && f_lo == f_hi {
+            return (f_lo, o_lo);
+        }
+    }
+}
+
+// Computes `exp(x) - 1` for a nonzero `Rational` `x`, rounded to precision `prec` with rounding
+// mode `rm`. (`expm1(0) = 0` is handled by the caller.) Because the value at a nonzero rational is
+// transcendental, the result is never exactly representable, so `rm` must not be `Exact`.
+fn exp_x_minus_1_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact exp_x_minus_1");
+    let positive = x.sign() == Greater;
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
+    // cannot bracket it (its Float bounds would be 0), so sum the Taylor series instead. expm1(x) ~
+    // x underflows, which `from_rational_prec_round` handles in the helper.
+    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
+        return exp_x_minus_1_rational_near_zero(x, prec, rm);
+    }
+    // |x| is too large to be a finite Float. For x > 0, expm1(x) overflows to +inf; for x < 0,
+    // expm1(x) = -1 + exp(x) tends to -1. Smaller x that still overflow are caught in the loop
+    // below.
+    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
+        if positive {
+            return exp_overflow(prec, rm);
+        }
+        // exp(x) is far below ulp(-1) at any precision, so expm1(x) rounds to -1 or its toward-zero
+        // neighbor.
+        let err = u64::exact_from(Float::MAX_EXPONENT);
+        if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
+            return result;
+        }
+        // `prec` is enormous (>= MAX_EXPONENT), so `float_round_near_x` cannot resolve the
+        // rounding; but exp(x) is still far below ulp(-1), so -1 rounds the same way.
+        return match rm {
+            Ceiling | Down => (-one_neighbor(prec, false), Greater), // -1 + ulp (toward zero)
+            _ => (-Float::one_prec(prec), Less),                     // -1
+        };
+    }
+    // General case: bracket x between the Floats x_lo <= x <= x_hi, apply expm1 to both, and
+    // increase the working precision until the two bounds round to the same result. expm1 is
+    // monotonic, so once the bounds agree the exact expm1(x) (which lies between them) rounds the
+    // same way.
+    let mut working_prec = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (x_lo, x_o) = Float::from_rational_prec_round_ref(x, working_prec, Floor);
+        if x_o == Equal {
+            // x is exactly representable at `working_prec`, so expm1(x) is simply expm1(x_lo).
+            return x_lo.exp_x_minus_1_prec_round(prec, rm);
+        }
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
+        // expm1 of a finite nonzero Float is transcendental, so it is never exact: both orderings
+        // are `Less` or `Greater`, never `Equal`.
+        let (e_lo, o_lo) = x_lo.exp_x_minus_1_prec_round_ref(prec, rm);
+        let (e_hi, o_hi) = x_hi.exp_x_minus_1_prec_round_ref(prec, rm);
+        if o_lo == o_hi && e_lo == e_hi {
+            return (e_lo, o_lo);
+        }
         working_prec += increment;
         increment = working_prec >> 1;
     }
@@ -355,6 +469,50 @@ impl Float {
     #[inline]
     pub fn exp_x_minus_1_prec_ref(&self, prec: u64) -> (Self, Ordering) {
         self.exp_x_minus_1_prec_round_ref(prec, Nearest)
+    }
+
+    /// Computes $e^x-1$, where $x$ is a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value.
+    #[inline]
+    pub fn exp_x_minus_1_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::exp_x_minus_1_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $e^x-1$, where $x$ is a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference.
+    pub fn exp_x_minus_1_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // expm1(0) = 0, exactly.
+            return (float_zero!(), Equal);
+        }
+        exp_x_minus_1_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $e^x-1$, where $x$ is a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by value.
+    #[inline]
+    pub fn exp_x_minus_1_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::exp_x_minus_1_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $e^x-1$, where $x$ is a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by reference.
+    #[inline]
+    pub fn exp_x_minus_1_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::exp_x_minus_1_rational_prec_round_ref(x, prec, Nearest)
     }
 
     /// Computes $e^x-1$, where $x$ is a [`Float`], rounding the result with the specified rounding

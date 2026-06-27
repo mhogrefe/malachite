@@ -698,7 +698,7 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
 // the predecessor `1 - 2 ^ (-prec)`. Both are exactly representable at precision `prec`. (Note that
 // `Float::increment`/`decrement` cannot be used here: they keep the ulp of the current binade, so
 // they bump the precision when crossing into the next binade and overshoot the true predecessor.)
-fn one_neighbor(prec: u64, above: bool) -> Float {
+pub(crate) fn one_neighbor(prec: u64, above: bool) -> Float {
     let (m, shift) = if above {
         (Natural::power_of_2(prec - 1) + Natural::ONE, prec - 1)
     } else {

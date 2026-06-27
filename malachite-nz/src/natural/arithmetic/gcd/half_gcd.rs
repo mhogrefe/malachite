@@ -470,7 +470,6 @@ fn limbs_half_gcd_matrix_apply(m: &HalfGcdMatrix, xs: &mut [Limb], ys: &mut [Lim
         // Put Y <- Y - q X
         limbs_gcd_sub_mul(ys_lo, xs_lo, &m.get(1, 0)[..m_lens[1][0]])
     } else if m_lens[1][0] == 0 {
-        fail_on_untested_path("limbs_half_gcd_matrix_apply, m_lens[1][0] == 0");
         // Y unchanged, M = (1, q; 0, 1)
         assert_eq!(m_lens[0][0], 1);
         assert_eq!(m.get(0, 0)[0], 1);
