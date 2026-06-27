@@ -16,7 +16,8 @@ use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, one_neighbor};
 use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::{
-    Float, emulate_float_to_float_fn, float_infinity, float_nan, float_zero, floor_and_ceiling,
+    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_infinity, float_nan,
+    float_zero, floor_and_ceiling,
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
@@ -1321,4 +1322,66 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::exp_x_minus_1_prec, x)
+}
+
+/// Computes $e^x-1$, where $x$ is a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = e^x-1+\varepsilon.
+/// $$
+/// - If $e^x-1$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $e^x-1$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |e^x-1|\rfloor-p}$,
+///   where $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=0$
+///
+/// Overflow and underflow are possible: a large positive `x` gives $\infty$, and a small nonzero
+/// `x` may give $\pm0.0$. Unlike $e^x$, a large negative `x` does not underflow to zero; it gives
+/// `-1.0`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::exp_x_minus_1::primitive_float_exp_x_minus_1_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_x_minus_1_rational::<f64>(
+///         &Rational::ZERO
+///     )),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_x_minus_1_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.3956124250860895)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_x_minus_1_rational::<f64>(
+///         &Rational::from(10000)
+///     )),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_exp_x_minus_1_rational::<f64>(
+///         &Rational::from(-10000)
+///     )),
+///     NiceFloat(-1.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_exp_x_minus_1_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::exp_x_minus_1_rational_prec_ref, x)
 }

@@ -24,7 +24,9 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
     unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::arithmetic::exp_x_minus_1::primitive_float_exp_x_minus_1;
+use malachite_float::arithmetic::exp_x_minus_1::{
+    primitive_float_exp_x_minus_1, primitive_float_exp_x_minus_1_rational,
+};
 use malachite_float::test_util::arithmetic::exp_x_minus_1::{
     rug_exp_x_minus_1, rug_exp_x_minus_1_prec, rug_exp_x_minus_1_prec_round,
     rug_exp_x_minus_1_rational_prec, rug_exp_x_minus_1_rational_prec_round,
@@ -42,7 +44,7 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
 
 #[test]
@@ -2919,4 +2921,84 @@ fn exp_x_minus_1_rational_prec_properties() {
         assert_eq!(ComparableFloat(f), ComparableFloat(Float::ZERO));
         assert_eq!(o, Equal);
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_exp_x_minus_1_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_exp_x_minus_1_rational(&u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 0.0);
+    test::<f32>("1", 1.7182819);
+    test::<f32>("1/2", 0.6487213);
+    test::<f32>("1/3", 0.39561242);
+    test::<f32>("22/7", 22.169971);
+    test::<f32>("1000000", f32::INFINITY);
+    test::<f32>("1/1000000", 0.0000010000005);
+    test::<f32>("-1", -0.63212055);
+    test::<f32>("-1/2", -0.39346933);
+    test::<f32>("-1/3", -0.2834687);
+    test::<f32>("-22/7", -0.9568407);
+    test::<f32>("-1000000", -1.0);
+
+    test::<f64>("0", 0.0);
+    test::<f64>("1", 1.7182818284590453);
+    test::<f64>("1/2", 0.6487212707001282);
+    test::<f64>("1/3", 0.3956124250860895);
+    test::<f64>("22/7", 22.16997229826248);
+    test::<f64>("1000000", f64::INFINITY);
+    test::<f64>("1/1000000", 1.0000005000001667e-6);
+    test::<f64>("-1", -0.6321205588285577);
+    test::<f64>("-1/2", -0.3934693402873666);
+    test::<f64>("-1/3", -0.28346868942621073);
+    test::<f64>("-22/7", -0.9568406907385474);
+    test::<f64>("-1000000", -1.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_exp_x_minus_1_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let y = primitive_float_exp_x_minus_1_rational::<T>(&x);
+        // expm1 has the same sign as x, and is never NaN.
+        assert!(!y.is_nan());
+        if x > 0u32 {
+            assert!(y >= T::ZERO);
+        } else if x < 0u32 {
+            assert!(y <= T::ZERO);
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // expm1 of a finite, nonzero primitive float, taken through the `Rational` path, matches
+        // the direct primitive-float expm1. Zero is excluded: a `Rational` has no signed zero, so
+        // the `Rational` path returns +0 for both signs whereas the direct path preserves it
+        // (expm1(-0.0) = -0.0).
+        if x.is_finite() && x != T::ZERO {
+            assert_eq!(
+                NiceFloat(primitive_float_exp_x_minus_1_rational::<T>(
+                    &Rational::exact_from(x)
+                )),
+                NiceFloat(primitive_float_exp_x_minus_1(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_exp_x_minus_1_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_exp_x_minus_1_rational_properties_helper);
 }
