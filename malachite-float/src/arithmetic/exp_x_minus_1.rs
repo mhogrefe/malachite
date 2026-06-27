@@ -291,7 +291,9 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (e, o) = Float::from_unsigned_prec(1u32, 100).0.exp_x_minus_1_prec(20);
+    /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
+    ///     .0
+    ///     .exp_x_minus_1_prec(20);
     /// assert_eq!(e.to_string(), "1.718283");
     /// assert_eq!(o, Greater);
     /// ```
