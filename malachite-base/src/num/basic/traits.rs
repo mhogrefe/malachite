@@ -213,6 +213,11 @@ pub trait GaussConstant {
     const GAUSS_CONSTANT: Self;
 }
 
+/// Provides Gelfond's constant, $e^\pi$.
+pub trait GelfondsConstant {
+    const GELFONDS_CONSTANT: Self;
+}
+
 /// Provides the lemniscate constant $\varpi=\pi G$, where $G$ is Gauss's constant.
 pub trait LemniscateConstant {
     const LEMNISCATE_CONSTANT: Self;

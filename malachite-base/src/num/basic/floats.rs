@@ -16,11 +16,11 @@ use crate::num::arithmetic::traits::{
     SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    GaussConstant, Infinity, LemniscateConstant, Ln2, Ln10, Log2E, Log10E, Log102, Log210, NaN,
-    NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi, OneOverSqrtPi,
-    OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant,
-    ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau,
-    Two, TwoOverPi, TwoOverSqrtPi, Zero,
+    GaussConstant, GelfondsConstant, Infinity, LemniscateConstant, Ln2, Ln10, Log2E, Log10E,
+    Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi,
+    OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
+    PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5,
+    Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -138,11 +138,14 @@ pub trait PrimitiveFloat:
     + FmtRyuString
     + From<f32>
     + FromStr
+    + GaussConstant
+    + GelfondsConstant
     + Infinity
     + IntegerMantissaAndExponent<u64, i64>
     + Into<f64>
     + IsInteger
     + IsPowerOf2
+    + LemniscateConstant
     + Log2E
     + Log10E
     + Log210
@@ -164,11 +167,20 @@ pub trait PrimitiveFloat:
     + NextPowerOf2<Output = Self>
     + NextPowerOf2Assign
     + One
+    + OneHalf
+    + OneOverPi
+    + OneOverSqrtPi
+    + OneOverSqrtTau
     + PartialEq<Self>
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
     + Phi
     + Pi
+    + PiOver2
+    + PiOver3
+    + PiOver4
+    + PiOver6
+    + PiOver8
     + Pow<i64, Output = Self>
     + Pow<Self, Output = Self>
     + PowAssign<i64>
@@ -218,6 +230,7 @@ pub trait PrimitiveFloat:
     + Sqrt3Over3
     + Sqrt5
     + Sqrt5Over5
+    + SqrtPi
     + Square<Output = Self>
     + SquareAssign
     + Sub<Output = Self>
@@ -226,7 +239,10 @@ pub trait PrimitiveFloat:
     + SubMulAssign<Self, Self>
     + Sum<Self>
     + ProuhetThueMorseConstant
+    + Tau
     + Two
+    + TwoOverPi
+    + TwoOverSqrtPi
     + UpperExp
     + Zero
 {
@@ -620,6 +636,7 @@ macro_rules! impl_basic_traits_primitive_float {
         $one_over_sqrt_pi: expr,
         $one_over_sqrt_tau: expr,
         $gauss_constant: expr,
+        $gelfonds_constant: expr,
         $lemniscate_constant: expr
     ) => {
         impl PrimitiveFloat for $t {
@@ -884,6 +901,11 @@ macro_rules! impl_basic_traits_primitive_float {
             const GAUSS_CONSTANT: $t = $gauss_constant;
         }
 
+        /// $e^\pi$.
+        impl GelfondsConstant for $t {
+            const GELFONDS_CONSTANT: $t = $gelfonds_constant;
+        }
+
         /// $\varpi=\pi G$.
         impl LemniscateConstant for $t {
             const LEMNISCATE_CONSTANT: $t = $lemniscate_constant;
@@ -907,6 +929,7 @@ impl_basic_traits_primitive_float!(
     0.5641896,
     0.3989423,
     0.83462685,
+    23.140692,
     2.6220574
 );
 impl_basic_traits_primitive_float!(
@@ -926,5 +949,6 @@ impl_basic_traits_primitive_float!(
     0.5641895835477563,
     0.3989422804014327,
     0.8346268416740732,
+    23.14069263277927,
     2.6220575542921196
 );
