@@ -223,6 +223,11 @@ pub trait LemniscateConstant {
     const LEMNISCATE_CONSTANT: Self;
 }
 
+/// Provides Ramanujan's constant, $e^{\pi\sqrt{163}}$.
+pub trait RamanujansConstant {
+    const RAMANUJANS_CONSTANT: Self;
+}
+
 // Implementation for `NonZero*` types:
 // - `One` and `Two` for both signed and unsigned variants
 // - `NegativeOne` for the signed variant

@@ -31,6 +31,7 @@ pub(crate) fn register(runner: &mut Runner) {
     pi_over_8::register(runner);
     prime_constant::register(runner);
     prouhet_thue_morse_constant::register(runner);
+    ramanujans_constant::register(runner);
     sqrt_2::register(runner);
     sqrt_2_over_2::register(runner);
     sqrt_3::register(runner);
@@ -65,6 +66,7 @@ mod pi_over_6;
 mod pi_over_8;
 mod prime_constant;
 mod prouhet_thue_morse_constant;
+mod ramanujans_constant;
 mod sqrt_2;
 mod sqrt_2_over_2;
 mod sqrt_3;

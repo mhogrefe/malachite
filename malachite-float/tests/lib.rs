@@ -158,6 +158,7 @@ pub mod constants {
     pub mod pi_over_8;
     pub mod prime_constant;
     pub mod prouhet_thue_morse_constant;
+    pub mod ramanujans_constant;
     pub mod sqrt_2;
     pub mod sqrt_2_over_2;
     pub mod sqrt_3;

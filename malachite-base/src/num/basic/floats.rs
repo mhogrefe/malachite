@@ -19,8 +19,8 @@ use crate::num::basic::traits::{
     GaussConstant, GelfondsConstant, Infinity, LemniscateConstant, Ln2, Ln10, Log2E, Log10E,
     Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi,
     OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
-    PrimeConstant, ProuhetThueMorseConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5,
-    Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
+    PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3,
+    Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -189,6 +189,7 @@ pub trait PrimitiveFloat:
     + PowerOf2<u64>
     + PrimeConstant
     + Product
+    + RamanujansConstant
     + RawMantissaAndExponent<u64, u64>
     + Reciprocal<Output = Self>
     + ReciprocalAssign
@@ -637,7 +638,8 @@ macro_rules! impl_basic_traits_primitive_float {
         $one_over_sqrt_tau: expr,
         $gauss_constant: expr,
         $gelfonds_constant: expr,
-        $lemniscate_constant: expr
+        $lemniscate_constant: expr,
+        $ramanujans_constant: expr
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
@@ -910,6 +912,11 @@ macro_rules! impl_basic_traits_primitive_float {
         impl LemniscateConstant for $t {
             const LEMNISCATE_CONSTANT: $t = $lemniscate_constant;
         }
+
+        /// $e^{\pi\sqrt{163}}$.
+        impl RamanujansConstant for $t {
+            const RAMANUJANS_CONSTANT: $t = $ramanujans_constant;
+        }
     };
 }
 impl_basic_traits_primitive_float!(
@@ -930,7 +937,8 @@ impl_basic_traits_primitive_float!(
     0.3989423,
     0.83462685,
     23.140692,
-    2.6220574
+    2.6220574,
+    2.6253742e17
 );
 impl_basic_traits_primitive_float!(
     f64,
@@ -950,5 +958,6 @@ impl_basic_traits_primitive_float!(
     0.3989422804014327,
     0.8346268416740732,
     23.14069263277927,
-    2.6220575542921196
+    2.6220575542921196,
+    2.6253741264076874e17
 );

@@ -53,6 +53,8 @@ pub mod prime_constant;
 /// Functions for approximating the Prouhet-Thue-Morse constant (the constant whose bits are the
 /// Thue-Morse sequence).
 pub mod prouhet_thue_morse_constant;
+/// Functions for approximating Ramanujan's constant, $e^{\pi\sqrt{163}}$.
+pub mod ramanujans_constant;
 /// Functions for approximating $\sqrt{2}$.
 pub mod sqrt_2;
 /// Functions for approximating $\sqrt{2}/2=\sqrt{1/2}=1/\sqrt{2}$.
