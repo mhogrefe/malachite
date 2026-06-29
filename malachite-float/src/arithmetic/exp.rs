@@ -629,7 +629,7 @@ pub(crate) fn exp_overflow(precy: u64, rm: RoundingMode) -> (Float, Ordering) {
 // MPFR maps Nearest to toward-zero here, so Nearest joins Down/Floor.
 //
 // This is `mpfr_underflow` (with positive sign) as used by `mpfr_exp`, MPFR 4.2.2.
-fn exp_underflow(precy: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn exp_underflow(precy: u64, rm: RoundingMode) -> (Float, Ordering) {
     match rm {
         Nearest | Down | Floor => (Float::ZERO, Less),
         Up | Ceiling => (Float::min_positive_value_prec(precy), Greater),

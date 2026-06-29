@@ -1368,6 +1368,11 @@ pub trait PowerOf2<POW> {
     fn power_of_2(pow: POW) -> Self;
 }
 
+/// Replaces a number with 2 raised to the power of that number.
+pub trait PowerOf2Assign {
+    fn power_of_2_assign(&mut self);
+}
+
 pub trait Primorial {
     fn primorial(n: u64) -> Self;
 
