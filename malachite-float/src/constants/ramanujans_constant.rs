@@ -131,10 +131,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec(97);
-    /// assert_eq!(
-    ///     ramanujans_constant.to_string(),
-    ///     "262537412640768744.0"
-    /// );
+    /// assert_eq!(ramanujans_constant.to_string(), "262537412640768744.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec(100);

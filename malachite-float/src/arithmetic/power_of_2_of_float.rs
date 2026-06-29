@@ -105,7 +105,87 @@ fn power_of_2_of_float_prec_round_normal(
 
 impl Float {
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the specified precision and
-    /// with the specified rounding mode. The exponent is taken by value.
+    /// with the specified rounding mode. The [`Float`] is taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than the
+    /// exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 2^x\rfloor-p+1}$.
+    /// - If $2^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p,m)=\text{NaN}$
+    /// - $f(\infty,p,m)=\infty$
+    /// - $f(-\infty,p,m)=0.0$
+    /// - $f(\pm0.0,p,m)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $f(x,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::power_of_2_of_float_prec`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::power_of_2_of_float_round`] instead. If both of these things are true,
+    /// consider using the [`PowerOf2`] implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "2.82843");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_round(
         pow: Float,
@@ -116,7 +196,89 @@ impl Float {
     }
 
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the specified precision and
-    /// with the specified rounding mode. The exponent is taken by reference.
+    /// with the specified rounding mode. The [`Float`] is taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 2^x\rfloor-p+1}$.
+    /// - If $2^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p,m)=\text{NaN}$
+    /// - $f(\infty,p,m)=\infty$
+    /// - $f(-\infty,p,m)=0.0$
+    /// - $f(\pm0.0,p,m)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $f(x,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_prec_ref`] instead. If you know that your target precision is
+    /// the precision of the input, consider using [`Float::power_of_2_of_float_round_ref`] instead.
+    /// If both of these things are true, consider using the [`PowerOf2`] implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from(1.5);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 5, Floor);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 5, Ceiling);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 5, Nearest);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 20, Floor);
+    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 20, Ceiling);
+    /// assert_eq!(p.to_string(), "2.82843");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 20, Nearest);
+    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn power_of_2_of_float_prec_round_ref(
         pow: &Float,
         prec: u64,
@@ -140,21 +302,199 @@ impl Float {
     }
 
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the nearest value of the
-    /// specified precision. The exponent is taken by value.
+    /// specified precision. The [`Float`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded power is less than, equal to, or greater than the exact
+    /// power. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p)=\text{NaN}$
+    /// - $f(\infty,p)=\infty$
+    /// - $f(-\infty,p)=0.0$
+    /// - $f(\pm0.0,p)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_prec_round`] instead. If you know that your target precision is
+    /// the precision of the input, consider using the [`PowerOf2`] implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec(Float::from(1.5), 5);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec(Float::from(1.5), 20);
+    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_prec(pow: Float, prec: u64) -> (Self, Ordering) {
         Self::power_of_2_of_float_prec_round_ref(&pow, prec, Nearest)
     }
 
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the nearest value of the
-    /// specified precision. The exponent is taken by reference.
+    /// specified precision. The [`Float`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded power is less than, equal to, or greater than the exact
+    /// power. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},p)=\text{NaN}$
+    /// - $f(\infty,p)=\infty$
+    /// - $f(-\infty,p)=0.0$
+    /// - $f(\pm0.0,p)=1.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_prec_round_ref`] instead. If you know that your target
+    /// precision is the precision of the input, consider using the [`PowerOf2`] implementation
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from(1.5);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_ref(&x, 5);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_prec_ref(&x, 20);
+    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_ref(pow: &Float, prec: u64) -> (Self, Ordering) {
         Self::power_of_2_of_float_prec_round_ref(pow, prec, Nearest)
     }
 
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result with the specified rounding
-    /// mode. The output precision is the precision of the exponent. The exponent is taken by value.
+    /// mode. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded power is less than, equal to, or greater than the exact power. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,m) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 2^x\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $2^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 2^x\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},m)=\text{NaN}$
+    /// - $f(\infty,m)=\infty$
+    /// - $f(-\infty,m)=0.0$
+    /// - $f(\pm0.0,m)=1.0$
+    ///
+    /// See the [`Float::power_of_2_of_float_prec_round`] documentation for information on overflow
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::power_of_2_of_float_prec_round`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using the [`PowerOf2`] implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_of_float_round(Float::from_unsigned_prec(3u32, 100).0 >> 1u32, Floor);
+    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_round(
+    ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u32,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(p.to_string(), "2.828427124746190097603377448422");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_round(
+    ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u32,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_round(pow: Float, rm: RoundingMode) -> (Self, Ordering) {
         let prec = pow.significant_bits();
@@ -162,16 +502,147 @@ impl Float {
     }
 
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result with the specified rounding
-    /// mode. The output precision is the precision of the exponent. The exponent is taken by
-    /// reference.
+    /// mode. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,m) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 2^x\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $2^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 2^x\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},m)=\text{NaN}$
+    /// - $f(\infty,m)=\infty$
+    /// - $f(-\infty,m)=0.0$
+    /// - $f(\pm0.0,m)=1.0$
+    ///
+    /// See the [`Float::power_of_2_of_float_prec_round`] documentation for information on overflow
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::power_of_2_of_float_prec_round_ref`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using the [`PowerOf2`] implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Floor);
+    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Ceiling);
+    /// assert_eq!(p.to_string(), "2.828427124746190097603377448422");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Nearest);
+    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_round_ref(pow: &Float, rm: RoundingMode) -> (Self, Ordering) {
         let prec = pow.significant_bits();
         Self::power_of_2_of_float_prec_round_ref(pow, prec, rm)
     }
 
-    /// Replaces $x$ with $2^x$, rounding the result to the specified precision and with the
-    /// specified rounding mode.
+    /// Computes $2^x$, where $x$ is a [`Float`], in place, rounding the result to the specified
+    /// precision and with the specified rounding mode. An [`Ordering`] is returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function sets the [`Float`] to
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 2^x\rfloor-p+1}$.
+    /// - If $2^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::power_of_2_of_float_prec_round`] documentation for information on special
+    /// cases, overflow, and underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_prec_assign`] instead. If you know that your target precision
+    /// is the precision of the input, consider using [`Float::power_of_2_of_float_round_assign`]
+    /// instead. If both of these things are true, consider using the [`PowerOf2Assign`]
+    /// implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_round_assign(5, Floor), Less);
+    /// assert_eq!(x.to_string(), "2.8");
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_round_assign(5, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "2.9");
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_round_assign(5, Nearest), Greater);
+    /// assert_eq!(x.to_string(), "2.9");
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_round_assign(20, Floor), Less);
+    /// assert_eq!(x.to_string(), "2.828426");
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(
+    ///     x.power_of_2_of_float_prec_round_assign(20, Ceiling),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "2.82843");
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_round_assign(20, Nearest), Less);
+    /// assert_eq!(x.to_string(), "2.828426");
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_round_assign(
         &mut self,
@@ -183,15 +654,115 @@ impl Float {
         o
     }
 
-    /// Replaces $x$ with $2^x$, rounding the result to the nearest value of the specified
-    /// precision.
+    /// Computes $2^x$, where $x$ is a [`Float`], in place, rounding the result to the nearest value
+    /// of the specified precision. An [`Ordering`] is returned, indicating whether the rounded
+    /// power is less than, equal to, or greater than the exact power. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function sets the [`Float`] to `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// x \gets 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::power_of_2_of_float_prec`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_prec_round_assign`] instead. If you know that your target
+    /// precision is the precision of the input, consider using the [`PowerOf2Assign`]
+    /// implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_assign(5), Greater);
+    /// assert_eq!(x.to_string(), "2.9");
+    ///
+    /// let mut x = Float::from(1.5);
+    /// assert_eq!(x.power_of_2_of_float_prec_assign(20), Less);
+    /// assert_eq!(x.to_string(), "2.828426");
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_assign(&mut self, prec: u64) -> Ordering {
         self.power_of_2_of_float_prec_round_assign(prec, Nearest)
     }
 
-    /// Replaces $x$ with $2^x$, rounding the result with the specified rounding mode. The precision
-    /// of $x$ is unchanged.
+    /// Computes $2^x$, where $x$ is a [`Float`], in place, rounding the result with the specified
+    /// rounding mode. An [`Ordering`] is returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets the [`Float`] to `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 2^x\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $2^x$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 2^x\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// See the [`Float::power_of_2_of_float_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::power_of_2_of_float_prec_round_assign`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using the [`PowerOf2Assign`] implementation instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// assert_eq!(x.power_of_2_of_float_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "2.828427124746190097603377448418");
+    ///
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// assert_eq!(x.power_of_2_of_float_round_assign(Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "2.828427124746190097603377448422");
+    ///
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// assert_eq!(x.power_of_2_of_float_round_assign(Nearest), Less);
+    /// assert_eq!(x.to_string(), "2.828427124746190097603377448418");
+    /// ```
     #[inline]
     pub fn power_of_2_of_float_round_assign(&mut self, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();
@@ -200,8 +771,54 @@ impl Float {
 }
 
 impl PowerOf2<Float> for Float {
-    /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the nearest value with the
-    /// precision of $x$. The exponent is taken by value.
+    /// Computes $2^x$, where $x$ is a [`Float`], taking it by value.
+    ///
+    /// If the output has a precision, it is the precision of the input. If the power is equidistant
+    /// from two [`Float`]s with the specified precision, the [`Float`] with fewer 1s in its binary
+    /// expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$,
+    ///   where $p$ is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN})=\text{NaN}$
+    /// - $f(\infty)=\infty$
+    /// - $f(-\infty)=0.0$
+    /// - $f(\pm0.0)=1.0$
+    ///
+    /// See the [`Float::power_of_2_of_float_round`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_round`] instead. If you want to specify the output precision,
+    /// consider using [`Float::power_of_2_of_float_prec`]. If you want both of these things,
+    /// consider using [`Float::power_of_2_of_float_prec_round`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+    /// use malachite_float::Float;
+    ///
+    /// assert!(Float::power_of_2(Float::NAN).is_nan());
+    /// assert_eq!(Float::power_of_2(Float::INFINITY), Float::INFINITY);
+    /// assert_eq!(Float::power_of_2(Float::NEGATIVE_INFINITY), Float::ZERO);
+    /// assert_eq!(
+    ///     Float::power_of_2(Float::from_unsigned_prec(3u32, 100).0 >> 1u32).to_string(),
+    ///     "2.828427124746190097603377448418"
+    /// );
+    /// ```
     #[inline]
     fn power_of_2(pow: Float) -> Float {
         Float::power_of_2_of_float_round(pow, Nearest).0
@@ -209,8 +826,54 @@ impl PowerOf2<Float> for Float {
 }
 
 impl PowerOf2<&Float> for Float {
-    /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the nearest value with the
-    /// precision of $x$. The exponent is taken by reference.
+    /// Computes $2^x$, where $x$ is a [`Float`], taking it by reference.
+    ///
+    /// If the output has a precision, it is the precision of the input. If the power is equidistant
+    /// from two [`Float`]s with the specified precision, the [`Float`] with fewer 1s in its binary
+    /// expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x) = 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$,
+    ///   where $p$ is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN})=\text{NaN}$
+    /// - $f(\infty)=\infty$
+    /// - $f(-\infty)=0.0$
+    /// - $f(\pm0.0)=1.0$
+    ///
+    /// See the [`Float::power_of_2_of_float_round`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_round_ref`] instead. If you want to specify the output
+    /// precision, consider using [`Float::power_of_2_of_float_prec_ref`]. If you want both of these
+    /// things, consider using [`Float::power_of_2_of_float_prec_round_ref`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+    /// use malachite_float::Float;
+    ///
+    /// assert!(Float::power_of_2(&Float::NAN).is_nan());
+    /// assert_eq!(Float::power_of_2(&Float::INFINITY), Float::INFINITY);
+    /// assert_eq!(Float::power_of_2(&Float::NEGATIVE_INFINITY), Float::ZERO);
+    /// assert_eq!(
+    ///     Float::power_of_2(&(Float::from_unsigned_prec(3u32, 100).0 >> 1u32)).to_string(),
+    ///     "2.828427124746190097603377448418"
+    /// );
+    /// ```
     #[inline]
     fn power_of_2(pow: &Float) -> Float {
         Float::power_of_2_of_float_round_ref(pow, Nearest).0
@@ -218,7 +881,43 @@ impl PowerOf2<&Float> for Float {
 }
 
 impl PowerOf2Assign for Float {
-    /// Replaces $x$ with $2^x$, rounding the result to the nearest value with the precision of $x$.
+    /// Computes $2^x$, where $x$ is a [`Float`], in place.
+    ///
+    /// If the output has a precision, it is the precision of the input. If the power is equidistant
+    /// from two [`Float`]s with the specified precision, the [`Float`] with fewer 1s in its binary
+    /// expansion is chosen. See [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// x \gets 2^x+\varepsilon.
+    /// $$
+    /// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$,
+    ///   where $p$ is the precision of the input.
+    ///
+    /// See the [`Float::power_of_2_of_float_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_of_float_round_assign`] instead. If you want to specify the output
+    /// precision, consider using [`Float::power_of_2_of_float_prec_assign`]. If you want both of
+    /// these things, consider using [`Float::power_of_2_of_float_prec_round_assign`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowerOf2Assign;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// x.power_of_2_assign();
+    /// assert_eq!(x.to_string(), "2.828427124746190097603377448418");
+    /// ```
     #[inline]
     fn power_of_2_assign(&mut self) {
         self.power_of_2_of_float_round_assign(Nearest);
