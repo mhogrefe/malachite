@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     e::register(runner);
     gauss_constant::register(runner);
+    gelfond_schneider_constant::register(runner);
     gelfonds_constant::register(runner);
     lemniscate_constant::register(runner);
     ln_10::register(runner);
@@ -46,6 +47,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod e;
 mod gauss_constant;
+mod gelfond_schneider_constant;
 mod gelfonds_constant;
 mod lemniscate_constant;
 mod ln_10;

@@ -16,10 +16,10 @@ use crate::num::arithmetic::traits::{
     SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    GaussConstant, GelfondsConstant, Infinity, LemniscateConstant, Ln2, Ln10, Log2E, Log10E,
-    Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi,
-    OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
-    PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3,
+    GaussConstant, GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant, Ln2,
+    Ln10, Log2E, Log10E, Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One,
+    OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6,
+    PiOver8, PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3,
     Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
@@ -139,6 +139,7 @@ pub trait PrimitiveFloat:
     + From<f32>
     + FromStr
     + GaussConstant
+    + GelfondSchneiderConstant
     + GelfondsConstant
     + Infinity
     + IntegerMantissaAndExponent<u64, i64>
@@ -638,6 +639,7 @@ macro_rules! impl_basic_traits_primitive_float {
         $one_over_sqrt_tau: expr,
         $gauss_constant: expr,
         $gelfonds_constant: expr,
+        $gelfond_schneider_constant: expr,
         $lemniscate_constant: expr,
         $ramanujans_constant: expr
     ) => {
@@ -908,6 +910,11 @@ macro_rules! impl_basic_traits_primitive_float {
             const GELFONDS_CONSTANT: $t = $gelfonds_constant;
         }
 
+        /// $2^{\sqrt 2}$.
+        impl GelfondSchneiderConstant for $t {
+            const GELFOND_SCHNEIDER_CONSTANT: $t = $gelfond_schneider_constant;
+        }
+
         /// $\varpi=\pi G$.
         impl LemniscateConstant for $t {
             const LEMNISCATE_CONSTANT: $t = $lemniscate_constant;
@@ -937,6 +944,7 @@ impl_basic_traits_primitive_float!(
     0.3989423,
     0.83462685,
     23.140692,
+    2.6651442,
     2.6220574,
     2.6253742e17
 );
@@ -958,6 +966,7 @@ impl_basic_traits_primitive_float!(
     0.3989422804014327,
     0.8346268416740732,
     23.14069263277927,
+    2.665144142690225,
     2.6220575542921196,
     2.6253741264076874e17
 );

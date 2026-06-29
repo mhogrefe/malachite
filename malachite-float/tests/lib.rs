@@ -139,6 +139,7 @@ pub mod comparison {
 pub mod constants {
     pub mod e;
     pub mod gauss_constant;
+    pub mod gelfond_schneider_constant;
     pub mod gelfonds_constant;
     pub mod lemniscate_constant;
     pub mod ln_10;

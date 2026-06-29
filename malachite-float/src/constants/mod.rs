@@ -10,6 +10,8 @@
 pub mod e;
 /// Functions for approximating Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.
 pub mod gauss_constant;
+/// Functions for approximating the Gelfond–Schneider constant, $2^{\sqrt 2}$.
+pub mod gelfond_schneider_constant;
 /// Functions for approximating Gelfond's constant, $e^\pi$.
 pub mod gelfonds_constant;
 /// Functions for approximating the lemniscate constant $\varpi=\pi G$, where $G$ is Gauss's
