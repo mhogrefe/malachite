@@ -30,7 +30,45 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::{Limb, SignedLimb};
 
-// This is mpfr_exp2 from exp2.c, MPFR 4.2.2, where the input is finite and nonzero.
+fn power_of_2_of_float_prec_round_normal_helper(
+    xfrac: &Float,
+    xint: i64,
+    precy: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let mut working_prec = precy + 5 + precy.ceiling_log_base_2();
+    let mut increment = Limb::WIDTH;
+    loop {
+        let ln_2 = Float::ln_2_prec_round(working_prec, Up).0;
+        let mut t = xfrac.mul_prec_round_ref_val(ln_2, working_prec, Up).0; // xfrac * ln(2)
+        // Error estimate (cf. mpfr_exp2): the relative error of t (computed with two roundings) is
+        // bounded so that exp(t) is correct to `err` bits.
+        let err = u64::exact_from(
+            i64::exact_from(working_prec) - (i64::from(t.get_exponent().unwrap()) + 2),
+        );
+        t.exp_prec_round_assign(working_prec, Nearest); // exp(xfrac * ln(2))
+        if float_can_round(t.significand_ref().unwrap(), err, precy, rm) {
+            let (y, inexact) = Float::from_float_prec_round(t, precy, rm);
+            // Multiply by 2^xint. Special case (mpfr_exp2): if `Nearest` rounded 2^xfrac down to
+            // 1/2 and xint = MIN_EXPONENT - 1, the unrounded result is the midpoint between 0 and
+            // the smallest positive Float, which is a double-rounding problem: round up to that
+            // smallest value instead of underflowing.
+            if rm == Nearest
+                && xint == const { (Float::MIN_EXPONENT as i64) - 1 }
+                && y.get_exponent() == Some(0)
+                && (&y).is_power_of_2()
+            {
+                return (Float::min_positive_value_prec(precy), Greater);
+            }
+            return (y << xint, inexact);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// This is mpfr_exp2 from exp2.c, MPFR 4.2.2, where the input is finite and nonzero and the float is
+// taken by reference.
 fn power_of_2_of_float_prec_round_normal(
     x: &Float,
     precy: u64,
@@ -55,42 +93,13 @@ fn power_of_2_of_float_prec_round_normal(
     // 2^x = 2^xint * 2^xfrac, where xfrac = x - xint and |xfrac| < 1. We compute 2^xfrac =
     // exp(xfrac * ln(2)) and then multiply by 2^xint by shifting the result's exponent.
     let p = x.get_prec().unwrap();
-    let xfrac = if xint == 0 {
-        x.clone()
+    if xint == 0 {
+        power_of_2_of_float_prec_round_normal_helper(x, 0, precy, rm)
     } else {
         // x - xint is exact: the difference has fewer significant bits than x.
         let xint_f = Float::from_integer_prec(Integer::from(xint), p).0;
-        x.sub_prec_round_ref_val(xint_f, p, Floor).0
-    };
-    // The working precision and error estimate are from algorithms.tex (mpfr_exp2).
-    let mut working_prec = precy + 5 + precy.ceiling_log_base_2();
-    let mut increment = Limb::WIDTH;
-    loop {
-        let ln_2 = Float::ln_2_prec_round(working_prec, Up).0;
-        let t = xfrac.mul_prec_round_ref_val(ln_2, working_prec, Up).0; // xfrac * ln(2)
-        // Error estimate (cf. mpfr_exp2): the relative error of t (computed with two roundings) is
-        // bounded so that exp(t) is correct to `err` bits.
-        let err = u64::exact_from(
-            i64::exact_from(working_prec) - (i64::from(t.get_exponent().unwrap()) + 2),
-        );
-        let (t, _) = t.exp_prec_round(working_prec, Nearest); // exp(xfrac * ln(2))
-        if float_can_round(t.significand_ref().unwrap(), err, precy, rm) {
-            let (y, inexact) = Float::from_float_prec_round(t, precy, rm);
-            // Multiply by 2^xint. Special case (mpfr_exp2): if `Nearest` rounded 2^xfrac down to
-            // 1/2 and xint = MIN_EXPONENT - 1, the unrounded result is the midpoint between 0 and
-            // the smallest positive Float, which is a double-rounding problem: round up to that
-            // smallest value instead of underflowing.
-            if rm == Nearest
-                && xint == const { (Float::MIN_EXPONENT as i64) - 1 }
-                && y.get_exponent() == Some(0)
-                && (&y).is_power_of_2()
-            {
-                return (Float::min_positive_value_prec(precy), Greater);
-            }
-            return (y << xint, inexact);
-        }
-        working_prec += increment;
-        increment = working_prec >> 1;
+        let xfrac = x.sub_prec_round_ref_val(xint_f, p, Floor).0;
+        power_of_2_of_float_prec_round_normal_helper(&xfrac, xint, precy, rm)
     }
 }
 
@@ -174,7 +183,8 @@ impl Float {
         o
     }
 
-    /// Replaces $x$ with $2^x$, rounding the result to the nearest value of the specified precision.
+    /// Replaces $x$ with $2^x$, rounding the result to the nearest value of the specified
+    /// precision.
     #[inline]
     pub fn power_of_2_of_float_prec_assign(&mut self, prec: u64) -> Ordering {
         self.power_of_2_of_float_prec_round_assign(prec, Nearest)
