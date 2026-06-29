@@ -8,12 +8,17 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{PowerOf2, PowerOf2Assign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::power_of_2_of_float::primitive_float_power_of_2;
 use malachite_float::test_util::arithmetic::power_of_2_of_float::{
     rug_power_of_2_of_float, rug_power_of_2_of_float_prec, rug_power_of_2_of_float_prec_round,
     rug_power_of_2_of_float_round,
@@ -422,4 +427,66 @@ fn power_of_2_of_float_properties_helper(x: Float) {
 #[test]
 fn power_of_2_of_float_properties() {
     float_gen().test_properties(power_of_2_of_float_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_power_of_2() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_power_of_2(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(0.0, 1.0);
+    test::<f32>(-0.0, 1.0);
+    test::<f32>(1.0, 2.0);
+    test::<f32>(-1.0, 0.5);
+    test::<f32>(0.5, 1.4142135);
+    test::<f32>(-0.5, 0.70710677);
+    test::<f32>(2.0, 4.0);
+    test::<f32>(-2.0, 0.25);
+    test::<f32>(core::f32::consts::PI, 8.824979);
+    test::<f32>(-core::f32::consts::PI, 0.113314725);
+    test::<f32>(core::f32::consts::E, 6.5808854);
+    test::<f32>(-core::f32::consts::E, 0.15195523);
+
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, 0.0);
+    test::<f64>(0.0, 1.0);
+    test::<f64>(-0.0, 1.0);
+    test::<f64>(1.0, 2.0);
+    test::<f64>(-1.0, 0.5);
+    test::<f64>(0.5, 1.4142135623730951);
+    test::<f64>(-0.5, 0.7071067811865476);
+    test::<f64>(2.0, 4.0);
+    test::<f64>(-2.0, 0.25);
+    test::<f64>(core::f64::consts::PI, 8.824977827076287);
+    test::<f64>(-core::f64::consts::PI, 0.11331473229676088);
+    test::<f64>(core::f64::consts::E, 6.5808859910179205);
+    test::<f64>(-core::f64::consts::E, 0.15195522325791297);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_power_of_2_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        let p = primitive_float_power_of_2(x);
+        // 2^x is never negative, and is NaN only for a NaN input.
+        assert_eq!(p.is_nan(), x.is_nan());
+        assert!(p.is_nan() || p >= T::ZERO);
+    });
+}
+
+#[test]
+fn primitive_float_power_of_2_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_power_of_2_properties_helper);
 }

@@ -12,13 +12,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_underflow};
+use crate::{Float, emulate_float_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, IsPowerOf2, PowerOf2, PowerOf2Assign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, Zero as ZeroTrait,
@@ -922,4 +923,66 @@ impl PowerOf2Assign for Float {
     fn power_of_2_assign(&mut self) {
         self.power_of_2_of_float_round_assign(Nearest);
     }
+}
+
+/// Computes $2^x$, where $x$ is a primitive float, returning the result as a primitive float of the
+/// same type. Using this function is more accurate than using `x.exp2()` or the `exp2` function
+/// provided by `libm`.
+///
+/// $$
+/// f(x) = 2^x+\varepsilon.
+/// $$
+/// - If $2^x$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\infty)=\infty$
+/// - $f(-\infty)=0.0$
+/// - $f(\pm0.0)=1.0$
+///
+/// Overflow and underflow are possible: a large positive `x` gives $\infty$, and a large negative
+/// `x` gives `0.0`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::power_of_2_of_float::primitive_float_power_of_2;
+///
+/// assert!(primitive_float_power_of_2(f32::NAN).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2(f32::INFINITY)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2(f32::NEGATIVE_INFINITY)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2(0.0f32)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2(1.0f32)),
+///     NiceFloat(2.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2(0.5f32)),
+///     NiceFloat(1.4142135)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_power_of_2<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::power_of_2_of_float_prec, x)
 }
