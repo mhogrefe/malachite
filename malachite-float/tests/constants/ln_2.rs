@@ -20,6 +20,20 @@ use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
+// Regression test: at this precision the binary-splitting numerator and denominator have more than
+// `MAX_EXPONENT` bits, which used to overflow the `Float` conversion to infinity (and panic in the
+// rounding test). Check that the high-precision value is finite and that its leading 100 bits match
+// a directly computed low-precision `ln(2)`. (~128 MB intermediates, so release-only.)
+#[test]
+fn test_ln_2_prec_high() {
+    let (high, _) = Float::ln_2_prec(1u64 << 27);
+    assert!(high.is_valid());
+    assert!(high.is_normal());
+    let (high_rounded, _) = Float::from_float_prec_round(high, 100, Nearest);
+    let (low, _) = Float::ln_2_prec(100);
+    assert_eq!(ComparableFloatRef(&high_rounded), ComparableFloatRef(&low));
+}
+
 fn test_ln_2_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) {
     let (x, o) = Float::ln_2_prec(prec);
     assert!(x.is_valid());

@@ -714,7 +714,11 @@ pub(crate) fn one_neighbor(prec: u64, above: bool) -> Float {
 // by term, bracketing the exact value between two rationals (consecutive partial sums for `x < 0`,
 // a partial sum and a remainder bound for `x > 0`) until both ends round to the same `Float`.
 // Working entirely with values near 1, this avoids ever representing `x` itself as a `Float`.
-fn exp_rational_near_one(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn exp_rational_near_one(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
     let negative = x.sign() == Less;
     let mut s = Rational::ONE; // partial sum S_{k-1}
     let mut term = Rational::ONE; // x^(k-1) / (k-1)!

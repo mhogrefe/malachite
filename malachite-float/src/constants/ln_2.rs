@@ -13,6 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::basic::extended::ExtendedFloat;
 use alloc::vec;
 use core::cmp::Ordering;
 use core::mem::swap;
@@ -20,10 +21,12 @@ use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // Auxiliary function: Compute the terms from n1 to n2 (excluded) 3 / 4 * sum((-1) ^ n * n! ^ 2 / 2
 // ^ n / (2 * n + 1)!, n = n1...n2 - 1).s
@@ -138,8 +141,25 @@ impl Float {
             let mut q0 = Integer::ZERO;
             swap(&mut t0, &mut t[0]);
             swap(&mut q0, &mut q[0]);
-            let ln_2 = Self::from_integer_prec(t0, working_prec).0
-                / Self::from_integer_prec(q0, working_prec).0;
+            // ln(2) = t0 / q0 ~ 0.69. For large `working_prec`, t0 and q0 each have more than
+            // `MAX_EXPONENT` bits, so `Float::from_integer_prec` would overflow them to infinity.
+            // Round each into an `ExtendedFloat` (whose exponent is an `i64`) and divide there; the
+            // in-range quotient then converts back to a `Float`. First shift off the bits below
+            // `working_prec` (the same shift for both, so the ratio is preserved): without this,
+            // the `ExtendedFloat` conversion would build a power-of-2 denominator as wide as t0/q0
+            // themselves (up to ~1 GB), rather than ~`working_prec` bits.
+            let extra = t0
+                .significant_bits()
+                .max(q0.significant_bits())
+                .saturating_sub(working_prec + Limb::WIDTH);
+            let (t0, q0) = (t0 >> extra, q0 >> extra);
+            let ext_t =
+                ExtendedFloat::from_rational_prec_round(Rational::from(t0), working_prec, Nearest)
+                    .0;
+            let ext_q =
+                ExtendedFloat::from_rational_prec_round(Rational::from(q0), working_prec, Nearest)
+                    .0;
+            let ln_2 = Float::try_from(ext_t.div_prec_val_ref(&ext_q, working_prec).0).unwrap();
             if float_can_round(ln_2.significand_ref().unwrap(), working_prec - 2, prec, rm) {
                 return Self::from_float_prec_round(ln_2, prec, rm);
             }

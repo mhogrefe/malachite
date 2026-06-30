@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
+use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{PowerOf2, PowerOf2Assign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
@@ -16,12 +17,13 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
-    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
 };
 use malachite_float::arithmetic::power_of_2_of_float::primitive_float_power_of_2;
 use malachite_float::test_util::arithmetic::power_of_2_of_float::{
     rug_power_of_2_of_float, rug_power_of_2_of_float_prec, rug_power_of_2_of_float_prec_round,
-    rug_power_of_2_of_float_round,
+    rug_power_of_2_of_float_round, rug_power_of_2_rational_prec,
+    rug_power_of_2_rational_prec_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -29,8 +31,11 @@ use malachite_float::test_util::common::{
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
     float_unsigned_rounding_mode_triple_gen_var_36,
+    rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
 use std::panic::catch_unwind;
 
 #[test]
@@ -489,4 +494,446 @@ where
 #[test]
 fn primitive_float_power_of_2_properties() {
     apply_fn_to_primitive_floats!(primitive_float_power_of_2_properties_helper);
+}
+
+#[test]
+fn test_power_of_2_rational_prec() {
+    let test = |s, prec, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (f, o) = Float::power_of_2_rational_prec(x.clone(), prec);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_rational_prec_ref(&x, prec);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    // integer x: 2^x is an exact power of 2
+    test("0", 1, "1.0", "0x1.0#1", Equal);
+    test("0", 10, "1.0", "0x1.000#10", Equal);
+    test("0", 53, "1.0", "0x1.0000000000000#53", Equal);
+    test("1", 1, "2.0", "0x2.0#1", Equal);
+    test("1", 10, "2.0", "0x2.00#10", Equal);
+    test("1", 53, "2.0", "0x2.0000000000000#53", Equal);
+    test("-1", 1, "0.5", "0x0.8#1", Equal);
+    test("-1", 10, "0.5", "0x0.800#10", Equal);
+    test("-1", 53, "0.5", "0x0.80000000000000#53", Equal);
+    // non-integer x: 2^x is transcendental
+    test("1/2", 1, "1.0", "0x1.0#1", Less);
+    test("1/2", 10, "1.414", "0x1.6a0#10", Less);
+    test(
+        "1/2",
+        53,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    test("-1/2", 1, "0.5", "0x0.8#1", Less);
+    test("-1/2", 10, "0.707", "0x0.b50#10", Less);
+    test(
+        "-1/2",
+        53,
+        "0.7071067811865476",
+        "0x0.b504f333f9de68#53",
+        Greater,
+    );
+    test("1/3", 1, "1.0", "0x1.0#1", Less);
+    test("1/3", 10, "1.26", "0x1.428#10", Less);
+    test(
+        "1/3",
+        53,
+        "1.2599210498948732",
+        "0x1.428a2f98d728b#53",
+        Greater,
+    );
+    test("22/7", 1, "8.0", "0x8.0#1", Less);
+    test("22/7", 10, "8.83", "0x8.d4#10", Less);
+    test(
+        "22/7",
+        53,
+        "8.832716109390498",
+        "0x8.d52ce208af3e8#53",
+        Less,
+    );
+    test("-22/7", 1, "0.1", "0x0.2#1", Greater);
+    test("-22/7", 10, "0.1132", "0x0.1cf8#10", Less);
+    test(
+        "-22/7",
+        53,
+        "0.11321545803298834",
+        "0x0.1cfbb031a741a5#53",
+        Greater,
+    );
+    test("100", 1, "1.0e30", "0x1.0E+25#1", Equal);
+    test("100", 10, "1.268e30", "0x1.000E+25#10", Equal);
+    test(
+        "100",
+        53,
+        "1.2676506002282294e30",
+        "0x1.0000000000000E+25#53",
+        Equal,
+    );
+    test("-100", 1, "8.0e-31", "0x1.0E-25#1", Equal);
+    test("-100", 10, "7.89e-31", "0x1.000E-25#10", Equal);
+    test(
+        "-100",
+        53,
+        "7.888609052210118e-31",
+        "0x1.0000000000000E-25#53",
+        Equal,
+    );
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_rational_prec_fail() {
+    Float::power_of_2_rational_prec(Rational::from(1), 0);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_rational_prec_ref_fail() {
+    Float::power_of_2_rational_prec_ref(&Rational::from(1), 0);
+}
+
+#[test]
+fn test_power_of_2_rational_prec_round() {
+    let test = |s, prec, rm, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (f, o) = Float::power_of_2_rational_prec_round(x.clone(), prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_rational_prec_round_ref(&x, prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    // Like `test`, but takes a constructed `Rational` directly (for inputs too large or small to
+    // write as a literal).
+    let test_big = |x: Rational, prec, rm, out: &str, out_hex: &str, out_o| {
+        let (f, o) = Float::power_of_2_rational_prec_round(x.clone(), prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_rational_prec_round_ref(&x, prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    // integer x: 2^x is an exact power of 2, rounding-mode-invariant
+    test("0", 1, Floor, "1.0", "0x1.0#1", Equal);
+    test("0", 1, Ceiling, "1.0", "0x1.0#1", Equal);
+    test("0", 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test("0", 10, Floor, "1.0", "0x1.000#10", Equal);
+    test("0", 10, Ceiling, "1.0", "0x1.000#10", Equal);
+    test("0", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("1", 1, Floor, "2.0", "0x2.0#1", Equal);
+    test("1", 1, Ceiling, "2.0", "0x2.0#1", Equal);
+    test("1", 1, Nearest, "2.0", "0x2.0#1", Equal);
+    test("1", 10, Floor, "2.0", "0x2.00#10", Equal);
+    test("1", 10, Ceiling, "2.0", "0x2.00#10", Equal);
+    test("1", 10, Nearest, "2.0", "0x2.00#10", Equal);
+    test("-1", 1, Floor, "0.5", "0x0.8#1", Equal);
+    test("-1", 1, Ceiling, "0.5", "0x0.8#1", Equal);
+    test("-1", 1, Nearest, "0.5", "0x0.8#1", Equal);
+    test("-1", 10, Floor, "0.5", "0x0.800#10", Equal);
+    test("-1", 10, Ceiling, "0.5", "0x0.800#10", Equal);
+    test("-1", 10, Nearest, "0.5", "0x0.800#10", Equal);
+    // non-integer x: 2^x is transcendental
+    test("1/2", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("1/2", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("1/2", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("1/2", 10, Floor, "1.414", "0x1.6a0#10", Less);
+    test("1/2", 10, Ceiling, "1.416", "0x1.6a8#10", Greater);
+    test("1/2", 10, Nearest, "1.414", "0x1.6a0#10", Less);
+    test("-1/2", 1, Floor, "0.5", "0x0.8#1", Less);
+    test("-1/2", 1, Ceiling, "1.0", "0x1.0#1", Greater);
+    test("-1/2", 1, Nearest, "0.5", "0x0.8#1", Less);
+    test("-1/2", 10, Floor, "0.707", "0x0.b50#10", Less);
+    test("-1/2", 10, Ceiling, "0.708", "0x0.b54#10", Greater);
+    test("-1/2", 10, Nearest, "0.707", "0x0.b50#10", Less);
+    test("1/3", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("1/3", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("1/3", 10, Floor, "1.26", "0x1.428#10", Less);
+    test("1/3", 10, Ceiling, "1.262", "0x1.430#10", Greater);
+    test("1/3", 10, Nearest, "1.26", "0x1.428#10", Less);
+    test("22/7", 1, Floor, "8.0", "0x8.0#1", Less);
+    test("22/7", 1, Ceiling, "2.0e1", "0x1.0E+1#1", Greater);
+    test("22/7", 1, Nearest, "8.0", "0x8.0#1", Less);
+    test("22/7", 10, Floor, "8.83", "0x8.d4#10", Less);
+    test("22/7", 10, Ceiling, "8.84", "0x8.d8#10", Greater);
+    test("22/7", 10, Nearest, "8.83", "0x8.d4#10", Less);
+    test("-22/7", 1, Floor, "0.06", "0x0.1#1", Less);
+    test("-22/7", 1, Ceiling, "0.1", "0x0.2#1", Greater);
+    test("-22/7", 1, Nearest, "0.1", "0x0.2#1", Greater);
+    test("-22/7", 10, Floor, "0.1132", "0x0.1cf8#10", Less);
+    test("-22/7", 10, Ceiling, "0.1133", "0x0.1d00#10", Greater);
+    test("-22/7", 10, Nearest, "0.1132", "0x0.1cf8#10", Less);
+    test("100", 1, Floor, "1.0e30", "0x1.0E+25#1", Equal);
+    test("100", 1, Ceiling, "1.0e30", "0x1.0E+25#1", Equal);
+    test("100", 1, Nearest, "1.0e30", "0x1.0E+25#1", Equal);
+    test("100", 10, Floor, "1.268e30", "0x1.000E+25#10", Equal);
+    test("100", 10, Ceiling, "1.268e30", "0x1.000E+25#10", Equal);
+    test("100", 10, Nearest, "1.268e30", "0x1.000E+25#10", Equal);
+    test("-100", 1, Floor, "8.0e-31", "0x1.0E-25#1", Equal);
+    test("-100", 1, Ceiling, "8.0e-31", "0x1.0E-25#1", Equal);
+    test("-100", 1, Nearest, "8.0e-31", "0x1.0E-25#1", Equal);
+    test("-100", 10, Floor, "7.89e-31", "0x1.000E-25#10", Equal);
+    test("-100", 10, Ceiling, "7.89e-31", "0x1.000E-25#10", Equal);
+    test("-100", 10, Nearest, "7.89e-31", "0x1.000E-25#10", Equal);
+    // Exact succeeds for integer x (2^x is an exact power of 2)
+    test("0", 10, Exact, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Exact, "2.0", "0x2.00#10", Equal);
+    test("-1", 10, Exact, "0.5", "0x0.800#10", Equal);
+    test("100", 10, Exact, "1.268e30", "0x1.000E+25#10", Equal);
+    test("-100", 10, Exact, "7.89e-31", "0x1.000E-25#10", Equal);
+    // x near a rounding boundary: the bracket loop iterates before the bounds agree
+    test("17/37", 3, Nearest, "1.5", "0x1.8#3", Greater);
+
+    // The cases below cover the helper's branches for integer and extreme x. Integer x too large to
+    // fit in an i64 (2^x is an exact power of 2 that overflows or underflows):
+    test_big(
+        Rational::power_of_2(100i64),
+        20,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(100i64),
+        20,
+        Floor,
+        "too_big",
+        "0x7.ffff8E+268435455#20",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(100i64),
+        20,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(100i64),
+        20,
+        Ceiling,
+        "too_small",
+        "0x1.00000E-268435456#20",
+        Greater,
+    );
+    // Tiny non-integer x = +/- 2^-100: 2^x is within half an ulp of 1, so it rounds to 1 or its
+    // neighbor.
+    test_big(
+        Rational::power_of_2(-100i64),
+        10,
+        Nearest,
+        "1.0",
+        "0x1.000#10",
+        Less,
+    ); // 1
+    test_big(
+        Rational::power_of_2(-100i64),
+        10,
+        Ceiling,
+        "1.002",
+        "0x1.008#10",
+        Greater,
+    ); // 1 + ulp
+    test_big(
+        -Rational::power_of_2(-100i64),
+        10,
+        Nearest,
+        "1.0",
+        "0x1.000#10",
+        Greater,
+    ); // 1
+    test_big(
+        -Rational::power_of_2(-100i64),
+        10,
+        Floor,
+        "0.999",
+        "0x0.ffc#10",
+        Less,
+    ); // 1 - ulp
+    // Sub-MIN x (|x| < 2^MIN_EXPONENT): too small for a normal Float, so 2^x is rounded directly
+    // from 1 by `float_round_near_x`. 2^x is above 1 for x > 0 and below 1 for x < 0. (See
+    // `power_of_2_rational_prec_round_near_one_huge` for the prec >= MAX_EXPONENT fallback.)
+    let min1 = Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1);
+    test_big(min1.clone(), 1, Nearest, "1.0", "0x1.0#1", Less);
+    test_big(-min1, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    // Non-integer x too large to be a finite Float (exp_x >= MAX_EXPONENT): 2^x overflows (x > 0)
+    // or underflows (x < 0).
+    let big =
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 2u32);
+    test_big(big.clone(), 1, Nearest, "Infinity", "Infinity", Greater);
+    test_big(-big, 1, Nearest, "0.0", "0x0.0", Less);
+}
+
+// Sub-MIN x at a precision where `float_round_near_x` cannot resolve the rounding (prec >= -exp_x),
+// so `power_of_2_rational_near_one` falls through to actually computing 2^x = exp(x * ln(2)). Here
+// x = 3 * 2^(MIN_EXPONENT - 2) has exp_x = MIN_EXPONENT and 2^x - 1 ~ 0.52 ulp at this precision,
+// so 2^x is genuinely more than half an ulp above 1 and the correct result is 1 + ulp (not 1). The
+// result is a ~128 MB Float, checked by value. (Mirrors the `exp_x_minus_1_rational` test at prec =
+// MAX_EXPONENT.)
+#[test]
+fn power_of_2_rational_near_one_compute_huge() {
+    let prec = u64::exact_from(Float::MAX_EXPONENT) + 1;
+    let one = Float::one_prec(prec);
+    // 1 + ulp away from zero is 1 + 2^(1 - prec).
+    let one_plus_ulp = one
+        .clone()
+        .add_prec_round(Float::power_of_2(1 - i64::exact_from(prec)), prec, Exact)
+        .0;
+    let x = Rational::from(3) * Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2);
+    // Nearest (and rounding away from 1) gives 1 + ulp.
+    let (f, o) = Float::power_of_2_rational_prec_round_ref(&x, prec, Nearest);
+    assert!(f.is_valid());
+    assert_eq!(ComparableFloatRef(&f), ComparableFloatRef(&one_plus_ulp));
+    assert_eq!(o, Greater);
+    // Rounding toward 1 gives 1.
+    let (f, o) = Float::power_of_2_rational_prec_round_ref(&x, prec, Floor);
+    assert!(f.is_valid());
+    assert_eq!(ComparableFloatRef(&f), ComparableFloatRef(&one));
+    assert_eq!(o, Less);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_rational_prec_round_fail_1() {
+    Float::power_of_2_rational_prec_round(Rational::from(1), 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_rational_prec_round_fail_2() {
+    // 2^(1/2) is transcendental, so Exact panics.
+    Float::power_of_2_rational_prec_round(Rational::from_unsigneds(1u32, 2u32), 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_rational_prec_round_ref_fail() {
+    Float::power_of_2_rational_prec_round_ref(&Rational::from_unsigneds(1u32, 2u32), 10, Exact);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn power_of_2_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
+    let (f, o) = Float::power_of_2_rational_prec_round(x.clone(), prec, rm);
+    assert!(f.is_valid());
+
+    let (f_alt, o_alt) = Float::power_of_2_rational_prec_round_ref(&x, prec, rm);
+    assert!(f_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+    assert_eq!(o_alt, o);
+
+    // 2^x is always positive (a positive finite value, +0, or +inf), never negative or NaN.
+    assert!(f >= 0u32);
+
+    if let Ok(rrm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_f, rug_o) = rug_power_of_2_rational_prec_round(&x, prec, rrm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_f)),
+            ComparableFloatRef(&f)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if f.is_normal() {
+        assert_eq!(f.get_prec(), Some(prec));
+        if x > 0u32 {
+            assert!(f >= 1u32);
+        } else if x < 0u32 {
+            assert!(f <= 1u32);
+        }
+    }
+
+    if o == Equal {
+        // 2^x is exact only for integer x, so the result is rounding-mode-invariant.
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = Float::power_of_2_rational_prec_round_ref(&x, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(f.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::power_of_2_rational_prec_round_ref(&x, prec, Exact));
+    }
+}
+
+#[test]
+fn power_of_2_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(x, prec, rm)| {
+        power_of_2_rational_prec_round_properties_helper(x, prec, rm);
+    });
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        let (f, o) = Float::power_of_2_rational_prec_round(Rational::ZERO, prec, rm);
+        assert_eq!(ComparableFloat(f), ComparableFloat(Float::one_prec(prec)));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn power_of_2_rational_prec_properties_helper(x: Rational, prec: u64) {
+    let (f, o) = Float::power_of_2_rational_prec(x.clone(), prec);
+    assert!(f.is_valid());
+
+    let (f_alt, o_alt) = Float::power_of_2_rational_prec_ref(&x, prec);
+    assert!(f_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+    assert_eq!(o_alt, o);
+
+    let (f_alt, o_alt) = Float::power_of_2_rational_prec_round_ref(&x, prec, Nearest);
+    assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+    assert_eq!(o_alt, o);
+
+    assert!(f >= 0u32);
+
+    let (rug_f, rug_o) = rug_power_of_2_rational_prec(&x, prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_f)),
+        ComparableFloatRef(&f)
+    );
+    assert_eq!(rug_o, o);
+
+    if f.is_normal() {
+        assert_eq!(f.get_prec(), Some(prec));
+        if x > 0u32 {
+            assert!(f >= 1u32);
+        } else if x < 0u32 {
+            assert!(f <= 1u32);
+        }
+    }
+}
+
+#[test]
+fn power_of_2_rational_prec_properties() {
+    rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
+        power_of_2_rational_prec_properties_helper(x, prec);
+    });
+
+    unsigned_gen_var_11().test_properties(|prec| {
+        let (f, o) = Float::power_of_2_rational_prec(Rational::ZERO, prec);
+        assert_eq!(ComparableFloat(f), ComparableFloat(Float::one_prec(prec)));
+        assert_eq!(o, Equal);
+    });
 }
