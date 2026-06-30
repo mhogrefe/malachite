@@ -141,8 +141,8 @@ fn power_of_2_rational_near_one(
         let ln_2_hi = Rational::exact_from(&ln_2_hi);
         // x * ln(2) lies between x * ln_2_lo and x * ln_2_hi, and exp is increasing, so 2 ^ x lies
         // between exp of these two products.
-        let (lo, o_lo) = exp_rational_near_one(&(x * &ln_2_lo), prec, rm);
-        let (hi, o_hi) = exp_rational_near_one(&(x * &ln_2_hi), prec, rm);
+        let (lo, o_lo) = exp_rational_near_one(&(x * ln_2_lo), prec, rm);
+        let (hi, o_hi) = exp_rational_near_one(&(x * ln_2_hi), prec, rm);
         if o_lo == o_hi && lo == hi {
             return (lo, o_lo);
         }
