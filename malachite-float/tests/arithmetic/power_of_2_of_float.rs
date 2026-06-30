@@ -19,7 +19,9 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
     primitive_float_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::arithmetic::power_of_2_of_float::primitive_float_power_of_2;
+use malachite_float::arithmetic::power_of_2_of_float::{
+    primitive_float_power_of_2, primitive_float_power_of_2_rational,
+};
 use malachite_float::test_util::arithmetic::power_of_2_of_float::{
     rug_power_of_2_of_float, rug_power_of_2_of_float_prec, rug_power_of_2_of_float_prec_round,
     rug_power_of_2_of_float_round, rug_power_of_2_rational_prec,
@@ -35,7 +37,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
 
 #[test]
@@ -494,6 +496,84 @@ where
 #[test]
 fn primitive_float_power_of_2_properties() {
     apply_fn_to_primitive_floats!(primitive_float_power_of_2_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_power_of_2_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_power_of_2_rational(&u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 1.0);
+    test::<f32>("1", 2.0);
+    test::<f32>("1/2", 1.4142135);
+    test::<f32>("1/3", 1.2599211);
+    test::<f32>("22/7", 8.832716);
+    test::<f32>("1000000", f32::INFINITY);
+    test::<f32>("1/1000000", 1.0000007);
+    test::<f32>("-1", 0.5);
+    test::<f32>("-1/2", 0.70710677);
+    test::<f32>("-1/3", 0.7937005);
+    test::<f32>("-22/7", 0.11321546);
+    test::<f32>("-1000000", 0.0);
+
+    test::<f64>("0", 1.0);
+    test::<f64>("1", 2.0);
+    test::<f64>("1/2", 1.4142135623730951);
+    test::<f64>("1/3", 1.2599210498948732);
+    test::<f64>("22/7", 8.832716109390498);
+    test::<f64>("1000000", f64::INFINITY);
+    test::<f64>("1/1000000", 1.0000006931474208);
+    test::<f64>("-1", 0.5);
+    test::<f64>("-1/2", 0.7071067811865476);
+    test::<f64>("-1/3", 0.7937005259840998);
+    test::<f64>("-22/7", 0.11321545803298834);
+    test::<f64>("-1000000", 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_power_of_2_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let y = primitive_float_power_of_2_rational::<T>(&x);
+        // 2^x is always positive (a positive value, +0, or +inf), never negative or NaN.
+        assert!(y >= T::ZERO);
+        if x > 0u32 {
+            assert!(y >= T::ONE);
+        } else if x < 0u32 {
+            assert!(y <= T::ONE);
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // 2^x of a finite primitive float, taken through the `Rational` path, matches the direct
+        // primitive-float `2^x`.
+        if x.is_finite() {
+            assert_eq!(
+                NiceFloat(primitive_float_power_of_2_rational::<T>(
+                    &Rational::exact_from(x)
+                )),
+                NiceFloat(primitive_float_power_of_2(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_power_of_2_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_power_of_2_rational_properties_helper);
 }
 
 #[test]

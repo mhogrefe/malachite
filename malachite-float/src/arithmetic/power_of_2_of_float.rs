@@ -15,7 +15,7 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor};
 use crate::arithmetic::round_near_x::float_round_near_x;
-use crate::{Float, emulate_float_to_float_fn, floor_and_ceiling};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, IsPowerOf2, PowerOf2, PowerOf2Assign, Sign,
@@ -1138,4 +1138,63 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::power_of_2_of_float_prec, x)
+}
+
+/// Computes $2^x$, where $x$ is a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = 2^x+\varepsilon.
+/// $$
+/// - If $2^x$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $2^x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=1$
+///
+/// Overflow and underflow are possible: a large positive `x` gives $\infty$, and a large negative
+/// `x` gives `0.0`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::power_of_2_of_float::primitive_float_power_of_2_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(1.2599210498948732)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_rational::<f64>(&Rational::from(
+///         10000
+///     ))),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_rational::<f64>(&Rational::from(
+///         -10000
+///     ))),
+///     NiceFloat(0.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_power_of_2_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::power_of_2_rational_prec_ref, x)
 }
