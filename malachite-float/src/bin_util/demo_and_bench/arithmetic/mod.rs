@@ -36,6 +36,7 @@ pub(crate) fn register(runner: &mut Runner) {
     neg::register(runner);
     power_of_2::register(runner);
     power_of_2_of_float::register(runner);
+    power_of_2_x_minus_1::register(runner);
     reciprocal::register(runner);
     reciprocal_sqrt::register(runner);
     shl::register(runner);
@@ -75,6 +76,7 @@ mod mul;
 mod neg;
 mod power_of_2;
 mod power_of_2_of_float;
+mod power_of_2_x_minus_1;
 mod reciprocal;
 mod reciprocal_sqrt;
 mod shl;

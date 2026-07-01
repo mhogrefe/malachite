@@ -30,6 +30,7 @@ pub mod log_base_rational_rational_base;
 pub mod mul;
 pub mod power_of_2;
 pub mod power_of_2_of_float;
+pub mod power_of_2_x_minus_1;
 pub mod reciprocal;
 pub mod reciprocal_sqrt;
 pub mod shl;

@@ -485,6 +485,18 @@ pub trait ExpXMinus1Assign {
     fn exp_x_minus_1_assign(&mut self);
 }
 
+/// Computes $2^x-1$, two raised to the power of a number, minus one.
+pub trait PowerOf2XMinus1 {
+    type Output;
+
+    fn power_of_2_x_minus_1(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $2^x-1$.
+pub trait PowerOf2XMinus1Assign {
+    fn power_of_2_x_minus_1_assign(&mut self);
+}
+
 /// Takes the natural logarithm of a number.
 pub trait Ln {
     type Output;

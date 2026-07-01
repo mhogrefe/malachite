@@ -108,6 +108,10 @@ pub mod power_of_2;
 /// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2) with a
 /// [`Float`](super::Float) exponent, computing $2^x$ for [`Float`](super::Float)s.
 pub mod power_of_2_of_float;
+/// Implementations of [`PowerOf2XMinus1`](malachite_base::num::arithmetic::traits::PowerOf2XMinus1)
+/// and [`PowerOf2XMinus1Assign`](malachite_base::num::arithmetic::traits::PowerOf2XMinus1Assign),
+/// traits for computing $2^x-1$.
+pub mod power_of_2_x_minus_1;
 /// Implementations of [`Reciprocal`](malachite_base::num::arithmetic::traits::Reciprocal) and
 /// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
 /// computing the reciprocal of a number.
