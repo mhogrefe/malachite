@@ -17,11 +17,12 @@ use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
     float_infinity, float_nan, float_negative_infinity, float_zero, floor_and_ceiling,
+    significand_bits,
 };
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, Sign,
+    Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, Parity, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -46,10 +47,45 @@ use malachite_q::Rational;
 // s) * (1 - 4 / s ^ 2) < log(s) < pi / 2 / AG(1, 4 / s) so the relative error 4 / s ^ 2 is < 4 / 2
 // ^ p i.e. 4 ulps.
 //
+// When `x` lies within a sliver of 1 -- `|x - 1|` within a few binades of the smallest positive
+// `Float` -- returns `x - 1`, and otherwise `None`. For such `x`, `log(x) ~ x - 1` can fall below
+// the smallest positive `Float`: the working subtractions in the log loops would flush to zero or
+// clamp, and the rounding test could never certify a result, so the callers delegate to the
+// `1_plus_x` functions, whose tiny-argument paths handle the underflow region correctly. Reaching
+// the sliver requires an input precision of nearly 2^30 bits, so for every other `x` the guard
+// costs only an exponent-and-precision test; the subtraction (performed only past that test) is
+// exact, since `x` is within `(1/2, 2)`.
+pub(crate) fn sliver_of_one(x: &Float) -> Option<Float> {
+    let e = i64::from(x.get_exponent().unwrap());
+    if (e == 0 || e == 1)
+        && x.get_prec().unwrap() >= u64::exact_from(-i64::from(Float::MIN_EXPONENT) - 8)
+    {
+        let (mut d, o) = x.sub_prec_round_ref_val(Float::ONE, x.get_prec().unwrap() + 1, Floor);
+        debug_assert_eq!(o, Equal);
+        if i64::from(d.get_exponent().unwrap()) <= i64::from(Float::MIN_EXPONENT) + 4 {
+            // Shed the trailing zeros inherited from the subtraction's requested precision: d's
+            // true significant span is small, and the inflated precision would defeat the
+            // `1_plus_x` functions' round-near-x shortcut (a significand padded with ~2^30 trailing
+            // zeros fails their rounding test).
+            let sig = d.significand_ref().unwrap();
+            let min_prec = significand_bits(sig) - sig.trailing_zeros().unwrap();
+            let o = d.set_prec_round(min_prec, Floor);
+            debug_assert_eq!(o, Equal);
+            return Some(d);
+        }
+    }
+    None
+}
+
 // This is mpfr_log from log.c, MPFR 4.2.0.
 fn ln_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     if *x == 1u32 {
         return (Float::ZERO, Equal);
+    }
+    // ln(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x form
+    // handles that underflow region.
+    if let Some(d) = sliver_of_one(x) {
+        return d.ln_1_plus_x_prec_round(prec, rm);
     }
     assert_ne!(rm, Exact, "Inexact ln");
     let x_exp = i64::from(x.get_exponent().unwrap());
@@ -103,6 +139,11 @@ fn ln_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, O
 fn ln_prec_round_normal(mut x: Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     if x == 1u32 {
         return (Float::ZERO, Equal);
+    }
+    // ln(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x form
+    // handles that underflow region.
+    if let Some(d) = sliver_of_one(&x) {
+        return d.ln_1_plus_x_prec_round(prec, rm);
     }
     assert_ne!(rm, Exact, "Inexact ln");
     let x_exp = i64::from(x.get_exponent().unwrap());
@@ -212,6 +253,62 @@ pub(crate) fn ln_prec_round_normal_extended(
         }
         working_prec += increment;
         increment = working_prec >> 1;
+    }
+}
+
+// Computes `ln(1 + eps)` for a nonzero `Rational` `eps` of tiny magnitude (the caller guards `|eps|
+// < 2^(MIN_EXPONENT + 5)`), where the result can lie below the smallest positive `Float`: the
+// bracketing in `ln_rational_helper` could never resolve such a value (its `Float` approximations
+// of `1 + eps` collapse to 1). The Taylor series `ln(1 + eps) = eps - eps^2/2 + eps^3/3 - ...` is
+// summed term by term in exact `Rational`s, bracketing the exact value between two rationals
+// (consecutive partial sums for `eps > 0`, a partial sum and a remainder bound for `eps < 0`) until
+// both ends round to the same `Float`; `from_rational_prec_round` performs the final, possibly
+// underflowing, clamp. Termination: `ln(1 + eps)` is irrational, so some finite bracket eventually
+// separates it from every representable point and tie. This mirrors `exp_rational_near_one`.
+fn ln_rational_near_one(eps: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let negative = *eps < 0u32;
+    let mut pow = eps.clone(); // eps^k
+    let mut s = eps.clone(); // S_1
+    let mut k = 1u64;
+    loop {
+        pow *= eps;
+        k += 1;
+        let mut term = &pow / Rational::from(k); // |term| when k even, term when k odd
+        if k.even() {
+            term = -term;
+        }
+        let s_next = &s + &term; // S_k
+        let (lo, hi) = if negative {
+            // Every term is negative, so the partial sums decrease toward ln(1 + eps), and the
+            // remainder after S_k is bounded in magnitude by |eps|^(k+1) / ((k + 1) (1 - |eps|)).
+            let bound = (&pow * eps) / (Rational::from(k + 1) * (Rational::ONE + eps.clone()));
+            // pow * eps = eps^(k+1) is negative here (odd power of a negative number) when k is
+            // even... its sign alternates; take the magnitude explicitly.
+            let bound = -bound.abs();
+            (&s_next + bound, s_next.clone())
+        } else {
+            // The terms alternate in sign with strictly decreasing magnitude, so ln(1 + eps) lies
+            // between consecutive partial sums.
+            if s < s_next {
+                (s.clone(), s_next.clone())
+            } else {
+                (s_next.clone(), s.clone())
+            }
+        };
+        s = s_next;
+        let (f_lo, mut o_lo) = Float::from_rational_prec_round_ref(&lo, prec, rm);
+        let (f_hi, mut o_hi) = Float::from_rational_prec_round_ref(&hi, prec, rm);
+        // A bound that is exactly representable rounds with `Equal`; the exact value lies strictly
+        // inside the bracket, so treat it as agreeing with the other bound.
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && f_lo == f_hi {
+            return (f_lo, o_lo);
+        }
     }
 }
 
@@ -1090,6 +1187,12 @@ impl Float {
             return (float_zero!(), Equal);
         }
         assert_ne!(rm, Exact, "Inexact ln");
+        // x within a sliver of 1: ln(x) ~ x - 1 may fall below the smallest positive Float, which
+        // the helpers below could never resolve.
+        let eps = x - Rational::ONE;
+        if eps.floor_log_base_2_abs() <= i64::from(Self::MIN_EXPONENT) + 4 {
+            return ln_rational_near_one(&eps, prec, rm);
+        }
         let x_exp = i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1);
         if x_exp >= Self::MAX_EXPONENT - 1 || x_exp <= Self::MIN_EXPONENT + 1 {
             ln_rational_helper_extended(x, prec, rm)

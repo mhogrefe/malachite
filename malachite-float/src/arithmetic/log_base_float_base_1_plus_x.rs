@@ -7,7 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN};
-use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
+use crate::arithmetic::log_base::{
+    dyadic_1p_log_of_root, dyadic_primitive_root, odd_significand_and_exponent,
+};
 use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_float_float_to_float_fn, float_infinity, float_nan, float_negative_infinity,
@@ -18,7 +20,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{NegativeZero, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -37,27 +39,19 @@ use malachite_q::Rational;
 // reduces to a base above 1. Balloon-safe via the `64 * prec` size bound on `x`'s exponent and the
 // operands' precisions (an `x` near -1 has a near-zero exponent and is materialized, but `1 + x` is
 // then bounded by `x`'s precision).
-pub(crate) fn log_base_float_base_1_plus_x_rational(
-    x: &Float,
-    base: &Float,
-    prec: u64,
-) -> Option<Rational> {
-    let bound = prec.saturating_mul(64);
-    if i64::from(x.get_exponent()?).unsigned_abs() > bound
-        || x.significant_bits() > bound
-        || i64::from(base.get_exponent()?).unsigned_abs() > bound
-        || base.significant_bits() > bound
-    {
-        return None;
+pub(crate) fn log_base_float_base_1_plus_x_rational(x: &Float, base: &Float) -> Option<Rational> {
+    if *x == 0u32 {
+        return Some(Rational::ZERO);
     }
-    let one_plus_x = Rational::exact_from(x) + Rational::ONE;
-    let br = Rational::exact_from(base);
-    if br > 1u32 {
-        rational_log_base_rational_rational_base(&one_plus_x, &br, prec)
-    } else {
-        rational_log_base_rational_rational_base(&one_plus_x, &(Rational::ONE / br), prec)
-            .map(|q| -q)
-    }
+    // The base's primitive root comes from its odd significand and exponent without materializing
+    // it, and `1 + x` is matched against that root implicitly (see `dyadic_1p_log_of_root`): its
+    // integer form can be enormous even when `x` has few bits, so it is only materialized to verify
+    // a match that a cheap congruence filter has already endorsed. No size cutoff: skipping the
+    // check when the result is exactly representable would leave the Ziv loop unable to terminate.
+    let (s_b, t_b) = odd_significand_and_exponent(base);
+    let (z, h, e_base) = dyadic_primitive_root(&s_b, t_b);
+    let m = dyadic_1p_log_of_root(x, z, &h)?;
+    Some(Rational::from_signeds(m, i64::exact_from(e_base)))
 }
 
 // The computation of log_base(1 + x) for a `Float` base is done by log_base(1 + x) = log_2(1 + x) /
@@ -77,7 +71,7 @@ fn log_base_float_base_1_plus_x_normal(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     // If log_base(1 + x) is rational -- 1 + x and base commensurable -- compute it directly.
-    if let Some(q) = log_base_float_base_1_plus_x_rational(x, base, prec) {
+    if let Some(q) = log_base_float_base_1_plus_x_rational(x, base) {
         return Float::from_rational_prec_round(q, prec, rm);
     }
     // The result is irrational, so it is never exactly representable.

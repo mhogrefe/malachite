@@ -976,7 +976,7 @@ pub fn log_base_float_base_prec_round_valid(
         return true;
     }
     // x, base finite positive and not 1: Exact only when log_base(x) is rational and representable.
-    log_base_float_base_rational(x, base, prec)
+    log_base_float_base_rational(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
 }
 
@@ -993,7 +993,7 @@ pub(crate) fn log_base_float_base_round_valid(x: &Float, base: &Float, rm: Round
     {
         return true;
     }
-    log_base_float_base_rational(x, base, x.significant_bits())
+    log_base_float_base_rational(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
 }
 
@@ -1053,7 +1053,7 @@ pub fn log_base_float_base_1_plus_x_prec_round_valid(
     {
         return true;
     }
-    log_base_float_base_1_plus_x_rational(x, base, prec)
+    log_base_float_base_1_plus_x_rational(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
 }
 
@@ -1074,7 +1074,7 @@ pub(crate) fn log_base_float_base_1_plus_x_round_valid(
     {
         return true;
     }
-    log_base_float_base_1_plus_x_rational(x, base, x.significant_bits())
+    log_base_float_base_1_plus_x_rational(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
 }
 
@@ -3063,7 +3063,7 @@ pub fn log_base_rational_base_prec_round_valid(
     }
     // rm == Exact and x is finite, positive, and not 1: exact only when log_base(x) is rational and
     // representable at the target precision.
-    rational_log_base_rational_base(x, base, prec)
+    rational_log_base_rational_base(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
 }
 
@@ -3414,7 +3414,7 @@ pub(crate) fn log_base_rational_base_round_valid(
     if rm != Exact || !x.is_finite() || *x <= 0u32 || *x == 1u32 {
         return true;
     }
-    rational_log_base_rational_base(x, base, x.significant_bits())
+    rational_log_base_rational_base(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, x.significant_bits()).1 == Equal)
 }
 
@@ -4703,7 +4703,7 @@ pub fn log_base_rational_rational_base_prec_round_valid(
     }
     // rm == Exact and x is positive and not 1: exact only when log_base(x) is rational and
     // representable at the target precision.
-    rational_log_base_rational_rational_base(x, base, prec)
+    rational_log_base_rational_rational_base(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
 }
 
@@ -4744,7 +4744,7 @@ pub fn log_base_rational_float_base_prec_round_valid(
     if *x <= 0u32 || *x == 1u32 || !base.is_finite() || *base <= 0u32 || *base == 1u32 {
         return true;
     }
-    log_base_rational_float_base_rational(x, base, prec)
+    log_base_rational_float_base_rational(x, base)
         .is_some_and(|q| Float::from_rational_prec(q, prec).1 == Equal)
 }
 

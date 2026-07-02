@@ -13,6 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::ln::sliver_of_one;
 use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::basic::extended::ExtendedFloat;
 use crate::{
@@ -45,6 +46,11 @@ fn log_base_2_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Floa
     // precision).
     if x.is_power_of_2() {
         return Float::from_signed_prec_round(i64::from(x.get_exponent().unwrap()) - 1, prec, rm);
+    }
+    // log_2(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x form
+    // handles that underflow region.
+    if let Some(d) = sliver_of_one(x) {
+        return d.log_base_2_1_plus_x_prec_round(prec, rm);
     }
     // The result is never exactly representable for other inputs.
     assert_ne!(rm, Exact, "Inexact log_base_2");

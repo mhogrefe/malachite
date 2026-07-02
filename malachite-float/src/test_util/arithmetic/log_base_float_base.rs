@@ -36,11 +36,10 @@ fn rug_log_base_float_base_exact(x: &rug::Float, base: &rug::Float) -> Option<Ra
     }
     let xr = Rational::exact_from(&mx);
     let br = Rational::exact_from(&mb);
-    let prec = mx.get_prec()?;
     if br > 1u32 {
-        rational_log_base_rational_rational_base(&xr, &br, prec)
+        rational_log_base_rational_rational_base(&xr, &br)
     } else {
-        rational_log_base_rational_rational_base(&xr, &(Rational::ONE / br), prec).map(|q| -q)
+        rational_log_base_rational_rational_base(&xr, &(Rational::ONE / br)).map(|q| -q)
     }
 }
 

@@ -41,10 +41,9 @@ fn rug_log_base_float_base_1_plus_x_exact(
     let one_plus_x = Rational::exact_from(&mx) + Rational::ONE;
     let br = Rational::exact_from(&mb);
     if br > 1u32 {
-        rational_log_base_rational_rational_base(&one_plus_x, &br, prec)
+        rational_log_base_rational_rational_base(&one_plus_x, &br)
     } else {
-        rational_log_base_rational_rational_base(&one_plus_x, &(Rational::ONE / br), prec)
-            .map(|q| -q)
+        rational_log_base_rational_rational_base(&one_plus_x, &(Rational::ONE / br)).map(|q| -q)
     }
 }
 

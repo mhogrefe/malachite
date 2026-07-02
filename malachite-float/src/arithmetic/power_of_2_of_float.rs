@@ -17,9 +17,7 @@ use crate::arithmetic::exp::{exp_overflow, exp_rational_near_one, exp_underflow,
 use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, IsPowerOf2, PowerOf2, PowerOf2Assign, Sign,
-};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2, PowerOf2Assign, Sign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -45,45 +43,44 @@ fn power_of_2_of_float_prec_round_normal_helper(
     // resolve the rounding of 1 + tiny. This is the `power_of_2_rational_near_one` fast path,
     // applied to the `Float` case.
     let ex = i64::from(xfrac.get_exponent().unwrap());
-    let (y, inexact) = if let Some(near) = float_round_near_x(
+    if let Some((mut y, o)) = float_round_near_x(
         &Float::one_prec(1),
         u64::exact_from(1 - ex),
         *xfrac > 0u32,
         precy,
         rm,
     ) {
-        near
-    } else {
-        let mut working_prec = precy + 5 + precy.ceiling_log_base_2();
-        let mut increment = Limb::WIDTH;
-        loop {
-            let ln_2 = Float::ln_2_prec_round(working_prec, Up).0;
-            let mut t = xfrac.mul_prec_round_ref_val(ln_2, working_prec, Up).0; // xfrac * ln(2)
-            // Error estimate (cf. mpfr_exp2): the relative error of t (computed with two roundings)
-            // is bounded so that exp(t) is correct to `err` bits.
-            let err = u64::exact_from(
-                i64::exact_from(working_prec) - (i64::from(t.get_exponent().unwrap()) + 2),
-            );
-            t.exp_prec_round_assign(working_prec, Nearest); // exp(xfrac * ln(2))
-            if float_can_round(t.significand_ref().unwrap(), err, precy, rm) {
-                break Float::from_float_prec_round(t, precy, rm);
-            }
-            working_prec += increment;
-            increment = working_prec >> 1;
-        }
-    };
-    // Multiply by 2^xint. Special case (mpfr_exp2): if `Nearest` rounded 2^xfrac down to 1/2 and
-    // xint = MIN_EXPONENT - 1, the unrounded result is the midpoint between 0 and the smallest
-    // positive Float, which is a double-rounding problem: round up to that smallest value instead
-    // of underflowing.
-    if rm == Nearest
-        && xint == const { (Float::MIN_EXPONENT as i64) - 1 }
-        && y.get_exponent() == Some(0)
-        && (&y).is_power_of_2()
-    {
-        return (Float::min_positive_value_prec(precy), Greater);
+        // Multiply by 2^xint. `y` is already rounded to `precy`, and `o` already compares it to the
+        // exact 2^xfrac, so the shift helper is called directly with that ternary: it adjusts the
+        // exponent, substituting the correct overflow or underflow result if the shift leaves the
+        // valid exponent range.
+        let o = y.shl_prec_round_assign_helper(xint, precy, rm, o);
+        return (y, o);
     }
-    (y << xint, inexact)
+    let mut working_prec = precy + 5 + precy.ceiling_log_base_2();
+    let mut increment = Limb::WIDTH;
+    loop {
+        let ln_2 = Float::ln_2_prec_round(working_prec, Up).0;
+        let mut t = xfrac.mul_prec_round_ref_val(ln_2, working_prec, Up).0; // xfrac * ln(2)
+        // Error estimate (cf. mpfr_exp2): the relative error of t (computed with two roundings) is
+        // bounded so that exp(t) is correct to `err` bits.
+        let err = u64::exact_from(
+            i64::exact_from(working_prec) - (i64::from(t.get_exponent().unwrap()) + 2),
+        );
+        t.exp_prec_round_assign(working_prec, Nearest); // exp(xfrac * ln(2))
+        if float_can_round(t.significand_ref().unwrap(), err, precy, rm) {
+            // Round to `precy` and multiply by 2^xint. MPFR performs the multiplication in an
+            // extended exponent range and applies the range reduction in mpfr_check_range;
+            // `shl_prec_round` provides the same overflow and underflow handling here. In
+            // particular, when `Nearest` rounds 2^xfrac down to exactly 1/2 and xint = MIN_EXPONENT
+            // - 1, the shifted value is the midpoint between 0 and the smallest positive Float, but
+            // the rounding's ternary shows that the exact value lies above the midpoint, so the
+            // result rounds up to that smallest value rather than underflowing to zero.
+            return t.shl_prec_round(xint, precy, rm);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
 }
 
 // This is mpfr_exp2 from exp2.c, MPFR 4.2.2, where the input is finite and nonzero and the float is

@@ -7,8 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN};
+use crate::arithmetic::log_base::{
+    dyadic_primitive_root, odd_significand_and_exponent, rational_value_log_of_dyadic_root,
+};
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
-use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
 use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_rational_float_to_float_fn, float_infinity, float_nan, float_negative_infinity,
@@ -17,9 +19,8 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{NegativeZero, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
@@ -36,21 +37,15 @@ use malachite_q::Rational;
 pub(crate) fn log_base_rational_float_base_rational(
     x: &Rational,
     base: &Float,
-    prec: u64,
 ) -> Option<Rational> {
-    let bound = prec.saturating_mul(64);
-    if x.significant_bits() > bound
-        || i64::from(base.get_exponent()?).unsigned_abs() > bound
-        || base.significant_bits() > bound
-    {
-        return None;
-    }
-    let br = Rational::exact_from(base);
-    if br > 1u32 {
-        rational_log_base_rational_rational_base(x, &br, prec)
-    } else {
-        rational_log_base_rational_rational_base(x, &(Rational::ONE / br), prec).map(|q| -q)
-    }
+    // The base is dyadic, so its primitive root comes from its odd significand and exponent without
+    // materializing it (its exponent may be extreme, making the integer form enormous even though
+    // the Float is small). No size cutoff: skipping the check when the result is exactly
+    // representable would leave the Ziv loop unable to terminate.
+    let (s_b, t_b) = odd_significand_and_exponent(base);
+    let (z, h, e_base) = dyadic_primitive_root(&s_b, t_b);
+    let m = rational_value_log_of_dyadic_root(x, z, &h)?;
+    Some(Rational::from_signeds(m, i64::exact_from(e_base)))
 }
 
 // The computation of log_base(x) for a `Rational` `x` and a `Float` base is done by log_base(x) =
@@ -81,7 +76,7 @@ fn log_base_rational_float_base_normal(
         };
     }
     // If log_base(x) is rational -- x and base commensurable -- compute it directly.
-    if let Some(q) = log_base_rational_float_base_rational(x, base, prec) {
+    if let Some(q) = log_base_rational_float_base_rational(x, base) {
         return Float::from_rational_prec_round(q, prec, rm);
     }
     // The result is irrational, so it is never exactly representable.

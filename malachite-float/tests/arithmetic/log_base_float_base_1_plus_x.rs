@@ -509,3 +509,20 @@ where
 fn primitive_float_log_base_float_base_1_plus_x_properties() {
     apply_fn_to_primitive_floats!(primitive_float_log_base_float_base_1_plus_x_properties_helper);
 }
+
+// The exactness detection must not be skipped for large bases or extreme exponents: an
+// exactly-representable result would leave the Ziv loop unable to terminate.
+#[test]
+fn log_base_float_base_1_plus_x_exact_extreme() {
+    use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
+    use malachite_nz::natural::Natural;
+    // 1 + 2^70 = root, base = root^2 (a 142-bit Float): log_base(1 + x) = 1/2, exact.
+    let x = Float::power_of_2(70i64);
+    let base = Float::exact_from((Natural::power_of_2(70u64) + Natural::ONE).pow(2));
+    let (v, o) = Float::log_base_float_base_1_plus_x_prec_round_ref(&x, &base, 1, Nearest);
+    assert_eq!(o, Equal);
+    assert_eq!(
+        ComparableFloat(v),
+        ComparableFloat(Float::power_of_2(-1i64))
+    );
+}

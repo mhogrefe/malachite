@@ -7,16 +7,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
+use crate::arithmetic::log_base::{dyadic_1p_log_of_root, rational_root_parts};
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
 use crate::basic::extended::ExtendedFloat;
 use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase, LogBaseOf1PlusX, LogBaseOf1PlusXAssign,
+    CeilingLogBase2, LogBaseOf1PlusX, LogBaseOf1PlusXAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -49,16 +50,23 @@ pub(crate) fn rational_log_base_rational_base_1_plus_x(
     if *x == 0u32 {
         return Some(Rational::ZERO);
     }
-    let bound = x.get_prec()?.saturating_mul(64);
-    let e = i64::from(x.get_exponent()?);
-    if e.unsigned_abs() > bound || base.significant_bits() > bound {
-        return None;
-    }
     // `express_as_power` returns `None` when `base` is not a perfect power, in which case `base`
-    // itself is `g` (with exponent 1).
+    // itself is `g` (with exponent 1); its cost is polynomial in `base`, which the caller holds
+    // materialized. `1 + x` is dyadic, so only the orientation of the root with no odd denominator
+    // (for positive powers) or no odd numerator (for negative powers) can match; `1 + x` itself is
+    // matched implicitly (see `dyadic_1p_log_of_root`), since its integer form can be enormous even
+    // when `x` has few bits. No size cutoff: skipping the check when the result is exactly
+    // representable would leave the Ziv loop unable to terminate.
     let (root, e_base) = base.express_as_power().unwrap_or_else(|| (base.clone(), 1));
-    // 1 + x > 0 since x > -1, so `checked_log_base` is well-defined; `m` may be negative.
-    let m = (Rational::exact_from(x) + Rational::ONE).checked_log_base(&root)?;
+    let (z, hn, hd) = rational_root_parts(&root);
+    let m = if hd == 1u32 {
+        dyadic_1p_log_of_root(x, z, &hn)
+    } else if hn == 1u32 {
+        dyadic_1p_log_of_root(x, -z, &hd).map(|m| -m)
+    } else {
+        // Both an odd numerator and an odd denominator: no nonzero power is dyadic.
+        None
+    }?;
     Some(Rational::from_signeds(m, i64::exact_from(e_base)))
 }
 

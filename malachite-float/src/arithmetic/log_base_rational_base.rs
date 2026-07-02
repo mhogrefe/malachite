@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::log_base::{dyadic_log_of_rational_root, odd_significand_and_exponent};
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
 use crate::basic::extended::ExtendedFloat;
 use crate::{
@@ -14,9 +16,7 @@ use crate::{
     float_negative_infinity,
 };
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase, LogBase, LogBaseAssign,
-};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, LogBase, LogBaseAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
@@ -43,27 +43,20 @@ use malachite_q::Rational;
 // result sitting exactly on a representable point or tie. That holds in every rounding mode, so
 // every exactly-representable result must be caught here.
 //
-// Materializing `x` as a `Rational` is kept balloon-safe by capping `x`'s exponent and `base`'s
-// size at `bound`, the larger of `x`'s own precision and the requested `prec`. The two can differ
-// sharply -- a precision-1 `x` such as `2.0` may be asked for a 53-bit result -- so the bound must
-// track `prec`, not just `x.get_prec()`; otherwise an exactly-representable result like
-// `log_{2^64}(2) = 2^-6` would be missed and the Ziv loop would spin forever on it.
-// (`Rational::checked_log_base` itself is balloon-safe even for a `g` near 1.)
-pub(crate) fn rational_log_base_rational_base(
-    x: &Float,
-    base: &Rational,
-    prec: u64,
-) -> Option<Rational> {
-    let bound = x.get_prec().unwrap().max(prec).saturating_mul(64);
-    let e = i64::from(x.get_exponent().unwrap());
-    if e.unsigned_abs() > bound || base.significant_bits() > bound {
-        return None;
-    }
+// The check is complete and cheap for any input. No size cutoff is sound here: representable
+// results can have enormous exponents with few significant bits (`log_4` of the smallest positive
+// `Float` is `-2^29`, exact at precision 1), and a small `x` can be a root of an enormous `base`
+// (`log_{3^k}(3) = 1/k`, representable whenever `k` is a power of 2). So instead of materializing
+// `x` as a `Rational` under a size bound, the match runs on `x`'s odd significand (at most
+// `prec(x)` bits) and `i64` exponent arithmetic; `express_as_power(base)` costs polynomial in
+// `base`, a value the caller holds materialized anyway.
+pub(crate) fn rational_log_base_rational_base(x: &Float, base: &Rational) -> Option<Rational> {
     // `express_as_power` returns `None` when `base` is not a perfect power, in which case `base`
     // itself is `g` (with exponent 1).
     let (root, e_base) = base.express_as_power().unwrap_or_else(|| (base.clone(), 1));
-    let a = (&Rational::exact_from(x)).checked_log_base(&root)?;
-    Some(Rational::from_signeds(a, i64::exact_from(e_base)))
+    let (s, t) = odd_significand_and_exponent(x);
+    let m = dyadic_log_of_rational_root(&s, t, &root)?;
+    Some(Rational::from_signeds(m, i64::exact_from(e_base)))
 }
 
 // The computation of log_base(x) for a `Rational` base is done by log_base(x) = log_2(x) /
@@ -91,8 +84,13 @@ fn log_base_rational_base_prec_round_normal(
     // If log_base(x) is rational -- x and base are both powers of a common rational -- compute it
     // directly. This includes exactly-representable results (which the Ziv loop could never
     // certify) as well as non-representable rationals (cheaper and exact this way).
-    if let Some(q) = rational_log_base_rational_base(x, base, prec) {
+    if let Some(q) = rational_log_base_rational_base(x, base) {
         return Float::from_rational_prec_round(q, prec, rm);
+    }
+    // log_base(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x
+    // form handles that underflow region.
+    if let Some(d) = sliver_of_one(x) {
+        return d.log_base_rational_base_1_plus_x_prec_round(base, prec, rm);
     }
     // The result is irrational, so it is never exactly representable.
     assert_ne!(rm, Exact, "Inexact log_base_rational_base");

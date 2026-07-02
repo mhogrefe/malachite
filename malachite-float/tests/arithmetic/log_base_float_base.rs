@@ -494,3 +494,30 @@ where
 fn primitive_float_log_base_float_base_properties() {
     apply_fn_to_primitive_floats!(primitive_float_log_base_float_base_properties_helper);
 }
+
+// The exactness detection must not be skipped for large bases or extreme exponents: an
+// exactly-representable result would leave the Ziv loop unable to terminate. These inputs formerly
+// hung.
+#[test]
+fn log_base_float_base_exact_extreme() {
+    use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
+    use malachite_nz::natural::Natural;
+    // log_{3^64}(3) = 2^-6, exact at precision 1.
+    let base = Float::exact_from(Natural::from(3u32).pow(64));
+    let x = Float::from_unsigned_prec(3u32, 2).0;
+    let (v, o) = Float::log_base_float_base_prec_round_ref(&x, &base, 1, Nearest);
+    assert_eq!(o, Equal);
+    assert_eq!(
+        ComparableFloat(v),
+        ComparableFloat(Float::power_of_2(-6i64))
+    );
+    // log_4 of the smallest positive Float is -2^29, exact.
+    let x = Float::min_positive_value_prec(1);
+    let base = Float::from_unsigned_prec(4u32, 10).0;
+    let (v, o) = Float::log_base_float_base_prec_round_ref(&x, &base, 17, Floor);
+    assert_eq!(o, Equal);
+    assert_eq!(
+        ComparableFloat(v),
+        ComparableFloat(Float::from_signed_prec(-(1i64 << 29), 17).0)
+    );
+}

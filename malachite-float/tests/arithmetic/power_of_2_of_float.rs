@@ -10,12 +10,14 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{PowerOf2, PowerOf2Assign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     primitive_float_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
 };
@@ -31,11 +33,13 @@ use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::generators::{
-    float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
+    float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_36,
     rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
@@ -206,6 +210,64 @@ fn test_power_of_2_of_float_prec_round() {
         "0x1.0E-268435456#1",
         Greater,
     );
+    // The same boundary with other rounding modes: the exact result lies strictly between 0 and the
+    // smallest positive Float, so rounding toward zero gives +0 and rounding away from zero gives
+    // that smallest value. (`shl_prec_round` handles this; a plain `<<` would ignore the rounding
+    // mode and always produce the smallest positive value.)
+    test(
+        "-1073741824.5",
+        "-0x40000000.800#40",
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test(
+        "-1073741824.5",
+        "-0x40000000.800#40",
+        1,
+        Down,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test(
+        "-1073741824.5",
+        "-0x40000000.800#40",
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test(
+        "-1073741824.5",
+        "-0x40000000.800#40",
+        1,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test(
+        "-1073741824.5",
+        "-0x40000000.800#40",
+        20,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test(
+        "-1073741824.5",
+        "-0x40000000.800#40",
+        20,
+        Nearest,
+        "too_small",
+        "0x1.00000E-268435456#20",
+        Greater,
+    );
 }
 
 #[test]
@@ -314,6 +376,16 @@ fn power_of_2_of_float_prec_round_properties() {
         power_of_2_of_float_prec_round_properties_helper(x, prec, rm);
     });
 
+    let mut config = GenConfig::new();
+    config.insert("mean_precision_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    float_unsigned_rounding_mode_triple_gen_var_36().test_properties_with_config(
+        &config,
+        |(x, prec, rm)| {
+            power_of_2_of_float_prec_round_properties_helper(x, prec, rm);
+        },
+    );
+
     unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
         let (p, o) = Float::power_of_2_of_float_prec_round(Float::NAN, prec, rm);
         assert!(p.is_nan());
@@ -373,38 +445,54 @@ fn power_of_2_of_float_round_properties() {
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
+fn power_of_2_of_float_prec_properties_helper(x: Float, prec: u64) {
+    let (p, o) = Float::power_of_2_of_float_prec(x.clone(), prec);
+    assert!(p.is_valid());
+
+    let (p_alt, o_alt) = Float::power_of_2_of_float_prec_ref(&x, prec);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.power_of_2_of_float_prec_assign(prec);
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // power_of_2_of_float_prec is power_of_2_of_float_prec_round with Nearest.
+    let (p_alt, o_alt) = Float::power_of_2_of_float_prec_round_ref(&x, prec, Nearest);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    assert!(p.is_nan() || p.is_sign_positive());
+    if p.is_normal() {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+
+    let (rug_p, rug_o) = rug_power_of_2_of_float_prec(&rug::Float::exact_from(&x), prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_p)),
+        ComparableFloatRef(&p)
+    );
+    assert_eq!(rug_o, o);
+}
+
 #[test]
 fn power_of_2_of_float_prec_properties() {
     float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
-        let (p, o) = Float::power_of_2_of_float_prec(x.clone(), prec);
-        assert!(p.is_valid());
+        power_of_2_of_float_prec_properties_helper(x, prec);
+    });
 
-        let (p_alt, o_alt) = Float::power_of_2_of_float_prec_ref(&x, prec);
-        assert!(p_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
-        assert_eq!(o_alt, o);
+    let mut config = GenConfig::new();
+    config.insert("mean_precision_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    float_unsigned_pair_gen_var_1().test_properties_with_config(&config, |(x, prec)| {
+        power_of_2_of_float_prec_properties_helper(x, prec);
+    });
 
-        let mut x_alt = x.clone();
-        let o_alt = x_alt.power_of_2_of_float_prec_assign(prec);
-        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
-        assert_eq!(o_alt, o);
-
-        // power_of_2_of_float_prec is power_of_2_of_float_prec_round with Nearest.
-        let (p_alt, o_alt) = Float::power_of_2_of_float_prec_round_ref(&x, prec, Nearest);
-        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
-        assert_eq!(o_alt, o);
-
-        assert!(p.is_nan() || p.is_sign_positive());
-        if p.is_normal() {
-            assert_eq!(p.get_prec(), Some(prec));
-        }
-
-        let (rug_p, rug_o) = rug_power_of_2_of_float_prec(&rug::Float::exact_from(&x), prec);
-        assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_p)),
-            ComparableFloatRef(&p)
-        );
-        assert_eq!(rug_o, o);
+    float_unsigned_pair_gen_var_4().test_properties(|(x, prec)| {
+        power_of_2_of_float_prec_properties_helper(x, prec);
     });
 }
 
@@ -434,6 +522,7 @@ fn power_of_2_of_float_properties_helper(x: Float) {
 #[test]
 fn power_of_2_of_float_properties() {
     float_gen().test_properties(power_of_2_of_float_properties_helper);
+    float_gen_var_12().test_properties(power_of_2_of_float_properties_helper);
 }
 
 #[test]

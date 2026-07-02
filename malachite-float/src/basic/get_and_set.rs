@@ -505,12 +505,18 @@ impl Float {
             return (x, o);
         }
         match x {
+            // The fast path places the significand at an exponent equal to its bit count and shifts
+            // afterwards, so that intermediate exponent (plus a possible rounding carry) must stay
+            // within the valid range; otherwise it would silently overflow to infinity. For the
+            // enormous precisions that fail that test, fall back to cloning, whose cost is
+            // proportional to an input that is already that large. (`set_prec_round` works in place
+            // and never puts the bit count in the exponent.)
             Self(Finite {
                 sign,
                 exponent,
                 significand,
                 ..
-            }) => {
+            }) if significand_bits(significand) < u64::exact_from(Self::MAX_EXPONENT - 1) => {
                 let (mut y, mut o) = Self::from_natural_prec_round_ref(
                     significand,
                     prec,
@@ -524,6 +530,11 @@ impl Float {
                     y >> (i32::exact_from(significand_bits(significand)) - exponent),
                     o,
                 )
+            }
+            Self(Finite { .. }) => {
+                let mut x = x.clone();
+                let o = x.set_prec_round(prec, rm);
+                (x, o)
             }
             _ => (x.clone(), Equal),
         }

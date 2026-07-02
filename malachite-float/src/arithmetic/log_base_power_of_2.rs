@@ -7,6 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
+use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
     float_infinity, float_nan, float_negative_infinity,
@@ -43,6 +46,11 @@ fn log_base_power_of_2_prec_round_normal(
         let m = i64::from(x.get_exponent().unwrap()) - 1;
         return Float::from(m).div_prec_round(Float::from(pow), prec, rm);
     }
+    // log_{2^pow}(x) for x in a sliver of 1 can fall below the smallest positive Float; the
+    // 1-plus-x form handles that underflow region.
+    if let Some(d) = sliver_of_one(x) {
+        return d.log_base_power_of_2_1_plus_x_prec_round(pow, prec, rm);
+    }
     // The result is never exactly representable otherwise.
     assert_ne!(rm, Exact, "Inexact log_base_power_of_2");
     let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
@@ -76,18 +84,29 @@ fn log_base_power_of_2_rational_prec_round_helper(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
+    // The initial slack keeps working_prec at least 7, so the subtraction in the rounding test
+    // below stays positive.
+    let mut working_prec = prec + 6 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {
         // log_2(x) / pow, with two correctly-rounded operations: log_base_2_rational (at most 1/2
         // ulp) and division by the exact integer pow (at most 1/2 ulp). The relative error is thus
         // below 2^(1 - working_prec), so working_prec - 2 correct bits suffice for rounding.
-        let t = Float::log_base_2_rational_prec_ref(x, working_prec)
-            .0
-            .div_prec(Float::from(pow), working_prec)
-            .0;
-        if float_can_round(t.significand_ref().unwrap(), working_prec - 2, prec, rm) {
-            return Float::from_float_prec_round(t, prec, rm);
+        // log_2(x) in the extended exponent range: for x within a sliver of 1 the ordinary Float
+        // form would flush to zero or clamp, and the rounding test below could never resolve it.
+        let num = extended_log_base_2_of_rational(x, working_prec);
+        let den = ExtendedFloat::from(Float::from(pow));
+        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        if float_can_round(
+            quotient.x.significand_ref().unwrap(),
+            working_prec - 4,
+            prec,
+            rm,
+        ) {
+            let (rounded, o) = Float::from_float_prec_round(quotient.x, prec, rm);
+            let mut result = ExtendedFloat::from(rounded);
+            result.exp = result.exp.checked_add(quotient.exp).unwrap();
+            return result.into_float_helper(prec, rm, o);
         }
         // Increase the precision.
         working_prec += increment;

@@ -7,7 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN};
-use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
+use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::log_base::{
+    dyadic_log_of_root, dyadic_primitive_root, odd_significand_and_exponent,
+};
 use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_float_float_to_float_fn, float_infinity, float_nan, float_negative_infinity,
@@ -16,7 +19,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, LogBase, LogBaseAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{NegativeZero, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -35,22 +38,18 @@ use malachite_q::Rational;
 // Detecting these rational results up front is essential: the Ziv loop could never certify an
 // exactly-representable one. The check is balloon-safe: it materializes `x` and `base` as
 // `Rational`s only when their exponents and precisions are within `64 * prec`.
-pub(crate) fn log_base_float_base_rational(x: &Float, base: &Float, prec: u64) -> Option<Rational> {
-    let bound = prec.saturating_mul(64);
-    if i64::from(x.get_exponent()?).unsigned_abs() > bound
-        || i64::from(base.get_exponent()?).unsigned_abs() > bound
-        || x.significant_bits() > bound
-        || base.significant_bits() > bound
-    {
-        return None;
-    }
-    let xr = Rational::exact_from(x);
-    let br = Rational::exact_from(base);
-    if br > 1u32 {
-        rational_log_base_rational_rational_base(&xr, &br, prec)
-    } else {
-        rational_log_base_rational_rational_base(&xr, &(Rational::ONE / br), prec).map(|q| -q)
-    }
+pub(crate) fn log_base_float_base_rational(x: &Float, base: &Float) -> Option<Rational> {
+    // Both x and the base are dyadic: the base's primitive root comes from its odd significand and
+    // exponent, and x is matched against it on its own odd significand and exponent, so neither is
+    // ever materialized as a `Rational` (their exponents may be extreme, making the integer forms
+    // enormous even though the Floats are small). No size cutoff: skipping the check when the
+    // result is exactly representable (such as `log_4` of the smallest positive Float, `-2^29`)
+    // would leave the Ziv loop unable to terminate.
+    let (s_b, t_b) = odd_significand_and_exponent(base);
+    let (z, h, e_base) = dyadic_primitive_root(&s_b, t_b);
+    let (s, t) = odd_significand_and_exponent(x);
+    let m = dyadic_log_of_root(&s, t, z, &h)?;
+    Some(Rational::from_signeds(m, i64::exact_from(e_base)))
 }
 
 // The computation of log_base(x) for a `Float` base is done by log_base(x) = log_2(x) /
@@ -80,8 +79,13 @@ fn log_base_float_base_normal(
     // If log_base(x) is rational -- x and base commensurable -- compute it directly. This includes
     // exactly-representable results (which the Ziv loop could never certify) as well as
     // non-representable rationals (cheaper and exact this way).
-    if let Some(q) = log_base_float_base_rational(x, base, prec) {
+    if let Some(q) = log_base_float_base_rational(x, base) {
         return Float::from_rational_prec_round(q, prec, rm);
+    }
+    // log_base(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x
+    // form handles that underflow region.
+    if let Some(d) = sliver_of_one(x) {
+        return d.log_base_float_base_1_plus_x_prec_round(base, prec, rm);
     }
     // The result is irrational, so it is never exactly representable.
     assert_ne!(rm, Exact, "Inexact log_base_float_base");

@@ -18,7 +18,7 @@ use crate::{Float, float_infinity, float_nan};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, PowerOf2, PowerOf2XMinus1, PowerOf2XMinus1Assign,
+    CeilingLogBase2, PowerOf2XMinus1, PowerOf2XMinus1Assign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
@@ -98,10 +98,17 @@ fn power_of_2_x_minus_1_prec_round_normal(
     // result always rounds away from zero. Rounding ln(2) to `x`'s precision (rather than the
     // output precision, which may be enormous) is enough to resolve which side of min_positive the
     // result lies on.
-    if i64::from(x.get_exponent().unwrap()) <= i64::from(Float::MIN_EXPONENT) {
+    let ex = i64::from(x.get_exponent().unwrap());
+    if ex <= i64::from(Float::MIN_EXPONENT) {
         let ln_2 = Float::ln_2_prec(x.significant_bits() + Limb::WIDTH).0;
-        let x_ln_2 = Rational::exact_from(x) * Rational::exact_from(&ln_2);
-        if x_ln_2.lt_abs(&Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1)) {
+        // Scale x to exponent 1 before converting to a `Rational`: x itself sits in the smallest
+        // binade, so an exact `Rational` for it would carry a ~2^30-bit power-of-2 denominator
+        // (~128 MB). With x' = x * 2^(1 - EXP(x)), a small number, the test |x ln(2)| <
+        // 2^(MIN_EXPONENT - 1) becomes |x' ln(2)| < 2^(MIN_EXPONENT - ex), which is a comparison of
+        // floor(log_2 |x' ln(2)|) against the exponent -- no power-of-2 `Rational` needed.
+        let x_scaled = x >> (ex - 1);
+        let x_ln_2_scaled = Rational::exact_from(&x_scaled) * Rational::exact_from(&ln_2);
+        if x_ln_2_scaled.floor_log_base_2_abs() < i64::from(Float::MIN_EXPONENT) - ex {
             let neg = x.is_sign_negative();
             // A magnitude in (min_positive / 2, min_positive) rounds either away from zero (to
             // +/-min_positive) or toward zero (to +/-0), depending on the rounding mode.

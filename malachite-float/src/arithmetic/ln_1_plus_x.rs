@@ -45,8 +45,13 @@ fn ln_1_plus_x_small(x: &Float, prec: u64) -> (Float, u64) {
         t.mul_prec_assign_ref(x, prec); // t = x^i * (1 + theta)^i
         // u = x^i / i * (1 + theta)^(i + 1)
         let u = t.div_prec_ref_val(Float::from(i), prec).0;
-        // |u| < ulp(y)
-        if i64::from(u.get_exponent().unwrap()) <= y_exp_m_prec {
+        // |u| < ulp(y). For x within a few binades of the smallest positive Float, x^i underflows
+        // to zero (MPFR computes in an extended exponent range where it cannot); a zero term means
+        // the remainder is certainly below ulp(y), the same break condition.
+        let Some(u_exp) = u.get_exponent() else {
+            break;
+        };
+        if i64::from(u_exp) <= y_exp_m_prec {
             break;
         }
         if i.odd() {

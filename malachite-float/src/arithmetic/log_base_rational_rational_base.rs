@@ -16,7 +16,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN, NegativeInfinity, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::ExpressAsPower;
-use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
@@ -47,12 +46,11 @@ use malachite_q::Rational;
 pub(crate) fn rational_log_base_rational_rational_base(
     x: &Rational,
     base: &Rational,
-    prec: u64,
 ) -> Option<Rational> {
-    let bound = prec.saturating_mul(64);
-    if x.significant_bits() > bound || base.significant_bits() > bound {
-        return None;
-    }
+    // No size cutoff: skipping the check when the result is exactly representable would leave the
+    // Ziv loop unable to terminate, and representable results exist at any input size
+    // (`log_{3^k}(3) = 1/k` whenever `k` is a power of 2). Both inputs are already materialized
+    // `Rational`s, so `express_as_power` and `checked_log_base` cost polynomial in the inputs.
     // `express_as_power` returns `None` when `base` is not a perfect power, in which case `base`
     // itself is `g` (with exponent 1).
     let (root, e_base) = base.express_as_power().unwrap_or_else(|| (base.clone(), 1));
@@ -83,7 +81,7 @@ fn log_base_rational_rational_base_prec_round_normal(
     // If log_base(x) is rational -- x and base are both powers of a common rational -- compute it
     // directly. This includes exactly-representable results (which the Ziv loop could never
     // certify) as well as non-representable rationals (cheaper and exact this way).
-    if let Some(q) = rational_log_base_rational_rational_base(x, base, prec) {
+    if let Some(q) = rational_log_base_rational_rational_base(x, base) {
         return Float::from_rational_prec_round(q, prec, rm);
     }
     // The result is irrational, so it is never exactly representable.

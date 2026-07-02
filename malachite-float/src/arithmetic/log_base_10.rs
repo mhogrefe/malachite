@@ -13,6 +13,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
+use crate::basic::extended::ExtendedFloat;
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
     float_infinity, float_nan, float_negative_infinity,
@@ -71,6 +74,11 @@ fn log_base_10_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
     if let Some(n) = float_is_power_of_10(x) {
         return Float::from_unsigned_prec_round(n, prec, rm);
     }
+    // log_10(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x
+    // form handles that underflow region.
+    if let Some(d) = sliver_of_one(x) {
+        return d.log_base_10_1_plus_x_prec_round(prec, rm);
+    }
     // The result is irrational, so it is never exactly representable.
     assert_ne!(rm, Exact, "Inexact log_base_10");
     const TEN: Float = Float::const_from_unsigned(10);
@@ -110,15 +118,28 @@ fn log_base_10_rational_prec_round_helper(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     const TEN: Float = Float::const_from_unsigned(10);
-    let mut working_prec = prec + 4 + prec.ceiling_log_base_2();
+    // The initial slack keeps working_prec at least 7, so the working_prec - 6 below stays
+    // positive.
+    let mut working_prec = prec + 6 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {
-        let t = Float::log_base_2_rational_prec_ref(x, working_prec)
-            .0
-            .div_prec(TEN.log_base_2_prec(working_prec).0, working_prec)
-            .0;
-        if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
-            return Float::from_float_prec_round(t, prec, rm);
+        // log_2(x) in the extended exponent range: for x within a sliver of 1 the ordinary Float
+        // form would flush to zero or clamp, and the rounding test below could never resolve it.
+        let num = extended_log_base_2_of_rational(x, working_prec);
+        let den = ExtendedFloat::from(TEN.log_base_2_prec(working_prec).0);
+        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        // log_2(x) is within 2 ulps, log_2(10) within 1/2, and the division adds 1/2 more, so
+        // working_prec - 6 correct bits comfortably suffice.
+        if float_can_round(
+            quotient.x.significand_ref().unwrap(),
+            working_prec - 6,
+            prec,
+            rm,
+        ) {
+            let (rounded, o) = Float::from_float_prec_round(quotient.x, prec, rm);
+            let mut result = ExtendedFloat::from(rounded);
+            result.exp = result.exp.checked_add(quotient.exp).unwrap();
+            return result.into_float_helper(prec, rm, o);
         }
         // Increase the precision.
         working_prec += increment;
