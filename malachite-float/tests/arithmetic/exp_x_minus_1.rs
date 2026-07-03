@@ -8,7 +8,9 @@
 
 use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{ExpXMinus1, ExpXMinus1Assign, PowerOf2};
+use malachite_base::num::arithmetic::traits::{
+    ExpXMinus1, ExpXMinus1Assign, FloorLogBase2, PowerOf2,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -1606,6 +1608,50 @@ fn test_exp_x_minus_1_prec_round() {
         "-0x0.ffffffffffffffffffffffffffffffffffff2b9f0758ea851b#200",
         Less,
     );
+
+    // - deeply negative x: e^x lies below the smallest positive Float (x < ln(2) * (MIN_EXPONENT -
+    //   1) ~ -744261117.95), but prec is so large that the bits of e^x land within the output's
+    //   prec-bit window, so the result must be computed for real via 2^(x/ln(2)) - 1 (this used to
+    //   panic). Here y = x/ln(2) ~ -1073741826.95, and with prec = MAX_EXPONENT + 65 the result -1
+    //   + 2^y is about 2^61 ulps above -1. The result is a ~128 MB Float, so instead of comparing
+    //   strings, check that 1 + f (an exact `Rational`, approximately 2^y) is positive and lies in
+    //   the right binade; the pre-fix answers (-1 or -1 + ulp) give 0 or the wrong binade. Also
+    //   check that the Floor and Ceiling results differ by exactly one ulp and that Nearest matches
+    //   one of them.
+    let prec = u64::exact_from(Float::MAX_EXPONENT) + 65;
+    let x = Float::exact_from(-744261120i64);
+    let mut r_floor = None;
+    let mut r_ceiling = None;
+    let mut r_nearest = None;
+    for rm in [Floor, Ceiling, Nearest] {
+        let (f, o) = x.exp_x_minus_1_prec_round_ref(prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.get_prec(), Some(prec));
+        let r = Rational::exact_from(&f) + Rational::ONE;
+        assert!(r > 0u32);
+        assert_eq!(r.floor_log_base_2(), -1073741827);
+        match rm {
+            Floor => {
+                assert_eq!(o, Less);
+                r_floor = Some(f);
+            }
+            Ceiling => {
+                assert_eq!(o, Greater);
+                r_ceiling = Some(f);
+            }
+            _ => r_nearest = Some(f),
+        }
+    }
+    let (r_floor, r_ceiling, r_nearest) =
+        (r_floor.unwrap(), r_ceiling.unwrap(), r_nearest.unwrap());
+    assert_eq!(
+        Rational::exact_from(&r_ceiling) - Rational::exact_from(&r_floor),
+        Rational::power_of_2(-i64::exact_from(prec))
+    );
+    assert!(
+        ComparableFloatRef(&r_nearest) == ComparableFloatRef(&r_floor)
+            || ComparableFloatRef(&r_nearest) == ComparableFloatRef(&r_ceiling)
+    );
 }
 
 #[test]
@@ -2799,6 +2845,20 @@ fn test_exp_x_minus_1_rational_prec_round() {
         );
         assert_eq!(o, Greater);
     }
+
+    // - deeply negative x with the bits of e^x inside the output window: the squeeze's Float
+    //   bracket ends route through the Float function's deep-negative helper (this used to panic).
+    //   See the corresponding case in `test_exp_x_minus_1_prec_round` for the numbers; here just
+    //   check that 1 + f lands in the right binade.
+    let prec = u64::exact_from(Float::MAX_EXPONENT) + 65;
+    let x = Rational::from(-744261120i64);
+    let (f, o) = Float::exp_x_minus_1_rational_prec_round_ref(&x, prec, Nearest);
+    assert!(f.is_valid());
+    assert_eq!(f.get_prec(), Some(prec));
+    assert_ne!(o, Equal);
+    let r = Rational::exact_from(&f) + Rational::ONE;
+    assert!(r > 0u32);
+    assert_eq!(r.floor_log_base_2(), -1073741827);
 }
 
 #[test]

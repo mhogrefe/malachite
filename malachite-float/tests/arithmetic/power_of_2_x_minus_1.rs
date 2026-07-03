@@ -7,21 +7,30 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{PowerOf2XMinus1, PowerOf2XMinus1Assign};
+use core::str::FromStr;
+use malachite_base::assert_panic;
+use malachite_base::num::arithmetic::traits::{PowerOf2, PowerOf2XMinus1, PowerOf2XMinus1Assign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    rounding_mode_gen, unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, rounding_mode_gen, unsigned_gen_var_11,
+    unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::arithmetic::power_of_2_x_minus_1::{
+    primitive_float_power_of_2_x_minus_1, primitive_float_power_of_2_x_minus_1_rational,
 };
 use malachite_float::test_util::arithmetic::power_of_2_x_minus_1::{
     rug_power_of_2_x_minus_1, rug_power_of_2_x_minus_1_prec, rug_power_of_2_x_minus_1_prec_round,
+    rug_power_of_2_x_minus_1_rational_prec, rug_power_of_2_x_minus_1_rational_prec_round,
     rug_power_of_2_x_minus_1_round,
 };
 use malachite_float::test_util::common::{
@@ -31,9 +40,12 @@ use malachite_float::test_util::generators::{
     float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_36,
+    rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
 
 #[test]
@@ -1930,4 +1942,1193 @@ fn power_of_2_x_minus_1_properties() {
     float_gen_var_12().test_properties(|x| {
         power_of_2_x_minus_1_properties_helper(x);
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_power_of_2_x_minus_1() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_power_of_2_x_minus_1(x)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, -1.0);
+    test::<f32>(0.0, 0.0);
+    test::<f32>(-0.0, -0.0);
+    test::<f32>(1.0, 1.0);
+    test::<f32>(3.0, 7.0);
+    test::<f32>(-2.0, -0.75);
+    // Computing `x.exp2() - 1.0` with the primitive float functions gives 0.41421354;
+    // `primitive_float_power_of_2_x_minus_1` is correctly rounded.
+    test::<f32>(0.5, 0.41421357);
+    test::<f32>(-0.5, -0.29289323);
+    test::<f32>(100.0, 1.2676506e30);
+    test::<f32>(200.0, f32::INFINITY);
+    test::<f32>(-130.0, -1.0);
+    // For small x the subtraction in `x.exp2() - 1.0` loses everything (it gives 0.0 for both of
+    // these); the correctly-rounded result is close to x ln(2).
+    test::<f32>(1.0e-8, 6.931472e-9);
+    test::<f32>(-1.0e-8, -6.931472e-9);
+    // A subnormal result.
+    test::<f32>(1.0e-38, 6.931471e-39);
+
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::INFINITY);
+    test::<f64>(f64::NEGATIVE_INFINITY, -1.0);
+    test::<f64>(0.0, 0.0);
+    test::<f64>(-0.0, -0.0);
+    test::<f64>(1.0, 1.0);
+    test::<f64>(3.0, 7.0);
+    test::<f64>(-2.0, -0.75);
+    // Computing `x.exp2() - 1.0` with the primitive float functions gives 0.41421356237309515;
+    // `primitive_float_power_of_2_x_minus_1` is correctly rounded.
+    test::<f64>(0.5, 0.41421356237309503);
+    test::<f64>(-0.5, -0.2928932188134525);
+    test::<f64>(1000.0, 1.0715086071862673e301);
+    test::<f64>(1100.0, f64::INFINITY);
+    test::<f64>(-1080.0, -1.0);
+    // For small x the subtraction in `x.exp2() - 1.0` loses everything (it gives 0.0 and
+    // -1.1102230246251565e-16 respectively); the correctly-rounded result is close to x ln(2).
+    test::<f64>(1.0e-16, 6.931471805599453e-17);
+    test::<f64>(-1.0e-16, -6.931471805599453e-17);
+    // A subnormal result.
+    test::<f64>(1.0e-308, 6.93147180559945e-309);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_power_of_2_x_minus_1_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        primitive_float_power_of_2_x_minus_1(x);
+    });
+}
+
+#[test]
+fn primitive_float_power_of_2_x_minus_1_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_power_of_2_x_minus_1_properties_helper);
+}
+
+#[test]
+fn test_power_of_2_x_minus_1_rational_prec() {
+    let test = |s, prec, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec(x.clone(), prec);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_ref(&x, prec);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    test("0", 1, "0.0", "0x0.0", Equal);
+    test("0", 10, "0.0", "0x0.0", Equal);
+    test("0", 53, "0.0", "0x0.0", Equal);
+    // - integer x: the result 2^x - 1 is exact whenever prec suffices
+    test("1", 1, "1.0", "0x1.0#1", Equal);
+    test("1", 10, "1.0", "0x1.000#10", Equal);
+    test("1", 53, "1.0", "0x1.0000000000000#53", Equal);
+    test("3", 1, "8.0", "0x8.0#1", Greater);
+    test("3", 10, "7.0", "0x7.00#10", Equal);
+    test("3", 53, "7.0", "0x7.0000000000000#53", Equal);
+    test("-1", 1, "-0.5", "-0x0.8#1", Equal);
+    test("-1", 10, "-0.5", "-0x0.800#10", Equal);
+    test("-1", 53, "-0.5", "-0x0.80000000000000#53", Equal);
+    test("-2", 1, "-1.0", "-0x1.0#1", Less);
+    test("-2", 10, "-0.75", "-0x0.c00#10", Equal);
+    test("-2", 53, "-0.75", "-0x0.c0000000000000#53", Equal);
+    // - non-integer x: the result is irrational, computed by the bracketing squeeze
+    test("1/2", 1, "0.5", "0x0.8#1", Greater);
+    test("1/2", 10, "0.4141", "0x0.6a0#10", Less);
+    test(
+        "1/2",
+        53,
+        "0.41421356237309503",
+        "0x0.6a09e667f3bcc8#53",
+        Less,
+    );
+    test("-1/2", 1, "-0.2", "-0x0.4#1", Greater);
+    test("-1/2", 10, "-0.293", "-0x0.4b0#10", Less);
+    test(
+        "-1/2",
+        53,
+        "-0.29289321881345248",
+        "-0x0.4afb0ccc06219c#53",
+        Less,
+    );
+    test("1/3", 1, "0.2", "0x0.4#1", Less);
+    test("1/3", 10, "0.2598", "0x0.428#10", Less);
+    test(
+        "1/3",
+        53,
+        "0.25992104989487319",
+        "0x0.428a2f98d728b0#53",
+        Greater,
+    );
+    test("-1/3", 1, "-0.2", "-0x0.4#1", Less);
+    test("-1/3", 10, "-0.2063", "-0x0.34d#10", Greater);
+    test(
+        "-1/3",
+        53,
+        "-0.20629947401590026",
+        "-0x0.34d00ad6148e1c#53",
+        Less,
+    );
+    test("22/7", 1, "8.0", "0x8.0#1", Greater);
+    test("22/7", 10, "7.836", "0x7.d6#10", Greater);
+    test(
+        "22/7",
+        53,
+        "7.832716109390499",
+        "0x7.d52ce208af3ec#53",
+        Greater,
+    );
+    test("-22/7", 1, "-1.0", "-0x1.0#1", Less);
+    test("-22/7", 10, "-0.887", "-0x0.e30#10", Greater);
+    test(
+        "-22/7",
+        53,
+        "-0.8867845419670116",
+        "-0x0.e3044fce58be58#53",
+        Greater,
+    );
+    test("100", 1, "1.0e30", "0x1.0E+25#1", Greater);
+    test("100", 10, "1.268e30", "0x1.000E+25#10", Greater);
+    test(
+        "100",
+        53,
+        "1.2676506002282294e30",
+        "0x1.0000000000000E+25#53",
+        Greater,
+    );
+    test("-100", 1, "-1.0", "-0x1.0#1", Less);
+    test("-100", 10, "-1.0", "-0x1.000#10", Less);
+    test("-100", 53, "-1.0", "-0x1.0000000000000#53", Less);
+    // - the exact 2^100 - 1 needs exactly 100 bits
+    test(
+        "100",
+        100,
+        "1267650600228229401496703205375.0",
+        "0xfffffffffffffffffffffffff.0#100",
+        Equal,
+    );
+    // - the exact -1 + 2^-100 needs 101 bits: at prec 99 the deep-negative rounding shortcut
+    //   resolves it from -1, and at prec 100 and 101 the exact rational is materialized (prec 100
+    //   sits exactly on the midpoint between -1 and its toward-zero neighbor)
+    test(
+        "-100",
+        99,
+        "-1.0",
+        "-0x1.0000000000000000000000000#99",
+        Less,
+    );
+    test(
+        "-100",
+        100,
+        "-0.999999999999999999999999999999",
+        "-0x0.fffffffffffffffffffffffff#100",
+        Equal,
+    );
+    test(
+        "-100",
+        101,
+        "-0.9999999999999999999999999999992",
+        "-0x0.fffffffffffffffffffffffff0#101",
+        Equal,
+    );
+
+    let test_big = |x: Rational, prec, out: &str, out_hex: &str, out_o| {
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec(x.clone(), prec);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_ref(&x, prec);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    // - integer x > MAX_EXPONENT: 2^x - 1 overflows
+    test_big(
+        Rational::power_of_2(31i64),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(31i64),
+        10,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - integer x = MAX_EXPONENT: 2^x - 1 is representable, but needs at least MAX_EXPONENT bits;
+    //   at smaller precisions it rounds exactly like an overflow
+    test_big(
+        Rational::from(Float::MAX_EXPONENT),
+        1,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - integer x < -MAX_EXPONENT: 2^x - 1 rounds from -1
+    test_big(-Rational::power_of_2(31i64), 1, "-1.0", "-0x1.0#1", Less);
+    test_big(
+        -Rational::power_of_2(31i64),
+        10,
+        "-1.0",
+        "-0x1.000#10",
+        Less,
+    );
+    // - integer x = MIN_EXPONENT - 1: 2^x is the smallest positive Float, and the exact difference
+    //   2^x - 1 is rounded directly
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        "-1.0",
+        "-0x1.000#10",
+        Less,
+    );
+    // - integer x = MIN_EXPONENT - 2: 2^x is below the smallest positive Float, and the result is
+    //   resolved by rounding from -1
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    // - non-integer |x| < 2^MIN_EXPONENT: 2^x - 1 ~ x ln(2) is smaller than the smallest positive
+    //   Float, resolved by the ln(2)-bracketing helper; for |x| in the smallest binade the result
+    //   magnitude is in (min_positive / 2, min_positive), so `Nearest` rounds away from zero, while
+    //   for smaller |x| it rounds to zero
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        10,
+        "-too_small",
+        "-0x1.000E-268435456#10",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 10),
+        1,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 10),
+        1,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_x_minus_1_rational_prec_fail() {
+    Float::power_of_2_x_minus_1_rational_prec(Rational::ONE, 0);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_x_minus_1_rational_prec_ref_fail() {
+    Float::power_of_2_x_minus_1_rational_prec_ref(&Rational::ONE, 0);
+}
+
+#[test]
+fn test_power_of_2_x_minus_1_rational_prec_round() {
+    let test = |s, prec, rm, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round(x.clone(), prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    test("0", 1, Floor, "0.0", "0x0.0", Equal);
+    test("0", 1, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 53, Floor, "0.0", "0x0.0", Equal);
+    test("0", 53, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 53, Nearest, "0.0", "0x0.0", Equal);
+    // - integer x: the result is exact whenever prec suffices, for every rounding mode (including
+    //   `Exact`)
+    test("1", 1, Floor, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Ceiling, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test("1", 1, Exact, "1.0", "0x1.0#1", Equal);
+    test("1", 10, Floor, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("1", 53, Floor, "1.0", "0x1.0000000000000#53", Equal);
+    test("1", 53, Ceiling, "1.0", "0x1.0000000000000#53", Equal);
+    test("1", 53, Nearest, "1.0", "0x1.0000000000000#53", Equal);
+    test("3", 1, Floor, "4.0", "0x4.0#1", Less);
+    test("3", 1, Ceiling, "8.0", "0x8.0#1", Greater);
+    test("3", 1, Nearest, "8.0", "0x8.0#1", Greater);
+    test("3", 10, Floor, "7.0", "0x7.00#10", Equal);
+    test("3", 10, Ceiling, "7.0", "0x7.00#10", Equal);
+    test("3", 10, Nearest, "7.0", "0x7.00#10", Equal);
+    test("3", 10, Exact, "7.0", "0x7.00#10", Equal);
+    test("3", 53, Floor, "7.0", "0x7.0000000000000#53", Equal);
+    test("3", 53, Ceiling, "7.0", "0x7.0000000000000#53", Equal);
+    test("3", 53, Nearest, "7.0", "0x7.0000000000000#53", Equal);
+    test("-1", 1, Floor, "-0.5", "-0x0.8#1", Equal);
+    test("-1", 1, Ceiling, "-0.5", "-0x0.8#1", Equal);
+    test("-1", 1, Nearest, "-0.5", "-0x0.8#1", Equal);
+    test("-1", 1, Exact, "-0.5", "-0x0.8#1", Equal);
+    test("-1", 10, Floor, "-0.5", "-0x0.800#10", Equal);
+    test("-1", 10, Ceiling, "-0.5", "-0x0.800#10", Equal);
+    test("-1", 10, Nearest, "-0.5", "-0x0.800#10", Equal);
+    test("-1", 53, Floor, "-0.5", "-0x0.80000000000000#53", Equal);
+    test("-1", 53, Ceiling, "-0.5", "-0x0.80000000000000#53", Equal);
+    test("-1", 53, Nearest, "-0.5", "-0x0.80000000000000#53", Equal);
+    test("-2", 1, Floor, "-1.0", "-0x1.0#1", Less);
+    test("-2", 1, Ceiling, "-0.5", "-0x0.8#1", Greater);
+    test("-2", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-2", 10, Floor, "-0.75", "-0x0.c00#10", Equal);
+    test("-2", 10, Ceiling, "-0.75", "-0x0.c00#10", Equal);
+    test("-2", 10, Nearest, "-0.75", "-0x0.c00#10", Equal);
+    test("-2", 10, Exact, "-0.75", "-0x0.c00#10", Equal);
+    test("-2", 53, Floor, "-0.75", "-0x0.c0000000000000#53", Equal);
+    test("-2", 53, Ceiling, "-0.75", "-0x0.c0000000000000#53", Equal);
+    test("-2", 53, Nearest, "-0.75", "-0x0.c0000000000000#53", Equal);
+    // - non-integer x: the result is irrational
+    test("1/2", 1, Floor, "0.2", "0x0.4#1", Less);
+    test("1/2", 1, Ceiling, "0.5", "0x0.8#1", Greater);
+    test("1/2", 1, Nearest, "0.5", "0x0.8#1", Greater);
+    test("1/2", 10, Floor, "0.4141", "0x0.6a0#10", Less);
+    test("1/2", 10, Ceiling, "0.4146", "0x0.6a2#10", Greater);
+    test("1/2", 10, Nearest, "0.4141", "0x0.6a0#10", Less);
+    test(
+        "1/2",
+        53,
+        Floor,
+        "0.41421356237309503",
+        "0x0.6a09e667f3bcc8#53",
+        Less,
+    );
+    test(
+        "1/2",
+        53,
+        Ceiling,
+        "0.41421356237309509",
+        "0x0.6a09e667f3bccc#53",
+        Greater,
+    );
+    test(
+        "1/2",
+        53,
+        Nearest,
+        "0.41421356237309503",
+        "0x0.6a09e667f3bcc8#53",
+        Less,
+    );
+    test("-1/2", 1, Floor, "-0.5", "-0x0.8#1", Less);
+    test("-1/2", 1, Ceiling, "-0.2", "-0x0.4#1", Greater);
+    test("-1/2", 1, Nearest, "-0.2", "-0x0.4#1", Greater);
+    test("-1/2", 10, Floor, "-0.293", "-0x0.4b0#10", Less);
+    test("-1/2", 10, Ceiling, "-0.2925", "-0x0.4ae#10", Greater);
+    test("-1/2", 10, Nearest, "-0.293", "-0x0.4b0#10", Less);
+    test(
+        "-1/2",
+        53,
+        Floor,
+        "-0.29289321881345248",
+        "-0x0.4afb0ccc06219c#53",
+        Less,
+    );
+    test(
+        "-1/2",
+        53,
+        Ceiling,
+        "-0.29289321881345243",
+        "-0x0.4afb0ccc062198#53",
+        Greater,
+    );
+    test(
+        "-1/2",
+        53,
+        Nearest,
+        "-0.29289321881345248",
+        "-0x0.4afb0ccc06219c#53",
+        Less,
+    );
+    test("1/3", 1, Floor, "0.2", "0x0.4#1", Less);
+    test("1/3", 1, Ceiling, "0.5", "0x0.8#1", Greater);
+    test("1/3", 1, Nearest, "0.2", "0x0.4#1", Less);
+    test("1/3", 10, Floor, "0.2598", "0x0.428#10", Less);
+    test("1/3", 10, Ceiling, "0.2603", "0x0.42a#10", Greater);
+    test("1/3", 10, Nearest, "0.2598", "0x0.428#10", Less);
+    test(
+        "1/3",
+        53,
+        Floor,
+        "0.25992104989487314",
+        "0x0.428a2f98d728ac#53",
+        Less,
+    );
+    test(
+        "1/3",
+        53,
+        Ceiling,
+        "0.25992104989487319",
+        "0x0.428a2f98d728b0#53",
+        Greater,
+    );
+    test(
+        "1/3",
+        53,
+        Nearest,
+        "0.25992104989487319",
+        "0x0.428a2f98d728b0#53",
+        Greater,
+    );
+    test("-1/3", 1, Floor, "-0.2", "-0x0.4#1", Less);
+    test("-1/3", 1, Ceiling, "-0.1", "-0x0.2#1", Greater);
+    test("-1/3", 1, Nearest, "-0.2", "-0x0.4#1", Less);
+    test("-1/3", 10, Floor, "-0.2065", "-0x0.34e#10", Less);
+    test("-1/3", 10, Ceiling, "-0.2063", "-0x0.34d#10", Greater);
+    test("-1/3", 10, Nearest, "-0.2063", "-0x0.34d#10", Greater);
+    test(
+        "-1/3",
+        53,
+        Floor,
+        "-0.20629947401590026",
+        "-0x0.34d00ad6148e1c#53",
+        Less,
+    );
+    test(
+        "-1/3",
+        53,
+        Ceiling,
+        "-0.20629947401590024",
+        "-0x0.34d00ad6148e1a#53",
+        Greater,
+    );
+    test(
+        "-1/3",
+        53,
+        Nearest,
+        "-0.20629947401590026",
+        "-0x0.34d00ad6148e1c#53",
+        Less,
+    );
+    test("22/7", 1, Floor, "4.0", "0x4.0#1", Less);
+    test("22/7", 1, Ceiling, "8.0", "0x8.0#1", Greater);
+    test("22/7", 1, Nearest, "8.0", "0x8.0#1", Greater);
+    test("22/7", 10, Floor, "7.83", "0x7.d4#10", Less);
+    test("22/7", 10, Ceiling, "7.836", "0x7.d6#10", Greater);
+    test("22/7", 10, Nearest, "7.836", "0x7.d6#10", Greater);
+    test(
+        "22/7",
+        53,
+        Floor,
+        "7.832716109390498",
+        "0x7.d52ce208af3e8#53",
+        Less,
+    );
+    test(
+        "22/7",
+        53,
+        Ceiling,
+        "7.832716109390499",
+        "0x7.d52ce208af3ec#53",
+        Greater,
+    );
+    test(
+        "22/7",
+        53,
+        Nearest,
+        "7.832716109390499",
+        "0x7.d52ce208af3ec#53",
+        Greater,
+    );
+    test("-22/7", 1, Floor, "-1.0", "-0x1.0#1", Less);
+    test("-22/7", 1, Ceiling, "-0.5", "-0x0.8#1", Greater);
+    test("-22/7", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-22/7", 10, Floor, "-0.888", "-0x0.e34#10", Less);
+    test("-22/7", 10, Ceiling, "-0.887", "-0x0.e30#10", Greater);
+    test("-22/7", 10, Nearest, "-0.887", "-0x0.e30#10", Greater);
+    test(
+        "-22/7",
+        53,
+        Floor,
+        "-0.8867845419670117",
+        "-0x0.e3044fce58be60#53",
+        Less,
+    );
+    test(
+        "-22/7",
+        53,
+        Ceiling,
+        "-0.8867845419670116",
+        "-0x0.e3044fce58be58#53",
+        Greater,
+    );
+    test(
+        "-22/7",
+        53,
+        Nearest,
+        "-0.8867845419670116",
+        "-0x0.e3044fce58be58#53",
+        Greater,
+    );
+    test("100", 1, Floor, "6.0e29", "0x8.0E+24#1", Less);
+    test("100", 1, Ceiling, "1.0e30", "0x1.0E+25#1", Greater);
+    test("100", 1, Nearest, "1.0e30", "0x1.0E+25#1", Greater);
+    test("100", 10, Floor, "1.266e30", "0xf.fcE+24#10", Less);
+    test("100", 10, Ceiling, "1.268e30", "0x1.000E+25#10", Greater);
+    test("100", 10, Nearest, "1.268e30", "0x1.000E+25#10", Greater);
+    test(
+        "100",
+        53,
+        Floor,
+        "1.2676506002282293e30",
+        "0xf.ffffffffffff8E+24#53",
+        Less,
+    );
+    test(
+        "100",
+        53,
+        Ceiling,
+        "1.2676506002282294e30",
+        "0x1.0000000000000E+25#53",
+        Greater,
+    );
+    test(
+        "100",
+        53,
+        Nearest,
+        "1.2676506002282294e30",
+        "0x1.0000000000000E+25#53",
+        Greater,
+    );
+    test("-100", 1, Floor, "-1.0", "-0x1.0#1", Less);
+    test("-100", 1, Ceiling, "-0.5", "-0x0.8#1", Greater);
+    test("-100", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-100", 10, Floor, "-1.0", "-0x1.000#10", Less);
+    test("-100", 10, Ceiling, "-0.999", "-0x0.ffc#10", Greater);
+    test("-100", 10, Nearest, "-1.0", "-0x1.000#10", Less);
+    test("-100", 53, Floor, "-1.0", "-0x1.0000000000000#53", Less);
+    test(
+        "-100",
+        53,
+        Ceiling,
+        "-0.9999999999999999",
+        "-0x0.fffffffffffff8#53",
+        Greater,
+    );
+    test("-100", 53, Nearest, "-1.0", "-0x1.0000000000000#53", Less);
+    // - the exact -1 + 2^-100 needs 101 bits
+    test(
+        "-100",
+        101,
+        Exact,
+        "-0.9999999999999999999999999999992",
+        "-0x0.fffffffffffffffffffffffff0#101",
+        Equal,
+    );
+
+    let test_big = |x: Rational, prec, rm, out: &str, out_hex: &str, out_o| {
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round(x.clone(), prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, out_o);
+    };
+    // - integer x > MAX_EXPONENT: 2^x - 1 overflows. Directed-down rounding returns the largest
+    //   finite Float; the other modes return +inf
+    test_big(
+        Rational::power_of_2(31i64),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(31i64),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(31i64),
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(31i64),
+        10,
+        Floor,
+        "too_big",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    // - integer x = MAX_EXPONENT: 2^x - 1 is representable but needs at least MAX_EXPONENT bits; at
+    //   smaller precisions it rounds exactly like an overflow
+    test_big(
+        Rational::from(Float::MAX_EXPONENT),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::from(Float::MAX_EXPONENT),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::from(Float::MAX_EXPONENT),
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - integer x < -MAX_EXPONENT: the result is resolved by rounding from -1
+    test_big(
+        -Rational::power_of_2(31i64),
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(31i64),
+        1,
+        Ceiling,
+        "-0.5",
+        "-0x0.8#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(31i64),
+        1,
+        Nearest,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(31i64),
+        10,
+        Ceiling,
+        "-0.999",
+        "-0x0.ffc#10",
+        Greater,
+    );
+    // - integer x = MIN_EXPONENT - 1: 2^x is the smallest positive Float, and the exact difference
+    //   2^x - 1 is rounded directly
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Ceiling,
+        "-0.5",
+        "-0x0.8#1",
+        Greater,
+    );
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Nearest,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    // - integer x = MIN_EXPONENT - 2: 2^x is below the smallest positive Float, and the result is
+    //   resolved by rounding from -1
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Ceiling,
+        "-0.5",
+        "-0x0.8#1",
+        Greater,
+    );
+    test_big(
+        Rational::from(i64::from(Float::MIN_EXPONENT) - 2),
+        1,
+        Nearest,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    // - non-integer x > 2^(MAX_EXPONENT - 1): 2^x - 1 overflows
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3),
+        1,
+        Floor,
+        "too_big",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3),
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3),
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - non-integer x < -2^(MAX_EXPONENT - 1): the result is resolved by rounding from -1
+    test_big(
+        -(Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3)),
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test_big(
+        -(Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3)),
+        1,
+        Ceiling,
+        "-0.5",
+        "-0x0.8#1",
+        Greater,
+    );
+    test_big(
+        -(Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3)),
+        10,
+        Nearest,
+        "-1.0",
+        "-0x1.000#10",
+        Less,
+    );
+    // - non-integer |x| < 2^MIN_EXPONENT: 2^x - 1 ~ x ln(2) underflows, via the ln(2)-bracketing
+    //   helper. For x > 0 the toward-zero modes give 0; for x < 0 they give -0
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Ceiling,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Nearest,
+        "too_small",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Floor,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Ceiling,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
+        1,
+        Nearest,
+        "-too_small",
+        "-0x1.0E-268435456#1",
+        Less,
+    );
+    // - |x ln(2)| below half the smallest positive Float: `Nearest` rounds to zero
+    test_big(
+        Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 10),
+        1,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    test_big(
+        -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 10),
+        1,
+        Nearest,
+        "-0.0",
+        "-0x0.0",
+        Greater,
+    );
+
+    // - huge-negative non-integer x with a precision so large that `float_round_near_x` cannot
+    //   resolve the rounding (its error bound MAX_EXPONENT <= prec + 1), exercising the manual -1 /
+    //   -1+ulp fallback. The result is a ~128 MB Float, so it is checked by value rather than by
+    //   string.
+    let prec = u64::exact_from(Float::MAX_EXPONENT);
+    let x =
+        -(Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3));
+    let neg_one = -Float::one_prec(prec);
+    // -1 + ulp, i.e. the neighbor of -1 toward zero.
+    let neg_one_plus_ulp = neg_one
+        .clone()
+        .add_prec_round(Float::power_of_2(-i64::exact_from(prec)), prec, Exact)
+        .0;
+    // Toward -inf or away from zero rounds to -1.
+    for rm in [Floor, Up, Nearest] {
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(ComparableFloatRef(&f), ComparableFloatRef(&neg_one));
+        assert_eq!(o, Less);
+    }
+    // Toward zero (Ceiling for a negative value, or Down) rounds to -1 + ulp.
+    for rm in [Ceiling, Down] {
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(
+            ComparableFloatRef(&f),
+            ComparableFloatRef(&neg_one_plus_ulp)
+        );
+        assert_eq!(o, Greater);
+    }
+
+    // - integer x = MAX_EXPONENT at prec = MAX_EXPONENT: the exact 2^MAX_EXPONENT - 1, a ~128 MB
+    //   Float, checked by round-trip rather than by string
+    let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round_ref(
+        &Rational::from(Float::MAX_EXPONENT),
+        prec,
+        Exact,
+    );
+    assert!(f.is_valid());
+    assert_eq!(o, Equal);
+    assert_eq!(f.get_prec(), Some(prec));
+    assert_eq!(
+        Rational::exact_from(&f),
+        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) - Rational::ONE
+    );
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_x_minus_1_rational_prec_round_fail_1() {
+    Float::power_of_2_x_minus_1_rational_prec_round(Rational::ONE, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_x_minus_1_rational_prec_round_fail_2() {
+    Float::power_of_2_x_minus_1_rational_prec_round(Rational::from_unsigneds(1u32, 3), 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_x_minus_1_rational_prec_round_fail_3() {
+    // 2^3 - 1 = 7 is not representable with 1 bit
+    Float::power_of_2_x_minus_1_rational_prec_round(Rational::from(3u32), 1, Exact);
+}
+
+#[test]
+#[should_panic]
+fn power_of_2_x_minus_1_rational_prec_round_ref_fail() {
+    Float::power_of_2_x_minus_1_rational_prec_round_ref(
+        &Rational::from_unsigneds(1u32, 3),
+        10,
+        Exact,
+    );
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn power_of_2_x_minus_1_rational_prec_round_properties_helper(
+    x: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round(x.clone(), prec, rm);
+    assert!(f.is_valid());
+
+    let (f_alt, o_alt) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+    assert!(f_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+    assert_eq!(o_alt, o);
+
+    // 2^x - 1 has the same sign as x, and is never NaN.
+    if x > 0u32 {
+        assert!(f >= 0u32);
+    } else if x < 0u32 {
+        assert!(f <= 0u32);
+    }
+
+    if let Ok(rrm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_f, rug_o) = rug_power_of_2_x_minus_1_rational_prec_round(&x, prec, rrm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_f)),
+            ComparableFloatRef(&f)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if f.is_normal() {
+        assert_eq!(f.get_prec(), Some(prec));
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(f.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::power_of_2_x_minus_1_rational_prec_round_ref(
+            &x, prec, Exact
+        ));
+    }
+}
+
+#[test]
+fn power_of_2_x_minus_1_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(x, prec, rm)| {
+        power_of_2_x_minus_1_rational_prec_round_properties_helper(x, prec, rm);
+    });
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec_round(Rational::ZERO, prec, rm);
+        assert_eq!(ComparableFloat(f), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn power_of_2_x_minus_1_rational_prec_properties_helper(x: Rational, prec: u64) {
+    let (f, o) = Float::power_of_2_x_minus_1_rational_prec(x.clone(), prec);
+    assert!(f.is_valid());
+
+    let (f_alt, o_alt) = Float::power_of_2_x_minus_1_rational_prec_ref(&x, prec);
+    assert!(f_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+    assert_eq!(o_alt, o);
+
+    let (f_alt, o_alt) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, Nearest);
+    assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+    assert_eq!(o_alt, o);
+
+    if x > 0u32 {
+        assert!(f >= 0u32);
+    } else if x < 0u32 {
+        assert!(f <= 0u32);
+    }
+
+    let (rug_f, rug_o) = rug_power_of_2_x_minus_1_rational_prec(&x, prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_f)),
+        ComparableFloatRef(&f)
+    );
+    assert_eq!(rug_o, o);
+
+    if f.is_normal() {
+        assert_eq!(f.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn power_of_2_x_minus_1_rational_prec_properties() {
+    rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
+        power_of_2_x_minus_1_rational_prec_properties_helper(x, prec);
+    });
+
+    unsigned_gen_var_11().test_properties(|prec| {
+        let (f, o) = Float::power_of_2_x_minus_1_rational_prec(Rational::ZERO, prec);
+        assert_eq!(ComparableFloat(f), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_power_of_2_x_minus_1_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let u = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_power_of_2_x_minus_1_rational(&u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 0.0);
+    test::<f32>("1", 1.0);
+    test::<f32>("3", 7.0);
+    test::<f32>("1/2", 0.41421357);
+    test::<f32>("1/3", 0.25992104);
+    test::<f32>("22/7", 7.832716);
+    test::<f32>("200", f32::INFINITY);
+    test::<f32>("1/1000000", 6.931474e-7);
+    test::<f32>("-1", -0.5);
+    test::<f32>("-3", -0.875);
+    test::<f32>("-1/2", -0.29289323);
+    test::<f32>("-1/3", -0.20629947);
+    test::<f32>("-22/7", -0.88678455);
+    test::<f32>("-200", -1.0);
+    test::<f32>("-1/1000000", -6.9314694e-7);
+
+    test::<f64>("0", 0.0);
+    test::<f64>("1", 1.0);
+    test::<f64>("3", 7.0);
+    test::<f64>("1/2", 0.41421356237309503);
+    test::<f64>("1/3", 0.2599210498948732);
+    test::<f64>("22/7", 7.832716109390499);
+    test::<f64>("1100", f64::INFINITY);
+    test::<f64>("1/1000000", 6.931474207865077e-7);
+    test::<f64>("-1", -0.5);
+    test::<f64>("-3", -0.875);
+    test::<f64>("-1/2", -0.2928932188134525);
+    test::<f64>("-1/3", -0.20629947401590026);
+    test::<f64>("-22/7", -0.8867845419670116);
+    test::<f64>("-1100", -1.0);
+    test::<f64>("-1/1000000", -6.931469403334938e-7);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_power_of_2_x_minus_1_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let y = primitive_float_power_of_2_x_minus_1_rational::<T>(&x);
+        // 2^x - 1 has the same sign as x, and is never NaN.
+        assert!(!y.is_nan());
+        if x > 0u32 {
+            assert!(y >= T::ZERO);
+        } else if x < 0u32 {
+            assert!(y <= T::ZERO);
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // 2^x - 1 of a finite, nonzero primitive float, taken through the `Rational` path, matches
+        // the direct primitive-float function. Zero is excluded: a `Rational` has no signed zero,
+        // so the `Rational` path returns +0 for both signs whereas the direct path preserves it
+        // (2^-0.0 - 1 = -0.0).
+        if x.is_finite() && x != T::ZERO {
+            assert_eq!(
+                NiceFloat(primitive_float_power_of_2_x_minus_1_rational::<T>(
+                    &Rational::exact_from(x)
+                )),
+                NiceFloat(primitive_float_power_of_2_x_minus_1(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_power_of_2_x_minus_1_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_power_of_2_x_minus_1_rational_properties_helper);
 }

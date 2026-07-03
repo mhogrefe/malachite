@@ -14,18 +14,25 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, one_neighbor};
-use crate::{Float, float_infinity, float_nan};
+use crate::arithmetic::exp_x_minus_1::exp_x_minus_1_rational_near_zero;
+use crate::arithmetic::round_near_x::float_round_near_x;
+use crate::{
+    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_infinity, float_nan,
+    float_zero, floor_and_ceiling,
+};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, PowerOf2XMinus1, PowerOf2XMinus1Assign,
+    CeilingLogBase2, PowerOf2, PowerOf2XMinus1, PowerOf2XMinus1Assign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{NegativeOne, NegativeZero, One, Zero as ZeroTrait};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -129,6 +136,14 @@ fn power_of_2_x_minus_1_prec_round_normal(
             };
         }
     }
+    // Deeply negative x: 2^x lies below the smallest positive Float, so the loop's
+    // `power_of_2_of_float` would return 0 or the minimum positive value with unbounded relative
+    // error, and the result could never be certified. Since the huge-negative shortcut above did
+    // not fire, |x| <= prec + 1, so the bits of 2^x land within the output's prec-bit window and
+    // must be computed for real.
+    if *x < const { Float::MIN_EXPONENT as i64 - 1 } {
+        return power_of_2_x_minus_1_deep_negative(x, prec, rm);
+    }
     // Compute the precision of the intermediary variable: the optimal number of bits, see
     // algorithms.tex.
     let mut working_prec = prec + prec.ceiling_log_base_2() + 6;
@@ -139,14 +154,14 @@ fn power_of_2_x_minus_1_prec_round_normal(
         if t.is_infinite() {
             return exp_overflow(prec, rm);
         }
-        // Integer x: 2^x is exact, so the result is simply round(2^x - 1).
+        // 2^x cannot underflow here: that would require x < MIN_EXPONENT - 1, but then the deep-
+        // negative case above would already have returned. Integer x: 2^x is exact, so the result
+        // is simply round(2^x - 1).
         if o1 == Equal {
             return t.sub_prec_round(Float::ONE, prec, rm);
         }
         // 2^x is inexact, so x is not an integer and 2^x - 1 is transcendental: never exact.
         assert_ne!(rm, Exact, "Inexact power_of_2_x_minus_1");
-        // 2^x cannot underflow here: that would require x < MIN_EXPONENT - 1, but then the huge-
-        // negative case above would already have returned.
         let exp_te = i64::from(t.get_exponent().unwrap());
         t.sub_prec_assign(Float::ONE, working_prec); // 2^x - 1
         if t != 0u32 {
@@ -165,6 +180,217 @@ fn power_of_2_x_minus_1_prec_round_normal(
             Small::NotSmall => {}
         }
         // Increase the precision.
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Computes 2^x - 1 for a Float x < MIN_EXPONENT - 1 (so that 2^x is smaller than the smallest
+// positive Float) with |x| <= prec + 1 (larger |x| is handled by the caller's -1-rounding
+// shortcut). The result is -1 + 2^x, and since |x| <= prec + 1 the bits of 2^x land within the
+// output's prec-bit window, even though 2^x itself is not representable. Split x = -s + f with
+// integer s and f in [0, 1): 2^x = 2^f * 2^-s, where 2^f is a normal Float in [1, 2); the scaling
+// by 2^-s and the subtraction of 1 are exact over `Rational`s, whose size stays O(prec) because s
+// <= prec + 2. For integer x the result is an exact dyadic rational; otherwise 2^f is bracketed and
+// the bracket is tightened Ziv-style. The initial working precision is small: the leading s - 1
+// bits of the result are a run of ones, so only about prec - s bits of 2^f are needed.
+fn power_of_2_x_minus_1_deep_negative(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let xr = Rational::exact_from(x);
+    let neg_n = -Integer::rounding_from(&xr, Floor).0; // = |floor(x)|, since x < 0
+    // The conversion fails only for |x| >= 2^63; but |x| <= prec + 1, and a result of such a
+    // precision could never be materialized at all.
+    let shift = u64::exact_from(&neg_n);
+    let frac = xr + Rational::from(neg_n); // x - floor(x), in [0, 1)
+    if frac == 0u32 {
+        // x is an integer, so -1 + 2^x is an exact dyadic rational needing |x| + 1 bits.
+        return Float::from_rational_prec_round(
+            Rational::power_of_2(-i64::exact_from(shift)) - Rational::ONE,
+            prec,
+            rm,
+        );
+    }
+    // x is not an integer, so 2^x - 1 is irrational: never exact.
+    assert_ne!(rm, Exact, "Inexact power_of_2_x_minus_1");
+    // The fractional part of the Float x is a dyadic rational, exactly representable with as many
+    // bits as its numerator has.
+    let frac_prec = frac.numerator_ref().significant_bits();
+    let frac = Float::from_rational_prec_round(frac, frac_prec, Exact).0;
+    let mut working_prec = prec.saturating_sub(shift) + Limb::WIDTH;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // 2^frac is in (1, 2) and irrational, so the Floor rounding is strict: the true value lies
+        // strictly between u_lo and u_hi.
+        let u = Float::power_of_2_of_float_prec_round_ref(&frac, working_prec, Floor);
+        let (u_lo, u_hi) = floor_and_ceiling(u);
+        let (f_lo, mut o_lo) = Float::from_rational_prec_round(
+            (Rational::exact_from(&u_lo) >> shift) - Rational::ONE,
+            prec,
+            rm,
+        );
+        let (f_hi, mut o_hi) = Float::from_rational_prec_round(
+            (Rational::exact_from(&u_hi) >> shift) - Rational::ONE,
+            prec,
+            rm,
+        );
+        // A bound that is exactly representable at `prec` rounds with `Equal`, but the true value
+        // lies strictly between the bounds, so the other bound's ordering is the true one; treat
+        // the exact bound as agreeing with it. (Both cannot be `Equal` with equal values, since the
+        // bounds are distinct.)
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && f_lo == f_hi {
+            return (f_lo, o_lo);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Computes 2^x - 1 for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, too small to bracket
+// between `Float`s. Since 2^x - 1 = expm1(x ln(2)), bracketing ln(2) between two `Rational`s (from
+// a single directed ln(2) computation) and applying `exp_x_minus_1_rational_near_zero` to each
+// product brackets the result; that helper's `from_rational_prec_round` calls perform the underflow
+// rounding, which matters here because |2^x - 1| ~ |x| ln(2) can fall below the smallest positive
+// `Float` (ln(2) < 1). expm1 is increasing, and x ln(2) is increasing in ln(2) for x > 0 and
+// decreasing for x < 0, so the bracket ends order accordingly. The bracket width is about |x| 2^-w
+// for a working ln(2) precision w, while the result's ulp is about 2^(EXP(x) - prec), so w ~ prec +
+// slack suffices regardless of how tiny x is; the Ziv loop widens w if not.
+fn power_of_2_x_minus_1_rational_near_zero(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let mut working_prec = prec + Limb::WIDTH;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // ln_2_lo <= ln(2) <= ln_2_hi, as exact Rationals, from a single ln(2) computation.
+        let (ln_2_lo, ln_2_hi) = floor_and_ceiling(Float::ln_2_prec_round(working_prec, Floor));
+        let ln_2_lo = Rational::exact_from(&ln_2_lo);
+        let ln_2_hi = Rational::exact_from(&ln_2_hi);
+        let (a_lo, a_hi) = if positive {
+            (x * ln_2_lo, x * ln_2_hi)
+        } else {
+            (x * ln_2_hi, x * ln_2_lo)
+        };
+        let (f_lo, o_lo) = exp_x_minus_1_rational_near_zero(&a_lo, prec, rm);
+        let (f_hi, o_hi) = exp_x_minus_1_rational_near_zero(&a_hi, prec, rm);
+        if o_lo == o_hi && f_lo == f_hi {
+            return (f_lo, o_lo);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Computes 2^x - 1 for a nonzero `Rational` `x`, rounded to precision `prec` with rounding mode
+// `rm`. (2^0 - 1 = 0 is handled by the caller.) Unlike expm1, the result is exactly representable
+// for some inputs: an integer x makes 2^x - 1 an exact dyadic rational, so those are computed
+// directly (the Ziv squeeze below could never certify one); every other rational x gives an
+// irrational result.
+fn power_of_2_x_minus_1_rational_helper(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    if x.is_integer() {
+        let n = Integer::exact_from(x);
+        return if n > i64::from(Float::MAX_EXPONENT) {
+            // 2^n - 1 has exponent n, beyond the maximum.
+            exp_overflow(prec, rm)
+        } else if n == i64::from(Float::MAX_EXPONENT) {
+            // 2^n is not representable, but 2^n - 1 (with exponent n) is -- though only with at
+            // least n bits of precision. At smaller precisions it rounds exactly like an overflow:
+            // down to the largest finite value, or up (and to nearest) past it.
+            if prec >= u64::exact_from(Float::MAX_EXPONENT) {
+                Float::from_rational_prec_round(
+                    Rational::power_of_2(i64::exact_from(&n)) - Rational::ONE,
+                    prec,
+                    rm,
+                )
+            } else {
+                exp_overflow(prec, rm)
+            }
+        } else if n >= i64::from(Float::MIN_EXPONENT) - 1 {
+            // 2^n is representable, so round the exact difference 2^n - 1 directly.
+            Float::power_of_2(i64::exact_from(&n)).sub_prec_round(Float::ONE, prec, rm)
+        } else {
+            // n <= MIN_EXPONENT - 2: the result is -1 + 2^n with 2^n below the smallest positive
+            // Float. It is exactly representable with 1 - n bits; at prec = -n it sits exactly on
+            // the midpoint between -1 and its toward-zero neighbor, so both cases materialize the
+            // exact rational (proportional to prec). (The i64 conversion would fail only for |n| >=
+            // 2^63, where prec >= |n| means the result could not be materialized at all.)
+            let bits_needed = Integer::ONE - &n;
+            if Integer::from(prec) >= &bits_needed - Integer::ONE {
+                Float::from_rational_prec_round(
+                    Rational::power_of_2(i64::exact_from(&n)) - Rational::ONE,
+                    prec,
+                    rm,
+                )
+            } else {
+                // The result is within 2^n < (1/4) ulp(-1) of -1, and err = 1 - n > prec + 1, so
+                // rounding from -1 always resolves.
+                assert_ne!(rm, Exact, "Inexact power_of_2_x_minus_1");
+                let err = u64::saturating_from(&bits_needed);
+                float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm).unwrap()
+            }
+        };
+    }
+    // The result for a non-integer rational is irrational, hence never exactly representable.
+    assert_ne!(rm, Exact, "Inexact power_of_2_x_minus_1");
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
+    // cannot bracket it (its Float bounds would be 0), so use the ln(2)-bracketing helper, which
+    // also performs the underflow rounding that |x| ln(2) may need.
+    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
+        return power_of_2_x_minus_1_rational_near_zero(x, prec, rm);
+    }
+    // |x| is too large to be a finite Float. For x > 0, 2^x - 1 overflows; for x < 0 it tends to
+    // -1. Smaller x that still overflow or round to -1 are handled by the Float function inside the
+    // squeeze below.
+    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
+        if positive {
+            return exp_overflow(prec, rm);
+        }
+        // 2^x is far below ulp(-1) at any precision, so 2^x - 1 rounds to -1 or its toward-zero
+        // neighbor.
+        let err = u64::exact_from(Float::MAX_EXPONENT);
+        if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
+            return result;
+        }
+        // `prec` is enormous (>= MAX_EXPONENT), so `float_round_near_x` cannot resolve the
+        // rounding; but 2^x is still far below ulp(-1), so -1 rounds the same way.
+        return match rm {
+            Ceiling | Down => (-one_neighbor(prec, false), Greater), // -1 + ulp (toward zero)
+            _ => (-Float::one_prec(prec), Less),                     // -1
+        };
+    }
+    // General case: bracket x between the Floats x_lo <= x <= x_hi, apply 2^x - 1 to both, and
+    // increase the working precision until the two bounds round to the same result. 2^x - 1 is
+    // monotonic, so once the bounds agree the exact result (which lies between them) rounds the
+    // same way. A bound that lands on an integer produces an `Equal` ordering, which cannot match
+    // the other (irrational) bound's; the loop then simply tightens the bracket until neither bound
+    // is an integer.
+    let mut working_prec = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (x_lo, x_o) = Float::from_rational_prec_round_ref(x, working_prec, Floor);
+        if x_o == Equal {
+            // x is exactly representable at `working_prec`, so the result is simply that of the
+            // Float function.
+            return x_lo.power_of_2_x_minus_1_prec_round(prec, rm);
+        }
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
+        let (e_lo, o_lo) = x_lo.power_of_2_x_minus_1_prec_round_ref(prec, rm);
+        let (e_hi, o_hi) = x_hi.power_of_2_x_minus_1_prec_round_ref(prec, rm);
+        if o_lo == o_hi && e_lo == e_hi {
+            return (e_lo, o_lo);
+        }
         working_prec += increment;
         increment = working_prec >> 1;
     }
@@ -254,6 +480,51 @@ impl Float {
         let prec = self.significant_bits();
         self.power_of_2_x_minus_1_prec_round_assign(prec, rm)
     }
+
+    /// Computes $2^x-1$, where $x$ is a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value.
+    #[inline]
+    pub fn power_of_2_x_minus_1_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $2^x-1$, where $x$ is a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference.
+    #[inline]
+    pub fn power_of_2_x_minus_1_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // 2^0 - 1 = 0, exactly.
+            return (float_zero!(), Equal);
+        }
+        power_of_2_x_minus_1_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $2^x-1$, where $x$ is a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by value.
+    #[inline]
+    pub fn power_of_2_x_minus_1_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::power_of_2_x_minus_1_rational_prec_round(x, prec, Nearest)
+    }
+
+    /// Computes $2^x-1$, where $x$ is a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by reference.
+    #[inline]
+    pub fn power_of_2_x_minus_1_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::power_of_2_x_minus_1_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl PowerOf2XMinus1 for Float {
@@ -285,4 +556,102 @@ impl PowerOf2XMinus1Assign for Float {
         let prec = self.significant_bits();
         self.power_of_2_x_minus_1_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes $2^x-1$ for a primitive float. The result is correctly rounded. Using this function is
+/// more accurate than computing `x.exp2() - 1.0` with the primitive float functions: that
+/// subtraction loses all precision when $x$ is small (where $2^x-1\approx x\ln 2$ but $2^x$ rounds
+/// to 1), and the standard library's `exp2` is not correctly rounded to begin with.
+///
+/// $$
+/// f(x) = 2^x-1+\varepsilon.
+/// $$
+/// - If $2^x-1$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $2^x-1$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |2^x-1|\rfloor-p}$,
+///   where $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\infty)=\infty$
+/// - $f(-\infty)=-1$
+/// - $f(\pm0.0)=\pm0.0$
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::power_of_2_x_minus_1::primitive_float_power_of_2_x_minus_1;
+///
+/// assert!(primitive_float_power_of_2_x_minus_1(f32::NAN).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_x_minus_1(f32::INFINITY)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_x_minus_1(f32::NEGATIVE_INFINITY)),
+///     NiceFloat(-1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_x_minus_1(3.0f32)),
+///     NiceFloat(7.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_power_of_2_x_minus_1<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::power_of_2_x_minus_1_prec, x)
+}
+
+/// Computes $2^x-1$, where $x$ is a [`Rational`], returning the result as a primitive float. The
+/// result is correctly rounded.
+///
+/// $$
+/// f(x) = 2^x-1+\varepsilon.
+/// $$
+/// - If $2^x-1$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $2^x-1$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |2^x-1|\rfloor-p}$,
+///   where $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=0$
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::power_of_2_x_minus_1::primitive_float_power_of_2_x_minus_1_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_x_minus_1_rational::<f32>(
+///         &Rational::from(3u32)
+///     )),
+///     NiceFloat(7.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_power_of_2_x_minus_1_rational::<f32>(
+///         &Rational::from_signeds(-1i32, 2)
+///     )),
+///     NiceFloat(-0.29289323)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_power_of_2_x_minus_1_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::power_of_2_x_minus_1_rational_prec_ref, x)
 }

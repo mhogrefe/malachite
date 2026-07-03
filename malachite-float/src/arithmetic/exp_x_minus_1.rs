@@ -27,7 +27,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero as ZeroTrait};
-use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
@@ -72,13 +72,24 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
         // err = -ceil(t), clamped to at most MAX_EXPONENT (avoiding overflow for huge |x|).
         let neg_ceil = -Integer::rounding_from(&t, Ceiling).0;
         const MAX_EXP: Integer = Integer::const_from_signed(Float::MAX_EXPONENT as SignedLimb);
-        let err = u64::exact_from(&if neg_ceil > MAX_EXP {
-            MAX_EXP
+        let clamped = neg_ceil >= MAX_EXP;
+        let err = if clamped {
+            u64::exact_from(Float::MAX_EXPONENT)
         } else {
-            neg_ceil
-        });
+            u64::exact_from(&neg_ceil)
+        };
         if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
             return result;
+        }
+        // `float_round_near_x` could not resolve the rounding, so prec + 1 >= err. If the clamp was
+        // active, |x| / ln(2) can exceed MAX_EXPONENT: exp(x) may lie below the smallest positive
+        // Float (so the loop below could not compute it), while prec is so large that the bits of
+        // e^x may still land within the output's prec-bit window. Delegate to the deep-negative
+        // helper. (Without the clamp, err = neg_ceil <= prec + 1, and neg_ceil < MAX_EXPONENT puts
+        // |x| / ln(2) < neg_ceil + 2 <= 2^30 = |MIN_EXPONENT - 1|, so exp(x) does not underflow and
+        // the loop below handles it.)
+        if clamped {
+            return exp_x_minus_1_deep_negative(x, prec, rm, u64::saturating_from(&neg_ceil));
         }
     }
     // General case. Compute the precision of the intermediary variable: the optimal number of bits,
@@ -113,12 +124,63 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
     }
 }
 
+// Computes e^x - 1 for a Float x so negative that e^x lies at or below the smallest positive Float
+// (or nearly so: |x| / ln(2) >= MAX_EXPONENT), while prec + 1 >= MAX_EXPONENT, so rounding from -1
+// cannot be certified. e^x is not representable, but since prec is enormous the bits of e^x may
+// still land within the output's prec-bit window and must be computed for real. Since e^x - 1 =
+// 2^(x / ln(2)) - 1, bracket y = x / ln(2) between dyadic Floats (y has magnitude about |x| / 0.7
+// -- an ordinary Float, even though 2^y is not) and apply the monotonically increasing
+// `power_of_2_x_minus_1_prec_round` to both ends, tightening the bracket Ziv-style until both round
+// identically. That function's own deep-negative machinery computes 2^(y_end) - 1 exactly where
+// needed, and its huge-negative shortcut keeps the ends cheap when |x| / ln(2) > prec + 1 (where
+// the result is just -1 or its neighbor). `s_est` is a lower bound on |x| / ln(2), used to size the
+// initial working precision: the result's leading ~|y| bits are a run of ones, so only about prec -
+// s_est bits of 2^y are needed.
+fn exp_x_minus_1_deep_negative(
+    x: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    s_est: u64,
+) -> (Float, Ordering) {
+    let xr = Rational::exact_from(x);
+    let mut working_prec = prec.saturating_add(2).saturating_sub(s_est) + (Limb::WIDTH << 1);
+    let mut increment = Limb::WIDTH;
+    loop {
+        // ln_2_lo <= ln(2) <= ln_2_hi, as exact Rationals, from a single ln(2) computation.
+        let (ln_2_lo, ln_2_hi) = floor_and_ceiling(Float::ln_2_prec_round(working_prec, Floor));
+        // x < 0: dividing x by the smaller (larger) positive bound gives the more (less) negative
+        // quotient, so these exact Rationals bracket y.
+        let y_lo = &xr / Rational::exact_from(&ln_2_lo);
+        let y_hi = &xr / Rational::exact_from(&ln_2_hi);
+        // Widen to dyadic Floats, rounding outward.
+        let y_lo = Float::from_rational_prec_round(y_lo, working_prec, Floor).0;
+        let y_hi = Float::from_rational_prec_round(y_hi, working_prec, Ceiling).0;
+        let (e_lo, mut o_lo) = y_lo.power_of_2_x_minus_1_prec_round(prec, rm);
+        let (e_hi, mut o_hi) = y_hi.power_of_2_x_minus_1_prec_round(prec, rm);
+        // A bracket end that lands on an integer y makes 2^y - 1 exactly representable, rounding
+        // with `Equal`; the true value lies strictly between the ends, so the other end's ordering
+        // is the true one. (Both cannot be `Equal`: the ends are distinct and the function is
+        // strictly increasing.)
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && e_lo == e_hi {
+            return (e_lo, o_lo);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
 // Computes `exp(x) - 1` for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, by summing its
 // Taylor series `sum_{k>=1} x^k / k!`. Used when `x` is so small that `expm1(x) ~ x` underflows:
 // the squeeze in `exp_x_minus_1_rational_helper` cannot bracket such an `x` (its Float bounds
 // collapse to 0). The series is bracketed between two rationals which are rounded with
 // `from_rational_prec_round` (which performs the underflow rounding) until both ends agree.
-fn exp_x_minus_1_rational_near_zero(
+pub(crate) fn exp_x_minus_1_rational_near_zero(
     x: &Rational,
     prec: u64,
     rm: RoundingMode,

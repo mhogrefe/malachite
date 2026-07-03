@@ -36,7 +36,7 @@ use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{LowMask, SignificantBits};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
@@ -697,14 +697,24 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
 // The neighbor of 1 at precision `prec`: the successor `1 + 2 ^ (1 - prec)` if `above`, otherwise
 // the predecessor `1 - 2 ^ (-prec)`. Both are exactly representable at precision `prec`. (Note that
 // `Float::increment`/`decrement` cannot be used here: they keep the ulp of the current binade, so
-// they bump the precision when crossing into the next binade and overshoot the true predecessor.)
+// they bump the precision when crossing into the next binade and overshoot the true predecessor.
+// Also note that the significand cannot be built as a `Natural` and shifted into place: the
+// unshifted intermediate has exponent `prec`, which overflows to infinity when `prec` exceeds
+// `MAX_EXPONENT`, even though the final value's exponent is 0 or 1. Going through a `Rational`
+// keeps every intermediate exponent small. The `i64` conversion fails only for `prec >= 2^63`,
+// where a `Float` of that precision could not be materialized at all.)
 pub(crate) fn one_neighbor(prec: u64, above: bool) -> Float {
-    let (m, shift) = if above {
-        (Natural::power_of_2(prec - 1) + Natural::ONE, prec - 1)
-    } else {
-        (Natural::low_mask(prec), prec)
-    };
-    Float::from_natural_prec(m, prec).0 >> shift
+    let p = i64::exact_from(prec);
+    Float::from_rational_prec_round(
+        if above {
+            Rational::ONE + Rational::power_of_2(1 - p)
+        } else {
+            Rational::ONE - Rational::power_of_2(-p)
+        },
+        prec,
+        Exact,
+    )
+    .0
 }
 
 // Computes `exp(x)` for a nonzero `Rational` `x` with `|x| < 1`, by summing its Taylor series
