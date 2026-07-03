@@ -57,9 +57,18 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{
-    DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
-    SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
+    DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD,
+    SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
+
+// Re-exported so that the tuner can read the compiled-in cap (`limbs_square_to_out_basecase`'s
+// stack buffer is sized by this threshold). The value lives in the platform files so that it can
+// be tuned per platform.
+#[cfg(feature = "test_build")]
+pub const SQR_TOOM2_THRESHOLD: usize = crate::platform::SQR_TOOM2_THRESHOLD;
+
+#[cfg(not(feature = "test_build"))]
+const SQR_TOOM2_THRESHOLD: usize = crate::platform::SQR_TOOM2_THRESHOLD;
 use alloc::vec::Vec;
 use core::cmp::{Ordering::*, max};
 use malachite_base::fail_on_untested_path;
@@ -72,7 +81,12 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 
-const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
+// Frozen at its pre-tuning effective value: this was `SQR_TOOM3_THRESHOLD * 3` when
+// SQR_TOOM3_THRESHOLD was 390 (a GMP-inherited heuristic). Tuning SQR_TOOM3_THRESHOLD down to
+// its measured crossover (67) would have silently dropped the squaring FFT entry point
+// (SQR_FFT_THRESHOLD = 10 * this) from 11700 to 2010 without any measurement of the FFT itself.
+// TODO tune the FFT crossover directly.
+const SQR_FFT_MODF_THRESHOLD: usize = 1170;
 
 // # Worst-case complexity
 // $T(n) = O(n)$

@@ -30,13 +30,34 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use malachite_nz::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_33,
     limbs_mul_greater_to_out_toom_33_input_sizes_valid,
     limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_44,
     limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_44_scratch_len,
+    limbs_mul_greater_to_out_toom_44_scratch_len, limbs_mul_greater_to_out_toom_6h,
+    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_scratch_len,
+};
+use malachite_nz::natural::arithmetic::div::{
+    limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
+};
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_divide_and_conquer, limbs_div_mod_schoolbook, limbs_two_limb_inverse_helper,
+};
+use malachite_nz::natural::arithmetic::square::{
+    limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
+    limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
+    limbs_square_to_out_toom_3_scratch_len, limbs_square_to_out_toom_4,
+    limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
+    limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8,
+    limbs_square_to_out_toom_8_scratch_len,
 };
 use malachite_nz::natural::conversion::digits::general_digits::limbs_to_digits_small_base_basecase;
 use malachite_nz::platform::Limb;
@@ -173,19 +194,37 @@ struct Level<'a> {
 }
 
 fn find_crossover(c: &Level) {
+    find_crossover_spec(
+        c.threshold_name,
+        c.lower.name,
+        c.upper.name,
+        c.min_size,
+        c.max_size,
+        &|n| measure_mul_pair(n, &c.lower, &c.upper),
+    );
+}
+
+// The generic crossover loop; `measure` returns (lower time, upper time) at a size, or `None` if
+// the size is invalid for either algorithm.
+fn find_crossover_spec(
+    threshold_name: &str,
+    lower_name: &str,
+    upper_name: &str,
+    min_size: usize,
+    max_size: usize,
+    measure: &dyn Fn(usize) -> Option<(f64, f64)>,
+) {
     let mut dat = Vec::new();
     let mut since_change = 0;
     let mut consecutive_upper_wins = 0;
     let mut last_thresh = None;
-    let mut size = c.min_size as f64;
-    println!(
-        "tuning {} ({} -> {})",
-        c.threshold_name, c.lower.name, c.upper.name
-    );
-    while (size as usize) < c.max_size {
+    let mut last_size = min_size;
+    let mut size = min_size as f64;
+    println!("tuning {threshold_name} ({lower_name} -> {upper_name})");
+    while (size as usize) < max_size {
         let n = size as usize;
         size = f64::max(size * 1.05, size + 1.0);
-        let Some((tl, tu)) = measure_mul_pair(n, &c.lower, &c.upper) else {
+        let Some((tl, tu)) = measure(n) else {
             continue;
         };
         // d > 0: lower algorithm faster here
@@ -197,9 +236,8 @@ fn find_crossover(c: &Level) {
         dat.push((n, d));
         let thresh = analyze(&dat);
         println!(
-            "  size {n:>6}  {} {tl:>10.1}ns  {} {tu:>10.1}ns  d {d:>7.4}  -> {}",
-            c.lower.name,
-            c.upper.name,
+            "  size {n:>6}  {lower_name} {tl:>10.1}ns  {upper_name} {tu:>10.1}ns  d {d:>7.4}  \
+            -> {}",
             thresh.map_or_else(|| "-".to_string(), |t| t.to_string()),
         );
         // Stop when the upper algorithm has clearly won several sizes in a row; a single outlier
@@ -214,20 +252,26 @@ fn find_crossover(c: &Level) {
         }
         if thresh == last_thresh {
             since_change += 1;
-            if since_change > 40 {
+            // Give up after a long stretch without progress -- but not while the two algorithms
+            // are running nearly glued together (|d| small): such plateaus can persist for dozens
+            // of sizes before the upper algorithm finally pulls ahead, and quitting inside one
+            // reports a bogus "never wins".
+            let glued = dat.iter().rev().take(10).any(|&(_, d)| d.abs() < 0.02);
+            if since_change > 40 && !glued {
                 break;
             }
         } else {
             since_change = 0;
             last_thresh = thresh;
         }
+        last_size = n;
     }
     match analyze(&dat) {
         None => println!(
-            "  {}: upper algorithm never wins below {}",
-            c.threshold_name, c.max_size
+            "  {threshold_name}: upper algorithm never wins below {last_size} (scan limit \
+            {max_size})"
         ),
-        Some(t) => println!("pub(crate) const {}: usize = {};", c.threshold_name, t),
+        Some(t) => println!("pub(crate) const {threshold_name}: usize = {t};"),
     }
 }
 
@@ -294,6 +338,340 @@ fn tune_mul_toom44() {
         max_size: 4000,
         lower: toom33_algo(),
         upper: toom44_algo(),
+    });
+}
+
+// The squaring algorithms reuse the mul-shaped `Algo` plumbing, ignoring `ys`. Validity
+// predicates replicate each function's split asserts (the sqr functions have no
+// `_input_sizes_valid` helpers).
+
+fn sqr_basecase_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "sqr_basecase",
+        // The basecase's stack buffer is sized by the compiled-in threshold, so it cannot be
+        // measured above it; the crossover scan is capped accordingly. To scan higher, raise
+        // SQR_TOOM2_THRESHOLD in platform_64.rs and rebuild.
+        valid: &|n| n <= malachite_nz::natural::arithmetic::square::SQR_TOOM2_THRESHOLD,
+        scratch_len: &|_| 0,
+        run: &|out, xs, _, _| limbs_square_to_out_basecase(out, xs),
+    }
+}
+
+fn sqr_toom2_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "sqr_toom2",
+        valid: &|n| n > 1,
+        scratch_len: &limbs_square_to_out_toom_2_scratch_len,
+        run: &|out, xs, _, scratch| limbs_square_to_out_toom_2(out, xs, scratch),
+    }
+}
+
+fn sqr_toom3_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "sqr_toom3",
+        // n = ceil(len / 3), s = len - 2n; s must be in 1..=n.
+        valid: &|len| {
+            let n = len.div_ceil(3);
+            len > n << 1 && len <= 3 * n
+        },
+        scratch_len: &limbs_square_to_out_toom_3_scratch_len,
+        run: &|out, xs, _, scratch| limbs_square_to_out_toom_3(out, xs, scratch),
+    }
+}
+
+fn sqr_toom4_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "sqr_toom4",
+        // n = ceil(len / 4), s = len - 3n; s must be in 1..=n.
+        valid: &|len| {
+            let n = (len + 3) >> 2;
+            len > 3 * n && len <= n << 2
+        },
+        scratch_len: &limbs_square_to_out_toom_4_scratch_len,
+        run: &|out, xs, _, scratch| limbs_square_to_out_toom_4(out, xs, scratch),
+    }
+}
+
+fn tune_sqr_toom2() {
+    find_crossover(&Level {
+        threshold_name: "SQR_TOOM2_THRESHOLD",
+        min_size: 4,
+        max_size: malachite_nz::natural::arithmetic::square::SQR_TOOM2_THRESHOLD,
+        lower: sqr_basecase_algo(),
+        upper: sqr_toom2_algo(),
+    });
+}
+
+fn tune_sqr_toom3() {
+    find_crossover(&Level {
+        threshold_name: "SQR_TOOM3_THRESHOLD",
+        min_size: 20,
+        max_size: 2000,
+        lower: sqr_toom2_algo(),
+        upper: sqr_toom3_algo(),
+    });
+}
+
+fn sqr_toom6_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "sqr_toom6",
+        // n = 1 + (len - 1) / 6, s = len - 5n; needs len >= 18, s in 1..=n, and
+        // 10n + 3 <= 2 * len.
+        valid: &|len| {
+            if len < 18 {
+                return false;
+            }
+            let n = 1 + (len - 1) / 6;
+            len > 5 * n && len - 5 * n <= n && 10 * n + 3 <= len << 1
+        },
+        scratch_len: &limbs_square_to_out_toom_6_scratch_len,
+        run: &|out, xs, _, scratch| limbs_square_to_out_toom_6(out, xs, scratch),
+    }
+}
+
+fn sqr_toom8_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "sqr_toom8",
+        // n = ceil(len / 8), s = len - 7n; needs len >= 40 and s in 2..=n.
+        valid: &|len| {
+            if len < 40 {
+                return false;
+            }
+            let n = len.div_ceil(8);
+            len > 7 * n + 1 && len - 7 * n <= n
+        },
+        scratch_len: &limbs_square_to_out_toom_8_scratch_len,
+        run: &|out, xs, _, scratch| limbs_square_to_out_toom_8(out, xs, scratch),
+    }
+}
+
+fn tune_sqr_toom4() {
+    find_crossover(&Level {
+        threshold_name: "SQR_TOOM4_THRESHOLD",
+        min_size: 60,
+        max_size: 4000,
+        lower: sqr_toom3_algo(),
+        upper: sqr_toom4_algo(),
+    });
+}
+
+fn tune_sqr_toom6() {
+    find_crossover(&Level {
+        threshold_name: "SQR_TOOM6_THRESHOLD",
+        min_size: 200,
+        max_size: 6000,
+        lower: sqr_toom4_algo(),
+        upper: sqr_toom6_algo(),
+    });
+}
+
+fn toom6h_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "toom6h",
+        valid: &|n| limbs_mul_greater_to_out_toom_6h_input_sizes_valid(n, n),
+        scratch_len: &|n| limbs_mul_greater_to_out_toom_6h_scratch_len(n, n),
+        run: &|out, xs, ys, scratch| limbs_mul_greater_to_out_toom_6h(out, xs, ys, scratch),
+    }
+}
+
+fn toom8h_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "toom8h",
+        valid: &|n| limbs_mul_greater_to_out_toom_8h_input_sizes_valid(n, n),
+        scratch_len: &|n| limbs_mul_greater_to_out_toom_8h_scratch_len(n, n),
+        run: &|out, xs, ys, scratch| limbs_mul_greater_to_out_toom_8h(out, xs, ys, scratch),
+    }
+}
+
+fn tune_mul_toom6h() {
+    find_crossover(&Level {
+        threshold_name: "MUL_TOOM6H_THRESHOLD",
+        min_size: 100,
+        max_size: 4000,
+        lower: toom44_algo(),
+        upper: toom6h_algo(),
+    });
+}
+
+// toom6h's measured crossover vs toom44 (229) is below toom44's own threshold (a ~315-465
+// plateau vs toom33), suggesting toom44 may have no winning range for balanced mul, as toom4
+// has none for squaring; this measures toom6h against the real incumbent directly.
+fn tune_mul_toom6h_vs_toom33() {
+    find_crossover(&Level {
+        threshold_name: "MUL_TOOM6H_THRESHOLD",
+        min_size: 60,
+        max_size: 4000,
+        lower: toom33_algo(),
+        upper: toom6h_algo(),
+    });
+}
+
+fn tune_mul_toom8h() {
+    find_crossover(&Level {
+        threshold_name: "MUL_TOOM8H_THRESHOLD",
+        min_size: 200,
+        max_size: 8000,
+        lower: toom6h_algo(),
+        upper: toom8h_algo(),
+    });
+}
+
+// Division algorithms all share the `mpn_sbpi1_div_qr` shape: quotient out, dividend mutated in
+// place (its low limbs become the remainder), normalized divisor, precomputed two-limb inverse.
+type DivAlgoFn = fn(&mut [Limb], &mut [Limb], &[Limb], Limb) -> bool;
+
+// Measure two division algorithms dividing 2n limbs by n limbs on identical, rotating input
+// sets. The dividend is refreshed from a pristine copy before each call (the copy cost is
+// incurred identically by both sides).
+fn measure_div_pair(n: usize, min_d: usize, a: DivAlgoFn, b: DivAlgoFn) -> Option<(f64, f64)> {
+    if n < min_d {
+        return None;
+    }
+    let inputs: Vec<(Vec<Limb>, Vec<Limb>, Limb)> = (0..INPUT_SETS)
+        .map(|k| {
+            let ns: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("dn{k}")))
+                .take(n << 1)
+                .collect();
+            let mut ds: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("dd{k}")))
+                .take(n)
+                .collect();
+            // The divisor must be normalized (highest bit set).
+            ds[n - 1] |= 1 << (Limb::WIDTH - 1);
+            let d_inv = limbs_two_limb_inverse_helper(ds[n - 1], ds[n - 2]);
+            (ns, ds, d_inv)
+        })
+        .collect();
+    let mut ns_a = vec![0; n << 1];
+    let mut ns_b = vec![0; n << 1];
+    let mut qs_a = vec![0; n];
+    let mut qs_b = vec![0; n];
+    // Warmup: fault in pages, settle the core.
+    for (ns, ds, d_inv) in &inputs {
+        ns_a.copy_from_slice(ns);
+        a(&mut qs_a, &mut ns_a, ds, *d_inv);
+        ns_b.copy_from_slice(ns);
+        b(&mut qs_b, &mut ns_b, ds, *d_inv);
+    }
+    let (mut i, mut j) = (0usize, 0usize);
+    let (ta, tb) = interleaved_min_pair(
+        &mut || {
+            let (ns, ds, d_inv) = &inputs[i & (INPUT_SETS - 1)];
+            i += 1;
+            ns_a.copy_from_slice(ns);
+            a(black_box(&mut qs_a), &mut ns_a, ds, *d_inv);
+        },
+        &mut || {
+            let (ns, ds, d_inv) = &inputs[j & (INPUT_SETS - 1)];
+            j += 1;
+            ns_b.copy_from_slice(ns);
+            b(black_box(&mut qs_b), &mut ns_b, ds, *d_inv);
+        },
+    );
+    Some((ta, tb))
+}
+
+// The Malachite side of the FFT-region mul comparison; the C sides are
+// perf/scratch/{mul_gmp.c, mul_flint.c} (make mul-gmp / mul-gmp-noasm / mul-flint). Inputs use
+// the same LCG so all four harnesses multiply identical operands. Times go through the full
+// dispatch, so sizes >= MUL_FFT_THRESHOLD exercise the fft_small port.
+fn tune_mul_fft_probe() {
+    let mut n = 1024;
+    while n <= 131072 {
+        let mut xs = vec![0; n];
+        let mut ys = vec![0; n];
+        lcg_fill(&mut xs, 1);
+        lcg_fill(&mut ys, 2);
+        let mut out = vec![0; n << 1];
+        let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(n, n)];
+        limbs_mul_greater_to_out(&mut out, &xs, &ys, &mut scratch); // warmup
+        let mut f = || {
+            black_box(limbs_mul_greater_to_out(
+                black_box(&mut out),
+                &xs,
+                &ys,
+                &mut scratch,
+            ));
+        };
+        let iters = 1 + ((1u64 << 22) / n as u64);
+        let mut best = f64::INFINITY;
+        for _ in 0..7 {
+            let t = time_batch(&mut f, iters);
+            if t < best {
+                best = t;
+            }
+        }
+        println!("limbs_mul_greater_to_out n={n:<7} {best:>14.1} ns");
+        n <<= 1;
+    }
+}
+
+// Matches the `lcg_fill` in the C harnesses, so all sides see identical operands.
+fn lcg_fill(p: &mut [Limb], seed: u64) {
+    let mut s = 0x9E3779B97F4A7C15u64 ^ seed;
+    for x in p.iter_mut() {
+        s = s
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        *x = s as Limb;
+    }
+}
+
+fn tune_dc_div_qr() {
+    find_crossover_spec(
+        "DC_DIV_QR_THRESHOLD",
+        "schoolbook",
+        "divide_and_conquer",
+        6,
+        500,
+        &|n| {
+            measure_div_pair(
+                n,
+                6,
+                limbs_div_mod_schoolbook,
+                limbs_div_mod_divide_and_conquer,
+            )
+        },
+    );
+}
+
+fn tune_dc_divappr_q() {
+    find_crossover_spec(
+        "DC_DIVAPPR_Q_THRESHOLD",
+        "schoolbook_approx",
+        "divide_and_conquer_approx",
+        6,
+        1000,
+        &|n| {
+            measure_div_pair(
+                n,
+                6,
+                limbs_div_schoolbook_approx,
+                limbs_div_divide_and_conquer_approx,
+            )
+        },
+    );
+}
+
+// toom4 appears to have no winning range on this machine (toom6 overtakes it below the
+// toom3/toom4 crossover), so the effective ladder is toom3 -> toom6; this measures that
+// crossover directly.
+fn tune_sqr_toom6_vs_toom3() {
+    find_crossover(&Level {
+        threshold_name: "SQR_TOOM6_THRESHOLD",
+        min_size: 60,
+        max_size: 6000,
+        lower: sqr_toom3_algo(),
+        upper: sqr_toom6_algo(),
+    });
+}
+
+fn tune_sqr_toom8() {
+    find_crossover(&Level {
+        threshold_name: "SQR_TOOM8_THRESHOLD",
+        min_size: 400,
+        max_size: 10000,
+        lower: sqr_toom6_algo(),
+        upper: sqr_toom8_algo(),
     });
 }
 
@@ -1040,6 +1418,18 @@ pub fn tune(key: &str) {
         "mul_toom22" => tune_mul_toom22(),
         "mul_toom33" => tune_mul_toom33(),
         "mul_toom44" => tune_mul_toom44(),
+        "mul_toom6h" => tune_mul_toom6h(),
+        "mul_toom6h_vs_toom33" => tune_mul_toom6h_vs_toom33(),
+        "mul_toom8h" => tune_mul_toom8h(),
+        "dc_div_qr" => tune_dc_div_qr(),
+        "dc_divappr_q" => tune_dc_divappr_q(),
+        "mul_fft_probe" => tune_mul_fft_probe(),
+        "sqr_toom2" => tune_sqr_toom2(),
+        "sqr_toom3" => tune_sqr_toom3(),
+        "sqr_toom4" => tune_sqr_toom4(),
+        "sqr_toom6" => tune_sqr_toom6(),
+        "sqr_toom6_vs_toom3" => tune_sqr_toom6_vs_toom3(),
+        "sqr_toom8" => tune_sqr_toom8(),
         "mul" => {
             tune_mul_toom22();
             tune_mul_toom33();

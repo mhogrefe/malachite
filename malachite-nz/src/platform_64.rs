@@ -37,9 +37,13 @@ pub(crate) const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
 pub(crate) const MUL_TOOM22_THRESHOLD: usize = 16;
 pub(crate) const MUL_TOOM33_THRESHOLD: usize = 105;
-pub(crate) const MUL_TOOM44_THRESHOLD: usize = 315; // unclear when 44 is better than 33
-pub(crate) const MUL_TOOM6H_THRESHOLD: usize = 345;
-pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 640;
+// toom44 has no winning range for balanced multiplication on this machine: toom6h overtakes
+// toom33 at ~300 (measured 2026-07), below the toom33/toom44 crossover (a wide plateau,
+// ~315-465). Setting this equal to MUL_TOOM6H_THRESHOLD makes the toom44 dispatch branch empty,
+// skipping it. (toom44 is still exercised via recursion inside the higher Toom levels.)
+pub(crate) const MUL_TOOM44_THRESHOLD: usize = 300;
+pub(crate) const MUL_TOOM6H_THRESHOLD: usize = 300;
+pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 823;
 
 pub(crate) const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 60;
 pub(crate) const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
@@ -54,8 +58,8 @@ pub(crate) const GET_STR_DC_THRESHOLD: usize = 18;
 // TODO tune
 pub(crate) const GET_STR_PRECOMPUTE_THRESHOLD: usize = 26;
 
-pub(crate) const DC_DIV_QR_THRESHOLD: usize = 85;
-pub(crate) const DC_DIVAPPR_Q_THRESHOLD: usize = 211;
+pub(crate) const DC_DIV_QR_THRESHOLD: usize = 61;
+pub(crate) const DC_DIVAPPR_Q_THRESHOLD: usize = 78;
 pub(crate) const MAYBE_DCP1_DIVAPPR: bool = true;
 pub(crate) const INV_NEWTON_THRESHOLD: usize = 789;
 pub(crate) const MU_DIV_QR_THRESHOLD: usize = 2094;
@@ -86,11 +90,14 @@ pub(crate) const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
 pub(crate) const BMOD_1_TO_MOD_1_THRESHOLD: usize = 100000000;
 
 pub(crate) const SQR_BASECASE_THRESHOLD: usize = 0;
-pub(crate) const SQR_TOOM2_THRESHOLD: usize = 43;
-pub(crate) const SQR_TOOM3_THRESHOLD: usize = 390;
-pub(crate) const SQR_TOOM4_THRESHOLD: usize = 1090;
-pub(crate) const SQR_TOOM6_THRESHOLD: usize = 336;
-pub(crate) const SQR_TOOM8_THRESHOLD: usize = 837;
+pub(crate) const SQR_TOOM2_THRESHOLD: usize = 35;
+pub(crate) const SQR_TOOM3_THRESHOLD: usize = 67;
+// toom4 has no winning range for squaring on this machine: toom6 overtakes toom3 at ~285
+// (measured 2026-07), below the toom3/toom4 crossover (a wide plateau, ~300-513, median 465).
+// Setting this equal to SQR_TOOM6_THRESHOLD makes the toom4 dispatch branch empty, skipping it.
+pub(crate) const SQR_TOOM4_THRESHOLD: usize = 285;
+pub(crate) const SQR_TOOM6_THRESHOLD: usize = 285;
+pub(crate) const SQR_TOOM8_THRESHOLD: usize = 590;
 
 pub(crate) const SQRLO_DC_THRESHOLD: usize = 389;
 

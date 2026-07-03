@@ -119,6 +119,50 @@ major improvement warrants re-porting.
 - Cap builds at `-j 4` (full parallelism has OOM'd the machine). Concurrent benchmarks contaminate
   each other's timings, so give the user a heads-up before benchmarking.
 
+## Verification checklist
+
+Run through this for every new or changed function in the `Float` transcendental/log/exp families
+(and use judgment elsewhere). These items encode the failure modes that most reliably slip past
+general-case tests — every one of them corresponds to a real bug class found in the 2026 audits.
+
+- **Handle exact results before Ziv loops.** Enumerate the inputs whose results are exactly
+  representable (integer arguments, powers of the base, commensurable base/argument pairs) and
+  dispatch them before the loop: a Ziv loop can never certify an exact result and will hang on
+  one. Property tests should assert that an `Equal` ternary implies rounding-mode invariance.
+- **Sweep the exponent-range boundaries.** Test inputs *and* results near `MIN_EXPONENT` and
+  `MAX_EXPONENT` (dyadic sweeps work well), cross-checked against rug — rug's default exponent
+  range equals `Float`'s, so it is a faithful overflow/underflow oracle. Where rug is impractical
+  (it computes some deep regimes at full precision, taking hours), use the rational
+  rounding-certificate pattern instead: bracket the exact value between rationals via an
+  independent computation path and check the defining inequalities of correct rounding for each
+  rounding mode.
+- **Treat precisions up to `MAX_EXPONENT` as reachable.** A prec of ~2^30 is testable by value
+  (the result is a ~128 MB `Float`); include such a case whenever the algorithm compares `prec`
+  against exponent magnitudes. Also test prec = 1: `working_prec - k` margins paired with
+  too-small initial slack wrap silently in release builds.
+- **Approximations never decide.** An `f64` estimate (`approx_log` and friends) may only choose
+  what to try first; every definite branch — overflow, underflow, exactness — needs an exact
+  bound check.
+- **Extreme generators are load-bearing.** If an extreme-variant demo or property test OOMs or
+  hangs, fix the algorithm or the test harness; never delete the coverage. The extreme cases are
+  where the real bugs live.
+- **Audit `Float` shifts near the range edges.** Plain `<<`/`>>` ignore the rounding mode at the
+  exponent-range boundary; a shift whose result can reach the boundary in a rounding path needs
+  `shl_prec_round`/`shl_prec_round_assign_helper`. But intermediate directed rounding (e.g.
+  `Floor` bounds inside a Ziv loop) is often deliberate — understand each case rather than
+  blanket-rewriting.
+- **Compose extreme-regime machinery rather than reimplementing it.** When a function's hard
+  regime reduces to a sibling's (e.g. $e^x - 1 = 2^{x/\ln 2} - 1$), bracket the transformed
+  input between dyadic `Float`s and squeeze through the sibling's correctly-rounded function;
+  its deep-regime handling comes along for free.
+- **Don't trust green against observation.** If a clean test, lint, or sweep result contradicts
+  something directly visible in the code, treat the checker as broken and debug *it* first;
+  stale caches, vacuous matching, and over-broad exemptions all produce false cleans.
+- **Never weaken a test to make a failure go away** — no deleted extreme rows, no loosened
+  asserts. If the test itself is wrong, fix it and say so explicitly.
+- **Run `bash additional-lints.sh` before handing work off**; the lints enforce the mechanical
+  conventions so review can focus on the algorithmic ones.
+
 ## Known traps
 
 ### MPFR-specific
@@ -137,8 +181,9 @@ major improvement warrants re-porting.
   `(y, v, err1, err2, dir, rnd, extra)` with `err = err1 + err2`, gated on `err1 > 0` and
   `err > prec + 1`.
 - **Ziv loops** (`MPFR_ZIV_INIT`/`NEXT`) follow the house pattern instead of MPFR's exact growth
-  schedule: `increment = Limb::WIDTH; ...; working_prec += increment; increment = working_prec >> 1`,
-  with `float_can_round` as the exit test.
+  schedule:
+  `increment = Limb::WIDTH; ...; working_prec += increment; increment = working_prec >> 1`, with
+  `float_can_round` as the exit test.
 - **Order asserts to match C control flow**: e.g. an `assert_ne!(rm, Exact)` belongs *after* the
   special-value and domain checks, since `Exact` is valid for inputs with exactly representable
   results (specials, domain-boundary values).
