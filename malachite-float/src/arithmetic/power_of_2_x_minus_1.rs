@@ -299,14 +299,14 @@ fn power_of_2_x_minus_1_rational_helper(
 ) -> (Float, Ordering) {
     if x.is_integer() {
         let n = Integer::exact_from(x);
-        return if n > i64::from(Float::MAX_EXPONENT) {
+        return if n > const { Float::MAX_EXPONENT as i64 } {
             // 2^n - 1 has exponent n, beyond the maximum.
             exp_overflow(prec, rm)
-        } else if n == i64::from(Float::MAX_EXPONENT) {
+        } else if n == const { Float::MAX_EXPONENT as i64 } {
             // 2^n is not representable, but 2^n - 1 (with exponent n) is -- though only with at
             // least n bits of precision. At smaller precisions it rounds exactly like an overflow:
             // down to the largest finite value, or up (and to nearest) past it.
-            if prec >= u64::exact_from(Float::MAX_EXPONENT) {
+            if prec >= const { Float::MAX_EXPONENT as u64 } {
                 Float::from_rational_prec_round(
                     Rational::power_of_2(i64::exact_from(&n)) - Rational::ONE,
                     prec,
@@ -325,7 +325,7 @@ fn power_of_2_x_minus_1_rational_helper(
             // exact rational (proportional to prec). (The i64 conversion would fail only for |n| >=
             // 2^63, where prec >= |n| means the result could not be materialized at all.)
             let bits_needed = Integer::ONE - &n;
-            if Integer::from(prec) >= &bits_needed - Integer::ONE {
+            if n >= -i64::exact_from(prec) {
                 Float::from_rational_prec_round(
                     Rational::power_of_2(i64::exact_from(&n)) - Rational::ONE,
                     prec,
@@ -359,7 +359,7 @@ fn power_of_2_x_minus_1_rational_helper(
         }
         // 2^x is far below ulp(-1) at any precision, so 2^x - 1 rounds to -1 or its toward-zero
         // neighbor.
-        let err = u64::exact_from(Float::MAX_EXPONENT);
+        let err = const { Float::MAX_EXPONENT as u64 };
         if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
             return result;
         }
