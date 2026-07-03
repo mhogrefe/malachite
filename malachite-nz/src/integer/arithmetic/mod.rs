@@ -44,6 +44,7 @@ pub mod div_exact;
 /// | towards $-\infty$ | [`DivMod`](malachite_base::num::arithmetic::traits::DivMod) | [`DivAssignMod`](malachite_base::num::arithmetic::traits::DivAssignMod) |
 /// | towards 0         | [`DivRem`](malachite_base::num::arithmetic::traits::DivRem) | [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem) |
 /// | towards $\infty$  | [`CeilingDivMod`](malachite_base::num::arithmetic::traits::CeilingDivMod) | [`CeilingDivAssignMod`](malachite_base::num::arithmetic::traits::CeilingDivAssignMod) |
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod div_mod;
 /// Implementations of [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for dividing
@@ -82,6 +83,7 @@ pub mod kronecker_symbol;
 /// | towards $\infty$ | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
 ///
 /// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_op;
 /// Implementations of traits for finding the remainder of a number divided by $2^k$, subject to
 /// various rounding rules.
@@ -93,6 +95,7 @@ pub mod mod_op;
 /// | towards $-\infty$ | [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) | [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign)       |
 /// | towards 0 | [`RemPowerOf2`](malachite_base::num::arithmetic::traits::RemPowerOf2) | [`RemPowerOf2Assign`](malachite_base::num::arithmetic::traits::RemPowerOf2Assign)       |
 /// | towards $\infty$  | [`CeilingModPowerOf2`](malachite_base::num::arithmetic::traits::CeilingModPowerOf2) | [`CeilingModPowerOf2Assign`](malachite_base::num::arithmetic::traits::CeilingModPowerOf2Assign) |
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_power_of_2;
 /// Multiplication of [`Integer`](super::Integer)s.
 pub mod mul;
@@ -125,6 +128,7 @@ pub mod round_to_multiple;
 /// and
 /// [`RoundToMultipleOfPowerOf2Assign`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign),
 /// traits for rounding a number to a multiple of a power of 2.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod round_to_multiple_of_power_of_2;
 /// Left-shifting an [`Integer`](super::Integer) (multiplying it by a power of 2).
 ///

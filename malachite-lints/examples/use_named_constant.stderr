@@ -1,0 +1,96 @@
+error: use `Natural::ZERO` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:8:13
+   |
+LL |     let _ = Natural::from(0u32);
+   |             ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_named_constant)]` on by default
+
+error: use `Natural::ONE` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:9:13
+   |
+LL |     let _ = Natural::from(1u32);
+   |             ^^^^^^^^^^^^^^^^^^^
+
+error: use `Integer::TWO` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:10:13
+   |
+LL |     let _ = Integer::from(2);
+   |             ^^^^^^^^^^^^^^^^
+
+error: use `Integer::NEGATIVE_ONE` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:11:13
+   |
+LL |     let _ = Integer::from(-1);
+   |             ^^^^^^^^^^^^^^^^^
+
+error: use `Integer::ONE` instead of `const_from_signed(..)`
+  --> $DIR/use_named_constant.rs:12:13
+   |
+LL |     let _ = Integer::const_from_signed(1);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `Rational::ONE` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:13:13
+   |
+LL |     let _ = Rational::from(1u32);
+   |             ^^^^^^^^^^^^^^^^^^^^
+
+error: use `Rational::ONE_HALF` instead of `from_unsigneds(..)`
+  --> $DIR/use_named_constant.rs:14:13
+   |
+LL |     let _ = Rational::from_unsigneds(1u32, 2u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `Rational::ONE_HALF` instead of `from_signeds(..)`
+  --> $DIR/use_named_constant.rs:15:13
+   |
+LL |     let _ = Rational::from_signeds(1, 2);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `Float::ONE` instead of `one_prec(..)`
+  --> $DIR/use_named_constant.rs:16:13
+   |
+LL |     let _ = Float::one_prec(1);
+   |             ^^^^^^^^^^^^^^^^^^
+
+error: use `Float::TWO` instead of `two_prec(..)`
+  --> $DIR/use_named_constant.rs:17:13
+   |
+LL |     let _ = Float::two_prec(1);
+   |             ^^^^^^^^^^^^^^^^^^
+
+error: use `Float::NEGATIVE_ONE` instead of `negative_one_prec(..)`
+  --> $DIR/use_named_constant.rs:18:13
+   |
+LL |     let _ = Float::negative_one_prec(1);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `Float::ONE_HALF` instead of `one_half_prec(..)`
+  --> $DIR/use_named_constant.rs:19:13
+   |
+LL |     let _ = Float::one_half_prec(1);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Natural::const_from(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:22:13
+   |
+LL |     let _ = Natural::from(3u32);
+   |             ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(runtime_literal_conversion)]` on by default
+
+error: evaluate this at compile time: use `Integer::const_from_signed(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:23:13
+   |
+LL |     let _ = Integer::from(-2);
+   |             ^^^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Rational::const_from_unsigneds(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:24:13
+   |
+LL |     let _ = Rational::from_unsigneds(1u32, 3u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 15 previous errors
+

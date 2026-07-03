@@ -648,6 +648,7 @@ where
 /// ```
 #[inline]
 #[allow(clippy::type_repetition_in_bounds)]
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub fn primitive_float_power_of_2_x_minus_1_rational<T: PrimitiveFloat>(x: &Rational) -> T
 where
     Float: PartialOrd<T>,

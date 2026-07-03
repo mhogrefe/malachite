@@ -80,6 +80,7 @@ pub mod log_base_power_of_2;
 /// and
 /// [`LogBasePowerOf2Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusXAssign),
 /// traits for computing $\log_{2^k}(1+x)$ for [`Float`](super::Float)s.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod log_base_power_of_2_1_plus_x;
 /// [`LogBase`](malachite_base::num::arithmetic::traits::LogBase) and
 /// [`LogBaseAssign`](malachite_base::num::arithmetic::traits::LogBaseAssign), implemented for a

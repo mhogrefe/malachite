@@ -1,0 +1,16 @@
+error: use `reciprocal()` (or `reciprocal_prec*` for a specific precision) instead of dividing `Float::ONE` by a value
+  --> $DIR/use_reciprocal.rs:9:13
+   |
+LL |     let _ = Float::ONE / &f;
+   |             ^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_reciprocal)]` on by default
+
+error: use `reciprocal()` instead of dividing `Rational::ONE` by a value
+  --> $DIR/use_reciprocal.rs:10:13
+   |
+LL |     let _ = Rational::ONE / &q;
+   |             ^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 2 previous errors
+

@@ -1,0 +1,29 @@
+[package]
+name = "malachite_lints"
+version = "0.1.0"
+description = "Dylint lints enforcing Malachite house conventions"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f6d310692116e9a527ce6d0b3526c965d9c5d7b9" }
+dylint_linting = "6.0.1"
+
+[dev-dependencies]
+dylint_testing = "6.0.1"
+malachite-base = { path = "../malachite-base" }
+malachite-nz = { path = "../malachite-nz" }
+malachite-float = { path = "../malachite-float" }
+malachite-q = { path = "../malachite-q" }
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[package.metadata.rust-analyzer]
+rustc_private = true

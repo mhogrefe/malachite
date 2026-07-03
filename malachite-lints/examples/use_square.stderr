@@ -1,0 +1,22 @@
+error: use `square()` (or `square_assign()`) instead of multiplying a value by itself
+  --> $DIR/use_square.rs:8:13
+   |
+LL |     let _ = &x * &x;
+   |             ^^^^^^^
+   |
+   = note: `#[deny(use_square)]` on by default
+
+error: use `square()` instead of `pow(2)`
+  --> $DIR/use_square.rs:10:13
+   |
+LL |     let _ = (&x).pow(2);
+   |             ^^^^^^^^^^^
+
+error: use `square_assign()` instead of `pow_assign(2)`
+  --> $DIR/use_square.rs:12:5
+   |
+LL |     q.pow_assign(2u64);
+   |     ^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 3 previous errors
+

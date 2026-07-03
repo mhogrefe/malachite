@@ -50,3 +50,8 @@ maplit = "1.0.2"
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
+
+# Accept the `dylint_lib` cfg that `cargo dylint` sets, used by
+# `#[cfg_attr(dylint_lib = "malachite_lints", expect(...))]` exemptions (see malachite-lints).
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(dylint_lib, values(any()))"] }

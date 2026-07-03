@@ -1,0 +1,40 @@
+error: compare `floor_log_base_2()`/`ceiling_log_base_2()`/`checked_log_base_2()` with the power instead of comparing with `Natural::power_of_2(..)`
+  --> $DIR/compare_with_power_of_2.rs:13:13
+   |
+LL |     let _ = n < Natural::power_of_2(5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(compare_with_power_of_2)]` on by default
+
+error: compare `floor_log_base_2()`/`ceiling_log_base_2()`/`checked_log_base_2()` with the power instead of comparing with `Natural::power_of_2(..)`
+  --> $DIR/compare_with_power_of_2.rs:14:13
+   |
+LL |     let _ = Natural::power_of_2(5) <= n;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: compare `floor_log_base_2()`/`ceiling_log_base_2()`/`checked_log_base_2()` of `unsigned_abs_ref()` with the power instead of comparing with `Integer::power_of_2(..)`
+  --> $DIR/compare_with_power_of_2.rs:15:13
+   |
+LL |     let _ = i == Integer::power_of_2(5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: compare `floor_log_base_2()`/`ceiling_log_base_2()` (or their `_abs` variants) with the power instead of comparing with `Rational::power_of_2(..)`
+  --> $DIR/compare_with_power_of_2.rs:16:13
+   |
+LL |     let _ = q >= Rational::power_of_2(-5i64);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: compare `floor_log_base_2()`/`ceiling_log_base_2()` (or their `_abs` variants) with the power instead of comparing with `Rational::power_of_2(..)`
+  --> $DIR/compare_with_power_of_2.rs:18:13
+   |
+LL |     let _ = q.lt_abs(&Rational::power_of_2(-5i64));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: compare `floor_log_base_2()`/`ceiling_log_base_2()`/`checked_log_base_2()` with the power instead of comparing with `Natural::power_of_2(..)`
+  --> $DIR/compare_with_power_of_2.rs:19:13
+   |
+LL |     let _ = n.cmp(&Natural::power_of_2(5)) == Ordering::Less;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 6 previous errors
+

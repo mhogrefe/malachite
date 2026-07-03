@@ -1,0 +1,22 @@
+error: use `even()` instead of comparing `% 2` with 0 or 1
+  --> $DIR/use_parity.rs:10:13
+   |
+LL |     let _ = &x % Natural::TWO == 0u32;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_parity)]` on by default
+
+error: use `odd()` instead of comparing `% 2` with 0 or 1
+  --> $DIR/use_parity.rs:11:13
+   |
+LL |     let _ = &i % Integer::TWO != 0i32;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `even()` instead of `divisible_by(2)`
+  --> $DIR/use_parity.rs:13:13
+   |
+LL |     let _ = (&x).divisible_by(Natural::TWO);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 3 previous errors
+

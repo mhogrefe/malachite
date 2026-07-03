@@ -99,8 +99,8 @@ impl Float {
     /// If the integer is nonzero, the precision of the [`Float`] is the minimum possible precision
     /// to represent the integer exactly.
     ///
-    /// If you don't need to use this function in a const context, try just using `from` instead; it
-    /// will probably be slightly faster.
+    /// If you don't need to use this function in a const context, you may use `from` instead; for
+    /// values that fit in a [`Limb`](malachite_nz#limbs) it takes the same fast path.
     ///
     /// This function does not overflow or underflow.
     ///
@@ -211,8 +211,8 @@ impl Float {
     /// If the integer is nonzero, the precision of the [`Float`] is the minimum possible precision
     /// to represent the integer exactly.
     ///
-    /// If you don't need to use this function in a const context, try just using `from` instead; it
-    /// will probably be slightly faster.
+    /// If you don't need to use this function in a const context, you may use `from` instead; for
+    /// values that fit in a [`Limb`](malachite_nz#limbs) it takes the same fast path.
     ///
     /// This function does not overflow or underflow.
     ///
@@ -388,7 +388,12 @@ macro_rules! impl_from_unsigned {
             /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(u: $t) -> Float {
-                Float::exact_from(Natural::from(u))
+                // The `const_from_unsigned` fast path builds the `Float` directly; the fallback is
+                // only reachable (and only compiled in) for types wider than `Limb`.
+                Limb::try_from(u).map_or_else(
+                    |_| Float::exact_from(Natural::from(u)),
+                    Float::const_from_unsigned,
+                )
             }
         }
     };
@@ -418,7 +423,12 @@ macro_rules! impl_from_signed {
             /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(i: $t) -> Float {
-                Float::exact_from(Integer::from(i))
+                // The `const_from_signed` fast path builds the `Float` directly; the fallback is
+                // only reachable (and only compiled in) for types wider than `SignedLimb`.
+                SignedLimb::try_from(i).map_or_else(
+                    |_| Float::exact_from(Integer::from(i)),
+                    Float::const_from_signed,
+                )
             }
         }
     };

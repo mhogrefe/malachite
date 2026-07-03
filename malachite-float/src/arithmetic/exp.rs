@@ -426,7 +426,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             prec,
         );
         for _ in 0..SHIFT {
-            tmp = tmp.square_prec_round(prec, Floor).0;
+            tmp.square_prec_round_assign(prec, Floor);
         }
         twopoweri *= 2;
         // General case.
@@ -522,9 +522,7 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
         0
     } else {
         let log2_est = Float::ln_2_prec_round(Limb::WIDTH - 1, Down).0;
-        let r_est = x
-            .div_prec_round_ref_val(log2_est, Limb::WIDTH - 1, Nearest)
-            .0;
+        let r_est = x.div_prec_ref_val(log2_est, Limb::WIDTH - 1).0;
         i64::rounding_from(r_est, Nearest).0
     };
     // error_r bounds the bits cancelled in x - n*log(2)
@@ -593,7 +591,7 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
                 exps += sh;
             }
             // s = ss * 2^exps (exact: ss has at most q bits and working >= q)
-            let s = Float::from_integer_prec_round(ss, working, Nearest).0 << exps;
+            let s = Float::from_integer_prec(ss, working).0 << exps;
             // error is at most 2^K * l_err, plus 2 for the 3-ulp error on r
             err = k_param + l_err.ceiling_log_base_2() + 2;
             if float_can_round(s.significand_ref().unwrap(), q - err, precy, rm) {

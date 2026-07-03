@@ -2,6 +2,9 @@
 members = ['malachite', 'malachite-base', 'malachite-bigint', 'malachite-float', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
 resolver = "2"
 
+[workspace.metadata.dylint]
+libraries = [{ path = "malachite-lints" }]
+
 [workspace.package]
 edition = "2024"
 rust-version = "1.90.0"

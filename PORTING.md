@@ -62,10 +62,16 @@ major improvement warrants re-porting.
   `ln`. Many Float functions also take Rational arguments (Rationals can't be losslessly converted
   to Float), but skip those when the function reduces trivially to an existing Rational entry
   point.
-- **Use the shorthand variants**: in algorithm bodies, `x.ln_prec_ref(p)` rather than
-  `x.ln_prec_round_ref(p, Nearest)` — `additional-lints.py` enforces this. Three contexts keep the
-  explicit form: the shorthand's own defining delegation, operator/assign trait impls (`fn add`,
-  `fn ln_assign`, ...), and doc examples demonstrating the `_prec_round*` function itself.
+- **Lint-enforced conventions** (run `bash additional-lints.sh`; one-time setup
+  `cargo install cargo-dylint dylint-link`): the mechanical house conventions are enforced by the
+  Dylint lints in `malachite-lints`, with self-explanatory messages; the full list, with each
+  rule's rationale and exemption mechanics, lives in `malachite-lints/README.md`. Highlights: use
+  the `*_prec*` shorthands rather than explicit `Nearest`; compare bignums with primitives
+  directly; shift rather than multiplying or dividing by `power_of_2`, and compare exponents
+  rather than comparing with `power_of_2`; use the named constants and convert other literals at
+  compile time; use the in-place `*_assign*` variants and the by-reference variants rather than
+  cloning; use `square()`, `even()`/`odd()`, and `reciprocal()` over their spelled-out
+  equivalents; and keep lines within 100 columns.
 - **Visibility macros**: `pub_test!`/`pub_crate_test!` make internals `pub` under `test_build` so
   tests, demos, and tuning code can call them. For tuner- or test-only entry points that don't fit
   the macros, add explicit `#[cfg(feature = "test_build")] pub fn ..._for_tuning` wrappers.

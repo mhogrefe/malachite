@@ -875,6 +875,7 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     ///     ]
     /// );
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn power_of_2_digits(self, log_base: u64) -> NaturalPowerOf2DigitIterator<'a> {
         assert_ne!(log_base, 0);
         match self {

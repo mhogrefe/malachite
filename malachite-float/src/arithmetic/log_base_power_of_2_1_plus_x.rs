@@ -78,7 +78,7 @@ fn log_base_power_of_2_1_plus_x_prec_round_normal(
             let high_prec = prec + e_pow.unsigned_abs() + Limb::WIDTH;
             let mut t = Float::from_signed_prec(k, high_prec).0;
             t.increment();
-            let (res, o) = t.div_prec_round(pow_f.clone(), prec, rm);
+            let (res, o) = t.div_prec_round_val_ref(&pow_f, prec, rm);
             let e_res = i64::from(res.get_exponent().unwrap());
             if 2 - expx < e_res - i64::exact_from(prec) - 1 {
                 return (res, o);
@@ -113,7 +113,7 @@ fn log_base_power_of_2_1_plus_x_prec_round_normal(
         // thus below 2^(1 - working_prec), so working_prec - 2 correct bits suffice for rounding.
         // (log_base_2_1_plus_x itself handles inputs x = 2^k with k so large that 1 + x is
         // astronomically close to a power of 2, so no extra precision is needed here.)
-        let t = num.div_prec(pow_f.clone(), working_prec).0;
+        let t = num.div_prec_val_ref(&pow_f, working_prec).0;
         if float_can_round(t.significand_ref().unwrap(), working_prec - 2, prec, rm) {
             return Float::from_float_prec_round(t, prec, rm);
         }

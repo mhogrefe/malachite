@@ -1,0 +1,24 @@
+error: line is 116 characters long (max 100)
+  --> $DIR/main.rs:1:1
+   |
+LL | // This comment is deliberately longer than one hundred characters, in order to exercise the basic case of the lint.
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(long_lines)]` on by default
+
+error: stale `long_lines` exception: this line is not too long
+  --> $DIR/main.rs:4:1
+   |
+LL |     let _short_line_listed_as_an_exception_which_makes_the_exception_stale = 0;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: this lint expectation is unfulfilled
+  --> $DIR/main.rs:15:51
+   |
+LL | #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+   |                                                   ^^^^^^^^^^
+   |
+   = note: `#[warn(unfulfilled_lint_expectations)]` on by default
+
+error: aborting due to 2 previous errors; 1 warning emitted
+

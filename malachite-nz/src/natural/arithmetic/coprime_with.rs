@@ -18,7 +18,8 @@ pub_test! {coprime_with_check_2(x: Natural, y: Natural) -> bool {
 #[cfg(feature = "test_build")]
 pub fn coprime_with_check_2_3(x: Natural, y: Natural) -> bool {
     (x.odd() || y.odd())
-        && (!(&x).divisible_by(Natural::from(3u32)) || !(&y).divisible_by(Natural::from(3u32)))
+        && (!(&x).divisible_by(const { Natural::const_from(3) })
+            || !(&y).divisible_by(const { Natural::const_from(3) }))
         && x.gcd(y) == 1u32
 }
 
@@ -27,8 +28,8 @@ pub fn coprime_with_check_2_3_5(x: Natural, y: Natural) -> bool {
     if x.even() && y.even() {
         false
     } else {
-        let x15 = &x % Natural::from(15u32);
-        let y15 = &y % Natural::from(15u32);
+        let x15 = &x % const { Natural::const_from(15) };
+        let y15 = &y % const { Natural::const_from(15) };
         if (x15 == 0u32 || x15 == 3u32 || x15 == 6u32 || x15 == 9u32 || x15 == 12u32)
             && (y15 == 0u32 || y15 == 3u32 || y15 == 6u32 || y15 == 9u32 || y15 == 12u32)
         {

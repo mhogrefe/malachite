@@ -55,6 +55,7 @@ pub mod div_exact;
 /// [`CeilingDivNegMod`](malachite_base::num::arithmetic::traits::CeilingDivNegMod) returns a
 /// remainder greater than or equal to zero. This allows the remainder to have an unsigned type, but
 /// modifies the usual relation $x = qy + r$ to $x = qy - r$.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod div_mod;
 /// Implementations of [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for dividing
@@ -172,6 +173,7 @@ pub mod mod_neg;
 /// relation $x = qy + r$ to $x = qy - r$.
 ///
 /// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_op;
 /// Implementations of traits for raising a number to a power modulo another number.
 ///
@@ -195,6 +197,7 @@ pub mod mod_pow;
 /// [`NegModPowerOf2`](malachite_base::num::arithmetic::traits::NegModPowerOf2) returns a remainder
 /// greater than or equal to zero. This allows the remainder to have an unsigned type, but modifies
 /// the usual relation $x = q2^k + r$ to $x = q2^k - r$.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_power_of_2;
 /// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign),
@@ -577,6 +580,7 @@ pub mod round_to_multiple;
 /// and
 /// [`RoundToMultipleOfPowerOf2Assign`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign),
 /// traits for rounding a number to a multiple of a power of 2.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod round_to_multiple_of_power_of_2;
 /// Implementations of [`SaturatingSub`](malachite_base::num::arithmetic::traits::SaturatingSub) and
 /// [`SaturatingSubAssign`](malachite_base::num::arithmetic::traits::SaturatingSubAssign), traits

@@ -521,6 +521,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ///     )
     /// );
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
         if let Self(Finite {
             exponent,
@@ -724,6 +725,7 @@ impl IntegerMantissaAndExponent<Natural, i64, Float> for &Float {
     ///     )
     /// );
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
         if let Float(Finite {
             exponent,

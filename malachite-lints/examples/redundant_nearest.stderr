@@ -1,0 +1,16 @@
+error: use `exp_prec` instead of `exp_prec_round(.., Nearest)`
+  --> $DIR/redundant_nearest.rs:34:13
+   |
+LL |     let _ = x.exp_prec_round(10, Nearest);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(redundant_nearest)]` on by default
+
+error: use `exp_prec` instead of `exp_prec_round(.., Nearest)`
+  --> $DIR/redundant_nearest.rs:35:13
+   |
+LL |     let _ = MyFloat::exp_prec_round(&x, 10, Nearest);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 2 previous errors
+

@@ -1,0 +1,23 @@
+# Configuration for the Dylint lints in malachite-lints.
+[malachite_lints]
+max_line_length = 100
+# Overlong lines that cannot be shortened (long Markdown table rows and links) and cannot carry a
+# `#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]` attribute on their item: lines
+# in crate-level `//!` docs (a crate-level `#![expect]` would exempt the entire crate) and lines
+# inside `macro_rules!` bodies (each expansion would need to fulfill the expectation separately).
+# An entry whose line is no longer too long is itself flagged, so this list cannot go stale.
+long_lines_exceptions = [
+    { file = "malachite-base/src/num/arithmetic/primorial.rs", line = 85 },
+    { file = "malachite-base/src/num/arithmetic/primorial.rs", line = 244 },
+    { file = "malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs", line = 118 },
+    { file = "malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs", line = 153 },
+    { file = "malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs", line = 155 },
+    { file = "malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs", line = 526 },
+    { file = "malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs", line = 528 },
+    { file = "malachite-nz/src/natural/conversion/mantissa_and_exponent.rs", line = 509 },
+    { file = "malachite-base/src/lib.rs", line = 65 },
+    { file = "malachite-float/src/lib.rs", line = 24 },
+    { file = "malachite-nz/src/lib.rs", line = 36 },
+    { file = "malachite-nz/src/lib.rs", line = 103 },
+    { file = "malachite-q/src/lib.rs", line = 54 },
+]

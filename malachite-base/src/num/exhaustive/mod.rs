@@ -1106,6 +1106,7 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 ///         .collect_vec()
 /// );
 /// ```
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision<T: PrimitiveFloat>(
     sci_exponent: i64,
     precision: u64,

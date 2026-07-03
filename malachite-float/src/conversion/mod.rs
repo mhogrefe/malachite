@@ -297,6 +297,7 @@ pub mod is_integer;
 ///     "1.392955569098538e-24"
 /// );
 /// ```
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mantissa_and_exponent;
 /// Implementations of traits for converting a [`Float`](crate::Float) to a
 /// [`Natural`](malachite_nz::natural::Natural).

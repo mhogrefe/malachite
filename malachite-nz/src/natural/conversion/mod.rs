@@ -304,6 +304,7 @@ pub mod limb_count;
 /// test(10.0, 1, None);
 /// test(0.5, 1, None);
 /// ```
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mantissa_and_exponent;
 /// Implementations of traits for converting a [`Natural`](crate::natural::Natural) to a primitive
 /// float.

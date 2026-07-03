@@ -1,0 +1,34 @@
+error: borrow instead of cloning: this operator is implemented for references
+  --> $DIR/clone_with_ref_variant.rs:9:13
+   |
+LL |     let _ = x.clone() + &y;
+   |             ^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(clone_with_ref_variant)]` on by default
+
+error: borrow instead of cloning: this operator is implemented for references
+  --> $DIR/clone_with_ref_variant.rs:10:13
+   |
+LL |     let _ = &x + y.clone();
+   |             ^^^^^^^^^^^^^^
+
+error: borrow instead of cloning: this operator is implemented for references
+  --> $DIR/clone_with_ref_variant.rs:14:5
+   |
+LL |     m += y.clone();
+   |     ^^^^^^^^^^^^^^
+
+error: avoid cloning the receiver: use `exp_prec_ref` on a reference instead
+  --> $DIR/clone_with_ref_variant.rs:20:13
+   |
+LL |     let _ = f.clone().exp_prec(p);
+   |             ^^^^^^^^^^^^^^^^^^^^^
+
+error: avoid cloning the argument: use `add_prec_ref_ref` with a reference instead
+  --> $DIR/clone_with_ref_variant.rs:22:13
+   |
+LL |     let _ = (&f).add_prec_ref_val(g.clone(), p);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 5 previous errors
+

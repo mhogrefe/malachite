@@ -576,6 +576,7 @@ pub mod div_exact;
 /// assert_eq!(x.ceiling_div_assign_mod(-10), 7);
 /// assert_eq!(x, 3);
 /// ```
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod div_mod;
 /// [`DivRound`](traits::DivRound) and [`DivExactAssign`](traits::DivRoundAssign), traits for
 /// dividing two numbers according to a specified
@@ -1520,6 +1521,7 @@ pub mod mod_neg;
 /// x.ceiling_mod_assign(-10);
 /// assert_eq!(x, 7);
 /// ```
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_op;
 /// Traits for raising a number to a power modulo another number.
 ///
@@ -1771,6 +1773,7 @@ pub mod mod_pow;
 /// x.ceiling_mod_power_of_2_assign(4);
 /// assert_eq!(x, -11);
 /// ```
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_power_of_2;
 /// [`ModPowerOf2Add`](traits::ModPowerOf2Add) and
 /// [`ModPowerOf2AddAssign`](traits::ModPowerOf2AddAssign), traits for adding two numbers modulo

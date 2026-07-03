@@ -68,6 +68,7 @@ pub mod log_base_power_of_2;
 /// | towards $\infty$ | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
 ///
 /// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_op;
 /// Multiplication of [`Rational`](super::Rational)s.
 pub mod mul;
@@ -100,6 +101,7 @@ pub mod round_to_multiple;
 /// and
 /// [`RoundToMultipleOfPowerOf2Assign`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign),
 /// traits for rounding a number to a multiple of a power of 2.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod round_to_multiple_of_power_of_2;
 /// Left-shifting a [`Rational`](super::Rational) (multiplying it by a power of 2).
 ///

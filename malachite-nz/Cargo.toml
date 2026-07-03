@@ -58,3 +58,8 @@ doc-images = ["embed-doc-image"]
 # ensure that it will render any images that we may have in inner attribute documentation.
 features = ["doc-images", "random"]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
+
+# Accept the `dylint_lib` cfg that `cargo dylint` sets, used by
+# `#[cfg_attr(dylint_lib = "malachite_lints", expect(...))]` exemptions (see malachite-lints).
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(dylint_lib, values(any()))"] }

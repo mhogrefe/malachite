@@ -1,0 +1,46 @@
+error: evaluate this at compile time: use `Natural::const_from(..)` in a `const` block or a named `const`
+  --> $DIR/runtime_literal_conversion.rs:9:13
+   |
+LL |     let _ = Natural::from(100u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(runtime_literal_conversion)]` on by default
+
+error: evaluate this at compile time: use `Integer::const_from_signed(..)` in a `const` block or a named `const`
+  --> $DIR/runtime_literal_conversion.rs:10:13
+   |
+LL |     let _ = Integer::from(-100i32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Rational::const_from_unsigned(..)` in a `const` block or a named `const`
+  --> $DIR/runtime_literal_conversion.rs:11:13
+   |
+LL |     let _ = Rational::from(7u32);
+   |             ^^^^^^^^^^^^^^^^^^^^
+
+error: this `const_from` call is not evaluated at compile time; wrap it in a `const` block or bind it to a named `const` (or use the non-`const` equivalent if the arguments are not constants)
+  --> $DIR/runtime_literal_conversion.rs:13:13
+   |
+LL |     let _ = Natural::const_from(10);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Rational::const_from_unsigneds(..)` in a `const` block or a named `const`
+  --> $DIR/runtime_literal_conversion.rs:24:13
+   |
+LL |     let _ = Rational::from_unsigneds(3u32, 4u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Rational::const_from_signeds(..)` in a `const` block or a named `const`
+  --> $DIR/runtime_literal_conversion.rs:25:13
+   |
+LL |     let _ = Rational::from_signeds(-3i32, 4i32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: this `const_from_unsigneds` call is not evaluated at compile time; wrap it in a `const` block or bind it to a named `const` (or use the non-`const` equivalent if the arguments are not constants)
+  --> $DIR/runtime_literal_conversion.rs:26:13
+   |
+LL |     let _ = Rational::const_from_unsigneds(3, 4);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 7 previous errors
+

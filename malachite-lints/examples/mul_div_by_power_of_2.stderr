@@ -1,0 +1,46 @@
+error: use `<<` instead of multiplying by `Natural::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:11:13
+   |
+LL |     let _ = &n * Natural::power_of_2(5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(mul_div_by_power_of_2)]` on by default
+
+error: use `<<` instead of multiplying by `Natural::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:12:13
+   |
+LL |     let _ = Natural::power_of_2(5) * &n;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `<<=` instead of multiplying by `Natural::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:14:5
+   |
+LL |     m *= Natural::power_of_2(5);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `>>` instead of dividing by `Natural::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:17:13
+   |
+LL |     let _ = &n / Natural::power_of_2(5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `shr_round` with `Down` (or `>>`, which takes the floor) instead of dividing by `Integer::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:18:13
+   |
+LL |     let _ = &i / Integer::power_of_2(5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `>>` instead of dividing by `Rational::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:19:13
+   |
+LL |     let _ = &q / Rational::power_of_2(-5i64);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `>>=` instead of dividing by `Rational::power_of_2(..)`
+  --> $DIR/mul_div_by_power_of_2.rs:21:5
+   |
+LL |     p /= Rational::power_of_2(5i64);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 7 previous errors
+

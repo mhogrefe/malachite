@@ -347,6 +347,7 @@ impl IntegerMantissaAndExponent<Natural, u64, Natural> for &Natural {
     /// );
     /// ```
     #[inline]
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn integer_mantissa_and_exponent(self) -> (Natural, u64) {
         let trailing_zeros = self.trailing_zeros().unwrap();
         (self >> trailing_zeros, trailing_zeros)

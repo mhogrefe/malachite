@@ -552,8 +552,10 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
     let t = i32::exact_from(e.significant_bits());
     // `error == t` means that the result is still exact.
     let mut error = t;
-    let mut err_s_a2: i32 = 0; // number of left shifts when squaring after the first inexact loop
-    let mut err_s_ab: i32 = 0; // number of left shifts when multiplying after the first inexact loop
+    // The error counters are the numbers of left shifts when squaring (`err_s_a2`) and multiplying
+    // (`err_s_ab`) after the first inexact loop.
+    let mut err_s_a2: i32 = 0;
+    let mut err_s_ab: i32 = 0;
     for i in (0..=t - 2).rev() {
         // xs_zeros is the number of zero low limbs of {xs, len} (that is, mpn_scan1(xs, 0) /
         // Limb::WIDTH).

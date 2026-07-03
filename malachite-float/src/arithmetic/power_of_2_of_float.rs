@@ -21,7 +21,7 @@ use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2, PowerOf
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity as InfinityTrait, NaN as NaNTrait, Zero as ZeroTrait,
+    Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
@@ -44,7 +44,7 @@ fn power_of_2_of_float_prec_round_normal_helper(
     // applied to the `Float` case.
     let ex = i64::from(xfrac.get_exponent().unwrap());
     if let Some((mut y, o)) = float_round_near_x(
-        &Float::one_prec(1),
+        &Float::ONE,
         u64::exact_from(1 - ex),
         *xfrac > 0u32,
         precy,
@@ -67,7 +67,7 @@ fn power_of_2_of_float_prec_round_normal_helper(
         let err = u64::exact_from(
             i64::exact_from(working_prec) - (i64::from(t.get_exponent().unwrap()) + 2),
         );
-        t.exp_prec_round_assign(working_prec, Nearest); // exp(xfrac * ln(2))
+        t.exp_prec_assign(working_prec); // exp(xfrac * ln(2))
         if float_can_round(t.significand_ref().unwrap(), err, precy, rm) {
             // Round to `precy` and multiply by 2^xint. MPFR performs the multiplication in an
             // extended exponent range and applies the range reduction in mpfr_check_range;
@@ -140,7 +140,7 @@ fn power_of_2_rational_near_one(
 ) -> (Float, Ordering) {
     let above = x.sign() == Greater;
     let err = u64::exact_from(1 - exp_x);
-    if let Some(result) = float_round_near_x(&Float::one_prec(1), err, above, prec, rm) {
+    if let Some(result) = float_round_near_x(&Float::ONE, err, above, prec, rm) {
         return result;
     }
     // prec >= -exp_x. ln(2) needs roughly `prec - (-exp_x)` bits to separate the two products at

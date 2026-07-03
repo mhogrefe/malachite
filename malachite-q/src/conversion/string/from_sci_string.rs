@@ -176,6 +176,7 @@ impl Rational {
     ///     "1/4105"
     /// );
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     pub fn from_sci_string_simplest_with_options(
         s: &str,
         options: FromSciStringOptions,
@@ -272,6 +273,7 @@ impl Rational {
     /// );
     /// ```
     #[inline]
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     pub fn from_sci_string_simplest(s: &str) -> Option<Self> {
         Self::from_sci_string_simplest_with_options(s, FromSciStringOptions::default())
     }
