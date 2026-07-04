@@ -20,6 +20,10 @@ use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 
+// A single folded chain per word ((flag_a | flag_b), with the previous flag folded in before
+// the next word) lets LLVM fuse the whole sequence into branchless adds/adcs (or subs/sbcs) on
+// aarch64 and adc/sbb chains on x86_64; the previous per-word branches did not fuse, and this
+// kernel is hot in the fft_small CRT reconstruction.
 pub_test! {xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
     x_2: T,
     x_1: T,
@@ -28,15 +32,11 @@ pub_test! {xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
     y_1: T,
     y_0: T,
 ) -> (T, T, T) {
-    let (z_0, borrow_1) = x_0.overflowing_sub(y_0);
-    let (mut z_1, mut borrow_2) = x_1.overflowing_sub(y_1);
-    if borrow_1 {
-        borrow_2 |= z_1.overflowing_sub_assign(T::ONE);
-    }
-    let mut z_2 = x_2.wrapping_sub(y_2);
-    if borrow_2 {
-        z_2.wrapping_sub_assign(T::ONE);
-    }
+    let (z_0, borrow) = x_0.overflowing_sub(y_0);
+    let (z_1, borrow_a) = x_1.overflowing_sub(y_1);
+    let (z_1, borrow_b) = z_1.overflowing_sub(if borrow { T::ONE } else { T::ZERO });
+    let borrow = borrow_a | borrow_b;
+    let z_2 = x_2.wrapping_sub(y_2).wrapping_sub(if borrow { T::ONE } else { T::ZERO });
     (z_2, z_1, z_0)
 }}
 

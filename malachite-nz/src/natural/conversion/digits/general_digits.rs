@@ -185,7 +185,10 @@ pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     assert!(base < 256);
     assert!(out.len() >= len);
     let mut xs_len = xs.len();
-    assert!(xs_len < GET_STR_PRECOMPUTE_THRESHOLD);
+    // The true precondition is the stack buffer's bound, RP_LEN: equal to the threshold in
+    // production, but lifted to GET_STR_THRESHOLD_LIMIT under TUNE_PROGRAM_BUILD so the tuner
+    // can scan above the compiled threshold.
+    assert!(xs_len < RP_LEN);
     // Allocate memory for largest possible string, given that we only get here for operands with
     // `xs_len` < GET_STR_PRECOMPUTE_THRESHOLD and that the smallest base is 3. 7 / 11 is an
     // approximation to 1 / log_2(3).

@@ -81,12 +81,10 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 
-// Frozen at its pre-tuning effective value: this was `SQR_TOOM3_THRESHOLD * 3` when
-// SQR_TOOM3_THRESHOLD was 390 (a GMP-inherited heuristic). Tuning SQR_TOOM3_THRESHOLD down to
-// its measured crossover (67) would have silently dropped the squaring FFT entry point
-// (SQR_FFT_THRESHOLD = 10 * this) from 11700 to 2010 without any measurement of the FFT itself.
-// TODO tune the FFT crossover directly.
-const SQR_FFT_MODF_THRESHOLD: usize = 1170;
+// Measured directly 2026-07 (FFT square vs toom6 head-to-head; the old derived heuristic said
+// 11700, 27x too high). The FFT's small-transform path is broken below output ~768 limbs (see
+// mul/fft.rs); 424 keeps every FFT square at output >= 848 limbs.
+pub(crate) const SQR_FFT_THRESHOLD: usize = 424;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -777,7 +775,6 @@ pub_test! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &m
 }}
 
 // TODO tune
-pub(crate) const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 
 // This function can be used to determine whether the size of the input slice to
 // `limbs_square_to_out_toom_8` is valid.

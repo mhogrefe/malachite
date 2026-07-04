@@ -29,27 +29,33 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
-use malachite_nz::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+use malachite_nz::natural::arithmetic::div::{
+    limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
+    limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
 };
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_divide_and_conquer,
+    limbs_div_mod_schoolbook, limbs_invert_approx_scratch_len, limbs_invert_basecase_approx,
+    limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
+};
+use malachite_nz::natural::arithmetic::mul::fft::{
+    mpn_mul_fft_for_tuning, mpn_square_fft_for_tuning,
+};
+use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_greater_to_out_toom_22,
+    limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_33,
     limbs_mul_greater_to_out_toom_33_input_sizes_valid,
     limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_44,
     limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_44_scratch_len, limbs_mul_greater_to_out_toom_6h,
-    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
-    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_8h_scratch_len,
+    limbs_mul_greater_to_out_toom_44_scratch_len,
 };
-use malachite_nz::natural::arithmetic::div::{
-    limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
-};
-use malachite_nz::natural::arithmetic::div_mod::{
-    limbs_div_mod_divide_and_conquer, limbs_div_mod_schoolbook, limbs_two_limb_inverse_helper,
+use malachite_nz::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
 use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
@@ -570,6 +576,153 @@ fn measure_div_pair(n: usize, min_d: usize, a: DivAlgoFn, b: DivAlgoFn) -> Optio
     Some((ta, tb))
 }
 
+// Newton inversion vs the basecase approximate inversion, at divisor length n (normalized).
+fn tune_inv_newton() {
+    find_crossover_spec(
+        "INV_NEWTON_THRESHOLD",
+        "invert_basecase",
+        "invert_newton",
+        5,
+        4000,
+        &|n| {
+            if n < 5 {
+                return None;
+            }
+            let inputs: Vec<Vec<Limb>> = (0..INPUT_SETS)
+                .map(|k| {
+                    let mut ds: Vec<Limb> =
+                        random_primitive_ints(EXAMPLE_SEED.fork(&format!("inv{k}")))
+                            .take(n)
+                            .collect();
+                    ds[n - 1] |= 1 << (Limb::WIDTH - 1);
+                    ds
+                })
+                .collect();
+            let mut is_a = vec![0; n];
+            let mut is_b = vec![0; n];
+            let mut scratch_a = vec![0; limbs_invert_approx_scratch_len(n)];
+            let mut scratch_b = vec![0; limbs_invert_approx_scratch_len(n)];
+            for ds in &inputs {
+                limbs_invert_basecase_approx(&mut is_a, ds, &mut scratch_a);
+                limbs_invert_newton_approx(&mut is_b, ds, &mut scratch_b);
+            }
+            let (mut i, mut j) = (0usize, 0usize);
+            Some(interleaved_min_pair(
+                &mut || {
+                    let ds = &inputs[i & (INPUT_SETS - 1)];
+                    i += 1;
+                    black_box(limbs_invert_basecase_approx(
+                        black_box(&mut is_a),
+                        ds,
+                        &mut scratch_a,
+                    ));
+                },
+                &mut || {
+                    let ds = &inputs[j & (INPUT_SETS - 1)];
+                    j += 1;
+                    black_box(limbs_invert_newton_approx(
+                        black_box(&mut is_b),
+                        ds,
+                        &mut scratch_b,
+                    ));
+                },
+            ))
+        },
+    );
+}
+
+// Divide-and-conquer division vs Barrett (MU) division, dividing 2n limbs by n limbs. The DC
+// side consumes its dividend, so its per-call refresh copy is included (as any
+// dividend-preserving caller would pay it); Barrett reads the dividend by reference.
+fn measure_mu_pair(
+    n: usize,
+    dc: DivAlgoFn,
+    barrett: fn(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut [Limb]) -> bool,
+    barrett_scratch: fn(usize, usize) -> usize,
+) -> Option<(f64, f64)> {
+    if n < 6 {
+        return None;
+    }
+    let inputs: Vec<(Vec<Limb>, Vec<Limb>, Limb)> = (0..INPUT_SETS)
+        .map(|k| {
+            let ns: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("mn{k}")))
+                .take(n << 1)
+                .collect();
+            let mut ds: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("md{k}")))
+                .take(n)
+                .collect();
+            ds[n - 1] |= 1 << (Limb::WIDTH - 1);
+            let d_inv = limbs_two_limb_inverse_helper(ds[n - 1], ds[n - 2]);
+            (ns, ds, d_inv)
+        })
+        .collect();
+    let mut ns_work = vec![0; n << 1];
+    let mut qs_a = vec![0; n + 1];
+    let mut qs_b = vec![0; n + 1];
+    let mut rs = vec![0; n];
+    let mut scratch = vec![0; barrett_scratch(n << 1, n)];
+    for (ns, ds, d_inv) in &inputs {
+        ns_work.copy_from_slice(ns);
+        dc(&mut qs_a[..n], &mut ns_work, ds, *d_inv);
+        barrett(&mut qs_b[..n], &mut rs, ns, ds, &mut scratch);
+    }
+    let (mut i, mut j) = (0usize, 0usize);
+    Some(interleaved_min_pair(
+        &mut || {
+            let (ns, ds, d_inv) = &inputs[i & (INPUT_SETS - 1)];
+            i += 1;
+            ns_work.copy_from_slice(ns);
+            dc(black_box(&mut qs_a[..n]), &mut ns_work, ds, *d_inv);
+        },
+        &mut || {
+            let (ns, ds, _) = &inputs[j & (INPUT_SETS - 1)];
+            j += 1;
+            barrett(black_box(&mut qs_b[..n]), &mut rs, ns, ds, &mut scratch);
+        },
+    ))
+}
+
+fn tune_mu_div_qr() {
+    find_crossover_spec(
+        "MU_DIV_QR_THRESHOLD",
+        "dc_div_qr",
+        "barrett_div_qr",
+        61,
+        8000,
+        &|n| {
+            measure_mu_pair(
+                n,
+                limbs_div_mod_divide_and_conquer,
+                limbs_div_mod_barrett,
+                limbs_div_mod_barrett_scratch_len,
+            )
+        },
+    );
+}
+
+fn tune_mu_divappr_q() {
+    find_crossover_spec(
+        "MU_DIVAPPR_Q_THRESHOLD",
+        "dc_divappr_q",
+        "barrett_divappr_q",
+        61,
+        10000,
+        &|n| {
+            measure_mu_pair(
+                n,
+                limbs_div_divide_and_conquer_approx,
+                |qs, _rs, ns, ds, scratch| {
+                    // The approx variant takes no remainder buffer; adapt to the common shape.
+                    let mut ns_plus = ns.to_vec();
+                    let _ = &mut ns_plus;
+                    limbs_div_barrett_approx(qs, ns, ds, scratch)
+                },
+                limbs_div_barrett_approx_scratch_len,
+            )
+        },
+    );
+}
+
 // The Malachite side of the FFT-region mul comparison; the C sides are
 // perf/scratch/{mul_gmp.c, mul_flint.c} (make mul-gmp / mul-gmp-noasm / mul-flint). Inputs use
 // the same LCG so all four harnesses multiply identical operands. Times go through the full
@@ -614,6 +767,129 @@ fn lcg_fill(p: &mut [Limb], seed: u64) {
             .wrapping_add(1442695040888963407);
         *x = s as Limb;
     }
+}
+
+fn fft_mul_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "fft",
+        valid: &|_| true,
+        scratch_len: &|_| 0,
+        run: &|out, xs, ys, _| mpn_mul_fft_for_tuning(out, xs, ys),
+    }
+}
+
+fn tune_mul_fft() {
+    find_crossover(&Level {
+        threshold_name: "MUL_FFT_THRESHOLD",
+        min_size: 400,
+        max_size: 8000,
+        lower: toom8h_algo(),
+        upper: fft_mul_algo(),
+    });
+}
+
+fn fft_sqr_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "fft_sqr",
+        valid: &|_| true,
+        scratch_len: &|_| 0,
+        run: &|out, xs, _, _| mpn_square_fft_for_tuning(out, xs),
+    }
+}
+
+// SQR_FFT_THRESHOLD is currently derived (SQR_FFT_MODF_THRESHOLD * 10, frozen at 11700 in
+// square.rs); this measures where the FFT square actually overtakes toom8, to inform replacing
+// the derivation with a measured constant.
+fn tune_sqr_fft() {
+    find_crossover(&Level {
+        threshold_name: "SQR_FFT_THRESHOLD",
+        min_size: 400,
+        max_size: 16000,
+        lower: sqr_toom8_algo(),
+        upper: fft_sqr_algo(),
+    });
+}
+
+// Both FFT crossovers landed below the toom8 thresholds, so toom8h/toom8 may be squeezed out;
+// these measure the FFT against the real incumbents at those sizes.
+fn tune_mul_fft_vs_toom6h() {
+    find_crossover(&Level {
+        threshold_name: "MUL_FFT_THRESHOLD",
+        min_size: 385,
+        max_size: 8000,
+        lower: toom6h_algo(),
+        upper: fft_mul_algo(),
+    });
+}
+
+fn tune_sqr_fft_vs_toom6() {
+    find_crossover(&Level {
+        threshold_name: "SQR_FFT_THRESHOLD",
+        min_size: 385,
+        max_size: 16000,
+        lower: sqr_toom6_algo(),
+        upper: fft_sqr_algo(),
+    });
+}
+
+// Correctness sweep for the FFT at small sizes (the `l <= LG_BLK_SZ` small-transform branch is
+// only reachable below ~400 limbs, which production never did while MUL_FFT_THRESHOLD was 1500):
+// compares the FFT against the standard dispatch on many random inputs.
+fn tune_fft_small_check() {
+    let mut mismatches = 0;
+    for n in 64..=1024 {
+        for k in 0..4u32 {
+            let xs: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("fx{n}_{k}")))
+                .take(n)
+                .collect();
+            let ys: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("fy{n}_{k}")))
+                .take(n)
+                .collect();
+            let mut out_fft = vec![0; n << 1];
+            let mut out_ref = vec![0; n << 1];
+            let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(n, n)];
+            let xs2 = xs.clone();
+            let ys2 = ys.clone();
+            let mul_ok = std::panic::catch_unwind(move || {
+                let mut out = vec![0; xs2.len() << 1];
+                mpn_mul_fft_for_tuning(&mut out, &xs2, &ys2);
+                out
+            });
+            limbs_mul_greater_to_out(&mut out_ref, &xs, &ys, &mut scratch);
+            match mul_ok {
+                Err(_) => {
+                    println!("MUL PANIC at n={n} set {k}");
+                    mismatches += 1;
+                }
+                Ok(out) if out != out_ref => {
+                    println!("MUL MISMATCH at n={n} set {k}");
+                    mismatches += 1;
+                }
+                _ => {}
+            }
+            let xs2 = xs.clone();
+            let sqr_ok = std::panic::catch_unwind(move || {
+                let mut out = vec![0; xs2.len() << 1];
+                mpn_square_fft_for_tuning(&mut out, &xs2);
+                out
+            });
+            let mut sq_ref = vec![0; n << 1];
+            limbs_mul_greater_to_out(&mut sq_ref, &xs, &xs, &mut scratch);
+            match sqr_ok {
+                Err(_) => {
+                    println!("SQR PANIC at n={n} set {k}");
+                    mismatches += 1;
+                }
+                Ok(out) if out != sq_ref => {
+                    println!("SQR MISMATCH at n={n} set {k}");
+                    mismatches += 1;
+                }
+                _ => {}
+            }
+            let _ = &out_fft;
+        }
+    }
+    println!("fft small-size check: {mismatches} failures over sizes 64..=1024 x4 input sets");
 }
 
 fn tune_dc_div_qr() {
@@ -1087,8 +1363,12 @@ fn tune_get_str_precompute() {
     // The basecase asserts xs_len < GET_STR_PRECOMPUTE_THRESHOLD (its stack buffers are sized by
     // it), so the scan is capped just below the compiled-in value; lower the constant and rebuild
     // to scan higher.
-    let max_size =
-        malachite_nz::natural::conversion::digits::general_digits::GET_STR_PRECOMPUTE_THRESHOLD - 1;
+    let max_size = if malachite_nz::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD {
+        // GET_STR_THRESHOLD_LIMIT: the basecase's lifted buffer bound under TUNE_PROGRAM_BUILD.
+        150
+    } else {
+        malachite_nz::natural::conversion::digits::general_digits::GET_STR_PRECOMPUTE_THRESHOLD - 1
+    };
     find_crossover(&Level {
         threshold_name: "GET_STR_PRECOMPUTE_THRESHOLD",
         min_size: 4,
@@ -1424,6 +1704,14 @@ pub fn tune(key: &str) {
         "dc_div_qr" => tune_dc_div_qr(),
         "dc_divappr_q" => tune_dc_divappr_q(),
         "mul_fft_probe" => tune_mul_fft_probe(),
+        "mul_fft" => tune_mul_fft(),
+        "sqr_fft" => tune_sqr_fft(),
+        "mul_fft_vs_toom6h" => tune_mul_fft_vs_toom6h(),
+        "sqr_fft_vs_toom6" => tune_sqr_fft_vs_toom6(),
+        "fft_small_check" => tune_fft_small_check(),
+        "inv_newton" => tune_inv_newton(),
+        "mu_div_qr" => tune_mu_div_qr(),
+        "mu_divappr_q" => tune_mu_divappr_q(),
         "sqr_toom2" => tune_sqr_toom2(),
         "sqr_toom3" => tune_sqr_toom3(),
         "sqr_toom4" => tune_sqr_toom4(),

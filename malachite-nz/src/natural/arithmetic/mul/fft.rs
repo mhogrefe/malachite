@@ -2520,6 +2520,13 @@ fn sd_fft_trunc(
         sd_fft_trunc_internal(q, ds, 1, l - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
         return;
     }
+    // KNOWN BUG (2026-07): the small-size FFT panics (index out of bounds in the
+    // `mpn_to_ffts` input conversion, and this small-transform branch is also unexercised) for
+    // balanced sizes 64-384; sizes >= 385 are verified correct against the Toom dispatch by
+    // `tune_fft_small_check`. Production cannot reach the broken zone: the dispatch requires
+    // mean(xs_len, ys_len) >= MUL_FFT_THRESHOLD and 3 * ys_len >= MUL_FFT_THRESHOLD, so with the
+    // tuned threshold of 515 every FFT call has output >= 1030 limbs, above the zone's ceiling of
+    // 768. Fix the small path before lowering the threshold further.
     fail_on_untested_path("sd_fft_trunc, l <= LG_BLK_SZ");
     ds[itrunc..][..usize::power_of_2(l)].fill(0.0);
     // L=8 reads from w2tab[7]
@@ -4672,570 +4679,77 @@ macro_rules! big_add_mul {
     };
 }
 
-// This is multi_add_3 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_add_3{($z: expr, $a: expr) => {{
-    let z = $z;
-    let a = $a;
-    (z[2], z[1], z[0]) = u64::xxx_add_yyy_to_zzz(z[2], z[1], z[0], a[2], a[1], a[0]);
-}}}
-
-// This is multi_add_4 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_add_4{($z: expr, $a: expr) => {{
-    let z = $z;
-    let a = $a;
-    (z[3], z[2], z[1], z[0]) =
-        u64::xxxx_add_yyyy_to_zzzz(z[3], z[2], z[1], z[0], a[3], a[2], a[1], a[0]);
-}}}
-
-// This is multi_add_5 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_add_5 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let carry_1 = z[0].overflowing_add_assign(a[0]);
-        let mut carry_2 = z[1].overflowing_add_assign(a[1]);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a[2]);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a[3]);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        z[4].wrapping_add_assign(a[4]);
-        if carry_4 {
-            z[4].wrapping_add_assign(1);
-        }
-    }};
+// These are multi_add_3 through multi_add_8 from crt_helpers.h, FLINT 3.3.0-dev, as one
+// function generic over the word count. Adds the low N words of `a` to `z`; the top word wraps
+// (no carry out). The folded carry chain ((carry_1 | carry_2), with the previous carry added
+// before the next word) is the shape LLVM fuses into branchless adds/adcs on aarch64; the fixed
+// trip count unrolls fully.
+#[inline(always)]
+fn multi_add<const N: usize>(z: &mut [u64], a: &[u64]) {
+    let mut carry = false;
+    for i in 0..N - 1 {
+        let (s, carry_1) = z[i].overflowing_add(a[i]);
+        let (s, carry_2) = s.overflowing_add(u64::from(carry));
+        z[i] = s;
+        carry = carry_1 | carry_2;
+    }
+    z[N - 1] = z[N - 1]
+        .wrapping_add(a[N - 1])
+        .wrapping_add(u64::from(carry));
 }
 
-// This is multi_add_6 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_add_6 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let carry_1 = z[0].overflowing_add_assign(a[0]);
-        let mut carry_2 = z[1].overflowing_add_assign(a[1]);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
+// These are multi_add_4_alt through multi_add_8_alt from crt_helpers.h, FLINT 3.3.0-dev, as one
+// function generic over the source word count. Splits the low N u64 words of `a` into 2N half
+// words and adds them to `z`, whose limbs are half-width; the final half word (index 2N - 1) may
+// fall past the end of `z`, in which case it (and the carry into it) is dropped, and otherwise
+// wraps. See `multi_add` for the carry-chain shape.
+#[cfg(feature = "32_bit_limbs")]
+#[inline(always)]
+fn multi_add_alt<const N: usize>(z: &mut [Limb], a: &[u64]) {
+    let mut carry = false;
+    for k in 0..N {
+        let (hi, lo) = a[k].split_in_half();
+        let w = k << 1;
+        let (s, carry_1) = z[w].overflowing_add(lo);
+        let (s, carry_2) = s.overflowing_add(Limb::from(carry));
+        z[w] = s;
+        carry = carry_1 | carry_2;
+        if w + 1 == (N << 1) - 1 {
+            if w + 1 < z.len() {
+                z[w + 1] = z[w + 1].wrapping_add(hi).wrapping_add(Limb::from(carry));
+            }
+        } else {
+            let (s, carry_1) = z[w + 1].overflowing_add(hi);
+            let (s, carry_2) = s.overflowing_add(Limb::from(carry));
+            z[w + 1] = s;
+            carry = carry_1 | carry_2;
         }
-        let mut carry_3 = z[2].overflowing_add_assign(a[2]);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a[3]);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a[4]);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        z[5].wrapping_add_assign(a[5]);
-        if carry_5 {
-            z[5].wrapping_add_assign(1);
-        }
-    }};
+    }
+}
+
+// These are multi_sub_4 through multi_sub_7 from crt_helpers.h, FLINT 3.3.0-dev, as one function
+// generic over the word count. Subtracts the low N words of `a` from `z`; the top word wraps (no
+// borrow out). See `multi_add` for the (borrow) chain shape.
+#[inline(always)]
+fn multi_sub<const N: usize>(z: &mut [u64], a: &[u64]) {
+    let mut borrow = false;
+    for i in 0..N - 1 {
+        let (d, borrow_1) = z[i].overflowing_sub(a[i]);
+        let (d, borrow_2) = d.overflowing_sub(u64::from(borrow));
+        z[i] = d;
+        borrow = borrow_1 | borrow_2;
+    }
+    z[N - 1] = z[N - 1]
+        .wrapping_sub(a[N - 1])
+        .wrapping_sub(u64::from(borrow));
 }
 
 // This is multi_add_7 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(not(feature = "32_bit_limbs"))]
-macro_rules! multi_add_7 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let carry_1 = z[0].overflowing_add_assign(a[0]);
-        let mut carry_2 = z[1].overflowing_add_assign(a[1]);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a[2]);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a[3]);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a[4]);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a[5]);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        z[6].wrapping_add_assign(a[6]);
-        if carry_6 {
-            z[6].wrapping_add_assign(1);
-        }
-    }};
-}
-
-// This is multi_add_8 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(not(feature = "32_bit_limbs"))]
-macro_rules! multi_add_8 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let carry_1 = z[0].overflowing_add_assign(a[0]);
-        let mut carry_2 = z[1].overflowing_add_assign(a[1]);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a[2]);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a[3]);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a[4]);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a[5]);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        let mut carry_7 = z[6].overflowing_add_assign(a[6]);
-        if carry_6 {
-            carry_7 |= z[6].overflowing_add_assign(1);
-        }
-        z[7].wrapping_add_assign(a[7]);
-        if carry_7 {
-            z[7].wrapping_add_assign(1);
-        }
-    }};
-}
-
-// This is multi_add_4 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(feature = "32_bit_limbs")]
-macro_rules! multi_add_4_alt {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let (a_1, a_0) = a[0].split_in_half();
-        let (a_3, a_2) = a[1].split_in_half();
-        let (a_5, a_4) = a[2].split_in_half();
-        let (a_7, a_6) = a[3].split_in_half();
-        let carry_1 = z[0].overflowing_add_assign(a_0);
-        let mut carry_2 = z[1].overflowing_add_assign(a_1);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a_2);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a_3);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a_4);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a_5);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        let mut carry_7 = z[6].overflowing_add_assign(a_6);
-        if carry_6 {
-            carry_7 |= z[6].overflowing_add_assign(1);
-        }
-        if 7 < z.len() {
-            z[7].wrapping_add_assign(a_7);
-            if carry_7 {
-                z[7].wrapping_add_assign(1);
-            }
-        }
-    }};
-}
-
-// This is multi_add_5 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(feature = "32_bit_limbs")]
-macro_rules! multi_add_5_alt {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let (a_1, a_0) = a[0].split_in_half();
-        let (a_3, a_2) = a[1].split_in_half();
-        let (a_5, a_4) = a[2].split_in_half();
-        let (a_7, a_6) = a[3].split_in_half();
-        let (a_9, a_8) = a[4].split_in_half();
-        let carry_1 = z[0].overflowing_add_assign(a_0);
-        let mut carry_2 = z[1].overflowing_add_assign(a_1);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a_2);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a_3);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a_4);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a_5);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        let mut carry_7 = z[6].overflowing_add_assign(a_6);
-        if carry_6 {
-            carry_7 |= z[6].overflowing_add_assign(1);
-        }
-        let mut carry_8 = z[7].overflowing_add_assign(a_7);
-        if carry_7 {
-            carry_8 |= z[7].overflowing_add_assign(1);
-        }
-        let mut carry_9 = z[8].overflowing_add_assign(a_8);
-        if carry_8 {
-            carry_9 |= z[8].overflowing_add_assign(1);
-        }
-        if 9 < z.len() {
-            z[9].wrapping_add_assign(a_9);
-            if carry_9 {
-                z[9].wrapping_add_assign(1);
-            }
-        }
-    }};
-}
-
-// This is multi_add_6 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(feature = "32_bit_limbs")]
-macro_rules! multi_add_6_alt {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let (a_1, a_0) = a[0].split_in_half();
-        let (a_3, a_2) = a[1].split_in_half();
-        let (a_5, a_4) = a[2].split_in_half();
-        let (a_7, a_6) = a[3].split_in_half();
-        let (a_9, a_8) = a[4].split_in_half();
-        let (a_11, a_10) = a[5].split_in_half();
-        let carry_1 = z[0].overflowing_add_assign(a_0);
-        let mut carry_2 = z[1].overflowing_add_assign(a_1);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a_2);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a_3);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a_4);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a_5);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        let mut carry_7 = z[6].overflowing_add_assign(a_6);
-        if carry_6 {
-            carry_7 |= z[6].overflowing_add_assign(1);
-        }
-        let mut carry_8 = z[7].overflowing_add_assign(a_7);
-        if carry_7 {
-            carry_8 |= z[7].overflowing_add_assign(1);
-        }
-        let mut carry_9 = z[8].overflowing_add_assign(a_8);
-        if carry_8 {
-            carry_9 |= z[8].overflowing_add_assign(1);
-        }
-        let mut carry_10 = z[9].overflowing_add_assign(a_9);
-        if carry_9 {
-            carry_10 |= z[9].overflowing_add_assign(1);
-        }
-        let mut carry_11 = z[10].overflowing_add_assign(a_10);
-        if carry_10 {
-            carry_11 |= z[10].overflowing_add_assign(1);
-        }
-        if 11 < z.len() {
-            z[11].wrapping_add_assign(a_11);
-            if carry_11 {
-                z[11].wrapping_add_assign(1);
-            }
-        }
-    }};
-}
-
-// This is multi_add_7 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(feature = "32_bit_limbs")]
-macro_rules! multi_add_7_alt {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let (a_1, a_0) = a[0].split_in_half();
-        let (a_3, a_2) = a[1].split_in_half();
-        let (a_5, a_4) = a[2].split_in_half();
-        let (a_7, a_6) = a[3].split_in_half();
-        let (a_9, a_8) = a[4].split_in_half();
-        let (a_11, a_10) = a[5].split_in_half();
-        let (a_13, a_12) = a[6].split_in_half();
-        let carry_1 = z[0].overflowing_add_assign(a_0);
-        let mut carry_2 = z[1].overflowing_add_assign(a_1);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a_2);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a_3);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a_4);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a_5);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        let mut carry_7 = z[6].overflowing_add_assign(a_6);
-        if carry_6 {
-            carry_7 |= z[6].overflowing_add_assign(1);
-        }
-        let mut carry_8 = z[7].overflowing_add_assign(a_7);
-        if carry_7 {
-            carry_8 |= z[7].overflowing_add_assign(1);
-        }
-        let mut carry_9 = z[8].overflowing_add_assign(a_8);
-        if carry_8 {
-            carry_9 |= z[8].overflowing_add_assign(1);
-        }
-        let mut carry_10 = z[9].overflowing_add_assign(a_9);
-        if carry_9 {
-            carry_10 |= z[9].overflowing_add_assign(1);
-        }
-        let mut carry_11 = z[10].overflowing_add_assign(a_10);
-        if carry_10 {
-            carry_11 |= z[10].overflowing_add_assign(1);
-        }
-        let mut carry_12 = z[11].overflowing_add_assign(a_11);
-        if carry_11 {
-            carry_12 |= z[11].overflowing_add_assign(1);
-        }
-        let mut carry_13 = z[12].overflowing_add_assign(a_12);
-        if carry_12 {
-            carry_13 |= z[12].overflowing_add_assign(1);
-        }
-        if 13 < z.len() {
-            z[13].wrapping_add_assign(a_13);
-            if carry_13 {
-                z[13].wrapping_add_assign(1);
-            }
-        }
-    }};
-}
-
-// This is multi_add_8 from crt_helpers.h, FLINT 3.3.0-dev.
-#[cfg(feature = "32_bit_limbs")]
-macro_rules! multi_add_8_alt {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let (a_1, a_0) = a[0].split_in_half();
-        let (a_3, a_2) = a[1].split_in_half();
-        let (a_5, a_4) = a[2].split_in_half();
-        let (a_7, a_6) = a[3].split_in_half();
-        let (a_9, a_8) = a[4].split_in_half();
-        let (a_11, a_10) = a[5].split_in_half();
-        let (a_13, a_12) = a[6].split_in_half();
-        let (a_15, a_14) = a[7].split_in_half();
-        let carry_1 = z[0].overflowing_add_assign(a_0);
-        let mut carry_2 = z[1].overflowing_add_assign(a_1);
-        if carry_1 {
-            carry_2 |= z[1].overflowing_add_assign(1);
-        }
-        let mut carry_3 = z[2].overflowing_add_assign(a_2);
-        if carry_2 {
-            carry_3 |= z[2].overflowing_add_assign(1);
-        }
-        let mut carry_4 = z[3].overflowing_add_assign(a_3);
-        if carry_3 {
-            carry_4 |= z[3].overflowing_add_assign(1);
-        }
-        let mut carry_5 = z[4].overflowing_add_assign(a_4);
-        if carry_4 {
-            carry_5 |= z[4].overflowing_add_assign(1);
-        }
-        let mut carry_6 = z[5].overflowing_add_assign(a_5);
-        if carry_5 {
-            carry_6 |= z[5].overflowing_add_assign(1);
-        }
-        let mut carry_7 = z[6].overflowing_add_assign(a_6);
-        if carry_6 {
-            carry_7 |= z[6].overflowing_add_assign(1);
-        }
-        let mut carry_8 = z[7].overflowing_add_assign(a_7);
-        if carry_7 {
-            carry_8 |= z[7].overflowing_add_assign(1);
-        }
-        let mut carry_9 = z[8].overflowing_add_assign(a_8);
-        if carry_8 {
-            carry_9 |= z[8].overflowing_add_assign(1);
-        }
-        let mut carry_10 = z[9].overflowing_add_assign(a_9);
-        if carry_9 {
-            carry_10 |= z[9].overflowing_add_assign(1);
-        }
-        let mut carry_11 = z[10].overflowing_add_assign(a_10);
-        if carry_10 {
-            carry_11 |= z[10].overflowing_add_assign(1);
-        }
-        let mut carry_12 = z[11].overflowing_add_assign(a_11);
-        if carry_11 {
-            carry_12 |= z[11].overflowing_add_assign(1);
-        }
-        let mut carry_13 = z[12].overflowing_add_assign(a_12);
-        if carry_12 {
-            carry_13 |= z[12].overflowing_add_assign(1);
-        }
-        let mut carry_14 = z[13].overflowing_add_assign(a_13);
-        if carry_13 {
-            carry_14 |= z[13].overflowing_add_assign(1);
-        }
-        let mut carry_15 = z[14].overflowing_add_assign(a_14);
-        if carry_14 {
-            carry_15 |= z[14].overflowing_add_assign(1);
-        }
-        if 15 < z.len() {
-            z[15].wrapping_add_assign(a_15);
-            if carry_15 {
-                z[15].wrapping_add_assign(1);
-            }
-        }
-    }};
-}
-
-// This is multi_sub_4 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_sub_4 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let borrow_1 = z[0].overflowing_sub_assign(a[0]);
-        let mut borrow_2 = z[1].overflowing_sub_assign(a[1]);
-        if borrow_1 {
-            borrow_2 |= z[1].overflowing_sub_assign(1);
-        }
-        let mut borrow_3 = z[2].overflowing_sub_assign(a[2]);
-        if borrow_2 {
-            borrow_3 |= z[2].overflowing_sub_assign(1);
-        }
-        z[3].wrapping_sub_assign(a[3]);
-        if borrow_3 {
-            z[3].wrapping_sub_assign(1);
-        }
-    }};
-}
-
-// This is multi_sub_5 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_sub_5 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let borrow_1 = z[0].overflowing_sub_assign(a[0]);
-        let mut borrow_2 = z[1].overflowing_sub_assign(a[1]);
-        if borrow_1 {
-            borrow_2 |= z[1].overflowing_sub_assign(1);
-        }
-        let mut borrow_3 = z[2].overflowing_sub_assign(a[2]);
-        if borrow_2 {
-            borrow_3 |= z[2].overflowing_sub_assign(1);
-        }
-        let mut borrow_4 = z[3].overflowing_sub_assign(a[3]);
-        if borrow_3 {
-            borrow_4 |= z[3].overflowing_sub_assign(1);
-        }
-        z[4].wrapping_sub_assign(a[4]);
-        if borrow_4 {
-            z[4].wrapping_sub_assign(1);
-        }
-    }};
-}
-
-// This is multi_sub_6 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_sub_6 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let borrow_1 = z[0].overflowing_sub_assign(a[0]);
-        let mut borrow_2 = z[1].overflowing_sub_assign(a[1]);
-        if borrow_1 {
-            borrow_2 |= z[1].overflowing_sub_assign(1);
-        }
-        let mut borrow_3 = z[2].overflowing_sub_assign(a[2]);
-        if borrow_2 {
-            borrow_3 |= z[2].overflowing_sub_assign(1);
-        }
-        let mut borrow_4 = z[3].overflowing_sub_assign(a[3]);
-        if borrow_3 {
-            borrow_4 |= z[3].overflowing_sub_assign(1);
-        }
-        let mut borrow_5 = z[4].overflowing_sub_assign(a[4]);
-        if borrow_4 {
-            borrow_5 |= z[4].overflowing_sub_assign(1);
-        }
-        z[5].wrapping_sub_assign(a[5]);
-        if borrow_5 {
-            z[5].wrapping_sub_assign(1);
-        }
-    }};
-}
-
-// This is multi_sub_7 from crt_helpers.h, FLINT 3.3.0-dev.
-macro_rules! multi_sub_7 {
-    ($z: expr, $a: expr) => {{
-        let z = $z;
-        let a = $a;
-        let borrow_1 = z[0].overflowing_sub_assign(a[0]);
-        let mut borrow_2 = z[1].overflowing_sub_assign(a[1]);
-        if borrow_1 {
-            borrow_2 |= z[1].overflowing_sub_assign(1);
-        }
-        let mut borrow_3 = z[2].overflowing_sub_assign(a[2]);
-        if borrow_2 {
-            borrow_3 |= z[2].overflowing_sub_assign(1);
-        }
-        let mut borrow_4 = z[3].overflowing_sub_assign(a[3]);
-        if borrow_3 {
-            borrow_4 |= z[3].overflowing_sub_assign(1);
-        }
-        let mut borrow_5 = z[4].overflowing_sub_assign(a[4]);
-        if borrow_4 {
-            borrow_5 |= z[4].overflowing_sub_assign(1);
-        }
-        let mut borrow_6 = z[5].overflowing_sub_assign(a[5]);
-        if borrow_5 {
-            borrow_6 |= z[5].overflowing_sub_assign(1);
-        }
-        z[6].wrapping_sub_assign(a[6]);
-        if borrow_6 {
-            z[6].wrapping_sub_assign(1);
-        }
-    }};
-}
-
 // This is _reduce_big_sum from crt_helpers.h, FLINT 3.3.0-dev.
 macro_rules! reduce_big_sum {
-    ($n: expr, $faddm1: ident, $fsub: ident, $r: ident, $t: ident, $limit: expr) => {
+    ($n: expr, $r: ident, $t: ident, $limit: expr) => {
         let limit = $limit;
-        $faddm1!(&mut $r[1..], &$t[1..]);
+        multi_add::<{ $n - 1 }>(&mut $r[1..], &$t[1..]);
         'outer: loop {
             let mut goto_sub = false;
             for k in (2..=$n).rev() {
@@ -5251,24 +4765,14 @@ macro_rules! reduce_big_sum {
             if !goto_sub && $r[0] < limit[0] {
                 break 'outer;
             }
-            $fsub!(&mut $r, limit);
+            multi_sub::<{ $n }>(&mut $r, limit);
         }
     };
 }
 
 // This is _add_to_answer_easy from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
 macro_rules! add_to_answer_easy {
-    (
-        $n: expr,
-        $fadd: ident,
-        $fadd_alt: ident,
-        $faddp1: ident,
-        $fadd_altp1: ident,
-        $z: ident,
-        $r: ident,
-        $toff: ident,
-        $tshift: ident
-    ) => {{
+    ($n: expr, $z: ident, $r: ident, $toff: ident, $tshift: ident) => {{
         #[cfg(feature = "32_bit_limbs")]
         let z_len = $z.len().shr_round(1, Ceiling).0;
         #[cfg(not(feature = "32_bit_limbs"))]
@@ -5276,9 +4780,9 @@ macro_rules! add_to_answer_easy {
         assert!(z_len > $toff);
         if $tshift == 0 {
             #[cfg(feature = "32_bit_limbs")]
-            $fadd_alt!(&mut $z[$toff << 1..], $r);
+            multi_add_alt::<{ $n }>(&mut $z[$toff << 1..], &$r);
             #[cfg(not(feature = "32_bit_limbs"))]
-            $fadd!(&mut $z[$toff..], $r);
+            multi_add::<{ $n }>(&mut $z[$toff..], &$r);
         } else {
             let comp_shift = 64 - $tshift;
             $r[$n] = $r[$n - 1] >> comp_shift;
@@ -5287,9 +4791,9 @@ macro_rules! add_to_answer_easy {
             }
             $r[0] <<= $tshift;
             #[cfg(feature = "32_bit_limbs")]
-            $fadd_altp1!(&mut $z[$toff << 1..], $r);
+            multi_add_alt::<{ $n + 1 }>(&mut $z[$toff << 1..], &$r);
             #[cfg(not(feature = "32_bit_limbs"))]
-            $faddp1!(&mut $z[$toff..], $r);
+            multi_add::<{ $n + 1 }>(&mut $z[$toff..], &$r);
         }
     }};
 }
@@ -5311,17 +4815,7 @@ fn limbs_slice_add_same_length_in_place_left_alt(xs: &mut [u32], ys: &[u64]) -> 
 
 // This is _add_to_answer_hard from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
 macro_rules! add_to_answer_hard {
-    (
-        $n: expr,
-        $fadd: ident,
-        $fadd_alt: ident,
-        $faddp1: ident,
-        $fadd_altp1: ident,
-        $z: ident,
-        $r: ident,
-        $toff: ident,
-        $tshift: ident
-    ) => {{
+    ($n: expr, $z: ident, $r: ident, $toff: ident, $tshift: ident) => {{
         #[cfg(feature = "32_bit_limbs")]
         let z_len = $z.len().shr_round(1, Ceiling).0;
         #[cfg(not(feature = "32_bit_limbs"))]
@@ -5331,9 +4825,9 @@ macro_rules! add_to_answer_hard {
         if $tshift == 0 {
             if z_len - $toff >= const { $n as usize } {
                 #[cfg(feature = "32_bit_limbs")]
-                $fadd_alt!(&mut $z[$toff << 1..], $r);
+                multi_add_alt::<{ $n }>(&mut $z[$toff << 1..], &$r);
                 #[cfg(not(feature = "32_bit_limbs"))]
-                $fadd!(&mut $z[$toff..], $r);
+                multi_add::<{ $n }>(&mut $z[$toff..], &$r);
                 do_add = false;
             }
         } else {
@@ -5345,9 +4839,9 @@ macro_rules! add_to_answer_hard {
             $r[0] <<= $tshift;
             if z_len - $toff > const { $n as usize } {
                 #[cfg(feature = "32_bit_limbs")]
-                $fadd_altp1!(&mut $z[$toff << 1..], $r);
+                multi_add_alt::<{ $n + 1 }>(&mut $z[$toff << 1..], &$r);
                 #[cfg(not(feature = "32_bit_limbs"))]
-                $faddp1!(&mut $z[$toff..], $r);
+                multi_add::<{ $n + 1 }>(&mut $z[$toff..], &$r);
                 do_add = false;
             }
         }
@@ -5434,18 +4928,7 @@ macro_rules! convert_block {
 //
 // This is _mpn_from_ffts and crt_worker_func from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
 macro_rules! process_crt {
-    (
-        $f: ident,
-        $np: expr,
-        $n: expr,
-        $m: expr,
-        $faddm1: ident,
-        $fadd: ident,
-        $faddp1: ident,
-        $fadd_alt: ident,
-        $faddp1_alt: ident,
-        $fsub: ident
-    ) => {
+    ($f: ident, $np: expr, $n: expr, $m: expr) => {
         fn $f(
             zs: &mut [Limb],
             zlen: usize,
@@ -5482,21 +4965,11 @@ macro_rules! process_crt {
                         big_add_mul!($n, $m, r, t, rcrt.co_prime(l), xs_hi[m]);
                         m += BLK_SZ;
                     }
-                    reduce_big_sum!($n, $faddm1, $fsub, r, t, rcrt.prod_primes_ref());
+                    reduce_big_sum!($n, r, t, rcrt.prod_primes_ref());
                     let toff = k >> u64::LOG_WIDTH;
                     let tshift = k & const {u64::WIDTH_MASK as usize};
                     assert!(zn_stop > $n + toff);
-                    add_to_answer_easy!(
-                        $n,
-                        $fadd,
-                        $fadd_alt,
-                        $faddp1,
-                        $faddp1_alt,
-                        zs,
-                        r,
-                        toff,
-                        tshift
-                    );
+add_to_answer_easy!($n, zs, r, toff, tshift);
                     k += bits;
                 }
             }
@@ -5515,88 +4988,23 @@ macro_rules! process_crt {
                     big_add_mul!($n, $m, r, t, rcrt.co_prime(l), x);
                     m += dstride;
                 }
-                reduce_big_sum!($n, $faddm1, $fsub, r, t, rcrt.prod_primes_ref());
+                reduce_big_sum!($n, r, t, rcrt.prod_primes_ref());
                 let toff = j >> u64::LOG_WIDTH;
                 let tshift = j & const {u64::WIDTH_MASK as usize};
                 if toff >= zn_stop {
                     break;
                 }
-                add_to_answer_hard!(
-                    $n,
-                    $fadd,
-                    $fadd_alt,
-                    $faddp1,
-                    $faddp1_alt,
-                    zs,
-                    r,
-                    toff,
-                    tshift
-                );
+add_to_answer_hard!($n, zs, r, toff, tshift);
                 j += bits;
             }
         }
     }
 }
-process_crt!(
-    process_crt_4_4_3,
-    4,
-    4,
-    3,
-    multi_add_3,
-    multi_add_4,
-    multi_add_5,
-    multi_add_4_alt,
-    multi_add_5_alt,
-    multi_sub_4
-);
-process_crt!(
-    process_crt_5_4_4,
-    5,
-    4,
-    4,
-    multi_add_3,
-    multi_add_4,
-    multi_add_5,
-    multi_add_4_alt,
-    multi_add_5_alt,
-    multi_sub_4
-);
-process_crt!(
-    process_crt_6_5_4,
-    6,
-    5,
-    4,
-    multi_add_4,
-    multi_add_5,
-    multi_add_6,
-    multi_add_5_alt,
-    multi_add_6_alt,
-    multi_sub_5
-);
-process_crt!(
-    process_crt_7_6_5,
-    7,
-    6,
-    5,
-    multi_add_5,
-    multi_add_6,
-    multi_add_7,
-    multi_add_6_alt,
-    multi_add_7_alt,
-    multi_sub_6
-);
-process_crt!(
-    process_crt_8_7_6,
-    8,
-    7,
-    6,
-    multi_add_6,
-    multi_add_7,
-    multi_add_8,
-    multi_add_7_alt,
-    multi_add_8_alt,
-    multi_sub_7
-);
+process_crt!(process_crt_4_4_3, 4, 4, 3);
+process_crt!(process_crt_5_4_4, 5, 4, 4);
+process_crt!(process_crt_6_5_4, 6, 5, 4);
+process_crt!(process_crt_7_6_5, 7, 6, 5);
+process_crt!(process_crt_8_7_6, 8, 7, 6);
 
 // This is mpn_ctx_mpn_mul from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
 fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test_slow: bool) {
@@ -5759,6 +5167,19 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
 pub(crate) fn mpn_mul_default_mpn_ctx(r1: &mut [Limb], i1: &[Limb], i2: &[Limb], test_slow: bool) {
     let mut context = CONTEXT.deserialize();
     mpn_ctx_mpn_mul(&mut context, r1, i1, i2, test_slow);
+}
+
+// Tuner entry points (see bin_util/tune.rs and PORTING.md's note on `_for_tuning` wrappers).
+// The context deserialization is part of every production call, so it is correct for the
+// threshold measurements to include it.
+#[cfg(feature = "test_build")]
+pub fn mpn_mul_fft_for_tuning(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+    mpn_mul_default_mpn_ctx(out, xs, ys, false);
+}
+
+#[cfg(feature = "test_build")]
+pub fn mpn_square_fft_for_tuning(out: &mut [Limb], xs: &[Limb]) {
+    mpn_square_default_mpn_ctx(out, xs);
 }
 
 pub(crate) fn mpn_square_default_mpn_ctx(r1: &mut [Limb], i1: &[Limb]) {
