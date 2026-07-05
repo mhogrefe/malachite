@@ -24,6 +24,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_triple_gen_var_53, unsigned_vec_unsigned_pair_gen_var_22,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_13,
 };
+use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_qs_to_out_rs_to_ns;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod,
     limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
@@ -23897,6 +23898,28 @@ fn limbs_div_mod_properties() {
         let (qs, rs) = limbs_div_mod(&ns, &ds);
         verify_limbs_div_mod_4(&ns, &ds, &qs, &rs);
     });
+}
+
+#[test]
+fn limbs_div_mod_qs_to_out_rs_to_ns_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_quadruple_gen_var_1().test_properties_with_config(
+        &config,
+        |(mut qs, _rs, ns, ds)| {
+            let qs_old = qs.clone();
+            let mut ns_mut = ns.clone();
+            limbs_div_mod_qs_to_out_rs_to_ns(&mut qs, &mut ns_mut, &ds);
+            let n = Natural::from_limbs_asc(&ns);
+            let d = Natural::from_limbs_asc(&ds);
+            let (q, r) = n.div_mod(&d);
+            let q_len = ns.len() - ds.len() + 1;
+            assert_eq!(Natural::from_limbs_asc(&qs[..q_len]), q);
+            assert_eq!(&qs[q_len..], &qs_old[q_len..]);
+            assert_eq!(Natural::from_limbs_asc(&ns_mut[..ds.len()]), r);
+        },
+    );
 }
 
 #[test]

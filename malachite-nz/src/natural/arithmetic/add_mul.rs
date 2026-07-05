@@ -94,30 +94,23 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
 ) -> Limb {
     let len = ys.len();
     assert_eq!(xs.len(), len + 1);
-    let mut carry_hi: Limb = 0;
+    // Double-width accumulation: both partial sums fit exactly (x + carry + y * z <= 2^(2W) - 1),
+    // so no carry is lost. Measured 3-13% faster than the comparison-carry shape on Apple Silicon,
+    // growing with the length; the single-limb addmul/submul loops measured the opposite, so only
+    // this kernel uses the double-width shape.
     let mut carry_lo: Limb = 0;
-
-    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let (mut product_hi, mut product_lo) = XMulYToZZ::x_mul_y_to_zz(y, zs[0]);
-
-        product_lo = (*x).wrapping_add(product_lo);
-        let mut add_carry = Limb::from(*x > product_lo);
-
-        *x = product_lo.wrapping_add(carry_lo);
-        add_carry += Limb::from(product_lo > *x);
-
-        carry_lo = product_hi.wrapping_add(add_carry);
-        carry_lo = carry_hi.wrapping_add(carry_lo);
-        add_carry = Limb::from(carry_hi > carry_lo);
-
-        (product_hi, product_lo) = XMulYToZZ::x_mul_y_to_zz(y, zs[1]);
-        carry_lo = product_lo.wrapping_add(carry_lo);
-        add_carry += Limb::from(product_lo > carry_lo);
-        carry_hi = product_hi.wrapping_add(add_carry);
+    let mut carry_hi: Limb = 0;
+    let z_0 = DoubleLimb::from(zs[0]);
+    let z_1 = DoubleLimb::from(zs[1]);
+    for (x, &y) in xs[..len].iter_mut().zip(ys.iter()) {
+        let y = DoubleLimb::from(y);
+        let t = DoubleLimb::from(*x) + DoubleLimb::from(carry_lo) + y * z_0;
+        *x = t.lower_half();
+        let t_2 = DoubleLimb::from(t.upper_half()) + DoubleLimb::from(carry_hi) + y * z_1;
+        carry_lo = t_2.lower_half();
+        carry_hi = t_2.upper_half();
     }
-
     xs[len] = carry_lo;
-
     carry_hi
 }
 

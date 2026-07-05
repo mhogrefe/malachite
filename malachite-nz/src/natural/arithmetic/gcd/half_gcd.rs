@@ -18,7 +18,6 @@ use crate::natural::arithmetic::div_mod::{
     limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns,
 };
 use crate::natural::arithmetic::gcd::matrix_2_2::limbs_matrix_2_2_mul;
-use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
@@ -31,7 +30,6 @@ use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
-use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::{bit_to_limb_count_floor, limb_to_bit_count};
 use crate::platform::{DoubleLimb, Limb};
@@ -39,7 +37,7 @@ use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivMod, Gcd, Parity, WrappingAddAssign, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
+    DivMod, Gcd, Parity, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
@@ -61,7 +59,14 @@ pub(crate) trait GcdSubdivideStepContext {
 }
 
 /// This is equivalent to `gcd_ctx` from `mpn/gcd.c`, GMP 6.2.1.
-struct GcdContext<'a>(&'a mut [Limb]);
+struct GcdContext<'a> {
+    out: &'a mut [Limb],
+    // The length of the gcd delivered to the hook, as in `gcd_ctx.gn` from GMP's gcd.c. This is
+    // `limbs_gcd_reduced`'s return value: the pre-step operand size over-reports the length
+    // whenever the final gcd is shorter than the current working width (e.g. for Mersenne-shaped
+    // inputs, whose reduction reaches equal operands far below the tracked size).
+    out_len: usize,
+}
 
 impl GcdSubdivideStepContext for GcdContext<'_> {
     /// This is equivalent to `gcd_hook` from `mpn/gcd.c`, GMP 6.2.1.
@@ -73,7 +78,8 @@ impl GcdSubdivideStepContext for GcdContext<'_> {
         _d: i8,
     ) {
         if let Some(g) = g {
-            self.0[..g.len()].copy_from_slice(g);
+            self.out[..g.len()].copy_from_slice(g);
+            self.out_len = g.len();
         }
     }
 }
@@ -664,19 +670,41 @@ pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
     let n = xs.len();
     assert!(ys.len() > n);
     assert!(out.len() > n);
-    let (out_lo, out_hi) = out.split_at_mut(n);
-    let (ys_lo, ys_hi) = ys.split_at_mut(n);
-    let mut x_high = limbs_mul_limb_to_out::<DoubleLimb, Limb>(out_lo, xs, m.data[0][0]);
-    x_high.wrapping_add_assign(
-        limbs_slice_add_mul_limb_same_length_in_place_left(out_lo, ys_lo, m.data[1][0])
-    );
-    let mut y_high = limbs_slice_mul_limb_in_place(ys_lo, m.data[1][1]);
-    y_high.wrapping_add_assign(
-        limbs_slice_add_mul_limb_same_length_in_place_left(ys_lo, xs, m.data[0][1])
-    );
-    out_hi[0] = x_high;
-    ys_hi[0] = y_high;
-    if x_high == 0 && y_high == 0 {
+    // A single fused pass computing both linear combinations: each input limb is loaded once, and
+    // the four multiply streams are independent, so a wide core can interleave them. This measured
+    // ~2x faster than the four separate mul_1/addmul_1 passes at hgcd-typical lengths.
+    let m_00 = DoubleLimb::from(m.data[0][0]);
+    let m_10 = DoubleLimb::from(m.data[1][0]);
+    let m_01 = DoubleLimb::from(m.data[0][1]);
+    let m_11 = DoubleLimb::from(m.data[1][1]);
+    // Each combination is accumulated in two chained double-width steps (a single expression with
+    // both products can exceed the double-width range). The running carry into each position can
+    // reach two limbs' worth (two product highs), so it is kept as (high bit, low limb), exactly as
+    // in an addmul_2 kernel; this works for arbitrary matrix entries.
+    let (mut carry_x_1, mut carry_x_0): (Limb, Limb) = (0, 0);
+    let (mut carry_y_1, mut carry_y_0): (Limb, Limb) = (0, 0);
+    for (o, (&x, y)) in out[..n].iter_mut().zip(xs.iter().zip(ys[..n].iter_mut())) {
+        let xw = DoubleLimb::from(x);
+        let yw = DoubleLimb::from(*y);
+        let p = m_00 * xw + DoubleLimb::from(carry_x_0);
+        let q = m_10 * yw + DoubleLimb::from(p.lower_half());
+        *o = q.lower_half();
+        let (c, overflow_1) = p.upper_half().overflowing_add(q.upper_half());
+        let (c, overflow_2) = c.overflowing_add(carry_x_1);
+        carry_x_0 = c;
+        carry_x_1 = Limb::from(overflow_1) | Limb::from(overflow_2);
+        let r = m_01 * xw + DoubleLimb::from(carry_y_0);
+        let t = m_11 * yw + DoubleLimb::from(r.lower_half());
+        *y = t.lower_half();
+        let (c, overflow_1) = r.upper_half().overflowing_add(t.upper_half());
+        let (c, overflow_2) = c.overflowing_add(carry_y_1);
+        carry_y_0 = c;
+        carry_y_1 = Limb::from(overflow_1) | Limb::from(overflow_2);
+    }
+    // The final carry above the top limb wraps, matching the previous pass-based version.
+    out[n] = carry_x_0;
+    ys[n] = carry_y_0;
+    if carry_x_0 == 0 && carry_y_0 == 0 {
         n
     } else {
         n + 1
@@ -709,12 +737,40 @@ pub(crate) fn limbs_half_gcd_matrix_1_mul_inverse_vector(
     let n = xs.len();
     assert_eq!(ys.len(), n);
     assert_eq!(out.len(), n);
-    let h0 = limbs_mul_limb_to_out::<DoubleLimb, Limb>(out, xs, m.data[1][1]);
-    let h1 = limbs_sub_mul_limb_same_length_in_place_left(out, ys, m.data[0][1]);
-    assert_eq!(h0, h1);
-    let h0 = limbs_slice_mul_limb_in_place(ys, m.data[0][0]);
-    let h1 = limbs_sub_mul_limb_same_length_in_place_left(ys, xs, m.data[1][0]);
-    assert_eq!(h0, h1);
+    // A single fused pass with independent multiply carry chains and subtraction borrow chains; see
+    // limbs_half_gcd_matrix_1_mul_vector. The final carry/borrow identities are exactly the
+    // pairwise assert_eq's of the previous four-pass version (the combinations cannot go negative,
+    // by the continued-fraction invariants).
+    let m_00 = DoubleLimb::from(m.data[0][0]);
+    let m_01 = DoubleLimb::from(m.data[0][1]);
+    let m_10 = DoubleLimb::from(m.data[1][0]);
+    let m_11 = DoubleLimb::from(m.data[1][1]);
+    let (mut carry_p, mut carry_q, mut borrow_out): (Limb, Limb, Limb) = (0, 0, 0);
+    let (mut carry_r, mut carry_s, mut borrow_y): (Limb, Limb, Limb) = (0, 0, 0);
+    for (o, (&x, y)) in out.iter_mut().zip(xs.iter().zip(ys.iter_mut())) {
+        let xw = DoubleLimb::from(x);
+        let yw = DoubleLimb::from(*y);
+        // out[i] = (m11 * x)[i] - (m01 * y)[i], with separate carry and borrow streams
+        let p = m_11 * xw + DoubleLimb::from(carry_p);
+        let q = m_01 * yw + DoubleLimb::from(carry_q);
+        carry_p = p.upper_half();
+        carry_q = q.upper_half();
+        let (d, borrow_1) = p.lower_half().overflowing_sub(q.lower_half());
+        let (d, borrow_2) = d.overflowing_sub(borrow_out);
+        borrow_out = Limb::from(borrow_1) + Limb::from(borrow_2);
+        *o = d;
+        // ys[i] = (m00 * y)[i] - (m10 * x)[i]
+        let r = m_00 * yw + DoubleLimb::from(carry_r);
+        let s = m_10 * xw + DoubleLimb::from(carry_s);
+        carry_r = r.upper_half();
+        carry_s = s.upper_half();
+        let (d, borrow_1) = r.lower_half().overflowing_sub(s.lower_half());
+        let (d, borrow_2) = d.overflowing_sub(borrow_y);
+        borrow_y = Limb::from(borrow_1) + Limb::from(borrow_2);
+        *y = d;
+    }
+    assert_eq!(carry_p, carry_q.wrapping_add(borrow_out));
+    assert_eq!(carry_r, carry_s.wrapping_add(borrow_y));
     if out[n - 1] == 0 && ys[n - 1] == 0 {
         n - 1
     } else {
@@ -1189,7 +1245,7 @@ pub(crate) const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
 }
 
 // TODO tune
-pub(crate) const HGCD_THRESHOLD: usize = 101;
+pub(crate) const HGCD_THRESHOLD: usize = 140;
 
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -1475,7 +1531,13 @@ pub(crate) fn limbs_half_gcd(
     }
 }
 
-// TODO tune
+// Re-measured 2026-07 after the fused matrix_1 vector kernels made Lehmer steps cheaper: the
+// crossover moved up from 330 into a wide plateau (~500-1000, within 2% noise); 500 wins the
+// 400-1600 limb band. The GMP-inherited value was 330. Measured on 64-bit only; 32-bit keeps the
+// old value pending measurement on real 32-bit hardware.
+#[cfg(not(feature = "32_bit_limbs"))]
+pub(crate) const GCD_DC_THRESHOLD: usize = 500;
+#[cfg(feature = "32_bit_limbs")]
 pub(crate) const GCD_DC_THRESHOLD: usize = 330;
 
 // X >= Y, X and Y not both even.
@@ -1532,10 +1594,13 @@ pub_crate_test! {limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [
             n = limbs_half_gcd_matrix_adjust(&m, p + new_n, xs, ys, p, scratch_hi);
         } else {
             // Temporary storage n.
-            let out_len = n;
-            n = limbs_gcd_subdivide_step(xs, ys, 0, &mut GcdContext(out), scratch);
+            let mut context = GcdContext {
+                out: &mut *out,
+                out_len: 0,
+            };
+            n = limbs_gcd_subdivide_step(xs, ys, 0, &mut context, scratch);
             if n == 0 {
-                return out_len;
+                return context.out_len;
             }
         }
     }
@@ -1566,16 +1631,13 @@ pub_crate_test! {limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [
         } else {
             // limbs_half_gcd_2 has failed. Then either one of x or y is very small, or the
             // difference is very small. Perform one subtraction followed by one division.
-            let out_len = n;
-            n = limbs_gcd_subdivide_step(
-                &mut xs[..n],
-                &mut ys[..n],
-                0,
-                &mut GcdContext(out),
-                scratch,
-            );
+            let mut context = GcdContext {
+                out: &mut *out,
+                out_len: 0,
+            };
+            n = limbs_gcd_subdivide_step(&mut xs[..n], &mut ys[..n], 0, &mut context, scratch);
             if n == 0 {
-                return out_len;
+                return context.out_len;
             }
         }
     }

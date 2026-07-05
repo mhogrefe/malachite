@@ -37,26 +37,25 @@ pub(crate) const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
 pub(crate) const MUL_TOOM22_THRESHOLD: usize = 16;
 pub(crate) const MUL_TOOM33_THRESHOLD: usize = 105;
-// toom44 has no winning range for balanced multiplication on this machine: toom6h overtakes
-// toom33 at ~300 (measured 2026-07), below the toom33/toom44 crossover (a wide plateau,
-// ~315-465). Setting this equal to MUL_TOOM6H_THRESHOLD makes the toom44 dispatch branch empty,
-// skipping it. (toom44 is still exercised via recursion inside the higher Toom levels.)
+// toom44 has no winning range for balanced multiplication on this machine: toom6h overtakes toom33
+// at ~300 (measured 2026-07), below the toom33/toom44 crossover (a wide plateau, ~315-465). Setting
+// this equal to MUL_TOOM6H_THRESHOLD makes the toom44 dispatch branch empty, skipping it. (toom44
+// is still exercised via recursion inside the higher Toom levels.)
 pub(crate) const MUL_TOOM44_THRESHOLD: usize = 300;
 pub(crate) const MUL_TOOM6H_THRESHOLD: usize = 300;
-// toom8h has no winning range for balanced multiplication on this machine: the FFT overtakes
-// toom6h at ~515 (measured 2026-07), below the toom6h/toom8h crossover (823). Equal to
-// MUL_FFT_THRESHOLD, emptying the toom8h dispatch branch.
-pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 515;
+// toom8h has no winning range for balanced multiplication on this machine: the FFT overtakes toom6h
+// at ~450 (measured 2026-07), below the toom6h/toom8h crossover (823). Equal to MUL_FFT_THRESHOLD,
+// emptying the toom8h dispatch branch.
+pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 450;
 
 pub(crate) const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 60;
 pub(crate) const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
 pub(crate) const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 600;
 pub(crate) const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
 
-// Measured 2026-07 (FFT vs toom6h head-to-head). NOTE: the FFT's small-transform path is
-// broken below output ~768 limbs (see the known-bug comment in mul/fft.rs); this threshold
-// keeps every FFT call at output >= 1030 limbs. Fix the small path before lowering further.
-pub(crate) const MUL_FFT_THRESHOLD: usize = 515;
+// Measured 2026-07 (FFT vs toom6h head-to-head over the full size range, after the small-transform
+// fixes made FFT sizes below 385 limbs work).
+pub(crate) const MUL_FFT_THRESHOLD: usize = 450;
 
 // Binary-to-string conversion thresholds (see natural/conversion/digits/general_digits.rs). TODO
 // tune
@@ -72,7 +71,7 @@ pub(crate) const MU_DIV_QR_THRESHOLD: usize = 809;
 pub(crate) const INV_MULMOD_BNM1_THRESHOLD: usize = 62;
 pub(crate) const MU_DIV_QR_SKEW_THRESHOLD: usize = 231;
 
-pub(crate) const MU_DIVAPPR_Q_THRESHOLD: usize = 187;
+pub(crate) const MU_DIVAPPR_Q_THRESHOLD: usize = 154;
 pub(crate) const FUDGE: usize = 311;
 
 pub(crate) const MULLO_BASECASE_THRESHOLD: usize = 1;
@@ -98,14 +97,14 @@ pub(crate) const BMOD_1_TO_MOD_1_THRESHOLD: usize = 100000000;
 pub(crate) const SQR_BASECASE_THRESHOLD: usize = 0;
 pub(crate) const SQR_TOOM2_THRESHOLD: usize = 35;
 pub(crate) const SQR_TOOM3_THRESHOLD: usize = 67;
-// toom4 has no winning range for squaring on this machine: toom6 overtakes toom3 at ~285
-// (measured 2026-07), below the toom3/toom4 crossover (a wide plateau, ~300-513, median 465).
-// Setting this equal to SQR_TOOM6_THRESHOLD makes the toom4 dispatch branch empty, skipping it.
+// toom4 has no winning range for squaring on this machine: toom6 overtakes toom3 at ~285 (measured
+// 2026-07), below the toom3/toom4 crossover (a wide plateau, ~300-513, median 465). Setting this
+// equal to SQR_TOOM6_THRESHOLD makes the toom4 dispatch branch empty, skipping it.
 pub(crate) const SQR_TOOM4_THRESHOLD: usize = 285;
 pub(crate) const SQR_TOOM6_THRESHOLD: usize = 285;
-// toom8 has no winning range for squaring on this machine: the FFT square overtakes toom6 at
-// ~424 (measured 2026-07), below the toom6/toom8 crossover (590). Equal to SQR_FFT_THRESHOLD
-// (in square.rs), emptying the toom8 dispatch branch.
+// toom8 has no winning range for squaring on this machine: the FFT square overtakes toom6 at ~424
+// (measured 2026-07), below the toom6/toom8 crossover (590). Equal to SQR_FFT_THRESHOLD (in
+// square.rs), emptying the toom8 dispatch branch.
 pub(crate) const SQR_TOOM8_THRESHOLD: usize = 424;
 
 pub(crate) const SQRLO_DC_THRESHOLD: usize = 389;

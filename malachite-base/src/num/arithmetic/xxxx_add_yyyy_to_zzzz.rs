@@ -42,7 +42,9 @@ fn xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(
     let (z_2, carry_a) = x_2.overflowing_add(y_2);
     let (z_2, carry_b) = z_2.overflowing_add(if carry { T::ONE } else { T::ZERO });
     let carry = carry_a | carry_b;
-    let z_3 = x_3.wrapping_add(y_3).wrapping_add(if carry { T::ONE } else { T::ZERO });
+    let z_3 = x_3
+        .wrapping_add(y_3)
+        .wrapping_add(if carry { T::ONE } else { T::ZERO });
     (z_3, z_2, z_1, z_0)
 }
 

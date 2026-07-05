@@ -28,9 +28,8 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivRound, ModInverse, ModPow, OverflowingAddAssign, OverflowingSubAssign,
-    Parity, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign,
-    WrappingSubAssign, XMulYToZZ, XXAddYYToZZ, XXXAddYYYToZZZ, XXXXAddYYYYToZZZZ,
+    CeilingLogBase2, DivRound, ModInverse, ModPow, Parity, PowerOf2, RoundToMultiple,
+    RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
@@ -721,7 +720,8 @@ macro_rules! mpn_to_ffts_hard {
         let mut xs = [f64x4::default(); $nvs];
         let mut ps = [f64x4::default(); $nvs];
         let mut pinvs = [f64x4::default(); $nvs];
-        for (i, r) in $rffts.chunks(4).enumerate() {
+        // Only the first `nvs` chunks; see the identical loop in apply_mpn_to_fft_func.
+        for (i, r) in $rffts.chunks(4).take($nvs).enumerate() {
             ps[i] = f64x4::new([r[0].p, r[1].p, r[2].p, r[3].p]);
             pinvs[i] = f64x4::new([r[0].pinv, r[1].pinv, r[2].pinv, r[3].pinv]);
         }
@@ -796,7 +796,11 @@ macro_rules! apply_mpn_to_fft_func {
             let mut xs = [f64x4::default(); $nvs];
             let mut ps = [f64x4::default(); $nvs];
             let mut pinvs = [f64x4::default(); $nvs];
-            for (i, r) in rffts.chunks(4).enumerate() {
+            // Only the first `nvs` chunks: `rffts` is the full MPN_CTX_NCRTS-entry context array
+            // (as in FLINT, which does exactly `nvs` vector loads from it). Iterating further
+            // overran `ps` for the np = 4 profiles, which is why balanced multiplications of 64-384
+            // limbs (the np = 4 size range) used to panic.
+            for (i, r) in rffts.chunks(4).take($nvs).enumerate() {
                 ps[i] = f64x4::from([r[0].p, r[1].p, r[2].p, r[3].p]);
                 pinvs[i] = f64x4::from([r[0].pinv, r[1].pinv, r[2].pinv, r[3].pinv]);
             }
@@ -2520,15 +2524,10 @@ fn sd_fft_trunc(
         sd_fft_trunc_internal(q, ds, 1, l - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
         return;
     }
-    // KNOWN BUG (2026-07): the small-size FFT panics (index out of bounds in the
-    // `mpn_to_ffts` input conversion, and this small-transform branch is also unexercised) for
-    // balanced sizes 64-384; sizes >= 385 are verified correct against the Toom dispatch by
-    // `tune_fft_small_check`. Production cannot reach the broken zone: the dispatch requires
-    // mean(xs_len, ys_len) >= MUL_FFT_THRESHOLD and 3 * ys_len >= MUL_FFT_THRESHOLD, so with the
-    // tuned threshold of 515 every FFT call has output >= 1030 limbs, above the zone's ceiling of
-    // 768. Fix the small path before lowering the threshold further.
-    fail_on_untested_path("sd_fft_trunc, l <= LG_BLK_SZ");
-    ds[itrunc..][..usize::power_of_2(l)].fill(0.0);
+    // This small-transform branch is reached by multiplications below ~385 balanced limbs (the np =
+    // 4 profiles), which became reachable when the `mpn_to_ffts` context-loading bug was fixed
+    // (2026-07); `tune_fft_small_check` verifies it against the Toom dispatch.
+    ds[itrunc..usize::power_of_2(l)].fill(0.0);
     // L=8 reads from w2tab[7]
     const _: () = assert!(LG_BLK_SZ <= SD_FFT_CTX_W2TAB_INIT);
     match l {
@@ -4353,7 +4352,9 @@ fn sd_ifft_trunc(
         sd_ifft_trunc_internal(q, d, 1, l - LG_BLK_SZ, 0, new_trunc, new_trunc, false);
         return;
     }
-    fail_on_untested_path("sd_ifft_trunc, l <= LG_BLK_SZ");
+    // This path is reached by small (< 385-limb balanced) multiplications, reachable since the
+    // mpn_to_ffts context-loading fix (2026-07); verified against the Toom dispatch by
+    // tune_fft_small_check.
     match l {
         0 => sd_ifft_basecase_0_1(q, d),
         1 => sd_ifft_basecase_1_1(q, d),
@@ -4679,11 +4680,11 @@ macro_rules! big_add_mul {
     };
 }
 
-// These are multi_add_3 through multi_add_8 from crt_helpers.h, FLINT 3.3.0-dev, as one
-// function generic over the word count. Adds the low N words of `a` to `z`; the top word wraps
-// (no carry out). The folded carry chain ((carry_1 | carry_2), with the previous carry added
-// before the next word) is the shape LLVM fuses into branchless adds/adcs on aarch64; the fixed
-// trip count unrolls fully.
+// These are multi_add_3 through multi_add_8 from crt_helpers.h, FLINT 3.3.0-dev, as one function
+// generic over the word count. Adds the low N words of `a` to `z`; the top word wraps (no carry
+// out). The folded carry chain ((carry_1 | carry_2), with the previous carry added before the next
+// word) is the shape LLVM fuses into branchless adds/adcs on aarch64; the fixed trip count unrolls
+// fully.
 #[inline(always)]
 fn multi_add<const N: usize>(z: &mut [u64], a: &[u64]) {
     let mut carry = false;
@@ -4699,10 +4700,10 @@ fn multi_add<const N: usize>(z: &mut [u64], a: &[u64]) {
 }
 
 // These are multi_add_4_alt through multi_add_8_alt from crt_helpers.h, FLINT 3.3.0-dev, as one
-// function generic over the source word count. Splits the low N u64 words of `a` into 2N half
-// words and adds them to `z`, whose limbs are half-width; the final half word (index 2N - 1) may
-// fall past the end of `z`, in which case it (and the carry into it) is dropped, and otherwise
-// wraps. See `multi_add` for the carry-chain shape.
+// function generic over the source word count. Splits the low N u64 words of `a` into 2N half words
+// and adds them to `z`, whose limbs are half-width; the final half word (index 2N - 1) may fall
+// past the end of `z`, in which case it (and the carry into it) is dropped, and otherwise wraps.
+// See `multi_add` for the carry-chain shape.
 #[cfg(feature = "32_bit_limbs")]
 #[inline(always)]
 fn multi_add_alt<const N: usize>(z: &mut [Limb], a: &[u64]) {
@@ -4744,8 +4745,8 @@ fn multi_sub<const N: usize>(z: &mut [u64], a: &[u64]) {
         .wrapping_sub(u64::from(borrow));
 }
 
-// This is multi_add_7 from crt_helpers.h, FLINT 3.3.0-dev.
-// This is _reduce_big_sum from crt_helpers.h, FLINT 3.3.0-dev.
+// This is multi_add_7 from crt_helpers.h, FLINT 3.3.0-dev. This is _reduce_big_sum from
+// crt_helpers.h, FLINT 3.3.0-dev.
 macro_rules! reduce_big_sum {
     ($n: expr, $r: ident, $t: ident, $limit: expr) => {
         let limit = $limit;
@@ -5169,9 +5170,9 @@ pub(crate) fn mpn_mul_default_mpn_ctx(r1: &mut [Limb], i1: &[Limb], i2: &[Limb],
     mpn_ctx_mpn_mul(&mut context, r1, i1, i2, test_slow);
 }
 
-// Tuner entry points (see bin_util/tune.rs and PORTING.md's note on `_for_tuning` wrappers).
-// The context deserialization is part of every production call, so it is correct for the
-// threshold measurements to include it.
+// Tuner entry points (see bin_util/tune.rs and PORTING.md's note on `_for_tuning` wrappers). The
+// context deserialization is part of every production call, so it is correct for the threshold
+// measurements to include it.
 #[cfg(feature = "test_build")]
 pub fn mpn_mul_fft_for_tuning(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     mpn_mul_default_mpn_ctx(out, xs, ys, false);

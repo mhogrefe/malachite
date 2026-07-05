@@ -1815,7 +1815,7 @@ fn ln_rational_prec_ref_fail() {
 }
 
 #[test]
-fn test_ln_rational_prec_round_xxx() {
+fn test_ln_rational_prec_round() {
     let test = |s, prec, rm, out, out_hex, out_o| {
         let u = Rational::from_str(s).unwrap();
 

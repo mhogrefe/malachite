@@ -448,7 +448,14 @@ const fn limbs_extended_gcd_same_length_lehmer_scratch_len(n: usize) -> usize {
     (n << 2) + 3
 }
 
-// TODO tune
+// Re-measured 2026-07 after the fused matrix_1 vector kernels (rebuild-per-candidate sweep over
+// 242/350/400/500/700): 500 has the best aggregate, winning 6-7% at 1600-3200 limbs over the
+// GMP-inherited 242 and matching the re-measured GCD_DC_THRESHOLD. The 242 setting is ~8% faster in
+// a narrow band around n = 400 only. Measured on 64-bit only; 32-bit keeps the old value (see
+// GCD_DC_THRESHOLD in half_gcd.rs).
+#[cfg(not(feature = "32_bit_limbs"))]
+const GCDEXT_DC_THRESHOLD: usize = 500;
+#[cfg(feature = "32_bit_limbs")]
 const GCDEXT_DC_THRESHOLD: usize = 242;
 
 // Temporary storage:

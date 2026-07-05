@@ -29,10 +29,12 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_nz::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use malachite_nz::natural::arithmetic::div::{
     limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
     limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
 };
+use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_divide_and_conquer,
     limbs_div_mod_schoolbook, limbs_invert_approx_scratch_len, limbs_invert_basecase_approx,
@@ -258,10 +260,10 @@ fn find_crossover_spec(
         }
         if thresh == last_thresh {
             since_change += 1;
-            // Give up after a long stretch without progress -- but not while the two algorithms
-            // are running nearly glued together (|d| small): such plateaus can persist for dozens
-            // of sizes before the upper algorithm finally pulls ahead, and quitting inside one
-            // reports a bogus "never wins".
+            // Give up after a long stretch without progress -- but not while the two algorithms are
+            // running nearly glued together (|d| small): such plateaus can persist for dozens of
+            // sizes before the upper algorithm finally pulls ahead, and quitting inside one reports
+            // a bogus "never wins".
             let glued = dat.iter().rev().take(10).any(|&(_, d)| d.abs() < 0.02);
             if since_change > 40 && !glued {
                 break;
@@ -347,9 +349,8 @@ fn tune_mul_toom44() {
     });
 }
 
-// The squaring algorithms reuse the mul-shaped `Algo` plumbing, ignoring `ys`. Validity
-// predicates replicate each function's split asserts (the sqr functions have no
-// `_input_sizes_valid` helpers).
+// The squaring algorithms reuse the mul-shaped `Algo` plumbing, ignoring `ys`. Validity predicates
+// replicate each function's split asserts (the sqr functions have no `_input_sizes_valid` helpers).
 
 fn sqr_basecase_algo<'a>() -> Algo<'a> {
     Algo {
@@ -421,8 +422,7 @@ fn tune_sqr_toom3() {
 fn sqr_toom6_algo<'a>() -> Algo<'a> {
     Algo {
         name: "sqr_toom6",
-        // n = 1 + (len - 1) / 6, s = len - 5n; needs len >= 18, s in 1..=n, and
-        // 10n + 3 <= 2 * len.
+        // n = 1 + (len - 1) / 6, s = len - 5n; needs len >= 18, s in 1..=n, and 10n + 3 <= 2 * len.
         valid: &|len| {
             if len < 18 {
                 return false;
@@ -499,9 +499,9 @@ fn tune_mul_toom6h() {
     });
 }
 
-// toom6h's measured crossover vs toom44 (229) is below toom44's own threshold (a ~315-465
-// plateau vs toom33), suggesting toom44 may have no winning range for balanced mul, as toom4
-// has none for squaring; this measures toom6h against the real incumbent directly.
+// toom6h's measured crossover vs toom44 (229) is below toom44's own threshold (a ~315-465 plateau
+// vs toom33), suggesting toom44 may have no winning range for balanced mul, as toom4 has none for
+// squaring; this measures toom6h against the real incumbent directly.
 fn tune_mul_toom6h_vs_toom33() {
     find_crossover(&Level {
         threshold_name: "MUL_TOOM6H_THRESHOLD",
@@ -526,9 +526,9 @@ fn tune_mul_toom8h() {
 // place (its low limbs become the remainder), normalized divisor, precomputed two-limb inverse.
 type DivAlgoFn = fn(&mut [Limb], &mut [Limb], &[Limb], Limb) -> bool;
 
-// Measure two division algorithms dividing 2n limbs by n limbs on identical, rotating input
-// sets. The dividend is refreshed from a pristine copy before each call (the copy cost is
-// incurred identically by both sides).
+// Measure two division algorithms dividing 2n limbs by n limbs on identical, rotating input sets.
+// The dividend is refreshed from a pristine copy before each call (the copy cost is incurred
+// identically by both sides).
 fn measure_div_pair(n: usize, min_d: usize, a: DivAlgoFn, b: DivAlgoFn) -> Option<(f64, f64)> {
     if n < min_d {
         return None;
@@ -631,9 +631,9 @@ fn tune_inv_newton() {
     );
 }
 
-// Divide-and-conquer division vs Barrett (MU) division, dividing 2n limbs by n limbs. The DC
-// side consumes its dividend, so its per-call refresh copy is included (as any
-// dividend-preserving caller would pay it); Barrett reads the dividend by reference.
+// Divide-and-conquer division vs Barrett (MU) division, dividing 2n limbs by n limbs. The DC side
+// consumes its dividend, so its per-call refresh copy is included (as any dividend-preserving
+// caller would pay it); Barrett reads the dividend by reference.
 fn measure_mu_pair(
     n: usize,
     dc: DivAlgoFn,
@@ -723,10 +723,10 @@ fn tune_mu_divappr_q() {
     );
 }
 
-// The Malachite side of the FFT-region mul comparison; the C sides are
-// perf/scratch/{mul_gmp.c, mul_flint.c} (make mul-gmp / mul-gmp-noasm / mul-flint). Inputs use
-// the same LCG so all four harnesses multiply identical operands. Times go through the full
-// dispatch, so sizes >= MUL_FFT_THRESHOLD exercise the fft_small port.
+// The Malachite side of the FFT-region mul comparison; the C sides are perf/scratch/{mul_gmp.c,
+// mul_flint.c} (make mul-gmp / mul-gmp-noasm / mul-flint). Inputs use the same LCG so all four
+// harnesses multiply identical operands. Times go through the full dispatch, so sizes >=
+// MUL_FFT_THRESHOLD exercise the fft_small port.
 fn tune_mul_fft_probe() {
     let mut n = 1024;
     while n <= 131072 {
@@ -755,6 +755,138 @@ fn tune_mul_fft_probe() {
         }
         println!("limbs_mul_greater_to_out n={n:<7} {best:>14.1} ns");
         n <<= 1;
+    }
+}
+
+// The Malachite side of the small-kernel gap analysis; the C side is perf/scratch/small_gmp.c (make
+// small-gmp / small-gmp-noasm). Sizes, seeds, and the best-of-batches loop mirror the C harness
+// exactly, so the tables compare directly.
+fn tune_small_kernel_probe() {
+    fn best_of(f: &mut dyn FnMut(), iters: u64) -> f64 {
+        let mut best = f64::INFINITY;
+        for _ in 0..9 {
+            let t = time_batch(f, iters);
+            if t < best {
+                best = t;
+            }
+        }
+        best
+    }
+    for n in [1usize, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64] {
+        let mut xs = vec![0; n];
+        let mut ys = vec![0; n];
+        lcg_fill(&mut xs, 1);
+        lcg_fill(&mut ys, 2);
+        let mut out = vec![0; n << 1];
+        let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(n, n)];
+        let iters = 1 + ((1u64 << 22) / (n * n + 16) as u64);
+        let t_dispatch = best_of(
+            &mut || {
+                black_box(limbs_mul_greater_to_out(
+                    black_box(&mut out),
+                    &xs,
+                    &ys,
+                    &mut scratch,
+                ));
+            },
+            iters,
+        );
+        let t_basecase = best_of(
+            &mut || {
+                limbs_mul_greater_to_out_basecase(black_box(&mut out), &xs, &ys);
+            },
+            iters,
+        );
+        println!("mul n={n:<3} dispatch {t_dispatch:>10.1} ns   basecase {t_basecase:>10.1} ns");
+    }
+    for n in [2usize, 4, 8, 16, 32, 64] {
+        let mut ns = vec![0; n << 1];
+        let mut ds = vec![0; n];
+        lcg_fill(&mut ns, 3);
+        lcg_fill(&mut ds, 4);
+        ds[n - 1] |= 1 << (Limb::WIDTH - 1);
+        let mut qs = vec![0; n + 1];
+        let mut rs = vec![0; n];
+        let iters = 1 + ((1u64 << 22) / (n * n + 16) as u64);
+        let t = best_of(
+            &mut || {
+                limbs_div_mod_to_out(black_box(&mut qs), &mut rs, &ns, &ds);
+            },
+            iters,
+        );
+        println!("div 2n/n n={n:<3} {t:>10.1} ns");
+    }
+    for n in [16usize, 64, 256] {
+        let mut xs = vec![0; n];
+        let mut ys = vec![0; n];
+        lcg_fill(&mut xs, 5);
+        lcg_fill(&mut ys, 6);
+        let z = 0x9E3779B97F4A7C15 as Limb;
+        let iters = 1 + ((1u64 << 22) / n as u64);
+        let t = best_of(
+            &mut || {
+                black_box(limbs_slice_add_mul_limb_same_length_in_place_left(
+                    black_box(&mut xs),
+                    &ys,
+                    z,
+                ));
+            },
+            iters,
+        );
+        println!("addmul_1 n={n:<3} {t:>10.1} ns");
+    }
+}
+
+// The Malachite side of the gcd comparison; the C side is perf/scratch/gcd_gmp.c (make gcd-gmp /
+// gcd-gmp-noasm). Identical operands via the shared LCG.
+fn tune_gcd_probe() {
+    use malachite_base::num::arithmetic::traits::Gcd;
+    use malachite_nz::natural::Natural;
+    for n in [10usize, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400] {
+        let mut xs = vec![0; n];
+        let mut ys = vec![0; n];
+        lcg_fill(&mut xs, 1);
+        lcg_fill(&mut ys, 2);
+        let x = Natural::from_owned_limbs_asc(xs);
+        let y = Natural::from_owned_limbs_asc(ys);
+        let mut best = f64::INFINITY;
+        let iters = 1 + ((1u64 << 24) / (n * n) as u64);
+        for _ in 0..7 {
+            let mut f = || {
+                black_box((&x).gcd(&y));
+            };
+            let t = time_batch(&mut f, iters);
+            if t < best {
+                best = t;
+            }
+        }
+        println!("gcd n={n:<5} {best:>12.1} ns");
+    }
+}
+
+// Extended-gcd timing at n-limb operand sizes, for the GCDEXT_DC / MATRIX22_STRASSEN sweeps.
+fn tune_xgcd_probe() {
+    use malachite_base::num::arithmetic::traits::ExtendedGcd;
+    use malachite_nz::natural::Natural;
+    for n in [25usize, 50, 100, 200, 400, 800, 1600, 3200] {
+        let mut xs = vec![0; n];
+        let mut ys = vec![0; n];
+        lcg_fill(&mut xs, 1);
+        lcg_fill(&mut ys, 2);
+        let x = Natural::from_owned_limbs_asc(xs);
+        let y = Natural::from_owned_limbs_asc(ys);
+        let mut best = f64::INFINITY;
+        let iters = 1 + ((1u64 << 23) / (n * n) as u64);
+        for _ in 0..7 {
+            let mut f = || {
+                black_box((&x).extended_gcd(&y));
+            };
+            let t = time_batch(&mut f, iters);
+            if t < best {
+                best = t;
+            }
+        }
+        println!("xgcd n={n:<5} {best:>12.1} ns");
     }
 }
 
@@ -798,8 +930,8 @@ fn fft_sqr_algo<'a>() -> Algo<'a> {
 }
 
 // SQR_FFT_THRESHOLD is currently derived (SQR_FFT_MODF_THRESHOLD * 10, frozen at 11700 in
-// square.rs); this measures where the FFT square actually overtakes toom8, to inform replacing
-// the derivation with a measured constant.
+// square.rs); this measures where the FFT square actually overtakes toom8, to inform replacing the
+// derivation with a measured constant.
 fn tune_sqr_fft() {
     find_crossover(&Level {
         threshold_name: "SQR_FFT_THRESHOLD",
@@ -810,12 +942,12 @@ fn tune_sqr_fft() {
     });
 }
 
-// Both FFT crossovers landed below the toom8 thresholds, so toom8h/toom8 may be squeezed out;
-// these measure the FFT against the real incumbents at those sizes.
+// Both FFT crossovers landed below the toom8 thresholds, so toom8h/toom8 may be squeezed out; these
+// measure the FFT against the real incumbents at those sizes.
 fn tune_mul_fft_vs_toom6h() {
     find_crossover(&Level {
         threshold_name: "MUL_FFT_THRESHOLD",
-        min_size: 385,
+        min_size: 64,
         max_size: 8000,
         lower: toom6h_algo(),
         upper: fft_mul_algo(),
@@ -825,15 +957,15 @@ fn tune_mul_fft_vs_toom6h() {
 fn tune_sqr_fft_vs_toom6() {
     find_crossover(&Level {
         threshold_name: "SQR_FFT_THRESHOLD",
-        min_size: 385,
+        min_size: 64,
         max_size: 16000,
         lower: sqr_toom6_algo(),
         upper: fft_sqr_algo(),
     });
 }
 
-// Correctness sweep for the FFT at small sizes (the `l <= LG_BLK_SZ` small-transform branch is
-// only reachable below ~400 limbs, which production never did while MUL_FFT_THRESHOLD was 1500):
+// Correctness sweep for the FFT at small sizes (the `l <= LG_BLK_SZ` small-transform branch is only
+// reachable below ~400 limbs, which production never did while MUL_FFT_THRESHOLD was 1500):
 // compares the FFT against the standard dispatch on many random inputs.
 fn tune_fft_small_check() {
     let mut mismatches = 0;
@@ -928,9 +1060,8 @@ fn tune_dc_divappr_q() {
     );
 }
 
-// toom4 appears to have no winning range on this machine (toom6 overtakes it below the
-// toom3/toom4 crossover), so the effective ladder is toom3 -> toom6; this measures that
-// crossover directly.
+// toom4 appears to have no winning range on this machine (toom6 overtakes it below the toom3/toom4
+// crossover), so the effective ladder is toom3 -> toom6; this measures that crossover directly.
 fn tune_sqr_toom6_vs_toom3() {
     find_crossover(&Level {
         threshold_name: "SQR_TOOM6_THRESHOLD",
@@ -1704,6 +1835,9 @@ pub fn tune(key: &str) {
         "dc_div_qr" => tune_dc_div_qr(),
         "dc_divappr_q" => tune_dc_divappr_q(),
         "mul_fft_probe" => tune_mul_fft_probe(),
+        "small_kernel_probe" => tune_small_kernel_probe(),
+        "gcd_probe" => tune_gcd_probe(),
+        "xgcd_probe" => tune_xgcd_probe(),
         "mul_fft" => tune_mul_fft(),
         "sqr_fft" => tune_sqr_fft(),
         "mul_fft_vs_toom6h" => tune_mul_fft_vs_toom6h(),

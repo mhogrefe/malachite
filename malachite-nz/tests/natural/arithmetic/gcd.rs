@@ -1070,7 +1070,7 @@ fn test_limbs_gcd_reduced() {
         // - an == 1 in limbs_gcd_subdivide_step
         // - s == 0 fourth time in limbs_gcd_subdivide_step
         // - n == 0
-        test(&[0, 0, 0, 0, 1], &[1, 0, 1], &[1, 0, 0]);
+        test(&[0, 0, 0, 0, 1], &[1, 0, 1], &[1]);
         // - n == 1
         test(&[0, 1, 1], &[1, 0, 1], &[1]);
         // - limbs_cmp_same_length(xs_init, ys_init) == Less second time in limbs_gcd_subdivide_step
@@ -1644,7 +1644,7 @@ fn test_limbs_gcd_reduced() {
                 4294967295, 4294967295, 4294967295, 4294967295, 32255, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4128768, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4128768,
             ],
         );
         // - n <= s + 2 in limbs_half_gcd

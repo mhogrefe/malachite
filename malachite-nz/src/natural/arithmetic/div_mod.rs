@@ -1394,8 +1394,8 @@ fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> 
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_invertappr_itch` from `gmp-impl.h`, GMP 6.2.1.
-// Public under test_build for the tuner (see PORTING.md's `_for_tuning` note).
+// This is equivalent to `mpn_invertappr_itch` from `gmp-impl.h`, GMP 6.2.1. Public under test_build
+// for the tuner (see PORTING.md's `_for_tuning` note).
 #[cfg(feature = "test_build")]
 pub const fn limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     limbs_invert_approx_scratch_len_helper(is_len)
@@ -1525,19 +1525,35 @@ pub_test! {limbs_div_mod_barrett(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
+    // Small dividends use a stack buffer: a heap allocation per call tripled the latency of the
+    // (very common) short division by a two-limb divisor.
+    const STACK_LEN: usize = 32;
+    let mut small_buf = [0; STACK_LEN + 1];
     let ds_1 = ds[1];
     let bits = LeadingZeros::leading_zeros(ds_1);
     if bits == 0 {
-        let mut ns = ns.to_vec();
+        let mut big_buf;
+        let ns = if n_len <= STACK_LEN {
+            small_buf[..n_len].copy_from_slice(ns);
+            &mut small_buf[..n_len]
+        } else {
+            big_buf = ns.to_vec();
+            &mut big_buf[..]
+        };
         // always store n_len - 1 quotient limbs
-        qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized(qs, &mut ns, ds));
+        qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized(qs, ns, ds));
         rs[0] = ns[0];
         rs[1] = ns[1];
     } else {
         let ds_0 = ds[0];
         let cobits = Limb::WIDTH - bits;
-        let mut ns_shifted = vec![0; n_len + 1];
-        let ns_shifted = &mut ns_shifted;
+        let mut big_buf;
+        let ns_shifted: &mut [Limb] = if n_len < STACK_LEN {
+            &mut small_buf[..=n_len]
+        } else {
+            big_buf = vec![0; n_len + 1];
+            &mut big_buf
+        };
         let carry = limbs_shl_to_out(ns_shifted, ns, bits);
         let ds_shifted = &mut [ds_0 << bits, (ds_1 << bits) | (ds_0 >> cobits)];
         if carry == 0 {
@@ -1891,8 +1907,6 @@ pub_crate_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Li
     }
 }}
 
-// TODO improve!
-//
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
 //
@@ -1900,8 +1914,38 @@ pub_crate_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Li
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 pub_crate_test! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
-    let ns_copy = ns.to_vec();
-    limbs_div_mod_to_out(qs, ns, &ns_copy, ds);
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len > 1);
+    assert!(n_len >= d_len);
+    assert!(qs.len() > n_len - d_len);
+    let ds_last = ds[d_len - 1];
+    assert_ne!(ds_last, 0);
+    // For normalized divisors below the Barrett range, the destructive schoolbook and
+    // divide-and-conquer engines leave the remainder in the low limbs of `ns`, which is exactly
+    // this function's contract, so the division runs fully in place: no allocation and no copying.
+    // (The previous implementation copied the entire dividend to the heap on every call.) The
+    // engines return the high quotient limb, which is 0 or 1 since the divisor is normalized.
+    if ds_last.get_highest_bit() && d_len < MU_DIV_QR_THRESHOLD {
+        if d_len == 2 {
+            qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized(qs, ns, ds));
+        } else {
+            let d_inv = limbs_two_limb_inverse_helper(ds_last, ds[d_len - 2]);
+            let highest_q = if d_len < DC_DIV_QR_THRESHOLD || n_len < d_len + 3 {
+                limbs_div_mod_schoolbook(qs, ns, ds, d_inv)
+            } else {
+                limbs_div_mod_divide_and_conquer(qs, ns, ds, d_inv)
+            };
+            qs[n_len - d_len] = Limb::from(highest_q);
+        }
+    } else {
+        // Unnormalized or Barrett-range divisors: divide out of place. (For unnormalized divisors
+        // the algorithms need a shifted, one-limb-longer dividend anyway, and Barrett reads the
+        // dividend while writing the remainder elsewhere; in both cases the copy is amortized
+        // against the division itself.)
+        let ns_copy = ns.to_vec();
+        limbs_div_mod_to_out(qs, ns, &ns_copy, ds);
+    }
 }}
 
 impl Natural {

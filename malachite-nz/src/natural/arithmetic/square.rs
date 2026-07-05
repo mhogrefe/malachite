@@ -62,8 +62,8 @@ use crate::platform::{
 };
 
 // Re-exported so that the tuner can read the compiled-in cap (`limbs_square_to_out_basecase`'s
-// stack buffer is sized by this threshold). The value lives in the platform files so that it can
-// be tuned per platform.
+// stack buffer is sized by this threshold). The value lives in the platform files so that it can be
+// tuned per platform.
 #[cfg(feature = "test_build")]
 pub const SQR_TOOM2_THRESHOLD: usize = crate::platform::SQR_TOOM2_THRESHOLD;
 
@@ -81,10 +81,15 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 
-// Measured directly 2026-07 (FFT square vs toom6 head-to-head; the old derived heuristic said
-// 11700, 27x too high). The FFT's small-transform path is broken below output ~768 limbs (see
-// mul/fft.rs); 424 keeps every FFT square at output >= 848 limbs.
+// Measured directly 2026-07 on 64-bit (FFT square vs toom6 head-to-head; the old derived heuristic
+// said 11700, 27x too high; re-measured over the full size range after the small-transform fixes:
+// 429, within plateau noise of the applied value). 32-bit keeps the original derivation,
+// SQR_TOOM3_THRESHOLD * 3 * 10: the 64-bit value shrinks SQR_TOOM8_MAX below platform_32's Toom
+// thresholds, turning off every recursion gate in limbs_square_to_out_toom_8 and breaking it.
+#[cfg(not(feature = "32_bit_limbs"))]
 pub(crate) const SQR_FFT_THRESHOLD: usize = 424;
+#[cfg(feature = "32_bit_limbs")]
+pub(crate) const SQR_FFT_THRESHOLD: usize = crate::platform::SQR_TOOM3_THRESHOLD * 30;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
