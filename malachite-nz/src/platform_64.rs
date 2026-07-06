@@ -48,10 +48,15 @@ pub(crate) const MUL_TOOM6H_THRESHOLD: usize = 300;
 // emptying the toom8h dispatch branch.
 pub(crate) const MUL_TOOM8H_THRESHOLD: usize = 450;
 
-pub(crate) const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 60;
+pub(crate) const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 58;
+// Not directly measurable as a toom32/toom53 pair: toom32's validity (2x < 3(y + 1)) only
+// overlaps the bottom edge of this threshold's dispatch band (3y/2 <= x < 7y/4), and at that
+// edge toom32 wins to beyond 1900 limbs (measured 2026-07). In the band's interior the choice
+// is toom53 vs the general fallback, which this constant was not measured against; the
+// GMP-inherited value is kept.
 pub(crate) const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
-pub(crate) const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 600;
-pub(crate) const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
+pub(crate) const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 121;
+pub(crate) const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 100;
 
 // Measured 2026-07 (FFT vs toom6h head-to-head over the full size range, after the small-transform
 // fixes made FFT sizes below 385 limbs work).
@@ -75,22 +80,39 @@ pub(crate) const MU_DIVAPPR_Q_THRESHOLD: usize = 154;
 pub(crate) const FUDGE: usize = 311;
 
 pub(crate) const MULLO_BASECASE_THRESHOLD: usize = 1;
-pub(crate) const MULLO_DC_THRESHOLD: usize = 56;
-pub(crate) const MULLO_MUL_N_THRESHOLD: usize = 10806;
+pub(crate) const MULLO_DC_THRESHOLD: usize = 61;
+pub(crate) const MULLO_MUL_N_THRESHOLD: usize = 1015;
 
-pub(crate) const BINV_NEWTON_THRESHOLD: usize = 2211;
-pub(crate) const DC_BDIV_QR_THRESHOLD: usize = 211;
-pub(crate) const MU_BDIV_QR_THRESHOLD: usize = 7547;
-pub(crate) const DC_BDIV_Q_THRESHOLD: usize = 211;
-pub(crate) const MU_BDIV_Q_THRESHOLD: usize = 1998;
+// Rebuild-per-candidate sweep 2026-07 (probe: limbs_modular_invert at 400-6400 limbs): Newton
+// inversion wins from ~120 limbs, flat below; the GMP-inherited 2211 left 19-24% on the table
+// at 1600+ limbs. Newton rides multiplication, which is far faster than when 2211 was set.
+pub(crate) const BINV_NEWTON_THRESHOLD: usize = 120;
+// Divide-and-conquer Hensel division has (almost) no winning range on this machine: Barrett
+// bdiv overtakes schoolbook at ~121 (measured 2026-07), below the schoolbook/DC crossover
+// (~218). Set to MU_BDIV_QR_THRESHOLD - 1 (the dispatch asserts require strictly less), leaving
+// DC a single-size sliver.
+pub(crate) const DC_BDIV_QR_THRESHOLD: usize = 120;
+// Measured 2026-07 vs schoolbook (the real incumbent; see DC_BDIV_QR_THRESHOLD). The
+// GMP-inherited value was 7547; Barrett bdiv rides multiplication, which is far faster now.
+pub(crate) const MU_BDIV_QR_THRESHOLD: usize = 121;
+// See DC_BDIV_QR_THRESHOLD: Barrett bdiv-Q overtakes schoolbook at ~162, below the
+// schoolbook/DC crossover; DC keeps a single-size sliver to satisfy the ladder asserts.
+pub(crate) const DC_BDIV_Q_THRESHOLD: usize = 161;
+// Measured 2026-07 vs schoolbook (extended-patience scan; schoolbook dominates below 162 by
+// wide margins, then Barrett wins). The GMP-inherited value was 1998.
+pub(crate) const MU_BDIV_Q_THRESHOLD: usize = 162;
 
 pub(crate) const MOD_1_NORM_THRESHOLD: usize = 0;
 pub(crate) const MOD_1_UNNORM_THRESHOLD: usize = 0;
 pub(crate) const MOD_1_1P_METHOD: bool = false;
-pub(crate) const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
-pub(crate) const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 0;
-pub(crate) const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 6;
-pub(crate) const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
+// The MOD_1* thresholds below were set from the tune_mod_1_shootout kernel table (2026-07);
+// MOD_1_1P_METHOD = false (the any_leading_zeros_2 kernel) confirmed best at length >= 24 and
+// tied below. INV_MULMOD_BNM1_THRESHOLD and the AORSMUL_FASTER_* settings were measured flat
+// (non-levers on this machine) and keep their inherited values.
+pub(crate) const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 6;
+pub(crate) const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 3;
+pub(crate) const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 10;
+pub(crate) const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 24;
 
 pub(crate) const BMOD_1_TO_MOD_1_THRESHOLD: usize = 100000000;
 
@@ -107,9 +129,9 @@ pub(crate) const SQR_TOOM6_THRESHOLD: usize = 285;
 // square.rs), emptying the toom8 dispatch branch.
 pub(crate) const SQR_TOOM8_THRESHOLD: usize = 424;
 
-pub(crate) const SQRLO_DC_THRESHOLD: usize = 389;
+pub(crate) const SQRLO_DC_THRESHOLD: usize = 15;
 
-pub(crate) const FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 6500;
+pub(crate) const FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 525;
 
 pub(crate) const MATRIX22_STRASSEN_THRESHOLD: usize = 30;
 

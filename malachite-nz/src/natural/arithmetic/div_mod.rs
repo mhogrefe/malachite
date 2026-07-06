@@ -1211,7 +1211,7 @@ pub_crate_test! {limbs_div_barrett_large_product(
 // where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
 // This is equivalent to `mpn_preinv_mu_div_qr` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
-fn limbs_div_mod_barrett_preinverted(
+pub(crate) fn limbs_div_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1385,7 +1385,7 @@ pub_crate_test! {limbs_div_mod_barrett_helper(
 //
 // This is equivalent to `mpn_preinv_mu_div_qr_itch` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, but
 // `nn` is omitted from the arguments as it is unused.
-fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
+pub(crate) fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
     itch_local + itch_out

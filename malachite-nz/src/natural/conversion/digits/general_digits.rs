@@ -8,6 +8,15 @@
 //
 //      Copyright © 1991-2018 Free Software Foundation, Inc.
 //
+// Uses techniques adopted from the FLINT Library.
+//
+//      The precomputed-inverse divide-and-conquer conversion is from `fmpz_get_str` and
+//      `_fmpz_get_str_recursive` in `fmpz/get_str.c`, FLINT 3.3.0-dev.
+//
+//      Copyright © 2010, 2011 Sebastian Pancratz
+//
+//      Copyright © 2023 Fredrik Johansson
+//
 // This file is part of Malachite.
 //
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -15,16 +24,22 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::arithmetic::add::limbs_add_limb_to_out;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 use crate::natural::arithmetic::div_mod::{
-    limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_qs_to_out_rs_to_ns,
+    limbs_div_limb_in_place_mod, limbs_div_mod_barrett_is_len,
+    limbs_div_mod_barrett_preinverse_scratch_len, limbs_div_mod_barrett_preinverted,
+    limbs_div_mod_extra_in_place, limbs_div_mod_qs_to_out_rs_to_ns, limbs_invert_approx,
+    limbs_invert_approx_scratch_len,
 };
 use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use crate::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
+use crate::natural::arithmetic::shl::limbs_shl_to_out;
+use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::{Natural, limb_to_bit_count};
@@ -682,6 +697,145 @@ pub_test! {limbs_compute_power_table(
 // The value lives in the platform files so that it can be tuned per platform.
 use crate::platform::GET_STR_DC_THRESHOLD;
 
+// This is equivalent to the `pows`/`preinv` tables of `_fmpz_get_str_recursive` from
+// `fmpz/get_str.c`, FLINT 3.3.0-dev (there per-level `fmpz_preinvn_struct`s; here per-row limb
+// slices): a row's power divides the number once per chunk at its level of the
+// divide-and-conquer tree, so computing its Newton inverse once and reusing it turns each
+// division's inversion cost (roughly a third of a Barrett division) into a one-time cost per
+// row. GMP's mpn_get_str, by contrast, re-derives the inverse inside every division.
+//
+// Every division through a row is zero-padded to the fixed per-row shape
+// (2 * power_len + shift + 1) / power_len, so the quotient length, and therefore the required
+// inverse length, is a per-row constant.
+struct PowerInverse<'a> {
+    // the row's power, shifted left by `bits` so its highest bit is set
+    ds_shifted: &'a [Limb],
+    // approximate inverse of the top of ds_shifted, as built by limbs_div_mod_barrett_helper
+    is: &'a [Limb],
+    // the normalization shift
+    bits: u64,
+}
+
+// With the inversion precomputed, Barrett's economics change: its per-division cost is two
+// multiplications (which ride Toom/FFT), beating the schoolbook/divide-and-conquer engines'
+// quadratic kernels far below the ordinary MU_DIV_QR_THRESHOLD. Swept 2026-07: monotone
+// improvement down to ~50 limbs, flat below.
+const POWER_INVERSE_THRESHOLD: usize = 50;
+
+const fn power_inverse_padded_len(power_len: usize, shift: usize) -> usize {
+    (power_len << 1) + shift + 1
+}
+
+const fn power_inverse_is_len(power_len: usize, shift: usize) -> usize {
+    limbs_div_mod_barrett_is_len(power_len + shift + 1, power_len)
+}
+
+// Returns (arena length for the shifted powers and inverses, scratch length for
+// divide_by_power_preinverted).
+fn power_inverses_scratch_lens(powers: &[PowerTableRow]) -> (usize, usize) {
+    let mut arena_len = 0;
+    let mut scratch_len = 0;
+    for p in powers {
+        let d_len = p.power.len();
+        if d_len >= POWER_INVERSE_THRESHOLD {
+            let is_len = power_inverse_is_len(d_len, p.shift);
+            arena_len += d_len + is_len;
+            let call_scratch = power_inverse_padded_len(d_len, p.shift)
+                + d_len
+                + limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
+            if call_scratch > scratch_len {
+                scratch_len = call_scratch;
+            }
+        }
+    }
+    (arena_len, scratch_len)
+}
+
+// Computes the normalized powers and their approximate inverses for the qualifying rows,
+// borrowing storage from `memory` (sized by power_inverses_scratch_lens). The inverse
+// construction matches limbs_div_mod_barrett_helper's: invert the top is_len + 1 limbs of the
+// normalized divisor plus one, and drop the lowest limb of the result.
+fn compute_power_inverses<'a>(
+    powers: &[PowerTableRow],
+    mut memory: &'a mut [Limb],
+) -> Vec<Option<PowerInverse<'a>>> {
+    let mut out = Vec::with_capacity(powers.len());
+    for p in powers {
+        let d_len = p.power.len();
+        if d_len < POWER_INVERSE_THRESHOLD {
+            out.push(None);
+            continue;
+        }
+        let is_len = power_inverse_is_len(d_len, p.shift);
+        let (ds_shifted, rest) = memory.split_at_mut(d_len);
+        let (is, rest) = rest.split_at_mut(is_len);
+        memory = rest;
+        let bits = LeadingZeros::leading_zeros(*p.power.last().unwrap());
+        if bits == 0 {
+            ds_shifted.copy_from_slice(p.power);
+        } else {
+            assert_eq!(limbs_shl_to_out(ds_shifted, p.power, bits), 0);
+        }
+        let is_len_plus_1 = is_len + 1;
+        let mut top = vec![0; is_len_plus_1];
+        if limbs_add_limb_to_out(&mut top, &ds_shifted[d_len - is_len_plus_1..], 1) {
+            // The top of the divisor is all ones; the inverse is zero.
+        } else {
+            let mut is_buf = vec![0; is_len_plus_1];
+            let mut inv_scratch = vec![0; limbs_invert_approx_scratch_len(is_len_plus_1)];
+            limbs_invert_approx(&mut is_buf, &top, &mut inv_scratch);
+            is.copy_from_slice(&is_buf[1..]);
+        }
+        out.push(Some(PowerInverse {
+            ds_shifted,
+            is,
+            bits,
+        }));
+    }
+    out
+}
+
+// Divides `xs` by the row's power using the precomputed inverse: the quotient is written to
+// `qs` (padded_q_len limbs, zero above the true quotient) and the remainder to
+// `xs[..power_len]`, matching limbs_div_mod_qs_to_out_rs_to_ns's contract at this call shape.
+fn divide_by_power_preinverted(
+    qs: &mut [Limb],
+    xs: &mut [Limb],
+    power_len: usize,
+    shift: usize,
+    pinv: &PowerInverse,
+    scratch: &mut [Limb],
+) {
+    let n_len = xs.len();
+    let d_len = power_len;
+    let padded_len = power_inverse_padded_len(d_len, shift);
+    assert!(n_len < padded_len);
+    let (ns_padded, scratch) = scratch.split_at_mut(padded_len);
+    let (rs, scratch) = scratch.split_at_mut(d_len);
+    if pinv.bits == 0 {
+        ns_padded[..n_len].copy_from_slice(xs);
+        slice_set_zero(&mut ns_padded[n_len..]);
+    } else {
+        let carry = limbs_shl_to_out(ns_padded, xs, pinv.bits);
+        ns_padded[n_len] = carry;
+        slice_set_zero(&mut ns_padded[n_len + 1..]);
+    }
+    let q_len = padded_len - d_len;
+    limbs_div_mod_barrett_preinverted(
+        &mut qs[..q_len],
+        rs,
+        ns_padded,
+        pinv.ds_shifted,
+        pinv.is,
+        scratch,
+    );
+    if pinv.bits == 0 {
+        xs[..d_len].copy_from_slice(rs);
+    } else {
+        limbs_shr_to_out(&mut xs[..d_len], rs, pinv.bits);
+    }
+}
+
 // Convert `xs` to a string with a base as represented in `powers`, and put the string in `out`.
 // Generate `len` characters, possibly padding with zeros to the left. If `len` is zero, generate as
 // many characters as required. Return a pointer immediately after the last digit of the result
@@ -701,6 +855,8 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
     xs: &mut [Limb],
     base: u64,
     powers: &[PowerTableRow],
+    inverses: &[Option<PowerInverse>],
+    preinv_scratch: &mut [Limb],
     i: usize,
     scratch: &mut [Limb],
 ) -> usize {
@@ -733,12 +889,25 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
                 xs,
                 base,
                 powers,
+                inverses,
+                preinv_scratch,
                 i - 1,
                 scratch,
             )
         } else {
             let power = &powers[i];
-            limbs_div_mod_qs_to_out_rs_to_ns(scratch, &mut xs[shift..], power.power);
+            if let Some(Some(pinv)) = inverses.get(i) {
+                divide_by_power_preinverted(
+                    scratch,
+                    &mut xs[shift..],
+                    power.power.len(),
+                    shift,
+                    pinv,
+                    preinv_scratch,
+                );
+            } else {
+                limbs_div_mod_qs_to_out_rs_to_ns(scratch, &mut xs[shift..], power.power);
+            }
             let mut q_len = xs_len - total_len;
             if scratch[q_len] != 0 {
                 q_len += 1;
@@ -758,6 +927,8 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
                 scratch_lo,
                 base,
                 powers,
+                inverses,
+                preinv_scratch,
                 i - 1,
                 scratch_hi,
             );
@@ -767,6 +938,8 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
                 &mut xs[..total_len],
                 base,
                 powers,
+                inverses,
+                preinv_scratch,
                 i - 1,
                 scratch,
             ) + next_index
@@ -786,7 +959,17 @@ pub fn limbs_to_digits_small_base_divide_and_conquer_for_tuning<T: PrimitiveUnsi
     i: usize,
     scratch: &mut [Limb],
 ) -> usize {
-    limbs_to_digits_small_base_divide_and_conquer(out, 0, xs, base, powers, i, scratch)
+    limbs_to_digits_small_base_divide_and_conquer(
+        out,
+        0,
+        xs,
+        base,
+        powers,
+        &[],
+        &mut [],
+        i,
+        scratch,
+    )
 }
 
 #[cfg(feature = "test_build")]
@@ -848,6 +1031,12 @@ pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
         let len = 1 + usize::exact_from(digits_len) / get_chars_per_limb(base);
         let (power_len, powers) =
             limbs_compute_power_table(&mut power_table_memory, len, base, forced_algorithm);
+        // Precompute Barrett inverses for the rows whose divisions run at Barrett sizes; each
+        // such row's inverse is computed once and reused by every division through the row.
+        let (inverse_arena_len, preinv_scratch_len) = power_inverses_scratch_lens(&powers);
+        let mut inverse_arena = vec![0; inverse_arena_len];
+        let mut preinv_scratch = vec![0; preinv_scratch_len];
+        let inverses = compute_power_inverses(&powers, &mut inverse_arena);
         // Using our precomputed powers, convert our number.
         let mut scratch =
             vec![0; limbs_to_digits_small_base_divide_and_conquer_scratch_len(xs_len)];
@@ -857,6 +1046,8 @@ pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
             xs,
             base,
             &powers,
+            &inverses,
+            &mut preinv_scratch,
             power_len,
             &mut scratch,
         )

@@ -37,24 +37,48 @@ use malachite_nz::natural::arithmetic::div::{
 use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_divide_and_conquer,
-    limbs_div_mod_schoolbook, limbs_invert_approx_scratch_len, limbs_invert_basecase_approx,
-    limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
+    limbs_div_mod_schoolbook, limbs_invert_approx, limbs_invert_approx_scratch_len,
+    limbs_invert_basecase_approx, limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mul::fft::{
     mpn_mul_fft_for_tuning, mpn_square_fft_for_tuning,
 };
+use malachite_nz::natural::arithmetic::div_exact::{
+    limbs_modular_div_barrett, limbs_modular_div_barrett_scratch_len,
+    limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_barrett,
+    limbs_modular_div_mod_barrett_scratch_len, limbs_modular_div_mod_divide_and_conquer,
+    limbs_modular_div_mod_schoolbook, limbs_modular_div_schoolbook, limbs_modular_invert,
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
+use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
+    limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
+};
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use malachite_nz::natural::arithmetic::mul::mul_low::{
+    limbs_mul_low_same_length_basecase, limbs_mul_low_same_length_divide_and_conquer,
+    limbs_mul_low_same_length_divide_and_conquer_scratch_len,
+};
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
     limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_greater_to_out_toom_22,
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_33,
+    limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_32,
+    limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_32_scratch_len, limbs_mul_greater_to_out_toom_33,
     limbs_mul_greater_to_out_toom_33_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_44,
+    limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_42,
+    limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_42_scratch_len, limbs_mul_greater_to_out_toom_43,
+    limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_43_scratch_len, limbs_mul_greater_to_out_toom_44,
     limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_44_scratch_len,
+    limbs_mul_greater_to_out_toom_44_scratch_len, limbs_mul_greater_to_out_toom_53,
+    limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_53_scratch_len, limbs_mul_greater_to_out_toom_63,
+    limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_63_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
@@ -1024,6 +1048,678 @@ fn tune_fft_small_check() {
     println!("fft small-size check: {mismatches} failures over sizes 64..=1024 x4 input sets");
 }
 
+// An algorithm entry for the unbalanced-multiplication crossovers, parameterized over
+// (xs_len, ys_len) rather than a single balanced size.
+struct UnbalancedAlgo<'a> {
+    name: &'a str,
+    valid: &'a dyn Fn(usize, usize) -> bool,
+    scratch_len: &'a dyn Fn(usize, usize) -> usize,
+    run: &'a dyn Fn(&mut [Limb], &[Limb], &[Limb], &mut [Limb]),
+}
+
+// Like measure_mul_pair, but for distinct operand lengths.
+fn measure_unbalanced_pair(
+    xs_len: usize,
+    ys_len: usize,
+    a: &UnbalancedAlgo,
+    b: &UnbalancedAlgo,
+) -> Option<(f64, f64)> {
+    if xs_len < ys_len || !(a.valid)(xs_len, ys_len) || !(b.valid)(xs_len, ys_len) {
+        return None;
+    }
+    let inputs: Vec<(Vec<Limb>, Vec<Limb>)> = (0..INPUT_SETS)
+        .map(|k| {
+            let xs = random_primitive_ints(EXAMPLE_SEED.fork(&format!("ux{k}")))
+                .take(xs_len)
+                .collect();
+            let ys = random_primitive_ints(EXAMPLE_SEED.fork(&format!("uy{k}")))
+                .take(ys_len)
+                .collect();
+            (xs, ys)
+        })
+        .collect();
+    let out_len = xs_len + ys_len;
+    let mut out_a = vec![0; out_len];
+    let mut out_b = vec![0; out_len];
+    let mut scratch_a = vec![0; (a.scratch_len)(xs_len, ys_len)];
+    let mut scratch_b = vec![0; (b.scratch_len)(xs_len, ys_len)];
+    for (xs, ys) in &inputs {
+        (a.run)(&mut out_a, xs, ys, &mut scratch_a);
+        (b.run)(&mut out_b, xs, ys, &mut scratch_b);
+    }
+    assert_eq!(out_a, out_b);
+    let (mut i, mut j) = (0usize, 0usize);
+    Some(interleaved_min_pair(
+        &mut || {
+            let (xs, ys) = &inputs[i & (INPUT_SETS - 1)];
+            i += 1;
+            (a.run)(black_box(&mut out_a), xs, ys, &mut scratch_a);
+        },
+        &mut || {
+            let (xs, ys) = &inputs[j & (INPUT_SETS - 1)];
+            j += 1;
+            (b.run)(black_box(&mut out_b), xs, ys, &mut scratch_b);
+        },
+    ))
+}
+
+macro_rules! unbalanced_algo {
+    ($name: literal, $valid: ident, $scratch: ident, $run: ident) => {
+        UnbalancedAlgo {
+            name: $name,
+            valid: &|x, y| $valid(x, y),
+            scratch_len: &|x, y| $scratch(x, y),
+            run: &|out, xs, ys, scratch| $run(out, xs, ys, scratch),
+        }
+    };
+}
+
+// Each interior threshold selects between two Toom variants within an aspect-ratio band of the
+// unbalanced dispatch (see limbs_mul_greater_to_out); the scan sweeps ys_len with xs_len at a
+// representative aspect ratio inside that band.
+fn tune_unbalanced_interior(
+    threshold_name: &str,
+    lower: &UnbalancedAlgo,
+    upper: &UnbalancedAlgo,
+    aspect: &dyn Fn(usize) -> usize,
+    max_size: usize,
+) {
+    find_crossover_spec(threshold_name, lower.name, upper.name, 15, max_size, &|y| {
+        measure_unbalanced_pair(aspect(y), y, lower, upper)
+    });
+}
+
+fn tune_mul_toom32_to_toom43() {
+    // dispatch band: 7 * y / 6 <= x < 3 * y / 2; representative aspect 4 / 3
+    tune_unbalanced_interior(
+        "MUL_TOOM32_TO_TOOM43_THRESHOLD",
+        &unbalanced_algo!(
+            "toom32",
+            limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_32_scratch_len,
+            limbs_mul_greater_to_out_toom_32
+        ),
+        &unbalanced_algo!(
+            "toom43",
+            limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_43_scratch_len,
+            limbs_mul_greater_to_out_toom_43
+        ),
+        &|y| y * 4 / 3,
+        1200,
+    );
+}
+
+fn tune_mul_toom32_to_toom53() {
+    // dispatch band: 3 * y / 2 <= x < 7 * y / 4; toom32's validity (2x < 3(y + 1)) only
+    // overlaps the band's bottom edge, so the comparison runs at x = 3y/2 + 1
+    tune_unbalanced_interior(
+        "MUL_TOOM32_TO_TOOM53_THRESHOLD",
+        &unbalanced_algo!(
+            "toom32",
+            limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_32_scratch_len,
+            limbs_mul_greater_to_out_toom_32
+        ),
+        &unbalanced_algo!(
+            "toom53",
+            limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_53_scratch_len,
+            limbs_mul_greater_to_out_toom_53
+        ),
+        &|y| y * 3 / 2 + 1,
+        2000,
+    );
+}
+
+fn tune_mul_toom42_to_toom53() {
+    // dispatch band: 7 * y / 4 <= x < 11 * y / 6; representative aspect 9 / 5
+    tune_unbalanced_interior(
+        "MUL_TOOM42_TO_TOOM53_THRESHOLD",
+        &unbalanced_algo!(
+            "toom42",
+            limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_42_scratch_len,
+            limbs_mul_greater_to_out_toom_42
+        ),
+        &unbalanced_algo!(
+            "toom53",
+            limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_53_scratch_len,
+            limbs_mul_greater_to_out_toom_53
+        ),
+        &|y| y * 9 / 5,
+        3000,
+    );
+}
+
+fn tune_mul_toom42_to_toom63() {
+    // dispatch band: 11 * y / 6 <= x < 5 * y / 2; representative aspect 21 / 10
+    tune_unbalanced_interior(
+        "MUL_TOOM42_TO_TOOM63_THRESHOLD",
+        &unbalanced_algo!(
+            "toom42",
+            limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_42_scratch_len,
+            limbs_mul_greater_to_out_toom_42
+        ),
+        &unbalanced_algo!(
+            "toom63",
+            limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+            limbs_mul_greater_to_out_toom_63_scratch_len,
+            limbs_mul_greater_to_out_toom_63
+        ),
+        &|y| y * 21 / 10,
+        3000,
+    );
+}
+
+fn mullo_basecase_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "mullo_basecase",
+        valid: &|_| true,
+        scratch_len: &|_| 0,
+        run: &|out, xs, ys, _| limbs_mul_low_same_length_basecase(out, xs, ys),
+    }
+}
+
+fn mullo_dc_algo<'a>() -> Algo<'a> {
+    Algo {
+        name: "mullo_dc",
+        valid: &|n| n >= 8,
+        scratch_len: &|n| limbs_mul_low_same_length_divide_and_conquer_scratch_len(n),
+        run: &|out, xs, ys, scratch| {
+            limbs_mul_low_same_length_divide_and_conquer(out, xs, ys, scratch);
+        },
+    }
+}
+
+fn tune_mullo_dc() {
+    find_crossover(&Level {
+        threshold_name: "MULLO_DC_THRESHOLD",
+        min_size: 8,
+        max_size: 500,
+        lower: mullo_basecase_algo(),
+        upper: mullo_dc_algo(),
+    });
+}
+
+// Above MULLO_MUL_N_THRESHOLD, the low product is computed as a full multiplication (whose high
+// half is discarded); the harness's output buffer has 2n limbs, so both run in place. (The
+// balanced-measure harness does not compare outputs, so the differing high halves are fine.)
+fn tune_mullo_mul_n() {
+    find_crossover(&Level {
+        threshold_name: "MULLO_MUL_N_THRESHOLD",
+        min_size: 300,
+        max_size: 30000,
+        lower: mullo_dc_algo(),
+        upper: Algo {
+            name: "full_mul",
+            valid: &|_| true,
+            scratch_len: &|n| limbs_mul_greater_to_out_scratch_len(n, n),
+            run: &|out, xs, ys, scratch| {
+                black_box(limbs_mul_greater_to_out(out, xs, ys, scratch));
+            },
+        },
+    });
+}
+
+// SQRLO_DC_THRESHOLD is capped by SQRLO_DC_THRESHOLD_LIMIT (500); the scan respects the limit.
+fn tune_sqrlo_dc() {
+    find_crossover(&Level {
+        threshold_name: "SQRLO_DC_THRESHOLD",
+        min_size: 15,
+        max_size: 499,
+        lower: Algo {
+            name: "sqrlo_basecase",
+            valid: &|_| true,
+            scratch_len: &|_| 0,
+            run: &|out, xs, _, _| limbs_square_low_basecase(out, xs),
+        },
+        upper: Algo {
+            name: "sqrlo_dc",
+            valid: &|n| n >= 8,
+            scratch_len: &|n| limbs_square_low_scratch_len(n),
+            run: &|out, xs, _, scratch| limbs_square_low_divide_and_conquer(out, xs, scratch),
+        },
+    });
+}
+
+// Measure two Hensel (modular/bdiv) division algorithms dividing 2n limbs by an odd n-limb
+// divisor. `full_q` selects the Q-only shape, whose quotient has the dividend's full length.
+fn measure_bdiv_pair(
+    n: usize,
+    full_q: bool,
+    a: &dyn Fn(&mut [Limb], &mut [Limb], &[Limb], Limb),
+    b: &dyn Fn(&mut [Limb], &mut [Limb], &[Limb], Limb),
+) -> Option<(f64, f64)> {
+    if n < 2 {
+        return None;
+    }
+    let inputs: Vec<(Vec<Limb>, Vec<Limb>, Limb)> = (0..INPUT_SETS)
+        .map(|k| {
+            let ns: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("bn{k}")))
+                .take(n << 1)
+                .collect();
+            let mut ds: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("bd{k}")))
+                .take(n)
+                .collect();
+            ds[0] |= 1;
+            let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+            (ns, ds, d_inv)
+        })
+        .collect();
+    let qs_len = if full_q { n << 1 } else { n };
+    let mut ns_a = vec![0; n << 1];
+    let mut ns_b = vec![0; n << 1];
+    let mut qs_a = vec![0; qs_len];
+    let mut qs_b = vec![0; qs_len];
+    for (ns, ds, d_inv) in &inputs {
+        ns_a.copy_from_slice(ns);
+        a(&mut qs_a, &mut ns_a, ds, *d_inv);
+        ns_b.copy_from_slice(ns);
+        b(&mut qs_b, &mut ns_b, ds, *d_inv);
+    }
+    let (mut i, mut j) = (0usize, 0usize);
+    Some(interleaved_min_pair(
+        &mut || {
+            let (ns, ds, d_inv) = &inputs[i & (INPUT_SETS - 1)];
+            i += 1;
+            ns_a.copy_from_slice(ns);
+            a(black_box(&mut qs_a), &mut ns_a, ds, *d_inv);
+        },
+        &mut || {
+            let (ns, ds, d_inv) = &inputs[j & (INPUT_SETS - 1)];
+            j += 1;
+            ns_b.copy_from_slice(ns);
+            b(black_box(&mut qs_b), &mut ns_b, ds, *d_inv);
+        },
+    ))
+}
+
+fn tune_dc_bdiv_qr() {
+    find_crossover_spec(
+        "DC_BDIV_QR_THRESHOLD",
+        "bdiv_qr_schoolbook",
+        "bdiv_qr_dc",
+        4,
+        1500,
+        &|n| {
+            measure_bdiv_pair(
+                n,
+                false,
+                &|qs, ns, ds, d_inv| {
+                    limbs_modular_div_mod_schoolbook(qs, ns, ds, d_inv);
+                },
+                &|qs, ns, ds, d_inv| {
+                    limbs_modular_div_mod_divide_and_conquer(qs, ns, ds, d_inv);
+                },
+            )
+        },
+    );
+}
+
+fn tune_dc_bdiv_q() {
+    find_crossover_spec(
+        "DC_BDIV_Q_THRESHOLD",
+        "bdiv_q_schoolbook",
+        "bdiv_q_dc",
+        4,
+        1500,
+        &|n| {
+            measure_bdiv_pair(
+                n,
+                true,
+                &|qs, ns, ds, d_inv| limbs_modular_div_schoolbook(qs, ns, ds, d_inv),
+                &|qs, ns, ds, d_inv| limbs_modular_div_divide_and_conquer(qs, ns, ds, d_inv),
+            )
+        },
+    );
+}
+
+// Measure DC-vs-Barrett Hensel division at 2n / n (odd divisor). The DC side consumes its
+// dividend (refresh copy included); the Barrett side reads it directly and manages its own
+// inverse internally.
+fn measure_mu_bdiv_pair(
+    n: usize,
+    full_q: bool,
+    dc: &dyn Fn(&mut [Limb], &mut [Limb], &[Limb], Limb),
+    barrett: &dyn Fn(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut [Limb]),
+    barrett_scratch: fn(usize, usize) -> usize,
+) -> Option<(f64, f64)> {
+    if n < 4 {
+        return None;
+    }
+    let inputs: Vec<(Vec<Limb>, Vec<Limb>, Limb)> = (0..INPUT_SETS)
+        .map(|k| {
+            let ns: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("mbn{k}")))
+                .take(n << 1)
+                .collect();
+            let mut ds: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("mbd{k}")))
+                .take(n)
+                .collect();
+            ds[0] |= 1;
+            let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+            (ns, ds, d_inv)
+        })
+        .collect();
+    let qs_len = if full_q { n << 1 } else { n };
+    let mut ns_work = vec![0; n << 1];
+    let mut qs_a = vec![0; qs_len];
+    let mut qs_b = vec![0; qs_len];
+    let mut rs = vec![0; n];
+    let mut scratch = vec![0; barrett_scratch(n << 1, n)];
+    for (ns, ds, d_inv) in &inputs {
+        ns_work.copy_from_slice(ns);
+        dc(&mut qs_a, &mut ns_work, ds, *d_inv);
+        barrett(&mut qs_b, &mut rs, ns, ds, &mut scratch);
+    }
+    let (mut i, mut j) = (0usize, 0usize);
+    Some(interleaved_min_pair(
+        &mut || {
+            let (ns, ds, d_inv) = &inputs[i & (INPUT_SETS - 1)];
+            i += 1;
+            ns_work.copy_from_slice(ns);
+            dc(black_box(&mut qs_a), &mut ns_work, ds, *d_inv);
+        },
+        &mut || {
+            let (ns, ds, _) = &inputs[j & (INPUT_SETS - 1)];
+            j += 1;
+            barrett(black_box(&mut qs_b), &mut rs, ns, ds, &mut scratch);
+        },
+    ))
+}
+
+fn tune_mu_bdiv_qr() {
+    find_crossover_spec(
+        "MU_BDIV_QR_THRESHOLD",
+        "dc_bdiv_qr",
+        "barrett_bdiv_qr",
+        50,
+        20000,
+        &|n| {
+            measure_mu_bdiv_pair(
+                n,
+                false,
+                &|qs, ns, ds, d_inv| {
+                    limbs_modular_div_mod_divide_and_conquer(qs, ns, ds, d_inv);
+                },
+                &|qs, rs, ns, ds, scratch| {
+                    limbs_modular_div_mod_barrett(qs, rs, ns, ds, scratch);
+                },
+                limbs_modular_div_mod_barrett_scratch_len,
+            )
+        },
+    );
+}
+
+fn tune_mu_bdiv_q() {
+    find_crossover_spec(
+        "MU_BDIV_Q_THRESHOLD",
+        "dc_bdiv_q",
+        "barrett_bdiv_q",
+        50,
+        8000,
+        &|n| {
+            measure_mu_bdiv_pair(
+                n,
+                true,
+                &|qs, ns, ds, d_inv| limbs_modular_div_divide_and_conquer(qs, ns, ds, d_inv),
+                &|qs, _rs, ns, ds, scratch| limbs_modular_div_barrett(qs, ns, ds, scratch),
+                limbs_modular_div_barrett_scratch_len,
+            )
+        },
+    );
+}
+
+// Times limbs_modular_invert across sizes, for the BINV_NEWTON_THRESHOLD rebuild-per-candidate
+// sweep (the threshold is compiled into the Newton recursion).
+fn tune_binv_probe() {
+    for n in [400usize, 800, 1600, 3200, 6400] {
+        let mut ds = vec![0; n];
+        lcg_fill(&mut ds, 9);
+        ds[0] |= 1;
+        let mut is = vec![0; n];
+        let mut scratch = vec![0; limbs_modular_invert_scratch_len(n)];
+        let mut best = f64::INFINITY;
+        let iters = 1 + ((1u64 << 21) / n as u64);
+        for _ in 0..7 {
+            let mut f = || {
+                limbs_modular_invert(black_box(&mut is), &ds, &mut scratch);
+            };
+            let t = time_batch(&mut f, iters);
+            if t < best {
+                best = t;
+            }
+        }
+        println!("binv n={n:<5} {best:>12.1} ns");
+    }
+}
+
+// Basecase vs divide-and-conquer digit parsing, sweeping the digit count (the threshold is in
+// digits, not limbs).
+fn tune_from_digits_dc() {
+    use malachite_nz::natural::conversion::digits::general_digits::{
+        limbs_compute_power_table, limbs_digits_power_table_scratch_len_for_tuning,
+        limbs_from_digits_small_base_basecase, limbs_from_digits_small_base_divide_and_conquer,
+    };
+    find_crossover_spec(
+        "FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD",
+        "parse_basecase",
+        "parse_dc",
+        500,
+        40000,
+        &|digit_count| {
+            let ds: Vec<u8> = random_primitive_ints(EXAMPLE_SEED.fork("fd"))
+                .take(digit_count)
+                .map(|b: u8| b % 10)
+                .collect();
+            let len = digit_count / 19 + 2;
+            let mut power_table_memory =
+                vec![0; limbs_digits_power_table_scratch_len_for_tuning(len)];
+            let (power_len, powers) =
+                limbs_compute_power_table(&mut power_table_memory, len, 10, None);
+            let mut out_a = vec![0; len + 1];
+            let mut out_b = vec![0; len + 1];
+            let mut scratch = vec![0; len + 1 + (Limb::WIDTH as usize)];
+            let mut best_a = f64::INFINITY;
+            let mut best_b = f64::INFINITY;
+            let iters = 1 + ((1u64 << 22) / (digit_count * 12) as u64);
+            for _ in 0..7 {
+                let mut f = || {
+                    black_box(limbs_from_digits_small_base_basecase(
+                        black_box(&mut out_a),
+                        &ds,
+                        10,
+                    ));
+                };
+                let t = time_batch(&mut f, iters);
+                if t < best_a {
+                    best_a = t;
+                }
+            }
+            for _ in 0..7 {
+                let mut f = || {
+                    black_box(limbs_from_digits_small_base_divide_and_conquer(
+                        black_box(&mut out_b),
+                        &ds,
+                        10,
+                        &powers,
+                        power_len,
+                        &mut scratch,
+                    ));
+                };
+                let t = time_batch(&mut f, iters);
+                if t < best_b {
+                    best_b = t;
+                }
+            }
+            Some((best_a, best_b))
+        },
+    );
+}
+
+// The measured Barrett-bdiv crossovers vs DC (120/139) fall below DC_BDIV_*_THRESHOLD (218),
+// so DC may have no winning range; these measure Barrett against the real incumbent there.
+fn tune_mu_bdiv_qr_vs_schoolbook() {
+    find_crossover_spec(
+        "MU_BDIV_QR_THRESHOLD",
+        "bdiv_qr_schoolbook",
+        "barrett_bdiv_qr",
+        10,
+        2000,
+        &|n| {
+            measure_mu_bdiv_pair(
+                n,
+                false,
+                &|qs, ns, ds, d_inv| {
+                    limbs_modular_div_mod_schoolbook(qs, ns, ds, d_inv);
+                },
+                &|qs, rs, ns, ds, scratch| {
+                    limbs_modular_div_mod_barrett(qs, rs, ns, ds, scratch);
+                },
+                limbs_modular_div_mod_barrett_scratch_len,
+            )
+        },
+    );
+}
+
+fn tune_mu_bdiv_q_vs_schoolbook() {
+    find_crossover_spec(
+        "MU_BDIV_Q_THRESHOLD",
+        "bdiv_q_schoolbook",
+        "barrett_bdiv_q",
+        10,
+        2000,
+        &|n| {
+            measure_mu_bdiv_pair(
+                n,
+                true,
+                &|qs, ns, ds, d_inv| limbs_modular_div_schoolbook(qs, ns, ds, d_inv),
+                &|qs, _rs, ns, ds, scratch| limbs_modular_div_barrett(qs, ns, ds, scratch),
+                limbs_modular_div_barrett_scratch_len,
+            )
+        },
+    );
+}
+
+// A shootout table over the mod-by-limb kernels: times each applicable kernel at each size for
+// normalized and unnormalized (< 2^(W - 2)) divisors, from which the MOD_1* thresholds and
+// MOD_1_1P_METHOD are read off manually (the dispatch conditions are multi-way).
+fn tune_mod_1_shootout() {
+    use malachite_nz::natural::arithmetic::mod_op::{
+        limbs_mod_limb_any_leading_zeros_1, limbs_mod_limb_any_leading_zeros_2,
+        limbs_mod_limb_at_least_1_leading_zero, limbs_mod_limb_at_least_2_leading_zeros,
+        limbs_mod_limb_small_normalized, limbs_mod_limb_small_unnormalized,
+    };
+    type ModFn = fn(&[Limb], Limb) -> Limb;
+    let norm_kernels: [(&str, ModFn); 3] = [
+        ("small_norm", |ns, d| {
+            limbs_mod_limb_small_normalized::<DoubleLimb, Limb>(ns, d)
+        }),
+        ("any_lz_1", |ns, d| {
+            limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(ns, d)
+        }),
+        ("any_lz_2", |ns, d| {
+            limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(ns, d)
+        }),
+    ];
+    let unnorm_kernels: [(&str, ModFn); 5] = [
+        ("small_unnorm", |ns, d| {
+            limbs_mod_limb_small_unnormalized::<DoubleLimb, Limb>(ns, d)
+        }),
+        ("any_lz_1", |ns, d| {
+            limbs_mod_limb_any_leading_zeros_1::<DoubleLimb, Limb>(ns, d)
+        }),
+        ("any_lz_2", |ns, d| {
+            limbs_mod_limb_any_leading_zeros_2::<DoubleLimb, Limb>(ns, d)
+        }),
+        ("one_lz", |ns, d| {
+            limbs_mod_limb_at_least_1_leading_zero::<DoubleLimb, Limb>(ns, d)
+        }),
+        ("two_lz", |ns, d| {
+            limbs_mod_limb_at_least_2_leading_zeros::<DoubleLimb, Limb>(ns, d)
+        }),
+    ];
+    for (label, d_mask, kernels) in [
+        (
+            "normalized",
+            !(Limb::MAX >> 1),
+            &norm_kernels[..],
+        ),
+        (
+            "unnormalized (2 leading zeros)",
+            0,
+            &unnorm_kernels[..],
+        ),
+    ] {
+        println!("### {label} divisors");
+        for n in [2usize, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 128] {
+            let mut line = format!("n={n:<4}");
+            for (name, f) in kernels {
+                let inputs: Vec<(Vec<Limb>, Limb)> = (0..INPUT_SETS)
+                    .map(|k| {
+                        let ns: Vec<Limb> =
+                            random_primitive_ints(EXAMPLE_SEED.fork(&format!("m1n{k}")))
+                                .take(n)
+                                .collect();
+                        let mut d: Limb = random_primitive_ints(EXAMPLE_SEED.fork(&format!("m1d{k}")))
+                            .next()
+                            .unwrap();
+                        d >>= 2;
+                        d |= d_mask | 1;
+                        (ns, d)
+                    })
+                    .collect();
+                let mut best = f64::INFINITY;
+                let iters = 1 + ((1u64 << 20) / n as u64);
+                for _ in 0..7 {
+                    let mut i = 0;
+                    let mut g = || {
+                        let (ns, d) = &inputs[i & (INPUT_SETS - 1)];
+                        i += 1;
+                        black_box(f(ns, *d));
+                    };
+                    let t = time_batch(&mut g, iters);
+                    if t < best {
+                        best = t;
+                    }
+                }
+                line.push_str(&format!("  {name} {best:>7.1}"));
+            }
+            println!("{line}");
+        }
+    }
+}
+
+// Times limbs_invert_approx across sizes, for the INV_MULMOD_BNM1_THRESHOLD
+// rebuild-per-candidate sweep.
+fn tune_invert_probe() {
+    for n in [50usize, 100, 200, 400, 800, 1600] {
+        let mut ds = vec![0; n];
+        lcg_fill(&mut ds, 11);
+        ds[n - 1] |= 1 << (Limb::WIDTH - 1);
+        let mut is = vec![0; n];
+        let mut scratch = vec![0; limbs_invert_approx_scratch_len(n)];
+        let mut best = f64::INFINITY;
+        let iters = 1 + ((1u64 << 20) / n as u64);
+        for _ in 0..7 {
+            let mut f = || {
+                black_box(limbs_invert_approx(
+                    black_box(&mut is),
+                    &ds,
+                    &mut scratch,
+                ));
+            };
+            let t = time_batch(&mut f, iters);
+            if t < best {
+                best = t;
+            }
+        }
+        println!("invert n={n:<5} {best:>12.1} ns");
+    }
+}
+
 fn tune_dc_div_qr() {
     find_crossover_spec(
         "DC_DIV_QR_THRESHOLD",
@@ -1832,8 +2528,25 @@ pub fn tune(key: &str) {
         "mul_toom6h" => tune_mul_toom6h(),
         "mul_toom6h_vs_toom33" => tune_mul_toom6h_vs_toom33(),
         "mul_toom8h" => tune_mul_toom8h(),
+        "mul_toom32_to_toom43" => tune_mul_toom32_to_toom43(),
+        "mul_toom32_to_toom53" => tune_mul_toom32_to_toom53(),
+        "mul_toom42_to_toom53" => tune_mul_toom42_to_toom53(),
+        "mul_toom42_to_toom63" => tune_mul_toom42_to_toom63(),
         "dc_div_qr" => tune_dc_div_qr(),
         "dc_divappr_q" => tune_dc_divappr_q(),
+        "mullo_dc" => tune_mullo_dc(),
+        "mullo_mul_n" => tune_mullo_mul_n(),
+        "sqrlo_dc" => tune_sqrlo_dc(),
+        "dc_bdiv_qr" => tune_dc_bdiv_qr(),
+        "dc_bdiv_q" => tune_dc_bdiv_q(),
+        "mu_bdiv_qr" => tune_mu_bdiv_qr(),
+        "mu_bdiv_q" => tune_mu_bdiv_q(),
+        "binv_probe" => tune_binv_probe(),
+        "from_digits_dc" => tune_from_digits_dc(),
+        "mu_bdiv_qr_vs_schoolbook" => tune_mu_bdiv_qr_vs_schoolbook(),
+        "mu_bdiv_q_vs_schoolbook" => tune_mu_bdiv_q_vs_schoolbook(),
+        "mod_1_shootout" => tune_mod_1_shootout(),
+        "invert_probe" => tune_invert_probe(),
         "mul_fft_probe" => tune_mul_fft_probe(),
         "small_kernel_probe" => tune_small_kernel_probe(),
         "gcd_probe" => tune_gcd_probe(),
