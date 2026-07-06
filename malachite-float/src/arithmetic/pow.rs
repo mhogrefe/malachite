@@ -14,14 +14,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
+use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_underflow, one_neighbor};
+use crate::{Float, float_either_infinity, float_either_zero, float_nan};
 use core::cmp::Ordering::{self, *};
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     Abs, CeilingLogBase2, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign,
 };
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One,
+    Zero as ZeroTrait,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
@@ -173,6 +176,11 @@ fn pow_pos_natural(
         {
             if exceptional {
                 // overflow or underflow: the sign and the exceptional value are already correct
+                if !is_zero {
+                    // The growing regime rounds toward zero (lower bounds), and the entry check
+                    // bounds the true value below 2^MAX_EXPONENT.
+                    fail_on_untested_path("pow_pos_natural, overflow");
+                }
                 let o = if is_zero { Less } else { Greater };
                 return (res, o);
             }
@@ -197,14 +205,20 @@ fn pow_integer_underflow_nearest(x: &Float, z: &Integer, prec: u64) -> (Float, O
 // This is `mpfr_pow_z` from `pow_z.c`, MPFR 4.3.0.
 fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     if *z == 0u32 {
+        // The public entry handles y = 0 before calling pow_integer.
+        fail_on_untested_path("pow_integer, z == 0");
         return Float::from_float_prec_round(Float::ONE, prec, rm);
     }
     if x.is_nan() {
+        // The public entry filters singular x before calling pow_integer.
+        fail_on_untested_path("pow_integer, NaN x");
         return (Float::NAN, Equal);
     }
     let z_pos = *z > 0u32;
     let z_odd = z.odd();
     if x.is_infinite() {
+        // The public entry filters singular x before calling pow_integer.
+        fail_on_untested_path("pow_integer, infinite x");
         let negative = x.is_sign_negative() && z_odd;
         return (
             match (z_pos, negative) {
@@ -217,6 +231,8 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         );
     }
     if x.is_zero() {
+        // The public entry filters singular x before calling pow_integer.
+        fail_on_untested_path("pow_integer, zero x");
         let negative = x.is_sign_negative() && z_odd;
         return (
             match (z_pos, negative) {
@@ -242,6 +258,10 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         return if new_exp < Float::MIN_EXPONENT {
             pow_underflow(prec, if rm == Nearest { Down } else { rm }, sign_negative)
         } else if new_exp > Float::MAX_EXPONENT {
+            // z(ex - 1) + 1 > MAX_EXPONENT implies z * log2|x| >= MAX_EXPONENT (the product is an
+            // exact integer at 64 bits here), which the entry's early overflow check already
+            // caught.
+            fail_on_untested_path("pow_integer, power-of-2 overflow");
             pow_overflow(prec, rm, sign_negative)
         } else {
             let sh = i64::exact_from(&(new_exp - Integer::ONE));
@@ -257,6 +277,8 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         * f64::rounding_from(z, Nearest).0;
     let negative = x.is_sign_negative() && z_odd;
     if est > const { Float::MAX_EXPONENT as f64 + 64.0 } {
+        // est > MAX_EXPONENT + 64 implies the entry's early overflow check already caught it.
+        fail_on_untested_path("pow_integer, pre-bound overflow");
         return pow_overflow(prec, rm, negative);
     }
     if est < const { Float::MIN_EXPONENT as f64 - 64.0 } {
@@ -289,10 +311,16 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         loop {
             let t = Float::ONE.div_prec_round_val_ref(x, wprec, rnd1).0;
             if t.is_infinite() {
+                // For |x| < 1 the reciprocal is rounded toward zero and cannot reach infinity; for
+                // |x| >= 1 it is at most 1.
+                fail_on_untested_path("pow_integer, 1/x overflow");
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
             let t = pow_pos_natural(&t, abs_z, wprec, rm, false).0;
             if t.is_infinite() {
+                // The entry check bounds |x^y| < 2^MAX_EXPONENT, and the magnitude-decreasing
+                // rounding directions keep the computed value below it.
+                fail_on_untested_path("pow_integer, (1/x)^|z| overflow");
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
             if t.is_zero() {
@@ -327,7 +355,10 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
             a <<= 1u32;
             b -= 1;
         }
-        a = a.checked_sqrt()?;
+        let Some(sq) = a.checked_sqrt() else {
+            return None;
+        };
+        a = sq;
         b >>= 1;
         d += 1;
     }
@@ -426,6 +457,9 @@ fn pow_general(
                     .exp_prec_round(wprec, Floor)
                     .0;
                 if t2.is_infinite() {
+                    // The entry check bounds |x^y| < 2^MAX_EXPONENT, so the lower-bound
+                    // recomputation cannot be infinite.
+                    fail_on_untested_path("pow_general, confirmed overflow");
                     (result, o) = pow_overflow(prec, rm, false);
                     break;
                 }
@@ -505,6 +539,106 @@ fn float_to_odd_mantissa_and_exponent_natural(x: &Float) -> (Natural, i64) {
 
 impl Float {
     // This is `mpfr_pow` from `pow.c`, MPFR 4.3.0.
+
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// with the specified rounding mode. Both [`Float`]s are taken by reference. An [`Ordering`] is
+    /// also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p,m)=1.0$
+    /// - $f(-1.0,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_ref_ref`]
+    /// instead. If you know that your target precision is the maximum of the precisions of the
+    /// two inputs, consider using [`Float::pow_round_ref_ref`] instead. If both of these things
+    /// are true, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_ref(&Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_ref(&Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_ref(&Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_ref(&Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_ref(&Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "15.58847");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_ref(&Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn pow_prec_round_ref_ref(
         &self,
         y: &Self,
@@ -521,39 +655,40 @@ impl Float {
         }
         let x = self;
         // Singular cases; see Section F.9.4.4 of the C standard.
-        if !x.is_normal() || !y.is_normal() {
+        match (x, y) {
             // pow(x, 0) = 1 for any x, even NaN
-            if y.is_zero() {
+            (_, float_either_zero!()) => {
                 return Self::from_float_prec_round(Self::ONE, prec, rm);
-            } else if x.is_nan() {
-                return (Self::NAN, Equal);
-            } else if y.is_nan() {
-                // pow(+1, NaN) = 1
+            }
+            (float_nan!(), _) => return (Self::NAN, Equal),
+            // pow(+1, NaN) = 1
+            (_, float_nan!()) => {
                 return if *x == 1u32 {
                     Self::from_float_prec_round(Self::ONE, prec, rm)
                 } else {
                     (Self::NAN, Equal)
                 };
-            } else if y.is_infinite() {
-                return if x.is_infinite() {
-                    if y.is_sign_positive() {
-                        (Self::INFINITY, Equal)
-                    } else {
-                        (Self::ZERO, Equal)
-                    }
+            }
+            (float_either_infinity!(), Float(Infinity { sign })) => {
+                return if *sign {
+                    (Self::INFINITY, Equal)
                 } else {
-                    let mut cmp = x.partial_cmp_abs(&Self::ONE).unwrap();
-                    if y.is_sign_negative() {
-                        cmp = cmp.reverse();
-                    }
-                    match cmp {
-                        Greater => (Self::INFINITY, Equal),
-                        Less => (Self::ZERO, Equal),
-                        Equal => Self::from_float_prec_round(Self::ONE, prec, rm),
-                    }
+                    (Self::ZERO, Equal)
                 };
-            } else if x.is_infinite() {
-                let negative = x.is_sign_negative() && float_odd_integer(y);
+            }
+            (_, Float(Infinity { sign })) => {
+                let mut cmp = x.partial_cmp_abs(&Self::ONE).unwrap();
+                if !*sign {
+                    cmp = cmp.reverse();
+                }
+                return match cmp {
+                    Greater => (Self::INFINITY, Equal),
+                    Less => (Self::ZERO, Equal),
+                    Equal => Self::from_float_prec_round(Self::ONE, prec, rm),
+                };
+            }
+            (Float(Infinity { sign }), _) => {
+                let negative = !*sign && float_odd_integer(y);
                 return (
                     match (y.is_sign_positive(), negative) {
                         (true, false) => Self::INFINITY,
@@ -564,17 +699,19 @@ impl Float {
                     Equal,
                 );
             }
-            // x is zero
-            let negative = x.is_sign_negative() && float_odd_integer(y);
-            return (
-                match (y.is_sign_negative(), negative) {
-                    (true, false) => Self::INFINITY,
-                    (true, true) => Self::NEGATIVE_INFINITY,
-                    (false, false) => Self::ZERO,
-                    (false, true) => Self::NEGATIVE_ZERO,
-                },
-                Equal,
-            );
+            (Float(Zero { sign }), _) => {
+                let negative = !*sign && float_odd_integer(y);
+                return (
+                    match (y.is_sign_negative(), negative) {
+                        (true, false) => Self::INFINITY,
+                        (true, true) => Self::NEGATIVE_INFINITY,
+                        (false, false) => Self::ZERO,
+                        (false, true) => Self::NEGATIVE_ZERO,
+                    },
+                    Equal,
+                );
+            }
+            _ => {}
         }
         // x^y for x < 0 and y not an integer is not defined
         let y_is_integer = y.is_integer();
@@ -663,10 +800,208 @@ impl Float {
 }
 
 impl Float {
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// with the specified rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is
+    /// also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p,m)=1.0$
+    /// - $f(-1.0,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec`]
+    /// instead. If you know that your target precision is the maximum of the precisions of the
+    /// two inputs, consider using [`Float::pow_round`] instead. If both of these things
+    /// are true, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round(Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round(Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round(Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round(Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round(Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "15.58847");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round(Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn pow_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         self.pow_prec_round_ref_ref(&other, prec, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// with the specified rounding mode. The first [`Float`] is taken by value and the second by
+    /// reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p,m)=1.0$
+    /// - $f(-1.0,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_val_ref`]
+    /// instead. If you know that your target precision is the maximum of the precisions of the
+    /// two inputs, consider using [`Float::pow_round_val_ref`] instead. If both of these things
+    /// are true, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round_val_ref(&Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round_val_ref(&Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round_val_ref(&Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round_val_ref(&Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round_val_ref(&Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "15.58847");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_round_val_ref(&Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn pow_prec_round_val_ref(
         self,
         other: &Self,
@@ -676,6 +1011,105 @@ impl Float {
         self.pow_prec_round_ref_ref(other, prec, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// with the specified rounding mode. The first [`Float`] is taken by reference and the second
+    /// by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p,m)=1.0$
+    /// - $f(-1.0,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_ref_val`]
+    /// instead. If you know that your target precision is the maximum of the precisions of the
+    /// two inputs, consider using [`Float::pow_round_ref_val`] instead. If both of these things
+    /// are true, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_val(Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_val(Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_val(Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_val(Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_val(Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "15.58847");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_round_ref_val(Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn pow_prec_round_ref_val(
         &self,
         other: Self,
@@ -685,50 +1119,810 @@ impl Float {
         self.pow_prec_round_ref_ref(&other, prec, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// to the nearest value. Both [`Float`]s are taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p)=f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p)=1.0$
+    /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_prec_round`] instead. If you know that your target precision is the
+    /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_prec(Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec(Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn pow_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
         self.pow_prec_ref_ref(&other, prec)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// to the nearest value. Both [`Float`]s are taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p)=f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p)=1.0$
+    /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_prec_round_ref_ref`] instead. If you know that your target precision is the
+    /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_ref_ref(&Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_ref_ref(&Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     pub fn pow_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.pow_prec_round_ref_ref(other, prec, Nearest)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
+    /// precisions of the two inputs and with the specified rounding mode. Both [`Float`]s are taken
+    /// by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,m)=f(x,\text{NaN},m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,m)=1.0$
+    /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::pow_prec_round`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_round(Float::from(2.5), Floor);
+    /// assert_eq!(p.to_string(), "14.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_round(Float::from(2.5), Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::from(3).pow_round(Float::from(2.5), Nearest);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    /// ```
     pub fn pow_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_round_ref_ref(&other, prec, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
+    /// precisions of the two inputs and with the specified rounding mode. Both [`Float`]s are taken
+    /// by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,m)=f(x,\text{NaN},m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,m)=1.0$
+    /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::pow_prec_round_ref_ref`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_round_ref_ref(&Float::from(2.5), Floor);
+    /// assert_eq!(p.to_string(), "14.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_round_ref_ref(&Float::from(2.5), Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_round_ref_ref(&Float::from(2.5), Nearest);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    /// ```
     pub fn pow_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_round_ref_ref(other, prec, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
+    /// precisions of the two inputs and with the specified rounding mode. The first [`Float`] is
+    /// taken by value and the second by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,m)=f(x,\text{NaN},m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,m)=1.0$
+    /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::pow_prec_round_val_ref`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_round_val_ref(&Float::from(2.5), Floor);
+    /// assert_eq!(p.to_string(), "14.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_round_val_ref(&Float::from(2.5), Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::from(3).pow_round_val_ref(&Float::from(2.5), Nearest);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    /// ```
     #[inline]
     pub fn pow_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         self.pow_round_ref_ref(other, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
+    /// precisions of the two inputs and with the specified rounding mode. The first [`Float`] is
+    /// taken by reference and the second by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,m)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,m)=f(x,\text{NaN},m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,m)=1.0$
+    /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
+    ///   returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::pow_prec_round_ref_val`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_round_ref_val(Float::from(2.5), Floor);
+    /// assert_eq!(p.to_string(), "14.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_round_ref_val(Float::from(2.5), Ceiling);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_round_ref_val(Float::from(2.5), Nearest);
+    /// assert_eq!(p.to_string(), "16.0");
+    /// assert_eq!(o, Greater);
+    /// ```
     #[inline]
     pub fn pow_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         self.pow_round_ref_ref(&other, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// to the nearest value. The first [`Float`] is taken by value and the second by reference. An
+    /// [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p)=f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p)=1.0$
+    /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_prec_round_val_ref`] instead. If you know that your target precision is the
+    /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_val_ref(&Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_prec_val_ref(&Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn pow_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.pow_prec_ref_ref(other, prec)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
+    /// to the nearest value. The first [`Float`] is taken by reference and the second by value. An
+    /// [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(\text{NaN},y,p)=f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(-1.0,\pm\infty,p)=1.0$
+    /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
+    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
+    ///   negative and not an odd integer
+    /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
+    ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
+    ///   and not an odd integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
+    ///   integer
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_prec_round_ref_val`] instead. If you know that your target precision is the
+    /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_ref_val(Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "15.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_prec_ref_val(Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    /// ```
     #[inline]
     pub fn pow_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
         self.pow_prec_ref_ref(&other, prec)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
+    /// taken by value. An
+    /// [`Ordering`] is returned, indicating whether the rounded power is less than, equal to, or
+    /// greater than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_assign`]
+    /// instead. If you know that your target precision is the maximum of the precisions of the
+    /// two inputs, consider using [`Float::pow_round_assign`] instead. If both of these
+    /// things are true, consider using [`PowAssign::pow_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign(Float::from(2.5), 5, Floor), Less);
+    /// assert_eq!(x.to_string(), "15.5");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign(Float::from(2.5), 5, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "16.0");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign(Float::from(2.5), 5, Nearest), Less);
+    /// assert_eq!(x.to_string(), "15.5");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign(Float::from(2.5), 20, Floor), Less);
+    /// assert_eq!(x.to_string(), "15.58846");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign(Float::from(2.5), 20, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "15.58847");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign(Float::from(2.5), 20, Nearest), Less);
+    /// assert_eq!(x.to_string(), "15.58846");
+    /// ```
     pub fn pow_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
         let (result, o) = self.pow_prec_round_ref_ref(&other, prec, rm);
         *self = result;
         o
     }
 
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
+    /// taken by reference. An
+    /// [`Ordering`] is returned, indicating whether the rounded power is less than, equal to, or
+    /// greater than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_assign_ref`]
+    /// instead. If you know that your target precision is the maximum of the precisions of the
+    /// two inputs, consider using [`Float::pow_round_assign_ref`] instead. If both of these
+    /// things are true, consider using [`PowAssign::pow_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign_ref(&Float::from(2.5), 5, Floor), Less);
+    /// assert_eq!(x.to_string(), "15.5");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign_ref(&Float::from(2.5), 5, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "16.0");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign_ref(&Float::from(2.5), 5, Nearest), Less);
+    /// assert_eq!(x.to_string(), "15.5");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign_ref(&Float::from(2.5), 20, Floor), Less);
+    /// assert_eq!(x.to_string(), "15.58846");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign_ref(&Float::from(2.5), 20, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "15.58847");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_round_assign_ref(&Float::from(2.5), 20, Nearest), Less);
+    /// assert_eq!(x.to_string(), "15.58846");
+    /// ```
     pub fn pow_prec_round_assign_ref(
         &mut self,
         other: &Self,
@@ -740,21 +1934,229 @@ impl Float {
         o
     }
 
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
+    /// precision and to the nearest value. The [`Float`] on the right-hand side is taken by value.
+    /// An [`Ordering`] is returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_prec_round_assign`] instead. If you know that your target precision is the
+    /// maximum of the precisions of the two inputs, consider using
+    /// [`PowAssign::pow_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_assign(Float::from(2.5), 5), Less);
+    /// assert_eq!(x.to_string(), "15.5");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_assign(Float::from(2.5), 20), Less);
+    /// assert_eq!(x.to_string(), "15.58846");
+    /// ```
     #[inline]
     pub fn pow_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
         self.pow_prec_round_assign(other, prec, Nearest)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
+    /// precision and to the nearest value. The [`Float`] on the right-hand side is taken by
+    /// reference. An [`Ordering`] is returned, indicating whether the rounded power is less than,
+    /// equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_prec_round_assign_ref`] instead. If you know that your target precision is the
+    /// maximum of the precisions of the two inputs, consider using
+    /// [`PowAssign::pow_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_assign_ref(&Float::from(2.5), 5), Less);
+    /// assert_eq!(x.to_string(), "15.5");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_prec_assign_ref(&Float::from(2.5), 20), Less);
+    /// assert_eq!(x.to_string(), "15.58846");
+    /// ```
     #[inline]
     pub fn pow_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
         self.pow_prec_round_assign_ref(other, prec, Nearest)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the maximum of the
+    /// precisions of the two inputs and with the specified rounding mode. The [`Float`] on the
+    /// right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function sets a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::pow_prec_round_assign`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`PowAssign::pow_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_round_assign(Float::from(2.5), Floor), Less);
+    /// assert_eq!(x.to_string(), "14.0");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_round_assign(Float::from(2.5), Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "16.0");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_round_assign(Float::from(2.5), Nearest), Greater);
+    /// assert_eq!(x.to_string(), "16.0");
+    /// ```
     pub fn pow_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_round_assign(other, prec, rm)
     }
 
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the maximum of the
+    /// precisions of the two inputs and with the specified rounding mode. The [`Float`] on the
+    /// right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function sets a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::pow_prec_round_assign_ref`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`PowAssign::pow_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_round_assign_ref(&Float::from(2.5), Floor), Less);
+    /// assert_eq!(x.to_string(), "14.0");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_round_assign_ref(&Float::from(2.5), Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "16.0");
+    ///
+    /// let mut x = Float::from(3);
+    /// assert_eq!(x.pow_round_assign_ref(&Float::from(2.5), Nearest), Greater);
+    /// assert_eq!(x.to_string(), "16.0");
+    /// ```
     pub fn pow_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_round_assign_ref(other, prec, rm)
@@ -764,6 +2166,43 @@ impl Float {
 impl Pow<Self> for Float {
     type Output = Self;
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the nearest value. Both
+    /// [`Float`]s are taken by value.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
+    /// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+    /// `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::from(3).pow(Float::from(2.5)).to_string(), "16.0");
+    /// assert_eq!(Float::from(10).pow(Float::from(-0.5)).to_string(), "0.3");
+    /// ```
     fn pow(self, other: Self) -> Self {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_ref_ref(&other, prec).0
@@ -773,6 +2212,43 @@ impl Pow<Self> for Float {
 impl Pow<&Self> for Float {
     type Output = Self;
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the nearest value. The first
+    /// [`Float`] is taken by value and the second by reference.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
+    /// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+    /// `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::from(3).pow(&Float::from(2.5)).to_string(), "16.0");
+    /// assert_eq!(Float::from(10).pow(&Float::from(-0.5)).to_string(), "0.3");
+    /// ```
     fn pow(self, other: &Self) -> Self {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_ref_ref(other, prec).0
@@ -782,6 +2258,43 @@ impl Pow<&Self> for Float {
 impl Pow<Float> for &Float {
     type Output = Float;
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the nearest value. The first
+    /// [`Float`] is taken by reference and the second by value.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
+    /// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+    /// `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!((&Float::from(3)).pow(Float::from(2.5)).to_string(), "16.0");
+    /// assert_eq!((&Float::from(10)).pow(Float::from(-0.5)).to_string(), "0.3");
+    /// ```
     fn pow(self, other: Float) -> Float {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_ref_ref(&other, prec).0
@@ -791,6 +2304,43 @@ impl Pow<Float> for &Float {
 impl Pow<&Float> for &Float {
     type Output = Float;
 
+    /// Raises a [`Float`] to a [`Float`] power, rounding the result to the nearest value. Both
+    /// [`Float`]s are taken by reference.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
+    /// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+    /// `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!((&Float::from(3)).pow(&Float::from(2.5)).to_string(), "16.0");
+    /// assert_eq!((&Float::from(10)).pow(&Float::from(-0.5)).to_string(), "0.3");
+    /// ```
     fn pow(self, other: &Float) -> Float {
         let prec = self.significant_bits().max(other.significant_bits());
         self.pow_prec_ref_ref(other, prec).0
@@ -798,6 +2348,47 @@ impl Pow<&Float> for &Float {
 }
 
 impl PowAssign<Self> for Float {
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the nearest
+    /// value. The [`Float`] on the right-hand side is taken by value.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!((&Float::from(3)).pow(&Float::from(2.5)).to_string(), "16.0");
+    /// assert_eq!(
+    ///     (&Float::from(10)).pow(&Float::from(-0.5)).to_string(),
+    ///     "0.3"
+    /// );
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(3);
+    /// x.pow_assign(Float::from(2.5));
+    /// assert_eq!(x.to_string(), "16.0");
+    /// ```
     fn pow_assign(&mut self, other: Self) {
         let prec = self.significant_bits().max(other.significant_bits());
         *self = self.pow_prec_ref_ref(&other, prec).0;
@@ -805,6 +2396,44 @@ impl PowAssign<Self> for Float {
 }
 
 impl PowAssign<&Self> for Float {
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the nearest
+    /// value. The [`Float`] on the right-hand side is taken by reference.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
+    /// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+    /// `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(3);
+    /// x.pow_assign(&Float::from(2.5));
+    /// assert_eq!(x.to_string(), "16.0");
+    /// ```
     fn pow_assign(&mut self, other: &Self) {
         let prec = self.significant_bits().max(other.significant_bits());
         *self = self.pow_prec_ref_ref(other, prec).0;

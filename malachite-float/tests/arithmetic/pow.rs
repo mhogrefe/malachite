@@ -17,7 +17,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
 };
-use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
+use malachite_float::test_util::common::{
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_9,
     float_float_unsigned_rounding_mode_quadruple_gen_var_10, float_float_unsigned_triple_gen_var_1,
@@ -119,20 +121,116 @@ fn test_pow_special_values() {
 
 #[test]
 fn test_pow() {
-    let test = |x: f64, y: f64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
-        let (p, o) = Float::from(x).pow_prec_round(Float::from(y), prec, rm);
+    let test = |s, s_hex, t, t_hex, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = parse_hex_string(t_hex);
+        assert_eq!(y.to_string(), t);
+        let (p, o) = x.pow_prec_round(y, prec, rm);
+        assert!(p.is_valid());
         assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
         assert_eq!(o, o_out);
     };
-    test(2.0, 0.5, 53, Nearest, "1.4142135623730951", Greater);
-    test(3.0, 100.0, 53, Nearest, "5.153775207320113e47", Less);
-    test(2.0, 10.0, 53, Nearest, "1024.0", Equal);
-    test(0.5, 2.0, 53, Nearest, "0.25", Equal);
-    test(10.0, -1.0, 53, Nearest, "0.10000000000000001", Greater);
-    test(2.0, 0.5, 53, Floor, "1.4142135623730949", Less);
-    test(1.5, 1.5, 53, Nearest, "1.8371173070873836", Greater);
-    test(-2.0, 3.0, 53, Nearest, "-8.0", Equal);
-    test(-2.0, -3.0, 53, Nearest, "-0.125", Equal);
+    test(
+        "2.0",
+        "0x2.0#1",
+        "0.5",
+        "0x0.8#1",
+        53,
+        Nearest,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "100.0",
+        "0x64.0#5",
+        53,
+        Nearest,
+        "5.153775207320113e47",
+        "0x5.a4653ca673768E+39#53",
+        Less,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "10.0",
+        "0xa.0#3",
+        53,
+        Nearest,
+        "1024.0",
+        "0x400.00000000000#53",
+        Equal,
+    );
+    test(
+        "0.5",
+        "0x0.8#1",
+        "2.0",
+        "0x2.0#1",
+        53,
+        Nearest,
+        "0.25",
+        "0x0.40000000000000#53",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "-1.0",
+        "-0x1.0#1",
+        53,
+        Nearest,
+        "0.10000000000000001",
+        "0x0.1999999999999a#53",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "0.5",
+        "0x0.8#1",
+        53,
+        Floor,
+        "1.4142135623730949",
+        "0x1.6a09e667f3bcc#53",
+        Less,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        "1.5",
+        "0x1.8#2",
+        53,
+        Nearest,
+        "1.8371173070873836",
+        "0x1.d64d51e0db1c6#53",
+        Greater,
+    );
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        "3.0",
+        "0x3.0#2",
+        53,
+        Nearest,
+        "-8.0",
+        "-0x8.0000000000000#53",
+        Equal,
+    );
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        "-3.0",
+        "-0x3.0#2",
+        53,
+        Nearest,
+        "-0.125",
+        "-0x0.20000000000000#53",
+        Equal,
+    );
 }
 
 // The nearest-mode underflow boundary for integer exponents: x^z landing near 2^(emin - 2) must
@@ -158,10 +256,9 @@ fn test_pow_integer_underflow_boundary() {
         );
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_p)),
-            ComparableFloatRef(&p),
-            "boundary case dz={dz}"
+            ComparableFloatRef(&p)
         );
-        assert_eq!(rug_o, o, "boundary ordering dz={dz}");
+        assert_eq!(rug_o, o);
     }
 }
 
@@ -178,11 +275,10 @@ fn test_pow_exact_bottom_binade() {
     let y = Float::from(2.5f64);
     for prec in [12u64, 13, 20, 53] {
         let (p, o) = x.pow_prec_round_ref_ref(&y, prec, Nearest);
-        assert_eq!(o, Equal, "prec {prec}");
+        assert_eq!(o, Equal);
         assert_eq!(
             i64::from(p.get_exponent().unwrap()),
-            i64::from(Float::MIN_EXPONENT),
-            "prec {prec}"
+            i64::from(Float::MIN_EXPONENT)
         );
         let (rug_p, rug_o) = rug_pow_prec_round(
             &rug::Float::exact_from(&x),
@@ -192,10 +288,9 @@ fn test_pow_exact_bottom_binade() {
         );
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_p)),
-            ComparableFloatRef(&p),
-            "prec {prec}"
+            ComparableFloatRef(&p)
         );
-        assert_eq!(rug_o, o, "prec {prec}");
+        assert_eq!(rug_o, o);
     }
 }
 
@@ -208,11 +303,10 @@ fn test_pow_early_underflow_bound_equality() {
     let y = -(Float::exact_from(&malachite_nz::natural::Natural::from(1u32)) << 29u32);
     for rm in [Floor, Ceiling, Down, Up, Nearest, Exact] {
         let (p, o) = x.pow_prec_round_ref_ref(&y, 10, rm);
-        assert_eq!(o, Equal, "rm {rm}");
+        assert_eq!(o, Equal);
         assert_eq!(
             i64::from(p.get_exponent().unwrap()),
-            i64::from(Float::MIN_EXPONENT),
-            "rm {rm}"
+            i64::from(Float::MIN_EXPONENT)
         );
         if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_p, rug_o) = rug_pow_prec_round(
@@ -223,12 +317,199 @@ fn test_pow_early_underflow_bound_equality() {
             );
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_p)),
-                ComparableFloatRef(&p),
-                "rm {rm}"
+                ComparableFloatRef(&p)
             );
-            assert_eq!(rug_o, o, "rm {rm}");
+            assert_eq!(rug_o, o);
         }
     }
+}
+
+// Branch-coverage cases discovered by instrumenting every interesting branch of pow.rs and running
+// the unit and property suites plus handcrafted probes (the porting workflow's manual coverage
+// step). Each case is annotated with the branch it exercises and was verified against MPFR via rug
+// when generated.
+#[test]
+fn test_pow_coverage() {
+    let test = |s, s_hex, t, t_hex, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = parse_hex_string(t_hex);
+        assert_eq!(y.to_string(), t);
+        let (p, o) = x.pow_prec_round(y, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // - e_tiny + tiny_one_above: y*log2(x) tiny, Nearest rounds to exactly 1
+    test(
+        "1.5",
+        "0x1.8#2",
+        "6.0e-61",
+        "0x1.0E-50#1",
+        10,
+        Nearest,
+        "1.0",
+        "0x1.000#10",
+        Less,
+    );
+    // - tiny_up_above: 1+ulp for Up when the true result is above 1
+    test(
+        "1.5",
+        "0x1.8#2",
+        "6.0e-61",
+        "0x1.0E-50#1",
+        10,
+        Up,
+        "1.002",
+        "0x1.008#10",
+        Greater,
+    );
+    // - tiny_down_below: 1-ulp for Floor when the true result is below 1
+    test(
+        "1.5",
+        "0x1.8#2",
+        "-6.0e-61",
+        "-0x1.0E-50#1",
+        10,
+        Floor,
+        "0.999",
+        "0x0.ffc#10",
+        Less,
+    );
+    // - tiny_one_below: Nearest rounds to exactly 1 from below
+    test(
+        "1.5",
+        "0x1.8#2",
+        "-6.0e-61",
+        "-0x1.0E-50#1",
+        10,
+        Nearest,
+        "1.0",
+        "0x1.000#10",
+        Greater,
+    );
+    // - pg_neg_result: negative x with huge odd integer y routes through pow_general
+    test(
+        "-1.0000000000000000000000000000000000000000000000000000000000000000000000000000000000005",
+        "-0x1.0000000000000000000000000000000000000000000000000000000000000000000001#281",
+        "2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397\
+         377.0",
+        "0x1000000000000000000000000000000000000000000000000000000000000000000000000001.0#301",
+        10,
+        Nearest,
+        "-too_big",
+        "-0xa.84E+378193#10",
+        Greater,
+    );
+    // - pi_pow2_underflow: (2^b)^z with result exponent below the range
+    test(
+        "2.0",
+        "0x2.0#1",
+        "-1073741825.0",
+        "-0x40000001.0#31",
+        5,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - pg_overflow_spurious + pg_k_subtract + pg_shl_k: exp upper bound overflows, 2^k rescue
+    test(
+        "3.0",
+        "0x3.0#2",
+        "677453079.5",
+        "0x28611d17.8#32",
+        2,
+        Nearest,
+        "too_big",
+        "0x8.0E+268434431#2",
+        Less,
+    );
+    // - pie_y_neg: pow_is_exact bails on negative y
+    test(
+        "3.0",
+        "0x3.0#2",
+        "-1048576.5",
+        "-0x100000.8#22",
+        10,
+        Nearest,
+        "too_small",
+        "0x2.f7E-415489#10",
+        Less,
+    );
+    // - pie_b_odd_shift + pie_sqrt_fail: odd exponent shift, then non-square mantissa
+    test(
+        "1.5",
+        "0x1.8#2",
+        "1048576.5",
+        "0x100000.8#22",
+        10,
+        Nearest,
+        "too_big",
+        "0x3.d1E+153344#10",
+        Greater,
+    );
+    // - pi_pos_zero_directed: deep positive-exponent underflow, Floor gives 0
+    test(
+        "0.8",
+        "0x0.c#2",
+        "2587095930.0",
+        "0x9a33f37a.0#31",
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - pi_pos_zero_directed: deep positive-exponent underflow, Up gives min positive
+    test(
+        "0.8",
+        "0x0.c#2",
+        "2587095930.0",
+        "0x9a33f37a.0#31",
+        10,
+        Up,
+        "too_small",
+        "0x1.000E-268435456#10",
+        Greater,
+    );
+    // - pi_neg_zero_nearest + pp_saturation_zeroed + pp_noncr: negative-z deep underflow, Nearest
+    test(
+        "1.5",
+        "0x1.8#2",
+        "-1835573822.0",
+        "-0x6d68a23e.0#30",
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - pi_neg_zero_directed: negative-z deep underflow, Floor
+    test(
+        "1.5",
+        "0x1.8#2",
+        "-1835573822.0",
+        "-0x6d68a23e.0#30",
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - pi_prebound_underflow: estimate far below the exponent range
+    test(
+        "0.8",
+        "0x0.c#2",
+        "9.0e9",
+        "0x2.0E+8#1",
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
 }
 
 fn pow_prec_round_properties_helper(
