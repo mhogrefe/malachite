@@ -367,6 +367,7 @@ fn pow_general(
     let mut wprec = prec + 9 + prec.ceiling_log_base_2();
     let mut k: Option<Integer> = None;
     let mut check_exact_case = false;
+    let mut exact_case = false;
     let mut result;
     let mut o;
     loop {
@@ -405,6 +406,9 @@ fn pow_general(
             && t.get_exponent()
                 .is_some_and(|e| i64::from(e) == i64::from(Float::MIN_EXPONENT));
         if t.is_zero() || t.is_infinite() || t_bottom_binade {
+            // After a 2^k rescue the computation stays comfortably in range, so a singular
+            // result cannot recur (MPFR_ASSERTN(!k_non_zero) in mpfr_pow_general).
+            assert!(k.is_none());
             if t.is_zero() {
                 // real underflow of |x|^y
                 (result, o) = pow_underflow(prec, if rm == Nearest { Down } else { rm }, false);
@@ -440,13 +444,14 @@ fn pow_general(
             if let Some((z, oz)) = pow_is_exact(&abs_x, y, prec, rm) {
                 result = z;
                 o = oz;
+                exact_case = true;
                 break;
             }
             check_exact_case = true;
         }
         wprec += wprec >> 1;
     }
-    if let Some(kv) = &k {
+    if !exact_case && let Some(kv) = &k {
         let lk = i64::exact_from(kv);
         // Double-rounding guard from `mpfr_pow_general`: in rounding to nearest, if the scaled
         // result would be exactly 2^(emin - 2) but the unscaled rounding already went below the
@@ -605,7 +610,14 @@ impl Float {
                     tmp.sub_prec_assign(Self::ONE, 64);
                 }
                 tmp.mul_prec_round_assign_ref(y, 64, Ceiling);
-                let ebound = i64::rounding_from(&tmp, Ceiling).0;
+                let mut ebound = i64::rounding_from(&tmp, Ceiling).0;
+                // For y < 0 the bound |x^y| <= 2^((ex - 1) * y) is not strict, so if the product
+                // is an exact integer the exponent bound must be bumped to keep |x^y| < 2^ebound
+                // (mpfr_nextabove(tmp) in mpfr_pow); otherwise x = 2^(ex - 1) exactly achieves
+                // the bound and a representable result would be misreported as underflow.
+                if y.is_sign_negative() && tmp == ebound {
+                    ebound += 1;
+                }
                 let lim = i64::from(Self::MIN_EXPONENT) - if rm == Nearest { 2 } else { 1 };
                 if ebound <= lim {
                     let negative = x.is_sign_negative() && float_odd_integer(y);

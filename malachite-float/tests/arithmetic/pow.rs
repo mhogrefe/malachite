@@ -165,6 +165,72 @@ fn test_pow_integer_underflow_boundary() {
     }
 }
 
+// An exact power in the bottom binade with non-integer y: x = 25 * 2^(2j), y = 5/2, so that x^y =
+// 5^5 * 2^(5j) exactly with exponent exactly MIN_EXPONENT. Exercises pow_general's bottom-binade
+// 2^k rescue followed by the pow_is_exact break, which must NOT apply the final 2^k scaling (the
+// exact result is already at true scale).
+#[test]
+fn test_pow_exact_bottom_binade() {
+    let j: i64 = -214748367;
+    let (x, o) = Float::from_unsigned_prec(25u32, 5);
+    assert_eq!(o, Equal);
+    let x = x << (2 * j);
+    let y = Float::from(2.5f64);
+    for prec in [12u64, 13, 20, 53] {
+        let (p, o) = x.pow_prec_round_ref_ref(&y, prec, Nearest);
+        assert_eq!(o, Equal, "prec {prec}");
+        assert_eq!(
+            i64::from(p.get_exponent().unwrap()),
+            i64::from(Float::MIN_EXPONENT),
+            "prec {prec}"
+        );
+        let (rug_p, rug_o) = rug_pow_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+            rug::float::Round::Nearest,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p),
+            "prec {prec}"
+        );
+        assert_eq!(rug_o, o, "prec {prec}");
+    }
+}
+
+// 4^(-2^29) = 2^(-2^30), the minimum positive Float exactly: the early-underflow exponent bound (ex
+// - 1) * y is achieved with equality, so the nextabove bump ported from mpfr_pow is required to
+// keep directed modes from misreporting a representable result as underflow.
+#[test]
+fn test_pow_early_underflow_bound_equality() {
+    let x = Float::from(4.0f64);
+    let y = -(Float::exact_from(&malachite_nz::natural::Natural::from(1u32)) << 29u32);
+    for rm in [Floor, Ceiling, Down, Up, Nearest, Exact] {
+        let (p, o) = x.pow_prec_round_ref_ref(&y, 10, rm);
+        assert_eq!(o, Equal, "rm {rm}");
+        assert_eq!(
+            i64::from(p.get_exponent().unwrap()),
+            i64::from(Float::MIN_EXPONENT),
+            "rm {rm}"
+        );
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_p, rug_o) = rug_pow_prec_round(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y),
+                10,
+                rug_rm,
+            );
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_p)),
+                ComparableFloatRef(&p),
+                "rm {rm}"
+            );
+            assert_eq!(rug_o, o, "rm {rm}");
+        }
+    }
+}
+
 fn pow_prec_round_properties_helper(
     x: Float,
     y: Float,
