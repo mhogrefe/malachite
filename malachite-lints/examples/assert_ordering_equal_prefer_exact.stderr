@@ -1,0 +1,19 @@
+error: asserting the `Ordering` from `add_prec` is `Equal` instead of demanding exactness
+  --> $DIR/assert_ordering_equal_prefer_exact.rs:9:5
+   |
+LL |     let (x, o) = Float::ONE.add_prec(Float::TWO, p);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: call `add_prec_round(.., Exact)` and take `.0`; `Exact` panics if inexact and avoids the cost of round-to-nearest
+   = note: `#[deny(assert_ordering_equal_prefer_exact)]` on by default
+
+error: asserting the `Ordering` from `from_natural_prec` is `Equal` instead of demanding exactness
+  --> $DIR/assert_ordering_equal_prefer_exact.rs:12:5
+   |
+LL |     let (y, oy) = Float::from_natural_prec(Natural::from(p), p);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: call `from_natural_prec_round(.., Exact)` and take `.0`; `Exact` panics if inexact and avoids the cost of round-to-nearest
+
+error: aborting due to 2 previous errors
+

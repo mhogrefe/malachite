@@ -864,7 +864,7 @@ fn div_float_significands_long_by_short_to_out(
     if round_bit == 0 && sticky_bit == 0 {
         return (exp_offset, Equal);
     }
-    let (_, out) = out.split_last_mut().unwrap();
+    let out = out.split_last_mut().unwrap().1;
     match rm {
         Exact => panic!("Inexact float division"),
         Nearest => {

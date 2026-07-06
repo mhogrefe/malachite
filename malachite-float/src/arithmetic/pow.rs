@@ -189,12 +189,9 @@ fn pow_pos_natural(
 // shl_prec_round applies the correct nearest-mode underflow rounding.
 fn pow_integer_underflow_nearest(x: &Float, z: &Integer, prec: u64) -> (Float, Ordering) {
     let z_bits = z.significant_bits();
-    let (zz, o) = Float::from_integer_prec(z.clone(), z_bits);
-    assert_eq!(o, Equal);
+    let zz = Float::from_integer_prec_round(z.clone(), z_bits, Exact).0;
     let (y2, o) = pow_general(x, &zz, 2, Nearest, true);
-    let (result, oo) = Float::from_float_prec(y2, prec);
-    assert_eq!(oo, Equal);
-    (result, o)
+    (Float::from_float_prec_round(y2, prec, Exact).0, o)
 }
 
 // This is `mpfr_pow_z` from `pow_z.c`, MPFR 4.3.0.
@@ -236,7 +233,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         let ex = i64::from(x.get_exponent().unwrap());
         let sign_negative = x.is_sign_negative() && z_odd;
         // new exponent = z * (ex - 1) + 1
-        let new_exp = z.clone() * Integer::from(ex - 1) + Integer::ONE;
+        let new_exp = z * Integer::from(ex - 1) + Integer::ONE;
         let base = if sign_negative {
             -Float::one_prec(prec)
         } else {
@@ -256,27 +253,23 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
     // letting the exponentiation saturate; this mirrors the role of MPFR's underflow/overflow
     // flags, which malachite does not have, and keeps the Ziv loop from ballooning on saturated
     // values.
-    let (log2_x, _) = x.abs().log_base_2_prec(64);
-    let log2_x = f64::rounding_from(&log2_x, Nearest).0;
-    let z_f = f64::rounding_from(z, Nearest).0;
-    let est = log2_x * z_f;
+    let est = f64::rounding_from(x.abs().log_base_2_prec(64).0, Nearest).0
+        * f64::rounding_from(z, Nearest).0;
     let negative = x.is_sign_negative() && z_odd;
-    if est > f64::from(Float::MAX_EXPONENT) + 64.0 {
+    if est > const { Float::MAX_EXPONENT as f64 + 64.0 } {
         return pow_overflow(prec, rm, negative);
     }
-    if est < f64::from(Float::MIN_EXPONENT) - 64.0 {
+    if est < const { Float::MIN_EXPONENT as f64 - 64.0 } {
         return pow_underflow(prec, if rm == Nearest { Down } else { rm }, negative);
     }
     if z_pos {
-        let abs_z = z.unsigned_abs_ref();
-        let (result, o) = pow_pos_natural(x, abs_z, prec, rm, true);
+        let (result, o) = pow_pos_natural(x, z.unsigned_abs_ref(), prec, rm, true);
         if result.is_zero() {
             // pow_pos_natural only returns zero when the result underflowed.
-            let negative = x.is_sign_negative() && z_odd;
             return if rm == Nearest {
                 pow_integer_underflow_nearest(x, z, prec)
             } else {
-                pow_underflow(prec, rm, negative)
+                pow_underflow(prec, rm, x.is_sign_negative() && z_odd)
             };
         }
         (result, o)
@@ -294,11 +287,11 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
             Floor
         };
         loop {
-            let (t, _) = Float::ONE.div_prec_round_val_ref(x, wprec, rnd1);
+            let t = Float::ONE.div_prec_round_val_ref(x, wprec, rnd1).0;
             if t.is_infinite() {
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
-            let (t, _) = pow_pos_natural(&t, abs_z, wprec, rm, false);
+            let t = pow_pos_natural(&t, abs_z, wprec, rm, false).0;
             if t.is_infinite() {
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
@@ -306,8 +299,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
                 if rm == Nearest {
                     return pow_integer_underflow_nearest(x, z, prec);
                 }
-                let negative = x.is_sign_negative() && z_odd;
-                return pow_underflow(prec, rm, negative);
+                return pow_underflow(prec, rm, x.is_sign_negative() && z_odd);
             }
             let err = wprec - size_z - 2;
             if float_can_round(t.significand_ref().unwrap(), err, prec, rm) {
@@ -326,6 +318,8 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
     }
     // y = c * 2^d with c an odd integer, d < 0
     let (c, mut d) = float_to_odd_mantissa_and_exponent(y);
+    // y is not an integer (the callers filter integers), so it has fractional bits.
+    assert!(d < 0);
     // x = a * 2^b with a odd
     let (mut a, mut b) = float_to_odd_mantissa_and_exponent_natural(x);
     while d != 0 {
@@ -339,10 +333,10 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
     }
     // x^y = (a * 2^b)^c with c an odd integer
     let tmp_prec = a.significant_bits();
-    let (tmp, o) = Float::from_natural_prec(a, tmp_prec);
-    assert_eq!(o, Equal);
-    let (tmp, o) = tmp.shl_prec(b, tmp_prec);
-    assert_eq!(o, Equal);
+    let tmp = Float::from_natural_prec_round(a, tmp_prec, Exact)
+        .0
+        .shl_prec_round(b, tmp_prec, Exact)
+        .0;
     Some(pow_integer(&tmp, &c, prec, rm))
 }
 
@@ -361,7 +355,7 @@ fn pow_general(
         assert!(y_is_integer);
         if float_odd_integer(y) {
             neg_result = true;
-            rm = -rm; // invert directed modes; Nearest stays
+            rm.neg_assign(); // invert directed modes; Nearest stays
         }
     }
     let mut wprec = prec + 9 + prec.ceiling_log_base_2();
@@ -372,15 +366,24 @@ fn pow_general(
     let mut o;
     loop {
         // t = ln|x|, rounded so that t is an upper bound on y * ln|x|
-        let (mut t, _) =
-            abs_x.ln_prec_round_ref(wprec, if y.is_sign_negative() { Floor } else { Ceiling });
+        let mut t = abs_x
+            .ln_prec_round_ref(wprec, if y.is_sign_negative() { Floor } else { Ceiling })
+            .0;
         t.mul_prec_round_assign_ref(y, wprec, Ceiling);
         let exp_t = t.get_exponent().map_or(0, i64::from);
         if let Some(kv) = &k {
-            let (ln2, _) = Float::ln_2_prec_round(wprec, Floor);
-            let (kf, _) = Float::from_signed_prec(i64::exact_from(kv), wprec);
-            let (u, _) = ln2.mul_prec_round(kf, wprec, Floor);
-            t.sub_prec_round_assign(u, wprec, Ceiling);
+            t.sub_prec_round_assign(
+                Float::ln_2_prec_round(wprec, Floor)
+                    .0
+                    .mul_prec_round(
+                        Float::from_signed_prec(i64::exact_from(kv), wprec).0,
+                        wprec,
+                        Floor,
+                    )
+                    .0,
+                wprec,
+                Ceiling,
+            );
         }
         let mut err = if !t.is_zero() && exp_t >= -1 {
             exp_t + 3
@@ -394,8 +397,7 @@ fn pow_general(
             }
             err += 1;
         }
-        let (mut t, _) = t.exp_prec(wprec);
-        let _ = &mut t;
+        let t = t.exp_prec(wprec).0;
         // MPFR checks the underflow flag here, which also fires when the result rounds UP into the
         // bottom binade (e.g. to the minimum positive value); malachite has no flags, so treat any
         // bottom-binade result as "possibly spurious underflow" and take the 2^k rescue path, which
@@ -406,8 +408,8 @@ fn pow_general(
             && t.get_exponent()
                 .is_some_and(|e| i64::from(e) == i64::from(Float::MIN_EXPONENT));
         if t.is_zero() || t.is_infinite() || t_bottom_binade {
-            // After a 2^k rescue the computation stays comfortably in range, so a singular
-            // result cannot recur (MPFR_ASSERTN(!k_non_zero) in mpfr_pow_general).
+            // After a 2^k rescue the computation stays comfortably in range, so a singular result
+            // cannot recur (MPFR_ASSERTN(!k_non_zero) in mpfr_pow_general).
             assert!(k.is_none());
             if t.is_zero() {
                 // real underflow of |x|^y
@@ -416,19 +418,26 @@ fn pow_general(
             }
             if t.is_infinite() {
                 // possible overflow: recompute a lower bound
-                let (mut t2, _) = abs_x
-                    .ln_prec_round_ref(wprec, if y.is_sign_negative() { Ceiling } else { Floor });
-                t2.mul_prec_round_assign_ref(y, wprec, Floor);
-                let (t2, _) = t2.exp_prec_round(wprec, Floor);
+                let t2 = abs_x
+                    .ln_prec_round_ref(wprec, if y.is_sign_negative() { Ceiling } else { Floor })
+                    .0
+                    .mul_prec_round_val_ref(y, wprec, Floor)
+                    .0
+                    .exp_prec_round(wprec, Floor)
+                    .0;
                 if t2.is_infinite() {
                     (result, o) = pow_overflow(prec, rm, false);
                     break;
                 }
             }
             // scale by 2^-k with k ~ y*log2|x|
-            let (mut kf, _) = abs_x.log_base_2_prec_ref(64);
-            kf.mul_prec_assign_ref(y, 64);
-            k = Some(Integer::rounding_from(&kf, Nearest).0);
+            k = Some(
+                Integer::rounding_from(
+                    abs_x.log_base_2_prec_ref(64).0.mul_prec_val_ref(y, 64).0,
+                    Nearest,
+                )
+                .0,
+            );
             continue;
         }
         if float_can_round(
@@ -484,14 +493,7 @@ fn pow_general(
 // Decomposes a finite nonzero Float into (odd Integer mantissa, exponent): x = c * 2^d.
 fn float_to_odd_mantissa_and_exponent(x: &Float) -> (Integer, i64) {
     let (n, d) = float_to_odd_mantissa_and_exponent_natural(&x.abs());
-    (
-        if x.is_sign_negative() {
-            -Integer::from(n)
-        } else {
-            Integer::from(n)
-        },
-        d,
-    )
+    (Integer::from_sign_and_abs(x.is_sign_positive(), n), d)
 }
 
 fn float_to_odd_mantissa_and_exponent_natural(x: &Float) -> (Natural, i64) {
@@ -596,39 +598,44 @@ impl Float {
         if !no_over_under {
             // early overflow detection: lower bound on y * log2|x|
             if (cmp_x_1 == Greater) == y.is_sign_positive() {
-                let (mut t, _) = x.abs().log_base_2_prec_round_ref(64, Down);
-                t.mul_prec_round_assign_ref(y, 64, Down);
+                let t = x
+                    .abs()
+                    .log_base_2_prec_round_ref(64, Down)
+                    .0
+                    .mul_prec_round_val_ref(y, 64, Down)
+                    .0;
                 if t >= const { Self::const_from_signed(Float::MAX_EXPONENT as i64) } {
-                    let negative = x.is_sign_negative() && float_odd_integer(y);
-                    return pow_overflow(prec, rm, negative);
+                    return pow_overflow(prec, rm, x.is_sign_negative() && float_odd_integer(y));
                 }
             }
             // early underflow detection: ebound such that |x^y| < 2^ebound
             if if y.is_sign_negative() { ex > 1 } else { ex < 0 } {
-                let (mut tmp, _) = Self::from_signed_prec(ex, 64);
+                let mut tmp = Self::from_signed_prec(ex, 64).0;
                 if y.is_sign_negative() {
                     tmp.sub_prec_assign(Self::ONE, 64);
                 }
                 tmp.mul_prec_round_assign_ref(y, 64, Ceiling);
                 let mut ebound = i64::rounding_from(&tmp, Ceiling).0;
-                // For y < 0 the bound |x^y| <= 2^((ex - 1) * y) is not strict, so if the product
-                // is an exact integer the exponent bound must be bumped to keep |x^y| < 2^ebound
-                // (mpfr_nextabove(tmp) in mpfr_pow); otherwise x = 2^(ex - 1) exactly achieves
-                // the bound and a representable result would be misreported as underflow.
+                // For y < 0 the bound |x^y| <= 2^((ex - 1) * y) is not strict, so if the product is
+                // an exact integer the exponent bound must be bumped to keep |x^y| < 2^ebound
+                // (mpfr_nextabove(tmp) in mpfr_pow); otherwise x = 2^(ex - 1) exactly achieves the
+                // bound and a representable result would be misreported as underflow.
                 if y.is_sign_negative() && tmp == ebound {
                     ebound += 1;
                 }
                 let lim = i64::from(Self::MIN_EXPONENT) - if rm == Nearest { 2 } else { 1 };
                 if ebound <= lim {
-                    let negative = x.is_sign_negative() && float_odd_integer(y);
-                    return pow_underflow(prec, if rm == Nearest { Down } else { rm }, negative);
+                    return pow_underflow(
+                        prec,
+                        if rm == Nearest { Down } else { rm },
+                        x.is_sign_negative() && float_odd_integer(y),
+                    );
                 }
             }
         }
         // y a not-too-large integer: use the multiplication-based algorithm
         if y_is_integer && ey <= POW_EXP_THRESHOLD {
-            let zi = Integer::rounding_from(y, Nearest).0;
-            return pow_integer(x, &zi, prec, rm);
+            return pow_integer(x, &Integer::rounding_from(y, Nearest).0, prec, rm);
         }
         // (+/-2^b)^y, which could be exact
         if raw_power_of_2(x) {
@@ -644,14 +651,12 @@ impl Float {
             return Self::power_of_2_of_float_prec_round(tmp, prec, rm);
         }
         // y * ln(x) very small: 1 + tiny
-        {
-            let expx = if cmp_x_1 == Less { 1 - ex } else { ex };
-            let logt = i64::exact_from(u64::exact_from(expx.max(1)).ceiling_log_base_2());
-            let err = ey + logt;
-            if err < -i64::exact_from(prec) - 1 {
-                let above = y.is_sign_positive() == (cmp_x_1 == Greater);
-                return float_one_plus_tiny(prec, rm, above);
-            }
+        let expx = if cmp_x_1 == Less { 1 - ex } else { ex };
+        let logt = i64::exact_from(u64::exact_from(expx.max(1)).ceiling_log_base_2());
+        let err = ey + logt;
+        if err < -i64::exact_from(prec) - 1 {
+            let above = y.is_sign_positive() == (cmp_x_1 == Greater);
+            return float_one_plus_tiny(prec, rm, above);
         }
         pow_general(x, y, prec, rm, y_is_integer)
     }
@@ -795,15 +800,13 @@ impl Pow<&Float> for &Float {
 impl PowAssign<Self> for Float {
     fn pow_assign(&mut self, other: Self) {
         let prec = self.significant_bits().max(other.significant_bits());
-        let (result, _) = self.pow_prec_ref_ref(&other, prec);
-        *self = result;
+        *self = self.pow_prec_ref_ref(&other, prec).0;
     }
 }
 
 impl PowAssign<&Self> for Float {
     fn pow_assign(&mut self, other: &Self) {
         let prec = self.significant_bits().max(other.significant_bits());
-        let (result, _) = self.pow_prec_ref_ref(other, prec);
-        *self = result;
+        *self = self.pow_prec_ref_ref(other, prec).0;
     }
 }

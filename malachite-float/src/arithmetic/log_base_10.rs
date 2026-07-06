@@ -127,7 +127,7 @@ fn log_base_10_rational_prec_round_helper(
         // form would flush to zero or clamp, and the rounding test below could never resolve it.
         let num = extended_log_base_2_of_rational(x, working_prec);
         let den = ExtendedFloat::from(TEN.log_base_2_prec(working_prec).0);
-        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        let quotient = num.div_prec_val_ref(&den, working_prec).0;
         // log_2(x) is within 2 ulps, log_2(10) within 1/2, and the division adds 1/2 more, so
         // working_prec - 6 correct bits comfortably suffice.
         if float_can_round(

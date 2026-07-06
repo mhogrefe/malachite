@@ -485,7 +485,7 @@ fn reciprocal_float_significand_short_to_out(
     };
     // Clear the lowest `shift` bits
     out[0] &= !shift_mask;
-    let (_, out) = out.split_last_mut().unwrap();
+    let out = out.split_last_mut().unwrap().1;
     match rm {
         Exact => panic!("Inexact float reciprocation"),
         Nearest => {

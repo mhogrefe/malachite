@@ -737,8 +737,6 @@ fn tune_mu_divappr_q() {
                 limbs_div_divide_and_conquer_approx,
                 |qs, _rs, ns, ds, scratch| {
                     // The approx variant takes no remainder buffer; adapt to the common shape.
-                    let mut ns_plus = ns.to_vec();
-                    let _ = &mut ns_plus;
                     limbs_div_barrett_approx(qs, ns, ds, scratch)
                 },
                 limbs_div_barrett_approx_scratch_len,
@@ -1001,7 +999,6 @@ fn tune_fft_small_check() {
             let ys: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(&format!("fy{n}_{k}")))
                 .take(n)
                 .collect();
-            let mut out_fft = vec![0; n << 1];
             let mut out_ref = vec![0; n << 1];
             let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(n, n)];
             let xs2 = xs.clone();
@@ -1042,7 +1039,6 @@ fn tune_fft_small_check() {
                 }
                 _ => {}
             }
-            let _ = &out_fft;
         }
     }
     println!("fft small-size check: {mismatches} failures over sizes 64..=1024 x4 input sets");

@@ -1,0 +1,12 @@
+error: `add_prec_assign_ref` is bound, mutated once in place, then moved once
+  --> $DIR/assign_then_consumed_once.rs:10:5
+   |
+LL | /     let mut t = Float::ONE.mul_prec(Float::TWO, p).0;
+LL | |     t.add_prec_assign_ref(&value, p);
+   | |_____________________________________^
+   |
+   = help: thread the value through a by-value variant of the operation in a chain instead of a separate `mut` binding and `*_assign*` step
+   = note: `#[deny(assign_then_consumed_once)]` on by default
+
+error: aborting due to 1 previous error
+

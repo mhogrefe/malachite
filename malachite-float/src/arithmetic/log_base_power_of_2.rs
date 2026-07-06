@@ -96,7 +96,7 @@ fn log_base_power_of_2_rational_prec_round_helper(
         // form would flush to zero or clamp, and the rounding test below could never resolve it.
         let num = extended_log_base_2_of_rational(x, working_prec);
         let den = ExtendedFloat::from(Float::from(pow));
-        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        let quotient = num.div_prec_val_ref(&den, working_prec).0;
         if float_can_round(
             quotient.x.significand_ref().unwrap(),
             working_prec - 4,

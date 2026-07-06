@@ -760,9 +760,11 @@ pub_test! {rational_div_float_prec_round_direct(
             let mut quotient = from_natural_zero_exponent(n);
             let d = from_natural_zero_exponent(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
-            let mut y = y >> y_exp;
-            y.mul_prec_round_assign(d, mul_prec, Floor);
-            let o = quotient.div_prec_round_assign(y, prec, rm);
+            let o = quotient.div_prec_round_assign(
+                (y >> y_exp).mul_prec_round(d, mul_prec, Floor).0,
+                prec,
+                rm,
+            );
             let o = quotient.shl_prec_round_assign_helper(
                 -i128::from(y_exp) + i128::from(n_exp) - i128::from(d_exp),
                 prec,
@@ -848,9 +850,11 @@ pub_test! {rational_div_float_prec_round_direct_val_ref(
             let mut quotient = from_natural_zero_exponent(n);
             let d = from_natural_zero_exponent(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
-            let mut y = y >> y_exp;
-            y.mul_prec_round_assign(d, mul_prec, Floor);
-            let o = quotient.div_prec_round_assign(y, prec, rm);
+            let o = quotient.div_prec_round_assign(
+                (y >> y_exp).mul_prec_round(d, mul_prec, Floor).0,
+                prec,
+                rm,
+            );
             let o = quotient.shl_prec_round_assign_helper(
                 -i128::from(y_exp) + i128::from(n_exp) - i128::from(d_exp),
                 prec,
@@ -936,9 +940,11 @@ pub_test! {rational_div_float_prec_round_direct_ref_val(
             let mut quotient = from_natural_zero_exponent_ref(n);
             let d = from_natural_zero_exponent_ref(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
-            let mut y = y >> y_exp;
-            y.mul_prec_round_assign(d, mul_prec, Floor);
-            let o = quotient.div_prec_round_assign(y, prec, rm);
+            let o = quotient.div_prec_round_assign(
+                (y >> y_exp).mul_prec_round(d, mul_prec, Floor).0,
+                prec,
+                rm,
+            );
             let o = quotient.shl_prec_round_assign_helper(
                 -i128::from(y_exp) + i128::from(n_exp) - i128::from(d_exp),
                 prec,
@@ -1024,9 +1030,11 @@ pub_test! {rational_div_float_prec_round_direct_ref_ref(
             let mut quotient = from_natural_zero_exponent_ref(n);
             let d = from_natural_zero_exponent_ref(d);
             let mul_prec = y.get_min_prec().unwrap_or(1) + d.significant_bits();
-            let mut y = y >> y_exp;
-            y.mul_prec_round_assign(d, mul_prec, Floor);
-            let o = quotient.div_prec_round_assign(y, prec, rm);
+            let o = quotient.div_prec_round_assign(
+                (y >> y_exp).mul_prec_round(d, mul_prec, Floor).0,
+                prec,
+                rm,
+            );
             let o = quotient.shl_prec_round_assign_helper(
                 -i128::from(y_exp) + i128::from(n_exp) - i128::from(d_exp),
                 prec,

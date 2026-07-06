@@ -96,7 +96,7 @@ fn log_base_rational_rational_base_prec_round_normal(
         // log_2(base) > 0, extended.
         let den = extended_log_base_2_of_rational(base, working_prec);
         // log_2(x) / log_2(base) in the extended range; cannot overflow or underflow here.
-        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        let quotient = num.div_prec_val_ref(&den, working_prec).0;
         // Each log is accurate to within 2 ulps and the division adds at most 1 more, for at most 5
         // ulps total; working_prec - 6 correct bits comfortably suffice for the rounding test.
         if float_can_round(

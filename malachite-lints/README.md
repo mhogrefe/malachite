@@ -177,6 +177,33 @@ Flags dividing `ONE` by a `Rational` or a `Float` (`Float::ONE / x`): use `recip
 `reciprocal_assign()`, or (for `Float`) the `reciprocal_prec*` family for a specific output
 precision.
 
+### `let_tuple_underscore_to_field`
+
+Flags a `let` that destructures a tuple only to keep one field and discard the rest with `_` —
+`let (x, _) = f();`, `let (_, o) = f();` — suggesting direct field access (`let x = f().0;`,
+machine-applicable). Malachite functions pervasively return `(value, Ordering)` tuples; field
+access is shorter and leaves the initializer as an expression that can be chained (`f().0.g().0`)
+instead of forcing an intermediate binding. Tuples with two or more real bindings, `..` rest
+patterns, and `ref` bindings are exempt.
+
+### `assert_ordering_equal_prefer_exact`
+
+Flags binding a `(value, Ordering)` result and then asserting the ordering is `Equal`
+(`let (x, o) = f(..); assert_eq!(o, Equal);`) when the function has a `_round` sibling: call
+`f_round(.., Exact)` and take `.0` instead. The `Exact` rounding mode *is* the assertion — it
+panics if the result is not exactly representable — and it is also usually faster, since the
+default `Nearest` does more work than the other modes.
+
+### `assign_then_consumed_once`
+
+Flags a freshly bound mutable bignum that is mutated in place by a single `*_assign*` call and
+then moved exactly once (`let mut t = f(..).0; t.op_assign(y); g(t)`): thread the value through a
+by-value variant in a chain instead (`g(f(..).0.op(y).0)`). This is the near-inverse of
+`use_assign_variant`, which prefers the in-place form when a *persisted* variable is reassigned
+its own result; the two do not overlap, because here the binding is fresh and consumed once. GMP,
+FLINT, and MPFR's assembly-like bind-mutate-move shape reads naturally in C, but in Malachite
+chaining is the idiom.
+
 ## Tests
 
 `cargo test` in this directory runs UI tests: `ui/main.rs` exercises `long_lines` (the basic

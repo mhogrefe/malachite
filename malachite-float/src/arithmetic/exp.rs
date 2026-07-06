@@ -172,7 +172,7 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
     let mut s = Integer::ZERO;
     let (r1, e1) = get_z_2exp(r); // exact: no error
     // normalize R[1] to exponent 1 - q (error <= 1 ulp)
-    let (r1, _) = mpz_normalize2(r1, e1, one_minus_q);
+    let r1 = mpz_normalize2(r1, e1, one_minus_q).0;
     r_pows[1] = r1;
     exp_r_pows[1] = one_minus_q;
     // R[2] = R[1]^2 >> (q - 1) (err <= 3 ulps)

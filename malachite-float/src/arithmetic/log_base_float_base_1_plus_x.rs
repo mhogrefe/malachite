@@ -86,7 +86,7 @@ fn log_base_float_base_1_plus_x_normal(
         let num = ExtendedFloat::from(x.log_base_2_1_plus_x_prec_ref(working_prec).0);
         let den = ExtendedFloat::from(base.log_base_2_prec_ref(working_prec).0);
         // log_2(1 + x) / log_2(base) in the extended range; cannot overflow or underflow here.
-        let (quotient, _) = num.div_prec_val_ref(&den, working_prec);
+        let quotient = num.div_prec_val_ref(&den, working_prec).0;
         // Two correctly-rounded logs (<= 1/2 ulp each) and the division (<= 1/2 ulp) give under 2
         // ulps total; working_prec - 6 correct bits comfortably suffice for the rounding test.
         if float_can_round(

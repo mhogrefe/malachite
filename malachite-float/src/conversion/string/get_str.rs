@@ -33,12 +33,12 @@ use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_s
 fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     // p = mantissa * 2 ^ (exp - 128): the l2b approximation as an exact `Float`.
     let (mantissa, exp) = MPFR_L2B[usize::exact_from(beta) - 2][i];
-    let (p, _) = Float::from_natural_prec(Natural::from(mantissa), 128);
+    let p = Float::from_natural_prec(Natural::from(mantissa), 128).0;
     let p = p >> u64::exact_from(128 - i64::from(exp));
     // t = e, as a `Float` with the precision of an `mpfr_exp_t` minus one, rounded up.
-    let (t, _) = Float::from_signed_prec_round(e, i64::WIDTH - 1, Ceiling);
+    let t = Float::from_signed_prec_round(e, i64::WIDTH - 1, Ceiling).0;
     // t = t * p, rounded up.
-    let (t, _) = t.mul_prec_round(p, i64::WIDTH - 1, Ceiling);
+    let t = t.mul_prec_round(p, i64::WIDTH - 1, Ceiling).0;
     // ceil(t).
     i64::rounding_from(&t, Ceiling).0
 }

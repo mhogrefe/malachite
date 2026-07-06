@@ -17,8 +17,11 @@ extern crate rustc_middle;
 extern crate rustc_session;
 extern crate rustc_span;
 
+mod assert_ordering_equal_prefer_exact;
+mod assign_then_consumed_once;
 mod clone_with_ref_variant;
 mod compare_with_power_of_2;
+mod let_tuple_underscore_to_field;
 mod long_lines;
 mod mul_div_by_power_of_2;
 mod redundant_from_in_comparison;
@@ -219,8 +222,11 @@ fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> boo
 pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint::LintStore) {
     dylint_linting::init_config(sess);
     lint_store.register_lints(&[
+        assert_ordering_equal_prefer_exact::ASSERT_ORDERING_EQUAL_PREFER_EXACT,
+        assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
+        let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
         mul_div_by_power_of_2::MUL_DIV_BY_POWER_OF_2,
         redundant_from_in_comparison::REDUNDANT_FROM_IN_COMPARISON,
@@ -232,7 +238,13 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_reciprocal::USE_RECIPROCAL,
         use_square::USE_SQUARE,
     ]);
+    lint_store.register_late_pass(|_| {
+        Box::new(assert_ordering_equal_prefer_exact::AssertOrderingEqualPreferExact)
+    });
+    lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
+    lint_store
+        .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));
     lint_store.register_late_pass(|_| Box::new(mul_div_by_power_of_2::MulDivByPowerOf2));
     lint_store

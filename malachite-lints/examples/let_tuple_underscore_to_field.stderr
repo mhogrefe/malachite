@@ -1,0 +1,22 @@
+error: destructuring a tuple only to discard all fields but one
+  --> $DIR/let_tuple_underscore_to_field.rs:7:5
+   |
+LL |     let (x, _) = Float::ONE.add_prec(Float::TWO, p);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: access the field directly: `let x = Float::ONE.add_prec(Float::TWO, p).0;`
+   |
+   = note: `#[deny(let_tuple_underscore_to_field)]` on by default
+
+error: destructuring a tuple only to discard all fields but one
+  --> $DIR/let_tuple_underscore_to_field.rs:9:5
+   |
+LL |     let (_, o) = Float::ONE.add_prec(Float::TWO, p);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: access the field directly: `let o = Float::ONE.add_prec(Float::TWO, p).1;`
+
+error: destructuring a tuple only to discard all fields but one
+  --> $DIR/let_tuple_underscore_to_field.rs:11:5
+   |
+LL |     let (mut y, _) = Float::ONE.add_prec(Float::TWO, p);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: access the field directly: `let mut y = Float::ONE.add_prec(Float::TWO, p).0;`
+
+error: aborting due to 3 previous errors
+
