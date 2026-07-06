@@ -460,9 +460,9 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             let mut scaled = false;
             if matches!(t.0, Zero { .. }) {
                 // Possibly spurious underflow: rescale by 2 and retry. Reachable only for x in the
-                // narrow band just above `normal_ref`'s `bound_emin`; no test input lands there (so
-                // the genuine-underflow, scaled, and unscale branches below are untested too).
-                fail_on_untested_path("exp_3, underflow below normal_ref's bound_emin");
+                // narrow band just above `normal_ref`'s `bound_emin`; exp's own test inputs never
+                // land there, but `Float::pow`'s do (its Ziv loop feeds y * ln|x| here at boundary
+                // magnitudes), and pow's property tests validate this path against MPFR.
                 tmp <<= 1;
                 t = tmp.square_prec_round_ref(prec, Floor).0;
                 if matches!(t.0, Zero { .. }) {

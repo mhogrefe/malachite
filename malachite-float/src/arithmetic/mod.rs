@@ -105,6 +105,7 @@ pub mod mul;
 pub mod neg;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
+pub mod pow;
 pub mod power_of_2;
 /// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2) with a
 /// [`Float`](super::Float) exponent, computing $2^x$ for [`Float`](super::Float)s.
