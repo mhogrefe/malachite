@@ -159,7 +159,7 @@ impl Float {
             let ext_q =
                 ExtendedFloat::from_rational_prec_round(Rational::from(q0), working_prec, Nearest)
                     .0;
-            let ln_2 = Float::try_from(ext_t.div_prec_val_ref(&ext_q, working_prec).0).unwrap();
+            let ln_2 = Self::try_from(ext_t.div_prec_val_ref(&ext_q, working_prec).0).unwrap();
             if float_can_round(ln_2.significand_ref().unwrap(), working_prec - 2, prec, rm) {
                 return Self::from_float_prec_round(ln_2, prec, rm);
             }

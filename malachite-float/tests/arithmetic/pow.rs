@@ -8,7 +8,9 @@
 
 use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -49,23 +51,68 @@ fn test_pow_special_values() {
     test(-Float::ONE, Float::NEGATIVE_INFINITY, one(), Equal);
     // y = +/-inf against |x| <> 1
     test(Float::from(2.0), Float::INFINITY, Float::INFINITY, Equal);
-    test(Float::from(2.0), Float::NEGATIVE_INFINITY, Float::ZERO, Equal);
+    test(
+        Float::from(2.0),
+        Float::NEGATIVE_INFINITY,
+        Float::ZERO,
+        Equal,
+    );
     test(Float::from(0.5), Float::INFINITY, Float::ZERO, Equal);
-    test(Float::from(0.5), Float::NEGATIVE_INFINITY, Float::INFINITY, Equal);
+    test(
+        Float::from(0.5),
+        Float::NEGATIVE_INFINITY,
+        Float::INFINITY,
+        Equal,
+    );
     // x = +/-inf
     test(Float::INFINITY, Float::from(2.0), Float::INFINITY, Equal);
     test(Float::INFINITY, Float::from(-2.0), Float::ZERO, Equal);
-    test(Float::NEGATIVE_INFINITY, Float::from(3.0), Float::NEGATIVE_INFINITY, Equal);
-    test(Float::NEGATIVE_INFINITY, Float::from(2.0), Float::INFINITY, Equal);
-    test(Float::NEGATIVE_INFINITY, Float::from(-3.0), Float::NEGATIVE_ZERO, Equal);
-    test(Float::NEGATIVE_INFINITY, Float::from(-2.0), Float::ZERO, Equal);
+    test(
+        Float::NEGATIVE_INFINITY,
+        Float::from(3.0),
+        Float::NEGATIVE_INFINITY,
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_INFINITY,
+        Float::from(2.0),
+        Float::INFINITY,
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_INFINITY,
+        Float::from(-3.0),
+        Float::NEGATIVE_ZERO,
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_INFINITY,
+        Float::from(-2.0),
+        Float::ZERO,
+        Equal,
+    );
     // x = +/-0
     test(Float::ZERO, Float::from(3.0), Float::ZERO, Equal);
-    test(Float::NEGATIVE_ZERO, Float::from(3.0), Float::NEGATIVE_ZERO, Equal);
+    test(
+        Float::NEGATIVE_ZERO,
+        Float::from(3.0),
+        Float::NEGATIVE_ZERO,
+        Equal,
+    );
     test(Float::NEGATIVE_ZERO, Float::from(2.0), Float::ZERO, Equal);
     test(Float::ZERO, Float::from(-3.0), Float::INFINITY, Equal);
-    test(Float::NEGATIVE_ZERO, Float::from(-3.0), Float::NEGATIVE_INFINITY, Equal);
-    test(Float::NEGATIVE_ZERO, Float::from(-2.0), Float::INFINITY, Equal);
+    test(
+        Float::NEGATIVE_ZERO,
+        Float::from(-3.0),
+        Float::NEGATIVE_INFINITY,
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_ZERO,
+        Float::from(-2.0),
+        Float::INFINITY,
+        Equal,
+    );
     // negative base, non-integer exponent
     test(Float::from(-2.0), Float::from(0.5), Float::NAN, Equal);
 }
@@ -86,6 +133,36 @@ fn test_pow() {
     test(1.5, 1.5, 53, Nearest, "1.8371173070873836", Greater);
     test(-2.0, 3.0, 53, Nearest, "-8.0", Equal);
     test(-2.0, -3.0, 53, Nearest, "-0.125", Equal);
+}
+
+// The nearest-mode underflow boundary for integer exponents: x^z landing near 2^(emin - 2) must
+// choose between 0 and the minimum positive Float, which requires the pow_general fallback of
+// `mpfr_pow_pos_z` (with its bottom-binade 2^k rescue and the double-rounding guard on the final
+// scaling). Each case is cross-checked against MPFR via rug.
+#[test]
+fn test_pow_integer_underflow_boundary() {
+    let emin = i64::from(Float::MIN_EXPONENT);
+    let x = Float::from(0.75f64);
+    let log2_x = 0.75f64.log2();
+    #[allow(clippy::cast_possible_truncation)]
+    let z_mid = (((emin as f64) - 1.5) / log2_x) as i64;
+    for dz in [-8i64, -2, -1, 0, 1, 2, 8] {
+        let z = z_mid + dz;
+        let y = Float::exact_from(&malachite_nz::integer::Integer::from(z));
+        let (p, o) = x.pow_prec_round_ref_ref(&y, 5, Nearest);
+        let (rug_p, rug_o) = rug_pow_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            5,
+            rug::float::Round::Nearest,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p),
+            "boundary case dz={dz}"
+        );
+        assert_eq!(rug_o, o, "boundary ordering dz={dz}");
+    }
 }
 
 fn pow_prec_round_properties_helper(

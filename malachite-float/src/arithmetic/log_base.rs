@@ -197,7 +197,7 @@ fn implicit_sum_is_pow(high: &Natural, shift: u64, low: &Integer, h: &Natural, m
         return false;
     }
     // The filter passed; verify exactly.
-    Integer::from(high << shift) + low == Integer::from(h.pow(m))
+    Integer::from(high << shift) + low == h.pow(m)
 }
 
 // Given a `Float` `x` (finite, nonzero, greater than -1) and a root `2^z * h` (`h` an odd

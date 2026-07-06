@@ -888,7 +888,7 @@ fn test_primitive_float_exp() {
     test::<f32>(f32::NEGATIVE_INFINITY, 0.0);
     test::<f32>(0.0, 1.0);
     test::<f32>(-0.0, 1.0);
-    test::<f32>(1.0, 2.7182817);
+    test::<f32>(1.0, core::f32::consts::E);
     test::<f32>(-1.0, 0.36787945);
     test::<f32>(0.5, 1.6487212);
     test::<f32>(-0.5, 0.60653067);
@@ -904,7 +904,7 @@ fn test_primitive_float_exp() {
     test::<f64>(f64::NEGATIVE_INFINITY, 0.0);
     test::<f64>(0.0, 1.0);
     test::<f64>(-0.0, 1.0);
-    test::<f64>(1.0, 2.718281828459045);
+    test::<f64>(1.0, core::f64::consts::E);
     test::<f64>(-1.0, 0.36787944117144233);
     test::<f64>(0.5, 1.6487212707001282);
     test::<f64>(-0.5, 0.6065306597126334);
@@ -947,7 +947,7 @@ fn test_primitive_float_exp_rational() {
         assert_eq!(NiceFloat(primitive_float_exp_rational(&u)), NiceFloat(out));
     }
     test::<f32>("0", 1.0);
-    test::<f32>("1", 2.7182817);
+    test::<f32>("1", core::f32::consts::E);
     test::<f32>("1/2", 1.6487212);
     test::<f32>("1/3", 1.3956125);
     test::<f32>("22/7", 23.169971);
@@ -960,7 +960,7 @@ fn test_primitive_float_exp_rational() {
     test::<f32>("-1000000", 0.0);
 
     test::<f64>("0", 1.0);
-    test::<f64>("1", 2.718281828459045);
+    test::<f64>("1", core::f64::consts::E);
     test::<f64>("1/2", 1.6487212707001282);
     test::<f64>("1/3", 1.3956124250860895);
     test::<f64>("22/7", 23.16997229826248);

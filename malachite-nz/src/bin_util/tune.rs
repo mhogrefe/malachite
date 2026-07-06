@@ -34,15 +34,6 @@ use malachite_nz::natural::arithmetic::div::{
     limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
     limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
 };
-use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
-use malachite_nz::natural::arithmetic::div_mod::{
-    limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_divide_and_conquer,
-    limbs_div_mod_schoolbook, limbs_invert_approx, limbs_invert_approx_scratch_len,
-    limbs_invert_basecase_approx, limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
-};
-use malachite_nz::natural::arithmetic::mul::fft::{
-    mpn_mul_fft_for_tuning, mpn_square_fft_for_tuning,
-};
 use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_barrett, limbs_modular_div_barrett_scratch_len,
     limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_barrett,
@@ -50,8 +41,17 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_mod_schoolbook, limbs_modular_div_schoolbook, limbs_modular_invert,
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
+use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_divide_and_conquer,
+    limbs_div_mod_schoolbook, limbs_invert_approx, limbs_invert_approx_scratch_len,
+    limbs_invert_basecase_approx, limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
+};
 use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
     limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
+};
+use malachite_nz::natural::arithmetic::mul::fft::{
+    mpn_mul_fft_for_tuning, mpn_square_fft_for_tuning,
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::mul::mul_low::{
@@ -1642,16 +1642,8 @@ fn tune_mod_1_shootout() {
         }),
     ];
     for (label, d_mask, kernels) in [
-        (
-            "normalized",
-            !(Limb::MAX >> 1),
-            &norm_kernels[..],
-        ),
-        (
-            "unnormalized (2 leading zeros)",
-            0,
-            &unnorm_kernels[..],
-        ),
+        ("normalized", !(Limb::MAX >> 1), &norm_kernels[..]),
+        ("unnormalized (2 leading zeros)", 0, &unnorm_kernels[..]),
     ] {
         println!("### {label} divisors");
         for n in [2usize, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 128] {
@@ -1663,9 +1655,10 @@ fn tune_mod_1_shootout() {
                             random_primitive_ints(EXAMPLE_SEED.fork(&format!("m1n{k}")))
                                 .take(n)
                                 .collect();
-                        let mut d: Limb = random_primitive_ints(EXAMPLE_SEED.fork(&format!("m1d{k}")))
-                            .next()
-                            .unwrap();
+                        let mut d: Limb =
+                            random_primitive_ints(EXAMPLE_SEED.fork(&format!("m1d{k}")))
+                                .next()
+                                .unwrap();
                         d >>= 2;
                         d |= d_mask | 1;
                         (ns, d)
@@ -1705,11 +1698,7 @@ fn tune_invert_probe() {
         let iters = 1 + ((1u64 << 20) / n as u64);
         for _ in 0..7 {
             let mut f = || {
-                black_box(limbs_invert_approx(
-                    black_box(&mut is),
-                    &ds,
-                    &mut scratch,
-                ));
+                black_box(limbs_invert_approx(black_box(&mut is), &ds, &mut scratch));
             };
             let t = time_batch(&mut f, iters);
             if t < best {

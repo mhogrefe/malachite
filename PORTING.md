@@ -48,10 +48,13 @@ major improvement warrants re-porting.
 5. **Debug bad behavior** by comparing the C and Rust sources side by side. Before adding debug
    printing inside bignum loops, estimate the output volume — it is easy to generate tens of
    gigabytes and crash the machine.
-6. **Refactor to idiomatic Rust**, including renaming variables. The tests make this safe. Run
-   clippy with the relevant features (`test_build`, `bin_build`, `--tests`) — several house lints
-   (`use_self`, `if_not_else`, `missing_const_for_fn`) are stricter than the defaults.
-7. **Document**: prose, LaTeX definition ($f(x,p,m) = \ldots + \varepsilon$ with epsilon bounds),
+6. **Format and lint.** Run `bash ../superfmt.sh` from the crate directory, then clippy with the
+   relevant features (`test_build`, `bin_build`, `--tests`) — several house lints (`use_self`,
+   `if_not_else`, `missing_const_for_fn`) are stricter than the defaults — and
+   `bash additional-lints.sh` for the Dylint house lints. Fix everything mechanical here so the
+   manual refactor can focus on naming and structure.
+7. **Refactor to idiomatic Rust**, including renaming variables. The tests make this safe.
+8. **Document**: prose, LaTeX definition ($f(x,p,m) = \ldots + \varepsilon$ with epsilon bounds),
    special cases, overflow/underflow behavior, worst-case complexity, panic conditions, and
    doctests with *verified* values (run `cargo test -p <crate> --doc <name>`; never guess).
 

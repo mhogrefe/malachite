@@ -417,7 +417,7 @@ impl Float {
             Self(NaN) => (float_nan!(), Equal),
             float_infinity!() => (float_infinity!(), Equal),
             // 2^(-inf) - 1 = -1
-            Self(Infinity { sign: false }) => (Float::from_signed_prec(-1i32, prec).0, Equal),
+            Self(Infinity { sign: false }) => (Self::from_signed_prec(-1i32, prec).0, Equal),
             // 2^(±0) - 1 = ±0
             Self(Zero { sign }) => (Self(Zero { sign: *sign }), Equal),
             _ => power_of_2_x_minus_1_prec_round_normal(self, prec, rm),

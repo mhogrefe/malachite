@@ -64,7 +64,6 @@ pub mod arithmetic {
     pub mod abs;
     pub mod add;
     pub mod agm;
-    pub mod pow;
     pub mod div;
     pub mod exp;
     pub mod exp_x_minus_1;
@@ -87,6 +86,7 @@ pub mod arithmetic {
     pub mod log_base_rational_rational_base;
     pub mod mul;
     pub mod neg;
+    pub mod pow;
     pub mod power_of_2;
     pub mod power_of_2_of_float;
     pub mod power_of_2_x_minus_1;

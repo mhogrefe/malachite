@@ -306,7 +306,7 @@ impl Float {
     /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_round(
-        pow: Float,
+        pow: Self,
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
@@ -398,7 +398,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     pub fn power_of_2_of_float_prec_round_ref(
-        pow: &Float,
+        pow: &Self,
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
@@ -476,7 +476,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn power_of_2_of_float_prec(pow: Float, prec: u64) -> (Self, Ordering) {
+    pub fn power_of_2_of_float_prec(pow: Self, prec: u64) -> (Self, Ordering) {
         Self::power_of_2_of_float_prec_round_ref(&pow, prec, Nearest)
     }
 
@@ -540,7 +540,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn power_of_2_of_float_prec_ref(pow: &Float, prec: u64) -> (Self, Ordering) {
+    pub fn power_of_2_of_float_prec_ref(pow: &Self, prec: u64) -> (Self, Ordering) {
         Self::power_of_2_of_float_prec_round_ref(pow, prec, Nearest)
     }
 
@@ -614,7 +614,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn power_of_2_of_float_round(pow: Float, rm: RoundingMode) -> (Self, Ordering) {
+    pub fn power_of_2_of_float_round(pow: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = pow.significant_bits();
         Self::power_of_2_of_float_prec_round_ref(&pow, prec, rm)
     }
@@ -684,7 +684,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
-    pub fn power_of_2_of_float_round_ref(pow: &Float, rm: RoundingMode) -> (Self, Ordering) {
+    pub fn power_of_2_of_float_round_ref(pow: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = pow.significant_bits();
         Self::power_of_2_of_float_prec_round_ref(pow, prec, rm)
     }
@@ -911,7 +911,7 @@ impl Float {
         if let Ok(n) = Integer::try_from(x) {
             return if let Ok(pow) = i64::try_from(&n) {
                 // `power_of_2_prec_round` handles its own overflow and underflow.
-                Float::power_of_2_prec_round(pow, prec, rm)
+                Self::power_of_2_prec_round(pow, prec, rm)
             } else if x.sign() == Greater {
                 // x is too large to fit in an i64, so 2^x overflows.
                 exp_overflow(prec, rm)
@@ -937,7 +937,7 @@ impl Float {
     }
 }
 
-impl PowerOf2<Float> for Float {
+impl PowerOf2<Self> for Float {
     /// Computes $2^x$, where $x$ is a [`Float`], taking it by value.
     ///
     /// If the output has a precision, it is the precision of the input. If the power is equidistant
@@ -987,12 +987,12 @@ impl PowerOf2<Float> for Float {
     /// );
     /// ```
     #[inline]
-    fn power_of_2(pow: Float) -> Float {
-        Float::power_of_2_of_float_round(pow, Nearest).0
+    fn power_of_2(pow: Self) -> Self {
+        Self::power_of_2_of_float_round(pow, Nearest).0
     }
 }
 
-impl PowerOf2<&Float> for Float {
+impl PowerOf2<&Self> for Float {
     /// Computes $2^x$, where $x$ is a [`Float`], taking it by reference.
     ///
     /// If the output has a precision, it is the precision of the input. If the power is equidistant
@@ -1042,8 +1042,8 @@ impl PowerOf2<&Float> for Float {
     /// );
     /// ```
     #[inline]
-    fn power_of_2(pow: &Float) -> Float {
-        Float::power_of_2_of_float_round_ref(pow, Nearest).0
+    fn power_of_2(pow: &Self) -> Self {
+        Self::power_of_2_of_float_round_ref(pow, Nearest).0
     }
 }
 

@@ -1634,7 +1634,7 @@ impl Float {
         assert_ne!(prec, 0);
         if *x == 0u32 {
             // exp(0) = 1, exactly.
-            return (Float::one_prec(prec), Equal);
+            return (Self::one_prec(prec), Equal);
         }
         exp_rational_helper(x, prec, rm)
     }
