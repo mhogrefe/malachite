@@ -159,6 +159,22 @@ family has a receiver-by-reference sibling (`op_ref`, `op_ref_val`, `op_ref_ref`
 references. Cloning a bignum can copy an arbitrarily large value; the `_val`/`_ref` families and
 the reference operator impls exist precisely to avoid that.
 
+### `manual_rational_significant_bits`
+
+Flags `x.numerator_ref().significant_bits() + x.denominator_ref().significant_bits()` (in either
+order, and with the `to_numerator`/`to_denominator` accessors too) for a [`Rational`] `x`. That sum
+is exactly what `Rational::significant_bits` returns, in constant time; write `x.significant_bits()`.
+
+### `redundant_from_in_literal_comparison`
+
+Flags widening a primitive integer with `from` only to compare the result with an integer literal,
+like `i64::from(x) <= 32`. Because `from` is an exact, value-preserving conversion, dropping it
+leaves the comparison unchanged as long as the literal is representable in the source type: `x <= 32`
+(the literal takes the source type). Fires for every comparison operator and either operand order,
+but not when the literal is out of the source type's range (then the conversion is load-bearing) or
+when the other operand is not a literal. Distinct from `redundant_from_in_comparison`, which is about
+comparing a *bignum* with `Bignum::from(primitive)`.
+
 ### `use_square`
 
 Flags multiplying a bignum by itself (`&x * &x`) and raising one to the power of 2 (`x.pow(2)`,

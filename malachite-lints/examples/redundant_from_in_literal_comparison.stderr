@@ -1,0 +1,22 @@
+error: `from` is redundant in a comparison with a representable literal
+  --> $DIR/redundant_from_in_literal_comparison.rs:3:13
+   |
+LL |     let a = i64::from(x) <= 32;
+   |             ^^^^^^^^^^^^ help: compare the source value directly: `x`
+   |
+   = note: `#[deny(redundant_from_in_literal_comparison)]` on by default
+
+error: `from` is redundant in a comparison with a representable literal
+  --> $DIR/redundant_from_in_literal_comparison.rs:5:19
+   |
+LL |     let b = 100 > u64::from(y);
+   |                   ^^^^^^^^^^^^ help: compare the source value directly: `y`
+
+error: `from` is redundant in a comparison with a representable literal
+  --> $DIR/redundant_from_in_literal_comparison.rs:6:13
+   |
+LL |     let c = i64::from(x) == -7;
+   |             ^^^^^^^^^^^^ help: compare the source value directly: `x`
+
+error: aborting due to 3 previous errors
+

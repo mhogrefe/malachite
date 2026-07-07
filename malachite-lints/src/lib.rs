@@ -23,8 +23,10 @@ mod clone_with_ref_variant;
 mod compare_with_power_of_2;
 mod let_tuple_underscore_to_field;
 mod long_lines;
+mod manual_rational_significant_bits;
 mod mul_div_by_power_of_2;
 mod redundant_from_in_comparison;
+mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
 mod runtime_literal_conversion;
 mod use_assign_variant;
@@ -228,8 +230,10 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
+        manual_rational_significant_bits::MANUAL_RATIONAL_SIGNIFICANT_BITS,
         mul_div_by_power_of_2::MUL_DIV_BY_POWER_OF_2,
         redundant_from_in_comparison::REDUNDANT_FROM_IN_COMPARISON,
+        redundant_from_in_literal_comparison::REDUNDANT_FROM_IN_LITERAL_COMPARISON,
         redundant_nearest::REDUNDANT_NEAREST,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         use_assign_variant::USE_ASSIGN_VARIANT,
@@ -246,9 +250,15 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store
         .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));
+    lint_store.register_late_pass(|_| {
+        Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
+    });
     lint_store.register_late_pass(|_| Box::new(mul_div_by_power_of_2::MulDivByPowerOf2));
     lint_store
         .register_late_pass(|_| Box::new(redundant_from_in_comparison::RedundantFromInComparison));
+    lint_store.register_late_pass(|_| {
+        Box::new(redundant_from_in_literal_comparison::RedundantFromInLiteralComparison)
+    });
     lint_store.register_late_pass(|_| Box::new(redundant_nearest::RedundantNearest));
     lint_store
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));

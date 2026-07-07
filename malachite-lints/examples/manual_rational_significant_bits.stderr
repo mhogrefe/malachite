@@ -1,0 +1,22 @@
+error: this is `Rational::significant_bits`
+  --> $DIR/manual_rational_significant_bits.rs:6:13
+   |
+LL |     let a = x.numerator_ref().significant_bits() + x.denominator_ref().significant_bits();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use it directly: `x.significant_bits()`
+   |
+   = note: `#[deny(manual_rational_significant_bits)]` on by default
+
+error: this is `Rational::significant_bits`
+  --> $DIR/manual_rational_significant_bits.rs:8:13
+   |
+LL |     let b = x.denominator_ref().significant_bits() + x.numerator_ref().significant_bits();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use it directly: `x.significant_bits()`
+
+error: this is `Rational::significant_bits`
+  --> $DIR/manual_rational_significant_bits.rs:10:13
+   |
+LL |     let c = x.to_numerator().significant_bits() + x.to_denominator().significant_bits();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use it directly: `x.significant_bits()`
+
+error: aborting due to 3 previous errors
+

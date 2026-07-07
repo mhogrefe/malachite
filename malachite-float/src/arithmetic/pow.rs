@@ -2968,8 +2968,8 @@ impl Float {
         }
         // Small integer y with a small base: materialize x^y as an exact Rational;
         // `from_rational_prec_round` handles all rounding, including at the range boundaries.
-        let nbits = x.numerator_ref().significant_bits() + x.denominator_ref().significant_bits();
-        if y_is_integer && i64::from(y.get_exponent().unwrap()) <= 32 {
+        let nbits = x.significant_bits();
+        if y_is_integer && y.get_exponent().unwrap() <= 32 {
             let z = i64::rounding_from(y, Nearest).0;
             if z.unsigned_abs().saturating_mul(nbits) <= max(65536, prec << 2) {
                 return Self::from_rational_prec_round(x.pow(z), prec, rm);
@@ -2987,11 +2987,10 @@ impl Float {
         // of 1 only when it lies in `(1/2, 2)`, i.e. `fl` is 0 or -1; the exact subtraction is
         // skipped otherwise.
         let sliver_fld = if fl == 0 || fl == -1 {
-            let d = x - Rational::ONE;
-            if d == 0u32 {
+            if *x == 1u32 {
                 None
             } else {
-                Some(d.floor_log_base_2_abs())
+                Some((x - Rational::ONE).floor_log_base_2_abs())
             }
         } else {
             None
@@ -3668,3 +3667,4 @@ impl Float {
         Self::rational_pow_prec_round_ref_ref(x, y, prec, Nearest)
     }
 }
+
