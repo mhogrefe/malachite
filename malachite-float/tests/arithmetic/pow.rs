@@ -11,16 +11,19 @@ use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow, PowAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::arithmetic::pow::{primitive_float_pow, primitive_float_rational_pow};
+use malachite_float::arithmetic::pow::{
+    primitive_float_pow, primitive_float_pow_integer, primitive_float_rational_pow,
+};
 use malachite_float::test_util::arithmetic::pow::{
-    rug_pow, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
+    rug_pow, rug_pow_integer, rug_pow_integer_prec, rug_pow_integer_prec_round,
+    rug_pow_integer_round, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -28,12 +31,15 @@ use malachite_float::test_util::common::{
 use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_9,
     float_float_unsigned_rounding_mode_quadruple_gen_var_10, float_float_unsigned_triple_gen_var_1,
-    float_pair_gen, float_pair_gen_var_10,
+    float_integer_pair_gen, float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
+    float_integer_unsigned_triple_gen_var_1, float_pair_gen, float_pair_gen_var_10,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
     float_rational_unsigned_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
+use malachite_nz::test_util::generators::integer_primitive_float_pair_gen;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use std::cmp::Ordering::{self, *};
@@ -1332,4 +1338,540 @@ where
 #[test]
 fn primitive_float_rational_pow_properties() {
     apply_fn_to_primitive_floats!(primitive_float_rational_pow_properties_helper);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn pow_integer_prec_round_properties_helper(
+    x: Float,
+    z: Integer,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    if rm == Exact {
+        // Exact is only allowed when the result is exactly representable; otherwise panic.
+        let (p, o) = x.pow_integer_prec_round_ref_ref(&z, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = x.pow_integer_prec_round_ref_ref(&z, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(x.pow_integer_prec_round_ref_ref(&z, prec, Exact));
+        }
+        return;
+    }
+    let (p, o) = x.clone().pow_integer_prec_round(z.clone(), prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = x.clone().pow_integer_prec_round_val_ref(&z, prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = x.pow_integer_prec_round_ref_val(z.clone(), prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = x.pow_integer_prec_round_ref_ref(&z, prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.pow_integer_prec_round_assign(z.clone(), prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.pow_integer_prec_round_assign_ref(&z, prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_p, rug_o) = rug_pow_integer_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Integer::from(&z),
+            prec,
+            rug_rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if p.is_normal() && !extreme {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn pow_integer_prec_round_properties() {
+    float_integer_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(x, z, prec, rm)| {
+            pow_integer_prec_round_properties_helper(x, z, prec, rm, false);
+        },
+    );
+
+    float_integer_unsigned_rounding_mode_quadruple_gen_var_2().test_properties(
+        |(x, z, prec, rm)| {
+            pow_integer_prec_round_properties_helper(x, z, prec, rm, true);
+        },
+    );
+}
+
+#[test]
+fn pow_integer_prec_properties() {
+    float_integer_unsigned_triple_gen_var_1::<u64>().test_properties(|(x, z, prec)| {
+        let (p, o) = x.clone().pow_integer_prec(z.clone(), prec);
+        assert!(p.is_valid());
+        let (p_alt, o_alt) = x.clone().pow_integer_prec_val_ref(&z, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_integer_prec_ref_val(z.clone(), prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_integer_prec_ref_ref(&z, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_integer_prec_round_ref_ref(&z, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (rug_p, rug_o) =
+            rug_pow_integer_prec(&rug::Float::exact_from(&x), &rug::Integer::from(&z), prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+        assert_eq!(rug_o, o);
+    });
+}
+
+#[test]
+fn pow_integer_round_properties() {
+    float_integer_pair_gen().test_properties(|(x, z)| {
+        for rm in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p, o) = x.clone().pow_integer_round(z.clone(), rm);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = x.clone().pow_integer_round_val_ref(&z, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = x.pow_integer_round_ref_val(z.clone(), rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = x.pow_integer_round_ref_ref(&z, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+
+            let mut x_alt = x.clone();
+            let o_alt = x_alt.pow_integer_round_assign(z.clone(), rm);
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let mut x_alt = x.clone();
+            let o_alt = x_alt.pow_integer_round_assign_ref(&z, rm);
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_p, rug_o) = rug_pow_integer_round(
+                    &rug::Float::exact_from(&x),
+                    &rug::Integer::from(&z),
+                    rug_rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_p)),
+                    ComparableFloatRef(&p)
+                );
+                assert_eq!(rug_o, o);
+            }
+        }
+    });
+}
+
+#[test]
+fn pow_integer_properties() {
+    float_integer_pair_gen().test_properties(|(x, z)| {
+        let p = x.clone().pow(z.clone());
+        assert!(p.is_valid());
+        let p_alt = x.clone().pow(&z);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        let p_alt = (&x).pow(z.clone());
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        let p_alt = (&x).pow(&z);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+
+        let mut x_alt = x.clone();
+        x_alt.pow_assign(z.clone());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+        let mut x_alt = x.clone();
+        x_alt.pow_assign(&z);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+
+        // The trait rounds to the nearest value at the base's precision.
+        let (p_alt, _) = x.pow_integer_round_ref_ref(&z, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+
+        let rug_p = rug_pow_integer(&rug::Float::exact_from(&x), &rug::Integer::from(&z));
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+    });
+}
+
+#[test]
+fn test_pow_integer() {
+    let test = |s, s_hex, z: i64, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let (p, o) = x.pow_integer_prec_round(Integer::from(z), prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    test(
+        "3.0",
+        "0x3.0#2",
+        5,
+        20,
+        Nearest,
+        "243.0",
+        "0xf3.000#20",
+        Equal,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        10,
+        10,
+        Nearest,
+        "1024.0",
+        "0x400.0#10",
+        Equal,
+    );
+    // - negative base, odd exponent gives a negative result
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        3,
+        10,
+        Nearest,
+        "-8.0",
+        "-0x8.00#10",
+        Equal,
+    );
+    // - negative base, even exponent gives a positive result
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        4,
+        10,
+        Nearest,
+        "16.0",
+        "0x10.00#10",
+        Equal,
+    );
+    test("1.5", "0x1.8#2", 2, 10, Nearest, "2.25", "0x2.40#10", Equal);
+    // - inexact, rounded down
+    test(
+        "3.0",
+        "0x3.0#2",
+        -2,
+        10,
+        Floor,
+        "0.1111",
+        "0x0.1c70#10",
+        Less,
+    );
+    // - inexact, rounded up
+    test(
+        "3.0",
+        "0x3.0#2",
+        -2,
+        10,
+        Ceiling,
+        "0.1112",
+        "0x0.1c78#10",
+        Greater,
+    );
+    test("3.0", "0x3.0#2", 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test(
+        "3.0",
+        "0x3.0#2",
+        5,
+        2,
+        Ceiling,
+        "3.0e2",
+        "0x1.0E+2#2",
+        Greater,
+    );
+    // - negative exponent, reciprocal power
+    test(
+        "-3.0",
+        "-0x3.0#2",
+        -1,
+        10,
+        Nearest,
+        "-0.3335",
+        "-0x0.556#10",
+        Less,
+    );
+    // - zero exponent gives 1 for any base
+    test("5.0", "0x5.0#3", 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(
+        "-5.0",
+        "-0x5.0#3",
+        0,
+        10,
+        Nearest,
+        "1.0",
+        "0x1.000#10",
+        Equal,
+    );
+    // - |base| == 1: sign follows exponent parity
+    test("-1.0", "-0x1.0#1", 7, 5, Nearest, "-1.0", "-0x1.0#5", Equal);
+    test("-1.0", "-0x1.0#1", 8, 5, Nearest, "1.0", "0x1.0#5", Equal);
+    // - overflow
+    test(
+        "2.0",
+        "0x2.0#3",
+        100000000000,
+        5,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - underflow to zero (Nearest)
+    test(
+        "2.0",
+        "0x2.0#3",
+        -100000000000,
+        5,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - underflow to smallest positive (Up)
+    test(
+        "2.0",
+        "0x2.0#3",
+        -100000000000,
+        5,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#5",
+        Greater,
+    );
+}
+
+#[test]
+fn test_pow_integer_special_values() {
+    let test = |base: Float, z: i64, out: &str, out_hex: &str| {
+        let (p, o) = base.pow_integer_prec_round(Integer::from(z), 1, Nearest);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, Equal);
+    };
+    test(Float::NAN, 0, "1.0", "0x1.0#1");
+    test(Float::NAN, 2, "NaN", "NaN");
+    test(Float::NAN, 3, "NaN", "NaN");
+    test(Float::NAN, -2, "NaN", "NaN");
+    test(Float::NAN, -3, "NaN", "NaN");
+
+    test(Float::INFINITY, 0, "1.0", "0x1.0#1");
+    test(Float::INFINITY, 2, "Infinity", "Infinity");
+    test(Float::INFINITY, 3, "Infinity", "Infinity");
+    test(Float::INFINITY, -2, "0.0", "0x0.0");
+    test(Float::INFINITY, -3, "0.0", "0x0.0");
+
+    test(Float::NEGATIVE_INFINITY, 0, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_INFINITY, 2, "Infinity", "Infinity");
+    test(Float::NEGATIVE_INFINITY, 3, "-Infinity", "-Infinity");
+    test(Float::NEGATIVE_INFINITY, -2, "0.0", "0x0.0");
+    test(Float::NEGATIVE_INFINITY, -3, "-0.0", "-0x0.0");
+
+    test(Float::ZERO, 0, "1.0", "0x1.0#1");
+    test(Float::ZERO, 2, "0.0", "0x0.0");
+    test(Float::ZERO, 3, "0.0", "0x0.0");
+    test(Float::ZERO, -2, "Infinity", "Infinity");
+    test(Float::ZERO, -3, "Infinity", "Infinity");
+
+    test(Float::NEGATIVE_ZERO, 0, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ZERO, 2, "0.0", "0x0.0");
+    test(Float::NEGATIVE_ZERO, 3, "-0.0", "-0x0.0");
+    test(Float::NEGATIVE_ZERO, -2, "Infinity", "Infinity");
+    test(Float::NEGATIVE_ZERO, -3, "-Infinity", "-Infinity");
+
+    test(Float::ONE, 0, "1.0", "0x1.0#1");
+    test(Float::ONE, 2, "1.0", "0x1.0#1");
+    test(Float::ONE, 3, "1.0", "0x1.0#1");
+    test(Float::ONE, -2, "1.0", "0x1.0#1");
+    test(Float::ONE, -3, "1.0", "0x1.0#1");
+
+    test(Float::NEGATIVE_ONE, 0, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ONE, 2, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ONE, 3, "-1.0", "-0x1.0#1");
+    test(Float::NEGATIVE_ONE, -2, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ONE, -3, "-1.0", "-0x1.0#1");
+}
+
+#[test]
+fn test_pow_integer_extreme() {
+    let max_e = i64::from(Float::MAX_EXPONENT);
+    let min_e = i64::from(Float::MIN_EXPONENT);
+    let test = |base: Float, z: i64, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let (p, o) = base.pow_integer_prec_round(Integer::from(z), prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // 2^(MAX_EXPONENT - 1) is the largest finite power of 2; raised to 1 it is itself
+    test(
+        Float::power_of_2(max_e - 1),
+        1,
+        10,
+        Nearest,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    // squaring it overflows
+    test(
+        Float::power_of_2(max_e - 1),
+        2,
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // overflow with Down gives the largest finite value
+    test(
+        Float::power_of_2(max_e - 1),
+        2,
+        5,
+        Down,
+        "too_big",
+        "0x7.cE+268435455#5",
+        Less,
+    );
+    // 2^MIN_EXPONENT squared underflows
+    test(
+        Float::power_of_2(min_e),
+        2,
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // underflow with Up gives the smallest positive value
+    test(
+        Float::power_of_2(min_e),
+        2,
+        5,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#5",
+        Greater,
+    );
+    // a negative exponent on the smallest value overflows
+    test(
+        Float::power_of_2(min_e),
+        -1,
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_pow_integer() {
+    fn test<T: PrimitiveFloat>(x: T, z: i64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_pow_integer(x, &Integer::from(z))),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 0, 1.0);
+    test::<f32>(f32::NAN, 2, f32::NAN);
+    test::<f32>(f32::NAN, 3, f32::NAN);
+    test::<f32>(f32::NAN, -2, f32::NAN);
+    test::<f32>(f32::NAN, -3, f32::NAN);
+
+    test::<f32>(f32::INFINITY, 0, 1.0);
+    test::<f32>(f32::INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::INFINITY, 3, f32::INFINITY);
+    test::<f32>(f32::INFINITY, -2, 0.0);
+    test::<f32>(f32::INFINITY, -3, 0.0);
+
+    test::<f32>(f32::NEGATIVE_INFINITY, 0, 1.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 3, f32::NEGATIVE_INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, -2, 0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, -3, -0.0);
+
+    test::<f32>(0.0, 0, 1.0);
+    test::<f32>(0.0, 2, 0.0);
+    test::<f32>(0.0, 3, 0.0);
+    test::<f32>(0.0, -2, f32::INFINITY);
+    test::<f32>(0.0, -3, f32::INFINITY);
+
+    test::<f32>(-0.0, 0, 1.0);
+    test::<f32>(-0.0, 2, 0.0);
+    test::<f32>(-0.0, 3, -0.0);
+    test::<f32>(-0.0, -2, f32::INFINITY);
+    test::<f32>(-0.0, -3, f32::NEGATIVE_INFINITY);
+
+    test::<f32>(1.0, 0, 1.0);
+    test::<f32>(1.0, 2, 1.0);
+    test::<f32>(1.0, 3, 1.0);
+    test::<f32>(1.0, -2, 1.0);
+    test::<f32>(1.0, -3, 1.0);
+
+    test::<f32>(-1.0, 0, 1.0);
+    test::<f32>(-1.0, 2, 1.0);
+    test::<f32>(-1.0, 3, -1.0);
+    test::<f32>(-1.0, -2, 1.0);
+    test::<f32>(-1.0, -3, -1.0);
+
+    test::<f32>(3.0, 5, 243.0);
+    test::<f32>(2.0, 10, 1024.0);
+    test::<f32>(-2.0, 3, -8.0);
+    test::<f32>(2.0, -3, 0.125);
+    test::<f32>(2.0, 200, f32::INFINITY);
+    test::<f32>(0.5, 200, 0.0);
+
+    test::<f64>(3.0, 5, 243.0);
+    test::<f64>(2.0, -3, 0.125);
+    test::<f64>(1.5, 100, 4.065611775352152e17);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_pow_integer_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    integer_primitive_float_pair_gen::<T>().test_properties(|(z, x)| {
+        primitive_float_pow_integer::<T>(x, &z);
+    });
+}
+
+#[test]
+fn primitive_float_pow_integer_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_pow_integer_properties_helper);
 }

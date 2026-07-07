@@ -49,3 +49,32 @@ pub fn rug_pow(x: &rug::Float, y: &rug::Float) -> rug::Float {
     )
     .0
 }
+
+pub fn rug_pow_integer_prec_round(
+    x: &rug::Float,
+    y: &rug::Integer,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut power = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = power.assign_round(Pow::pow(x, y), rm);
+    (power, o)
+}
+
+#[inline]
+pub fn rug_pow_integer_round(
+    x: &rug::Float,
+    y: &rug::Integer,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    rug_pow_integer_prec_round(x, y, rug_float_significant_bits(x), rm)
+}
+
+#[inline]
+pub fn rug_pow_integer_prec(x: &rug::Float, y: &rug::Integer, prec: u64) -> (rug::Float, Ordering) {
+    rug_pow_integer_prec_round(x, y, prec, Round::Nearest)
+}
+
+pub fn rug_pow_integer(x: &rug::Float, y: &rug::Integer) -> rug::Float {
+    rug_pow_integer_prec_round(x, y, rug_float_significant_bits(x), Round::Nearest).0
+}

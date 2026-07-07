@@ -1629,6 +1629,80 @@ pub fn exhaustive_float_integer_pair_gen_var_2() -> It<(Float, Integer)> {
     ))
 }
 
+// -- (Float, Integer, PrimitiveUnsigned) --
+
+pub fn exhaustive_float_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(Float, Integer, T)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_floats(),
+        exhaustive_integers(),
+        exhaustive_positive_primitive_ints::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// All `(Float, Integer, T)` where the `Float` is extreme and the `T` is unsigned, small, and
+// positive.
+pub fn exhaustive_float_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> It<(Float, Integer, T)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_extreme_floats(),
+        exhaustive_integers(),
+        exhaustive_positive_primitive_ints::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// -- (Float, Integer, PrimitiveUnsigned, RoundingMode) --
+
+// Whether `(x, z, prec, rm)` is a valid input to `Float::pow_integer_prec_round`: `Exact` is only
+// allowed when the power really is exact at the given precision.
+pub fn pow_integer_prec_round_valid(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.pow_integer_prec_round_ref_ref(z, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_integer_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Float, Integer, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_integers(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, z, prec, rm)| pow_integer_prec_round_valid(x, z, *prec, *rm)),
+    )
+}
+
+// All `(Float, Integer, u64, RoundingMode)` valid for `Float::pow_integer_prec_round`, where the
+// `Float` is extreme.
+pub fn exhaustive_float_integer_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Float, Integer, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_extreme_floats(),
+                exhaustive_integers(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, z, prec, rm)| pow_integer_prec_round_valid(x, z, *prec, *rm)),
+    )
+}
+
 // -- (Float, Integer, Integer) --
 
 pub fn exhaustive_float_integer_integer_triple_gen() -> It<(Float, Integer, Integer)> {

@@ -422,6 +422,30 @@ pub fn pair_float_integer_max_complexity_bucketer<'a>(
     }
 }
 
+pub fn triple_1_2_float_integer_max_complexity_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, Integer, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| {
+            usize::exact_from(max(x.complexity(), y.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn quadruple_1_2_float_integer_max_complexity_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, Integer, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _, _)| {
+            usize::exact_from(max(x.complexity(), y.significant_bits()))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
 pub fn pair_float_natural_max_complexity_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

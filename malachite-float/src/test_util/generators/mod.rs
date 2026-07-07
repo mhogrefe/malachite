@@ -1198,6 +1198,52 @@ pub fn float_integer_pair_gen_var_2() -> Generator<(Float, Integer)> {
     )
 }
 
+// -- (Float, Integer, PrimitiveUnsigned) --
+
+pub fn float_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Float, Integer, T)> {
+    Generator::new(
+        &exhaustive_float_integer_unsigned_triple_gen_var_1,
+        &random_float_integer_unsigned_triple_gen_var_1,
+        &special_random_float_integer_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Float, Integer, T)` where the `Float` is extreme and the `T` is unsigned, small, and
+// positive.
+pub fn float_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(Float, Integer, T)> {
+    Generator::new(
+        &exhaustive_float_integer_unsigned_triple_gen_var_2,
+        &random_float_integer_unsigned_triple_gen_var_1,
+        &special_random_float_integer_unsigned_triple_gen_var_1,
+    )
+}
+
+// -- (Float, Integer, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Float, Integer, u64, RoundingMode)` that are valid inputs to
+// `Float::pow_integer_prec_round`.
+pub fn float_integer_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Float, Integer, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// All `(Float, Integer, u64, RoundingMode)` valid for `Float::pow_integer_prec_round`, where the
+// `Float` is extreme.
+pub fn float_integer_unsigned_rounding_mode_quadruple_gen_var_2()
+-> Generator<(Float, Integer, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
+        &random_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
 // -- (Float, Integer, Integer) --
 
 pub fn float_integer_integer_triple_gen() -> Generator<(Float, Integer, Integer)> {
